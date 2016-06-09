@@ -1,2 +1,0 @@
-B:\Code\DyingAndMore\DyingAndMore\obj\x86\Debug\DyingAndMore.csprojResolveAssemblyReference.cache
-B:\Code\DyingAndMore\DyingAndMore\bin\Windows\x86\Debug\DyingAndMore.exe.config
