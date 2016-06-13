@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DyingAndMore", "DyingAndMore\DyingAndMore.csproj", "{963BDA37-96F7-463E-9CD0-3F256239E90F}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -24,6 +24,7 @@ Global
 		{963BDA37-96F7-463E-9CD0-3F256239E90F}.Debug|x64.ActiveCfg = Debug|x64
 		{963BDA37-96F7-463E-9CD0-3F256239E90F}.Debug|x64.Build.0 = Debug|x64
 		{963BDA37-96F7-463E-9CD0-3F256239E90F}.Debug|x86.ActiveCfg = Debug|x86
+		{963BDA37-96F7-463E-9CD0-3F256239E90F}.Debug|x86.Build.0 = Debug|x86
 		{963BDA37-96F7-463E-9CD0-3F256239E90F}.Release|Any CPU.ActiveCfg = Release|x86
 		{963BDA37-96F7-463E-9CD0-3F256239E90F}.Release|x64.ActiveCfg = Release|x64
 		{963BDA37-96F7-463E-9CD0-3F256239E90F}.Release|x64.Build.0 = Release|x64
