@@ -9,6 +9,20 @@ namespace DyingAndMore.Entities
         public float MaxSpeed { get; set; } = 10;
         public float MoveForce { get; set; } = 60;
 
+        Components.HealthComponent health;
+
+        public Actor()
+        {
+            health = AddComponent<Components.HealthComponent>();
+        }
+
+        public override void Load()
+        {
+            base.Load();
+
+            health.MaxHealth = 100;
+        }
+
         /// <summary>
         /// The current faction. Typically used by the AI to determine enemies
         /// </summary>

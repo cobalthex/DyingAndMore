@@ -7,28 +7,65 @@ namespace Takai.Game
     /// </summary>
     public class Entity
     {
-        internal System.Collections.Generic.Dictionary<System.Type, Component> components;
-            
+        /// <summary>
+        /// Generator for unique entity IDs
+        /// </summary>
+        internal uint EntIdCounter = 1;
+
+        internal System.Collections.Generic.Dictionary<System.Type, Component> components = new System.Collections.Generic.Dictionary<System.Type, Component>();
+
+        /// <summary>
+        /// A unique ID for this entity
+        /// </summary>
+        public uint Id { get; internal set; }
+
+        /// <summary>
+        /// Determines if the entity is thinking (alive)
+        /// </summary>
+        public bool IsEnabled { get; set; } = true;
+
         public Vector2 Position { get; set; } = Vector2.Zero;
         public Vector2 Direction { get; set; } = Vector2.UnitX; //should remain normalized
         public float FieldOfView { get; set; } = MathHelper.PiOver4 * 3;
 
+        public MapSection Section { get; internal set; } = null;
+
         public Entity()
         {
-            components = new System.Collections.Generic.Dictionary<System.Type, Component>();
+            Id = EntIdCounter;
+            EntIdCounter++;
         }
-
-        public void AddComponent<TComponent>() where TComponent : Component, new()
+        
+        /// <summary>
+        /// Add a component
+        /// </summary>
+        /// <typeparam name="TComponent">The type of component to add</typeparam>
+        /// <returns>The component added</returns>
+        public TComponent AddComponent<TComponent>() where TComponent : Component, new()
         {
-            components.Add(typeof(TComponent), new TComponent { Entity = this });
+            if (!components.ContainsKey(typeof(TComponent)))
+                components.Add(typeof(TComponent), new TComponent { Entity = this });
+            return GetComponent<TComponent>();
         }
+        /// <summary>
+        /// Remove a component
+        /// </summary>
+        /// <typeparam name="TComponent">The type of component to remove</typeparam>
+        /// <returns>True if the component was removed, false if not (for example, if the component did not exist)</returns>
         public bool RemoveComponent<TComponent>() where TComponent : Component
         {
             return components.Remove(typeof(TComponent));
         }
+        /// <summary>
+        /// Get a component
+        /// </summary>
+        /// <typeparam name="TComponent">The type of component to search for</typeparam>
+        /// <returns>The component or null if not found</returns>
         public TComponent GetComponent<TComponent>() where TComponent : Component
         {
-            return (TComponent)components[typeof(TComponent)];
+            Component tc = null;
+            components.TryGetValue(typeof(TComponent), out tc);
+            return (TComponent)tc;
         }
 
         /// <summary>

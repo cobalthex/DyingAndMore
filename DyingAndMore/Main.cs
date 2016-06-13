@@ -94,7 +94,7 @@ namespace DyingAndMore
 #endif
             #endregion
 
-            GraphicsDevice.BlendState = Microsoft.Xna.Framework.Graphics.BlendState.NonPremultiplied;
+            GraphicsDevice.BlendState = Microsoft.Xna.Framework.Graphics.BlendState.AlphaBlend;
 
             //load all included assets
             Takai.AssetManager asm = new Takai.AssetManager(GraphicsDevice, "Data\\");
