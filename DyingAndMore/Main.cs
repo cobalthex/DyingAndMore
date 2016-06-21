@@ -2,10 +2,12 @@
 //Copyright Dejitaru Forge 2012
 
 using Takai.States;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 //empty class to test on pc with xbox settings
 #if XBOX && WINDOWS
-namespace Microsoft.Xna.Framework.GamerServices { class Guide { public static bool IsTrialMode = false; public static void ShowMarketplace(PlayerIndex p) { } } }
+namespace GamerServices { class Guide { public static bool IsTrialMode = false; public static void ShowMarketplace(PlayerIndex p) { } } }
 #endif
 
 namespace DyingAndMore
@@ -39,7 +41,7 @@ namespace DyingAndMore
     /// </summary>
     public class DyingAndMoreGame : Microsoft.Xna.Framework.Game
     {
-        Microsoft.Xna.Framework.GraphicsDeviceManager gdm;
+        GraphicsDeviceManager gdm;
 
         bool useCustomCursor = true;
         bool takingScreenshot = false;
@@ -50,21 +52,21 @@ namespace DyingAndMore
         public DyingAndMoreGame()
         {
 #if XBOX
-            Components.Add(new Microsoft.Xna.Framework.GamerServices.GamerServicesComponent(this));
+            Components.Add(new GamerServices.GamerServicesComponent(this));
 #endif
 
-            gdm = new Microsoft.Xna.Framework.GraphicsDeviceManager(this);
+            gdm = new GraphicsDeviceManager(this);
             gdm.DeviceCreated += new System.EventHandler<System.EventArgs>(gdm_DeviceCreated);
             gdm.PreferMultiSampling = true;
 
 #if WINDOWS_PHONE
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 30f); //30 fps
-            gdm.SupportedOrientations = Microsoft.Xna.Framework.DisplayOrientation.LandscapeLeft | Microsoft.Xna.Framework.DisplayOrientation.LandscapeRight;
+            gdm.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
             gdm.IsFullScreen = true;
 #elif WINDOWS
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps
-            gdm.PreferredBackBufferWidth = 800;
-            gdm.PreferredBackBufferHeight = 600;
+            gdm.PreferredBackBufferWidth = 1280;
+            gdm.PreferredBackBufferHeight = 800;
             IsMouseVisible = true;
 #elif XBOX
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps
@@ -93,15 +95,14 @@ namespace DyingAndMore
             }
 #endif
             #endregion
+            
+            GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
-            GraphicsDevice.BlendState = Microsoft.Xna.Framework.Graphics.BlendState.AlphaBlend;
+            Takai.AssetManager.Initialize(GraphicsDevice, "Data\\");
 
-            //load all included assets
-            Takai.AssetManager asm = new Takai.AssetManager(GraphicsDevice, "Data\\");
-
-            StateManager.Initialize(this, asm);
+            StateManager.Initialize(this);
             StateManager.PushState(new Game());
-           
+
             base.Initialize();
         }
 
@@ -110,28 +111,27 @@ namespace DyingAndMore
             StateManager.Exit();
         }
 
-        protected override void Update(Microsoft.Xna.Framework.GameTime gameTime)
+        protected override void Update(GameTime gameTime)
         {
+#if WINDOWS
+            if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.F12))
+            takingScreenshot = true;
+#endif
+
             StateManager.Update(gameTime);
             Takai.Input.InputCatalog.Update();
             Takai.Input.TouchAbstractor.Update();
-
-#if WINDOWS
-            if (Takai.Input.InputCatalog.IsKeyClick(Microsoft.Xna.Framework.Input.Keys.F12))
-                takingScreenshot = true;
-#endif
         }
 
-        protected override void Draw(Microsoft.Xna.Framework.GameTime gameTime)
+        protected override void Draw(GameTime gameTime)
         {
 #if WINDOWS
             if (takingScreenshot)
             {
                 takingScreenshot = false;
 
-                Microsoft.Xna.Framework.Graphics.RenderTarget2D rt = new Microsoft.Xna.Framework.Graphics.RenderTarget2D(GraphicsDevice,
-                    GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false, Microsoft.Xna.Framework.Graphics.SurfaceFormat.Color,
-                    Microsoft.Xna.Framework.Graphics.DepthFormat.Depth24Stencil8);
+                RenderTarget2D rt = new RenderTarget2D(GraphicsDevice,
+                    GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
                 GraphicsDevice.SetRenderTarget(rt);
                 StateManager.Draw(gameTime);

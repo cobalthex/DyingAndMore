@@ -138,7 +138,7 @@ namespace Takai.Graphics
         /// <param name="Image">The image to use</param>
         /// <param name="Bounds">The position and size of the image</param>
         /// <param name="ClipRect">The portion of the image to use</param>
-        public Graphic(Texture2D Image, Rectangle? Bounds, Rectangle? ClipRect, TweenStyle TweenStyle = TweenStyle.Consecutive)
+        public Graphic(Texture2D Image, Rectangle? Bounds = null, Rectangle? ClipRect = null)
             : base(0, System.TimeSpan.Zero, AnimationOptions.None)
         {
             image = Image;
@@ -146,7 +146,7 @@ namespace Takai.Graphics
             bounds = Bounds == null ? new Rectangle(0, 0, Image.Bounds.Width, Image.Bounds.Height) : Bounds.Value;
             hue = Color.White;
             placement = GraphicPlacement.Center;
-            tween = TweenStyle;
+            tween = TweenStyle.None;
             angle = 0;
             origin = Vector2.Zero;
 
@@ -156,6 +156,14 @@ namespace Takai.Graphics
                 _clip = Rectangle.Empty;
             else
                 _clip = image.Bounds;
+        }
+
+        /// <summary>
+        /// Center the origin of the sprite
+        /// </summary>
+        public void CenterOrigin()
+        {
+            origin = size.ToVector2() / 2;
         }
 
         /// <summary>

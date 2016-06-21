@@ -47,6 +47,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -62,9 +63,12 @@
     <StartupObject>DyingAndMore.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Components\HealthComponent.cs" />
+    <Compile Include="Components\AnimState.cs" />
+    <Compile Include="Components\Health.cs" />
     <Compile Include="Entities\Actor.cs" />
     <Compile Include="Entities\Player.cs" />
+    <Compile Include="Entities\Projectile.cs" />
+    <Compile Include="Entities\Trigger.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

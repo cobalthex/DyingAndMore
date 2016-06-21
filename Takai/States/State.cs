@@ -31,12 +31,7 @@
         /// Has the state been loaded?
         /// </summary>
         public bool isLoaded = false;
-
-        /// <summary>
-        /// The content manager that can be used between state
-        /// </summary>
-        public AssetManager sharedAssets { get; internal set; }
-
+        
         /// <summary>
         /// Force this state to draw to its render target (Disabled becauase breaks rendering)
         /// </summary>

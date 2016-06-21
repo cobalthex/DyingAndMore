@@ -1,105 +1,79 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
 using System.IO.Compression;
 
 namespace Takai
 {
-
     /// <summary>
     /// A simple name based asset managment system that will hold various asset types and manage the lifetime of them
     /// </summary>
-    public class AssetManager
+    public static class AssetManager
     {
         /// <summary>
         /// The root directory to search for files for this asset manager
         /// </summary>
-        public string rootDirectory;
+        public static string RootDirectory { get; set; }
 
         /// <summary>
         /// The assets themselves
         /// </summary>
-        private System.Collections.Generic.Dictionary<string, IDisposable> assets;
+        private static Dictionary<string, IDisposable> assets;
 
         /// <summary>
         /// The graphics device used for this asset manager (for creating texture assets)
         /// </summary>
-        public Microsoft.Xna.Framework.Graphics.GraphicsDevice graphicsDevice;
+        public static GraphicsDevice GraphicsDevice { get; set; }
 
         /// <summary>
         /// The total number of loaded assets in the manager
         /// </summary>
-        public int totalAssets { get { return assets.Count; } }
+        public static int Count { get { return assets.Count; } }
 
-        /// <summary>
-        /// Create a new asset manager
-        /// </summary>
-        /// <param name="GDev">The graphics device to use</param>
-        public AssetManager(Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice)
+        static AssetManager()
         {
-            graphicsDevice = GraphicsDevice;
-            assets = new System.Collections.Generic.Dictionary<string, IDisposable>(64);
-            rootDirectory = "";
+            assets = new Dictionary<string, IDisposable>();
         }
 
         /// <summary>
-        /// Create a new asset manager
+        /// Initialize the asset manager. Required before using
         /// </summary>
-        /// <param name="GDev">The graphics device to use</param>
-        /// <param name="RootDirector">The optional root directory for asset searching</param>
-        public AssetManager(Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice, string RootDirectory)
+        /// <param name="GraphicsDevice">The graphics device to use for texture ops</param>
+        /// <param name="RootDirectory">The root directory to search for assets. By default is ''</param>
+        public static void Initialize(GraphicsDevice GraphicsDevice, string RootDirectory = "")
         {
-            graphicsDevice = GraphicsDevice;
-            assets = new System.Collections.Generic.Dictionary<string, IDisposable>(64);
-            rootDirectory = RootDirectory;
+            AssetManager.GraphicsDevice = GraphicsDevice;
+            AssetManager.RootDirectory = RootDirectory;
+            AssetManager.assets = new Dictionary<string, IDisposable>();
         }
 
-        /// <summary>
-        /// Load multiple assets from a package file
-        /// </summary>
-        /// <param name="File">The file to load from</param>
-        /// <param name="IncludeExtensions">Include file extensions in the asset's name</param>
-        /// <param name="CheckDirectory">Check the directory for a file of a matching name and use it instead</param>
-        /// <remarks>If the file is not found, a FileNotFoundException is thrown</remarks>
-        public void LoadZip(string File, bool IncludeExtensions, bool CheckDirectory)
+        public static Dictionary<string, System.Type> AssetTypes { get; set; } = new Dictionary<string, System.Type>
         {
-            string file = System.IO.Path.IsPathRooted(File) ? File : System.IO.Path.Combine(rootDirectory, File);
-#if WINDOWS
-            if (System.IO.File.Exists(file))
-            {
-                FileStream f = new FileStream(file, FileMode.Open);
-                LoadZip(f, IncludeExtensions, System.IO.Path.GetDirectoryName(file));
-                f.Close();
-            }
-            else
-                throw new FileNotFoundException(rootDirectory + "/" + File + " could not be found");
-#else
-            var stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(file);
-            if (stream != null)
-            {
-                LoadZip(stream, IncludeExtensions, System.IO.Path.GetDirectoryName(file));
-                stream.Close();
-            }
-#endif
-        }
+            { "png", typeof(Texture2D) },
+            { "jpg", typeof(Texture2D) },
+            { "jpeg", typeof(Texture2D) },
+            { "tga", typeof(Texture2D) },
+            { "tif", typeof(Texture2D) },
+            { "tiff", typeof(Texture2D) },
+            { "bmp", typeof(Texture2D) },
 
-        /// <summary>
-        /// Get the type of file from its extension
-        /// </summary>
-        /// <param name="Extension">The file extension (with/without the period in front)</param>
-        /// <returns>The type of asset or null if none found</returns>
-        protected System.Type GetAssetType(string Extension)
+            { "bfnt", typeof(Graphics.BitmapFont) },
+
+            { "mp3", typeof(SoundEffect) },
+            { "wav", typeof(SoundEffect) },
+            { "wma", typeof(SoundEffect) },
+            { "ogg", typeof(SoundEffect) },
+
+            { "fx", typeof(Effect) },
+            { "mgfx", typeof(Effect) },
+        };
+
+        static bool LoadZip(string File)
         {
-            if (Extension[0] == '.')
-                Extension = Extension.Substring(1);
-            if (Extension == "png" || Extension == "jpg" || Extension == "jpeg" || Extension == "tga" || Extension == "tif" || Extension == "tiff" || Extension == "bmp")
-                return typeof(Texture2D);
-            if (Extension == "bfnt")
-                return typeof(Takai.Graphics.BitmapFont);
-            if (Extension == "mp3" || Extension == "wav" || Extension == "wma" || Extension == "ogg")
-                return typeof(SoundEffect);
-            return null;
+            using (var stream = new System.IO.FileStream(File, FileMode.Open))
+                return LoadZip(stream);
         }
 
         /// <summary>
@@ -108,43 +82,16 @@ namespace Takai
         /// <param name="Stream">The stream to load from</param>
         /// <param name="IncludeExtensions">Include file extensions in the asset's name</param>
         /// <returns>True on successful load of all assets. False on error loading one or more assets (All assets will be attempted to be loaded)</returns>
-        public bool LoadZip(Stream Stream, bool IncludeExtensions)
-        {
-            return LoadZip(Stream, IncludeExtensions, null);
-        }
-
-        //todo: verify (changed to using native zip archive library)
-        bool LoadZip(Stream Stream, bool IncludeExtensions, string CheckDir)
+        static bool LoadZip(Stream Stream)
         {
             bool result = true;
             using (var zip = new ZipArchive(Stream, ZipArchiveMode.Read))
             {
                 foreach (var entry in zip.Entries)
                 {
-                    var type = GetAssetType(Path.GetExtension(entry.FullName));
-                    var file = IncludeExtensions ? entry.FullName : Path.GetFileNameWithoutExtension(entry.Name);
+                    var type = AssetTypes[Path.GetExtension(entry.FullName)];
+                    var file = entry.FullName;
 
-                    if (CheckDir != null)
-                    {
-                        var path = System.IO.Path.Combine(CheckDir, entry.FullName);
-                        if (System.IO.File.Exists(path))
-                        {
-                            path = path.Substring(rootDirectory.Length);
-                            IDisposable dat = null;
-                            if (type == typeof(Texture2D))
-                                dat = Load<Texture2D>(file, path, false);
-                            else if (type == typeof(Takai.Graphics.BitmapFont))
-                                dat = Load<Takai.Graphics.BitmapFont>(file, path, false);
-                            else if (type == typeof(SoundEffect))
-                                dat = Load<SoundEffect>(file, path, false);
-
-                            if (dat == null)
-                                result = false;
-
-                            continue;
-                        }
-                    }
-                        
                     if (type != null)
                     {
                         using (var stream = entry.Open())
@@ -169,44 +116,34 @@ namespace Takai
         }
 
         /// <summary>
-        /// Load an asset, replacing the old if an old one of the same name exists
-        /// </summary>
-        /// <typeparam name="T">The type of asset to load</typeparam>
-        /// <param name="Name">The name of the asset to be stored under</param>
-        /// <param name="File">The file to load the asset from</param>
-        /// <returns>The loaded asset, default(T) if not able to load</returns>
-        public T Load<T>(string Name, string File)
-        {
-            return Load<T>(Name, File, false);
-        }
-        
-        /// <summary>
         /// Load an asset into the manager, specify load-over to load the new asset over an older one at a name clash
         /// </summary>
         /// <typeparam name="T">The type of asset to load</typeparam>
-        /// <param name="Name">The unique name of the asset</param>
-        /// <param name="File">The file to load from</param>
-        /// <param name="LoadOver">If there is a name clash, unload the old one and load this over if true</param>
+        /// <param name="File">The name of the file to load. Will be used as the asset's name by default</param>
+        /// <param name="Overwrite">If there is a name clash, unload the old one and load this over if true</param>
+        /// <param name="CustomName">Use this name as opposed to the file to idenfity this asset</param>
         /// <returns>The asset loaded or if the asset (same name) is already in the manager, it is returned. Null on unrecognized type/error</returns>
-        public T Load<T>(string Name, string File, bool LoadOver)
+        public static T Load<T>(string File, bool Overwrite = false, string CustomName = null)
         {
-            string file = System.IO.Path.IsPathRooted(File) ? File : System.IO.Path.Combine(rootDirectory, File);
+            string file = System.IO.Path.IsPathRooted(File) ? File : System.IO.Path.Combine(RootDirectory, File);
+            if (CustomName == null)
+                CustomName = file;
 
             if (!System.IO.File.Exists(file))
-                return (T)assets[Name];
-            if (assets.ContainsKey(Name))
+                return (T)assets[CustomName];
+            if (assets.ContainsKey(CustomName))
             {
-                if (LoadOver)
-                    Unload(Name);
+                if (Overwrite)
+                    Unload(CustomName);
                 else
-                    return (T)assets[Name];
+                    return (T)assets[CustomName];
             }
 
 #if WINDOWS
             if (System.IO.File.Exists(file))
             {
                 var f = new FileStream(file, FileMode.Open);
-                var dat = LoadData<T>(Name, f);
+                var dat = LoadData<T>(CustomName, f);
                 f.Close();
                 return dat;
             }
@@ -231,7 +168,7 @@ namespace Takai
         /// <param name="Stream">The stream to load from</param>
         /// <param name="LoadOver">If there is a name clash, unload the old one and load this over if true</param>
         /// <returns>The asset loaded or if the asset (same name) is already in the manager, it is returned. Null on unrecognized type/error</returns>
-        public T Load<T>(string Name, Stream Stream, bool LoadOver)
+        public static T Load<T>(string Name, Stream Stream, bool LoadOver)
         {
             if (assets.ContainsKey(Name))
             {
@@ -253,16 +190,18 @@ namespace Takai
         /// <param name="Name">The name of the asset to be stored under</param>
         /// <param name="Stream">The stream of data to load from</param>
         /// <returns>The loaded asset, default(T) on failure</returns>
-        private T LoadData<T>(string Name, Stream Stream)
+        private static T LoadData<T>(string Name, Stream Stream)
         {
             IDisposable asset = null;
 
             if (typeof(T) == typeof(Texture2D))
-                asset = Texture2D.FromStream(graphicsDevice, Stream);
+                asset = Texture2D.FromStream(GraphicsDevice, Stream);
             else if (typeof(T) == typeof(Takai.Graphics.BitmapFont))
-                asset = Takai.Graphics.BitmapFont.FromStream(graphicsDevice, Stream);
+                asset = Takai.Graphics.BitmapFont.FromStream(GraphicsDevice, Stream);
             else if (typeof(T) == typeof(SoundEffect))
                 asset = SoundEffect.FromStream(Stream);
+            else if (typeof(T) == typeof(Effect))
+                asset = new Effect(GraphicsDevice, ReadToEnd(Stream));
 
             if (asset != null)
             {
@@ -273,6 +212,20 @@ namespace Takai
             return default(T);
         }
 
+        private static byte[] ReadToEnd(Stream Stream)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var bytes = new byte[16 * 1024];
+                int count = 0;
+
+                while ((count = Stream.Read(bytes, 0, bytes.Length)) != 0)
+                    ms.Write(bytes, 0, count);
+
+                return ms.ToArray();
+            }
+        }
+
         /// <summary>
         /// Load an asset from a resource
         /// </summary>
@@ -281,7 +234,7 @@ namespace Takai
         /// <param name="Resource">The actual resource to load</param>
         /// <param name="LoadOver">If there is a name clash, unload the old one and load this over if true</param>
         /// <returns>The asset if loaded, null if not</returns>
-        public T LoadFromResource<T>(string Name, object Resource, bool LoadOver)
+        public static T LoadFromResource<T>(string Name, object Resource, bool LoadOver)
         {
             if (assets.ContainsKey(Name))
             {
@@ -319,7 +272,7 @@ namespace Takai
         /// <param name="Name">The name of the asset</param>
         /// <param name="Object">The object itself to store</param>
         /// <remarks>This will overwrite any existing asset</remarks>
-        public void Add<T>(string Name, T Object)
+        public static void Add<T>(string Name, T Object)
         {
             if (Object.GetType() != typeof(IDisposable))
                 return;
@@ -336,7 +289,7 @@ namespace Takai
         /// <param name="name">The name of the asset</param>
         /// <returns>The asset if found, null if not</returns>
         /// <remarks>If BeginClean() has been called and the asset is found, it will be checked and will not be removed at EndClean()</remarks>
-        public T Find<T>(string Name)
+        public static T Find<T>(string Name)
         {
             IDisposable ass;
             if (assets.TryGetValue(Name, out ass))
@@ -348,11 +301,11 @@ namespace Takai
         }
 
         /// <summary>
-        /// Find the name of an asset based on itself (using a linear search)
+        /// Find the name of an asset (using a linear search)
         /// </summary>
         /// <param name="Asset">The asset to be named</param>
         /// <returns>The name if found, an empty string if not</returns>
-        public string FindName(IDisposable Asset)
+        public static string FindName(IDisposable Asset)
         {
             foreach (var asset in assets)
                 if (asset.Value == Asset)
@@ -364,7 +317,7 @@ namespace Takai
         /// Unload a specific asset, if not found, nothing happens
         /// </summary>
         /// <param name="name">The asset to remove</param>
-        public void Unload(string Name)
+        public static void Unload(string Name)
         {
             IDisposable ass;
             if (assets.TryGetValue(Name, out ass))
@@ -378,7 +331,7 @@ namespace Takai
         /// <summary>
         /// Destroy all assets in the manager
         /// </summary>
-        public void UnloadAll()
+        public static void UnloadAll()
         {
             foreach (var n in assets)
             {
@@ -392,7 +345,7 @@ namespace Takai
         /// <summary>
         /// The enumerator for the assets
         /// </summary>
-        public System.Collections.Generic.Dictionary<string, IDisposable>.Enumerator GetEnumerator()
+        public static Dictionary<string, IDisposable>.Enumerator GetEnumerator()
         {
             return assets.GetEnumerator();
         }

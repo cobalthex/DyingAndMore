@@ -21,9 +21,4 @@ namespace Takai.Game
 
         public virtual void Think(GameTime Time) { }
     }
-
-    /// <summary>
-    /// This component is only created when using the editor
-    /// </summary>
-    public sealed class EditorOnlyAttribute : System.Attribute { }
 }
