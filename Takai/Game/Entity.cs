@@ -7,33 +7,68 @@ namespace Takai.Game
     /// </summary>
     public class Entity
     {
-        /// <summary>
-        /// Generator for unique entity IDs
-        /// </summary>
-        internal uint EntIdCounter = 1;
-
         internal System.Collections.Generic.Dictionary<System.Type, Component> components = new System.Collections.Generic.Dictionary<System.Type, Component>();
 
         /// <summary>
-        /// A unique ID for this entity
+        /// The map the entity is in, null if none
         /// </summary>
-        public uint Id { get; internal set; }
+        public Map Map { get; internal set; } = null;
+        /// <summary>
+        /// The section the entity is located in in the map, null if none or if in the active set
+        /// </summary>
+        public MapSector Section { get; internal set; } = null;
 
         /// <summary>
         /// Determines if the entity is thinking (alive)
         /// </summary>
         public bool IsEnabled { get; set; } = true;
 
-        public Vector2 Position { get; set; } = Vector2.Zero;
-        public Vector2 Direction { get; set; } = Vector2.UnitX; //should remain normalized
-        public float FieldOfView { get; set; } = MathHelper.PiOver4 * 3;
-
-        public MapSection Section { get; internal set; } = null;
+        /// <summary>
+        /// Determines if this entity is always part of the active set and therefore always updated
+        /// </summary>
+        /// <remarks>This is typically used for things like projectiles</remarks>
+        public bool AlwaysActive { get; set; } = false;
+        
+        /// <summary>
+        /// The current position of the entity
+        /// </summary>
+        public Vector2 Position { get; set; }
+        /// <summary>
+        /// The (normalized) direction the entity is facing
+        /// </summary>
+        /// <remarks>This vector should always be normalized</remarks>
+        public Vector2 Direction { get; set; } = Vector2.UnitX;
+        /// <summary>
+        /// The direction the entity is moving
+        /// </summary>
+        public Vector2 Velocity { get; set; } = Vector2.Zero;
+        
+        /// <summary>
+        /// The radius of this entity. Used mainly for broad-phase collision
+        /// </summary>
+        public float Radius
+        {
+            get
+            {
+                return radius;
+            }
+            set
+            {
+                radius = value;
+                RadiusSq = value * value;
+            }
+        }
+        public float RadiusSq { get; private set; }
+        private float radius = 1;
+        
+        /// <summary>
+        /// The sprite for this entity (may be null for things like triggers)
+        /// Can be updated by components
+        /// </summary>
+        public Graphics.Graphic Sprite { get; set; } = null;
 
         public Entity()
         {
-            Id = EntIdCounter;
-            EntIdCounter++;
         }
         
         /// <summary>
@@ -100,37 +135,22 @@ namespace Takai.Game
             }
         }
 
-        #region Helpers
-
         /// <summary>
-        /// Is this entity facing a point
+        /// Called when there is a collision between this and another entity
         /// </summary>
-        /// <param name="Point">The point to check</param>
-        /// <returns>True if this entity is facing Point</returns>
-        public bool IsFacing(Vector2 Point)
+        /// <param name="Collider">The entity collided with</param>
+        public virtual void OnEntityCollision(Entity Collider)
         {
-            var diff = Point - Position;
-            diff.Normalize();
-
-            var dot = Vector2.Dot(Direction, diff);
-
-            return (dot > (1 - (FieldOfView / MathHelper.Pi)));
+            //todo: handle default collision resolution
         }
 
         /// <summary>
-        /// Is this entity behind another (The other entity cannot see this one)
+        /// Called when there is a collision between this and another entity
         /// </summary>
-        /// <param name="Ent">The entity to check</param>
-        /// <returns>True if this entity is behind Ent</returns>
-        public bool IsBehind(Entity Ent)
+        /// <param name="Tile">The tile on the map where the collision occurred</param>
+        public virtual void OnMapCollision(Point Tile)
         {
-            var diff = Ent.Position - Position;
-            diff.Normalize();
-
-            var dot = Vector2.Dot(diff, Ent.Direction);
-            return (dot > (Ent.FieldOfView / MathHelper.Pi) - 1);
+            Velocity = Vector2.Zero; //todo: only cut overlapping velocity
         }
-
-        #endregion
     }
 }

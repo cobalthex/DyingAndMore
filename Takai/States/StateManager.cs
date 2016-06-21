@@ -30,11 +30,6 @@ namespace Takai.States
         static int firstDraw = 0;
 
         /// <summary>
-        /// A shared content manager that is referenced by all states in the manager
-        /// </summary>
-        public static AssetManager assetManager { get; private set; }
-
-        /// <summary>
         /// Is the game exiting?
         /// </summary>
         public static bool isExiting { get; private set; }
@@ -72,23 +67,6 @@ namespace Takai.States
             game = Game;
             time = new Microsoft.Xna.Framework.GameTime();
 
-            assetManager = new AssetManager(Game.GraphicsDevice);
-            viewport = new Microsoft.Xna.Framework.Rectangle(Game.GraphicsDevice.Viewport.X, Game.GraphicsDevice.Viewport.Y, Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height);
-            isInitialized = true;
-        }
-
-        /// <summary>
-        /// Initialize the state manager
-        /// </summary>
-        /// <param name="Game">The game this state manager is part of</param>
-        /// <param name="AssetManager">A custom asset manager to use</param>
-        public static void Initialize(Microsoft.Xna.Framework.Game Game, AssetManager AssetManager)
-        {
-            states = new StateStack();
-            game = Game;
-            time = new Microsoft.Xna.Framework.GameTime();
-
-            assetManager = AssetManager;
             viewport = new Microsoft.Xna.Framework.Rectangle(Game.GraphicsDevice.Viewport.X, Game.GraphicsDevice.Viewport.Y, Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height);
             isInitialized = true;
         }
@@ -239,7 +217,6 @@ namespace Takai.States
         /// <param name="s">State to activate</param>
         static void ActivateState(State s)
         {
-            s.sharedAssets = assetManager;
             s.graphicsDevice = game.GraphicsDevice;
             s.startTime = time.TotalGameTime;
 
@@ -249,10 +226,10 @@ namespace Takai.States
         }
 
         /// <summary>
-        /// Get a rectangle with the TV safe area to draw to (defaults tp inner 85% of the screen)
+        /// Get a rectangle with the TV safe area to draw to (defaults to the inner 85% of the screen)
         /// </summary>
         /// <returns>A rectangle with the safe area</returns>
-        public static Microsoft.Xna.Framework.Rectangle GetTitleSafeArea(float SafeRegion)
+        public static Microsoft.Xna.Framework.Rectangle GetTitleSafeArea(float SafeRegion = 0.85f)
         {
             int w = (int)(viewport.Width * SafeRegion);
             int h = (int)(viewport.Height * SafeRegion);

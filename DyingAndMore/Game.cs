@@ -6,11 +6,14 @@ namespace DyingAndMore
     class Game : Takai.States.State
     {
         Entities.Player player;
-        Takai.Graphics.Graphic pgfx;
 
         Takai.Graphics.BitmapFont fnt;
 
         SpriteBatch sbatch;
+        Effect postEffect = null;
+        RenderTarget2D renderTarget;
+
+        Texture2D background;
 
         Takai.Game.Map map;
 
@@ -22,50 +25,58 @@ namespace DyingAndMore
 
         public override void Load()
         {
-            player = new Entities.Player();
-            player.Load();
-
-            pgfx = new Takai.Graphics.Graphic
-            (
-                sharedAssets.Load<Texture2D>("Player", "Textures/Player.png"),
-                new Point(48, 48),
-                null,
-                null,
-                2,
-                System.TimeSpan.FromMilliseconds(500),
-                Takai.AnimationOptions.Loop | Takai.AnimationOptions.StartImmediately
-            );
-            pgfx.origin = new Vector2(pgfx.width / 2, pgfx.height / 2);
-
-            fnt = sharedAssets.Load<Takai.Graphics.BitmapFont>("fnt", "Fonts/DebugFont.bfnt");
+            fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
 
             map = new Takai.Game.Map();
-            map.TilesImage = sharedAssets.Load<Texture2D>("tiles", "Textures/Tiles.png");
+            map.TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles.png");
             map.TileSize = 48;
-            map.Width = 4;
-            map.Height = 4;
-            map.Tiles = new ushort[4, 4]
-            {
-                { 0, 1, 0, 0 },
-                { 0, 0, 2, 0 },
-                { 0, 3, 0, 0 },
-                { 0, 0, 0, 0 } 
-            };
+            map.Width = map.Height = 50;
+            map.Tiles = new ushort[map.Width, map.Height];
+
+            var rand = new System.Random();
+            for (var y = 0; y < map.Height; y++)
+                for (var x = 0; x < map.Width; x++)
+                    map.Tiles[y, x] = (ushort)rand.Next(0, 4);
+            map.BuildSectors();
+            map.BuildMask(map.TilesImage, true);
+
+            map.fnt = fnt;
+
+            player = map.SpawnEntity<Entities.Player>(new Vector2(100), Vector2.UnitX, Vector2.Zero);
+
+            var ent = map.SpawnEntity<Entities.Actor>(new Vector2(40), Vector2.UnitX, Vector2.Zero);
+            var sprite = new Takai.Graphics.Graphic
+            (
+                Takai.AssetManager.Load<Texture2D>("Textures/Astrovirus.png"),
+                new Point(42, 42),
+                null,
+                null,
+                6,
+                System.TimeSpan.FromMilliseconds(30),
+                Takai.AnimationOptions.Loop | Takai.AnimationOptions.StartImmediately,
+                Takai.Graphics.TweenStyle.None
+            );
+            sprite.origin = new Vector2(sprite.width / 2, sprite.height / 2);
+            ent.Sprite = sprite;
 
             sbatch = new SpriteBatch(graphicsDevice);
+
+            postEffect = Takai.AssetManager.Load<Effect>("Shaders/test.mgfx");
+            background = Takai.AssetManager.Load<Texture2D>("Textures/Background.png");
+             
+            renderTarget = new RenderTarget2D(graphicsDevice, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
         }
 
         public override void Update(GameTime Time)
         {
-            player.Think(Time);
+            map.Update(Time, player.Position, graphicsDevice.Viewport.Bounds);
 
             if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.Q))
                 Takai.States.StateManager.Exit();
-
-
-            //var dir = new Vector2(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height) / 2;
+            
             var dir = Takai.Input.InputCatalog.MouseState.Position.ToVector2();
-            dir -= player.Position;
+            dir -= new Vector2(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height) / 2;
+            //dir -= player.Position;
             dir.Normalize();
             player.Direction = dir;
         }
@@ -78,15 +89,21 @@ namespace DyingAndMore
         /// <param name="Bounds">The bounds of the viewport</param>
         public override void Draw(Microsoft.Xna.Framework.GameTime Time)
         {
-            sbatch.Begin();
-            graphicsDevice.Clear(Color.Black);
-
-            map.Draw(sbatch, Vector2.Zero, graphicsDevice.Viewport.Bounds);
+            graphicsDevice.SetRenderTarget(renderTarget);
+            sbatch.Begin(SpriteSortMode.Deferred);
             
-            pgfx.Draw(sbatch, player.Position, (float)System.Math.Atan2(player.Direction.Y, player.Direction.X));
+            sbatch.Draw(background, graphicsDevice.Viewport.Bounds, Color.White);
+            
+            map.Draw(sbatch, player.Position, graphicsDevice.Viewport.Bounds);
 
-            fnt.Draw(sbatch, player.Velocity.Length().ToString(), new Vector2(10), Color.White);
-            fnt.Draw(sbatch, player.GetComponent<Components.HealthComponent>().MaxHealth.ToString(), new Vector2(50), Color.GreenYellow);
+            fnt.Draw(sbatch, player.Velocity.Length().ToString("N2"), new Vector2(10), Color.White);
+            fnt.Draw(sbatch, (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2"), new Vector2(200, 10), Color.LightSteelBlue);
+            sbatch.End();
+            graphicsDevice.SetRenderTarget(null);
+            
+            //post fx
+            sbatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, postEffect, null);
+            sbatch.Draw(renderTarget, graphicsDevice.Viewport.Bounds, Color.White);
             sbatch.End();
         }
     }

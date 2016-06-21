@@ -119,7 +119,7 @@
         public new void Restart()
         {
             offset = System.TimeSpan.Zero;
-            StartNew();
+            base.Restart();
         }
 #endif
     }
