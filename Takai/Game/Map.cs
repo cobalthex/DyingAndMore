@@ -5,20 +5,53 @@ using System.Collections.Generic;
 namespace Takai.Game
 {
     /// <summary>
-    /// A single section of the map, used for spacial calculations
+    /// A single type of blob
+    /// This struct defines the graphics for the blob and physical properties that can affect the game
     /// </summary>
-    public class MapSector
+    public class BlobType
     {
-        public List<Entity> entities = new List<Entity>(); //needs to be able to handle addition/removal during traversal (todo: possibly look into other types)
+        /// <summary>
+        /// The texture to render the blob with
+        /// </summary>
+        public Texture2D Texture { get; set; }
+        /// <summary>
+        /// The radius of an individual blob
+        /// </summary>
+        public float Radius { get; set; }
+        /// <summary>
+        /// Drag affects both how quickly the blob stops moving and how much resistance there is to entities moving through it
+        /// </summary>
+        public float Drag { get; set; }
     }
 
     /// <summary>
+    /// A single blob, rendered as a metablob
+    /// Blobs can have physics per their blob type
+    /// Blobs can be spawned with a velocity which is decreased by their drag over time. Once the velocity reaches zero, the blob is considered inactive (permanently)
+    /// </summary>
+    public struct Blob
+    {
+        public BlobType type;
+        public Vector2 position;
+        public Vector2 velocity;
+    }
+
+    /// <summary>
+    /// A single sector of the map, used for spacial calculations
+    /// Sectors typically contain inactive entities that are not visible as well as dummy objects (inactive blobs, decals). 
+    /// </summary>
+    public class MapSector
+    {
+        public List<Entity> entities = new List<Entity>();
+        public List<Blob> blobs = new List<Blob>();
+    }
+    
+    /// <summary>
     /// A 2D tile based renderable map that uses a grid for spacial subdivision
     /// </summary>
-    public class Map
-    {
-        public Texture2D TilesImage { get; set; }
-        public bool[,] TilesMask { get; set; }
+    public partial class Map
+    {        
+        public bool[] TilesMask { get; set; }
 
         public int TileSize
         {
@@ -27,43 +60,81 @@ namespace Takai.Game
             {
                 tileSize = value;
                 tilesPerRow = (TilesImage != null ? (TilesImage.Width / value) : 0);
-                sectorPixelSize = sectionSize * value;
+                sectorPixelSize = sectorSize * value;
             }
         }
         private int tileSize;
         private int tilesPerRow;
+        private int diagonalLengthSq; //used for collision detection (raycast if speedSq > this)
 
-        public int Width; //Width in tiles
-        public int Height; //Height in tiles
+        /// <summary>
+        /// The horizontal size of the map in tiles
+        /// </summary>
+        public int Width { get; set; }
+        /// <summary>
+        /// The vertical size of the map in tiles
+        /// </summary>
+        public int Height { get; set; }
 
-        public const int sectionSize = 4; //The number of tiles in a map section
+        public const int sectorSize = 4; //The number of tiles in a map sector
         private int sectorPixelSize = 0;
 
         /// <summary>
         /// All of the tiles in the map
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>
-        public ushort[,] Tiles { get; set; }
+        public short[,] Tiles { get; set; }
         /// <summary>
         /// All of the sectors in the map
         /// Typically inactive entities are stored here
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>
         public MapSector[,] Sectors { get; protected set; }
+        protected Point NumSectors { get; private set; }
+
         /// <summary>
-        /// The set of entities that are being updated
+        /// The set of live entities that are being updated.
         /// Entities not in this list are not updated
         /// Automatically updated as the view changes
         /// </summary>
-        public List<Entity> ActiveSet { get; protected set; } = new List<Entity>(128);
+        public List<Entity> ActiveEnts { get; protected set; } = new List<Entity>(128);
         /// <summary>
-        /// The last viewport used in Update()
-        /// Used for updating the active set
-        /// Stores sector coordinates
+        /// The list of live blobs. Once the blobs' velocity is zero, they are removed from this and not re-added
         /// </summary>
-        protected Rectangle lastView = Rectangle.Empty;
+        public List<Blob> ActiveBlobs { get; protected set; } = new List<Blob>(32);
 
-        public Takai.Graphics.BitmapFont fnt;
+        /// <summary>
+        /// Load tile data from a CSV
+        /// </summary>
+        /// <remarks>Assumes csv is well formed (all rows are the same length)</remarks>
+        public static Map FromCsv(GraphicsDevice GDevice, string File, bool BuildSectors = true)
+        {
+            Map m = new Map(GDevice);
+
+            var lines = System.IO.File.ReadAllLines(File);
+            for (int y = 0; y < lines.Length; y++)
+            {
+                if (string.IsNullOrWhiteSpace(lines[y]))
+                    continue;
+
+                var split = lines[y].Split(',');
+
+                if (m.Tiles == null)
+                {
+                    m.Width = split.Length;
+                    m.Height = lines.Length;
+                    m.Tiles = new short[lines.Length, split.Length];
+                }
+
+                for (int x = 0; x < split.Length; x++)
+                    m.Tiles[y, x] = short.Parse(split[x]);
+            }
+
+            if (BuildSectors)
+                m.BuildSectors();
+
+            return m;
+        }
 
         /// <summary>
         /// Build the tiles mask
@@ -76,13 +147,13 @@ namespace Takai.Game
             Color[] pixels = new Color[Texture.Width * Texture.Height];
             Texture.GetData<Color>(pixels);
 
-            TilesMask = new bool[Texture.Height, Texture.Width];
+            TilesMask = new bool[Texture.Height * Texture.Width];
             for (var i = 0; i < pixels.Length; i++)
             {
                 if (UseAlpha)
-                    TilesMask[i / Texture.Width, i % Texture.Width] = pixels[i].A > 127;
+                    TilesMask[i] = pixels[i].A > 127;
                 else
-                    TilesMask[i / Texture.Width, i % Texture.Width] = (pixels[i].R + pixels[i].G + pixels[i].B) / 3 > 127;
+                    TilesMask[i] = (pixels[i].R + pixels[i].G + pixels[i].B) / 3 > 127;
             }
         }
 
@@ -94,8 +165,8 @@ namespace Takai.Game
             if (Tiles != null)
             {
                 //round up
-                var width = 1 + ((Tiles.GetLength(1) - 1) / sectionSize);
-                var height = 1 + ((Tiles.GetLength(0) - 1) / sectionSize);
+                var width = 1 + ((Tiles.GetLength(1) - 1) / sectorSize);
+                var height = 1 + ((Tiles.GetLength(0) - 1) / sectorSize);
 
                 Sectors = new MapSector[height, width];
 
@@ -126,7 +197,7 @@ namespace Takai.Game
 
             //will be removed in next update if out of visible range
             //only inactive entities are placed in sectors
-            ActiveSet.Add(ent);
+            ActiveEnts.Add(ent);
 
             if (LoadEntity)
                 ent.Load();
@@ -135,82 +206,33 @@ namespace Takai.Game
         }
 
         /// <summary>
+        /// Spawn a single blob onto the map
+        /// </summary>
+        /// <param name="Position">The position of the blob</param>
+        /// <param name="Velocity">The blob's initial velocity</param>
+        /// <param name="Type">The blob's type</param>
+        public void SpawnBlob(Vector2 Position, Vector2 Velocity, BlobType Type)
+        {
+            //todo: don't spawn blobs outside the map (position + radius)
+
+            if (Velocity == Vector2.Zero)
+            {
+                
+                var sector = Vector2.Clamp(Position / sectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+                Sectors[sector.Y, sector.X].blobs.Add(new Blob { position = Position, velocity = Velocity, type = Type });
+            }
+            else
+                ActiveBlobs.Add(new Blob { position = Position, velocity = Velocity, type = Type });
+        }
+
+        /// <summary>
         /// Remove an entity from the map
         /// </summary>
         /// <param name="Ent">The entity to remove</param>
-        public void DestroyEntity(Entity Ent)
+        /// <remarks>Will be marked for deletion to be deleted in the next Update cycle</remarks>
+        public void Destroy(Entity Ent)
         {
-            if (Ent.Section != null)
-            {
-                Ent.Section.entities.Remove(Ent);
-                Ent.Section = null;
-            }
-            else
-                ActiveSet.Remove(Ent);
-            Ent.Unload();
-        }
-
-        /// <summary>
-        /// Move an entity to a new position in the map
-        /// All movement in the map should use this function to ensure correct spacial representation
-        /// </summary>
-        /// <param name="Ent">The entity to move</param>
-        /// <param name="Position">The new position to move the entity to</param>
-        public void MoveEntity(Entity Ent, Vector2 Position)
-        {
-            Ent.Position = Position;
-
-            if (Ent.Section != null)
-                Ent.Section.entities.Remove(Ent);
-
-            var cell = (Position / sectorPixelSize).ToPoint();
-            if (cell.Y < 0 || cell.Y >= Sectors.GetLength(0) || cell.X < 0 || cell.X >= Sectors.GetLength(1))
-                Ent.Section = null;
-            else
-            {
-                Sectors[cell.Y, cell.X].entities.Add(Ent);
-                Ent.Section = Sectors[cell.Y, cell.X];
-            }
-        }
-
-        /// <summary>
-        /// Find all entities within a certain radius
-        /// </summary>
-        /// <param name="Position">The origin search point</param>
-        /// <param name="Radius">The maximum search radius</param>
-        public List<Entity> GetNearbyEntities(Vector2 Position, float Radius)
-        {
-            var radiusSq = Radius * Radius;
-            var vr = new Vector2(Radius);
-
-            var mapSz = new Vector2(Width, Height);
-            var start = Vector2.Clamp((Position - vr) / sectorPixelSize, Vector2.Zero, mapSz).ToPoint();
-            var end = (Vector2.Clamp((Position + vr) / sectorPixelSize, Vector2.Zero, mapSz) + Vector2.One).ToPoint();
-
-            List<Entity> ents = new List<Entity>();
-            for (int y = start.Y; y < end.Y; y++)
-            {
-                for (int x = start.X; x < end.X; x++)
-                {
-                    foreach (var ent in Sectors[y, x].entities)
-                    {
-                        if (Vector2.DistanceSquared(ent.Position, Position) < radiusSq)
-                            ents.Add(ent);
-                    }
-                }
-            }
-
-            return ents;
-        }
-
-        /// <summary>
-        /// Check if a point is 'inside' the map
-        /// </summary>
-        /// <param name="Point">The point to test</param>
-        /// <returns>True if the point is in a navicable area</returns>
-        public bool IsPointInMap(Vector2 Point)
-        {
-            return (Point.X >= 0 && Point.X < (Width * TileSize) && Point.Y >= 0 && Point.Y < (Height * TileSize));
+            Ent.Map = null;
         }
 
         /// <summary>
@@ -233,99 +255,105 @@ namespace Takai.Game
             var activeRect = new Rectangle(startX - 1, startY - 1, width + 2, height + 2);
             var mapRect = new Rectangle(0, 0, Width * tileSize, Height * tileSize);
 
-            //update active entities
-            for (int i = 0; i < ActiveSet.Count; i++)
+            var deltaT = (float)Time.ElapsedGameTime.TotalSeconds;
+
+            //update active blobs
+            for (int i = 0; i < ActiveBlobs.Count; i++)
             {
-                var ent = ActiveSet[i];
+                var blob = ActiveBlobs[i];
+                var deltaV = blob.velocity * deltaT;
+                blob.position += deltaV;
+                blob.velocity -= deltaV * blob.type.Drag;
+                
+                //todo: maybe add collision detection for better fluid simulation (drag increases when colliding)
+
+                if (System.Math.Abs(blob.velocity.X) < 1 && System.Math.Abs(blob.velocity.Y) < 1)
+                {
+                    SpawnBlob(blob.position, Vector2.Zero, blob.type); //this will move the blob to the static area of the map
+                    ActiveBlobs[i] = ActiveBlobs[ActiveBlobs.Count - 1];
+                    ActiveBlobs.RemoveAt(ActiveBlobs.Count - 1);
+                    i--;
+                }
+                else
+                    ActiveBlobs[i] = blob;
+            }
+
+            //update active entities
+            for (int i = 0; i < ActiveEnts.Count; i++)
+            {
+                var ent = ActiveEnts[i];
                 if (!ent.AlwaysActive && !activeRect.Contains(ent.Position / sectorPixelSize))
                 {
-                    //add to sector (todo: handle out of bounds)
-                    Sectors[(int)ent.Position.Y / sectorPixelSize, (int)ent.Position.X / sectorPixelSize].entities.Add(ent);
+                    //ents outside the map are deleted
+                    if (mapRect.Contains((ent.Position / tileSize).ToPoint()))
+                        Sectors[(int)ent.Position.Y / sectorPixelSize, (int)ent.Position.X / sectorPixelSize].entities.Add(ent);
+                    else
+                    {
+                        ent.Map = null;
+                        ent.Unload();
+                        continue;
+                    }
 
                     //remove from active set (swap with last)
-                    ActiveSet[i] = ActiveSet[ActiveSet.Count - 1];
-                    ActiveSet.RemoveAt(ActiveSet.Count - 1);
+                    ActiveEnts[i] = ActiveEnts[ActiveEnts.Count - 1];
+                    ActiveEnts.RemoveAt(ActiveEnts.Count - 1);
                     i--;
                 }
                 else
                 {
+                    if (!ent.IsEnabled)
+                        continue;
+
                     ent.Think(Time);
 
-                    var targetPos = ent.Position + ent.Velocity * (float)Time.ElapsedGameTime.TotalSeconds;
-                    if (!mapRect.Contains(targetPos))
+                    var targetPos = ent.Position + ent.Velocity * deltaT;
+                    var targetCell = (targetPos / tileSize).ToPoint();
+                    var cellPos = new Point((int)targetPos.X % tileSize, (int)targetPos.Y % tileSize);
+
+                    short tile;
+                    if (!mapRect.Contains(targetPos) || (tile = Tiles[targetCell.Y, targetCell.X]) < 0)
+                    // || !TilesMask[(tile / tilesPerRow) + cellPos.Y, (tile % tileSize) + cellPos.X])
                     {
-                        ent.Velocity = Vector2.Zero;
-                        ent.OnMapCollision((targetPos / tileSize).ToPoint());
+                        ent.OnMapCollision(targetCell);
+
+                        if (ent.IsPhysical)
+                            ent.Velocity = Vector2.Zero;
+                    }
+
+                    else if (ent.Velocity != Vector2.Zero)
+                    {
+                        for (int j = 0; j < ActiveEnts.Count; j++)
+                        {
+                            if (i != j && Vector2.DistanceSquared(ent.Position, ActiveEnts[j].Position) < ent.RadiusSq + ActiveEnts[j].RadiusSq)
+                                ent.OnEntityCollision(ActiveEnts[j]);
+                        }
+                    }
+                    
+                    ent.Position += ent.Velocity * deltaT;
+                }
+                
+                if (ent.Map == null)
+                {
+                    if (ent.Sector != null)
+                    {
+                        ent.Sector.entities.Remove(ent);
+                        ent.Sector = null;
                     }
                     else
-                        ent.Position = targetPos;
+                        ActiveEnts.Remove(ent);
+                    ent.Unload();
                 }
             }
 
-            //add new entities to active set
-            for (var y = System.Math.Max(activeRect.Top, 0); y < System.Math.Min(Height / sectionSize, activeRect.Bottom); y++)
+            //add new entities to active set (will be updated next frame)
+            for (var y = System.Math.Max(activeRect.Top, 0); y < System.Math.Min(Height / sectorSize, activeRect.Bottom); y++)
             {
-                for (var x = System.Math.Max(activeRect.Left, 0); x < System.Math.Min(Width / sectionSize, activeRect.Right); x++)
+                for (var x = System.Math.Max(activeRect.Left, 0); x < System.Math.Min(Width / sectorSize, activeRect.Right); x++)
                 {
-                    ActiveSet.AddRange(Sectors[y, x].entities);
+                    ActiveEnts.AddRange(Sectors[y, x].entities);
                     Sectors[y, x].entities.Clear();
                 }
             }
-        }
-
-        /// <summary>
-        /// Draw the map, centered around the Camera
-        /// </summary>
-        /// <param name="Sbatch">The spritebatch to use</param>
-        /// <param name="Camera">The center of the visible area</param>
-        /// <param name="Viewport">Where on screen to draw</param>
-        public void Draw(SpriteBatch Sbatch, Vector2 Camera, Rectangle Viewport)
-        {
-            var half = Camera - (new Vector2(Viewport.Width, Viewport.Height) / 2);
-
-            var startX = (int)half.X / tileSize;
-            var startY = (int)half.Y / tileSize;
-
-            int endX = startX + 1 + ((Viewport.Width - 1) / tileSize);
-            int endY = startY + 1 + ((Viewport.Height - 1) / tileSize);
-
-            startX = System.Math.Max(startX, 0);
-            startY = System.Math.Max(startY, 0);
-
-            endX = System.Math.Min(endX + 1, Width);
-            endY = System.Math.Min(endY + 1, Height);
-            
-            for (var y = startY; y < endY; y++)
-            {
-                var vy = Viewport.Y + (y * tileSize) - (int)half.Y;
-
-                for (var x = startX; x < endX; x++)
-                {
-                    var tile = Tiles[y, x];
-
-                    var vx = Viewport.X + (x * tileSize) - (int)half.X;
-
-                    Sbatch.Draw
-                    (
-                        TilesImage,
-                        new Rectangle(vx, vy, tileSize, tileSize),
-                        new Rectangle((tile % tilesPerRow) * tileSize, (tile / tilesPerRow) * tileSize, tileSize, tileSize),
-                        Color.White
-                    );
-                }
-            }
-
-            var view = new Vector2(Viewport.X, Viewport.Y) - half;
-            foreach (var ent in ActiveSet)
-            {
-                if (ent.Sprite != null)
-                {
-                    var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                    ent.Sprite.Draw(Sbatch, view + ent.Position, angle);
-                }
-            }
-
-            fnt.Draw(Sbatch, ActiveSet.Count.ToString(), new Vector2(100), Color.CornflowerBlue);
         }
     }
 }

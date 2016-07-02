@@ -27,22 +27,16 @@ namespace DyingAndMore
         {
             fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
 
-            map = new Takai.Game.Map();
+            map = Takai.Game.Map.FromCsv(GraphicsDevice, "data/maps/test.csv");
             map.TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles.png");
             map.TileSize = 48;
-            map.Width = map.Height = 50;
-            map.Tiles = new ushort[map.Width, map.Height];
-
-            var rand = new System.Random();
-            for (var y = 0; y < map.Height; y++)
-                for (var x = 0; x < map.Width; x++)
-                    map.Tiles[y, x] = (ushort)rand.Next(0, 4);
-            map.BuildSectors();
             map.BuildMask(map.TilesImage, true);
 
-            map.fnt = fnt;
+            map.DebugFont = fnt;
+            map.decal = Takai.AssetManager.Load<Texture2D>("Textures/sparkparticle.png");
 
             player = map.SpawnEntity<Entities.Player>(new Vector2(100), Vector2.UnitX, Vector2.Zero);
+            player.OutlineColor = Color.Blue;
 
             var ent = map.SpawnEntity<Entities.Actor>(new Vector2(40), Vector2.UnitX, Vector2.Zero);
             var sprite = new Takai.Graphics.Graphic
@@ -54,28 +48,37 @@ namespace DyingAndMore
                 6,
                 System.TimeSpan.FromMilliseconds(30),
                 Takai.AnimationOptions.Loop | Takai.AnimationOptions.StartImmediately,
-                Takai.Graphics.TweenStyle.None
+                Takai.Graphics.TweenStyle.Sequentially
             );
-            sprite.origin = new Vector2(sprite.width / 2, sprite.height / 2);
+            ent.Radius = 24;
+            sprite.origin = new Vector2(sprite.Width / 2, sprite.Height / 2);
             ent.Sprite = sprite;
 
-            sbatch = new SpriteBatch(graphicsDevice);
+            sbatch = new SpriteBatch(GraphicsDevice);
 
-            postEffect = Takai.AssetManager.Load<Effect>("Shaders/test.mgfx");
-            background = Takai.AssetManager.Load<Texture2D>("Textures/Background.png");
+            //postEffect = Takai.AssetManager.Load<Effect>("Shaders/test.mgfx");
+            //background = Takai.AssetManager.Load<Texture2D>("Textures/Background.png");
              
-            renderTarget = new RenderTarget2D(graphicsDevice, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
+            renderTarget = new RenderTarget2D
+            (
+                GraphicsDevice,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height,
+                false,
+                SurfaceFormat.Color,
+                DepthFormat.Depth24Stencil8
+            );
         }
 
         public override void Update(GameTime Time)
         {
-            map.Update(Time, player.Position, graphicsDevice.Viewport.Bounds);
+            map.Update(Time, player.Position, GraphicsDevice.Viewport.Bounds);
 
             if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.Q))
                 Takai.States.StateManager.Exit();
             
             var dir = Takai.Input.InputCatalog.MouseState.Position.ToVector2();
-            dir -= new Vector2(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height) / 2;
+            dir -= new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height) / 2;
             //dir -= player.Position;
             dir.Normalize();
             player.Direction = dir;
@@ -89,21 +92,22 @@ namespace DyingAndMore
         /// <param name="Bounds">The bounds of the viewport</param>
         public override void Draw(Microsoft.Xna.Framework.GameTime Time)
         {
-            graphicsDevice.SetRenderTarget(renderTarget);
+            GraphicsDevice.SetRenderTarget(renderTarget);
             sbatch.Begin(SpriteSortMode.Deferred);
             
-            sbatch.Draw(background, graphicsDevice.Viewport.Bounds, Color.White);
-            
-            map.Draw(sbatch, player.Position, graphicsDevice.Viewport.Bounds);
+            map.Draw(player.Position, GraphicsDevice.Viewport.Bounds);
 
             fnt.Draw(sbatch, player.Velocity.Length().ToString("N2"), new Vector2(10), Color.White);
-            fnt.Draw(sbatch, (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2"), new Vector2(200, 10), Color.LightSteelBlue);
+
+            var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
+            fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - fnt.MeasureString(sFps).X - 10, 10), Color.LightSteelBlue);
+
             sbatch.End();
-            graphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.SetRenderTarget(null);
             
             //post fx
             sbatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, postEffect, null);
-            sbatch.Draw(renderTarget, graphicsDevice.Viewport.Bounds, Color.White);
+            sbatch.Draw(renderTarget, GraphicsDevice.Viewport.Bounds, Color.White);
             sbatch.End();
         }
     }

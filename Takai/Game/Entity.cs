@@ -16,7 +16,7 @@ namespace Takai.Game
         /// <summary>
         /// The section the entity is located in in the map, null if none or if in the active set
         /// </summary>
-        public MapSector Section { get; internal set; } = null;
+        public MapSector Sector { get; internal set; } = null;
 
         /// <summary>
         /// Determines if the entity is thinking (alive)
@@ -60,16 +60,25 @@ namespace Takai.Game
         }
         public float RadiusSq { get; private set; }
         private float radius = 1;
-        
+
+        /// <summary>
+        /// On collision, should this entity try to 'uncollide' with the entity
+        /// </summary>
+        /// <example>Triggers would have this set to false</example>
+        public bool IsPhysical { get; set; } = true;
+
         /// <summary>
         /// The sprite for this entity (may be null for things like triggers)
         /// Can be updated by components
         /// </summary>
         public Graphics.Graphic Sprite { get; set; } = null;
 
-        public Entity()
-        {
-        }
+        /// <summary>
+        /// Draw an outline around the sprite. If A is 0, ignored
+        /// </summary>
+        public Color OutlineColor { get; set; } = Color.Transparent;
+
+        public Entity() { }
         
         /// <summary>
         /// Add a component
@@ -136,21 +145,28 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Called when there is a collision between this and another entity
+        /// Called when there is a collision between this entity and another entity
         /// </summary>
         /// <param name="Collider">The entity collided with</param>
         public virtual void OnEntityCollision(Entity Collider)
         {
-            //todo: handle default collision resolution
         }
 
         /// <summary>
-        /// Called when there is a collision between this and another entity
+        /// Called when there is a collision between this entity and the map
         /// </summary>
         /// <param name="Tile">The tile on the map where the collision occurred</param>
         public virtual void OnMapCollision(Point Tile)
         {
-            Velocity = Vector2.Zero; //todo: only cut overlapping velocity
+        }
+
+        /// <summary>
+        /// Called when there is a collision between this entity and a blob
+        /// </summary>
+        /// <param name="Type">The type of blob collided with</param>
+        public virtual void OnBlobCollision(BlobType Type)
+        {
+
         }
     }
 }
