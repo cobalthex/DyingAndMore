@@ -122,5 +122,14 @@
             base.Restart();
         }
 #endif
+        
+        /// <summary>
+        /// Is the animation at the end (and not looping)
+        /// </summary>
+        /// <returns>True if at the end</returns>
+        public bool IsFinished()
+        {
+            return !IsRunning && (currentFrame >= frameCount);
+        }
     }
 }

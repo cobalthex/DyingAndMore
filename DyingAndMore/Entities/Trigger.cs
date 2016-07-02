@@ -17,9 +17,9 @@ namespace DyingAndMore.Entities
     }
 
     /// <summary>
-    /// Triggers an action whenever an entity enters the volume
+    /// A basic trigger, performs an action when an entity enters the collidable region
     /// </summary>
-    class TriggerVolume : Takai.Game.Entity
+    class Trigger : Takai.Game.Entity
     {
         /// <summary>
         /// This trigger only affects players

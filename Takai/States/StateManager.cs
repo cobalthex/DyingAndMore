@@ -217,7 +217,7 @@ namespace Takai.States
         /// <param name="s">State to activate</param>
         static void ActivateState(State s)
         {
-            s.graphicsDevice = game.GraphicsDevice;
+            s.GraphicsDevice = game.GraphicsDevice;
             s.startTime = time.TotalGameTime;
 
             s.Activate();

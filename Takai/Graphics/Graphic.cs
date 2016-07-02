@@ -15,11 +15,11 @@ namespace Takai.Graphics
         /// <summary>
         /// The previous frame is faded out while the next frame is faded in
         /// </summary>
-        Simultaneous,
+        Overlapping,
         /// <summary>
         /// The next frame is faded in before the previous frame is faded out
         /// </summary>
-        Consecutive,
+        Sequentially,
     }
 
     /// <summary>
@@ -44,13 +44,13 @@ namespace Takai.Graphics
         /// </summary>
         public Rectangle bounds;
         /// <summary>
-        /// The width of the graphic
+        /// The width of the graphic (or one frame)
         /// </summary>
-        public int width { get { return size.X; } }
+        public int Width { get { return size.X; } }
         /// <summary>
-        /// The height of the graphic
+        /// The height of the graphic (or one frame)
         /// </summary>
-        public int height { get { return size.Y; } }
+        public int Height { get { return size.Y; } }
 
         /// <summary>
         /// The region to take the animation from in the image
@@ -112,7 +112,7 @@ namespace Takai.Graphics
         }
 
         public Graphic(Texture2D Image, Point FrameSize, Rectangle? Bounds, Rectangle? ClipRect, uint NumFrames, System.TimeSpan FrameLength,
-            AnimationOptions AnimationOptions, TweenStyle TweenStyle = TweenStyle.Consecutive)
+            AnimationOptions AnimationOptions, TweenStyle TweenStyle = TweenStyle.Sequentially)
             : base(NumFrames, FrameLength, AnimationOptions)
         {
             image = Image;
@@ -260,7 +260,7 @@ namespace Takai.Graphics
                 Rectangle rgn = new Rectangle(_clip.X + ((size.X * (int)cf) % _clip.Width), _clip.Y + ((int)cf / row) * size.Y, size.X, size.Y);
                 Rectangle rgn2 = new Rectangle(_clip.X + ((size.X * nf) % _clip.Width), _clip.Y + (nf / row) * size.Y, size.X, size.Y);
 
-                if (tween == TweenStyle.Simultaneous)
+                if (tween == TweenStyle.Overlapping)
                 {
                     Color c = hue;
                     float dif = cf - (int)cf; //0-1 percentage between frameCount
@@ -271,7 +271,7 @@ namespace Takai.Graphics
                     c.A = (byte)(MathHelper.Lerp(0, hue.A, 1 - (dif)));
                     DrawImage(image, SpriteBatch, placement, Bounds, Angle, origin, rgn, c); //draw current frame
                 }
-                else if (tween == TweenStyle.Consecutive)
+                else if (tween == TweenStyle.Sequentially)
                 {
                     Color c = hue;
                     float dif = cf - (int)cf; //0-1 percentage between frameCount

@@ -40,7 +40,7 @@
         /// <summary>
         /// The graphics device for this game (only set if state is active)
         /// </summary>
-        public Microsoft.Xna.Framework.Graphics.GraphicsDevice graphicsDevice { get; internal set; }
+        public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice { get; internal set; }
 
         #endregion
 

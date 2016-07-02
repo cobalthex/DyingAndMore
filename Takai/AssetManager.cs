@@ -349,5 +349,20 @@ namespace Takai
         {
             return assets.GetEnumerator();
         }
+
+        //Export the names of all of the loaded assets
+        public static void ExportNames(Stream Stream, String Separator)
+        {
+            if (assets.Count < 1)
+                return;
+            
+            bool first = true;
+            foreach (var key in assets.Keys)
+            {
+                var bytes = System.Text.Encoding.Unicode.GetBytes((first ? "" : Separator) + key);
+                Stream.Write(bytes, 0, bytes.Length);
+                first = false;
+            }
+        }
     }
 }

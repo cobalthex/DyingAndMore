@@ -40,8 +40,7 @@ namespace DyingAndMore.Entities
             var vel = Velocity;
 
             if (vel == lastVelocity)
-                vel = Vector2.Zero;
-                //vel = Vector2.Lerp(vel, Vector2.Zero,  * (float)Time.ElapsedGameTime.TotalSeconds);
+                vel = Vector2.Lerp(vel, Vector2.Zero, 10 * (float)Time.ElapsedGameTime.TotalSeconds);
             if (System.Math.Abs(vel.X) < 0.01f)
                 vel.X = 0;
             if (System.Math.Abs(vel.Y) < 0.01f)
