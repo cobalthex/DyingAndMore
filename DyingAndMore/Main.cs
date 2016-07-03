@@ -1,5 +1,4 @@
 //Main.cs
-//Copyright Dejitaru Forge 2012
 
 using Takai.States;
 using Microsoft.Xna.Framework;

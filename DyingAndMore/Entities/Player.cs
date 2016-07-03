@@ -17,22 +17,21 @@ namespace DyingAndMore.Entities
             var idle = new Takai.Graphics.Graphic
             (
                 Takai.AssetManager.Load<Texture2D>("Textures/Player.png"),
-                new Point(48, 48),
-                null,
-                null,
+                48,
+                48,
                 2,
                 System.TimeSpan.FromMilliseconds(150),
-                Takai.AnimationOptions.Loop | Takai.AnimationOptions.StartImmediately,
-                Takai.Graphics.TweenStyle.None
+                true,
+                true
             );
             Radius = 24;
             idle.CenterOrigin();
 
             var dying = idle.Clone();
-            dying.clipRect = new Rectangle(0, 96, 48, 48);
-            dying.isLooping = false;
-            dying.frameLength = System.TimeSpan.FromSeconds(1);
-            dying.tween = Takai.Graphics.TweenStyle.Sequentially;
+            dying.ClipRect = new Rectangle(0, 96, 48, 48);
+            dying.IsLooping = false;
+            dying.FrameTime = System.TimeSpan.FromSeconds(1);
+            dying.Tween = Takai.Graphics.TweenStyle.Sequentially;
             
             state.States.Add("idle", idle);
             state.States.Add("dying", dying);
@@ -47,6 +46,7 @@ namespace DyingAndMore.Entities
             blobType2.Drag = 1.8f;
             blobType2.Radius = 10;
             blobType2.Texture = Takai.AssetManager.Load<Texture2D>("Textures/bblob.png");
+            blobType2.Reflection = Takai.AssetManager.Load<Texture2D>("Textures/bblobr.png");
         }
 
         System.TimeSpan lastShotTime = System.TimeSpan.Zero;
@@ -89,7 +89,7 @@ namespace DyingAndMore.Entities
                 Map.SpawnBlob(Position + ((Radius + 30) * Direction), Direction * 100, isLsh ? blobType2 : blobType);
             }
 
-            Map.DebugLine(Position, Position + Direction * 100, Color.GreenYellow);
+            Map.DebugLine(Position, Position + Direction * 1000, Color.GreenYellow);
 
             base.Think(Time);
         }

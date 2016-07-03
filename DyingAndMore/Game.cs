@@ -23,6 +23,7 @@ namespace DyingAndMore
 
         }
 
+        Entities.Actor ent;
         public override void Load()
         {
             fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
@@ -36,22 +37,19 @@ namespace DyingAndMore
             map.decal = Takai.AssetManager.Load<Texture2D>("Textures/sparkparticle.png");
 
             player = map.SpawnEntity<Entities.Player>(new Vector2(100), Vector2.UnitX, Vector2.Zero);
-            player.OutlineColor = Color.Blue;
 
-            var ent = map.SpawnEntity<Entities.Actor>(new Vector2(40), Vector2.UnitX, Vector2.Zero);
+            ent = map.SpawnEntity<Entities.Actor>(new Vector2(40), Vector2.UnitX, Vector2.Zero);
             var sprite = new Takai.Graphics.Graphic
             (
                 Takai.AssetManager.Load<Texture2D>("Textures/Astrovirus.png"),
-                new Point(42, 42),
-                null,
-                null,
+                42,
+                42,
                 6,
                 System.TimeSpan.FromMilliseconds(30),
-                Takai.AnimationOptions.Loop | Takai.AnimationOptions.StartImmediately,
-                Takai.Graphics.TweenStyle.Sequentially
+                true
             );
-            ent.Radius = 24;
-            sprite.origin = new Vector2(sprite.Width / 2, sprite.Height / 2);
+            ent.Radius = sprite.Width / 2;
+            sprite.CenterOrigin();
             ent.Sprite = sprite;
 
             sbatch = new SpriteBatch(GraphicsDevice);
@@ -82,7 +80,15 @@ namespace DyingAndMore
             //dir -= player.Position;
             dir.Normalize();
             player.Direction = dir;
+
+            float t;
+            var tgt = map.TraceLine(player.Position, player.Direction, out t);
+            if (tgt != null)
+                tgt.OutlineColor = Color.Gold;
+            debugText = t.ToString("N2");
+
         }
+        string debugText;
 
         /// <summary>
         /// Draw the map, centerd around the camera
@@ -97,8 +103,7 @@ namespace DyingAndMore
             
             map.Draw(player.Position, GraphicsDevice.Viewport.Bounds);
 
-            fnt.Draw(sbatch, player.Velocity.Length().ToString("N2"), new Vector2(10), Color.White);
-
+            fnt.Draw(sbatch, debugText, new Vector2(10), Color.CornflowerBlue);
             var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
             fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - fnt.MeasureString(sFps).X - 10, 10), Color.LightSteelBlue);
 
@@ -109,6 +114,8 @@ namespace DyingAndMore
             sbatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, postEffect, null);
             sbatch.Draw(renderTarget, GraphicsDevice.Viewport.Bounds, Color.White);
             sbatch.End();
+
+            ent.OutlineColor = Color.Transparent;
         }
     }
 }

@@ -202,10 +202,17 @@ namespace Takai
                 asset = SoundEffect.FromStream(Stream);
             else if (typeof(T) == typeof(Effect))
                 asset = new Effect(GraphicsDevice, ReadToEnd(Stream));
-
+            
             if (asset != null)
             {
                 assets.Add(Name, asset);
+
+#if DEBUG
+                var gfx = asset as GraphicsResource;
+                if (gfx != null)
+                    gfx.Name = Name;
+#endif
+
                 return (T)asset;
             }
 

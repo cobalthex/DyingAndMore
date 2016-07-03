@@ -15,9 +15,13 @@ namespace Takai.Game
         protected GraphicsDevice GraphicsDevice { get; set; }
         protected SpriteBatch sbatch;
         protected DepthStencilState stencilWrite, stencilRead;
-        protected AlphaTestEffect mapAlphaTest, metaAlphaTest;
-        protected RenderTarget2D mainRenderTarget, postRenderTarget;
+        protected AlphaTestEffect metaAlphaTest;
+        protected RenderTarget2D blobsRenderTarget;
+        protected RenderTarget2D reflectionRenderTarget;
+        protected RenderTarget2D entsRenderTarget;
         protected Effect outlineEffect;
+        protected Effect blobEffect;
+        protected Effect reflectionEffect; //writes color and reflection information to two render targets
 
         public Texture2D TilesImage { get; set; }
 
@@ -69,16 +73,16 @@ namespace Takai.Game
                     0, 1
                 );
 
-                mapAlphaTest = new AlphaTestEffect(GDevice) { Projection = m };
-                mapAlphaTest.ReferenceAlpha = 1;
-
                 metaAlphaTest = new AlphaTestEffect(GDevice) { Projection = m };
                 metaAlphaTest.ReferenceAlpha = 128;
-
-                mainRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PreserveContents);
-                postRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                
+                blobsRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                reflectionRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                entsRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
                 outlineEffect = Takai.AssetManager.Load<Effect>("Shaders/Outline.mgfx");
+                blobEffect = Takai.AssetManager.Load<Effect>("Shaders/Blob.mgfx");
+                reflectionEffect = Takai.AssetManager.Load<Effect>("Shaders/Reflection.mgfx");
             }
         }
 
@@ -103,6 +107,17 @@ namespace Takai.Game
         }
 
         /// <summary>
+        /// Get the world position of the top left corner of the camera's view
+        /// </summary>
+        /// <param name="Camera">The position of the camera</param>
+        /// <param name="Viewport">The viewport rectangle, centered around the camera</param>
+        /// <returns>The world position of the camera</returns>
+        public Vector2 GetViewStart(Vector2 Camera, Rectangle Viewport)
+        {
+            return new Vector2(Viewport.X, Viewport.Y) - (Camera - (new Vector2(Viewport.Width, Viewport.Height) / 2));
+        }
+
+        /// <summary>
         /// Draw the map, centered around the Camera
         /// </summary>
         /// <param name="Sbatch">The spritebatch to use</param>
@@ -111,20 +126,13 @@ namespace Takai.Game
         /// <remarks>All rendering management handled internally</remarks>
         public void Draw(Vector2 Camera, Rectangle Viewport)
         {
-            var lastRt = GraphicsDevice.GetRenderTargets();
+            var originalRt = GraphicsDevice.GetRenderTargets();
 
             var outlined = new List<Entity>();
 
 #if DEBUG
             DebugProfilingInfo dbgInfo = new DebugProfilingInfo();
 #endif
-
-            //map tiles
-
-            GraphicsDevice.SetRenderTarget(mainRenderTarget);
-            GraphicsDevice.Clear(Color.TransparentBlack); //todo: replace with background
-
-            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilWrite, null, mapAlphaTest);
 
             var half = Camera - (new Vector2(Viewport.Width, Viewport.Height) / 2);
 
@@ -139,6 +147,90 @@ namespace Takai.Game
 
             endX = System.Math.Min(endX + 1, Width);
             endY = System.Math.Min(endY + 1, Height);
+
+            //visible sector region
+            int sStartX = System.Math.Max((startX / sectorSize) - 1, 0);
+            int sStartY = System.Math.Max((startY / sectorSize) - 1, 0);
+            int sEndX = System.Math.Min(1 + (endX - 1) / sectorSize, Width / sectorSize);
+            int sEndY = System.Math.Min(1 + (endY - 1) / sectorSize, Height / sectorSize);
+
+            var view = new Vector2(Viewport.X, Viewport.Y) - half;
+
+            //entities
+            GraphicsDevice.SetRenderTarget(entsRenderTarget);
+            GraphicsDevice.Clear(Color.TransparentBlack);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, stencilRead);
+
+            foreach (var ent in ActiveEnts)
+            {
+                if (ent.Sprite != null)
+                {
+#if DEBUG
+                    dbgInfo.visibleEnts++;
+#endif
+
+                    if (ent.OutlineColor.A > 0)
+                        outlined.Add(ent);
+                    else
+                    {
+                        var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                        ent.Sprite.Draw(sbatch, view + ent.Position, angle);
+                    }
+                }
+            }
+
+            sbatch.End();
+
+            //outlined entities
+            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilRead, null, outlineEffect);
+
+            foreach (var ent in outlined)
+            {
+                outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / ent.Sprite.Texture.Width, 1.0f / ent.Sprite.Texture.Height));
+                outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(ent.Sprite.Width, ent.Sprite.Height));
+                var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                ent.Sprite.Draw(sbatch, view + ent.Position, angle, ent.OutlineColor);
+            }
+
+            sbatch.End();
+
+            //metablobs (alpha tested)
+            GraphicsDevice.SetRenderTargets(blobsRenderTarget, reflectionRenderTarget);
+            GraphicsDevice.Clear(Color.TransparentBlack);
+            sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, reflectionEffect);
+
+            //inactive blobs
+            for (var y = sStartY; y < sEndY; y++)
+            {
+                for (var x = sStartX; x < sEndX; x++)
+                {
+                    foreach (var blob in Sectors[y, x].blobs)
+                    {
+#if DEBUG
+                        dbgInfo.visibleInactiveBlobs++;
+#endif
+                        reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
+                        sbatch.Draw(blob.type.Texture, view + blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
+                    }
+                }
+            }
+            //active blobs
+            foreach (var blob in ActiveBlobs)
+            {
+#if DEBUG
+                dbgInfo.visibleActiveBlobs++;
+#endif
+                reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
+                sbatch.Draw(blob.type.Texture, view + blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
+            }
+
+            sbatch.End();
+
+            //main render
+            GraphicsDevice.SetRenderTargets(originalRt);
+
+            //map tiles
+            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilWrite);
 
             for (var y = startY; y < endY; y++)
             {
@@ -164,10 +256,7 @@ namespace Takai.Game
 
             sbatch.End();
 
-            var view = new Vector2(Viewport.X, Viewport.Y) - half;
-
             //decals
-
             var rnd = new System.Random(2);
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead);
 
@@ -175,94 +264,22 @@ namespace Takai.Game
                 sbatch.Draw(decal, view + new Vector2(600 + (i % 10) * 30, 40 + (i / 10) * rnd.Next(0, 4) * 40), Color.White);
 
             sbatch.End();
-
-            //entities
-
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, stencilRead);
-
-            foreach (var ent in ActiveEnts)
-            {
-                if (ent.Sprite != null)
-                {
-#if DEBUG
-                    dbgInfo.visibleEnts++;
-#endif
-
-                    if (ent.OutlineColor.A > 0)
-                        outlined.Add(ent);
-                    else
-                    {
-                        var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                        ent.Sprite.Draw(sbatch, view + ent.Position, angle);
-                    }
-                }
-            }
-
-            sbatch.End();
-
-            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilRead, null, outlineEffect);
-
-            foreach (var ent in outlined)
-            {
-                outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / ent.Sprite.image.Width, 1.0f / ent.Sprite.image.Height));
-                outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(ent.Sprite.Width, ent.Sprite.Height));
-                outlineEffect.Parameters["OutlineColor"].SetValue(ent.OutlineColor.ToVector4());
-                var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                ent.Sprite.Draw(sbatch, view + ent.Position, angle);
-            }
-
-            sbatch.End();
-
-            //visible sector region
-            startX = System.Math.Max((startX / sectorSize) - 1, 0);
-            startY = System.Math.Max((startY / sectorSize) - 1, 0);
-            endX = System.Math.Min(1 + (endX - 1) / sectorSize, Width / sectorSize);
-            endY = System.Math.Min(1 + (endY - 1) / sectorSize, Height / sectorSize);
             
-            //metablobs (alpha tested)
-
-            GraphicsDevice.SetRenderTarget(postRenderTarget);
-            GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-
-            //inactive blobs
-            for (var y = startY; y < endY; y++)
-            {
-                for (var x = startX; x < endX; x++)
-                {
-                    foreach (var blob in Sectors[y, x].blobs)
-                    {
-#if DEBUG
-                        dbgInfo.visibleInactiveBlobs++;
-#endif
-                        sbatch.Draw(blob.type.Texture, view + blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
-                    }
-                }
-            }
-            //active blobs
-            foreach (var blob in ActiveBlobs)
-            {
-#if DEBUG
-                dbgInfo.visibleActiveBlobs++;
-#endif
-                sbatch.Draw(blob.type.Texture, view + blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
-            }
-
-            sbatch.End();
-            GraphicsDevice.SetRenderTarget(mainRenderTarget);
-
-            //draw blobs onto map
-            
-            sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead, null, metaAlphaTest);
-            sbatch.Draw(postRenderTarget, Vector2.Zero, Color.White);
+            //draw blobs onto map (with reflections)
+            sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead, null, blobEffect);
+            blobEffect.Parameters["Mask"].SetValue(reflectionRenderTarget);
+            blobEffect.Parameters["Reflection"].SetValue(entsRenderTarget);
+            sbatch.Draw(blobsRenderTarget, Vector2.Zero, Color.White);
             sbatch.End();
 
-            //final render
+            //draw entities
+            sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead);
+            sbatch.Draw(entsRenderTarget, Vector2.Zero, Color.White);
+            sbatch.End();
 
-            GraphicsDevice.SetRenderTargets(lastRt);
+            //draw debug info
 
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-            sbatch.Draw(mainRenderTarget, Vector2.Zero, Color.White);
+            sbatch.Begin(SpriteSortMode.Deferred);
 
             while (debugLines.Count > 0)
             {

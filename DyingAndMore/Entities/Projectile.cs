@@ -7,6 +7,7 @@ namespace DyingAndMore.Entities
         public Projectile()
         {
             AlwaysActive = true;
+            IgnoreTrace = true;
         }
 
         public override void Load()
@@ -15,13 +16,11 @@ namespace DyingAndMore.Entities
             Sprite = new Takai.Graphics.Graphic
             (
                 tex,
-                new Point(24, 24),
-                null,
-                null,
+                24,
+                24,
                 8,
                 System.TimeSpan.FromMilliseconds(200),
-                Takai.AnimationOptions.All,
-                Takai.Graphics.TweenStyle.Sequentially
+                true
             );
             Sprite.CenterOrigin();
             base.Load();

@@ -75,6 +75,7 @@
     <Compile Include="Game\Map.cs" />
     <Compile Include="Game\Map.Drawing.cs" />
     <Compile Include="Game\Map.Helpers.cs" />
+    <Compile Include="Game\Map.Updating.cs" />
     <Compile Include="Graphics\BitmapFont.cs" />
     <Compile Include="FRectangle.cs" />
     <Compile Include="Graphics\Graphic.cs" />

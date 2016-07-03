@@ -27,422 +27,184 @@ namespace Takai.Graphics
     /// </summary>
     public class Graphic : Animation
     {
-        #region Data
+        /// <summary>
+        /// The source texture
+        /// </summary>
+        public Texture2D Texture { get; set; }
 
         /// <summary>
-        /// The image to use
+        /// The width of the graphic (the width of one frame)
         /// </summary>
-        public Texture2D image;
-
-        /// <summary>
-        /// The size of each frame
-        /// </summary>
-        public Point size;
-
-        /// <summary>
-        /// The bounds of the graphic (used in conjunction with placement)
-        /// </summary>
-        public Rectangle bounds;
-        /// <summary>
-        /// The width of the graphic (or one frame)
-        /// </summary>
-        public int Width { get { return size.X; } }
-        /// <summary>
-        /// The height of the graphic (or one frame)
-        /// </summary>
-        public int Height { get { return size.Y; } }
-
-        /// <summary>
-        /// The region to take the animation from in the image
-        /// frameCount are taken by moving to the right row by row
-        /// </summary>
-        public Rectangle clipRect
+        public int Width
         {
-            get { return _clip; }
+            get { return width; }
             set
             {
-                if (value == Rectangle.Empty)
-                    _clip = image.Bounds;
-                else
-                    _clip = value;
+                width = value;
+                if (value != 0)
+                    framesPerRow = (ClipRect.Width / value);
             }
         }
-        Rectangle _clip;
+        private int width;
 
         /// <summary>
-        /// The specific placement of the graphic inside the bounds
+        /// The height of the graphic (the height of one frame)
         /// </summary>
-        public GraphicPlacement placement;
-
-        /// <summary>
-        /// An optional hue to apply to the image
-        /// </summary>
-        public Color hue;
-
-        /// <summary>
-        /// Tween the animation (smooth between frameCount)
-        /// </summary>
-        public TweenStyle tween;
-
-        /// <summary>
-        /// The angle of the graphic
-        /// </summary>
-        public float angle;
-        /// <summary>
-        /// The origin for rotation
-        /// </summary>
-        public Vector2 origin;
-
-        #endregion
-
-        /// <summary>
-        /// Create a default graphic
-        /// </summary>
-        public Graphic()
+        public int Height
         {
-            placement = GraphicPlacement.Center;
-            size = Point.Zero;
-            bounds = Rectangle.Empty;
-            _clip = Rectangle.Empty;
-            image = null;
-            hue = Color.White;
-            tween = TweenStyle.None;
-            angle = 0;
-            origin = Vector2.Zero;
+            get { return height; }
+            set { height = value; }
+        }
+        private int height;
+
+        protected int framesPerRow;
+
+        /// <summary>
+        /// The region of the texture to use
+        /// </summary>
+        /// <remarks>Only full size frames are used, so any leftover space is ignored</remarks>
+        public Rectangle ClipRect
+        {
+            get { return clipRect; }
+            set
+            {
+                clipRect = value;
+                if (width != 0)
+                    framesPerRow = (value.Width / width);
+            }
+        }
+        private Rectangle clipRect;
+
+        /// <summary>
+        /// The origin of rotation for drawing
+        /// </summary>
+        public Vector2 Origin { get; set; }
+
+        /// <summary>
+        /// How inter-frames should be displayed
+        /// </summary>
+        public TweenStyle Tween { get; set; }
+
+        public Graphic() { }
+
+        public Graphic(Texture2D Texture)
+            : base()
+        {
+            this.Texture = Texture;
+            Width = Texture.Width;
+            Height = Texture.Height;
+            ClipRect = Texture.Bounds;
         }
 
-        public Graphic(Texture2D Image, Point FrameSize, Rectangle? Bounds, Rectangle? ClipRect, uint NumFrames, System.TimeSpan FrameLength,
-            AnimationOptions AnimationOptions, TweenStyle TweenStyle = TweenStyle.Sequentially)
-            : base(NumFrames, FrameLength, AnimationOptions)
+        public Graphic(Texture2D Texture, Rectangle ClipRect)
+            : base()
         {
-            image = Image;
-            size = FrameSize;
-            bounds = Bounds == null ? new Rectangle(0, 0, FrameSize.X, FrameSize.Y) : Bounds.Value;
-            hue = Color.White;
-            placement = GraphicPlacement.Center;
-            angle = 0;
-            origin = Vector2.Zero;
-            tween = TweenStyle;
-
-            if (ClipRect != null)
-                _clip = ClipRect.Value;
-            else if (image == null)
-                _clip = Rectangle.Empty;
-            else
-                _clip = image.Bounds;
+            this.Texture = Texture;
+            this.Width = ClipRect.Width;
+            this.Height = ClipRect.Height;
+            this.ClipRect = ClipRect;
+            this.Origin = Vector2.Zero;
+            this.Tween = TweenStyle.None;
         }
 
-        /// <summary>
-        /// Create a static graphic
-        /// </summary>
-        /// <param name="Image">The image to use</param>
-        /// <param name="Bounds">The position and size of the image</param>
-        /// <param name="ClipRect">The portion of the image to use</param>
-        public Graphic(Texture2D Image, Rectangle? Bounds = null, Rectangle? ClipRect = null)
-            : base(0, System.TimeSpan.Zero, AnimationOptions.None)
+        public Graphic
+        (
+            Texture2D Texture,
+            int Width,
+            int Height,
+            int FrameCount,
+            System.TimeSpan FrameTime,
+            bool ShouldLoop,
+            bool StartImmediately = true
+        ) : base(FrameCount, FrameTime, ShouldLoop, StartImmediately)
         {
-            image = Image;
-            size = new Point(Image.Bounds.Width, Image.Bounds.Height);
-            bounds = Bounds == null ? new Rectangle(0, 0, Image.Bounds.Width, Image.Bounds.Height) : Bounds.Value;
-            hue = Color.White;
-            placement = GraphicPlacement.Center;
-            tween = TweenStyle.None;
-            angle = 0;
-            origin = Vector2.Zero;
-
-            if (ClipRect != null)
-                _clip = ClipRect.Value;
-            else if (image == null)
-                _clip = Rectangle.Empty;
-            else
-                _clip = image.Bounds;
+            this.Texture = Texture;
+            this.Width = Width;
+            this.Height = Height;
+            this.ClipRect = Texture.Bounds;
+            this.Origin = Vector2.Zero;
+            this.Tween = TweenStyle.None;
         }
 
-        /// <summary>
-        /// Center the origin of the sprite
-        /// </summary>
-        public void CenterOrigin()
+        public Graphic
+        (
+            Texture2D Texture,
+            int Width,
+            int Height,
+            Rectangle ClipRect,
+            int FrameCount,
+            System.TimeSpan FrameTime,
+            bool ShouldLoop,
+            bool StartImmediately = true
+        ) : base(FrameCount, FrameTime, ShouldLoop, StartImmediately)
         {
-            origin = size.ToVector2() / 2;
+            this.Texture = Texture;
+            this.Width = Width;
+            this.Height = Height;
+            this.ClipRect = ClipRect;
+            this.Origin = Vector2.Zero;
+            this.Tween = TweenStyle.None;
         }
-
-        /// <summary>
-        /// Export the graphic's information (not texture) as a single packed string
-        /// </summary>
-        /// <returns>The packed string</returns>
-        public string Export()
+        
+        public new Graphic Clone()
         {
-            throw new System.NotImplementedException();
-        }
-
-        /// <summary>
-        /// Import a graphic from a string and a texture
-        /// </summary>
-        /// <param name="Texture"></param>
-        /// <param name="Metadata"></param>
-        /// <returns>The created graphic</returns>
-        public static Graphic Import(Texture2D Texture, string Metadata)
-        {
-            throw new System.NotImplementedException();
+            return (Graphic)this.MemberwiseClone();
         }
 
         /// <summary>
-        /// Duplicate the graphic
+        /// A helper method to center the origin of the image
         /// </summary>
-        /// <returns>A duplicated version of the graphic</returns>
-        public Graphic Clone()
+        /// <returns>The centered origin</returns>
+        public Vector2 CenterOrigin()
         {
-            Graphic g = (Graphic)MemberwiseClone();
-
-            if (IsRunning)
-                g.Restart();
-            else
-                g.Reset();
-
-            return g;
+            Origin = new Vector2(width / 2, height / 2);
+            return Origin;
         }
 
         /// <summary>
-        /// Draw the sprite at its current frame
+        /// Get the clip rect for a single frame of the image
         /// </summary>
-        /// <param name="SpriteBatch">Spritebatch to use</param>
-        public void Draw(SpriteBatch SpriteBatch)
+        /// <param name="Frame"></param>
+        /// <returns></returns>
+        public Rectangle GetFrameRect(int Frame)
         {
-            Draw(SpriteBatch, bounds, angle);
+            return new Rectangle((Frame % framesPerRow) * Width, (Frame / framesPerRow) * Height, Width, Height);
         }
+
+        //todo: tweening
 
         public void Draw(SpriteBatch SpriteBatch, Vector2 Position)
         {
-            Draw(SpriteBatch, Position, angle);
+            SpriteBatch.Draw(Texture, Position, GetFrameRect(CurrentFrame), Color.White);
         }
-
+        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, Color Color)
+        {
+            SpriteBatch.Draw(Texture, Position, GetFrameRect(CurrentFrame), Color);
+        }
         public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle)
         {
-            var bnd = new Rectangle((int)Position.X, (int)Position.Y, bounds.Width, bounds.Height);
-            Draw(SpriteBatch, bnd, Angle);
+            SpriteBatch.Draw(Texture, Position, GetFrameRect(CurrentFrame), Color.White, Angle, Origin, 1, SpriteEffects.None, 0);
+        }
+        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle, Color Color)
+        {
+            SpriteBatch.Draw(Texture, Position, GetFrameRect(CurrentFrame), Color, Angle, Origin, 1, SpriteEffects.None, 0);
         }
 
-        /// <summary>
-        /// Draw the sprite at a specific location at its current frame
-        /// </summary>
-        /// <param name="SpriteBatch">Spritebatch to use</param>
-        /// <param name="Bounds">Specific location to draw at</param>
         public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds)
         {
-            Draw(SpriteBatch, Bounds, angle);
+            SpriteBatch.Draw(Texture, Bounds, GetFrameRect(CurrentFrame), Color.White);
         }
-
-        /// <summary>
-        /// Draw the sprite at a specific location at its current frame
-        /// </summary>
-        /// <param name="SpriteBatch">Spritebatch to use</param>
-        /// <param name="Bounds">Specific location to draw at</param>
-        /// <param name="Angle">The angle to draw the image at</param>
+        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, Color Color)
+        {
+            SpriteBatch.Draw(Texture, Bounds, GetFrameRect(CurrentFrame), Color);
+        }
         public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle)
         {
-            if (image == null)
-                throw new System.ArgumentNullException("Texture cannot be null");
-            if (frameCount < 2) //no animation
-            {
-                DrawImage(image, SpriteBatch, placement, Bounds, Angle, origin, _clip, hue);
-                return;
-            }
-
-            int row = _clip.Width / size.X;
-
-            if (tween != TweenStyle.None && (isLooping || currentFrame < frameCount))
-            {
-                //current frame and next frame
-                float cf = MathHelper.Clamp(((float)(Elapsed - offset).Ticks / frameLength.Ticks) % frameCount, 0, frameCount + 1);
-                int nf = ((int)cf + 1) % (int)frameCount;
-
-                //regions of current and next frame
-                Rectangle rgn = new Rectangle(_clip.X + ((size.X * (int)cf) % _clip.Width), _clip.Y + ((int)cf / row) * size.Y, size.X, size.Y);
-                Rectangle rgn2 = new Rectangle(_clip.X + ((size.X * nf) % _clip.Width), _clip.Y + (nf / row) * size.Y, size.X, size.Y);
-
-                if (tween == TweenStyle.Overlapping)
-                {
-                    Color c = hue;
-                    float dif = cf - (int)cf; //0-1 percentage between frameCount
-                    c.A = (byte)MathHelper.Lerp(0, hue.A, dif);
-                    if (isLooping || currentFrame < frameCount - 1)
-                        DrawImage(image, SpriteBatch, placement, Bounds, Angle, origin, rgn2, c); //draw next frame
-
-                    c.A = (byte)(MathHelper.Lerp(0, hue.A, 1 - (dif)));
-                    DrawImage(image, SpriteBatch, placement, Bounds, Angle, origin, rgn, c); //draw current frame
-                }
-                else if (tween == TweenStyle.Sequentially)
-                {
-                    Color c = hue;
-                    float dif = cf - (int)cf; //0-1 percentage between frameCount
-                    if (dif <= 0.5f) //next frame
-                        c.A = (byte)MathHelper.Lerp(0, hue.A, dif * 2);
-                    if (isLooping || currentFrame < frameCount - 1)
-                        DrawImage(image, SpriteBatch, placement, Bounds, Angle, origin, rgn2, c); //draw next frame
-
-                    if (dif >= 0.5f) //current frame
-                        c.A = (byte)(MathHelper.Lerp(0, hue.A, 1 - (dif * 2)));
-                    else
-                        c.A = (byte)hue.A;
-                    DrawImage(image, SpriteBatch, placement, Bounds, Angle, origin, rgn, c); //draw current frame
-                }
-            }
-            else
-            {
-                int cf = (int)currentFrame;
-                Rectangle rgn = new Rectangle(_clip.X + ((size.X * cf) % _clip.Width), _clip.Y + (cf / row) * size.Y, size.X, size.Y);
-
-                DrawImage(image, SpriteBatch, placement, Bounds, Angle, origin, rgn, hue);
-            }
+            SpriteBatch.Draw(Texture, Bounds, GetFrameRect(CurrentFrame), Color.White, Angle, Origin, SpriteEffects.None, 0);
         }
-
-        /// <summary>
-        /// Draw an image with its placement settings
-        /// </summary>
-        /// <param name="Image">The image to draw</param>
-        /// <param name="SpriteBatch">The spritebatch to draw with</param>
-        /// <param name="Placement">The placement of the image</param>
-        /// <param name="Region">The region of the image to pick from</param>
-        /// <param name="Bounds">An optional boundary to draw to</param>
-        /// <param name="Hue">An optional hue to apply to the image; white for no hue</param>
-        public static void DrawImage(Texture2D Image, SpriteBatch SpriteBatch, GraphicPlacement Placement, Rectangle Bounds, Rectangle? Region, Color? Hue)
+        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle, Color Color)
         {
-            DrawImage(Image, SpriteBatch, Placement, Bounds, 0, Vector2.Zero, Region, Hue);
+            SpriteBatch.Draw(Texture, Bounds, GetFrameRect(CurrentFrame), Color, Angle, Origin, SpriteEffects.None, 0);
         }
-
-        /// <summary>
-        /// Draw an image with its placement settings
-        /// </summary>
-        /// <param name="Image">The image to draw</param>
-        /// <param name="SpriteBatch">The spritebatch to draw with</param>
-        /// <param name="Placement">The placement of the image</param>
-        /// <param name="Region">The region of the image to pick from</param>
-        /// <param name="Origin">The origin of rotation</param>
-        /// <param name="Rotation">Rotational amount in radians</param>
-        /// <param name="Bounds">An optional boundary to draw to</param>
-        /// <param name="Hue">An optional hue to apply to the image; white for no hue</param>
-        public static void DrawImage(Texture2D Image, SpriteBatch SpriteBatch, GraphicPlacement Placement, Rectangle Bounds, float Rotation, Vector2 Origin, Rectangle? Region, Color? Hue)
-        {
-            if (Image == null)
-                return;
-
-            Rectangle b = Bounds;
-
-            Color hu = Hue == null ? Color.White : (Color)Hue;
-            Rectangle rgn = (Region == null || Region.Value == Rectangle.Empty ? Image.Bounds : (Rectangle)Region);
-
-            //draw based on placement
-            if (Placement == GraphicPlacement.None) //None
-            {
-                int lesx = (rgn.Width < b.Width ? rgn.Width : b.Width);
-                int lesy = (rgn.Height < b.Height ? rgn.Height : b.Height);
-                SpriteBatch.Draw(Image, new Rectangle(b.X, b.Y, lesx, lesy), new Rectangle(rgn.X, rgn.Y, lesx, lesy), hu, Rotation, Origin, SpriteEffects.None, 0);
-            }
-
-            else if (Placement == GraphicPlacement.Center) //Centered
-            {
-                //calc center and don't let dimensions bigger than bounds
-                Rectangle r = rgn;
-                int wd = rgn.Width;
-                int hd = rgn.Height;
-                if (rgn.Width > b.Width)
-                {
-                    wd = b.Width - r.Width;
-                    r.X = rgn.X - (wd >> 1);
-                    r.Width = b.Width;
-                }
-                if (rgn.Height > b.Height)
-                {
-                    hd = b.Height - r.Height;
-                    r.Y = rgn.Y - (hd >> 1);
-                    r.Height = b.Height;
-                }
-
-                SpriteBatch.Draw(Image, new Rectangle(b.X + (b.Width - (wd < b.Width ? r.Width : b.Width) >> 1), b.Y + (b.Height - (r.Height < b.Height ? r.Height : b.Height) >> 1), r.Width, r.Height),
-                    r, hu, Rotation, Origin, SpriteEffects.None, 0);
-            }
-
-            else if (Placement == GraphicPlacement.CenterStretch) //Stretched if larger, centered if smaller
-            {
-                Rectangle loc = new Rectangle(b.X, b.Y, b.Width, b.Height);
-                //b.X + (b.Width - (wd < b.Width ? r.Width : b.Width) >> 1), b.Y + (b.Height - (r.Height < b.Height ? r.Height : b.Height) >> 1)
-
-                if (rgn.Width < b.Width)
-                {
-                    int n = b.Width - rgn.Width;
-                    loc.X += n >> 1;
-                    loc.Width -= n;
-                }
-                if (rgn.Height < b.Height)
-                {
-                    int n = b.Height - rgn.Height;
-                    loc.Y += n >> 1;
-                    loc.Height -= n;
-                }
-
-                SpriteBatch.Draw(Image, loc, rgn, hu, Rotation, Origin, SpriteEffects.None, 0);
-            }
-
-            else if (Placement == GraphicPlacement.Tile) //Tile
-            {
-                //Calc max number of visible items in region
-                int xr = (int)System.Math.Ceiling((float)b.Width / rgn.Width);
-                int yr = (int)System.Math.Ceiling((float)b.Height / rgn.Height);
-
-                //calculate the size when clipped
-                int clipx = rgn.Width - ((xr * rgn.Width) - b.Width);
-                int clipy = rgn.Height - ((yr * rgn.Height) - b.Height);
-
-                for (int x = 0; x < xr; x++)
-                    for (int y = 0; y < yr; y++)
-                    {
-                        //calculate boundaries, but clip if image dimensions exceed bounds
-                        Rectangle bd = new Rectangle(b.X + x * rgn.Width, b.Y + y * rgn.Height, (x + 1) * rgn.Width > b.Width ? clipx : rgn.Width,
-                            (y + 1) * rgn.Height > b.Height ? clipy : rgn.Height);
-
-                        SpriteBatch.Draw(Image, bd, new Rectangle(rgn.X, rgn.Y, bd.Width, bd.Height), hu, Rotation, Origin, SpriteEffects.None, 0);
-                    }
-            }
-
-            else if (Placement == GraphicPlacement.Stretch) //Stretch
-                SpriteBatch.Draw(Image, b, rgn, hu, Rotation, Origin, SpriteEffects.None, 0);
-
-            else if (Placement == GraphicPlacement.Fit) //Fit
-            { throw new System.NotImplementedException(); }
-        }
-    }
-
-
-    /// <summary>
-    /// Specify how an graphic is placed in a specific region
-    /// </summary>
-    public enum GraphicPlacement : byte
-    {
-        /// <summary>
-        /// Default placement
-        /// </summary>
-        None = 0,
-        /// <summary>
-        /// Center the image (does not fit to dimensions)
-        /// </summary>
-        Center,
-        /// <summary>
-        /// Center the image if the region is larger than the image or stretch the image if the region is smaller
-        /// </summary>
-        CenterStretch,
-        /// <summary>
-        /// Tile the image, if larger than dimensions, draws with top left orientation
-        /// </summary>
-        Tile,
-        /// <summary>
-        /// Stretch the image to fit the dimensions
-        /// </summary>
-        Stretch,
-        /// <summary>
-        /// Fit the image to the dimensions without frameLength/width size ratio
-        /// 
-        /// NOT IMPLEMENTED
-        /// </summary>
-        Fit
     }
 }

@@ -17,9 +17,9 @@ namespace Takai.Graphics
         public System.Collections.Generic.Dictionary<char, Rectangle> characters { get; protected set; }
 
         /// <summary>
-        /// The image with all of the characters
+        /// The source texture holding all of the character images
         /// </summary>
-        public Texture2D image { get; protected set; }
+        public Texture2D texture { get; protected set; }
         /// <summary>
         /// Spacing between each character when drawn
         /// </summary>
@@ -76,7 +76,7 @@ namespace Takai.Graphics
             } while (red > 0);
 
             ms.Seek(0, System.IO.SeekOrigin.Begin);
-            font.image = Texture2D.FromStream(GDev, ms);
+            font.texture = Texture2D.FromStream(GDev, ms);
 
             read.Close();
 
@@ -88,7 +88,7 @@ namespace Takai.Graphics
         /// </summary>
         public void Dispose()
         {
-            image.Dispose();
+            texture.Dispose();
             spacing = Point.Zero;
             characters.Clear();
             System.GC.SuppressFinalize(this);
@@ -108,6 +108,9 @@ namespace Takai.Graphics
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and www (base 33) to set the color in RGB. use `x to reset the color</remarks>
         public void Draw(SpriteBatch Spritebatch, string String, Vector2 Position, Color Color)
         {
+            if (String == null)
+                return;
+
             Vector2 pos = Position;
             int maxH = 0;
             Color curColor = Color;
@@ -156,7 +159,7 @@ namespace Takai.Graphics
                 if (!characters.TryGetValue(String[i], out rgn))
                     continue;
 
-                Spritebatch.Draw(image, pos, rgn, curColor);
+                Spritebatch.Draw(texture, pos, rgn, curColor);
                 pos.X += rgn.Width + spacing.X;
                 maxH = (int)MathHelper.Max(maxH, rgn.Height);
             }
@@ -285,7 +288,7 @@ namespace Takai.Graphics
                 else
                     rgn.Height = (rgn.Height > Bounds.Height ? Bounds.Height : rgn.Height);
 
-                Spritebatch.Draw(image, new Vector2(Bounds.X + pos.X, Bounds.Y + pos.Y), rgn, curColor);
+                Spritebatch.Draw(texture, new Vector2(Bounds.X + pos.X, Bounds.Y + pos.Y), rgn, curColor);
                 pos.X += rgn.Width + spacing.X;
                 maxH = (int)MathHelper.Max(maxH, rgn.Height);
             }
