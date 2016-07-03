@@ -1,0 +1,23 @@
+Terms:
+	RT(name) - set the render target to <name>
+
+
+
+
+Render process:
+	RT(entsRt)
+	Draw all visible entities
+
+	RT(blobsRt, reflectionRt)
+	Draw all visible blobs' color mask to blobsRt and reflection mask to reflectionRt
+
+	RT(preRt)
+	Draw map tiles and write to stencil mask
+	Draw decals and clip with stencil
+	Draw blobsRt, multiplying with entsRt using ReflectionsRt to distort (also has alpha test)
+	Draw entsRt
+	Draw debug info
+
+	RT(postRt)
+	Draw preRT with specified shader
+	Draw UI

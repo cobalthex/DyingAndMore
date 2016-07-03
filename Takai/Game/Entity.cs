@@ -8,6 +8,20 @@ namespace Takai.Game
     public class Entity
     {
         internal System.Collections.Generic.Dictionary<System.Type, Component> components = new System.Collections.Generic.Dictionary<System.Type, Component>();
+        
+        /// <summary>
+        /// The current position of the entity
+        /// </summary>
+        public Vector2 Position { get; set; }
+        /// <summary>
+        /// The (normalized) direction the entity is facing
+        /// </summary>
+        /// <remarks>This vector should always be normalized</remarks>
+        public Vector2 Direction { get; set; } = Vector2.UnitX;
+        /// <summary>
+        /// The direction the entity is moving
+        /// </summary>
+        public Vector2 Velocity { get; set; } = Vector2.Zero;
 
         /// <summary>
         /// The map the entity is in, null if none
@@ -28,20 +42,6 @@ namespace Takai.Game
         /// </summary>
         /// <remarks>This is typically used for things like projectiles</remarks>
         public bool AlwaysActive { get; set; } = false;
-        
-        /// <summary>
-        /// The current position of the entity
-        /// </summary>
-        public Vector2 Position { get; set; }
-        /// <summary>
-        /// The (normalized) direction the entity is facing
-        /// </summary>
-        /// <remarks>This vector should always be normalized</remarks>
-        public Vector2 Direction { get; set; } = Vector2.UnitX;
-        /// <summary>
-        /// The direction the entity is moving
-        /// </summary>
-        public Vector2 Velocity { get; set; } = Vector2.Zero;
         
         /// <summary>
         /// The radius of this entity. Used mainly for broad-phase collision
@@ -68,10 +68,15 @@ namespace Takai.Game
         public bool IsPhysical { get; set; } = true;
 
         /// <summary>
+        /// Trace (raycast) queries should ignore this entity
+        /// </summary>
+        public bool IgnoreTrace { get; set; } = false;
+
+        /// <summary>
         /// The sprite for this entity (may be null for things like triggers)
         /// Can be updated by components
         /// </summary>
-        public Graphics.Graphic Sprite { get; set; } = null;
+        public Graphics.Graphic Sprite { get; set; } = null; //todo: maybe replace with simpler graphic
 
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored

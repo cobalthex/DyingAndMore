@@ -47,40 +47,83 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Trace a line, searching active entities on the map to see if there is a collision
+        /// Calculate a list of entities that are potentially visible (in front of the viewer)
+        /// Only searches through active entities.
         /// </summary>
-        /// <param name="Start">The starting position to search</param>
-        /// <param name="Direction">The direction to search from</param>
-        /// <param name="T">How far in <paramref name="Direction"/> from <paramref name="Start"/> the collision occcured</param>
-        /// <returns>An entity, if found. Null if none</returns>
-        /// <remarks>Does not perform any map testing (use CanSee)</remarks>
-        public Entity TraceLine(Vector2 Start, Vector2 Direction, out float T, float MaxDistance = 0)
+        /// <param name="Start">Where to look from</param>
+        /// <param name="Direction">What direction to look in</param>
+        /// <param name="FieldOfView">The field of view, in radians (0 to Pi)</param>
+        /// <param name="MaxDistance">The maximum distance to search</param>
+        /// <returns>The set of potential visible ents, sorted by distance (Dictionary of &lt;distance sq, entity&gt;)</returns>
+        /// <remarks>Entities at Start or ignore traces are not added</remarks>
+        public SortedDictionary<float, Entity> PotentialVisibleSet(Vector2 Start, Vector2 Direction, float FieldOfView = MathHelper.Pi, float MaxDistance = 0)
         {
-            SortedDictionary<float, Entity> ents = new SortedDictionary<float, Entity>(); //ents sorted by distance
-
+            var ents = new SortedDictionary<float, Entity>();
+           
             MaxDistance *= MaxDistance;
-
-            //find the closest entity
+            FieldOfView = 1 - MathHelper.Clamp(FieldOfView / MathHelper.Pi, 0, 1);
+            
             foreach (var ent in ActiveEnts)
             {
-                if (ent.Position == Start)
+                if (ent.IgnoreTrace || ent.Position == Start)
                     continue;
 
                 var diff = ent.Position - Start;
 
-                //must be in front of vector
-                if (Vector2.Dot(diff, Direction) <= 0)
+                //must be in front of viewer
+                if (Vector2.Dot(diff, Direction) < FieldOfView) //todo: fix to handle non-normalized directions
                     continue;
 
                 var lsq = diff.LengthSquared();
-                if (lsq <= MaxDistance)
+                if (MaxDistance == 0 || lsq <= MaxDistance)
                     ents.Add(lsq, ent);
             }
 
-            foreach (var ent in ents)
+            return ents;
+        }
+
+        /// <summary>
+        /// Trace a line and return for the first entity hit. Uses PotentialVisibleSet (same rules apply)
+        /// </summary>
+        /// <param name="Start">The starting position to search</param>
+        /// <param name="Direction">The direction to search from</param>
+        /// <param name="T">How far in <paramref name="Direction"/> from <paramref name="Start"/> the collision occcured</param>
+        /// <param name="MaxDistance">The maximum search distance (not used if EntsToSearch is provided)</param>
+        /// <param name="EntsToSearch">
+        /// Provide an explicit list of entities to search through
+        /// Key should be the squared distance between start and the entity
+        /// If null, uses PotentialVisibleSet()
+        /// </param>
+        /// <returns>An entity, if found. Null if none</returns>
+        /// <remarks>Does not perform any map testing (use CanSee)</remarks>
+        public Entity TraceLine(Vector2 Start, Vector2 Direction, out float T, float MaxDistance = 0, SortedDictionary<float, Entity> EntsToSearch = null)
+        {
+            //check for intersections
+            foreach (var ent in EntsToSearch ?? PotentialVisibleSet(Start, Direction, MathHelper.Pi, MaxDistance))
             {
-                //check intersection
-                
+                var diff = ent.Value.Position - Start;
+                var lf = Vector2.Dot(Direction, diff);
+                var s = ent.Value.RadiusSq - ent.Key + (lf * lf);
+
+                if (s < 0)
+                    continue; //no intersection
+
+                s = (float)System.Math.Sqrt(s);
+                if (lf < s)
+                {
+                    if (lf + s >= 0)
+                    {
+                        T = lf + s;
+                        return ent.Value;
+                    }
+                    else
+                        System.Diagnostics.Debug.WriteLine("wtf");
+                }
+                else
+                {
+                    T = lf - s;
+                    return ent.Value;
+                }
             }
             
             T = 0;
