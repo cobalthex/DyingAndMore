@@ -10,11 +10,7 @@ namespace DyingAndMore
         Takai.Graphics.BitmapFont fnt;
 
         SpriteBatch sbatch;
-        Effect postEffect = null;
-        RenderTarget2D renderTarget;
-
-        Texture2D background;
-
+        
         Takai.Game.Map map;
 
         public Game()
@@ -53,19 +49,8 @@ namespace DyingAndMore
             ent.Sprite = sprite;
 
             sbatch = new SpriteBatch(GraphicsDevice);
-
-            //postEffect = Takai.AssetManager.Load<Effect>("Shaders/test.mgfx");
-            //background = Takai.AssetManager.Load<Texture2D>("Textures/Background.png");
-             
-            renderTarget = new RenderTarget2D
-            (
-                GraphicsDevice,
-                GraphicsDevice.Viewport.Width,
-                GraphicsDevice.Viewport.Height,
-                false,
-                SurfaceFormat.Color,
-                DepthFormat.Depth24Stencil8
-            );
+            
+            map.debugOptions.showProfileInfo = true;
         }
 
         public override void Update(GameTime Time)
@@ -74,7 +59,12 @@ namespace DyingAndMore
 
             if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.Q))
                 Takai.States.StateManager.Exit();
-            
+
+            if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.F1))
+                map.debugOptions.showProfileInfo = !map.debugOptions.showProfileInfo;
+            if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.F2))
+                map.debugOptions.showBlobReflectionMask = !map.debugOptions.showBlobReflectionMask;
+
             var dir = Takai.Input.InputCatalog.MouseState.Position.ToVector2();
             dir -= new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height) / 2;
             //dir -= player.Position;
@@ -98,23 +88,14 @@ namespace DyingAndMore
         /// <param name="Bounds">The bounds of the viewport</param>
         public override void Draw(Microsoft.Xna.Framework.GameTime Time)
         {
-            GraphicsDevice.SetRenderTarget(renderTarget);
-            sbatch.Begin(SpriteSortMode.Deferred);
-            
             map.Draw(player.Position, GraphicsDevice.Viewport.Bounds);
 
+            sbatch.Begin(SpriteSortMode.Deferred);
             fnt.Draw(sbatch, debugText, new Vector2(10), Color.CornflowerBlue);
             var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
             fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - fnt.MeasureString(sFps).X - 10, 10), Color.LightSteelBlue);
-
             sbatch.End();
-            GraphicsDevice.SetRenderTarget(null);
             
-            //post fx
-            sbatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, postEffect, null);
-            sbatch.Draw(renderTarget, GraphicsDevice.Viewport.Bounds, Color.White);
-            sbatch.End();
-
             ent.OutlineColor = Color.Transparent;
         }
     }

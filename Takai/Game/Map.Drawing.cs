@@ -15,13 +15,19 @@ namespace Takai.Game
         protected GraphicsDevice GraphicsDevice { get; set; }
         protected SpriteBatch sbatch;
         protected DepthStencilState stencilWrite, stencilRead;
-        protected AlphaTestEffect metaAlphaTest;
+        protected AlphaTestEffect mapAlphaTest;
+        protected RenderTarget2D preRenderTarget;
         protected RenderTarget2D blobsRenderTarget;
-        protected RenderTarget2D reflectionRenderTarget;
-        protected RenderTarget2D entsRenderTarget;
+        protected RenderTarget2D reflectionRenderTarget; //the reflection mask
+        protected RenderTarget2D reflectedRenderTarget; //draw all things that should be reflected here
         protected Effect outlineEffect;
         protected Effect blobEffect;
         protected Effect reflectionEffect; //writes color and reflection information to two render targets
+
+        /// <summary>
+        /// An optional, fullscreen post process effect to apply at the end of rendering
+        /// </summary>
+        public Effect PostEffect { get; set; } = null;
 
         public Texture2D TilesImage { get; set; }
 
@@ -32,6 +38,38 @@ namespace Takai.Game
         
         public Takai.Graphics.BitmapFont DebugFont { get; set; }
         public Texture2D decal;
+
+        /// <summary>
+        /// Configurable debug options
+        /// </summary>
+        public struct DebugOptions
+        {
+            public bool showProfileInfo;
+            public bool showBlobReflectionMask;
+        }
+
+        public DebugOptions debugOptions;
+        
+        /// <summary>
+        /// Draw a line the next frame
+        /// </summary>
+        /// <param name="Start">The start position of the line</param>
+        /// <param name="End">The end position of the line</param>
+        /// <param name="Color">The color of the line</param>
+        /// <remarks>Lines are world relative</remarks>
+        public void DebugLine(Vector2 Start, Vector2 End, Color Color)
+        {
+            debugLines.Add(new DrawLine { color = Color, start = Start, end = End });
+        }
+
+        protected struct DebugProfilingInfo
+        {
+            public int visibleEnts;
+            public int visibleInactiveBlobs;
+            public int visibleActiveBlobs;
+            public int visibleDecals;
+        }
+
 
         /// <summary>
         /// Create a new map
@@ -73,37 +111,19 @@ namespace Takai.Game
                     0, 1
                 );
 
-                metaAlphaTest = new AlphaTestEffect(GDevice) { Projection = m };
-                metaAlphaTest.ReferenceAlpha = 128;
-                
-                blobsRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                mapAlphaTest = new AlphaTestEffect(GDevice) { Projection = m };
+                mapAlphaTest.ReferenceAlpha = 1;
+
+                preRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                blobsRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
                 reflectionRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-                entsRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                reflectedRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                //todo: some of the render targets may be able to be combined
 
                 outlineEffect = Takai.AssetManager.Load<Effect>("Shaders/Outline.mgfx");
                 blobEffect = Takai.AssetManager.Load<Effect>("Shaders/Blob.mgfx");
                 reflectionEffect = Takai.AssetManager.Load<Effect>("Shaders/Reflection.mgfx");
             }
-        }
-
-        /// <summary>
-        /// Draw a line the next frame
-        /// </summary>
-        /// <param name="Start">The start position of the line</param>
-        /// <param name="End">The end position of the line</param>
-        /// <param name="Color">The color of the line</param>
-        /// <remarks>Lines are world relative</remarks>
-        public void DebugLine(Vector2 Start, Vector2 End, Color Color)
-        {
-            debugLines.Add(new DrawLine { color = Color, start = Start, end = End });
-        }
-
-        protected struct DebugProfilingInfo
-        {
-            public int visibleEnts;
-            public int visibleInactiveBlobs;
-            public int visibleActiveBlobs;
-            public int visibleDecals;
         }
 
         /// <summary>
@@ -157,7 +177,7 @@ namespace Takai.Game
             var view = new Vector2(Viewport.X, Viewport.Y) - half;
 
             //entities
-            GraphicsDevice.SetRenderTarget(entsRenderTarget);
+            GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, stencilRead);
 
@@ -227,10 +247,10 @@ namespace Takai.Game
             sbatch.End();
 
             //main render
-            GraphicsDevice.SetRenderTargets(originalRt);
-
+            GraphicsDevice.SetRenderTargets(preRenderTarget);
+            
             //map tiles
-            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilWrite);
+            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilWrite, null, mapAlphaTest);
 
             for (var y = startY; y < endY; y++)
             {
@@ -264,17 +284,26 @@ namespace Takai.Game
                 sbatch.Draw(decal, view + new Vector2(600 + (i % 10) * 30, 40 + (i / 10) * rnd.Next(0, 4) * 40), Color.White);
 
             sbatch.End();
-            
+
             //draw blobs onto map (with reflections)
-            sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead, null, blobEffect);
-            blobEffect.Parameters["Mask"].SetValue(reflectionRenderTarget);
-            blobEffect.Parameters["Reflection"].SetValue(entsRenderTarget);
-            sbatch.Draw(blobsRenderTarget, Vector2.Zero, Color.White);
-            sbatch.End();
+            if (debugOptions.showBlobReflectionMask)
+            {
+                sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+                sbatch.Draw(reflectionRenderTarget, Vector2.Zero, Color.White);
+                sbatch.End();
+            }
+            else
+            {
+                sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead, null, blobEffect);
+                blobEffect.Parameters["Mask"].SetValue(reflectionRenderTarget);
+                blobEffect.Parameters["Reflection"].SetValue(reflectedRenderTarget);
+                sbatch.Draw(blobsRenderTarget, Vector2.Zero, Color.White);
+                sbatch.End();
+            }
 
             //draw entities
             sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead);
-            sbatch.Draw(entsRenderTarget, Vector2.Zero, Color.White);
+            sbatch.Draw(reflectedRenderTarget, Vector2.Zero, Color.White);
             sbatch.End();
 
             //draw debug info
@@ -288,19 +317,25 @@ namespace Takai.Game
                 debugLines.RemoveAt(debugLines.Count - 1);
             }
 
-#if DEBUG
-            var dbgString = string.Format
-            (
-                "Visible\n======\nEnts: {0}\nInactive blobs: {1}\nActive Blobs: {2}\nDecals: {3}",
-                dbgInfo.visibleEnts,
-                dbgInfo.visibleInactiveBlobs,
-                dbgInfo.visibleActiveBlobs,
-                dbgInfo.visibleDecals
-            );
+            if (debugOptions.showProfileInfo)
+            {
+                var dbgString = string.Format
+                (
+                    "Visible\n======\nEnts: {0}\nInactive blobs: {1}\nActive Blobs: {2}\nDecals: {3}",
+                    dbgInfo.visibleEnts,
+                    dbgInfo.visibleInactiveBlobs,
+                    dbgInfo.visibleActiveBlobs,
+                    dbgInfo.visibleDecals
+                );
 
-            DebugFont.Draw(sbatch, dbgString, new Vector2(10, 30), Color.White);
-#endif
+                DebugFont.Draw(sbatch, dbgString, new Vector2(10, 30), Color.White);
+            }
 
+            sbatch.End();
+
+            GraphicsDevice.SetRenderTargets(originalRt);
+            sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, PostEffect);
+            sbatch.Draw(preRenderTarget, Vector2.Zero, Color.White);
             sbatch.End();
         }
     }
