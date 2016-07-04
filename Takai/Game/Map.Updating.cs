@@ -38,7 +38,7 @@ namespace Takai.Game
                 blob.position += deltaV;
                 blob.velocity -= deltaV * blob.type.Drag;
 
-                //todo: maybe add collision detection for better fluid simulation (drag increases when colliding)
+                //todo: maybe add collision detection for better fluid simulation (combine drag when colliding)
 
                 if (System.Math.Abs(blob.velocity.X) < 1 && System.Math.Abs(blob.velocity.Y) < 1)
                 {
@@ -97,7 +97,9 @@ namespace Takai.Game
                     else if (ent.Velocity != Vector2.Zero)
                     {
                         float t;
-                        var target = TraceLine(ent.Position, ent.Direction, out t);
+                        var nv = ent.Velocity;
+                        nv.Normalize();
+                        var target = TraceLine(ent.Position, nv, out t);
                         if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
                         {
                             ent.OnEntityCollision(target);
