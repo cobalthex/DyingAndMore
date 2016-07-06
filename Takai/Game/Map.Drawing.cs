@@ -46,6 +46,8 @@ namespace Takai.Game
         {
             public bool showProfileInfo;
             public bool showBlobReflectionMask;
+            public bool showOnlyReflections;
+            public bool showEntInfo;
         }
 
         public DebugOptions debugOptions;
@@ -134,7 +136,7 @@ namespace Takai.Game
         /// <returns>The world position of the camera</returns>
         public Vector2 GetViewStart(Vector2 Camera, Rectangle Viewport)
         {
-            return new Vector2(Viewport.X, Viewport.Y) - (Camera - (new Vector2(Viewport.Width, Viewport.Height) / 2));
+            return new Vector2(Viewport.X - (int)Camera.X - (Viewport.Width / 2), Viewport.Y - (int)Camera.X - (Viewport.Width / 2));
         }
 
         /// <summary>
@@ -150,11 +152,10 @@ namespace Takai.Game
 
             var outlined = new List<Entity>();
 
-#if DEBUG
             DebugProfilingInfo dbgInfo = new DebugProfilingInfo();
-#endif
 
-            var half = Camera - (new Vector2(Viewport.Width, Viewport.Height) / 2);
+            var half = new Vector2((int)Camera.X, (int)Camera.Y) - (new Vector2(Viewport.Width, Viewport.Height) / 2);
+            var view = new Vector2(Viewport.X, Viewport.Y) - half;
 
             var startX = (int)half.X / tileSize;
             var startY = (int)half.Y / tileSize;
@@ -174,8 +175,6 @@ namespace Takai.Game
             int sEndX = System.Math.Min(1 + (endX - 1) / sectorSize, Width / sectorSize);
             int sEndY = System.Math.Min(1 + (endY - 1) / sectorSize, Height / sectorSize);
 
-            var view = new Vector2(Viewport.X, Viewport.Y) - half;
-
             //entities
             GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
@@ -185,9 +184,7 @@ namespace Takai.Game
             {
                 if (ent.Sprite != null)
                 {
-#if DEBUG
                     dbgInfo.visibleEnts++;
-#endif
 
                     if (ent.OutlineColor.A > 0)
                         outlined.Add(ent);
@@ -196,6 +193,9 @@ namespace Takai.Game
                         var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
                         ent.Sprite.Draw(sbatch, view + ent.Position, angle);
                     }
+
+                    var str = string.Format("{0:N1},{1:N1}", ent.Position.X, ent.Position.Y);
+                    DebugFont.Draw(sbatch, str, view + ent.Position + new Vector2(20, -20), Color.White);
                 }
             }
 
@@ -226,9 +226,7 @@ namespace Takai.Game
                 {
                     foreach (var blob in Sectors[y, x].blobs)
                     {
-#if DEBUG
                         dbgInfo.visibleInactiveBlobs++;
-#endif
                         reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
                         sbatch.Draw(blob.type.Texture, view + blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
                     }
@@ -237,9 +235,7 @@ namespace Takai.Game
             //active blobs
             foreach (var blob in ActiveBlobs)
             {
-#if DEBUG
                 dbgInfo.visibleActiveBlobs++;
-#endif
                 reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
                 sbatch.Draw(blob.type.Texture, view + blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
             }
@@ -248,7 +244,7 @@ namespace Takai.Game
 
             //main render
             GraphicsDevice.SetRenderTargets(preRenderTarget);
-            
+
             //map tiles
             sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilWrite, null, mapAlphaTest);
 
@@ -301,9 +297,19 @@ namespace Takai.Game
                 sbatch.End();
             }
 
-            //draw entities
-            sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead);
-            sbatch.Draw(reflectedRenderTarget, Vector2.Zero, Color.White);
+            if (!debugOptions.showOnlyReflections)
+            {
+                //draw entities (and any other reflected objects)
+                sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead);
+                sbatch.Draw(reflectedRenderTarget, Vector2.Zero, Color.White);
+                sbatch.End();
+            }
+
+            //present
+            GraphicsDevice.SetRenderTargets(originalRt);
+            
+            sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, PostEffect);
+            sbatch.Draw(preRenderTarget, Vector2.Zero, Color.White);
             sbatch.End();
 
             //draw debug info
@@ -331,11 +337,6 @@ namespace Takai.Game
                 DebugFont.Draw(sbatch, dbgString, new Vector2(10, 30), Color.White);
             }
 
-            sbatch.End();
-
-            GraphicsDevice.SetRenderTargets(originalRt);
-            sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, PostEffect);
-            sbatch.Draw(preRenderTarget, Vector2.Zero, Color.White);
             sbatch.End();
         }
     }

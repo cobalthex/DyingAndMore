@@ -37,6 +37,39 @@ namespace Takai.Game
         }
 
         /// <summary>
+        /// Find all of the entities 
+        /// </summary>
+        /// <typeparam name="TEntity">The type of entity to find</typeparam>
+        /// <returns>A list of entities found</returns>
+        public List<Entity> GetEntitiesByType<TEntity>(bool SearchInactive = false) where TEntity : Entity
+        {
+            List<Entity> ents = new List<Entity>();
+
+            foreach (var ent in ActiveEnts)
+            {
+                if (ent is TEntity)
+                    ents.Add(ent);
+            }
+
+            if (SearchInactive)
+            {
+                for (var y = 0; y < Sectors.GetLength(0); y++)
+                {
+                    for (var x = 0; x < Sectors.GetLength(1); x++)
+                    {
+                        foreach (var ent in Sectors[y, x].entities)
+                        {
+                            if (ent is TEntity)
+                                ents.Add(ent);
+                        }
+                    }
+                }
+            }
+
+            return ents;
+        }
+
+        /// <summary>
         /// Check if a point is 'inside' the map
         /// </summary>
         /// <param name="Point">The point to test</param>

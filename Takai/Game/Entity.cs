@@ -5,10 +5,10 @@ namespace Takai.Game
     /// <summary>
     /// The basic entity. All actors and objects inherit from this
     /// </summary>
-    public class Entity
+    public class Entity : System.ICloneable
     {
         internal System.Collections.Generic.Dictionary<System.Type, Component> components = new System.Collections.Generic.Dictionary<System.Type, Component>();
-        
+
         /// <summary>
         /// The current position of the entity
         /// </summary>
@@ -42,7 +42,7 @@ namespace Takai.Game
         /// </summary>
         /// <remarks>This is typically used for things like projectiles</remarks>
         public bool AlwaysActive { get; set; } = false;
-        
+
         /// <summary>
         /// The radius of this entity. Used mainly for broad-phase collision
         /// </summary>
@@ -84,7 +84,22 @@ namespace Takai.Game
         public Color OutlineColor { get; set; } = Color.Transparent;
 
         public Entity() { }
-        
+
+        /// <summary>
+        /// Clone this entity
+        /// </summary>
+        /// <returns>A cloned entity</returns>
+        /// <remarks>Map information is not cloned</remarks>
+        public virtual object Clone()
+        {
+            var cloned = (Entity)MemberwiseClone();
+
+            cloned.Map = null;
+            cloned.Sector = null;
+
+            return cloned;
+        }
+
         /// <summary>
         /// Add a component
         /// </summary>
@@ -153,25 +168,18 @@ namespace Takai.Game
         /// Called when there is a collision between this entity and another entity
         /// </summary>
         /// <param name="Collider">The entity collided with</param>
-        public virtual void OnEntityCollision(Entity Collider)
-        {
-        }
+        public virtual void OnEntityCollision(Entity Collider, Vector2 Point) { }
 
         /// <summary>
         /// Called when there is a collision between this entity and the map
         /// </summary>
         /// <param name="Tile">The tile on the map where the collision occurred</param>
-        public virtual void OnMapCollision(Point Tile)
-        {
-        }
+        public virtual void OnMapCollision(Point Tile, Vector2 Point) { }
 
         /// <summary>
         /// Called when there is a collision between this entity and a blob
         /// </summary>
         /// <param name="Type">The type of blob collided with</param>
-        public virtual void OnBlobCollision(BlobType Type)
-        {
-
-        }
+        public virtual void OnBlobCollision(BlobType Type) { }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using Takai.Input;
 
 namespace DyingAndMore.Entities
 {
@@ -7,9 +9,12 @@ namespace DyingAndMore.Entities
     {
         Takai.Game.BlobType blobType, blobType2;
 
+        public Components.Weapon weapon;
+
         public Player()
         {
             AlwaysActive = true;
+            weapon = AddComponent<Components.Weapon>();
         }
 
         public override void Load()
@@ -41,16 +46,18 @@ namespace DyingAndMore.Entities
             blobType.Drag = 2.2f;
             blobType.Radius = 10;
             blobType.Texture = Takai.AssetManager.Load<Texture2D>("Textures/ablob.png");
+            blobType.Reflection = Takai.AssetManager.Load<Texture2D>("Textures/ablobr.png");
 
             blobType2 = new Takai.Game.BlobType();
             blobType2.Drag = 1.8f;
             blobType2.Radius = 10;
             blobType2.Texture = Takai.AssetManager.Load<Texture2D>("Textures/bblob.png");
             blobType2.Reflection = Takai.AssetManager.Load<Texture2D>("Textures/bblobr.png");
-        }
 
-        System.TimeSpan lastShotTime = System.TimeSpan.Zero;
-        System.TimeSpan shotDelay = System.TimeSpan.FromMilliseconds(100);
+            weapon.template = new Projectile();
+            weapon.speed = 400;
+        }
+        
         public override void Think(GameTime Time)
         {
             var vel = Velocity;
@@ -76,18 +83,15 @@ namespace DyingAndMore.Entities
             if (Sprite.IsFinished())
                 IsEnabled = false;
 
-            if (Takai.Input.InputCatalog.MouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && Time.TotalGameTime > lastShotTime + shotDelay)
-            {
-                lastShotTime = Time.TotalGameTime;
-                Map.SpawnEntity<Projectile>(Position + ((Radius + 10) * Direction), Direction, Direction * 600);
-            }
+            if (Takai.Input.InputCatalog.MouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
+                weapon.Fire();
 
-            if (Takai.Input.InputCatalog.MouseState.RightButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && Time.TotalGameTime > lastShotTime + shotDelay)
-            {
-                lastShotTime = Time.TotalGameTime;
-                bool isLsh = Takai.Input.InputCatalog.KBState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftShift);
-                Map.SpawnBlob(Position + ((Radius + 30) * Direction), Direction * 100, isLsh ? blobType2 : blobType);
-            }
+            //if (Takai.Input.InputCatalog.MouseState.RightButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && Time.TotalGameTime > lastShotTime + shotDelay)
+            //{
+            //    lastShotTime = Time.TotalGameTime;
+            //    bool isLsh = Takai.Input.InputCatalog.KBState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftShift);
+            //    Map.SpawnBlob(isLsh ? blobType2 : blobType, Position + ((Radius + 30) * Direction), Direction * 100);
+            //}
 
             Map.DebugLine(Position, Position + Direction * 1000, Color.GreenYellow);
 

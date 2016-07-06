@@ -51,6 +51,7 @@ namespace DyingAndMore
             sbatch = new SpriteBatch(GraphicsDevice);
             
             map.debugOptions.showProfileInfo = true;
+            //map.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
         }
 
         public override void Update(GameTime Time)
@@ -64,6 +65,8 @@ namespace DyingAndMore
                 map.debugOptions.showProfileInfo = !map.debugOptions.showProfileInfo;
             if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.F2))
                 map.debugOptions.showBlobReflectionMask = !map.debugOptions.showBlobReflectionMask;
+            if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.F3))
+                map.debugOptions.showOnlyReflections = !map.debugOptions.showOnlyReflections;
 
             var dir = Takai.Input.InputCatalog.MouseState.Position.ToVector2();
             dir -= new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height) / 2;
@@ -77,8 +80,11 @@ namespace DyingAndMore
                 tgt.OutlineColor = Color.Gold;
             debugText = t.ToString("N2");
 
+            cpoint = player.Position + player.Direction * t;
         }
         string debugText;
+
+        Vector2 cpoint;
 
         /// <summary>
         /// Draw the map, centerd around the camera
@@ -91,9 +97,11 @@ namespace DyingAndMore
             map.Draw(player.Position, GraphicsDevice.Viewport.Bounds);
 
             sbatch.Begin(SpriteSortMode.Deferred);
+
             fnt.Draw(sbatch, debugText, new Vector2(10), Color.CornflowerBlue);
             var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
             fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - fnt.MeasureString(sFps).X - 10, 10), Color.LightSteelBlue);
+            
             sbatch.End();
             
             ent.OutlineColor = Color.Transparent;
