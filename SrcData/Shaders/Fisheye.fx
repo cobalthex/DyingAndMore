@@ -1,0 +1,20 @@
+sampler2D Tex;
+
+float Fov = 2.1;
+
+float4 main(float4 pos : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0) : COLOR0
+{
+	uv -= 0.5;
+	float z = sqrt(1.0 - uv.x * uv.x - uv.y * uv.y);
+	float a = 1.0 / (z * tan(Fov * 0.5));
+	//a = (z * tan((3.14159 - Fov) * 0.5)) / 1.0; // reverse lens
+	return tex2D(Tex, (uv* a) + 0.5);
+}
+
+technique Technique1
+{
+    pass Pass1
+    {
+        PixelShader = compile ps_5_0 main();
+    }
+}

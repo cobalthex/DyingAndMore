@@ -120,10 +120,10 @@ namespace Takai
         /// </summary>
         /// <typeparam name="T">The type of asset to load</typeparam>
         /// <param name="File">The name of the file to load. Will be used as the asset's name by default</param>
-        /// <param name="Overwrite">If there is a name clash, unload the old one and load this over if true</param>
+        /// <param name="OverWrite">If there is a name clash, unload the old one and load this over if true</param>
         /// <param name="CustomName">Use this name as opposed to the file to idenfity this asset</param>
         /// <returns>The asset loaded or if the asset (same name) is already in the manager, it is returned. Null on unrecognized type/error</returns>
-        public static T Load<T>(string File, bool Overwrite = false, string CustomName = null)
+        public static T Load<T>(string File, bool OverWrite = false, string CustomName = null)
         {
             string file = System.IO.Path.IsPathRooted(File) ? File : System.IO.Path.Combine(RootDirectory, File);
             if (CustomName == null)
@@ -133,7 +133,7 @@ namespace Takai
                 return (T)assets[CustomName];
             if (assets.ContainsKey(CustomName))
             {
-                if (Overwrite)
+                if (OverWrite)
                     Unload(CustomName);
                 else
                     return (T)assets[CustomName];
@@ -166,13 +166,13 @@ namespace Takai
         /// <typeparam name="T">The type of asset to load</typeparam>
         /// <param name="Name">The unique name of the asset</param>
         /// <param name="Stream">The stream to load from</param>
-        /// <param name="LoadOver">If there is a name clash, unload the old one and load this over if true</param>
+        /// <param name="OverWrite">If there is a name clash, unload the old one and load this over if true</param>
         /// <returns>The asset loaded or if the asset (same name) is already in the manager, it is returned. Null on unrecognized type/error</returns>
-        public static T Load<T>(string Name, Stream Stream, bool LoadOver)
+        public static T Load<T>(string Name, Stream Stream, bool OverWrite)
         {
             if (assets.ContainsKey(Name))
             {
-                if (LoadOver)
+                if (OverWrite)
                 {
                     Unload(Name);
                     LoadData<T>(Name, Stream);
@@ -239,11 +239,11 @@ namespace Takai
         /// <typeparam name="T">The type of asset to load</typeparam>
         /// <param name="Name">The name of the asset to load</param>
         /// <param name="Resource">The actual resource to load</param>
-        /// <param name="LoadOver">If there is a name clash, unload the old one and load this over if true</param>
+        /// <param name="OverWrite">If there is a name clash, unload the old one and load this over if true</param>
         /// <returns>The asset if loaded, null if not</returns>
-        public static T LoadFromResource<T>(string Name, object Resource, bool LoadOver)
+        public static T LoadFromResource<T>(string Name, object Resource, bool OverWrite)
         {
-            if (assets.ContainsKey(Name))
+            if (!OverWrite && assets.ContainsKey(Name))
             {
                 return (T)assets[Name];
             }
@@ -257,7 +257,7 @@ namespace Takai
                     MemoryStream ms = new MemoryStream(bmp.Width * bmp.Height);
 
                     bmp.Save(ms, bmp.RawFormat);
-                    IDisposable tex = Load<Texture2D>(Name, ms, LoadOver);
+                    IDisposable tex = Load<Texture2D>(Name, ms, OverWrite);
                     ms.Close();
                     return (T)tex;
 #else
@@ -265,7 +265,7 @@ namespace Takai
 #endif
                 }
                 else if (typeof(T) == typeof(Takai.Graphics.BitmapFont))
-                    return (T)(IDisposable)Load<Takai.Graphics.BitmapFont>(Name, new MemoryStream((byte[])Resource), LoadOver);
+                    return (T)(IDisposable)Load<Takai.Graphics.BitmapFont>(Name, new MemoryStream((byte[])Resource), OverWrite);
             }
             catch { }
 

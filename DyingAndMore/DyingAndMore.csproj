@@ -63,11 +63,12 @@
     <StartupObject>DyingAndMore.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components\AnimState.cs" />
     <Compile Include="Components\Health.cs" />
+    <Compile Include="Components\Weapon.cs" />
     <Compile Include="Entities\Actor.cs" />
     <Compile Include="Entities\Player.cs" />
     <Compile Include="Entities\Projectile.cs" />

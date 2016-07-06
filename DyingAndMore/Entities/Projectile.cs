@@ -23,16 +23,21 @@ namespace DyingAndMore.Entities
                 true
             );
             Sprite.CenterOrigin();
+            Radius = 12;
             base.Load();
         }
 
-        public override void OnMapCollision(Point Tile)
+        public override void OnMapCollision(Point Tile, Vector2 Point)
         {
+            Map.DebugLine(Point - new Vector2(12), Point + new Vector2(12), Color.GreenYellow);
+            Map.DebugLine(Point + new Vector2(-12, 12), Point + new Vector2(12, -12), Color.GreenYellow);
             Map.Destroy(this);
         }
 
-        public override void OnEntityCollision(Takai.Game.Entity Collider)
+        public override void OnEntityCollision(Takai.Game.Entity Collider, Vector2 Point)
         {
+            Map.DebugLine(Point - new Vector2(12), Point + new Vector2(12), Color.GreenYellow);
+            Map.DebugLine(Point + new Vector2(-12, 12), Point + new Vector2(12, -12), Color.GreenYellow);
             Map.Destroy(this);
         }
     }

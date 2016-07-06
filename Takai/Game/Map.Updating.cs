@@ -42,7 +42,7 @@ namespace Takai.Game
 
                 if (System.Math.Abs(blob.velocity.X) < 1 && System.Math.Abs(blob.velocity.Y) < 1)
                 {
-                    SpawnBlob(blob.position, Vector2.Zero, blob.type); //this will move the blob to the static area of the map
+                    SpawnBlob(blob.type, blob.position, Vector2.Zero); //this will move the blob to the static area of the map
                     ActiveBlobs[i] = ActiveBlobs[ActiveBlobs.Count - 1];
                     ActiveBlobs.RemoveAt(ActiveBlobs.Count - 1);
                     i--;
@@ -88,7 +88,7 @@ namespace Takai.Game
                     if (!mapRect.Contains(ent.Position + deltaV) || (tile = Tiles[targetCell.Y, targetCell.X]) < 0)
                     // || !TilesMask[(tile / tilesPerRow) + cellPos.Y, (tile % tileSize) + cellPos.X])
                     {
-                        ent.OnMapCollision(targetCell);
+                        ent.OnMapCollision(targetCell, targetPos);
 
                         if (ent.IsPhysical)
                             ent.Velocity = Vector2.Zero;
@@ -102,19 +102,11 @@ namespace Takai.Game
                         var target = TraceLine(ent.Position, nv, out t);
                         if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
                         {
-                            ent.OnEntityCollision(target);
+                            ent.OnEntityCollision(target, ent.Position + (nv * t));
 
                             if (ent.IsPhysical)
                                 ent.Velocity = Vector2.Zero;
                         }
-
-                        //perhaps use this for discrete simulation
-                        ////todo: use potential visible set instead
-                        //for (int j = 0; j < ActiveEnts.Count; j++)
-                        //{
-                        //    if (i != j && Vector2.DistanceSquared(ent.Position, ActiveEnts[j].Position) < ent.RadiusSq + ActiveEnts[j].RadiusSq)
-                        //        ent.OnEntityCollision(ActiveEnts[j]);
-                        //}
                     }
 
                     ent.Position += ent.Velocity * deltaT;

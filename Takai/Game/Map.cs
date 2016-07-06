@@ -19,6 +19,7 @@ namespace Takai.Game
         /// Set to null or alpha = 0 for no reflection
         /// </summary>
         public Texture2D Reflection { get; set; }
+
         /// <summary>
         /// The radius of an individual blob
         /// </summary>
@@ -50,12 +51,12 @@ namespace Takai.Game
         public List<Entity> entities = new List<Entity>();
         public List<Blob> blobs = new List<Blob>();
     }
-    
+
     /// <summary>
     /// A 2D, tile based map system that handles logic and rendering of the map
     /// </summary>
     public partial class Map
-    {        
+    {
         public bool[] TilesMask { get; set; }
 
         public int TileSize
@@ -183,12 +184,23 @@ namespace Takai.Game
         }
 
         /// <summary>
+        /// Adds an existing entity to the map
+        /// </summary>
+        /// <param name="Entity">The entity to add</param>
+        public void SpawnEntity(Entity Entity)
+        {
+            Entity.Map = this;
+            ActiveEnts.Add(Entity);
+        }
+
+        /// <summary>
         /// Spawn an entity in the map
         /// </summary>
         /// <typeparam name="TEntity">The type of entity to spawn</typeparam>
         /// <param name="Position">Where to spawn the entity</param>
         /// <param name="Direction">The direction the entity should face</param>
-        /// <param name="LoadEntity">Load the entity, defaults to true</param>
+        /// <param name="Velocity">The entity's initial velocity</param>
+        /// <param name="LoadEntity">Should the entity be loaded, defaults to true</param>
         /// <returns>The entity spawned</returns>
         public TEntity SpawnEntity<TEntity>(Vector2 Position, Vector2 Direction, Vector2 Velocity, bool LoadEntity = true) where TEntity : Entity, new()
         {
@@ -210,18 +222,45 @@ namespace Takai.Game
         }
 
         /// <summary>
+        /// Spawn an entity, cloning another
+        /// </summary>
+        /// <param name="Template">The entity to clone</param>
+        /// <param name="Position">Where to spawn the entity</param>
+        /// <param name="Direction">The direction the entity should face</param>
+        /// <param name="Velocity">The entity's initial velocity</param>
+        /// <param name="LoadEntity">Should the entity be loaded, defaults to true</param>
+        /// <returns>The new entity spawned</returns>
+        public TEntity SpawnEntity<TEntity>(TEntity Template, Vector2 Position, Vector2 Direction, Vector2 Velocity, bool LoadEntity = true) where TEntity : Entity, new()
+        {
+            var ent = (TEntity)Template.Clone();
+            ent.Map = this;
+            
+            ent.Position = Position;
+            ent.Direction = Direction;
+            ent.Velocity = Velocity;
+
+            //will be removed in next update if out of visible range
+            //only inactive entities are placed in sectors
+            ActiveEnts.Add(ent);
+
+            if (LoadEntity)
+                ent.Load();
+
+            return ent;
+        }
+
+        /// <summary>
         /// Spawn a single blob onto the map
         /// </summary>
         /// <param name="Position">The position of the blob</param>
         /// <param name="Velocity">The blob's initial velocity</param>
         /// <param name="Type">The blob's type</param>
-        public void SpawnBlob(Vector2 Position, Vector2 Velocity, BlobType Type)
+        public void SpawnBlob(BlobType Type, Vector2 Position, Vector2 Velocity)
         {
             //todo: don't spawn blobs outside the map (position + radius)
 
             if (Velocity == Vector2.Zero)
             {
-                
                 var sector = Vector2.Clamp(Position / sectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
                 Sectors[sector.Y, sector.X].blobs.Add(new Blob { position = Position, velocity = Velocity, type = Type });
             }
