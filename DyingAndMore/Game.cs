@@ -1,13 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DyingAndMore
 {
     class Game : Takai.States.State
     {
-        Entities.Player player;
+        Entities.Actor player;
+        Entities.Actor ent;
+
+        Takai.Game.Camera camera;
 
         Takai.Graphics.BitmapFont fnt;
+        string debugText = "";
 
         SpriteBatch sbatch;
         
@@ -19,29 +24,61 @@ namespace DyingAndMore
 
         }
 
-        Entities.Actor ent;
         public override void Load()
         {
-            fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
+            fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/Debug.bfnt");
 
             map = Takai.Game.Map.FromCsv(GraphicsDevice, "data/maps/test.csv");
-            map.TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles.png");
+            map.TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles2.png");
             map.TileSize = 48;
             map.BuildMask(map.TilesImage, true);
+            using (var fs = new System.IO.FileStream("test.csv", System.IO.FileMode.Create))
+                map.WriteToCsv(fs);
 
             map.DebugFont = fnt;
-            map.decal = Takai.AssetManager.Load<Texture2D>("Textures/sparkparticle.png");
 
-            player = map.SpawnEntity<Entities.Player>(new Vector2(100), Vector2.UnitX, Vector2.Zero);
+            player = map.SpawnEntity<Entities.Actor>(new Vector2(100), Vector2.UnitX, Vector2.Zero, false);
+            player.MoveForce = 600;
+            player.MaxSpeed = 400;
+            player.Sprite = new Takai.Graphics.Graphic
+            (
+                Takai.AssetManager.Load<Texture2D>("Textures/Player.png"),
+                48,
+                48,
+                2,
+                System.TimeSpan.FromMilliseconds(100),
+                Takai.Graphics.TweenStyle.Overlap,
+                true
+            );
+            player.Sprite.CenterOrigin();
+            player.Radius = player.Sprite.Width / 2;
+
+            var gun = new Weapons.Gun();
+            gun.projectile = new Entities.Projectile();
+            gun.projectile.Load();
+            gun.speed = 800;
+            gun.shotDelay = System.TimeSpan.FromMilliseconds(50);
+            player.primaryWeapon = gun;
+
+            var blobber = new Weapons.BlobGun();
+            blobber.blob = new Takai.Game.BlobType();
+            blobber.blob.Radius = 54;
+            blobber.blob.Drag = 1.5f;
+            blobber.blob.Texture = Takai.AssetManager.Load<Texture2D>("Textures/bblob.png");
+            blobber.blob.Reflection = Takai.AssetManager.Load<Texture2D>("Textures/bblobr.png");
+            blobber.speed = 100;
+            player.altWeapon = blobber;
 
             ent = map.SpawnEntity<Entities.Actor>(new Vector2(40), Vector2.UnitX, Vector2.Zero);
             var sprite = new Takai.Graphics.Graphic
             (
-                Takai.AssetManager.Load<Texture2D>("Textures/Astrovirus.png"),
-                42,
-                42,
-                6,
-                System.TimeSpan.FromMilliseconds(30),
+                Takai.AssetManager.Load<Texture2D>("Textures/InfectedCell.png"),
+                64,
+                64,
+                new Rectangle(0, 32, 256, 96),
+                4,
+                System.TimeSpan.FromMilliseconds(100),
+                Takai.Graphics.TweenStyle.Overlap,
                 true
             );
             ent.Radius = sprite.Width / 2;
@@ -51,50 +88,71 @@ namespace DyingAndMore
             sbatch = new SpriteBatch(GraphicsDevice);
             
             map.debugOptions.showProfileInfo = true;
-            //map.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
-        }
+            map.debugOptions.showEntInfo = true;
+            
+            camera = new Takai.Game.Camera(map, player);
+            camera.MoveSpeed = 800;
+            camera.Viewport = GraphicsDevice.Viewport.Bounds;
+            //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
 
+            var tex = Takai.AssetManager.Load<Texture2D>("Textures/SparkParticle.png");
+            map.AddDecal(tex, new Vector2(200, 100));
+            map.AddDecal(tex, new Vector2(300, 120), 0, 2);
+        }
+        
         public override void Update(GameTime Time)
         {
-            map.Update(Time, player.Position, GraphicsDevice.Viewport.Bounds);
-
-            if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.Q))
+            if (Takai.Input.InputCatalog.IsKeyPress(Keys.Q))
                 Takai.States.StateManager.Exit();
 
-            if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.F1))
+            if (Takai.Input.InputCatalog.IsKeyPress(Keys.F1))
                 map.debugOptions.showProfileInfo = !map.debugOptions.showProfileInfo;
-            if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.F2))
+            if (Takai.Input.InputCatalog.IsKeyPress(Keys.F2))
+                map.debugOptions.showEntInfo = !map.debugOptions.showEntInfo;
+            if (Takai.Input.InputCatalog.IsKeyPress(Keys.F3))
                 map.debugOptions.showBlobReflectionMask = !map.debugOptions.showBlobReflectionMask;
-            if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.F3))
+            if (Takai.Input.InputCatalog.IsKeyPress(Keys.F4))
                 map.debugOptions.showOnlyReflections = !map.debugOptions.showOnlyReflections;
+
+            if (Takai.Input.InputCatalog.IsKeyPress(Keys.N))
+                camera.Follow = (camera.Follow == null ? player : null);
+
+            var d = Vector2.Zero;
+            if (Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.A))
+                d -= Vector2.UnitX;
+            if (Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.W))
+                d -= Vector2.UnitY;
+            if (Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.D))
+                d += Vector2.UnitX;
+            if (Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.S))
+                d += Vector2.UnitY;
+
+            player.Move(d);
+
+            if (player.primaryWeapon != null && Takai.Input.InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
+                player.primaryWeapon.Fire(Time, player);
+            if (player.altWeapon != null && Takai.Input.InputCatalog.MouseState.RightButton == ButtonState.Pressed)
+                player.altWeapon.Fire(Time, player);
 
             var dir = Takai.Input.InputCatalog.MouseState.Position.ToVector2();
             dir -= new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height) / 2;
-            //dir -= player.Position;
             dir.Normalize();
             player.Direction = dir;
 
-            float t;
-            var tgt = map.TraceLine(player.Position, player.Direction, out t);
-            if (tgt != null)
-                tgt.OutlineColor = Color.Gold;
-            debugText = t.ToString("N2");
+            if (camera.Follow == null)
+            {
+                if (d != Vector2.Zero)
+                    d.Normalize();
+                camera.Position += d * camera.MoveSpeed * (float)Time.ElapsedGameTime.TotalSeconds;
+            }
+            debugText = camera.Position.ToString();
 
-            cpoint = player.Position + player.Direction * t;
+            camera.Update(Time);
         }
-        string debugText;
-
-        Vector2 cpoint;
-
-        /// <summary>
-        /// Draw the map, centerd around the camera
-        /// </summary>
-        /// <param name="Spritebatch">Sprite batch to draw with</param>
-        /// <param name="Camera">The position of the camera (in map)</param>
-        /// <param name="Bounds">The bounds of the viewport</param>
+        
         public override void Draw(Microsoft.Xna.Framework.GameTime Time)
         {
-            map.Draw(player.Position, GraphicsDevice.Viewport.Bounds);
+            camera.Draw();
 
             sbatch.Begin(SpriteSortMode.Deferred);
 

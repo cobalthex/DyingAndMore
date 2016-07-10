@@ -15,11 +15,11 @@ namespace Takai.Graphics
         /// <summary>
         /// The previous frame is faded out while the next frame is faded in
         /// </summary>
-        Overlapping,
+        Overlap,
         /// <summary>
         /// The next frame is faded in before the previous frame is faded out
         /// </summary>
-        Sequentially,
+        Sequential,
     }
 
     /// <summary>
@@ -114,6 +114,7 @@ namespace Takai.Graphics
             int Height,
             int FrameCount,
             System.TimeSpan FrameTime,
+            TweenStyle TweenStyle,
             bool ShouldLoop,
             bool StartImmediately = true
         ) : base(FrameCount, FrameTime, ShouldLoop, StartImmediately)
@@ -123,7 +124,7 @@ namespace Takai.Graphics
             this.Height = Height;
             this.ClipRect = Texture.Bounds;
             this.Origin = Vector2.Zero;
-            this.Tween = TweenStyle.None;
+            this.Tween = TweenStyle;
         }
 
         public Graphic
@@ -134,6 +135,7 @@ namespace Takai.Graphics
             Rectangle ClipRect,
             int FrameCount,
             System.TimeSpan FrameTime,
+            TweenStyle TweenStyle,
             bool ShouldLoop,
             bool StartImmediately = true
         ) : base(FrameCount, FrameTime, ShouldLoop, StartImmediately)
@@ -143,10 +145,10 @@ namespace Takai.Graphics
             this.Height = Height;
             this.ClipRect = ClipRect;
             this.Origin = Vector2.Zero;
-            this.Tween = TweenStyle.None;
+            this.Tween = TweenStyle;
         }
-        
-        public new Graphic Clone()
+
+        public Graphic Clone()
         {
             return (Graphic)this.MemberwiseClone();
         }
@@ -168,43 +170,46 @@ namespace Takai.Graphics
         /// <returns></returns>
         public Rectangle GetFrameRect(int Frame)
         {
-            return new Rectangle((Frame % framesPerRow) * Width, (Frame / framesPerRow) * Height, Width, Height);
+            var src = new Rectangle(ClipRect.X + (Frame % framesPerRow) * Width, ClipRect.Y + (Frame / framesPerRow) * Height, Width, Height);
+            return Rectangle.Intersect(src, ClipRect);
         }
-
-        //todo: tweening
-
-        public void Draw(SpriteBatch SpriteBatch, Vector2 Position)
-        {
-            SpriteBatch.Draw(Texture, Position, GetFrameRect(CurrentFrame), Color.White);
-        }
-        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, Color Color)
-        {
-            SpriteBatch.Draw(Texture, Position, GetFrameRect(CurrentFrame), Color);
-        }
+        
         public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle)
         {
-            SpriteBatch.Draw(Texture, Position, GetFrameRect(CurrentFrame), Color.White, Angle, Origin, 1, SpriteEffects.None, 0);
-        }
-        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle, Color Color)
-        {
-            SpriteBatch.Draw(Texture, Position, GetFrameRect(CurrentFrame), Color, Angle, Origin, 1, SpriteEffects.None, 0);
+            Draw(SpriteBatch, Position, Angle, Color.White);
         }
 
-        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds)
+        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle, Color Color)
         {
-            SpriteBatch.Draw(Texture, Bounds, GetFrameRect(CurrentFrame), Color.White);
+            float frame = CurrentFrameDelta;
+            int cf = (int)frame;
+            int nf = (IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount));
+            float fd = frame - cf;
+            
+            switch (Tween)
+            {
+            case TweenStyle.None:
+                DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color);
+                break;
+
+            case TweenStyle.Overlap:
+                //todo: overlap should fade in and then fade out (maybe multiply fd * 2 and Clamp)
+                var nd = MathHelper.Clamp(fd * 2, 0, 1);
+                fd = MathHelper.Clamp((fd * 2) - 1, 0, 1);
+                DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
+                DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, nd));
+                break;
+
+            case TweenStyle.Sequential:
+                DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
+                DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, fd));
+                break;
+            }
         }
-        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, Color Color)
+
+        public void DrawFrame(SpriteBatch SpriteBatch, Rectangle Bounds, Rectangle SourceRect, float Angle, Color Color)
         {
-            SpriteBatch.Draw(Texture, Bounds, GetFrameRect(CurrentFrame), Color);
-        }
-        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle)
-        {
-            SpriteBatch.Draw(Texture, Bounds, GetFrameRect(CurrentFrame), Color.White, Angle, Origin, SpriteEffects.None, 0);
-        }
-        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle, Color Color)
-        {
-            SpriteBatch.Draw(Texture, Bounds, GetFrameRect(CurrentFrame), Color, Angle, Origin, SpriteEffects.None, 0);
+            SpriteBatch.Draw(Texture, Bounds, SourceRect, Color, Angle, Origin, SpriteEffects.None, 0);
         }
     }
 }

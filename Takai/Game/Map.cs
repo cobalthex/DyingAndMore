@@ -42,6 +42,14 @@ namespace Takai.Game
         public Vector2 velocity;
     }
 
+    public struct Decal
+    {
+        public Texture2D texture;
+        public Vector2 position;
+        public float angle;
+        public float scale;
+    }
+
     /// <summary>
     /// A single sector of the map, used for spacial calculations
     /// Sectors typically contain inactive entities that are not visible as well as dummy objects (inactive blobs, decals). 
@@ -50,6 +58,7 @@ namespace Takai.Game
     {
         public List<Entity> entities = new List<Entity>();
         public List<Blob> blobs = new List<Blob>();
+        public List<Decal> decals = new List<Decal>();
     }
 
     /// <summary>
@@ -139,6 +148,30 @@ namespace Takai.Game
                 m.BuildSectors();
 
             return m;
+        }
+
+        /// <summary>
+        /// write the map tiles to a CSV
+        /// </summary>
+        /// <param name="Stream">The stream to write to</param>
+        public void WriteToCsv(System.IO.Stream Stream)
+        {
+            var comma = System.Text.Encoding.UTF8.GetBytes(",");
+            var newl = System.Text.Encoding.UTF8.GetBytes("\n");
+
+            bool first = true;
+            for (int y = 0; y < Tiles.GetLength(0); y++)
+            {
+                for (int x = 0; x < Tiles.GetLength(1); x++)
+                {
+                    if (!first)
+                        Stream.Write(comma, 0, comma.Length);
+                    first = false;
+                    var bytes = System.Text.Encoding.UTF8.GetBytes(Tiles[y, x].ToString());
+                    Stream.Write(bytes, 0, bytes.Length);
+                }
+                Stream.Write(newl, 0, newl.Length);
+            }
         }
 
         /// <summary>
@@ -266,6 +299,19 @@ namespace Takai.Game
             }
             else
                 ActiveBlobs.Add(new Blob { position = Position, velocity = Velocity, type = Type });
+        }
+
+        /// <summary>
+        /// Add a decal to the map
+        /// </summary>
+        /// <param name="Texture"></param>
+        /// <param name="Position">The position of the decal on the map</param>
+        /// <param name="Angle">The angle the decal faces</param>
+        /// <param name="Scale">How much to scale the decal</param>
+        public void AddDecal(Texture2D Texture, Vector2 Position, float Angle = 0, float Scale = 1)
+        {
+            var sector = Vector2.Clamp(Position / sectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+            Sectors[sector.Y, sector.X].decals.Add(new Decal { texture = Texture, position = Position, angle = Angle, scale = Scale });
         }
 
         /// <summary>
