@@ -7,8 +7,6 @@ namespace Takai.Game
     /// </summary>
     public class Entity : System.ICloneable
     {
-        internal System.Collections.Generic.Dictionary<System.Type, Component> components = new System.Collections.Generic.Dictionary<System.Type, Component>();
-
         /// <summary>
         /// The current position of the entity
         /// </summary>
@@ -76,7 +74,7 @@ namespace Takai.Game
         /// The sprite for this entity (may be null for things like triggers)
         /// Can be updated by components
         /// </summary>
-        public Graphics.Graphic Sprite { get; set; } = null; //todo: maybe replace with simpler graphic
+        public Graphics.Graphic Sprite { get; set; } = null;
 
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
@@ -101,68 +99,19 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Add a component
-        /// </summary>
-        /// <typeparam name="TComponent">The type of component to add</typeparam>
-        /// <returns>The component added</returns>
-        public TComponent AddComponent<TComponent>() where TComponent : Component, new()
-        {
-            if (!components.ContainsKey(typeof(TComponent)))
-                components.Add(typeof(TComponent), new TComponent { Entity = this });
-            return GetComponent<TComponent>();
-        }
-        /// <summary>
-        /// Remove a component
-        /// </summary>
-        /// <typeparam name="TComponent">The type of component to remove</typeparam>
-        /// <returns>True if the component was removed, false if not (for example, if the component did not exist)</returns>
-        public bool RemoveComponent<TComponent>() where TComponent : Component
-        {
-            return components.Remove(typeof(TComponent));
-        }
-        /// <summary>
-        /// Get a component
-        /// </summary>
-        /// <typeparam name="TComponent">The type of component to search for</typeparam>
-        /// <returns>The component or null if not found</returns>
-        public TComponent GetComponent<TComponent>() where TComponent : Component
-        {
-            Component tc = null;
-            components.TryGetValue(typeof(TComponent), out tc);
-            return (TComponent)tc;
-        }
-
-        /// <summary>
         /// Called when the entity is loaded. Loads all components
         /// </summary>
-        public virtual void Load()
-        {
-            foreach (var behavior in components)
-                behavior.Value.Load();
-        }
+        public virtual void Load() { }
         /// <summary>
         /// Called when the entity is unloaded. Unloads all components
         /// </summary>
-        public virtual void Unload()
-        {
-            foreach (var behavior in components)
-                behavior.Value.Unload();
-        }
+        public virtual void Unload() { }
 
         /// <summary>
         /// The basic think function for this entity, called once a frame
         /// </summary>
         /// <param name="Time">Frame time</param>
-        public virtual void Think(GameTime Time)
-        {
-            foreach (var behavior in components)
-            {
-                if (!behavior.Value.IsEnabled)
-                    continue;
-
-                behavior.Value.Think(Time);
-            }
-        }
+        public virtual void Think(GameTime Time) { }
 
         /// <summary>
         /// Called when there is a collision between this entity and another entity

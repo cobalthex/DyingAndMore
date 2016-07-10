@@ -67,6 +67,7 @@ namespace DyingAndMore
             gdm.PreferredBackBufferWidth = 1280;
             gdm.PreferredBackBufferHeight = 800;
             gdm.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+            gdm.PreferMultiSampling = true;
             IsMouseVisible = true;
 #elif XBOX
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps

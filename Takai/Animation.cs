@@ -146,11 +146,6 @@
             IsLooping = false;
         }
 
-        public Animation Clone()
-        {
-            return (Animation)this.MemberwiseClone();
-        }
-
         public new void Restart()
         {
             TimeOffset = System.TimeSpan.Zero;

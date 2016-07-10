@@ -1,31 +1,65 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Takai.Graphics;
 
 namespace DyingAndMore.Entities
 {
     class Actor : Takai.Game.Entity
     {
+        private int maxHealth = 0;
+        private string currentState = null;
+        private Vector2 lastVelocity = Vector2.Zero;
+
+        /// <summary>
+        /// The current health of the actor
+        /// </summary>
+        public int CurrentHealth { get; set; }
+
+        /// <summary>
+        /// The default maximum allowed health of the entity (overhealing allowed)
+        /// </summary>
+        /// <remarks>Whenever this value is modified, the difference is added to current health</remarks>
+        public int MaxHealth
+        {
+            get { return maxHealth; }
+            set
+            {
+                CurrentHealth += (value - maxHealth);
+                maxHealth = value;
+            }
+        }
+        
+        /// <summary>
+        /// Different animation states for the actor
+        /// </summary>
+        public Dictionary<string, Graphic> States { get; set; } = new Dictionary<string, Graphic>();
+
+        /// <summary>
+        /// Get or set the current state.
+        /// Automatically updates entity sprite on set
+        /// </summary>
+        /// <remarks>Does nothing if the state does not exist</remarks>
+        public string CurrentState
+        {
+            get
+            {
+                return currentState;
+            }
+            set
+            {
+                if (States.ContainsKey(value))
+                {
+                    currentState = value;
+                    Sprite = States[currentState];
+                    Sprite.Restart();
+                }
+            }
+        }
+
         public float FieldOfView { get; set; } = MathHelper.PiOver4 * 3;
 
-        public float MaxSpeed { get; set; } = 400;
-        public float MoveForce { get; set; } = 600;
-        
-        protected Components.Health health;
-        protected Components.AnimState state;
-
-        public Actor()
-        {
-            health = AddComponent<Components.Health>();
-            state = AddComponent<Components.AnimState>();
-        }
-
-        public override void Load()
-        {
-            base.Load();
-
-            health.Max = 100;
-            health.Current = 100;
-        }
+        public float MaxSpeed { get; set; }
+        public float MoveForce { get; set; }
 
         /// <summary>
         /// The current faction. Typically used by the AI to determine enemies
@@ -33,7 +67,13 @@ namespace DyingAndMore.Entities
         /// <remarks>0 is any/no faction</remarks>
         int Faction { get; set; } = 0;
 
-        Vector2 lastVelocity = Vector2.Zero;
+        public Weapons.Weapon primaryWeapon;
+        public Weapons.Weapon altWeapon;
+
+        public Actor()
+        {
+        }
+
         public override void Think(GameTime Time)
         {
             //todo: move to physics
@@ -45,11 +85,7 @@ namespace DyingAndMore.Entities
                 vel.X = 0;
             if (System.Math.Abs(vel.Y) < 0.01f)
                 vel.Y = 0;
-
-            var lSq = vel.LengthSquared();
-            if (lSq > MaxSpeed * MaxSpeed)
-                vel = (vel / (float)System.Math.Sqrt(lSq)) * MaxSpeed;
-
+            
             Velocity = vel;
             lastVelocity = Velocity;
 
@@ -85,6 +121,15 @@ namespace DyingAndMore.Entities
 
             var dot = Vector2.Dot(diff, Ent.Direction);
             return (dot > (Ent.FieldOfView / MathHelper.Pi) - 1);
+        }
+
+        public void Move(Vector2 Direction)
+        {
+            var vel = Velocity + (Direction * MoveForce);
+            var lSq = vel.LengthSquared();
+            if (lSq > MaxSpeed * MaxSpeed)
+                vel = (vel / (float)System.Math.Sqrt(lSq)) * MaxSpeed;
+            Velocity = vel;
         }
 
         #endregion

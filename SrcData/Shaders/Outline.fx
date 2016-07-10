@@ -3,7 +3,7 @@ sampler2D Tex : register(S0);
 float2 TexNormSize; // 1 / size
 float2 FrameSize;
 
-float4 main(float4 pos : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0) : COLOR0
+float4 main(float4 pos : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0) : SV_Target
 {
     float4 px = tex2D(Tex, uv);
     if (px.a == 0)

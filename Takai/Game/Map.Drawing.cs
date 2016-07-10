@@ -6,11 +6,6 @@ namespace Takai.Game
 {
     public partial class Map
     {
-        protected struct DrawLine
-        {
-            public Color color;
-            public Vector2 start, end;
-        }
 
         protected GraphicsDevice GraphicsDevice { get; set; }
         protected SpriteBatch sbatch;
@@ -24,20 +19,16 @@ namespace Takai.Game
         protected Effect blobEffect;
         protected Effect reflectionEffect; //writes color and reflection information to two render targets
 
-        /// <summary>
-        /// An optional, fullscreen post process effect to apply at the end of rendering
-        /// </summary>
-        public Effect PostEffect { get; set; } = null;
-
         public Texture2D TilesImage { get; set; }
 
         /// <summary>
         /// A set of lines to draw during the next frame
         /// </summary>
-        protected List<DrawLine> debugLines = new List<DrawLine>(32);
+        protected List<VertexPositionColor> debugLines = new List<VertexPositionColor>(32);
+        protected Effect lineEffect;
+        protected RasterizerState lineRaster;
         
         public Takai.Graphics.BitmapFont DebugFont { get; set; }
-        public Texture2D decal;
 
         /// <summary>
         /// Configurable debug options
@@ -61,7 +52,8 @@ namespace Takai.Game
         /// <remarks>Lines are world relative</remarks>
         public void DebugLine(Vector2 Start, Vector2 End, Color Color)
         {
-            debugLines.Add(new DrawLine { color = Color, start = Start, end = End });
+            debugLines.Add(new VertexPositionColor { Position = new Vector3(Start, 0), Color = Color });
+            debugLines.Add(new VertexPositionColor { Position = new Vector3(End, 0), Color = Color });
         }
 
         protected struct DebugProfilingInfo
@@ -83,6 +75,10 @@ namespace Takai.Game
             if (GDevice != null)
             {
                 sbatch = new SpriteBatch(GDevice);
+                lineEffect = Takai.AssetManager.Load<Effect>("Shaders/Line.mgfx");
+                lineRaster = new RasterizerState();
+                lineRaster.CullMode = CullMode.None;
+                lineRaster.MultiSampleAntiAlias = true;
 
                 stencilWrite = new DepthStencilState()
                 {
@@ -129,36 +125,24 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Get the world position of the top left corner of the camera's view
-        /// </summary>
-        /// <param name="Camera">The position of the camera</param>
-        /// <param name="Viewport">The viewport rectangle, centered around the camera</param>
-        /// <returns>The world position of the camera</returns>
-        public Vector2 GetViewStart(Vector2 Camera, Rectangle Viewport)
-        {
-            return new Vector2(Viewport.X - (int)Camera.X - (Viewport.Width / 2), Viewport.Y - (int)Camera.X - (Viewport.Width / 2));
-        }
-
-        /// <summary>
         /// Draw the map, centered around the Camera
         /// </summary>
-        /// <param name="Sbatch">The spritebatch to use</param>
-        /// <param name="Camera">The center of the visible area</param>
+        /// <param name="Camera">The top-left corner of the visible area</param>
         /// <param name="Viewport">Where on screen to draw</param>
+        /// <param name="PostEffect">An optional fullscreen post effect to render with</param>
         /// <remarks>All rendering management handled internally</remarks>
-        public void Draw(Vector2 Camera, Rectangle Viewport)
+        public void Draw(Vector2 ViewStart, Rectangle Viewport, Effect PostEffect = null)
         {
             var originalRt = GraphicsDevice.GetRenderTargets();
 
             var outlined = new List<Entity>();
 
             DebugProfilingInfo dbgInfo = new DebugProfilingInfo();
+            
+            var view = new Vector2(Viewport.X, Viewport.Y) - ViewStart;
 
-            var half = new Vector2((int)Camera.X, (int)Camera.Y) - (new Vector2(Viewport.Width, Viewport.Height) / 2);
-            var view = new Vector2(Viewport.X, Viewport.Y) - half;
-
-            var startX = (int)half.X / tileSize;
-            var startY = (int)half.Y / tileSize;
+            var startX = (int)ViewStart.X / tileSize;
+            var startY = (int)ViewStart.Y / tileSize;
 
             int endX = startX + 1 + ((Viewport.Width - 1) / tileSize);
             int endY = startY + 1 + ((Viewport.Height - 1) / tileSize);
@@ -178,7 +162,7 @@ namespace Takai.Game
             //entities
             GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, stencilRead);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead);
 
             foreach (var ent in ActiveEnts)
             {
@@ -194,15 +178,27 @@ namespace Takai.Game
                         ent.Sprite.Draw(sbatch, view + ent.Position, angle);
                     }
 
-                    var str = string.Format("{0:N1},{1:N1}", ent.Position.X, ent.Position.Y);
-                    DebugFont.Draw(sbatch, str, view + ent.Position + new Vector2(20, -20), Color.White);
+                    if (debugOptions.showEntInfo)
+                    {
+                        var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                        var tip = ent.Position + (ent.Direction * ent.Radius * 1.5f);
+                        DebugLine(ent.Position, tip, Color.Yellow);
+                        float theta = MathHelper.ToRadians(150);
+
+                        float r = MathHelper.Clamp(ent.Radius * 0.5f, 5, 30);
+                        DebugLine(tip, tip + (r * new Vector2((float)System.Math.Cos(angle + theta), (float)System.Math.Sin(angle + theta))), Color.Yellow);
+                        DebugLine(tip, tip + (r * new Vector2((float)System.Math.Cos(angle - theta), (float)System.Math.Sin(angle - theta))), Color.Yellow);
+
+                        var str = string.Format("{0:N1},{1:N1}", ent.Position.X, ent.Position.Y);
+                        DebugFont.Draw(sbatch, str, view + ent.Position + new Vector2(20, -20), Color.White);
+                    }
                 }
             }
 
             sbatch.End();
 
             //outlined entities
-            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilRead, null, outlineEffect);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, outlineEffect);
 
             foreach (var ent in outlined)
             {
@@ -250,7 +246,7 @@ namespace Takai.Game
 
             for (var y = startY; y < endY; y++)
             {
-                var vy = Viewport.Y + (y * tileSize) - (int)half.Y;
+                var vy = Viewport.Y + (y * tileSize) - (int)ViewStart.Y;
 
                 for (var x = startX; x < endX; x++)
                 {
@@ -258,7 +254,7 @@ namespace Takai.Game
                     if (tile < 0)
                         continue;
 
-                    var vx = Viewport.X + (x * tileSize) - (int)half.X;
+                    var vx = Viewport.X + (x * tileSize) - (int)ViewStart.X;
 
                     sbatch.Draw
                     (
@@ -273,12 +269,29 @@ namespace Takai.Game
             sbatch.End();
 
             //decals
-            var rnd = new System.Random(2);
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead);
 
-            for (int i = 0; i < 20; i++)
-                sbatch.Draw(decal, view + new Vector2(600 + (i % 10) * 30, 40 + (i / 10) * rnd.Next(0, 4) * 40), Color.White);
-
+            for (var y = sStartY; y < sEndY; y++)
+            {
+                for (var x = sStartX; x < sEndX; x++)
+                {
+                    foreach (var decal in Sectors[y, x].decals)
+                    {
+                        sbatch.Draw
+                        (
+                            decal.texture,
+                            view + decal.position,
+                            null,
+                            Color.White,
+                            decal.angle,
+                            new Vector2(decal.texture.Width / 2, decal.texture.Height / 2),
+                            1,
+                            SpriteEffects.None,
+                            0
+                        );
+                    }
+                }
+            }
             sbatch.End();
 
             //draw blobs onto map (with reflections)
@@ -305,6 +318,22 @@ namespace Takai.Game
                 sbatch.End();
             }
 
+            //debug lines
+            if (debugLines.Count > 0)
+            {
+                GraphicsDevice.RasterizerState = lineRaster;
+                GraphicsDevice.BlendState = BlendState.AlphaBlend;
+                var projection = Matrix.CreateOrthographicOffCenter(GraphicsDevice.Viewport.Bounds, 0, 1);
+                var offset = Matrix.CreateTranslation(view.X, view.Y, 0);
+                lineEffect.Parameters["Transform"].SetValue(offset * projection);
+                foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, debugLines.ToArray(), 0, debugLines.Count / 2);
+                }
+                debugLines.Clear();
+            }
+
             //present
             GraphicsDevice.SetRenderTargets(originalRt);
             
@@ -314,17 +343,10 @@ namespace Takai.Game
 
             //draw debug info
 
-            sbatch.Begin(SpriteSortMode.Deferred);
-
-            while (debugLines.Count > 0)
-            {
-                var line = debugLines[debugLines.Count - 1];
-                Graphics.Primitives2D.DrawLine(sbatch, line.color, view + line.start, view + line.end);
-                debugLines.RemoveAt(debugLines.Count - 1);
-            }
-
             if (debugOptions.showProfileInfo)
             {
+                sbatch.Begin(SpriteSortMode.Deferred);
+
                 var dbgString = string.Format
                 (
                     "Visible\n======\nEnts: {0}\nInactive blobs: {1}\nActive Blobs: {2}\nDecals: {3}",
@@ -335,9 +357,9 @@ namespace Takai.Game
                 );
 
                 DebugFont.Draw(sbatch, dbgString, new Vector2(10, 30), Color.White);
-            }
 
-            sbatch.End();
+                sbatch.End();
+            }
         }
     }
 }

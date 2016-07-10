@@ -69,8 +69,7 @@
   <ItemGroup>
     <Compile Include="Animation.cs" />
     <Compile Include="AssetManager.cs" />
-    <Compile Include="BitConverter.cs" />
-    <Compile Include="Game\Component.cs" />
+    <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Entity.cs" />
     <Compile Include="Game\Map.cs" />
     <Compile Include="Game\Map.Drawing.cs" />
@@ -81,7 +80,6 @@
     <Compile Include="Graphics\Graphic.cs" />
     <Compile Include="Graphics\Primitives2D.cs" />
     <Compile Include="Guide.cs" />
-    <Compile Include="GUI\GUIElement.cs" />
     <Compile Include="GUI\TextBoxForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,7 +96,7 @@
     <Compile Include="Storage\FileStore.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="UI\Elements\" />
+    <Folder Include="Data\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
