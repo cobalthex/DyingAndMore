@@ -6,7 +6,6 @@ namespace Takai.Game
 {
     public partial class Map
     {
-
         protected GraphicsDevice GraphicsDevice { get; set; }
         protected SpriteBatch sbatch;
         protected DepthStencilState stencilWrite, stencilRead;
@@ -28,6 +27,7 @@ namespace Takai.Game
         protected Effect lineEffect;
         protected RasterizerState lineRaster;
         
+        [Data.NonSerialized]
         public Takai.Graphics.BitmapFont DebugFont { get; set; }
 
         /// <summary>
@@ -41,6 +41,7 @@ namespace Takai.Game
             public bool showEntInfo;
         }
 
+        [Data.NonSerialized]
         public DebugOptions debugOptions;
         
         /// <summary>
@@ -130,8 +131,9 @@ namespace Takai.Game
         /// <param name="Camera">The top-left corner of the visible area</param>
         /// <param name="Viewport">Where on screen to draw</param>
         /// <param name="PostEffect">An optional fullscreen post effect to render with</param>
+        /// <param name="DrawSectorEntities">Draw entities in sectors. Typically used for debugging/map editing</param>
         /// <remarks>All rendering management handled internally</remarks>
-        public void Draw(Vector2 ViewStart, Rectangle Viewport, Effect PostEffect = null)
+        public void Draw(Vector2 ViewStart, Rectangle Viewport, Effect PostEffect = null, bool DrawSectorEntities = false)
         {
             var originalRt = GraphicsDevice.GetRenderTargets();
 
@@ -164,6 +166,34 @@ namespace Takai.Game
             GraphicsDevice.Clear(Color.TransparentBlack);
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead);
 
+            if (DrawSectorEntities)
+            {
+                for (var y = sStartY; y < sEndY; y++)
+                {
+                    for (var x = sStartX; x < sEndX; x++)
+                    {
+                        foreach (var ent in Sectors[y, x].entities)
+                        {
+                            if (ent.Sprite != null)
+                            {
+                                dbgInfo.visibleEnts++;
+
+                                if (ent.OutlineColor.A > 0)
+                                    outlined.Add(ent);
+                                else
+                                {
+                                    var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                                    ent.Sprite.Draw(sbatch, view + ent.Position, angle);
+                                }
+                            }
+
+                            if (debugOptions.showEntInfo)
+                                DrawEntInfo(ent, view);
+                        }
+                    }
+                }
+            }
+
             foreach (var ent in ActiveEnts)
             {
                 if (ent.Sprite != null)
@@ -177,22 +207,10 @@ namespace Takai.Game
                         var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
                         ent.Sprite.Draw(sbatch, view + ent.Position, angle);
                     }
-
-                    if (debugOptions.showEntInfo)
-                    {
-                        var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                        var tip = ent.Position + (ent.Direction * ent.Radius * 1.5f);
-                        DebugLine(ent.Position, tip, Color.Yellow);
-                        float theta = MathHelper.ToRadians(150);
-
-                        float r = MathHelper.Clamp(ent.Radius * 0.5f, 5, 30);
-                        DebugLine(tip, tip + (r * new Vector2((float)System.Math.Cos(angle + theta), (float)System.Math.Sin(angle + theta))), Color.Yellow);
-                        DebugLine(tip, tip + (r * new Vector2((float)System.Math.Cos(angle - theta), (float)System.Math.Sin(angle - theta))), Color.Yellow);
-
-                        var str = string.Format("{0:N1},{1:N1}", ent.Position.X, ent.Position.Y);
-                        DebugFont.Draw(sbatch, str, view + ent.Position + new Vector2(20, -20), Color.White);
-                    }
                 }
+
+                if (debugOptions.showEntInfo)
+                    DrawEntInfo(ent, view);
             }
 
             sbatch.End();
@@ -360,6 +378,30 @@ namespace Takai.Game
 
                 sbatch.End();
             }
+        }
+
+        protected void DrawEntInfo(Entity Ent, Vector2 View)
+        {
+            //draw bounding box
+            DebugLine(new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y - Ent.Radius), new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y - Ent.Radius), Color.Red);
+            DebugLine(new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y - Ent.Radius), new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y + Ent.Radius), Color.Red);
+            DebugLine(new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y + Ent.Radius), new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y + Ent.Radius), Color.Red);
+            DebugLine(new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y + Ent.Radius), new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y - Ent.Radius), Color.Red);
+
+            //draw direction arrow
+            var angle = (float)System.Math.Atan2(Ent.Direction.Y, Ent.Direction.X);
+            var tip = Ent.Position + (Ent.Direction * Ent.Radius * 1.5f);
+            DebugLine(Ent.Position, tip, Color.Yellow);
+            float theta = MathHelper.ToRadians(150);
+
+            float r = MathHelper.Clamp(Ent.Radius * 0.5f, 5, 30);
+            DebugLine(tip, tip + (r * new Vector2((float)System.Math.Cos(angle + theta), (float)System.Math.Sin(angle + theta))), Color.Yellow);
+            DebugLine(tip, tip + (r * new Vector2((float)System.Math.Cos(angle - theta), (float)System.Math.Sin(angle - theta))), Color.Yellow);
+
+            //draw ent info string
+            var str = string.Format("{0:N1},{1:N1}", Ent.Position.X, Ent.Position.Y);
+            var sz = DebugFont.MeasureString(str);
+            DebugFont.Draw(sbatch, str, View + Ent.Position + new Vector2(sz.X / -2, Ent.Radius + 5), Color.White);
         }
     }
 }

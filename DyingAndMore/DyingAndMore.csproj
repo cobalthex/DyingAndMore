@@ -66,6 +66,7 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Editor.cs" />
     <Compile Include="Weapons\BlobGun.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\Weapon.cs" />

@@ -55,28 +55,22 @@
       <HintPath>C:\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation.cs" />
     <Compile Include="AssetManager.cs" />
+    <Compile Include="Data\Serializer.cs" />
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Entity.cs" />
     <Compile Include="Game\Map.cs" />
     <Compile Include="Game\Map.Drawing.cs" />
     <Compile Include="Game\Map.Helpers.cs" />
+    <Compile Include="Game\Map.Serialization.cs" />
     <Compile Include="Game\Map.Updating.cs" />
     <Compile Include="Graphics\BitmapFont.cs" />
-    <Compile Include="FRectangle.cs" />
     <Compile Include="Graphics\Graphic.cs" />
     <Compile Include="Graphics\Primitives2D.cs" />
     <Compile Include="Guide.cs" />
@@ -94,9 +88,6 @@
     <Compile Include="States\StateStack.cs" />
     <Compile Include="States\TestInputState.cs" />
     <Compile Include="Storage\FileStore.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
