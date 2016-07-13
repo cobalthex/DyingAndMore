@@ -18,22 +18,19 @@ namespace DyingAndMore
         
         Takai.Game.Map map;
 
-        public Game()
-            : base(Takai.States.StateType.Full)
-        {
-
-        }
+        public Game() : base(Takai.States.StateType.Full) { }
 
         public override void Load()
         {
             fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/Debug.bfnt");
 
-            map = Takai.Game.Map.FromCsv(GraphicsDevice, "data/maps/test.csv");
+            map = new Takai.Game.Map(GraphicsDevice);
+            using (var s = new System.IO.FileStream("data/maps/test.csv", System.IO.FileMode.Open))
+                map.ReadTiles(s);
             map.TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles2.png");
             map.TileSize = 48;
             map.BuildMask(map.TilesImage, true);
-            using (var fs = new System.IO.FileStream("test.csv", System.IO.FileMode.Create))
-                map.WriteToCsv(fs);
+            map.BuildSectors();
 
             map.DebugFont = fnt;
 
@@ -69,6 +66,14 @@ namespace DyingAndMore
             blobber.speed = 100;
             player.altWeapon = blobber;
 
+            //todo: change Load/Unload to OnSpawn/Destroy and call then
+
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            using (var stream = new System.IO.StreamWriter("test.map.tk"))
+                Takai.Data.Serializer.TextSerialize(stream, map);
+            sw.Stop();
+            
             ent = map.SpawnEntity<Entities.Actor>(new Vector2(40), Vector2.UnitX, Vector2.Zero);
             var sprite = new Takai.Graphics.Graphic
             (
@@ -106,13 +111,13 @@ namespace DyingAndMore
                 Takai.States.StateManager.Exit();
 
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.F1))
-                map.debugOptions.showProfileInfo = !map.debugOptions.showProfileInfo;
+                map.debugOptions.showProfileInfo ^= true;
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.F2))
-                map.debugOptions.showEntInfo = !map.debugOptions.showEntInfo;
+                map.debugOptions.showEntInfo ^= true;
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.F3))
-                map.debugOptions.showBlobReflectionMask = !map.debugOptions.showBlobReflectionMask;
+                map.debugOptions.showBlobReflectionMask ^= true;
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.F4))
-                map.debugOptions.showOnlyReflections = !map.debugOptions.showOnlyReflections;
+                map.debugOptions.showOnlyReflections ^= true;
 
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.N))
                 camera.Follow = (camera.Follow == null ? player : null);

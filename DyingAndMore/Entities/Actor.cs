@@ -32,6 +32,7 @@ namespace DyingAndMore.Entities
         /// <summary>
         /// Different animation states for the actor
         /// </summary>
+        [Takai.Data.NonSerialized]
         public Dictionary<string, Graphic> States { get; set; } = new Dictionary<string, Graphic>();
 
         /// <summary>
@@ -39,6 +40,7 @@ namespace DyingAndMore.Entities
         /// Automatically updates entity sprite on set
         /// </summary>
         /// <remarks>Does nothing if the state does not exist</remarks>
+        [Takai.Data.NonSerialized]
         public string CurrentState
         {
             get

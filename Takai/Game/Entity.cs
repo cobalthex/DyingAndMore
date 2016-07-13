@@ -1,38 +1,50 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
     /// <summary>
     /// The basic entity. All actors and objects inherit from this
     /// </summary>
-    public class Entity : System.ICloneable
+    public class Entity : ICloneable
     {
+        /// <summary>
+        /// The name of this entity. Typically used by other entities for locating
+        /// </summary>
+        public string Name { get; set; } = null;
+
         /// <summary>
         /// The current position of the entity
         /// </summary>
+        [Data.SaveState]
         public Vector2 Position { get; set; }
         /// <summary>
         /// The (normalized) direction the entity is facing
         /// </summary>
         /// <remarks>This vector should always be normalized</remarks>
+        [Data.SaveState]
         public Vector2 Direction { get; set; } = Vector2.UnitX;
         /// <summary>
         /// The direction the entity is moving
         /// </summary>
+        [Data.SaveState]
         public Vector2 Velocity { get; set; } = Vector2.Zero;
 
         /// <summary>
         /// The map the entity is in, null if none
         /// </summary>
+        [Data.NonSerialized]
         public Map Map { get; internal set; } = null;
         /// <summary>
         /// The section the entity is located in in the map, null if none or if in the active set
         /// </summary>
+        [Data.NonSerialized]
         public MapSector Sector { get; internal set; } = null;
 
         /// <summary>
         /// Determines if the entity is thinking (alive)
         /// </summary>
+        [Data.SaveState]
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
@@ -56,6 +68,7 @@ namespace Takai.Game
                 RadiusSq = value * value;
             }
         }
+        [Data.NonSerialized]
         public float RadiusSq { get; private set; }
         private float radius = 1;
 
@@ -63,6 +76,7 @@ namespace Takai.Game
         /// On collision, should this entity try to 'uncollide' with the entity
         /// </summary>
         /// <example>Triggers would have this set to false</example>
+        [Data.SaveState]
         public bool IsPhysical { get; set; } = true;
 
         /// <summary>
@@ -74,11 +88,13 @@ namespace Takai.Game
         /// The sprite for this entity (may be null for things like triggers)
         /// Can be updated by components
         /// </summary>
+        [Data.NonSerialized]
         public Graphics.Graphic Sprite { get; set; } = null;
 
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
+        [Data.SaveState]
         public Color OutlineColor { get; set; } = Color.Transparent;
 
         public Entity() { }

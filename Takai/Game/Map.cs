@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Takai.Game
 {
@@ -66,6 +67,18 @@ namespace Takai.Game
     /// </summary>
     public partial class Map
     {
+        /// <summary>
+        /// The file that this map was loaded for
+        /// </summary>
+        /// <remarks>This must be set in order to create a save-state</remarks>
+        public string File { get; set; }
+
+        /// <summary>
+        /// The human-friendly map name
+        /// </summary>
+        public string Name { get; set; }
+
+        [Data.NonSerialized]
         public bool[] TilesMask { get; set; }
 
         public int TileSize
@@ -103,6 +116,7 @@ namespace Takai.Game
         /// Typically inactive entities are stored here
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>
+        [Data.NonSerialized]
         public MapSector[,] Sectors { get; protected set; }
         protected Point NumSectors { get; private set; }
 
@@ -116,64 +130,7 @@ namespace Takai.Game
         /// The list of live blobs. Once the blobs' velocity is zero, they are removed from this and not re-added
         /// </summary>
         public List<Blob> ActiveBlobs { get; protected set; } = new List<Blob>(32);
-
-        /// <summary>
-        /// Load tile data from a CSV
-        /// </summary>
-        /// <remarks>Assumes csv is well formed (all rows are the same length)</remarks>
-        public static Map FromCsv(GraphicsDevice GDevice, string File, bool BuildSectors = true)
-        {
-            Map m = new Map(GDevice);
-
-            var lines = System.IO.File.ReadAllLines(File);
-            for (int y = 0; y < lines.Length; y++)
-            {
-                if (string.IsNullOrWhiteSpace(lines[y]))
-                    continue;
-
-                var split = lines[y].Split(',');
-
-                if (m.Tiles == null)
-                {
-                    m.Width = split.Length;
-                    m.Height = lines.Length;
-                    m.Tiles = new short[lines.Length, split.Length];
-                }
-
-                for (int x = 0; x < split.Length; x++)
-                    m.Tiles[y, x] = short.Parse(split[x]);
-            }
-
-            if (BuildSectors)
-                m.BuildSectors();
-
-            return m;
-        }
-
-        /// <summary>
-        /// write the map tiles to a CSV
-        /// </summary>
-        /// <param name="Stream">The stream to write to</param>
-        public void WriteToCsv(System.IO.Stream Stream)
-        {
-            var comma = System.Text.Encoding.UTF8.GetBytes(",");
-            var newl = System.Text.Encoding.UTF8.GetBytes("\n");
-
-            bool first = true;
-            for (int y = 0; y < Tiles.GetLength(0); y++)
-            {
-                for (int x = 0; x < Tiles.GetLength(1); x++)
-                {
-                    if (!first)
-                        Stream.Write(comma, 0, comma.Length);
-                    first = false;
-                    var bytes = System.Text.Encoding.UTF8.GetBytes(Tiles[y, x].ToString());
-                    Stream.Write(bytes, 0, bytes.Length);
-                }
-                Stream.Write(newl, 0, newl.Length);
-            }
-        }
-
+        
         /// <summary>
         /// Build the tiles mask
         /// </summary>
@@ -220,10 +177,17 @@ namespace Takai.Game
         /// Adds an existing entity to the map
         /// </summary>
         /// <param name="Entity">The entity to add</param>
-        public void SpawnEntity(Entity Entity)
+        /// <param name="AddToActive">Add this entity to the active set (defaults to true)</param>
+        public void SpawnEntity(Entity Entity, bool AddToActive = true)
         {
             Entity.Map = this;
-            ActiveEnts.Add(Entity);
+            if (AddToActive)
+                ActiveEnts.Add(Entity);
+            else
+            {
+                var sector = Vector2.Clamp(Entity.Position / sectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+                Sectors[sector.Y, sector.X].entities.Add(Entity);
+            }
         }
 
         /// <summary>

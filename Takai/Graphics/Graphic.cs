@@ -28,6 +28,11 @@ namespace Takai.Graphics
     public class Graphic : Animation
     {
         /// <summary>
+        /// The file that this graphic was loaded from
+        /// </summary>
+        public string File { get; set; }
+
+        /// <summary>
         /// The source texture
         /// </summary>
         public Texture2D Texture { get; set; }
@@ -91,6 +96,7 @@ namespace Takai.Graphics
             : base()
         {
             this.Texture = Texture;
+            File = Texture.Name;
             Width = Texture.Width;
             Height = Texture.Height;
             ClipRect = Texture.Bounds;

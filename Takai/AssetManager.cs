@@ -125,7 +125,7 @@ namespace Takai
         /// <returns>The asset loaded or if the asset (same name) is already in the manager, it is returned. Null on unrecognized type/error</returns>
         public static T Load<T>(string File, bool OverWrite = false, string CustomName = null)
         {
-            string file = System.IO.Path.IsPathRooted(File) ? File : System.IO.Path.Combine(RootDirectory, File);
+            string file = (Path.IsPathRooted(File) || File.StartsWith(RootDirectory)) ? File : System.IO.Path.Combine(RootDirectory, File);
             if (CustomName == null)
                 CustomName = file;
 
@@ -206,12 +206,10 @@ namespace Takai
             if (asset != null)
             {
                 assets.Add(Name, asset);
-
-#if DEBUG
+                
                 var gfx = asset as GraphicsResource;
                 if (gfx != null)
                     gfx.Name = Name;
-#endif
 
                 return (T)asset;
             }
