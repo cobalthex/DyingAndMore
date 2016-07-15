@@ -27,7 +27,7 @@ namespace Takai.Game
         protected Effect lineEffect;
         protected RasterizerState lineRaster;
         
-        [Data.NonSerialized]
+        [Data.NonSerializedAttribute]
         public Takai.Graphics.BitmapFont DebugFont { get; set; }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Takai.Game
             public bool showEntInfo;
         }
 
-        [Data.NonSerialized]
+        [Data.NonSerializedAttribute]
         public DebugOptions debugOptions;
         
         /// <summary>
@@ -307,6 +307,7 @@ namespace Takai.Game
                             SpriteEffects.None,
                             0
                         );
+                        dbgInfo.visibleDecals++;
                     }
                 }
             }
@@ -383,10 +384,10 @@ namespace Takai.Game
         protected void DrawEntInfo(Entity Ent, Vector2 View)
         {
             //draw bounding box
-            DebugLine(new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y - Ent.Radius), new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y - Ent.Radius), Color.Red);
-            DebugLine(new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y - Ent.Radius), new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y + Ent.Radius), Color.Red);
-            DebugLine(new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y + Ent.Radius), new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y + Ent.Radius), Color.Red);
-            DebugLine(new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y + Ent.Radius), new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y - Ent.Radius), Color.Red);
+            DebugLine(new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y - Ent.Radius), new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y - Ent.Radius), Color.LightGreen);
+            DebugLine(new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y - Ent.Radius), new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y + Ent.Radius), Color.LightGreen);
+            DebugLine(new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y + Ent.Radius), new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y + Ent.Radius), Color.LightGreen);
+            DebugLine(new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y + Ent.Radius), new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y - Ent.Radius), Color.LightGreen);
 
             //draw direction arrow
             var angle = (float)System.Math.Atan2(Ent.Direction.Y, Ent.Direction.X);

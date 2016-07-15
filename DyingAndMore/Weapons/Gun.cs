@@ -12,12 +12,12 @@ namespace DyingAndMore.Weapons
         /// <summary>
         /// The initial speed of the projectile
         /// </summary>
-        public float speed = 0;
+        public float speed = 1;
 
         protected override void SingleFire(Takai.Game.Entity Entity)
         {
             var pos = Entity.Position + (Entity.Direction * (Entity.Radius + projectile.Radius + 1));
-            Entity.Map.SpawnEntity(projectile, pos, Entity.Direction, Entity.Direction * speed, false);
+            Entity.Map.SpawnEntity(projectile, pos, Entity.Direction, Entity.Velocity + (Entity.Direction * speed), false);
         }
     }
 }

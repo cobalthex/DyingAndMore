@@ -40,7 +40,6 @@ namespace DyingAndMore.Entities
         /// Automatically updates entity sprite on set
         /// </summary>
         /// <remarks>Does nothing if the state does not exist</remarks>
-        [Takai.Data.NonSerialized]
         public string CurrentState
         {
             get
@@ -49,7 +48,7 @@ namespace DyingAndMore.Entities
             }
             set
             {
-                if (States.ContainsKey(value))
+                if (value != null && States.ContainsKey(value))
                 {
                     currentState = value;
                     Sprite = States[currentState];
@@ -68,7 +67,7 @@ namespace DyingAndMore.Entities
         /// </summary>
         /// <remarks>0 is any/no faction</remarks>
         int Faction { get; set; } = 0;
-
+        
         public Weapons.Weapon primaryWeapon;
         public Weapons.Weapon altWeapon;
 

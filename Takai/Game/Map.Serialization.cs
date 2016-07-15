@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using System.Runtime.Serialization;
+using System.Linq;
 
 namespace Takai.Game
 {
@@ -67,25 +68,113 @@ namespace Takai.Game
             }
         }
 
-
-
-        /// <summary>
-        /// Write this map to a file
-        /// </summary>
-        /// <param name="Filename">The file to write to</param>
-        public void Write(string Filename)
+        struct BlobSave
         {
-
+            public int type;
+            public Vector2 position;
+            public Vector2 velocity;
         }
 
         /// <summary>
-        /// Write the state of the map to a file (stores only states for things that change (ents, blobs, etc))
+        /// A temporary struct for organizing data to be serialized
         /// </summary>
-        /// <param name="Filename">The file to write to</param>
-        /// <remarks>This relies on the map named <see cref="File"/> existing at load time</remarks>
-        public void WriteState(string Filename)
+        struct MapSave
         {
+            public int width, height;
+            public short[,] tiles;
 
+            public MapSave(Map Map)
+            {
+                width = Map.Width;
+                height = Map.Height;
+                tiles = Map.Tiles;
+            }
+        }
+
+        /// <summary>
+        /// A temporary struct for organizing state data to be serialized
+        /// </summary>
+        struct MapStateSave
+        {
+            public List<Entity> entities;
+            public List<BlobType> blobTypes;
+            public List<BlobSave> blobs;
+            public List<Decal> decals;
+
+            public MapStateSave(Map Map)
+            {
+                entities = new List<Entity>(Map.ActiveEnts);
+                blobTypes = new List<BlobType>();
+                blobs = new List<BlobSave>();
+                decals = new List<Decal>();
+                
+                var typeIndices = new Dictionary<BlobType, int>();
+
+                foreach (var blob in Map.ActiveBlobs)
+                {
+                    var type = blob.type;
+                    int index;
+                    if (!typeIndices.TryGetValue(type, out index))
+                    {
+                        index = blobTypes.Count;
+                        blobTypes.Add(type);
+                        typeIndices.Add(type, index);
+                    }
+                    blobs.Add(new BlobSave { type = index, position = blob.position, velocity = blob.velocity });
+                }
+
+                foreach (var sector in (System.Collections.IEnumerable)Map.Sectors)
+                {
+                    var s = (MapSector)sector;
+
+                    entities.AddRange(s.entities);
+                    decals.AddRange(s.decals);
+
+                    foreach (var blob in s.blobs)
+                    {
+                        var type = blob.type;
+                        int index;
+                        if (!typeIndices.TryGetValue(type, out index))
+                        {
+                            index = blobTypes.Count;
+                            blobTypes.Add(type);
+                            typeIndices.Add(type, index);
+                        }
+                        blobs.Add(new BlobSave { type = index, position = blob.position, velocity = blob.velocity });
+                    }
+                }
+            }
+        }
+
+        public void WriteState(Stream Stream)
+        {
+            var save = new MapStateSave(this);
+            using (var writer = new StreamWriter(Stream))
+                Data.Serializer.TextSerialize(writer, save);
+        }
+
+        public void ReadState(Stream Stream)
+        {
+            MapStateSave load;
+            using (var reader = new StreamReader(Stream))
+                load = (MapStateSave)Data.Serializer.TextDeserialize(reader);
+
+            var blobTypes = new Dictionary<int, BlobType>();
+            for (var i = 0; i < load.blobTypes.Count; i++)
+                blobTypes[i] = load.blobTypes[i];
+
+            ActiveEnts = load.entities;
+            ActiveBlobs = load.blobs.Select<BlobSave, Blob>((BlobSave Save) =>
+            {
+                return new Blob
+                {
+                    type = blobTypes[Save.type],
+                    position = Save.position,
+                    velocity = Save.velocity
+                };
+            }).ToList();
+
+            BuildSectors();
         }
     }
 }
