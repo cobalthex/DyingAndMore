@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-
+using System;
 
 namespace Takai.Game
 {
@@ -134,6 +134,30 @@ namespace Takai.Game
                     Sectors[y, x].entities.Clear();
                 }
             }
+        }
+
+        /// <summary>
+        /// Find an  entity by its name
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <returns>The first entity found or null if none</returns>
+        /// <remarks>Searches active ents and then ents in sectors from 0 to end</remarks>
+        public Entity FindEntityByName(string Name)
+        {
+            foreach (var ent in ActiveEnts)
+            {
+                if (ent.Name == Name)
+                    return ent;
+            }
+
+            foreach (var s in (System.Collections.IEnumerable)Sectors)
+            {
+                foreach (var ent in ((MapSector)s).entities)
+                    if (ent.Name == Name)
+                        return ent;
+            }
+
+            return null;
         }
     }
 }

@@ -77,8 +77,7 @@ namespace Takai.Game
         /// The human-friendly map name
         /// </summary>
         public string Name { get; set; }
-
-        [Data.NonSerialized]
+        
         public bool[] TilesMask { get; set; }
 
         public int TileSize
@@ -116,7 +115,6 @@ namespace Takai.Game
         /// Typically inactive entities are stored here
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>
-        [Data.NonSerialized]
         public MapSector[,] Sectors { get; protected set; }
         protected Point NumSectors { get; private set; }
 

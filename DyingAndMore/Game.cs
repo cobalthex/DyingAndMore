@@ -35,6 +35,7 @@ namespace DyingAndMore
             map.DebugFont = fnt;
 
             player = map.SpawnEntity<Entities.Actor>(new Vector2(100), Vector2.UnitX, Vector2.Zero, false);
+            player.Name = "player";
             player.MoveForce = 600;
             player.MaxSpeed = 400;
             player.Sprite = new Takai.Graphics.Graphic
@@ -49,7 +50,7 @@ namespace DyingAndMore
             );
             player.Sprite.CenterOrigin();
             player.Radius = player.Sprite.Width / 2;
-
+            
             var gun = new Weapons.Gun();
             gun.projectile = new Entities.Projectile();
             gun.projectile.Load();
@@ -68,12 +69,9 @@ namespace DyingAndMore
 
             //todo: change Load/Unload to OnSpawn/Destroy and call then
 
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            using (var stream = new System.IO.StreamWriter("test.map.tk"))
-                Takai.Data.Serializer.TextSerialize(stream, map);
-            sw.Stop();
-            
+            using (var stream = new System.IO.StreamWriter("test.gfx.tk"))
+                Takai.Data.Serializer.TextSerialize(stream, player.Sprite);
+
             ent = map.SpawnEntity<Entities.Actor>(new Vector2(40), Vector2.UnitX, Vector2.Zero);
             var sprite = new Takai.Graphics.Graphic
             (
@@ -118,6 +116,20 @@ namespace DyingAndMore
                 map.debugOptions.showBlobReflectionMask ^= true;
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.F4))
                 map.debugOptions.showOnlyReflections ^= true;
+
+            if (Takai.Input.InputCatalog.IsKeyPress(Keys.F5))
+            {
+                using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Create))
+                    map.WriteState(stream);
+            }
+            if (Takai.Input.InputCatalog.IsKeyPress(Keys.F9))
+            {
+                using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Open))
+                    map.ReadState(stream);
+                player = map.FindEntityByName("player") as Entities.Actor;
+                if (camera.Follow != null)
+                    camera.Follow = player;
+            }
 
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.N))
                 camera.Follow = (camera.Follow == null ? player : null);

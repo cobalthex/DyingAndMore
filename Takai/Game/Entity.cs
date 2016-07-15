@@ -16,18 +16,15 @@ namespace Takai.Game
         /// <summary>
         /// The current position of the entity
         /// </summary>
-        [Data.SaveState]
         public Vector2 Position { get; set; }
         /// <summary>
         /// The (normalized) direction the entity is facing
         /// </summary>
         /// <remarks>This vector should always be normalized</remarks>
-        [Data.SaveState]
         public Vector2 Direction { get; set; } = Vector2.UnitX;
         /// <summary>
         /// The direction the entity is moving
         /// </summary>
-        [Data.SaveState]
         public Vector2 Velocity { get; set; } = Vector2.Zero;
 
         /// <summary>
@@ -44,7 +41,6 @@ namespace Takai.Game
         /// <summary>
         /// Determines if the entity is thinking (alive)
         /// </summary>
-        [Data.SaveState]
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
@@ -76,7 +72,6 @@ namespace Takai.Game
         /// On collision, should this entity try to 'uncollide' with the entity
         /// </summary>
         /// <example>Triggers would have this set to false</example>
-        [Data.SaveState]
         public bool IsPhysical { get; set; } = true;
 
         /// <summary>
@@ -88,13 +83,12 @@ namespace Takai.Game
         /// The sprite for this entity (may be null for things like triggers)
         /// Can be updated by components
         /// </summary>
-        [Data.NonSerialized]
+        [Data.CustomSerialize(typeof(Entity), "SerializeSprite")]
         public Graphics.Graphic Sprite { get; set; } = null;
 
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
-        [Data.SaveState]
         public Color OutlineColor { get; set; } = Color.Transparent;
 
         public Entity() { }
@@ -146,5 +140,18 @@ namespace Takai.Game
         /// </summary>
         /// <param name="Type">The type of blob collided with</param>
         public virtual void OnBlobCollision(BlobType Type) { }
+        
+        /// <summary>
+        /// A custom serializer for the sprite of an entity
+        /// </summary>
+        /// <param name="Sprite">The sprite to serialize</param>
+        /// <returns>The serializer friendly version of the sprite</returns>
+        public static object SerializeSprite(Graphics.Graphic Sprite)
+        {
+            if (Sprite.Texture?.Name != null) //todo: should be file
+                return Sprite.File;
+            //todo: custom serialization
+            return Sprite;
+        }
     }
 }
