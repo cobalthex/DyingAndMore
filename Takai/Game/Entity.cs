@@ -83,7 +83,6 @@ namespace Takai.Game
         /// The sprite for this entity (may be null for things like triggers)
         /// Can be updated by components
         /// </summary>
-        [Data.CustomSerialize(typeof(Entity), "SerializeSprite")]
         public Graphics.Graphic Sprite { get; set; } = null;
 
         /// <summary>
@@ -140,18 +139,5 @@ namespace Takai.Game
         /// </summary>
         /// <param name="Type">The type of blob collided with</param>
         public virtual void OnBlobCollision(BlobType Type) { }
-        
-        /// <summary>
-        /// A custom serializer for the sprite of an entity
-        /// </summary>
-        /// <param name="Sprite">The sprite to serialize</param>
-        /// <returns>The serializer friendly version of the sprite</returns>
-        public static object SerializeSprite(Graphics.Graphic Sprite)
-        {
-            if (Sprite.Texture?.Name != null) //todo: should be file
-                return Sprite.File;
-            //todo: custom serialization
-            return Sprite;
-        }
     }
 }

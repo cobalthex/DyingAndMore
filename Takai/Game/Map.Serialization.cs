@@ -68,7 +68,7 @@ namespace Takai.Game
             }
         }
 
-        struct BlobSave
+        internal struct BlobSave
         {
             public int type;
             public Vector2 position;
@@ -78,7 +78,7 @@ namespace Takai.Game
         /// <summary>
         /// A temporary struct for organizing data to be serialized
         /// </summary>
-        struct MapSave
+        internal struct MapSave
         {
             public int width, height;
             public short[,] tiles;

@@ -1,5 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Graphics
 {
@@ -25,6 +26,7 @@ namespace Takai.Graphics
     /// <summary>
     /// A graphic animation (A sprite)
     /// </summary>
+    [Data.CustomSerialize(typeof(Graphic), "Serialize"), Data.CustomDeserialize(typeof(Graphic), "Deserialize")]
     public class Graphic : Animation
     {
         /// <summary>
@@ -179,7 +181,7 @@ namespace Takai.Graphics
             var src = new Rectangle(ClipRect.X + (Frame % framesPerRow) * Width, ClipRect.Y + (Frame / framesPerRow) * Height, Width, Height);
             return Rectangle.Intersect(src, ClipRect);
         }
-        
+
         public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle)
         {
             Draw(SpriteBatch, Position, Angle, Color.White);
@@ -191,31 +193,122 @@ namespace Takai.Graphics
             int cf = (int)frame;
             int nf = (IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount));
             float fd = frame - cf;
-            
+
             switch (Tween)
             {
-            case TweenStyle.None:
-                DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color);
-                break;
+                case TweenStyle.None:
+                    DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color);
+                    break;
 
-            case TweenStyle.Overlap:
-                //todo: overlap should fade in and then fade out (maybe multiply fd * 2 and Clamp)
-                var nd = MathHelper.Clamp(fd * 2, 0, 1);
-                fd = MathHelper.Clamp((fd * 2) - 1, 0, 1);
-                DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
-                DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, nd));
-                break;
+                case TweenStyle.Overlap:
+                    //todo: overlap should fade in and then fade out (maybe multiply fd * 2 and Clamp)
+                    var nd = MathHelper.Clamp(fd * 2, 0, 1);
+                    fd = MathHelper.Clamp((fd * 2) - 1, 0, 1);
+                    DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
+                    DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, nd));
+                    break;
 
-            case TweenStyle.Sequential:
-                DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
-                DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, fd));
-                break;
+                case TweenStyle.Sequential:
+                    DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
+                    DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, fd));
+                    break;
             }
         }
 
         public void DrawFrame(SpriteBatch SpriteBatch, Rectangle Bounds, Rectangle SourceRect, float Angle, Color Color)
         {
             SpriteBatch.Draw(Texture, Bounds, SourceRect, Color, Angle, Origin, SpriteEffects.None, 0);
+        }
+
+        public static object Serialize(Graphic Graphic)
+        {
+            if (Graphic == null)
+                return null;
+
+            if (Graphic.File != null)
+                return Graphic.File;
+            
+            return new Dictionary<string, object>
+            {
+                { "texture", Graphic.Texture },
+                { "width", Graphic.width },
+                { "height", Graphic.height },
+                { "clipRect", Graphic.clipRect },
+                { "origin", Graphic.Origin },
+                { "frameCount", Graphic.FrameCount },
+                { "frameTime", Graphic.FrameTime },
+                { "isLooping", Graphic.IsLooping },
+                { "isRunning", Graphic.IsRunning },
+                { "tween", Graphic.Tween },
+                { "offset", Graphic.TimeOffset },
+                { "elapsed", Graphic.ElapsedMilliseconds }
+            };
+        }
+
+        public static object Deserialize(object Intermediate)
+        {
+            var file = Intermediate as string;
+            if (file != null)
+                return FromFile(file);
+
+            var dict = Intermediate as Dictionary<string, object>;
+            if (dict != null)
+            {
+                Graphic g = new Graphic();
+                g.Texture = Takai.AssetManager.Load<Texture2D>(dict["texture"] as string); //todo: use texture Deserializer
+                g.Width =  (int)dict["width"];
+                g.Height = (int)dict["height"];
+
+                Rectangle clipRect;
+                Data.Serializer.DeserializeAs(dict["clipRect"], out clipRect);
+                g.ClipRect = clipRect;
+
+                Vector2 origin;
+                Data.Serializer.DeserializeAs(dict["origin"], out origin);
+                g.Origin = origin;
+
+                g.Tween = (TweenStyle)dict["tween"];
+                g.FrameCount = (int)dict["frameCount"];
+
+                System.TimeSpan frameTime, elapsed, offset;
+                Data.Serializer.DeserializeAs(dict["frameTime"], out frameTime);
+                Data.Serializer.DeserializeAs(dict["elapsed"], out elapsed);
+                Data.Serializer.DeserializeAs(dict["offset"], out offset);
+
+                g.FrameTime = frameTime;
+                g.TimeOffset = elapsed - offset;
+
+                g.IsLooping = (bool)dict["isLooping"];
+
+                if ((bool)dict["isRunning"])
+                    g.Start();
+
+                return g;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Load a graphic from a file
+        /// </summary>
+        /// <param name="File">The file to load from</param>
+        /// <returns>The graphic loaded, or null if there was an error</returns>
+        public static Graphic FromFile(string File)
+        {
+            if (File.EndsWith(".tk"))
+            {
+                using (var reader = new System.IO.StreamReader(File))
+                {
+                    Graphic g;
+                    Data.Serializer.DeserializeAs(Data.Serializer.TextDeserialize(reader), out g);
+                    g.File = File;
+                    return g;
+                }
+            }
+
+            var tex = Takai.AssetManager.Load<Texture2D>(File);
+            return tex != null ? new Graphic(tex) : null;
         }
     }
 }
