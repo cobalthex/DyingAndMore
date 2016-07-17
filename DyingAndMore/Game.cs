@@ -38,18 +38,21 @@ namespace DyingAndMore
             player.Name = "player";
             player.MoveForce = 600;
             player.MaxSpeed = 400;
-            player.Sprite = new Takai.Graphics.Graphic
-            (
-                Takai.AssetManager.Load<Texture2D>("Textures/Player.png"),
-                48,
-                48,
-                2,
-                System.TimeSpan.FromMilliseconds(100),
-                Takai.Graphics.TweenStyle.Overlap,
-                true
-            );
-            player.Sprite.CenterOrigin();
+            player.Sprite = Takai.Graphics.Graphic.FromFile("test.gfx.tk");
+            //player.Sprite = new Takai.Graphics.Graphic
+            //(
+            //    Takai.AssetManager.Load<Texture2D>("Textures/Player.png"),
+            //    48,
+            //    48,
+            //    2,
+            //    System.TimeSpan.FromMilliseconds(100),
+            //    Takai.Graphics.TweenStyle.Overlap,
+            //    true
+            //);
+            //player.Sprite.CenterOrigin();
             player.Radius = player.Sprite.Width / 2;
+            player.States.Add("idle", player.Sprite);
+            player.CurrentState = "idle";
             
             var gun = new Weapons.Gun();
             gun.projectile = new Entities.Projectile();
@@ -68,9 +71,6 @@ namespace DyingAndMore
             player.altWeapon = blobber;
 
             //todo: change Load/Unload to OnSpawn/Destroy and call then
-
-            using (var stream = new System.IO.StreamWriter("test.gfx.tk"))
-                Takai.Data.Serializer.TextSerialize(stream, player.Sprite);
 
             ent = map.SpawnEntity<Entities.Actor>(new Vector2(40), Vector2.UnitX, Vector2.Zero);
             var sprite = new Takai.Graphics.Graphic

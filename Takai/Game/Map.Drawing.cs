@@ -27,7 +27,6 @@ namespace Takai.Game
         protected Effect lineEffect;
         protected RasterizerState lineRaster;
         
-        [Data.NonSerializedAttribute]
         public Takai.Graphics.BitmapFont DebugFont { get; set; }
 
         /// <summary>
@@ -40,8 +39,7 @@ namespace Takai.Game
             public bool showOnlyReflections;
             public bool showEntInfo;
         }
-
-        [Data.NonSerializedAttribute]
+        
         public DebugOptions debugOptions;
         
         /// <summary>
