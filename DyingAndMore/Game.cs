@@ -7,7 +7,7 @@ namespace DyingAndMore
     class Game : Takai.States.State
     {
         Entities.Actor player;
-        Entities.Actor ent;
+        Entities.Actor testEnt;
 
         Takai.Game.Camera camera;
 
@@ -26,7 +26,7 @@ namespace DyingAndMore
 
             map = new Takai.Game.Map(GraphicsDevice);
             using (var s = new System.IO.FileStream("data/maps/test.csv", System.IO.FileMode.Open))
-                map.ReadTiles(s);
+                map.LoadCsv(s);
             map.TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles2.png");
             map.TileSize = 48;
             map.BuildMask(map.TilesImage, true);
@@ -34,23 +34,13 @@ namespace DyingAndMore
 
             map.DebugFont = fnt;
 
-            player = map.SpawnEntity<Entities.Actor>(new Vector2(100), Vector2.UnitX, Vector2.Zero, false);
-            player.Name = "player";
-            player.MoveForce = 600;
-            player.MaxSpeed = 400;
-            player.Sprite = Takai.Graphics.Graphic.FromFile("test.gfx.tk");
-            //player.Sprite = new Takai.Graphics.Graphic
-            //(
-            //    Takai.AssetManager.Load<Texture2D>("Textures/Player.png"),
-            //    48,
-            //    48,
-            //    2,
-            //    System.TimeSpan.FromMilliseconds(100),
-            //    Takai.Graphics.TweenStyle.Overlap,
-            //    true
-            //);
-            //player.Sprite.CenterOrigin();
-            player.Radius = player.Sprite.Width / 2;
+            using (var stream = new System.IO.FileStream("test.map.tk", System.IO.FileMode.Create))
+                map.Save(stream);
+
+            using (var stream = new System.IO.StreamReader("Defs/Entities/Player.ent.tk"))
+                player = Takai.Data.Serializer.TextDeserialize(stream) as Entities.Actor;
+            player.Position = new Vector2(100);
+            map.SpawnEntity(player);
             player.States.Add("idle", player.Sprite);
             player.CurrentState = "idle";
             
@@ -72,7 +62,7 @@ namespace DyingAndMore
 
             //todo: change Load/Unload to OnSpawn/Destroy and call then
 
-            ent = map.SpawnEntity<Entities.Actor>(new Vector2(40), Vector2.UnitX, Vector2.Zero);
+            testEnt = map.SpawnEntity<Entities.Actor>(new Vector2(40), Vector2.UnitX, Vector2.Zero);
             var sprite = new Takai.Graphics.Graphic
             (
                 Takai.AssetManager.Load<Texture2D>("Textures/InfectedCell.png"),
@@ -84,15 +74,15 @@ namespace DyingAndMore
                 Takai.Graphics.TweenStyle.Overlap,
                 true
             );
-            ent.Radius = sprite.Width / 2;
+            testEnt.Radius = sprite.Width / 2;
             sprite.CenterOrigin();
-            ent.Sprite = sprite;
+            testEnt.Sprite = sprite;
 
             sbatch = new SpriteBatch(GraphicsDevice);
             
             map.debugOptions.showProfileInfo = true;
             map.debugOptions.showEntInfo = true;
-            
+
             camera = new Takai.Game.Camera(map, player);
             camera.MoveSpeed = 800;
             camera.Viewport = GraphicsDevice.Viewport.Bounds;
@@ -102,7 +92,7 @@ namespace DyingAndMore
             map.AddDecal(tex, new Vector2(200, 100));
             map.AddDecal(tex, new Vector2(300, 120), 0, 2);
         }
-        
+
         public override void Update(GameTime Time)
         {
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.Q))
@@ -119,13 +109,21 @@ namespace DyingAndMore
 
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.F5))
             {
-                using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Create))
-                    map.WriteState(stream);
+                if (Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.LeftControl) || Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.RightControl))
+                {
+                    using (var stream = new System.IO.Compression.DeflateStream(new System.IO.FileStream("test.map", System.IO.FileMode.Create), System.IO.Compression.CompressionMode.Compress, false))
+                        map.Save(stream);
+                }
+                else
+                {
+                    using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Create))
+                        map.SaveState(stream);
+                }
             }
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.F9))
             {
                 using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Open))
-                    map.ReadState(stream);
+                    map.LoadState(stream);
                 player = map.FindEntityByName("player") as Entities.Actor;
                 if (camera.Follow != null)
                     camera.Follow = player;
@@ -144,7 +142,8 @@ namespace DyingAndMore
             if (Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.S))
                 d += Vector2.UnitY;
 
-            player.Move(d);
+            if (camera.Follow != null)
+                player.Move(d);
 
             if (player.primaryWeapon != null && Takai.Input.InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
                 player.primaryWeapon.Fire(Time, player);
@@ -162,11 +161,49 @@ namespace DyingAndMore
                     d.Normalize();
                 camera.Position += d * camera.MoveSpeed * (float)Time.ElapsedGameTime.TotalSeconds;
             }
-            debugText = camera.Position.ToString();
 
             camera.Update(Time);
+
+            if (isEditMode)
+            {
+                if (Takai.Input.InputCatalog.IsMouseClick(Takai.Input.InputCatalog.MouseButton.Left) && Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.LeftControl))
+                {
+                    var ofd = new System.Windows.Forms.OpenFileDialog();
+                    ofd.Filter = "Entity Definitions (*.ent.tk)|*.ent.tk";
+                    if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        Takai.Game.Entity ent;
+                        using (var reader = new System.IO.StreamReader(ofd.OpenFile()))
+                            ent = Takai.Data.Serializer.TextDeserialize(reader) as Takai.Game.Entity;
+
+                        if (ent != null)
+                        {
+                            ent.Position = camera.ScreenToWorld(Takai.Input.InputCatalog.MouseState.Position.ToVector2());
+                            map.SpawnEntity(ent);
+                        }
+                    }
+                }
+
+                else if (Takai.Input.InputCatalog.MouseState.RightButton == ButtonState.Pressed && Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.LeftControl))
+                {
+                    var pos = camera.ScreenToWorld(Takai.Input.InputCatalog.MouseState.Position.ToVector2());
+                    if (map.IsInside(pos))
+                    {
+                        var tile = (pos / map.TileSize).ToPoint();
+                        map.Tiles[tile.Y, tile.X] = -1;
+                    }
+                }
+            }
+
+            foreach (var ent in highlighted)
+                ent.OutlineColor = Color.Transparent;
+            highlighted = map.FindNearbyEntities(camera.ScreenToWorld(Takai.Input.InputCatalog.MouseState.Position.ToVector2()), 5);
+            foreach (var ent in highlighted)
+                ent.OutlineColor = Color.Yellow;
         }
-        
+        System.Collections.Generic.List<Takai.Game.Entity> highlighted = new System.Collections.Generic.List<Takai.Game.Entity>();
+        bool isEditMode = true;
+
         public override void Draw(Microsoft.Xna.Framework.GameTime Time)
         {
             camera.Draw();
@@ -179,7 +216,7 @@ namespace DyingAndMore
             
             sbatch.End();
             
-            ent.OutlineColor = Color.Transparent;
+            testEnt.OutlineColor = Color.Transparent;
         }
     }
 }

@@ -1,0 +1,26 @@
+Actor {
+    primaryWeapon: Null;
+    altWeapon: Null;
+    MaxHealth: 100;
+    States: { };
+    CurrentState: Null;
+    MaxSpeed: 400;
+    MoveForce: 600;
+    IsEnabled: True;
+    AlwaysActive: False;
+    Radius: 21;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    Sprite: GraphicSave {
+        texture: "Textures/Astrovirus.png";
+        width: 42;
+        height: 42;
+        clipRect: [0 84 0 0];
+        origin: [21 21];
+        frameCount: 6;
+        frameTime: 100;
+        isLooping: True;
+        isRunning: True;
+        tween: TweenStyle Overlap;
+    }
+}

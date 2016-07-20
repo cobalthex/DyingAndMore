@@ -131,7 +131,7 @@ namespace Takai.Game
         /// <param name="PostEffect">An optional fullscreen post effect to render with</param>
         /// <param name="DrawSectorEntities">Draw entities in sectors. Typically used for debugging/map editing</param>
         /// <remarks>All rendering management handled internally</remarks>
-        public void Draw(Vector2 ViewStart, Rectangle Viewport, Effect PostEffect = null, bool DrawSectorEntities = false)
+        public void Draw(Vector2 ViewStart, Rectangle Viewport, Effect PostEffect = null)
         {
             var originalRt = GraphicsDevice.GetRenderTargets();
 
@@ -163,34 +163,6 @@ namespace Takai.Game
             GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead);
-
-            if (DrawSectorEntities)
-            {
-                for (var y = sStartY; y < sEndY; y++)
-                {
-                    for (var x = sStartX; x < sEndX; x++)
-                    {
-                        foreach (var ent in Sectors[y, x].entities)
-                        {
-                            if (ent.Sprite != null)
-                            {
-                                dbgInfo.visibleEnts++;
-
-                                if (ent.OutlineColor.A > 0)
-                                    outlined.Add(ent);
-                                else
-                                {
-                                    var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                                    ent.Sprite.Draw(sbatch, view + ent.Position, angle);
-                                }
-                            }
-
-                            if (debugOptions.showEntInfo)
-                                DrawEntInfo(ent, view);
-                        }
-                    }
-                }
-            }
 
             foreach (var ent in ActiveEnts)
             {
@@ -398,9 +370,23 @@ namespace Takai.Game
             DebugLine(tip, tip + (r * new Vector2((float)System.Math.Cos(angle - theta), (float)System.Math.Sin(angle - theta))), Color.Yellow);
 
             //draw ent info string
-            var str = string.Format("{0:N1},{1:N1}", Ent.Position.X, Ent.Position.Y);
-            var sz = DebugFont.MeasureString(str);
-            DebugFont.Draw(sbatch, str, View + Ent.Position + new Vector2(sz.X / -2, Ent.Radius + 5), Color.White);
+            string str;
+            Vector2 sz, pos;
+
+            if (Ent.Name != null)
+            {
+                str = Ent.Name;
+                sz = DebugFont.MeasureString(str);
+                pos = View + Ent.Position - new Vector2(sz.X / 2, Ent.Radius + 2 + sz.Y);
+                pos = new Vector2((int)pos.X, (int)pos.Y);
+                DebugFont.Draw(sbatch, str, pos, Color.White);
+            }
+
+            str = string.Format("{0:N1},{1:N1}", Ent.Position.X, Ent.Position.Y);
+            sz = DebugFont.MeasureString(str);
+            pos = View + Ent.Position + new Vector2(sz.X / -2, Ent.Radius + 2);
+            pos = new Vector2((int)pos.X, (int)pos.Y);
+            DebugFont.Draw(sbatch, str, pos, Color.White);
         }
     }
 }

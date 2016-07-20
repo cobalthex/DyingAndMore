@@ -92,14 +92,45 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Calculate the base world position for a camera's view
+        /// Calculate the top-left world position for a camera's view centered around the position
+        /// </summary>
+        /// <returns></returns>
+        public Vector2 GetViewStart()
+        {
+            return GetViewStart(Position, Viewport);
+        }
+
+        /// <summary>
+        /// Calculate the top-left world position for a camera's view centered around the camera
         /// </summary>
         /// <param name="Camera">The position of the camera</param>
-        /// <param name="Viewport">The viewport rectangle, centered around the camera</param>
+        /// <param name="Viewport">The viewport rectangle</param>
         /// <returns>The world position of the camera</returns>
-        public Vector2 GetViewStart(Vector2 Camera, Rectangle Viewport)
+        public static Vector2 GetViewStart(Vector2 Camera, Rectangle Viewport)
         {
-            return new Vector2(Viewport.X - (int)Camera.X - (Viewport.Width / 2), Viewport.Y - (int)Camera.X - (Viewport.Width / 2));
+            return new Vector2(Viewport.X - (int)Camera.X - (Viewport.Width / 2), Viewport.Y - (int)Camera.Y - (Viewport.Height / 2));
+        }
+
+        /// <summary>
+        /// Translate a screen position to a world position using the current camera's viewport
+        /// </summary>
+        /// <param name="ScreenPosition">The screen position</param>
+        /// <returns>The world position</returns>
+        public Vector2 ScreenToWorld(Vector2 ScreenPosition)
+        {
+            return ScreenToWorld(ScreenPosition, Position, Viewport);
+        }
+
+        /// <summary>
+        /// Translate a screen position to a world position using the current camera's viewport
+        /// </summary>
+        /// <param name="ScreenPosition">The screen position</param>
+        /// <param name="CameraPosition">The camera's position in the world</param>
+        /// <param name="Viewport">The camera's viewport</param>
+        /// <returns>The world position</returns>
+        public static Vector2 ScreenToWorld(Vector2 ScreenPosition, Vector2 CameraPosition, Rectangle Viewport)
+        {
+            return new Vector2(Viewport.X - (Viewport.Width / 2), Viewport.Y - (Viewport.Height / 2)) + CameraPosition + ScreenPosition;
         }
     }
 }

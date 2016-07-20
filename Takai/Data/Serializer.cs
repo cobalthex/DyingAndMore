@@ -38,6 +38,7 @@ namespace Takai.Data
     public static partial class Serializer
     {
         public const bool WriteFullTypeNames = false;
+        public const bool CaseSensitiveMembers = false;
 
         //cached types from assemblies
         private static Dictionary<string, Type> asmTypes;

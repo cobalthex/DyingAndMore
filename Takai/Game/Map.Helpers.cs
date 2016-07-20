@@ -7,28 +7,59 @@ namespace Takai.Game
     public partial class Map
     {
         /// <summary>
+        /// Get the sector of a point
+        /// </summary>
+        /// <param name="Position">The point in the map</param>
+        /// <returns>The sector coordinates. Clamped to the map bounds</returns>
+        public Point GetSector(Vector2 Position)
+        {
+            return Vector2.Clamp(Position / sectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+        }
+
+        /// <summary>
+        /// Check if a point is 'inside' the map
+        /// </summary>
+        /// <param name="Point">The point to test</param>
+        /// <returns>True if the point is in a navicable area</returns>
+        public bool IsInside(Vector2 Point)
+        {
+            return (Point.X >= 0 && Point.X < (Width * TileSize) && Point.Y >= 0 && Point.Y < (Height * TileSize));
+        }
+
+        /// <summary>
         /// Find all entities within a certain radius
         /// </summary>
         /// <param name="Position">The origin search point</param>
         /// <param name="Radius">The maximum search radius</param>
-        public List<Entity> GetNearbyEntities(Vector2 Position, float Radius)
+        public List<Entity> FindNearbyEntities(Vector2 Position, float Radius, bool SearchInSectors = false)
         {
             var radiusSq = Radius * Radius;
             var vr = new Vector2(Radius);
 
-            var mapSz = new Vector2(Width, Height);
-            var start = Vector2.Clamp((Position - vr) / sectorPixelSize, Vector2.Zero, mapSz).ToPoint();
-            var end = (Vector2.Clamp((Position + vr) / sectorPixelSize, Vector2.Zero, mapSz) + Vector2.One).ToPoint();
-
             List<Entity> ents = new List<Entity>();
-            for (int y = start.Y; y < end.Y; y++)
+
+            foreach (var ent in ActiveEnts)
             {
-                for (int x = start.X; x < end.X; x++)
+                if (Vector2.DistanceSquared(ent.Position, Position) < radiusSq + ent.RadiusSq)
+                    ents.Add(ent);
+            }
+
+            if (SearchInSectors)
+            {
+                var mapSz = new Vector2(Width, Height);
+                var start = Vector2.Clamp((Position - vr) / sectorPixelSize, Vector2.Zero, mapSz).ToPoint();
+                var end = (Vector2.Clamp((Position + vr) / sectorPixelSize, Vector2.Zero, mapSz) + Vector2.One).ToPoint();
+
+
+                for (int y = start.Y; y < end.Y; y++)
                 {
-                    foreach (var ent in Sectors[y, x].entities)
+                    for (int x = start.X; x < end.X; x++)
                     {
-                        if (Vector2.DistanceSquared(ent.Position, Position) < radiusSq)
-                            ents.Add(ent);
+                        foreach (var ent in Sectors[y, x].entities)
+                        {
+                            if (Vector2.DistanceSquared(ent.Position, Position) < radiusSq + ent.RadiusSq)
+                                ents.Add(ent);
+                        }
                     }
                 }
             }
@@ -41,7 +72,7 @@ namespace Takai.Game
         /// </summary>
         /// <typeparam name="TEntity">The type of entity to find</typeparam>
         /// <returns>A list of entities found</returns>
-        public List<Entity> GetEntitiesByType<TEntity>(bool SearchInactive = false) where TEntity : Entity
+        public List<Entity> FindEntitiesByType<TEntity>(bool SearchInactive = false) where TEntity : Entity
         {
             List<Entity> ents = new List<Entity>();
 
@@ -70,13 +101,27 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Check if a point is 'inside' the map
+        /// Find an  entity by its name
         /// </summary>
-        /// <param name="Point">The point to test</param>
-        /// <returns>True if the point is in a navicable area</returns>
-        public bool IsInside(Vector2 Point)
+        /// <param name="Name"></param>
+        /// <returns>The first entity found or null if none</returns>
+        /// <remarks>Searches active ents and then ents in sectors from 0 to end</remarks>
+        public Entity FindEntityByName(string Name)
         {
-            return (Point.X >= 0 && Point.X < (Width * TileSize) && Point.Y >= 0 && Point.Y < (Height * TileSize));
+            foreach (var ent in ActiveEnts)
+            {
+                if (ent.Name == Name)
+                    return ent;
+            }
+
+            foreach (var s in (System.Collections.IEnumerable)Sectors)
+            {
+                foreach (var ent in ((MapSector)s).entities)
+                    if (ent.Name == Name)
+                        return ent;
+            }
+
+            return null;
         }
 
         /// <summary>

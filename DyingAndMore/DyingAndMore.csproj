@@ -103,6 +103,7 @@
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <PropertyGroup>
     <PostBuildEvent>robocopy /MIR "$(SolutionDir)SrcData " "$(TargetDir)Data "
+robocopy /MIR "$(SolutionDir)Defs " "$(TargetDir)Defs "
 
 set rce=%25errorlevel%25
 if not %25rce%25==1 exit %25rce%25 else exit 0
