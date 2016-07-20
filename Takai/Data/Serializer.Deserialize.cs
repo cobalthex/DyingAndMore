@@ -46,7 +46,7 @@ namespace Takai.Data
         ///     true/false - bool
         ///     null - null
         ///     Type {...} - Type
-        ///     {...} - Dictionary&lt;string, object&gt;
+        ///     {...} - Dictionary&lt;string, object&gt; -- all keys converte to lowercase if CaseSensitiveMembers is false
         /// </remarks>
         public static object TextDeserialize(StreamReader Stream)
         {
@@ -92,7 +92,7 @@ namespace Takai.Data
                 var d = new Dictionary<string, object>();
                 while (!Stream.EndOfStream && Stream.Peek() != '}')
                 {
-                    var name = ReadWord(Stream);
+                    var name = ReadWord(Stream).ToLower();
                     if (Stream.Read() != ':')
                         throw new FormatException("Format is name:value;");
 
@@ -126,9 +126,8 @@ namespace Takai.Data
             if (lword == "null")
                 return null;
 
-            var ty = asmTypes[word];
-
-            if (ty == null)
+            System.Type ty;
+            if (!asmTypes.TryGetValue(word, out ty))
                 return null;
 
             //enum
@@ -144,14 +143,14 @@ namespace Takai.Data
             {
                 var inst = Activator.CreateInstance(ty);
 
-                foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance))
+                foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance | (CaseSensitiveMembers ? 0 : BindingFlags.IgnoreCase)))
                 {
                     object val;
                     if (DeserializeField(field, field.FieldType, dict, out val))
                         field.SetValue(inst, val);
                 }
 
-                foreach (var field in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                foreach (var field in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance | (CaseSensitiveMembers ? 0 : BindingFlags.IgnoreCase)))
                 {
                     object val;
                     if (DeserializeField(field, field.PropertyType, dict, out val))
@@ -166,7 +165,17 @@ namespace Takai.Data
 
         private static bool DeserializeField(MemberInfo Member, Type Type, Dictionary<string, Object> Props, out object Value)
         {
+            //ignored
             if (Member.GetCustomAttribute<Data.NonSerializedAttribute>() != null)
+            {
+                Value = null;
+                return false;
+            }
+
+            object prop;
+
+            //not set
+            if (!Props.TryGetValue(CaseSensitiveMembers ? Member.Name : Member.Name.ToLower(), out prop))
             {
                 Value = null;
                 return false;
@@ -176,54 +185,47 @@ namespace Takai.Data
             var deserial = Type.GetCustomAttribute<CustomDeserializeAttribute>();
             if (deserial != null)
             {
-                Value = deserial.Deserialize.Invoke(null, new[] { Props[Member.Name] });
+                Value = deserial.Deserialize.Invoke(null, new[] { prop });
                 return true;
             }
 
             //custom serializers
             if (Serializers.ContainsKey(Type) && Serializers[Type].Deserialize != null)
             {
-                Value = Serializers[Type].Deserialize(Props[Member.Name]);
+                Value = Serializers[Type].Deserialize(prop);
+                return true;
+            }
+            
+            if (prop is IList)
+            {
+                var ety = Type.HasElementType ? Type.GetElementType() : Type.GetGenericArguments()[0];
+                var orig = (List<object>)prop;
+
+                var castItems = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { orig });
+                var list = ToListMethod.MakeGenericMethod(ety).Invoke(null, new[] { castItems });
+
+                Value = list;
                 return true;
             }
 
-            else if (Props.ContainsKey(Member.Name))
+            if (prop is IDictionary) 
             {
-                if (Props[Member.Name] is IList)
-                {
-                    var ety = Type.HasElementType ? Type.GetElementType() : Type.GetGenericArguments()[0];
-                    var orig = (List<object>)Props[Member.Name];
+                var gArgs = Type.GetGenericArguments(); //[key, value]
+                var orig = (Dictionary<string, object>)prop;
 
-                    var castItems = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { orig });
-                    var list = ToListMethod.MakeGenericMethod(ety).Invoke(null, new[] { castItems });
+                Value = null;
+                return false;
+                //todo
 
-                    Value = list;
-                    return true;
-                }
-                else if (Props[Member.Name] is IDictionary) 
-                {
-                    var gArgs = Type.GetGenericArguments(); //[key, value]
-                    var orig = (Dictionary<string, object>)Props[Member.Name];
+                //var castItems = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { orig });
+                //var list = ToListMethod.MakeGenericMethod(ety).Invoke(null, new[] { castItems });
 
-                    Value = null;
-                    return false;
-                    //todo
-
-                    //var castItems = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { orig });
-                    //var list = ToListMethod.MakeGenericMethod(ety).Invoke(null, new[] { castItems });
-
-                    //Value = list;
-                    //return true;
-                }
-                else
-                {
-                    Value = Props[Member.Name];
-                    return true;
-                }
+                //Value = list;
+                //return true;
             }
 
-            Value = null;
-            return false;
+            Value = prop;
+            return true;
         }
 
         /// <summary>
@@ -234,7 +236,7 @@ namespace Takai.Data
         /// <param name="Value">The value deserialized</param>
         /// <returns>True if the object was deserialized to Value, false if the type is unknown to the deserializer</returns>
         /// <remarks>If Intermediate type and T do not match, will likely throw an exception</remarks>
-        public static bool DeserializeAs<T>(object Source, out T Value)
+        public static bool EvaluateAs<T>(object Source, out T Value)
         {
             var ty = typeof(T);
 

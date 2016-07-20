@@ -220,6 +220,22 @@ namespace Takai.Graphics
             SpriteBatch.Draw(Texture, Bounds, SourceRect, Color, Angle, Origin, SpriteEffects.None, 0);
         }
 
+        struct GraphicSave
+        {
+            public Texture2D texture;
+            public int width;
+            public int height;
+            public Rectangle clipRect;
+            public Vector2 origin;
+            public int frameCount;
+            public System.TimeSpan frameTime;
+            public bool isLooping;
+            public bool isRunning;
+            public TweenStyle tween;
+            public System.TimeSpan delay;
+            public System.TimeSpan elapsed;
+        }
+
         public static object Serialize(Graphic Graphic)
         {
             if (Graphic == null)
@@ -227,22 +243,25 @@ namespace Takai.Graphics
 
             if (Graphic.File != null)
                 return Graphic.File;
-            
-            return new Dictionary<string, object>
-            {
-                { "texture", Graphic.Texture },
-                { "width", Graphic.width },
-                { "height", Graphic.height },
-                { "clipRect", Graphic.clipRect },
-                { "origin", Graphic.Origin },
-                { "frameCount", Graphic.FrameCount },
-                { "frameTime", Graphic.FrameTime },
-                { "isLooping", Graphic.IsLooping },
-                { "isRunning", Graphic.IsRunning },
-                { "tween", Graphic.Tween },
-                { "offset", Graphic.TimeOffset },
-                { "elapsed", Graphic.ElapsedMilliseconds }
-            };
+
+            var elapsed = Graphic.ElapsedMilliseconds;
+            if (Graphic.IsLooping)
+                elapsed %= (long)Graphic.TotalFrameTime.TotalMilliseconds;
+
+            GraphicSave save;
+            save.texture = Graphic.Texture;
+            save.width = Graphic.Width;
+            save.height = Graphic.Height;
+            save.clipRect = Graphic.ClipRect;
+            save.origin = Graphic.Origin;
+            save.frameCount = Graphic.FrameCount;
+            save.frameTime = Graphic.FrameTime;
+            save.isLooping = Graphic.IsLooping;
+            save.isRunning = Graphic.IsRunning;
+            save.tween = Graphic.Tween;
+            save.delay = Graphic.StartDelay;
+            save.elapsed = System.TimeSpan.FromMilliseconds(elapsed);
+            return save;
         }
 
         public static object Deserialize(object Intermediate)
@@ -250,37 +269,31 @@ namespace Takai.Graphics
             var file = Intermediate as string;
             if (file != null)
                 return FromFile(file);
-
-            var dict = Intermediate as Dictionary<string, object>;
-            if (dict != null)
+            
+            if (Intermediate is GraphicSave)
             {
+                var save = (GraphicSave)Intermediate;
+
                 Graphic g = new Graphic();
-                g.Texture = Takai.AssetManager.Load<Texture2D>(dict["texture"] as string); //todo: use texture Deserializer
-                g.Width =  (int)dict["width"];
-                g.Height = (int)dict["height"];
 
-                Rectangle clipRect;
-                Data.Serializer.DeserializeAs(dict["clipRect"], out clipRect);
-                g.ClipRect = clipRect;
+                //auto calc clip rect
+                if (save.clipRect.Width == 0)
+                    save.clipRect.Width = MathHelper.Min(save.texture.Width - save.clipRect.X, save.width * save.frameCount);
+                if (save.clipRect.Height == 0)
+                    save.clipRect.Height = MathHelper.Min(save.texture.Height - save.clipRect.Y, save.height * save.frameCount);
 
-                Vector2 origin;
-                Data.Serializer.DeserializeAs(dict["origin"], out origin);
-                g.Origin = origin;
+                g.Texture = save.texture;
+                g.Width = save.width;
+                g.Height = save.height;
+                g.ClipRect = save.clipRect;
+                g.Origin = save.origin;
+                g.FrameCount = save.frameCount;
+                g.FrameTime = save.frameTime;
+                g.IsLooping = save.isLooping;
+                g.Tween = save.tween;
+                g.StartDelay = save.elapsed - save.delay;
 
-                g.Tween = (TweenStyle)dict["tween"];
-                g.FrameCount = (int)dict["frameCount"];
-
-                System.TimeSpan frameTime, elapsed, offset;
-                Data.Serializer.DeserializeAs(dict["frameTime"], out frameTime);
-                Data.Serializer.DeserializeAs(dict["elapsed"], out elapsed);
-                Data.Serializer.DeserializeAs(dict["offset"], out offset);
-
-                g.FrameTime = frameTime;
-                g.TimeOffset = elapsed - offset;
-
-                g.IsLooping = (bool)dict["isLooping"];
-
-                if ((bool)dict["isRunning"])
+                if (save.isRunning)
                     g.Start();
 
                 return g;
@@ -301,8 +314,9 @@ namespace Takai.Graphics
                 using (var reader = new System.IO.StreamReader(File))
                 {
                     Graphic g;
-                    Data.Serializer.DeserializeAs(Data.Serializer.TextDeserialize(reader), out g);
-                    g.File = File;
+                    Data.Serializer.EvaluateAs(Data.Serializer.TextDeserialize(reader), out g);
+                    if (g != null)
+                        g.File = File;
                     return g;
                 }
             }

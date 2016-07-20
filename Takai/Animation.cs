@@ -17,14 +17,26 @@
         public System.TimeSpan FrameTime { get; set; }
 
         /// <summary>
+        /// The total length of the animation (FrameTime * FrameCount)
+        /// </summary>
+        /// <remarks>Does not include start delay</remarks>
+        public System.TimeSpan TotalFrameTime
+        {
+            get
+            {
+                return System.TimeSpan.FromTicks(FrameTime.Ticks * FrameCount);
+            }
+        }
+
+        /// <summary>
         /// Loop the animation (only applies when using currentFrame)
         /// </summary>
         public bool IsLooping { get; set; } = true;
 
         /// <summary>
-        /// An optional offset to add to the time (only when checking currentFrame)
+        /// An optional time delay for the animation
         /// </summary>
-        public System.TimeSpan TimeOffset { get; set; } = System.TimeSpan.Zero;
+        public System.TimeSpan StartDelay { get; set; } = System.TimeSpan.Zero;
 
         /// <summary>
         /// Get or set the current frame with offset calculated
@@ -36,7 +48,7 @@
                 if (FrameCount == 0 || FrameTime == System.TimeSpan.Zero)
                     return 0;
 
-                var f = (int)((Elapsed - TimeOffset).Ticks / FrameTime.Ticks);
+                var f = (int)((Elapsed - StartDelay).Ticks / FrameTime.Ticks);
 
                 if (IsLooping)
                     return f % FrameCount;
@@ -57,12 +69,12 @@
                     return;
 
                 var val = value % FrameCount;
-                var cf = (int)((Elapsed - TimeOffset).Ticks / FrameTime.Ticks);
+                var cf = (int)((Elapsed - StartDelay).Ticks / FrameTime.Ticks);
 
                 if (val == 0)
                     Restart();
                 else
-                    TimeOffset = System.TimeSpan.FromTicks((val - cf) * FrameTime.Ticks);
+                    StartDelay = System.TimeSpan.FromTicks((val - cf) * FrameTime.Ticks);
             }
         }
 
@@ -73,7 +85,7 @@
         {
             get
             {
-                var f = (float)(Elapsed - TimeOffset).Ticks / (float)FrameTime.Ticks;
+                var f = (float)(Elapsed - StartDelay).Ticks / (float)FrameTime.Ticks;
                 return f - (int)f;
             }
             //todo: add setter that updates offset to current frame + frame delta
@@ -89,7 +101,7 @@
                 if (FrameCount == 0 || FrameTime == System.TimeSpan.Zero)
                     return 0;
 
-                var f = (float)(Elapsed - TimeOffset).Ticks / (float)FrameTime.Ticks;
+                var f = (float)(Elapsed - StartDelay).Ticks / (float)FrameTime.Ticks;
 
                 if (IsLooping)
                     return f % FrameCount;
@@ -110,12 +122,12 @@
                     return;
 
                 var val = value % FrameCount;
-                var cf = (uint)((Elapsed - TimeOffset).Ticks / FrameTime.Ticks);
+                var cf = (uint)((Elapsed - StartDelay).Ticks / FrameTime.Ticks);
 
                 if (val == 0)
                     Restart();
                 else
-                    TimeOffset = System.TimeSpan.FromTicks((uint)((val - cf) * FrameTime.Ticks));
+                    StartDelay = System.TimeSpan.FromTicks((uint)((val - cf) * FrameTime.Ticks));
             }
         }
 
@@ -148,7 +160,7 @@
 
         public new void Restart()
         {
-            TimeOffset = System.TimeSpan.Zero;
+            StartDelay = System.TimeSpan.Zero;
             base.Restart();
         }
         

@@ -183,7 +183,7 @@ namespace Takai.Game
                 ActiveEnts.Add(Entity);
             else
             {
-                var sector = Vector2.Clamp(Entity.Position / sectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+                var sector = GetSector(Entity.Position);
                 Sectors[sector.Y, sector.X].entities.Add(Entity);
             }
         }
@@ -256,7 +256,7 @@ namespace Takai.Game
 
             if (Velocity == Vector2.Zero)
             {
-                var sector = Vector2.Clamp(Position / sectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+                var sector = GetSector(Position);
                 Sectors[sector.Y, sector.X].blobs.Add(new Blob { position = Position, velocity = Velocity, type = Type });
             }
             else
@@ -272,8 +272,14 @@ namespace Takai.Game
         /// <param name="Scale">How much to scale the decal</param>
         public void AddDecal(Texture2D Texture, Vector2 Position, float Angle = 0, float Scale = 1)
         {
-            var sector = Vector2.Clamp(Position / sectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+            var sector = GetSector(Position);
             Sectors[sector.Y, sector.X].decals.Add(new Decal { texture = Texture, position = Position, angle = Angle, scale = Scale });
+        }
+
+        public void AddDecal(Decal Decal)
+        {
+            var sector = GetSector(Decal.position);
+            Sectors[sector.Y, sector.X].decals.Add(Decal);
         }
 
         /// <summary>

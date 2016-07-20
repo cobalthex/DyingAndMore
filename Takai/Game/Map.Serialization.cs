@@ -13,7 +13,7 @@ namespace Takai.Game
         /// Load tile data from a CSV
         /// </summary>
         /// <remarks>Assumes csv is well formed (all rows are the same length)</remarks>
-        public void ReadTiles(Stream Stream)
+        public void LoadCsv(Stream Stream)
         {
             var reader = new StreamReader(Stream);
             
@@ -45,30 +45,34 @@ namespace Takai.Game
                 for (var j = 0; j < Width; j++)
                     Tiles[i, j] = rows[i][j];
         }
-
+        
         /// <summary>
-        /// write the map tiles to a CSV
+        /// A temporary struct for organizing data to be serialized
         /// </summary>
-        /// <param name="Stream">The stream to write to</param>
-        public void WriteTiles(Stream Stream)
+        struct MapSave
         {
-            var writer = new StreamWriter(Stream);
-            
-            bool first = true;
-            for (int y = 0; y < Tiles.GetLength(0); y++)
+            public int width, height;
+            public short[,] tiles;
+
+            public MapState state;
+
+            public MapSave(Map Map)
             {
-                for (int x = 0; x < Tiles.GetLength(1); x++)
-                {
-                    if (!first)
-                        writer.Write(',');
-                    first = false;
-                    writer.Write(Tiles[y, x]);
-                }
-                writer.Write('\n');
+                width = Map.Width;
+                height = Map.Height;
+                tiles = Map.Tiles;
+                state = new MapState(Map);
             }
         }
 
-        internal struct BlobSave
+        public void Save(Stream Stream)
+        {
+            var save = new MapSave(this);
+            using (var writer = new StreamWriter(Stream))
+                Data.Serializer.TextSerialize(writer, save);
+        }
+
+        struct BlobSave
         {
             public int type;
             public Vector2 position;
@@ -76,32 +80,18 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// A temporary struct for organizing data to be serialized
-        /// </summary>
-        internal struct MapSave
-        {
-            public int width, height;
-            public short[,] tiles;
-
-            public MapSave(Map Map)
-            {
-                width = Map.Width;
-                height = Map.Height;
-                tiles = Map.Tiles;
-            }
-        }
-
-        /// <summary>
         /// A temporary struct for organizing state data to be serialized
         /// </summary>
-        struct MapStateSave
+        struct MapState
         {
             public List<Entity> entities;
             public List<BlobType> blobTypes;
             public List<BlobSave> blobs;
             public List<Decal> decals;
 
-            public MapStateSave(Map Map)
+            //decals are 
+
+            public MapState(Map Map)
             {
                 entities = new List<Entity>(Map.ActiveEnts);
                 blobTypes = new List<BlobType>();
@@ -146,25 +136,33 @@ namespace Takai.Game
             }
         }
 
-        public void WriteState(Stream Stream)
+        public void SaveState(Stream Stream)
         {
-            var save = new MapStateSave(this);
+            var save = new MapState(this);
             using (var writer = new StreamWriter(Stream))
                 Data.Serializer.TextSerialize(writer, save);
         }
 
-        public void ReadState(Stream Stream)
+        public void LoadState(Stream Stream)
         {
-            MapStateSave load;
+            MapState load;
             using (var reader = new StreamReader(Stream))
-                load = (MapStateSave)Data.Serializer.TextDeserialize(reader);
+            {
+                var temp = Data.Serializer.TextDeserialize(reader);
+                if (!(temp is MapState))
+                    return;
+                load = (MapState)temp;
+            }
 
             var blobTypes = new Dictionary<int, BlobType>();
             for (var i = 0; i < load.blobTypes.Count; i++)
                 blobTypes[i] = load.blobTypes[i];
 
+            foreach (var ent in load.entities)
+                ent.Map = this;
+
             ActiveEnts = load.entities;
-            ActiveBlobs = load.blobs.Select<BlobSave, Blob>((BlobSave Save) =>
+            ActiveBlobs = load.blobs.Select((BlobSave Save) =>
             {
                 return new Blob
                 {
@@ -175,6 +173,9 @@ namespace Takai.Game
             }).ToList();
 
             BuildSectors();
+
+            foreach (var decal in load.decals)
+                AddDecal(decal);
         }
     }
 }
