@@ -66,8 +66,8 @@ namespace Takai.Game
                 name = Map.Name;
                 width = Map.Width;
                 height = Map.Height;
-                tileSize = Map.TileSize;
                 tilesImage = Map.TilesImage;
+                tileSize = Map.TileSize;
                 tiles = new short[width * height];
                 Buffer.BlockCopy(Map.Tiles, 0, tiles, 0, width * height);
 
@@ -80,6 +80,32 @@ namespace Takai.Game
             var save = new MapSave(this);
             using (var writer = new StreamWriter(Stream))
                 Data.Serializer.TextSerialize(writer, save);
+        }
+
+        public void Load(Stream Stream, bool LoadState = true)
+        {
+            MapSave load;
+            using (var reader = new StreamReader(Stream))
+            {
+                var temp = Data.Serializer.TextDeserialize(reader);
+                if (!(temp is MapSave))
+                    return;
+                load = (MapSave)temp;
+            }
+            
+            Name = load.name;
+            Width = load.width;
+            Height = load.height;
+            TilesImage = load.tilesImage;
+            TileSize = load.tileSize;
+            Tiles = new short[Height, Width];
+            Buffer.BlockCopy(load.tiles, 0, Tiles, 0, Width * Height);
+
+            BuildSectors();
+            BuildMask(TilesImage);
+
+            if (LoadState)
+                this.LoadState(load.state);
         }
 
         struct BlobSave
@@ -162,15 +188,20 @@ namespace Takai.Game
                 load = (MapState)temp;
             }
 
-            var blobTypes = new Dictionary<int, BlobType>();
-            for (var i = 0; i < load.blobTypes.Count; i++)
-                blobTypes[i] = load.blobTypes[i];
+            LoadState(load);
+        }
 
-            foreach (var ent in load.entities)
+        private void LoadState(MapState State)
+        {
+            var blobTypes = new Dictionary<int, BlobType>();
+            for (var i = 0; i < State.blobTypes.Count; i++)
+                blobTypes[i] = State.blobTypes[i];
+
+            foreach (var ent in State.entities)
                 ent.Map = this;
 
-            ActiveEnts = load.entities;
-            ActiveBlobs = load.blobs.Select((BlobSave Save) =>
+            ActiveEnts = State.entities;
+            ActiveBlobs = State.blobs.Select((BlobSave Save) =>
             {
                 return new Blob
                 {
@@ -182,7 +213,7 @@ namespace Takai.Game
 
             BuildSectors();
 
-            foreach (var decal in load.decals)
+            foreach (var decal in State.decals)
                 AddDecal(decal);
         }
     }
