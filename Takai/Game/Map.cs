@@ -140,7 +140,7 @@ namespace Takai.Game
         public void BuildMask(Texture2D Texture, bool UseAlpha = false)
         {
             Color[] pixels = new Color[Texture.Width * Texture.Height];
-            Texture.GetData<Color>(pixels);
+            Texture.GetData(pixels);
 
             TilesMask = new bool[Texture.Height * Texture.Width];
             for (var i = 0; i < pixels.Length; i++)

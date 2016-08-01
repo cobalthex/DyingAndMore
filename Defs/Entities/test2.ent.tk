@@ -1,0 +1,36 @@
+Actor {
+    primaryWeapon: Null;
+    altWeapon: Null;
+    CurrentHealth: 0;
+    MaxHealth: 0;
+    States: {
+    };
+    CurrentState: Null;
+    FieldOfView: 2.356194;
+    MaxSpeed: 0;
+    MoveForce: 0;
+    Name: Null;
+    Position: [0 0];
+    Direction: [1 0];
+    Velocity: [0 0];
+    IsEnabled: True;
+    AlwaysActive: False;
+    Radius: 16;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    Sprite: GraphicSave {
+        texture: "Textures/TestEnt.png";
+        width: 96;
+        height: 96;
+        clipRect: [0 0 576 192];
+        origin: [48 48];
+        frameCount: 6;
+        frameTime: 100;
+        isLooping: True;
+        isRunning: True;
+        tween: TweenStyle Overlap;
+        delay: 0;
+        elapsed: 0;
+    };
+    OutlineColor: [0 0 0 0];
+}

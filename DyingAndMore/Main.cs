@@ -104,7 +104,7 @@ namespace DyingAndMore
             Takai.AssetManager.Initialize(GraphicsDevice, "Data\\");
 
             StateManager.Initialize(this);
-            StateManager.PushState(new Game());
+            StateManager.PushState(new Editor());
 
             base.Initialize();
         }
