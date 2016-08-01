@@ -15,7 +15,7 @@ Actor {
         texture: "Textures/Astrovirus.png";
         width: 42;
         height: 42;
-        clipRect: [0 84 0 0];
+        clip: [0 84 0 0];
         origin: [21 21];
         frameCount: 6;
         frameTime: 100;

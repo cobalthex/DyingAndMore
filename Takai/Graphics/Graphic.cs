@@ -220,12 +220,13 @@ namespace Takai.Graphics
             SpriteBatch.Draw(Texture, Bounds, SourceRect, Color, Angle, Origin, SpriteEffects.None, 0);
         }
 
+        [Data.DesignerCreatable]
         struct GraphicSave
         {
             public Texture2D texture;
             public int width;
             public int height;
-            public Rectangle clipRect;
+            public Rectangle clip;
             public Vector2 origin;
             public int frameCount;
             public System.TimeSpan frameTime;
@@ -252,7 +253,7 @@ namespace Takai.Graphics
             save.texture = Graphic.Texture;
             save.width = Graphic.Width;
             save.height = Graphic.Height;
-            save.clipRect = Graphic.ClipRect;
+            save.clip = Graphic.ClipRect;
             save.origin = Graphic.Origin;
             save.frameCount = Graphic.FrameCount;
             save.frameTime = Graphic.FrameTime;
@@ -277,15 +278,18 @@ namespace Takai.Graphics
                 Graphic g = new Graphic();
 
                 //auto calc clip rect
-                if (save.clipRect.Width == 0)
-                    save.clipRect.Width = MathHelper.Min(save.texture.Width - save.clipRect.X, save.width * save.frameCount);
-                if (save.clipRect.Height == 0)
-                    save.clipRect.Height = MathHelper.Min(save.texture.Height - save.clipRect.Y, save.height * save.frameCount);
+                if (save.texture != null)
+                {
+                    if (save.clip.Width == 0)
+                        save.clip.Width = MathHelper.Min(save.texture.Width - save.clip.X, save.width * save.frameCount);
+                    if (save.clip.Height == 0)
+                        save.clip.Height = MathHelper.Min(save.texture.Height - save.clip.Y, save.height * save.frameCount);
+                }
 
                 g.Texture = save.texture;
                 g.Width = save.width;
                 g.Height = save.height;
-                g.ClipRect = save.clipRect;
+                g.ClipRect = save.clip;
                 g.Origin = save.origin;
                 g.FrameCount = save.frameCount;
                 g.FrameTime = save.frameTime;

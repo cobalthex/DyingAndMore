@@ -6,6 +6,7 @@ namespace DyingAndMore.Weapons
     /// <summary>
     /// The base for a weapon
     /// </summary>
+    [Takai.Data.DesignerCreatable]
     abstract class Weapon
     {
         /// <summary>

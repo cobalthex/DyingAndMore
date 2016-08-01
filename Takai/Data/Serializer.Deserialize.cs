@@ -23,13 +23,14 @@ namespace Takai.Data
         {
             var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | (IsStatic ? BindingFlags.Static : 0));
             this.Deserialize = method;
-        }
+        } 
     }
 
     public static partial class Serializer
     {
-        private static readonly MethodInfo CastMethod = typeof(System.Linq.Enumerable).GetMethod("Cast");
-        private static readonly MethodInfo ToListMethod = typeof(System.Linq.Enumerable).GetMethod("ToList");
+        private static readonly MethodInfo CastMethod = typeof(Enumerable).GetMethod("Cast");
+        private static readonly MethodInfo ToListMethod = typeof(Enumerable).GetMethod("ToList");
+        private static readonly MethodInfo ToArrayMethod = typeof(Enumerable).GetMethod("ToArray");
 
         /// <summary>
         /// Desearialize an object from a text file (In the same format created by TextSerialize)
@@ -45,6 +46,7 @@ namespace Takai.Data
         ///     00000 - int (or long if too large)
         ///     true/false - bool
         ///     null - null
+        ///     Type prop1 prop2 - Enum
         ///     Type {...} - Type
         ///     {...} - Dictionary&lt;string, object&gt; -- all keys converte to lowercase if CaseSensitiveMembers is false
         /// </remarks>
@@ -53,6 +55,8 @@ namespace Takai.Data
             SkipWhitespace(Stream);
 
             var pk = (char)Stream.Peek();
+            if (pk == ';')
+                return null;
             //strings
             if (pk == '"' || pk == '\'')
                 return ReadString(Stream);
@@ -127,14 +131,24 @@ namespace Takai.Data
                 return null;
 
             System.Type ty;
-            if (!asmTypes.TryGetValue(word, out ty))
+            if (!RegisteredTypes.TryGetValue(word, out ty))
                 return null;
 
             //enum
             if (ty.IsEnum)
             {
-                var value = ReadWord(Stream);
-                return Enum.Parse(ty, value);
+
+                ulong values = 0;
+
+                do
+                {
+                    var value = ReadWord(Stream);
+                    values |= Convert.ToUInt64(Enum.Parse(ty, value));
+
+                    SkipWhitespace(Stream);
+                } while (!IsTerminator((char)Stream.Peek()));
+
+                return Enum.ToObject(ty, values);
             }
 
             var dict = TextDeserialize(Stream) as Dictionary<string, object>;
@@ -143,17 +157,17 @@ namespace Takai.Data
             {
                 var inst = Activator.CreateInstance(ty);
 
-                foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance | (CaseSensitiveMembers ? 0 : BindingFlags.IgnoreCase)))
-                {
-                    object val;
-                    if (DeserializeField(field, field.FieldType, dict, out val))
-                        field.SetValue(inst, val);
-                }
-
                 foreach (var field in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance | (CaseSensitiveMembers ? 0 : BindingFlags.IgnoreCase)))
                 {
                     object val;
                     if (DeserializeField(field, field.PropertyType, dict, out val))
+                        field.SetValue(inst, val);
+                }
+
+                foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance | (CaseSensitiveMembers ? 0 : BindingFlags.IgnoreCase)))
+                {
+                    object val;
+                    if (DeserializeField(field, field.FieldType, dict, out val))
                         field.SetValue(inst, val);
                 }
 
@@ -200,11 +214,28 @@ namespace Takai.Data
             {
                 var ety = Type.HasElementType ? Type.GetElementType() : Type.GetGenericArguments()[0];
                 var orig = (List<object>)prop;
+                
+                try
+                {
+                    var casted = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { orig });
+                    
+                    //exception only happens during ToArray/List
+                    if (Type.IsArray)
+                        Value = ToArrayMethod.MakeGenericMethod(ety).Invoke(null, new[] { casted });
+                    else
+                        Value = ToListMethod.MakeGenericMethod(ety).Invoke(null, new[] { casted });
+                }
+                catch
+                {
+                    var cvt = orig.Select(x => Convert.ChangeType(x, ety));
+                    var casted = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { cvt });
 
-                var castItems = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { orig });
-                var list = ToListMethod.MakeGenericMethod(ety).Invoke(null, new[] { castItems });
+                    if (Type.IsArray)
+                        Value = ToArrayMethod.MakeGenericMethod(ety).Invoke(null, new[] { casted });
+                    else
+                        Value = ToListMethod.MakeGenericMethod(ety).Invoke(null, new[] { casted });
+                }
 
-                Value = list;
                 return true;
             }
 

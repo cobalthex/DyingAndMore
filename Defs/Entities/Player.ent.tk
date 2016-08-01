@@ -12,6 +12,7 @@ Actor {
     Radius: 24;
     IsPhysical: True;
     IgnoreTrace: False;
+    Faction: Factions Player;
     Sprite: GraphicSave {
         texture: "Textures/Player.png";
         width: 48;

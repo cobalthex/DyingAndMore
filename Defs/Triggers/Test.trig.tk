@@ -1,0 +1,4 @@
+Trigger {
+	PlayerOnly: false;
+	Type: TriggerType Kill;
+}

@@ -9,6 +9,7 @@ namespace Takai.Game
     /// A single type of blob
     /// This struct defines the graphics for the blob and physical properties that can affect the game
     /// </summary>
+    [Data.DesignerCreatable]
     public class BlobType
     {
         /// <summary>
@@ -36,6 +37,7 @@ namespace Takai.Game
     /// Blobs can have physics per their blob type
     /// Blobs can be spawned with a velocity which is decreased by their drag over time. Once the velocity reaches zero, the blob is considered inactive (permanently)
     /// </summary>
+    [Data.DesignerCreatable]
     public struct Blob
     {
         public BlobType type;

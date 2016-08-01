@@ -49,10 +49,22 @@ namespace Takai.Data
             if (ty.IsPrimitive)
                 Stream.Write(Object);
 
-            else if (ty.IsEnum)
-                Stream.Write("{0} {1}", WriteFullTypeNames ? ty.FullName : ty.Name, Object.ToString());
+            else if (ty.IsEnum) //todo: flags
+            {
+                Stream.Write(WriteFullTypeNames ? ty.FullName : ty.Name);
 
-            else if (ty == typeof(String) || ty == typeof(char[]))
+                if (Attribute.IsDefined(ty, typeof(FlagsAttribute)) && Convert.ToInt32(Object) != 0)
+                {
+                    var e = Object as Enum;
+                    foreach (Enum flag in Enum.GetValues(ty))
+                        if (Convert.ToInt32(flag) != 0 && e.HasFlag(flag))
+                            Stream.Write(" {0}", flag.ToString());
+                }
+                else
+                    Stream.Write(" {0}", Object.ToString());
+            }
+
+            else if (ty == typeof(string) || ty == typeof(char[]))
                 Stream.Write(Object.ToString().ToLiteral());
 
             //user-defined serializer
@@ -111,10 +123,10 @@ namespace Takai.Data
             {
                 Stream.WriteLine("{0} {{", WriteFullTypeNames ? ty.FullName : ty.Name);
 
-                foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance))
+                foreach (var field in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                     SerializeMember(Stream, field, field.GetValue(Object), IndentLevel);
 
-                foreach (var field in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance))
                     SerializeMember(Stream, field, field.GetValue(Object), IndentLevel);
 
                 Indent(Stream, IndentLevel);

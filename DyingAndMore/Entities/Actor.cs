@@ -1,10 +1,22 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Takai.Game;
 using Takai.Graphics;
 
 namespace DyingAndMore.Entities
 {
-    class Actor : Takai.Game.Entity
+    /// <summary>
+    /// Available factions. Work as bit flags (one actor can have multiple factions)
+    /// </summary>
+    [System.Flags]
+    enum Factions : int
+    {
+        None = 0,
+        Player = 1,
+        Powerup = 2,
+    }
+
+    class Actor : Entity
     {
         private int maxHealth = 0;
         private string currentState = null;
@@ -13,6 +25,7 @@ namespace DyingAndMore.Entities
         /// <summary>
         /// The current health of the actor
         /// </summary>
+        [Takai.Data.NonDesigned]
         public int CurrentHealth { get; set; }
 
         /// <summary>
@@ -39,6 +52,7 @@ namespace DyingAndMore.Entities
         /// Automatically updates entity sprite on set
         /// </summary>
         /// <remarks>Does nothing if the state does not exist</remarks>
+        [Takai.Data.NonDesigned]
         public string CurrentState
         {
             get
@@ -65,7 +79,7 @@ namespace DyingAndMore.Entities
         /// The current faction. Typically used by the AI to determine enemies
         /// </summary>
         /// <remarks>0 is any/no faction</remarks>
-        int Faction { get; set; } = 0;
+        public Factions Faction { get; set; } = Factions.None;
         
         public Weapons.Weapon primaryWeapon;
         public Weapons.Weapon altWeapon;

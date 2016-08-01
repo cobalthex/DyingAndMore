@@ -5,3 +5,4 @@ syntax: glob
 *.user
 obj/
 bin/
+packages/

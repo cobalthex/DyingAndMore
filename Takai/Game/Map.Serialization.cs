@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.Serialization;
 using System.Linq;
 
@@ -45,22 +46,31 @@ namespace Takai.Game
                 for (var j = 0; j < Width; j++)
                     Tiles[i, j] = rows[i][j];
         }
-        
+
         /// <summary>
         /// A temporary struct for organizing data to be serialized
         /// </summary>
         struct MapSave
         {
+            public string name;
+
             public int width, height;
-            public short[,] tiles;
+            public int tileSize;
+            public Texture2D tilesImage;
+            public short[] tiles;
 
             public MapState state;
-
+            
             public MapSave(Map Map)
             {
+                name = Map.Name;
                 width = Map.Width;
                 height = Map.Height;
-                tiles = Map.Tiles;
+                tileSize = Map.TileSize;
+                tilesImage = Map.TilesImage;
+                tiles = new short[width * height];
+                Buffer.BlockCopy(Map.Tiles, 0, tiles, 0, width * height);
+
                 state = new MapState(Map);
             }
         }
@@ -88,9 +98,7 @@ namespace Takai.Game
             public List<BlobType> blobTypes;
             public List<BlobSave> blobs;
             public List<Decal> decals;
-
-            //decals are 
-
+            
             public MapState(Map Map)
             {
                 entities = new List<Entity>(Map.ActiveEnts);
