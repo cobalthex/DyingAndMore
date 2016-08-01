@@ -7,6 +7,7 @@ using System;
 
 namespace Takai.Graphics
 {
+    [Data.DesignerCreatable]
     public class BitmapFont : System.IDisposable
     {
         #region Data
@@ -14,16 +15,16 @@ namespace Takai.Graphics
         /// <summary>
         /// All of the available characters in the font
         /// </summary>
-        public System.Collections.Generic.Dictionary<char, Rectangle> characters { get; protected set; }
+        public System.Collections.Generic.Dictionary<char, Rectangle> Characters { get; protected set; }
 
         /// <summary>
         /// The source texture holding all of the character images
         /// </summary>
-        public Texture2D texture { get; protected set; }
+        public Texture2D Texture { get; protected set; }
         /// <summary>
         /// Spacing between each character when drawn
         /// </summary>
-        public Point spacing;
+        public Point Spacing { get; set; }
 
         #endregion
 
@@ -37,7 +38,7 @@ namespace Takai.Graphics
         public static BitmapFont FromStream(GraphicsDevice GDev, System.IO.Stream Stream)
         {
             BitmapFont font = new BitmapFont();
-            font.spacing = Point.Zero;
+            font.Spacing = Point.Zero;
 
             var read = new DeflateStream(Stream, CompressionMode.Decompress);
 
@@ -46,7 +47,7 @@ namespace Takai.Graphics
             int x, y, w, h; char c;
             read.Read(block, 0, 4);
             int len = BitConverter.ToInt32(block, 0);
-            font.characters = new System.Collections.Generic.Dictionary<char, Rectangle>(len);
+            font.Characters = new System.Collections.Generic.Dictionary<char, Rectangle>(len);
             for (int i = 0; i < len; i++)
             {
 #if XBOX
@@ -59,7 +60,7 @@ namespace Takai.Graphics
                 read.Read(block, 0, 4); w = BitConverter.ToInt32(block, 0);
                 read.Read(block, 0, 4); h = BitConverter.ToInt32(block, 0);
 
-                font.characters.Add(c, new Rectangle(x, y, w, h));
+                font.Characters.Add(c, new Rectangle(x, y, w, h));
             }
             block = new byte[8];
             read.Read(block, 0, 8);
@@ -76,7 +77,7 @@ namespace Takai.Graphics
             } while (red > 0);
 
             ms.Seek(0, System.IO.SeekOrigin.Begin);
-            font.texture = Texture2D.FromStream(GDev, ms);
+            font.Texture = Texture2D.FromStream(GDev, ms);
 
             read.Close();
 
@@ -88,9 +89,9 @@ namespace Takai.Graphics
         /// </summary>
         public void Dispose()
         {
-            texture.Dispose();
-            spacing = Point.Zero;
-            characters.Clear();
+            Texture.Dispose();
+            Spacing = Point.Zero;
+            Characters.Clear();
             System.GC.SuppressFinalize(this);
         }
 
@@ -121,7 +122,7 @@ namespace Takai.Graphics
                 if (String[i] == '\n')
                 {
                     pos.X = Position.X;
-                    pos.Y += maxH + spacing.Y;
+                    pos.Y += maxH + Spacing.Y;
                     maxH = 0;
                     esc++;
                     continue;
@@ -156,11 +157,11 @@ namespace Takai.Graphics
                 }
 
                 Rectangle rgn;
-                if (!characters.TryGetValue(String[i], out rgn))
+                if (!Characters.TryGetValue(String[i], out rgn))
                     continue;
 
-                Spritebatch.Draw(texture, pos, rgn, curColor);
-                pos.X += rgn.Width + spacing.X;
+                Spritebatch.Draw(Texture, pos, rgn, curColor);
+                pos.X += rgn.Width + Spacing.X;
                 maxH = (int)MathHelper.Max(maxH, rgn.Height);
             }
         }
@@ -205,7 +206,7 @@ namespace Takai.Graphics
                 if (ch == '\n')
                 {
                     pos.X = Bounds.X;
-                    pos.Y += maxH + spacing.Y;
+                    pos.Y += maxH + Spacing.Y;
                     off.X = Offset.X;
                     off.Y -= maxH;
                     if (off.Y < 0)
@@ -249,7 +250,7 @@ namespace Takai.Graphics
                 }
 
                 Rectangle rgn;
-                if (!characters.TryGetValue(ch, out rgn))
+                if (!Characters.TryGetValue(ch, out rgn))
                     continue;
 
                 int ofx = off.X, ofy = off.Y;
@@ -288,8 +289,8 @@ namespace Takai.Graphics
                 else
                     rgn.Height = (rgn.Height > Bounds.Height ? Bounds.Height : rgn.Height);
 
-                Spritebatch.Draw(texture, new Vector2(Bounds.X + pos.X, Bounds.Y + pos.Y), rgn, curColor);
-                pos.X += rgn.Width + spacing.X;
+                Spritebatch.Draw(Texture, new Vector2(Bounds.X + pos.X, Bounds.Y + pos.Y), rgn, curColor);
+                pos.X += rgn.Width + Spacing.X;
                 maxH = (int)MathHelper.Max(maxH, rgn.Height);
             }
         }
@@ -330,7 +331,7 @@ namespace Takai.Graphics
                 if (String[i] == '\n')
                 {
                     nW = 0;
-                    pos.Y += nH + spacing.Y;
+                    pos.Y += nH + Spacing.Y;
                     nH = 0;
                     continue;
                 }
@@ -355,7 +356,7 @@ namespace Takai.Graphics
                     }
                 }
                 Rectangle rgn;
-                if (characters.TryGetValue(String[i], out rgn))
+                if (Characters.TryGetValue(String[i], out rgn))
                 {
                     nW += rgn.Width;
                     nH = (int)MathHelper.Max(nH, rgn.Height);
@@ -363,7 +364,7 @@ namespace Takai.Graphics
 
                 pos.X = (int)MathHelper.Max(pos.X, nW);
             }
-            pos.Y += nH + spacing.Y;
+            pos.Y += nH + Spacing.Y;
             return pos;
         }
 

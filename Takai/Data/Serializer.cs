@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Data
-{   
+{
     [AttributeUsage(AttributeTargets.All, Inherited = true)]
     [System.Runtime.InteropServices.ComVisible(true)]
     public class NonSerializedAttribute : System.Attribute { }
@@ -41,7 +41,7 @@ namespace Takai.Data
         public const bool CaseSensitiveMembers = false;
 
         //cached types from assemblies
-        private static Dictionary<string, Type> asmTypes;
+        public static Dictionary<string, Type> RegisteredTypes { get; set; }
 
         /// <summary>
         /// Custom serializers (provided for things like system classes. User defined classes can use CustomSerializeAttribute
@@ -50,9 +50,10 @@ namespace Takai.Data
 
         static Serializer()
         {
-            asmTypes = new Dictionary<string, Type>();
+            RegisteredTypes = new Dictionary<string, Type>();
             Serializers = new Dictionary<Type, CustomTypeSerializer>();
-            ReloadTypes();
+
+            LoadTypesFrom(Assembly.GetExecutingAssembly());
 
             //default custom serializers
             Serializers.Add(typeof(Vector2), new CustomTypeSerializer
@@ -116,18 +117,17 @@ namespace Takai.Data
         }
 
         /// <summary>
-        /// Reload all cached types. Should be called if/when new assemblies are added
-        /// Automatically called at the beginning of the application
+        /// Load types from an assembly
         /// </summary>
-        public static void ReloadTypes()
+        /// <param name="Assembly">The assembly to load from</param>
+        public static void LoadTypesFrom(Assembly Ass)
         {
-            var assemblies = new[] { Assembly.GetEntryAssembly(), Assembly.GetExecutingAssembly() };
-            foreach (Assembly ass in assemblies)
-            {
-                Type[] types = ass.GetTypes();
-                foreach (var type in types)
-                    asmTypes[WriteFullTypeNames ? type.FullName : type.Name] = type;
-            }
+            if (Ass == null)
+                return;
+
+            Type[] types = Ass.GetTypes();
+            foreach (var type in types)
+                RegisteredTypes[WriteFullTypeNames ? type.FullName : type.Name] = type;
         }
     }
 }

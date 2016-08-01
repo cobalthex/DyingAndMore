@@ -78,6 +78,8 @@ namespace DyingAndMore
 
         void gdm_DeviceCreated(object sender, System.EventArgs e)
         {
+            Takai.Data.Serializer.LoadTypesFrom(System.Reflection.Assembly.GetEntryAssembly());
+
             if (StateManager.isInitialized)
                 return;
 

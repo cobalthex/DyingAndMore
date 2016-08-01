@@ -1,0 +1,4 @@
+Gun {
+	projectile: null;
+	speed: 10;
+}

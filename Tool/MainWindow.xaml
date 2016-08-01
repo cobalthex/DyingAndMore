@@ -1,29 +1,138 @@
-﻿<Window x:Class="Tool.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         xmlns:local="clr-namespace:Tool"
+        xmlns:Toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+        x:Class="Tool.MainWindow"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        Icon="Main.ico"
+        Title="Takai Tool"
+        Width="1280" Height="800" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <local:TypeToIconConverter x:Key="TypeToIcon" />
+        <local:FileToIconConverter x:Key="FileToIcon" />
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="local:UICommands.ShowNew" Executed="CShowNew"/>
+        <CommandBinding Command="local:UICommands.New" Executed="CNew"/>
+        <CommandBinding Command="local:UICommands.Duplicate" Executed="CDuplicate" CanExecute="CIsDocOpen"/>
+        <CommandBinding Command="ApplicationCommands.Open" Executed="COpen"/>
+        <CommandBinding Command="ApplicationCommands.Save" Executed="CSave" CanExecute="CIsDocOpen"/>
+        <CommandBinding Command="local:UICommands.SaveAs" Executed="CSaveAs" CanExecute="CIsDocOpen"/>
+        <CommandBinding Command="local:UICommands.Close" Executed="CClose" CanExecute="CIsDocOpen"/>
+        <CommandBinding Command="local:UICommands.CloseAll" Executed="CCloseAll" CanExecute="CIsDocOpen"/>
+        <CommandBinding Command="local:UICommands.Exit" Executed="CExit"/>
+    </Window.CommandBindings>
+
     <DockPanel>
         <Menu x:Name="menu" DockPanel.Dock="Top">
-            <MenuItem Header="File">
+            <MenuItem x:Name="fileMenu" Header="_File">
+                <MenuItem x:Name="newMenu" Header="_New" ItemsSource="{Binding CreatableTypes}" Command="local:UICommands.ShowNew">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Header" Value="{Binding Name}"/>
+                            <Setter Property="Icon">
+                                <Setter.Value>
+                                    <Image Source="{Binding Path=Name, Converter={StaticResource TypeToIcon}, Mode=OneWay}"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Command" Value="local:UICommands.New"/>
+                            <Setter Property="CommandParameter" Value="{Binding}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <MenuItem Command="local:UICommands.Duplicate"/>
+                <MenuItem Command="ApplicationCommands.Open"/>
+                <MenuItem Command="ApplicationCommands.Save"/>
+                <MenuItem Command="local:UICommands.SaveAs"/>
+                <MenuItem Command="local:UICommands.Close"/>
+                <MenuItem Command="local:UICommands.CloseAll"/>
                 <Separator/>
-                <MenuItem Header="E_xit" />
+                <MenuItem Command="local:UICommands.Exit"/>
             </MenuItem>
         </Menu>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*" MinWidth="100"/>
                 <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*" MinWidth="100"/>
             </Grid.ColumnDefinitions>
-            <GridSplitter Grid.Column="1" Width="4"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <TreeView x:Name="treeView" Grid.Column="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <TreeView x:Name="treeView" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0">
+                <TreeView.Resources>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="HeaderTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image
+											Width="16" Height="16" Stretch="UniformToFill" Margin="2"
+											Source="{Binding Path=Header, Converter={StaticResource FileToIcon},
+                                            RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}, Mode=FindAncestor}}"
+                                        />
+                                        <TextBlock Text="{Binding}" Margin="3,2,2,2" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TreeView.Resources>
             </TreeView>
 
+            <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Width="4" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext"/>
+
+            <TabControl x:Name="tabs" Grid.Column="2" Grid.Row="1" ItemsSource="{Binding Tabs}">
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.InputBindings>
+                                <MouseBinding Gesture="MiddleClick" Command="local:UICommands.Close" CommandParameter="{Binding}"/>
+                            </Grid.InputBindings>
+                            
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Image
+                                Grid.Column="0"
+								Width="16" Height="16" Stretch="UniformToFill" Margin="2"
+								Source="{Binding Path=Source, Converter={StaticResource TypeToIcon}}"
+                            />
+                            <TextBlock Text="{Binding Path=File, TargetNullValue='(Untitled)'}" Grid.Column="1" Margin="5,2,0,2" VerticalAlignment="Center" />
+                            <TextBlock Text="*" Visibility="{Binding Path=IsUnsaved, Converter={StaticResource BoolToVis}}" Grid.Column="2" Margin="2,2,0,2" VerticalAlignment="Center" />
+                            <Button Grid.Column="3" Margin="10,2,0,0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" FontFamily="Marlett" FontWeight="Light"
+                                    Command="local:UICommands.Close" CommandParameter="{Binding}" Content="r"/>
+
+                            <Grid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="_Duplicate" Command="local:UICommands.Duplicate" CommandParameter="{Binding}" InputGestureText=""/>
+                                    <MenuItem Header="_Save" Command="ApplicationCommands.Save" CommandParameter="{Binding}" InputGestureText=""/>
+                                    <MenuItem Header="Save _As…" Command="local:UICommands.SaveAs" CommandParameter="{Binding}" InputGestureText=""/>
+                                    <MenuItem Header="_Close" Command="local:UICommands.Close" CommandParameter="{Binding}" InputGestureText=""/>
+                                </ContextMenu>
+                            </Grid.ContextMenu>
+                        </Grid>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <local:DefSheet File="{Binding File}" Source="{Binding Source}" IsUnsaved="{Binding IsUnsaved, Mode=TwoWay}"/>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
         </Grid>
     </DockPanel>
 </Window>

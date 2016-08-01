@@ -6,7 +6,8 @@ namespace Takai.Game
     /// <summary>
     /// The basic entity. All actors and objects inherit from this
     /// </summary>
-    public class Entity : ICloneable
+    [Data.DesignerCreatable]
+    public class Entity
     {
         /// <summary>
         /// The name of this entity. Typically used by other entities for locating
@@ -16,15 +17,18 @@ namespace Takai.Game
         /// <summary>
         /// The current position of the entity
         /// </summary>
+        [Data.NonDesigned]
         public Vector2 Position { get; set; }
         /// <summary>
         /// The (normalized) direction the entity is facing
         /// </summary>
         /// <remarks>This vector should always be normalized</remarks>
+        [Data.NonDesigned]
         public Vector2 Direction { get; set; } = Vector2.UnitX;
         /// <summary>
         /// The direction the entity is moving
         /// </summary>
+        [Data.NonDesigned]
         public Vector2 Velocity { get; set; } = Vector2.Zero;
 
         /// <summary>
@@ -41,6 +45,7 @@ namespace Takai.Game
         /// <summary>
         /// Determines if the entity is thinking (alive)
         /// </summary>
+        [Data.NonDesigned]
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
@@ -88,6 +93,7 @@ namespace Takai.Game
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
+        [Data.NonDesigned]
         public Color OutlineColor { get; set; } = Color.Transparent;
 
         public Entity() { }

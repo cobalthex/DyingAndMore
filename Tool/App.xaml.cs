@@ -13,5 +13,9 @@ namespace Tool
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            Takai.Data.Serializer.LoadTypesFrom(typeof(DyingAndMore.DyingAndMoreGame).Assembly);
+        }
     }
 }

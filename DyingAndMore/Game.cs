@@ -34,11 +34,9 @@ namespace DyingAndMore
 
             map.DebugFont = fnt;
 
-            using (var stream = new System.IO.FileStream("test.map.tk", System.IO.FileMode.Create))
-                map.Save(stream);
-
             using (var stream = new System.IO.StreamReader("Defs/Entities/Player.ent.tk"))
                 player = Takai.Data.Serializer.TextDeserialize(stream) as Entities.Actor;
+            
             player.Position = new Vector2(100);
             map.SpawnEntity(player);
             player.States.Add("idle", player.Sprite);
