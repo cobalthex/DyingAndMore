@@ -112,6 +112,9 @@ namespace Takai.Graphics
             if (String == null)
                 return;
 
+            Position.X = (int)Position.X;
+            Position.Y = (int)Position.Y;
+
             Vector2 pos = Position;
             int maxH = 0;
             Color curColor = Color;

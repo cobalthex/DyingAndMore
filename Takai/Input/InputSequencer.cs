@@ -105,7 +105,7 @@
 
         public void Update(Microsoft.Xna.Framework.GameTime time)
         {
-            if (!InputCatalog.isCreated)
+            if (!InputCatalog.IsInitialized)
                 return;
 
             int eventCount = stream.Count; //used to track changes to see if need to clear stream

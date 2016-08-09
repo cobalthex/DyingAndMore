@@ -164,7 +164,7 @@ namespace DyingAndMore
 
             if (isEditMode)
             {
-                if (Takai.Input.InputCatalog.IsMouseClick(Takai.Input.InputCatalog.MouseButton.Left) && Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.LeftControl))
+                if (Takai.Input.InputCatalog.IsMousePress(Takai.Input.InputCatalog.MouseButton.Left) && Takai.Input.InputCatalog.KBState.IsKeyDown(Keys.LeftControl))
                 {
                     var ofd = new System.Windows.Forms.OpenFileDialog();
                     ofd.Filter = "Entity Definitions (*.ent.tk)|*.ent.tk";

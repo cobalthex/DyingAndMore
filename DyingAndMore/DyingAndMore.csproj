@@ -67,6 +67,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Editor.cs" />
+    <Compile Include="TileSelector.cs" />
+    <Compile Include="Selector.cs" />
     <Compile Include="Weapons\BlobGun.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\Weapon.cs" />
@@ -102,7 +104,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <PropertyGroup>
-    <PostBuildEvent>robocopy /MIR "$(SolutionDir)SrcData " "$(TargetDir)Data "
+    <PostBuildEvent>powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File "$(SolutionDir)SrcData\Shaders\compile.ps1"
+robocopy /MIR "$(SolutionDir)SrcData " "$(TargetDir)Data "
 robocopy /MIR "$(SolutionDir)Defs " "$(TargetDir)Defs "
 
 set rce=%25errorlevel%25
@@ -110,7 +113,8 @@ if not %25rce%25==1 exit %25rce%25 else exit 0
 </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File "$(SolutionDir)SrcData\Shaders\compile.ps1"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

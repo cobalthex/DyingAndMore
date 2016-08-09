@@ -54,6 +54,11 @@ namespace Takai.Game
         [Data.NonDesigned]
         public Entity Follow { get; set; } = null;
 
+        /// <summary>
+        /// A transformation matrix passed to the map renderer, typically used for zooming
+        /// </summary>
+        public Matrix Transform { get; set; } = Matrix.Identity;
+
         public Camera() { }
 
         public Camera(Map Map, Entity Follow = null)
@@ -99,7 +104,7 @@ namespace Takai.Game
         public void Draw(Rectangle Viewport)
         {
             var cam = ActualPosition + Offset;
-            Map.Draw(cam - GetCameraOrigin(Viewport.Width, Viewport.Height), Viewport, PostEffect);
+            Map.Draw(cam - GetCameraOrigin(Viewport.Width, Viewport.Height), Viewport, PostEffect, Transform);
         }
 
         /// <summary>

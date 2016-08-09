@@ -69,12 +69,12 @@
         /// Update the state
         /// </summary>
         /// <param name="time">game time</param>
-        public virtual void Update(Microsoft.Xna.Framework.GameTime time) { }
+        public virtual void Update(Microsoft.Xna.Framework.GameTime Time) { }
         /// <summary>
         /// Draw the state
         /// </summary>
         /// <param name="time">game time</param>
-        public virtual void Draw(Microsoft.Xna.Framework.GameTime time) { }
+        public virtual void Draw(Microsoft.Xna.Framework.GameTime Time) { }
 
         #region Helper functions
 
