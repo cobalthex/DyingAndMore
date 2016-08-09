@@ -82,7 +82,6 @@ namespace Takai.States
         public static void Update(Microsoft.Xna.Framework.GameTime Time)
         {
             time = Time;
-            Input.InputCatalog.Update();
 
             Microsoft.Xna.Framework.Rectangle nView = game.GraphicsDevice.Viewport.Bounds;
             bool resized = viewport != nView;

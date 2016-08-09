@@ -42,7 +42,7 @@ namespace DyingAndMore
     {
         GraphicsDeviceManager gdm;
 
-        bool useCustomCursor = true;
+        bool useCustomCursor = false;
         bool takingScreenshot = false;
 
         /// <summary>
@@ -50,30 +50,16 @@ namespace DyingAndMore
         /// </summary>
         public DyingAndMoreGame()
         {
-#if XBOX
-            Components.Add(new GamerServices.GamerServicesComponent(this));
-#endif
-
             gdm = new GraphicsDeviceManager(this);
             gdm.DeviceCreated += new System.EventHandler<System.EventArgs>(gdm_DeviceCreated);
             gdm.PreferMultiSampling = true;
 
-#if WINDOWS_PHONE
-            TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 30f); //30 fps
-            gdm.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
-            gdm.IsFullScreen = true;
-#elif WINDOWS
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps
             gdm.PreferredBackBufferWidth = 1280;
             gdm.PreferredBackBufferHeight = 800;
             gdm.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
             gdm.PreferMultiSampling = true;
             IsMouseVisible = true;
-#elif XBOX
-            TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps
-            gdm.PreferredBackBufferWidth = 800;
-            gdm.PreferredBackBufferHeight = 600;
-#endif
         }
 
         void gdm_DeviceCreated(object sender, System.EventArgs e)
@@ -121,9 +107,9 @@ namespace DyingAndMore
             takingScreenshot = true;
 #endif
 
-            StateManager.Update(gameTime);
             Takai.Input.InputCatalog.Update();
             Takai.Input.TouchAbstractor.Update();
+            StateManager.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)

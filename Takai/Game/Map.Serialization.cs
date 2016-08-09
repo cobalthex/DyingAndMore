@@ -69,7 +69,7 @@ namespace Takai.Game
                 tilesImage = Map.TilesImage;
                 tileSize = Map.TileSize;
                 tiles = new short[width * height];
-                Buffer.BlockCopy(Map.Tiles, 0, tiles, 0, width * height);
+                Buffer.BlockCopy(Map.Tiles, 0, tiles, 0, width * height * sizeof(short));
 
                 state = new MapState(Map);
             }
@@ -99,7 +99,7 @@ namespace Takai.Game
             TilesImage = load.tilesImage;
             TileSize = load.tileSize;
             Tiles = new short[Height, Width];
-            Buffer.BlockCopy(load.tiles, 0, Tiles, 0, Width * Height);
+            Buffer.BlockCopy(load.tiles, 0, Tiles, 0, Width * Height * sizeof(short));
 
             BuildSectors();
             BuildMask(TilesImage);

@@ -25,7 +25,7 @@ namespace Takai.Input
         /// <summary>
         /// Have the systems been initialized?
         /// </summary>
-        public static bool isCreated { get; private set; }
+        public static bool IsInitialized { get; private set; }
 
 #if WINDOWS_PHONE || ZUNE_HD
 
@@ -58,7 +58,7 @@ namespace Takai.Input
         public static void Update()
         {
             #region Not Created
-            if (!isCreated)
+            if (!IsInitialized)
             {
 #if WINDOWS_PHONE || ZUNE_HD
 #if USE_ACCELEROMETER
@@ -82,7 +82,7 @@ namespace Takai.Input
                 lastGPadState[3] = GamePad.GetState(Microsoft.Xna.Framework.PlayerIndex.Four);
 #endif
 
-                isCreated = true;
+                IsInitialized = true;
             }
             #endregion
 
@@ -160,11 +160,11 @@ namespace Takai.Input
         }
 
         /// <summary>
-        /// Has a mouse button been clicked (just pressed)
+        /// Has a mouse button been pressed (just pressed)
         /// </summary>
         /// <param name="Button">The mouse button</param>
         /// <returns>True if pressed</returns>
-        public static bool IsMouseClick(MouseButton Button)
+        public static bool IsMousePress(MouseButton Button)
         {
             switch (Button)
             {
@@ -181,15 +181,41 @@ namespace Takai.Input
             }
             return false;
         }
+
+        /// <summary>
+        /// Has a mouse button been clicked (just released)
+        /// </summary>
+        /// <param name="Button">The mouse button to test</param>
+        /// <returns>True if clicked</returns>
+        public static bool IsMouseClick(MouseButton Button)
+        {
+            switch (Button)
+            {
+                case MouseButton.Left:
+                    return MouseState.LeftButton == ButtonState.Released && lastMouseState.LeftButton == ButtonState.Pressed;
+                case MouseButton.Middle:
+                    return MouseState.MiddleButton == ButtonState.Released && lastMouseState.MiddleButton == ButtonState.Pressed;
+                case MouseButton.Right:
+                    return MouseState.RightButton == ButtonState.Released && lastMouseState.RightButton == ButtonState.Pressed;
+                case MouseButton.Button4:
+                    return MouseState.XButton1 == ButtonState.Released && lastMouseState.XButton1 == ButtonState.Pressed;
+                case MouseButton.Button5:
+                    return MouseState.XButton2 == ButtonState.Released && lastMouseState.XButton2 == ButtonState.Pressed;
+            }
+            return false;
+        }
+
+
+
         /// <summary>
         /// Check if a mouse button is clicked and in a region
         /// </summary>
         /// <param name="Button">The mouse button</param>
         /// <param name="Region">The window region to check</param>
         /// <returns>True if clicked and in region, false if not</returns>
-        public static bool IsMouseClickInRegion(MouseButton Button, Microsoft.Xna.Framework.Rectangle Region)
+        public static bool IsMousePressedInRegion(MouseButton Button, Microsoft.Xna.Framework.Rectangle Region)
         {
-            return IsMouseClick(Button) && Region.Contains(MouseState.X, MouseState.Y);
+            return IsMousePress(Button) && Region.Contains(MouseState.X, MouseState.Y);
         }
         /// <summary>
         /// Has the mouse wheel been scrolled

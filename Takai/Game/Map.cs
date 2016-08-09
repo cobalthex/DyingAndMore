@@ -88,12 +88,13 @@ namespace Takai.Game
             set
             {
                 tileSize = value;
-                tilesPerRow = (TilesImage != null ? (TilesImage.Width / value) : 0);
+                TilesPerRow = (TilesImage != null ? (TilesImage.Width / value) : 0);
                 sectorPixelSize = sectorSize * value;
             }
         }
         private int tileSize;
-        private int tilesPerRow;
+        [Data.NonSerialized]
+        public int TilesPerRow { get; private set; }
 
         /// <summary>
         /// The horizontal size of the map in tiles

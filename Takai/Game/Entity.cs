@@ -12,6 +12,7 @@ namespace Takai.Game
         /// <summary>
         /// The name of this entity. Typically used by other entities for locating
         /// </summary>
+        [Data.NonDesigned]
         public string Name { get; set; } = null;
 
         /// <summary>

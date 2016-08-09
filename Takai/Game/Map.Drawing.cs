@@ -8,12 +8,12 @@ namespace Takai.Game
     {
         protected GraphicsDevice GraphicsDevice { get; set; }
         protected SpriteBatch sbatch;
-        protected DepthStencilState stencilWrite, stencilRead;
-        protected AlphaTestEffect mapAlphaTest;
         protected RenderTarget2D preRenderTarget;
         protected RenderTarget2D blobsRenderTarget;
         protected RenderTarget2D reflectionRenderTarget; //the reflection mask
         protected RenderTarget2D reflectedRenderTarget; //draw all things that should be reflected here
+        protected DepthStencilState stencilWrite, stencilRead;
+        protected AlphaTestEffect mapAlphaTest;
         protected Effect outlineEffect;
         protected Effect blobEffect;
         protected Effect reflectionEffect; //writes color and reflection information to two render targets
@@ -99,16 +99,7 @@ namespace Takai.Game
                 var width = GDevice.PresentationParameters.BackBufferWidth;
                 var height = GDevice.PresentationParameters.BackBufferHeight;
 
-                var m = Matrix.CreateOrthographicOffCenter
-                (
-                    0,
-                    width,
-                    height,
-                    0,
-                    0, 1
-                );
-
-                mapAlphaTest = new AlphaTestEffect(GDevice) { Projection = m };
+                mapAlphaTest = new AlphaTestEffect(GDevice);
                 mapAlphaTest.ReferenceAlpha = 1;
 
                 preRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
@@ -122,6 +113,9 @@ namespace Takai.Game
                 reflectionEffect = Takai.AssetManager.Load<Effect>("Shaders/Reflection.mgfx");
             }
         }
+        
+        //todo: separate debug text
+        //todo: curves (and volumetric curves) (things like rivers/flows)
 
         /// <summary>
         /// Draw the map, centered around the Camera
@@ -131,8 +125,18 @@ namespace Takai.Game
         /// <param name="PostEffect">An optional fullscreen post effect to render with</param>
         /// <param name="DrawSectorEntities">Draw entities in sectors. Typically used for debugging/map editing</param>
         /// <remarks>All rendering management handled internally</remarks>
-        public void Draw(Vector2 ViewStart, Rectangle Viewport, Effect PostEffect = null)
+        public void Draw(Vector2 ViewStart, Rectangle Viewport, Effect PostEffect = null, Matrix? Transform = null)
         {
+            if (Transform.HasValue)
+            {
+                var transSz = Vector2.Transform(new Vector2(Viewport.Width, Viewport.Height), Matrix.Invert(Transform.Value));
+                Viewport.Width = (int)transSz.X;
+                Viewport.Height = (int)transSz.Y;
+            }
+
+            var projection = Matrix.CreateOrthographicOffCenter(Viewport, 0, 1);
+            mapAlphaTest.Projection = projection;
+
             var originalRt = GraphicsDevice.GetRenderTargets();
 
             var outlined = new List<Entity>();
@@ -162,7 +166,7 @@ namespace Takai.Game
             //entities
             GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Transform);
 
             foreach (var ent in ActiveEnts)
             {
@@ -186,7 +190,7 @@ namespace Takai.Game
             sbatch.End();
 
             //outlined entities
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, outlineEffect);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, outlineEffect, Transform);
 
             foreach (var ent in outlined)
             {
@@ -201,7 +205,7 @@ namespace Takai.Game
             //metablobs (alpha tested)
             GraphicsDevice.SetRenderTargets(blobsRenderTarget, reflectionRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, reflectionEffect);
+            sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, reflectionEffect, Transform);
 
             //inactive blobs
             for (var y = sStartY; y < sEndY; y++)
@@ -230,7 +234,7 @@ namespace Takai.Game
             GraphicsDevice.SetRenderTargets(preRenderTarget);
 
             //map tiles
-            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilWrite, null, mapAlphaTest);
+            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilWrite, null, mapAlphaTest, Transform);
 
             for (var y = startY; y < endY; y++)
             {
@@ -248,7 +252,7 @@ namespace Takai.Game
                     (
                         TilesImage,
                         new Rectangle(vx, vy, tileSize, tileSize),
-                        new Rectangle((tile % tilesPerRow) * tileSize, (tile / tilesPerRow) * tileSize, tileSize, tileSize),
+                        new Rectangle((tile % TilesPerRow) * tileSize, (tile / TilesPerRow) * tileSize, tileSize, tileSize),
                         Color.White
                     );
                 }
@@ -257,7 +261,7 @@ namespace Takai.Game
             sbatch.End();
 
             //decals
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Transform);
 
             for (var y = sStartY; y < sEndY; y++)
             {
@@ -312,9 +316,10 @@ namespace Takai.Game
             {
                 GraphicsDevice.RasterizerState = lineRaster;
                 GraphicsDevice.BlendState = BlendState.AlphaBlend;
-                var projection = Matrix.CreateOrthographicOffCenter(GraphicsDevice.Viewport.Bounds, 0, 1);
+                GraphicsDevice.DepthStencilState = DepthStencilState.None;
                 var offset = Matrix.CreateTranslation(view.X, view.Y, 0);
-                lineEffect.Parameters["Transform"].SetValue(offset * projection);
+                var viewProjection = Matrix.CreateOrthographicOffCenter(GraphicsDevice.Viewport.Bounds, 0, 1);
+                lineEffect.Parameters["Transform"].SetValue(offset * (Transform.HasValue ? Transform.Value : Matrix.Identity) * viewProjection);
                 foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();

@@ -3,19 +3,17 @@ Actor {
     altWeapon: Null;
     CurrentHealth: 0;
     MaxHealth: 0;
-    States: {
-    };
+    States: { };
     CurrentState: Null;
     FieldOfView: 2.356194;
     MaxSpeed: 0;
     MoveForce: 0;
-    Name: Null;
     Position: [0 0];
     Direction: [1 0];
     Velocity: [0 0];
     IsEnabled: True;
     AlwaysActive: False;
-    Radius: 16;
+    Radius: 48;
     IsPhysical: True;
     IgnoreTrace: False;
     Sprite: GraphicSave {
