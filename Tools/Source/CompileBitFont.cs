@@ -10,7 +10,12 @@ public static class CompileBitFont
 	public static void Main(string[] Args)
 	{
 		if (Args.Length < 3)
-			throw new Exception("CompileBitFont <Input metadata> <Input image> <Output font>");
+		{
+		 
+			Console.WriteLine("CompileBitFont <Input metadata> <Input image> <Output font>");
+			Environment.ExitCode = 1;
+			return;
+		}
 	
 		var lines = File.ReadAllLines(Args[0]).Where(l => !String.IsNullOrWhiteSpace(l)).ToArray();
 		using (var stream = new DeflateStream(new FileStream(Args[2], FileMode.Create), CompressionMode.Compress, false))
@@ -19,6 +24,7 @@ public static class CompileBitFont
 			foreach (var line in lines)
 			{
 				var split = line.Substring(2).Split(' ');
+				
 				stream.Write(BitConverter.GetBytes(line[0]), 0, 2); //codepoint
 				stream.Write(BitConverter.GetBytes(Int32.Parse(split[0])), 0, 4); //x
 				stream.Write(BitConverter.GetBytes(Int32.Parse(split[1])), 0, 4); //y

@@ -157,8 +157,8 @@
                 if (hasPressed && InputCatalog.MouseState.LeftButton == ButtonState.Released)
                     hasPressed = false;
 
-                int difX = InputCatalog.MouseState.X - InputCatalog.lastMouseState.X;
-                int difY = InputCatalog.MouseState.Y - InputCatalog.lastMouseState.Y;
+                int difX = InputCatalog.MouseState.X - InputCatalog.LastMouseState.X;
+                int difY = InputCatalog.MouseState.Y - InputCatalog.LastMouseState.Y;
 
                 if (!hasPressed && InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
                 {

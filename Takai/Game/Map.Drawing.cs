@@ -125,31 +125,28 @@ namespace Takai.Game
         /// <param name="PostEffect">An optional fullscreen post effect to render with</param>
         /// <param name="DrawSectorEntities">Draw entities in sectors. Typically used for debugging/map editing</param>
         /// <remarks>All rendering management handled internally</remarks>
-        public void Draw(Vector2 ViewStart, Rectangle Viewport, Effect PostEffect = null, Matrix? Transform = null)
+        public void Draw(Matrix Transform, Rectangle Viewport, Effect PostEffect = null)
         {
-            if (Transform.HasValue)
-            {
-                var transSz = Vector2.Transform(new Vector2(Viewport.Width, Viewport.Height), Matrix.Invert(Transform.Value));
-                Viewport.Width = (int)transSz.X;
-                Viewport.Height = (int)transSz.Y;
-            }
+            var invTransform = Matrix.Invert(Transform);
 
-            var projection = Matrix.CreateOrthographicOffCenter(Viewport, 0, 1);
-            mapAlphaTest.Projection = projection;
+            var invTranslation = invTransform.Translation;
+            var scale = invTransform.Scale;
+            var rotation = Transform.Rotation;
 
+            var scaleWidth = (int)(Viewport.Width * scale.Z);
+            var scaleHeight = (int)(Viewport.Height * scale.Z);
+            
             var originalRt = GraphicsDevice.GetRenderTargets();
 
             var outlined = new List<Entity>();
 
             DebugProfilingInfo dbgInfo = new DebugProfilingInfo();
             
-            var view = new Vector2(Viewport.X, Viewport.Y) - ViewStart;
+            var startX = (int)invTranslation.X / tileSize;
+            var startY = (int)invTranslation.Y / tileSize;
 
-            var startX = (int)ViewStart.X / tileSize;
-            var startY = (int)ViewStart.Y / tileSize;
-
-            int endX = startX + 1 + ((Viewport.Width - 1) / tileSize);
-            int endY = startY + 1 + ((Viewport.Height - 1) / tileSize);
+            int endX = startX + 1 + ((scaleWidth - 1) / tileSize);
+            int endY = startY + 1 + ((scaleHeight - 1) / tileSize);
 
             startX = System.Math.Max(startX, 0);
             startY = System.Math.Max(startY, 0);
@@ -163,7 +160,8 @@ namespace Takai.Game
             int sEndX = System.Math.Min(1 + (endX - 1) / sectorSize, Width / sectorSize);
             int sEndY = System.Math.Min(1 + (endY - 1) / sectorSize, Height / sectorSize);
 
-            //entities
+            #region entities
+
             GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Transform);
@@ -179,12 +177,12 @@ namespace Takai.Game
                     else
                     {
                         var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                        ent.Sprite.Draw(sbatch, view + ent.Position, angle);
+                        ent.Sprite.Draw(sbatch, ent.Position, angle);
                     }
                 }
 
                 if (debugOptions.showEntInfo)
-                    DrawEntInfo(ent, view);
+                    DrawEntInfo(ent);
             }
 
             sbatch.End();
@@ -197,12 +195,15 @@ namespace Takai.Game
                 outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / ent.Sprite.Texture.Width, 1.0f / ent.Sprite.Texture.Height));
                 outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(ent.Sprite.Width, ent.Sprite.Height));
                 var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                ent.Sprite.Draw(sbatch, view + ent.Position, angle, ent.OutlineColor);
+                ent.Sprite.Draw(sbatch, ent.Position, angle, ent.OutlineColor);
             }
 
             sbatch.End();
 
-            //metablobs (alpha tested)
+            #endregion
+
+            #region blobs
+
             GraphicsDevice.SetRenderTargets(blobsRenderTarget, reflectionRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
             sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, reflectionEffect, Transform);
@@ -216,7 +217,7 @@ namespace Takai.Game
                     {
                         dbgInfo.visibleInactiveBlobs++;
                         reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
-                        sbatch.Draw(blob.type.Texture, view + blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
+                        sbatch.Draw(blob.type.Texture, blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
                     }
                 }
             }
@@ -225,33 +226,35 @@ namespace Takai.Game
             {
                 dbgInfo.visibleActiveBlobs++;
                 reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
-                sbatch.Draw(blob.type.Texture, view + blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
+                sbatch.Draw(blob.type.Texture, blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
             }
 
             sbatch.End();
 
+            #endregion
+
             //main render
             GraphicsDevice.SetRenderTargets(preRenderTarget);
 
-            //map tiles
-            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilWrite, null, mapAlphaTest, Transform);
+            #region tiles
+
+            var projection = Matrix.CreateOrthographicOffCenter(Viewport, 0, 1);
+            mapAlphaTest.Projection = projection;
+            mapAlphaTest.View = Transform;
+            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilWrite, null, mapAlphaTest);
 
             for (var y = startY; y < endY; y++)
             {
-                var vy = Viewport.Y + (y * tileSize) - (int)ViewStart.Y;
-
                 for (var x = startX; x < endX; x++)
                 {
                     var tile = Tiles[y, x];
                     if (tile < 0)
                         continue;
-
-                    var vx = Viewport.X + (x * tileSize) - (int)ViewStart.X;
-
+                    
                     sbatch.Draw
                     (
                         TilesImage,
-                        new Rectangle(vx, vy, tileSize, tileSize),
+                        new Vector2(x * tileSize, y * tileSize),
                         new Rectangle((tile % TilesPerRow) * tileSize, (tile / TilesPerRow) * tileSize, tileSize, tileSize),
                         Color.White
                     );
@@ -260,7 +263,10 @@ namespace Takai.Game
 
             sbatch.End();
 
-            //decals
+            #endregion
+
+            #region decals
+
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Transform);
 
             for (var y = sStartY; y < sEndY; y++)
@@ -272,7 +278,7 @@ namespace Takai.Game
                         sbatch.Draw
                         (
                             decal.texture,
-                            view + decal.position,
+                            decal.position,
                             null,
                             Color.White,
                             decal.angle,
@@ -286,6 +292,10 @@ namespace Takai.Game
                 }
             }
             sbatch.End();
+
+            #endregion
+
+            #region blob effects
 
             //draw blobs onto map (with reflections)
             if (debugOptions.showBlobReflectionMask)
@@ -311,15 +321,17 @@ namespace Takai.Game
                 sbatch.End();
             }
 
-            //debug lines
+            #endregion
+
+            #region debug lines
+
             if (debugLines.Count > 0)
             {
                 GraphicsDevice.RasterizerState = lineRaster;
                 GraphicsDevice.BlendState = BlendState.AlphaBlend;
                 GraphicsDevice.DepthStencilState = DepthStencilState.None;
-                var offset = Matrix.CreateTranslation(view.X, view.Y, 0);
                 var viewProjection = Matrix.CreateOrthographicOffCenter(GraphicsDevice.Viewport.Bounds, 0, 1);
-                lineEffect.Parameters["Transform"].SetValue(offset * (Transform.HasValue ? Transform.Value : Matrix.Identity) * viewProjection);
+                lineEffect.Parameters["Transform"].SetValue(Transform * viewProjection);
                 foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
@@ -328,14 +340,19 @@ namespace Takai.Game
                 debugLines.Clear();
             }
 
-            //present
+            #endregion
+
+            #region present
+            
             GraphicsDevice.SetRenderTargets(originalRt);
             
             sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, PostEffect);
             sbatch.Draw(preRenderTarget, Vector2.Zero, Color.White);
             sbatch.End();
 
-            //draw debug info
+            #endregion
+
+            #region debug info
 
             if (debugOptions.showProfileInfo)
             {
@@ -354,9 +371,11 @@ namespace Takai.Game
 
                 sbatch.End();
             }
+
+            #endregion
         }
 
-        protected void DrawEntInfo(Entity Ent, Vector2 View)
+        protected void DrawEntInfo(Entity Ent)
         {
             //draw bounding box
             DebugLine(new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y - Ent.Radius), new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y - Ent.Radius), Color.LightGreen);
@@ -382,14 +401,14 @@ namespace Takai.Game
             {
                 str = Ent.Name;
                 sz = DebugFont.MeasureString(str);
-                pos = View + Ent.Position - new Vector2(sz.X / 2, Ent.Radius + 2 + sz.Y);
+                pos = Ent.Position - new Vector2(sz.X / 2, Ent.Radius + 2 + sz.Y);
                 pos = new Vector2((int)pos.X, (int)pos.Y);
                 DebugFont.Draw(sbatch, str, pos, Color.White);
             }
 
             str = string.Format("{0:N1},{1:N1}", Ent.Position.X, Ent.Position.Y);
             sz = DebugFont.MeasureString(str);
-            pos = View + Ent.Position + new Vector2(sz.X / -2, Ent.Radius + 2);
+            pos = Ent.Position + new Vector2(sz.X / -2, Ent.Radius + 2);
             pos = new Vector2((int)pos.X, (int)pos.Y);
             DebugFont.Draw(sbatch, str, pos, Color.White);
         }

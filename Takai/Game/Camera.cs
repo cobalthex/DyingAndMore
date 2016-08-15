@@ -42,11 +42,9 @@ namespace Takai.Game
         /// </summary>
         public Vector2 Position { get; set; } = Vector2.Zero;
 
-        /// <summary>
-        /// An offset to the camera position
-        /// </summary>
-        public Vector2 Offset { get; set; } = Vector2.Zero;
+        public float Scale { get; set; } = 1;
 
+        public float Rotation { get; set; } = 0;
 
         /// <summary>
         /// An entity to follow
@@ -55,10 +53,21 @@ namespace Takai.Game
         public Entity Follow { get; set; } = null;
 
         /// <summary>
-        /// A transformation matrix passed to the map renderer, typically used for zooming
+        /// A transformation matrix passed to the map renderer
+        /// Calculated from Position, offset, Zoom, and Angle
         /// </summary>
-        public Matrix Transform { get; set; } = Matrix.Identity;
-
+        /// <remarks>Setting transform will set position, scale and angle; and offset to zero</remarks>
+        public Matrix Transform
+        {
+            get
+            {
+                return Matrix.CreateTranslation(-ActualPosition.X, -ActualPosition.Y, 0) *
+                       Matrix.CreateRotationZ(Rotation) *
+                       Matrix.CreateScale(Scale) *
+                       Matrix.CreateTranslation(new Vector3(GetCameraOrigin(Viewport.Width, Viewport.Height), 0));
+            }
+        }
+        
         public Camera() { }
 
         public Camera(Map Map, Entity Follow = null)
@@ -86,7 +95,7 @@ namespace Takai.Game
             */
             ActualPosition = Vector2.Lerp(ActualPosition, Position, (float)Time.ElapsedGameTime.TotalSeconds * (MoveSpeed / 100));
 
-            Map.Update(Time, ActualPosition + Offset, Viewport);
+            Map.Update(Time, ActualPosition, Viewport);
         }
 
         /// <summary>
@@ -103,8 +112,7 @@ namespace Takai.Game
         /// <param name="Viewport">An explicit viewport to draw to</param>
         public void Draw(Rectangle Viewport)
         {
-            var cam = ActualPosition + Offset;
-            Map.Draw(cam - GetCameraOrigin(Viewport.Width, Viewport.Height), Viewport, PostEffect, Transform);
+            Map.Draw(Transform, Viewport, PostEffect);
         }
 
         /// <summary>
@@ -120,24 +128,14 @@ namespace Takai.Game
         /// <summary>
         /// Get the camera origin point in a specified region
         /// </summary>
-        /// <param name="ViewWidth">The viewport width</param>
-        /// <param name="ViewHeight">The viewport height</param>
+        /// <param name="ViewWidth">The viewport width (transformed)</param>
+        /// <param name="ViewHeight">The viewport height (transformed)</param>
         /// <returns>The origin point for the camera</returns>
-        public static Vector2 GetCameraOrigin(int ViewWidth, int ViewHeight)
+        public static Vector2 GetCameraOrigin(float ViewWidth, float ViewHeight)
         {
             return new Vector2(ViewWidth / 2, ViewHeight / 2);
         }
-
-        /// <summary>
-        /// Get the camera origin point in a rectangle
-        /// </summary>
-        /// <param name="Viewport">The viewport</param>
-        /// <returns>The origin point for the camera</returns>
-        public static Vector2 GetCameraOrigin(Rectangle Viewport)
-        {
-            return new Vector2(Viewport.X - (Viewport.Width / 2), Viewport.Y - (Viewport.Height / 2));
-        }
-
+        
         /// <summary>
         /// Unproject a world position to a screen position
         /// </summary>
@@ -145,30 +143,7 @@ namespace Takai.Game
         /// <returns>The screen position of a world position</returns>
         public Vector2 WorldToScreen(Vector2 WorldPosition)
         {
-            return WorldToScreen(WorldPosition, Viewport);
-        }
-
-        /// <summary>
-        /// Unproject a world position to a screen position 
-        /// </summary>
-        /// <param name="WorldPosition">The world position to convert</param>
-        /// <param name="Viewport">The viewport rectangle</param>
-        /// <returns>The screen position of a world position</returns>
-        public static Vector2 WorldToScreen(Vector2 WorldPosition, Rectangle Viewport)
-        {
-            return new Vector2(Viewport.X, Viewport.Y) - (WorldPosition - GetCameraOrigin(Viewport.Width, Viewport.Height));
-        }
-
-        /// <summary>
-        /// Unproject a world position to a screen position (rectangle form)
-        /// </summary>
-        /// <param name="WorldRect">The world position rectangle to convert</param>
-        /// <param name="Viewport">The viewport rectangle</param>
-        /// <returns>The screen position of a world position</returns>
-        public static Rectangle WorldToScreen(Rectangle WorldRect, Rectangle Viewport)
-        {
-            var origin = GetCameraOrigin(Viewport.Width, Viewport.Height).ToPoint();
-            return new Rectangle(Viewport.X - (WorldRect.X - origin.X), Viewport.Y - (WorldRect.Y - origin.Y), WorldRect.Width, WorldRect.Height);
+            return Vector2.Transform(WorldPosition, Transform);
         }
 
         /// <summary>
@@ -178,21 +153,9 @@ namespace Takai.Game
         /// <returns>The world position</returns>
         public Vector2 ScreenToWorld(Vector2 ScreenPosition)
         {
-            return ScreenToWorld(ScreenPosition, ActualPosition, Viewport);
+            return Vector2.Transform(ScreenPosition, Matrix.Invert(Transform));
         }
-
-        /// <summary>
-        /// Project a screen position to a world position using the current camera's viewport
-        /// </summary>
-        /// <param name="ScreenPosition">The screen position</param>
-        /// <param name="CameraPosition">The camera's position in the world</param>
-        /// <param name="Viewport">The camera's viewport</param>
-        /// <returns>The world position</returns>
-        public static Vector2 ScreenToWorld(Vector2 ScreenPosition, Vector2 CameraPosition, Rectangle Viewport)
-        {
-            return GetCameraOrigin(Viewport) + CameraPosition + ScreenPosition;
-        }
-
+        /*
         /// <summary>
         /// Is a world position visible on screen? (Based on the camera's position and viewport)
         /// </summary>
@@ -200,6 +163,7 @@ namespace Takai.Game
         /// <returns>True if the position is inside the screen boundaries</returns>
         public bool IsVisible(Vector2 WorldPosition)
         {
+            WorldPosition = Vector2.Transform(WorldPosition, Transform);
             return IsVisible(new Rectangle((int)WorldPosition.X, (int)WorldPosition.Y, 1, 1), ActualPosition, Viewport);
         }
 
@@ -222,9 +186,9 @@ namespace Takai.Game
         /// <returns>True if the rectangle intersects the screen boundaries</returns>
         public static bool IsVisible(Rectangle WorldRect, Vector2 CameraPosition, Rectangle Viewport)
         {
-            var w2s = WorldToScreen(WorldRect, Viewport);
+            var w2s = WorldToScreen(WorldRect);
             Viewport.Offset(-CameraPosition);
             return Viewport.Intersects(w2s);
-        }
+        }*/
     }
 }
