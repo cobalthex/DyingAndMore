@@ -45,6 +45,7 @@ namespace Takai.Game
         public Vector2 velocity;
     }
 
+    [Data.DesignerCreatable]
     public struct Decal
     {
         public Texture2D texture;
