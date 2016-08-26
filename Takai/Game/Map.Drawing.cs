@@ -155,10 +155,10 @@ namespace Takai.Game
             endY = System.Math.Min(endY + 1, Height);
 
             //visible sector region
-            int sStartX = System.Math.Max((startX / sectorSize) - 1, 0);
-            int sStartY = System.Math.Max((startY / sectorSize) - 1, 0);
-            int sEndX = System.Math.Min(1 + (endX - 1) / sectorSize, Width / sectorSize);
-            int sEndY = System.Math.Min(1 + (endY - 1) / sectorSize, Height / sectorSize);
+            int sStartX = System.Math.Max((startX / SectorSize) - 1, 0);
+            int sStartY = System.Math.Max((startY / SectorSize) - 1, 0);
+            int sEndX = System.Math.Min(1 + (endX - 1) / SectorSize, Width / SectorSize);
+            int sEndY = System.Math.Min(1 + (endY - 1) / SectorSize, Height / SectorSize);
 
             #region entities
 
@@ -283,7 +283,7 @@ namespace Takai.Game
                             Color.White,
                             decal.angle,
                             new Vector2(decal.texture.Width / 2, decal.texture.Height / 2),
-                            1,
+                            decal.scale,
                             SpriteEffects.None,
                             0
                         );

@@ -90,7 +90,7 @@ namespace Takai.Game
             {
                 tileSize = value;
                 TilesPerRow = (TilesImage != null ? (TilesImage.Width / value) : 0);
-                sectorPixelSize = sectorSize * value;
+                SectorPixelSize = SectorSize * value;
             }
         }
         private int tileSize;
@@ -106,8 +106,8 @@ namespace Takai.Game
         /// </summary>
         public int Height { get; set; }
 
-        public const int sectorSize = 4; //The number of tiles in a map sector
-        private int sectorPixelSize = 0;
+        public const int SectorSize = 4; //The number of tiles in a map sector
+        public int SectorPixelSize { get; private set; } = 0;
 
         /// <summary>
         /// All of the tiles in the map
@@ -162,8 +162,8 @@ namespace Takai.Game
             if (Tiles != null)
             {
                 //round up
-                var width = 1 + ((Tiles.GetLength(1) - 1) / sectorSize);
-                var height = 1 + ((Tiles.GetLength(0) - 1) / sectorSize);
+                var width = 1 + ((Tiles.GetLength(1) - 1) / SectorSize);
+                var height = 1 + ((Tiles.GetLength(0) - 1) / SectorSize);
 
                 Sectors = new MapSector[height, width];
 
