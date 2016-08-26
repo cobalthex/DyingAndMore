@@ -21,7 +21,7 @@ namespace DyingAndMore
         private bool isHoveringSplitter = false;
         private bool isHoveringScroll = false;
 
-        public int Padding = 2;
+        public int Padding { get; set; } = 2; //todo: make x,y
 
         /// <summary>
         /// The position of the scrollbar (in pixels, clamped to TotalHeight - ViewHeight)
@@ -101,7 +101,9 @@ namespace DyingAndMore
                     //todo: test if scrollbar
 
                     var mx = mouse.X - splitterX - splitterWidth - Padding;
-                    SelectedItem = (((mouse.Y + ScrollPosition - Padding) / (ItemSize.Y + Padding)) * itemsPerRow) + (mx / (ItemSize.X + Padding));
+                    var newSelect = (((mouse.Y + ScrollPosition - Padding) / (ItemSize.Y + Padding)) * itemsPerRow) + (mx / (ItemSize.X + Padding));
+                    if (newSelect >= 0 && newSelect < ItemCount)
+                        SelectedItem = newSelect;
                 }
             }
             else if (InputCatalog.IsMouseClick(InputCatalog.MouseButton.Left))
@@ -114,7 +116,7 @@ namespace DyingAndMore
                 ScrollPosition -= (InputCatalog.ScrollDelta() / 2);
 
             width = MathHelper.Clamp(width, 0, GraphicsDevice.Viewport.Width - scrollWidth - splitterWidth);
-            ScrollPosition = MathHelper.Clamp(ScrollPosition, 0, GetTotalHeight() - GraphicsDevice.Viewport.Height + 4);
+            ScrollPosition = MathHelper.Clamp(ScrollPosition, 0, GetTotalHeight() - GraphicsDevice.Viewport.Height);
         }
         
         public override void Draw(GameTime Time)
@@ -164,7 +166,7 @@ namespace DyingAndMore
                     var bounds = new Rectangle
                     (
                         Padding + (int)Start.X + (i % itemsPerRow) * (ItemSize.X + Padding),
-                        Padding + (int)Start.Y + (i / itemsPerRow) * (ItemSize.Y + Padding) - relScrollPos,
+                        Padding + (int)Start.Y + (i / itemsPerRow) * (ItemSize.Y + Padding) - ScrollPosition,
                         ItemSize.X,
                         ItemSize.Y
                     );

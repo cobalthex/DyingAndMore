@@ -67,6 +67,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Editor.cs" />
+    <Compile Include="DecalSelector.cs" />
     <Compile Include="TileSelector.cs" />
     <Compile Include="Selector.cs" />
     <Compile Include="Weapons\BlobGun.cs" />

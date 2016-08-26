@@ -13,7 +13,7 @@ namespace Takai.Game
         /// <returns>The sector coordinates. Clamped to the map bounds</returns>
         public Point GetSector(Vector2 Position)
         {
-            return Vector2.Clamp(Position / sectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+            return Vector2.Clamp(Position / SectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
         }
 
         /// <summary>
@@ -47,10 +47,9 @@ namespace Takai.Game
             if (SearchInSectors)
             {
                 var mapSz = new Vector2(Width, Height);
-                var start = Vector2.Clamp((Position - vr) / sectorPixelSize, Vector2.Zero, mapSz).ToPoint();
-                var end = (Vector2.Clamp((Position + vr) / sectorPixelSize, Vector2.Zero, mapSz) + Vector2.One).ToPoint();
-
-
+                var start = Vector2.Clamp((Position - vr) / SectorPixelSize, Vector2.Zero, mapSz).ToPoint();
+                var end = (Vector2.Clamp((Position + vr) / SectorPixelSize, Vector2.Zero, mapSz) + Vector2.One).ToPoint();
+                
                 for (int y = start.Y; y < end.Y; y++)
                 {
                     for (int x = start.X; x < end.X; x++)

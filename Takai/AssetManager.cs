@@ -129,17 +129,15 @@ namespace Takai
             if (CustomName == null)
                 CustomName = file;
 
-            if (!System.IO.File.Exists(file))
-                return (T)assets[CustomName];
-            if (assets.ContainsKey(CustomName))
+            IDisposable existing;
+            if (assets.TryGetValue(CustomName, out existing))
             {
                 if (OverWrite)
                     Unload(CustomName);
                 else
-                    return (T)assets[CustomName];
+                    return (T)existing;
             }
-
-#if WINDOWS
+            
             if (System.IO.File.Exists(file))
             {
                 var f = new FileStream(file, FileMode.Open);
@@ -147,15 +145,6 @@ namespace Takai
                 f.Close();
                 return dat;
             }
-#else
-            var stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(file);
-            if (stream != null)
-            {
-                var dat = LoadData<T>(Name, stream);
-                stream.Close();
-                return dat;
-            }
-#endif
 
             return default(T);
         }

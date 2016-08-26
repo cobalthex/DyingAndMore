@@ -16,6 +16,11 @@ namespace DyingAndMore
         Count
     }
 
+    struct DecalIndex
+    {
+        public int x, y, index;
+    }
+
     class Editor : Takai.States.State
     {
         EditorMode currentMode = EditorMode.Tiles;
@@ -30,14 +35,18 @@ namespace DyingAndMore
         BitmapFont smallFont, largeFont;
         
         public Takai.Game.Map map;
-        public short selectedTile = 0;
 
         Color highlightColor = Color.Gold;
 
         TileSelector tileSelector;
+        DecalSelector decalSelector;
 
         bool isPosSaved = false;
         Vector2 savedWorldPos, lastWorldPos;
+        float startRotation, startScale;
+
+        DecalIndex? selectedDecal = null;
+        Takai.Game.Entity selectedEntity = null; 
         
         public Editor() : base(Takai.States.StateType.Full) { }
         
@@ -65,6 +74,12 @@ namespace DyingAndMore
             tileSelector = new TileSelector(this);
             Takai.States.StateManager.PushState(tileSelector);
             tileSelector.Deactivate();
+
+            decalSelector = new DecalSelector(this);
+            Takai.States.StateManager.PushState(decalSelector);
+            decalSelector.Deactivate();
+            
+            //todo: load all ent defs in ents folder (in ent selector)
         }
         
         public override void Update(GameTime Time)
@@ -112,7 +127,17 @@ namespace DyingAndMore
             }
 
             if (InputCatalog.IsKeyPress(Keys.Tab))
-                tileSelector.Activate();
+            {
+                switch (currentMode)
+                {
+                    case EditorMode.Tiles:
+                        tileSelector.Activate();
+                        break;
+                    case EditorMode.Decals:
+                        decalSelector.Activate();
+                        break;
+                }
+            }
 
             if (InputCatalog.HasMouseScrolled())
             {
@@ -155,7 +180,7 @@ namespace DyingAndMore
                 var tile = short.MinValue;
 
                 if (InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
-                    tile = selectedTile;
+                    tile = (short)tileSelector.SelectedItem;
                 else if (InputCatalog.MouseState.RightButton == ButtonState.Pressed)
                     tile = -1;
 
@@ -172,6 +197,71 @@ namespace DyingAndMore
                         TileLine(lastWorldPos, worldMousePos, tile);
                 }
             }
+            else if (currentMode == EditorMode.Decals)
+            {
+                if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Left))
+                {
+                    if (!SelectDecal(worldMousePos))
+                    {
+                        map.AddDecal(decalSelector.textures[decalSelector.SelectedItem], worldMousePos);
+                        var pos = (worldMousePos / map.SectorPixelSize).ToPoint();
+                        selectedDecal = new DecalIndex { x = pos.X, y = pos.Y, index = map.Sectors[pos.Y, pos.X].decals.Count - 1 };
+                    }
+                    else
+                    {
+                    }
+                }
+                else if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Right))
+                {
+                    SelectDecal(worldMousePos);
+                }
+                else if (InputCatalog.IsMouseClick(InputCatalog.MouseButton.Right))
+                {
+                    var lastSelected = selectedDecal;
+                    SelectDecal(worldMousePos);
+
+                    if (selectedDecal != null && selectedDecal.Equals(lastSelected))
+                    {
+                        map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals.RemoveAt(selectedDecal.Value.index);
+                        selectedDecal = null;
+                    }
+                }
+
+                else if (selectedDecal.HasValue)
+                {
+                    var decal = map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index];
+
+                    if (InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        var delta = worldMousePos - lastWorldPos;
+                        decal.position += delta;
+                    }
+
+                    if (InputCatalog.KBState.IsKeyDown(Keys.R))
+                    {
+                        var diff = worldMousePos - decal.position;
+
+                        var theta = (float)System.Math.Atan2(diff.Y, diff.X);
+                        if (InputCatalog.lastKBState.IsKeyUp(Keys.R))
+                            startRotation = theta - decal.angle;
+
+                        decal.angle = theta - startRotation;
+                    }
+
+                    if (InputCatalog.KBState.IsKeyDown(Keys.E))
+                    {
+                        float dist = Vector2.Distance(worldMousePos, decal.position);
+
+                        if (InputCatalog.lastKBState.IsKeyUp(Keys.E))
+                            startScale = dist;
+
+                        decal.scale += (dist - startScale) / 25;
+                        startScale = dist;
+                    }
+
+                    map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index] = decal;
+                }
+            }
 
             foreach (var ent in highlighted)
                 ent.OutlineColor = Color.Transparent;
@@ -183,6 +273,36 @@ namespace DyingAndMore
 
         }
         System.Collections.Generic.List<Takai.Game.Entity> highlighted = new System.Collections.Generic.List<Takai.Game.Entity>();
+
+        bool SelectDecal(Vector2 WorldPosition)
+        {
+            //find closest decal
+            var mapSz = new Vector2(map.Width, map.Height);
+            var start = Vector2.Clamp((WorldPosition / map.SectorPixelSize) - Vector2.One, Vector2.Zero, mapSz).ToPoint();
+            var end = Vector2.Clamp((WorldPosition / map.SectorPixelSize) + Vector2.One, Vector2.Zero, mapSz).ToPoint();
+
+            selectedDecal = null;
+            for (int y = start.Y; y < end.Y; y++)
+            {
+                for (int x = start.X; x < end.X; x++)
+                {
+                    for (var i = 0; i < map.Sectors[y, x].decals.Count; i++)
+                    {
+                        var decal = map.Sectors[y, x].decals[i];
+
+                        //todo: transform worldPosition by decal matrix and perform transformed comparison
+                        var transform = Matrix.CreateScale(decal.scale) * Matrix.CreateRotationZ(decal.angle) * Matrix.CreateTranslation(new Vector3(decal.position, 0));
+
+                        if (Vector2.DistanceSquared(decal.position, WorldPosition) < decal.texture.Width * decal.texture.Width * decal.scale)
+                        {
+                            selectedDecal = new DecalIndex { x = x, y = y, index = i };
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
 
         Vector2 CenterInRect(Vector2 Size, Rectangle Region)
         {
@@ -264,19 +384,7 @@ namespace DyingAndMore
                 }
             }
         }
-
-        /*
-        4. For each element N of Q:
-        5.         Set w and e equal to N.
-        6.         Move w to the west until the color of the node to the west of w no longer matches target-color.
-        7.         Move e to the east until the color of the node to the east of e no longer matches target-color.
-        8.         For each node n between w and e:
-        9.             Set the color of n to replacement-color.
-        10.             If the color of the node to the north of n is target-color, add that node to Q.
-        11.             If the color of the node to the south of n is target-color, add that node to Q.
-        12. Continue looping until Q is exhausted.
-        */
-
+        
         void MapLineRect(Rectangle Rect, Color Color)
         {
             map.DebugLine(new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Right, Rect.Top), Color);
@@ -302,18 +410,17 @@ namespace DyingAndMore
             var viewPos = camera.WorldToScreen(camera.ActualPosition);
             var worldMousePos = camera.ScreenToWorld(InputCatalog.MouseState.Position.ToVector2());
 
+            var selectedItemRect = new Rectangle(GraphicsDevice.Viewport.Width - map.TileSize - 20, 20, map.TileSize, map.TileSize);
             if (currentMode == EditorMode.Tiles)
             {
                 //draw selected tile in corner of screen
-                var tilePos = new Vector2(GraphicsDevice.Viewport.Width - map.TileSize - 20, 20);
                 sbatch.Draw
                 (
                     map.TilesImage,
-                    tilePos,
-                    new Rectangle((selectedTile % map.TilesPerRow) * map.TileSize, (selectedTile / map.TilesPerRow) * map.TileSize, map.TileSize, map.TileSize),
+                    selectedItemRect,
+                    new Rectangle((tileSelector.SelectedItem % map.TilesPerRow) * map.TileSize, (tileSelector.SelectedItem / map.TilesPerRow) * map.TileSize, map.TileSize, map.TileSize),
                     Color.White
                 );
-                Primitives2D.DrawRect(sbatch, Color.White, new Rectangle((int)tilePos.X, (int)tilePos.Y, map.TileSize, map.TileSize));
 
                 //draw rect around tile under cursor
                 if (map.IsInside(worldMousePos))
@@ -340,6 +447,34 @@ namespace DyingAndMore
                     fnt.Draw(sbatch, string.Format("x:{0} y:{1} deg:{2}", diff.X, diff.Y, angle), camera.WorldToScreen(worldMousePos) + new Vector2(10, -10), Color.White);
                 }
             }
+            else if (currentMode == EditorMode.Decals)
+            {
+                sbatch.Draw
+                (
+                       decalSelector.textures[decalSelector.SelectedItem],
+                       selectedItemRect,
+                       Color.White
+                );
+                
+                if (selectedDecal.HasValue)
+                {
+                    var decal = map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index];
+                    var transform = Matrix.CreateScale(decal.scale) * Matrix.CreateRotationZ(decal.angle) * Matrix.CreateTranslation(new Vector3(decal.position, 0));
+
+                    var w2 = decal.texture.Width / 2;
+                    var h2 = decal.texture.Height / 2;
+                    var tl = Vector2.Transform(new Vector2(-w2, -h2), transform);
+                    var tr = Vector2.Transform(new Vector2(w2, -h2), transform);
+                    var bl = Vector2.Transform(new Vector2(-w2, h2), transform);
+                    var br = Vector2.Transform(new Vector2(w2, h2), transform);
+
+                    map.DebugLine(tl, tr, Color.GreenYellow);
+                    map.DebugLine(tr, br, Color.GreenYellow);
+                    map.DebugLine(br, bl, Color.GreenYellow);
+                    map.DebugLine(bl, tl, Color.GreenYellow);
+                }
+            }
+            Primitives2D.DrawRect(sbatch, Color.White, selectedItemRect);
 
             //draw modes
             {
