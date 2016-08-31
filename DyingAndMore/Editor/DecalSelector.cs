@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
-namespace DyingAndMore
+namespace DyingAndMore.Editor
 {
     class DecalSelector : Selector
     {
@@ -16,7 +16,7 @@ namespace DyingAndMore
             base.Load();
 
             textures = new List<Texture2D>();
-            foreach (var file in System.IO.Directory.EnumerateFiles("Data\\Textures\\Decals"))
+            foreach (var file in System.IO.Directory.EnumerateFiles("Data\\Textures\\Decals", "*", System.IO.SearchOption.AllDirectories))
             {
                 var tex = Takai.AssetManager.Load<Texture2D>(file);
                 if (tex != null)
@@ -27,9 +27,10 @@ namespace DyingAndMore
             Padding = 5;
         }
 
-        public override void DrawItem(GameTime Time, int ItemIndex, Rectangle Bounds)
+        public override void DrawItem(GameTime Time, int ItemIndex, Rectangle Bounds, SpriteBatch Sbatch = null)
         {
-            sbatch.Draw(textures[ItemIndex], Bounds, Color.White);
+            if (ItemIndex >= 0 && ItemIndex < textures.Count)
+                (Sbatch ?? sbatch).Draw(textures[ItemIndex], Bounds, Color.White);
         }
     }
 }

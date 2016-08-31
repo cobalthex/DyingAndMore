@@ -184,10 +184,19 @@ namespace Takai.Graphics
 
         public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle)
         {
-            Draw(SpriteBatch, Position, Angle, Color.White);
+            Draw(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle, Color.White);
+        }
+        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle)
+        {
+            Draw(SpriteBatch, Bounds, Angle, Color.White);
         }
 
         public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle, Color Color)
+        {
+            Draw(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle, Color);   
+        }
+
+        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle, Color Color)
         {
             float frame = CurrentFrameDelta;
             int cf = (int)frame;
@@ -197,27 +206,58 @@ namespace Takai.Graphics
             switch (Tween)
             {
                 case TweenStyle.None:
-                    DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color);
+                    DrawFrame(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color);
                     break;
 
                 case TweenStyle.Overlap:
                     //todo: overlap should fade in and then fade out (maybe multiply fd * 2 and Clamp)
                     var nd = MathHelper.Clamp(fd * 2, 0, 1);
                     fd = MathHelper.Clamp((fd * 2) - 1, 0, 1);
-                    DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
-                    DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, nd));
+                    DrawFrame(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
+                    DrawFrame(SpriteBatch, Bounds, GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, nd));
                     break;
 
                 case TweenStyle.Sequential:
-                    DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
-                    DrawFrame(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, fd));
+                    DrawFrame(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
+                    DrawFrame(SpriteBatch, Bounds, GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, fd));
                     break;
             }
         }
-
+        
         public void DrawFrame(SpriteBatch SpriteBatch, Rectangle Bounds, Rectangle SourceRect, float Angle, Color Color)
         {
             SpriteBatch.Draw(Texture, Bounds, SourceRect, Color, Angle, Origin, SpriteEffects.None, 0);
+        }
+
+        /// <summary>
+        /// Calculate the dest rectangle to fit an image into a rectangle:
+        /// Shrink if too large and center if too small to fit into the <see cref="Region"/>
+        /// </summary>
+        /// <param name="Width">The width of the image</param>
+        /// <param name="Height">The height of the image</param>
+        /// <param name="Region">The region to fit to</param>
+        /// <returns>The fit rectangle</returns>
+        public static Rectangle GetFitRect(int Width, int Height, Rectangle Region)
+        {
+            Width = MathHelper.Min(Width, Region.Width);
+            Height = MathHelper.Min(Height, Region.Height);
+            return new Rectangle(Region.X + MathHelper.Max(0, (Region.Width - Width) / 2), Region.Y + MathHelper.Max(0, (Region.Height - Height) / 2), Width, Height);
+        }
+        /// <summary>
+        /// Calculate the dest rectangle to contain an image into a rectangle:
+        /// Shrink if too large and center if too small to fit into the <see cref="Region"/>
+        /// while maintaining the same aspect ratio
+        /// </summary>
+        /// <param name="Width">The width of the image</param>
+        /// <param name="Height">The height of the image</param>
+        /// <param name="Region">The region to contain to</param>
+        /// <returns>The contain rectangle</returns>
+        public static Rectangle GetContainRect(int Width, int Height, Rectangle Region)
+        {
+            //todo
+            Width = MathHelper.Min(Width, Region.Width);
+            Height = MathHelper.Min(Height, Region.Height);
+            return new Rectangle(Region.X + MathHelper.Max(0, (Region.Width - Width) / 2), Region.Y + MathHelper.Max(0, (Region.Height - Height) / 2), Width, Height);
         }
 
         [Data.DesignerCreatable]

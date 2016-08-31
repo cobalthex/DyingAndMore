@@ -60,7 +60,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Storage\Animation.cs" />
+    <Compile Include="Animation.cs" />
     <Compile Include="AssetManager.cs" />
     <Compile Include="Data\Designer.cs" />
     <Compile Include="Data\Serializer.cs" />
@@ -91,7 +91,9 @@
     <Compile Include="States\StateStack.cs" />
     <Compile Include="States\TestInputState.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Storage\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

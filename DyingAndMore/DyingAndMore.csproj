@@ -66,10 +66,12 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Editor.cs" />
-    <Compile Include="DecalSelector.cs" />
-    <Compile Include="TileSelector.cs" />
-    <Compile Include="Selector.cs" />
+    <Compile Include="Editor\EntSelector.cs" />
+    <Compile Include="Editor\BlobSelector.cs" />
+    <Compile Include="Editor\Editor.cs" />
+    <Compile Include="Editor\DecalSelector.cs" />
+    <Compile Include="Editor\TileSelector.cs" />
+    <Compile Include="Editor\Selector.cs" />
     <Compile Include="Weapons\BlobGun.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\Weapon.cs" />
