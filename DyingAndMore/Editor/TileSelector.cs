@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
-namespace DyingAndMore
+namespace DyingAndMore.Editor
 {
     class TileSelector : Selector
     {
@@ -16,10 +16,10 @@ namespace DyingAndMore
             ItemCount = editor.map.TilesPerRow * (editor.map.TilesImage.Height / tileSz);
         }
 
-        public override void DrawItem(GameTime Time, int ItemIndex, Rectangle Bounds)
+        public override void DrawItem(GameTime Time, int ItemIndex, Rectangle Bounds, SpriteBatch Sbatch = null)
         {
             var clip = new Rectangle((ItemIndex % editor.map.TilesPerRow) * ItemSize.X, (ItemIndex / editor.map.TilesPerRow) * ItemSize.Y, ItemSize.X, ItemSize.Y);
-            sbatch.Draw(editor.map.TilesImage, Bounds, clip, Color.White);
+            (Sbatch ?? sbatch).Draw(editor.map.TilesImage, Bounds, clip, Color.White);
         }
     }
 }

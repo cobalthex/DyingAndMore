@@ -4,6 +4,14 @@ using System.Collections.Generic;
 
 namespace Takai.Game
 {
+    public struct MapProfilingInfo
+    {
+        public int visibleEnts;
+        public int visibleInactiveBlobs;
+        public int visibleActiveBlobs;
+        public int visibleDecals;
+    }
+
     public partial class Map
     {
         protected GraphicsDevice GraphicsDevice { get; set; }
@@ -27,17 +35,13 @@ namespace Takai.Game
         protected Effect lineEffect;
         protected RasterizerState lineRaster;
         
-        public Takai.Graphics.BitmapFont DebugFont { get; set; }
-
         /// <summary>
         /// Configurable debug options
         /// </summary>
         public struct DebugOptions
         {
-            public bool showProfileInfo;
             public bool showBlobReflectionMask;
             public bool showOnlyReflections;
-            public bool showEntInfo;
         }
         
         public DebugOptions debugOptions;
@@ -55,15 +59,9 @@ namespace Takai.Game
             debugLines.Add(new VertexPositionColor { Position = new Vector3(End, 0), Color = Color });
         }
 
-        protected struct DebugProfilingInfo
-        {
-            public int visibleEnts;
-            public int visibleInactiveBlobs;
-            public int visibleActiveBlobs;
-            public int visibleDecals;
-        }
-
-
+        public MapProfilingInfo ProfilingInfo { get { return profilingInfo; } }
+        protected MapProfilingInfo profilingInfo;
+        
         /// <summary>
         /// Create a new map
         /// </summary>
@@ -127,6 +125,10 @@ namespace Takai.Game
         /// <remarks>All rendering management handled internally</remarks>
         public void Draw(Matrix Transform, Rectangle Viewport, Effect PostEffect = null)
         {
+            profilingInfo = new MapProfilingInfo();
+
+            #region setup
+
             var invTransform = Matrix.Invert(Transform);
 
             var invTranslation = invTransform.Translation;
@@ -139,8 +141,6 @@ namespace Takai.Game
             var originalRt = GraphicsDevice.GetRenderTargets();
 
             var outlined = new List<Entity>();
-
-            DebugProfilingInfo dbgInfo = new DebugProfilingInfo();
             
             var startX = (int)invTranslation.X / tileSize;
             var startY = (int)invTranslation.Y / tileSize;
@@ -160,17 +160,19 @@ namespace Takai.Game
             int sEndX = System.Math.Min(1 + (endX - 1) / SectorSize, Width / SectorSize);
             int sEndY = System.Math.Min(1 + (endY - 1) / SectorSize, Height / SectorSize);
 
+            #endregion
+
             #region entities
 
             GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Transform);
-
+            
             foreach (var ent in ActiveEnts)
             {
                 if (ent.Sprite != null)
                 {
-                    dbgInfo.visibleEnts++;
+                    profilingInfo.visibleEnts++;
 
                     if (ent.OutlineColor.A > 0)
                         outlined.Add(ent);
@@ -180,9 +182,6 @@ namespace Takai.Game
                         ent.Sprite.Draw(sbatch, ent.Position, angle);
                     }
                 }
-
-                if (debugOptions.showEntInfo)
-                    DrawEntInfo(ent);
             }
 
             sbatch.End();
@@ -215,7 +214,7 @@ namespace Takai.Game
                 {
                     foreach (var blob in Sectors[y, x].blobs)
                     {
-                        dbgInfo.visibleInactiveBlobs++;
+                        profilingInfo.visibleInactiveBlobs++;
                         reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
                         sbatch.Draw(blob.type.Texture, blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
                     }
@@ -224,7 +223,7 @@ namespace Takai.Game
             //active blobs
             foreach (var blob in ActiveBlobs)
             {
-                dbgInfo.visibleActiveBlobs++;
+                profilingInfo.visibleActiveBlobs++;
                 reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
                 sbatch.Draw(blob.type.Texture, blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
             }
@@ -268,7 +267,7 @@ namespace Takai.Game
             #region decals
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Transform);
-
+            
             for (var y = sStartY; y < sEndY; y++)
             {
                 for (var x = sStartX; x < sEndX; x++)
@@ -287,7 +286,7 @@ namespace Takai.Game
                             SpriteEffects.None,
                             0
                         );
-                        dbgInfo.visibleDecals++;
+                        profilingInfo.visibleDecals++;
                     }
                 }
             }
@@ -351,66 +350,6 @@ namespace Takai.Game
             sbatch.End();
 
             #endregion
-
-            #region debug info
-
-            if (debugOptions.showProfileInfo)
-            {
-                sbatch.Begin(SpriteSortMode.Deferred);
-
-                var dbgString = string.Format
-                (
-                    "Visible\n======\nEnts: {0}\nInactive blobs: {1}\nActive Blobs: {2}\nDecals: {3}",
-                    dbgInfo.visibleEnts,
-                    dbgInfo.visibleInactiveBlobs,
-                    dbgInfo.visibleActiveBlobs,
-                    dbgInfo.visibleDecals
-                );
-
-                DebugFont.Draw(sbatch, dbgString, new Vector2(10, 30), Color.White);
-
-                sbatch.End();
-            }
-
-            #endregion
-        }
-
-        protected void DrawEntInfo(Entity Ent)
-        {
-            //draw bounding box
-            DebugLine(new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y - Ent.Radius), new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y - Ent.Radius), Color.LightGreen);
-            DebugLine(new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y - Ent.Radius), new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y + Ent.Radius), Color.LightGreen);
-            DebugLine(new Vector2(Ent.Position.X + Ent.Radius, Ent.Position.Y + Ent.Radius), new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y + Ent.Radius), Color.LightGreen);
-            DebugLine(new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y + Ent.Radius), new Vector2(Ent.Position.X - Ent.Radius, Ent.Position.Y - Ent.Radius), Color.LightGreen);
-
-            //draw direction arrow
-            var angle = (float)System.Math.Atan2(Ent.Direction.Y, Ent.Direction.X);
-            var tip = Ent.Position + (Ent.Direction * Ent.Radius * 1.5f);
-            DebugLine(Ent.Position, tip, Color.Yellow);
-            float theta = MathHelper.ToRadians(150);
-
-            float r = MathHelper.Clamp(Ent.Radius * 0.5f, 5, 30);
-            DebugLine(tip, tip + (r * new Vector2((float)System.Math.Cos(angle + theta), (float)System.Math.Sin(angle + theta))), Color.Yellow);
-            DebugLine(tip, tip + (r * new Vector2((float)System.Math.Cos(angle - theta), (float)System.Math.Sin(angle - theta))), Color.Yellow);
-
-            //draw ent info string
-            string str;
-            Vector2 sz, pos;
-
-            if (Ent.Name != null)
-            {
-                str = Ent.Name;
-                sz = DebugFont.MeasureString(str);
-                pos = Ent.Position - new Vector2(sz.X / 2, Ent.Radius + 2 + sz.Y);
-                pos = new Vector2((int)pos.X, (int)pos.Y);
-                DebugFont.Draw(sbatch, str, pos, Color.White);
-            }
-
-            str = string.Format("{0:N1},{1:N1}", Ent.Position.X, Ent.Position.Y);
-            sz = DebugFont.MeasureString(str);
-            pos = Ent.Position + new Vector2(sz.X / -2, Ent.Radius + 2);
-            pos = new Vector2((int)pos.X, (int)pos.Y);
-            DebugFont.Draw(sbatch, str, pos, Color.White);
         }
     }
 }

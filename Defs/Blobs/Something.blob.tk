@@ -1,0 +1,6 @@
+BlobType {
+    Texture: "Data\\Textures\\Blobs\\Something.png";
+    Reflection: "Data\\Textures\\Blobs\\Something.r.png";
+    Radius: 54;
+    Drag: 0.8;
+}

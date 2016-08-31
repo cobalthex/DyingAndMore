@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
-namespace DyingAndMore
+namespace DyingAndMore.Editor
 {
     abstract class Selector : Takai.States.State
     {
@@ -184,6 +184,6 @@ namespace DyingAndMore
             sbatch.End();
         }
 
-        public abstract void DrawItem(GameTime Time, int ItemIndex, Rectangle Bounds);
+        public abstract void DrawItem(GameTime Time, int ItemIndex, Rectangle Bounds, SpriteBatch Sbatch = null);
     }
 }

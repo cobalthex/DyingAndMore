@@ -61,7 +61,7 @@ namespace Takai.Data
             if (pk == '"' || pk == '\'')
                 return ReadString(Stream);
             //numbers
-            if (Char.IsDigit(pk) || pk == '-' || pk == '.' || pk == ',')
+            if (char.IsDigit(pk) || pk == '-' || pk == '.' || pk == ',')
             {
                 var num = ReadWord(Stream);
                 if (num.Contains(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator))
@@ -93,7 +93,7 @@ namespace Takai.Data
                 Stream.Read();
                 SkipWhitespace(Stream);
 
-                var d = new Dictionary<string, object>();
+                var d = new Dictionary<string, object>(System.StringComparer.OrdinalIgnoreCase);
                 while (!Stream.EndOfStream && Stream.Peek() != '}')
                 {
                     var name = ReadWord(Stream).ToLower();
@@ -112,7 +112,7 @@ namespace Takai.Data
                         SkipWhitespace(Stream);
                     }
                     else if (pk != '}')
-                        throw new FormatException(String.Format("Missing semicolon for property {0}", name));
+                        throw new FormatException(string.Format("Missing semicolon for property {0}", name));
                 }
 
                 Stream.Read();
@@ -177,7 +177,7 @@ namespace Takai.Data
             return null;
         }
 
-        private static bool DeserializeField(MemberInfo Member, Type Type, Dictionary<string, Object> Props, out object Value)
+        private static bool DeserializeField(MemberInfo Member, Type Type, Dictionary<string, object> Props, out object Value)
         {
             //ignored
             if (Member.GetCustomAttribute<Data.NonSerializedAttribute>() != null)
@@ -189,10 +189,16 @@ namespace Takai.Data
             object prop;
 
             //not set
-            if (!Props.TryGetValue(CaseSensitiveMembers ? Member.Name : Member.Name.ToLower(), out prop))
+            if (!Props.TryGetValue(Member.Name, out prop))
             {
                 Value = null;
                 return false;
+            }
+
+            if (prop == null)
+            {
+                Value = prop;
+                return true;
             }
 
             //user defined serializers

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.Graphics;
 
-namespace DyingAndMore
+namespace DyingAndMore.Editor
 {
     enum EditorMode
     {
@@ -12,8 +12,8 @@ namespace DyingAndMore
         Decals,
         Blobs,
         Entities,
-
-        Count
+        Regions,
+        Paths,
     }
 
     struct DecalIndex
@@ -38,18 +38,25 @@ namespace DyingAndMore
 
         Color highlightColor = Color.Gold;
 
-        TileSelector tileSelector;
-        DecalSelector decalSelector;
-
+        Selector[] selectors;
+        
         bool isPosSaved = false;
         Vector2 savedWorldPos, lastWorldPos;
-        float startRotation, startScale;
 
         DecalIndex? selectedDecal = null;
-        Takai.Game.Entity selectedEntity = null; 
-        
+        Takai.Game.Entity selectedEntity = null;
+        float startRotation, startScale;
+        System.TimeSpan lastBlobTime = System.TimeSpan.Zero;
+
         public Editor() : base(Takai.States.StateType.Full) { }
         
+        void AddSelector(Selector Sel, int Index)
+        {
+            selectors[Index] = Sel;
+            Takai.States.StateManager.PushState(Sel);
+            Sel.Deactivate();
+        }
+
         public override void Load()
         {
             fnt = Takai.AssetManager.Load<BitmapFont>("Fonts/rct2.bfnt");
@@ -60,9 +67,6 @@ namespace DyingAndMore
             sbatch = new SpriteBatch(GraphicsDevice);
 
             map = new Takai.Game.Map(GraphicsDevice);
-            map.debugOptions.showProfileInfo = true;
-            map.debugOptions.showEntInfo = true;
-            map.DebugFont = fnt;
 
             using (var stream = new System.IO.FileStream("Data/Maps/test.map.tk", System.IO.FileMode.Open))
                 map.Load(stream);
@@ -71,42 +75,68 @@ namespace DyingAndMore
             camera.MoveSpeed = 1600;
             camera.Viewport = GraphicsDevice.Viewport.Bounds;
 
-            tileSelector = new TileSelector(this);
-            Takai.States.StateManager.PushState(tileSelector);
-            tileSelector.Deactivate();
-
-            decalSelector = new DecalSelector(this);
-            Takai.States.StateManager.PushState(decalSelector);
-            decalSelector.Deactivate();
-            
-            //todo: load all ent defs in ents folder (in ent selector)
+            selectors = new Selector[System.Enum.GetValues(typeof(EditorMode)).Length];
+            AddSelector(new TileSelector(this), 0);
+            AddSelector(new DecalSelector(this), 1);
+            AddSelector(new BlobSelector(this), 2);
+            AddSelector(new EntSelector(this), 3);
         }
         
         public override void Update(GameTime Time)
         {
+            if (InputCatalog.KBState.IsKeyDown(Keys.LeftControl) || InputCatalog.KBState.IsKeyDown(Keys.RightControl))
+            {
+                if (InputCatalog.IsKeyPress(Keys.S))
+                {
+                    var sfd = new System.Windows.Forms.SaveFileDialog();
+                    sfd.Filter = "Map (*.map.tk)|*.map.tk|All Files (*.*)|*.*";
+                    if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        using (var stream = sfd.OpenFile())
+                            map.Save(stream);
+                    }
+                    return;
+                }
+                else if (InputCatalog.IsKeyPress(Keys.O))
+                {
+                    var ofd = new System.Windows.Forms.OpenFileDialog();
+                    ofd.Filter = "Map (*.map.tk)|*.map.tk|All Files (*.*)|*.*";
+                    if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        using (var stream = ofd.OpenFile())
+                            map.Load(stream, true);
+
+                        selectedDecal = null;
+                        selectedEntity = null;
+                    }
+                    return;
+                }
+            }
+
             if (InputCatalog.IsKeyPress(Keys.Q))
                 Takai.States.StateManager.Exit();
 
             if (InputCatalog.IsKeyPress(Keys.F1))
-                map.debugOptions.showProfileInfo ^= true;
-            if (InputCatalog.IsKeyPress(Keys.F2))
-                map.debugOptions.showEntInfo ^= true;
-            if (InputCatalog.IsKeyPress(Keys.F3))
                 map.debugOptions.showBlobReflectionMask ^= true;
-            if (InputCatalog.IsKeyPress(Keys.F4))
+            if (InputCatalog.IsKeyPress(Keys.F2))
                 map.debugOptions.showOnlyReflections ^= true;
-            
-            if (InputCatalog.IsKeyPress(Keys.D1) || InputCatalog.IsKeyPress(Keys.NumPad1))
-                currentMode = EditorMode.Tiles;
-            if (InputCatalog.IsKeyPress(Keys.D2) || InputCatalog.IsKeyPress(Keys.NumPad2))
-                currentMode = EditorMode.Decals;
-            if (InputCatalog.IsKeyPress(Keys.D3) || InputCatalog.IsKeyPress(Keys.NumPad3))
-                currentMode = EditorMode.Blobs;
-            if (InputCatalog.IsKeyPress(Keys.D4) || InputCatalog.IsKeyPress(Keys.NumPad4))
-                currentMode = EditorMode.Entities;
+
+            foreach (int i in System.Enum.GetValues(typeof(EditorMode)))
+            {
+                if (InputCatalog.IsKeyPress(Keys.D1 + i) || InputCatalog.IsKeyPress(Keys.NumPad1 + i))
+                {
+                    currentMode = (EditorMode)i;
+                    break;
+                }
+            }
+
+            var worldMousePos = camera.ScreenToWorld(InputCatalog.MouseState.Position.ToVector2());
 
             if (InputCatalog.MouseState.MiddleButton == ButtonState.Pressed)
-                camera.MoveTo(camera.Position + ((InputCatalog.LastMouseState.Position.ToVector2() - InputCatalog.MouseState.Position.ToVector2()) * (1 / camera.Scale)));
+            {
+                var delta = InputCatalog.LastMouseState.Position - InputCatalog.MouseState.Position;
+                camera.MoveTo(camera.Position + Vector2.TransformNormal(delta.ToVector2(), Matrix.Invert(camera.Transform)));
+            }
             else
             {
                 var d = Vector2.Zero;
@@ -127,27 +157,24 @@ namespace DyingAndMore
             }
 
             if (InputCatalog.IsKeyPress(Keys.Tab))
-            {
-                switch (currentMode)
-                {
-                    case EditorMode.Tiles:
-                        tileSelector.Activate();
-                        break;
-                    case EditorMode.Decals:
-                        decalSelector.Activate();
-                        break;
-                }
-            }
+                selectors[(int)currentMode]?.Activate();
 
             if (InputCatalog.HasMouseScrolled())
             {
-                camera.Scale += (InputCatalog.MouseState.ScrollWheelValue - InputCatalog.LastMouseState.ScrollWheelValue) / 1024f;
-                camera.Scale = MathHelper.Clamp(camera.Scale, 0.1f, 2f);
+                var delta = InputCatalog.ScrollDelta() / 1024f;
+                if (InputCatalog.KBState.IsKeyDown(Keys.LeftShift))
+                {
+                    camera.Rotation += delta;
+                }
+                else
+                {
+                    camera.Scale += delta;
+                    camera.Scale = MathHelper.Clamp(camera.Scale, 0.1f, 2f);
+                }
                 //todo: translate to mouse cursor
             }
 
             camera.Update(Time);
-            var worldMousePos = camera.ScreenToWorld(InputCatalog.MouseState.Position.ToVector2());
 
             if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Left) && InputCatalog.KBState.IsKeyDown(Keys.LeftAlt))
             {
@@ -175,12 +202,13 @@ namespace DyingAndMore
             else if (InputCatalog.IsKeyClick(Keys.LeftControl))
                 isPosSaved = false;
 
+            #region Tiles
             if (currentMode == EditorMode.Tiles)
             {
                 var tile = short.MinValue;
 
                 if (InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
-                    tile = (short)tileSelector.SelectedItem;
+                    tile = (short)selectors[0].SelectedItem;
                 else if (InputCatalog.MouseState.RightButton == ButtonState.Pressed)
                     tile = -1;
 
@@ -197,18 +225,20 @@ namespace DyingAndMore
                         TileLine(lastWorldPos, worldMousePos, tile);
                 }
             }
+            #endregion
+
+            #region Decals
             else if (currentMode == EditorMode.Decals)
             {
                 if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Left))
                 {
                     if (!SelectDecal(worldMousePos))
                     {
-                        map.AddDecal(decalSelector.textures[decalSelector.SelectedItem], worldMousePos);
+                        //add new decal none under cursor
+                        var sel = selectors[(int)currentMode] as DecalSelector;
+                        map.AddDecal(sel.textures[sel.SelectedItem], worldMousePos);
                         var pos = (worldMousePos / map.SectorPixelSize).ToPoint();
                         selectedDecal = new DecalIndex { x = pos.X, y = pos.Y, index = map.Sectors[pos.Y, pos.X].decals.Count - 1 };
-                    }
-                    else
-                    {
                     }
                 }
                 else if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Right))
@@ -255,24 +285,106 @@ namespace DyingAndMore
                         if (InputCatalog.lastKBState.IsKeyUp(Keys.E))
                             startScale = dist;
 
-                        decal.scale += (dist - startScale) / 25;
+                        decal.scale = MathHelper.Clamp(decal.scale + (dist - startScale) / 25, 0.25f, 10f);
                         startScale = dist;
                     }
 
                     map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index] = decal;
                 }
             }
+            #endregion
 
-            foreach (var ent in highlighted)
-                ent.OutlineColor = Color.Transparent;
-            highlighted = map.FindNearbyEntities(worldMousePos, 5);
-            foreach (var ent in highlighted)
-                ent.OutlineColor = highlightColor;
+            #region Blobs
+            else if (currentMode == EditorMode.Blobs)
+            {
+                if (Time.TotalGameTime > lastBlobTime + System.TimeSpan.FromMilliseconds(50))
+                {
+                    if (InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        var sel = selectors[(int)EditorMode.Blobs] as BlobSelector;
+                        map.SpawnBlob(sel.blobs[sel.SelectedItem], worldMousePos, Vector2.Zero);
+                    }
 
+                    else if (InputCatalog.MouseState.RightButton == ButtonState.Pressed)
+                    {
+                        var mapSz = new Vector2(map.Width, map.Height);
+                        var start = Vector2.Clamp((worldMousePos / map.SectorPixelSize) - Vector2.One, Vector2.Zero, mapSz).ToPoint();
+                        var end = Vector2.Clamp((worldMousePos / map.SectorPixelSize) + Vector2.One, Vector2.Zero, mapSz).ToPoint();
+                        
+                        for (int y = start.Y; y < end.Y; y++)
+                        {
+                            for (int x = start.X; x < end.X; x++)
+                            {
+                                var sect = map.Sectors[y, x];
+                                for (var i = 0; i < sect.blobs.Count; i++)
+                                {
+                                    var blob = sect.blobs[i];
+                                    
+                                    if (Vector2.DistanceSquared(blob.position, worldMousePos) < blob.type.Radius * blob.type.Radius)
+                                    {
+                                        sect.blobs[i] = sect.blobs[sect.blobs.Count - 1];
+                                        sect.blobs.RemoveAt(sect.blobs.Count - 1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    lastBlobTime = Time.TotalGameTime;
+                }
+            }
+            #endregion
+
+            #region Entities
+            else if (currentMode == EditorMode.Entities)
+            {
+                if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Left))
+                {
+                    var selected = map.FindNearbyEntities(worldMousePos, 1, true);
+                    if (selected.Count < 1)
+                    {
+                        var sel = selectors[(int)currentMode] as EntSelector;
+                        selectedEntity = map.SpawnEntity(sel.ents[sel.SelectedItem], worldMousePos, Vector2.UnitX, Vector2.Zero);
+                    }
+                    else
+                        selectedEntity = selected[0];
+                }
+                else if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Right))
+                {
+                    var selected = map.FindNearbyEntities(worldMousePos, 1, true);
+                    selectedEntity = selected.Count > 0 ? selected[0] : null;
+                }
+                else if (InputCatalog.IsMouseClick(InputCatalog.MouseButton.Right))
+                {
+                    var selected = map.FindNearbyEntities(worldMousePos, 1, true);
+                    if (selected.Count > 0 && selected[0] == selectedEntity)
+                    {
+                        map.Destroy(selectedEntity);
+                        selectedEntity = null;
+                    }
+                }
+
+                else if (selectedEntity != null)
+                {
+                    if (InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        var delta = worldMousePos - lastWorldPos;
+                        selectedEntity.Position += delta;
+                    }
+
+                    if (InputCatalog.KBState.IsKeyDown(Keys.R))
+                    {
+                        var diff = worldMousePos - selectedEntity.Position;
+                        diff.Normalize();
+                        selectedEntity.Direction = diff;
+                    }
+                }
+            }
+            #endregion
+            
             lastWorldPos = worldMousePos;
 
         }
-        System.Collections.Generic.List<Takai.Game.Entity> highlighted = new System.Collections.Generic.List<Takai.Game.Entity>();
 
         bool SelectDecal(Vector2 WorldPosition)
         {
@@ -410,18 +522,8 @@ namespace DyingAndMore
             var viewPos = camera.WorldToScreen(camera.ActualPosition);
             var worldMousePos = camera.ScreenToWorld(InputCatalog.MouseState.Position.ToVector2());
 
-            var selectedItemRect = new Rectangle(GraphicsDevice.Viewport.Width - map.TileSize - 20, 20, map.TileSize, map.TileSize);
             if (currentMode == EditorMode.Tiles)
             {
-                //draw selected tile in corner of screen
-                sbatch.Draw
-                (
-                    map.TilesImage,
-                    selectedItemRect,
-                    new Rectangle((tileSelector.SelectedItem % map.TilesPerRow) * map.TileSize, (tileSelector.SelectedItem / map.TilesPerRow) * map.TileSize, map.TileSize, map.TileSize),
-                    Color.White
-                );
-
                 //draw rect around tile under cursor
                 if (map.IsInside(worldMousePos))
                 {
@@ -448,14 +550,7 @@ namespace DyingAndMore
                 }
             }
             else if (currentMode == EditorMode.Decals)
-            {
-                sbatch.Draw
-                (
-                       decalSelector.textures[decalSelector.SelectedItem],
-                       selectedItemRect,
-                       Color.White
-                );
-                
+            {   
                 if (selectedDecal.HasValue)
                 {
                     var decal = map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index];
@@ -474,27 +569,43 @@ namespace DyingAndMore
                     map.DebugLine(bl, tl, Color.GreenYellow);
                 }
             }
-            Primitives2D.DrawRect(sbatch, Color.White, selectedItemRect);
+            else if (currentMode == EditorMode.Entities)
+            {
+                if (selectedEntity != null)
+                    DrawEntInfo(selectedEntity);
+
+                foreach (var ent in map.ActiveEnts)
+                    DrawArrow(ent.Position, ent.Direction, ent.Radius * 1.5f);
+            }
+
+            //draw selected item in top right corner
+            if (selectors[(int)currentMode] != null)
+            {
+                var selectedItemRect = new Rectangle(GraphicsDevice.Viewport.Width - map.TileSize - 20, 20, map.TileSize, map.TileSize);
+                selectors[(int)currentMode].DrawItem(Time, selectors[(int)currentMode].SelectedItem, selectedItemRect, sbatch);
+                Primitives2D.DrawRect(sbatch, Color.White, selectedItemRect);
+            }
 
             //draw modes
             {
-                var modeSz = new Vector2[(int)EditorMode.Count];
+                var modes = System.Enum.GetNames(typeof(EditorMode));
+                var modeSz = new Vector2[modes.Length];
                 var modeTotalWidth = 0f;
                 var modeMaxHeight = 0f;
-                for (var i = 0; i < (int)EditorMode.Count; i++)
+                for (var i = 0; i < modes.Length; i++)
                 {
-                    modeSz[i] = largeFont.MeasureString(System.Enum.GetName(typeof(EditorMode), i));
+                    modeSz[i] = largeFont.MeasureString(modes[i]);
                     modeSz[i].X += 20;
                     modeTotalWidth += modeSz[i].X;
                     modeMaxHeight = MathHelper.Max(modeMaxHeight, modeSz[i].Y);
                 }
 
                 var startX = (int)(GraphicsDevice.Viewport.Width - modeTotalWidth) / 2;
-                for (var i = 0; i < (int)EditorMode.Count; i++)
+                for (var i = 0; i < modes.Length; i++)
                 {
                     var isSel = (int)currentMode == i;
                     var font = isSel ? largeFont : smallFont;
-                    var str = System.Enum.GetName(typeof(EditorMode), i);
+                    var str = modes[i];
                     font.Draw
                     (
                         sbatch,
@@ -507,6 +618,48 @@ namespace DyingAndMore
             }
 
             sbatch.End();
+        }
+
+        static readonly Matrix ArrowRotation = Matrix.CreateRotationZ(120);
+
+        protected void DrawArrow(Vector2 Position, Vector2 Direction, float Magnitude)
+        {
+            var tip = Position + (Direction * Magnitude);
+            map.DebugLine(Position, tip, Color.Yellow);
+
+            Magnitude = MathHelper.Clamp(Magnitude * 0.333f, 5, 30);
+            map.DebugLine(tip, tip - (Magnitude * Vector2.Transform(Direction, ArrowRotation)), Color.Yellow);
+            map.DebugLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(ArrowRotation))), Color.Yellow);
+        }
+
+        protected void DrawEntInfo(Takai.Game.Entity Ent)
+        {
+            //draw bounding box
+            MapLineRect(new Rectangle(
+                (int)(Ent.Position.X - Ent.Radius),
+                (int)(Ent.Position.Y - Ent.Radius),
+                (int)(Ent.Radius * 2),
+                (int)(Ent.Radius * 2)
+            ), Color.GreenYellow);
+
+            //draw ent info string
+            string str;
+            Vector2 sz, pos;
+
+            if (Ent.Name != null)
+            {
+                str = Ent.Name;
+                sz = smallFont.MeasureString(str);
+                pos = camera.WorldToScreen(Ent.Position - new Vector2(0, Ent.Radius + 2));
+                pos = new Vector2((int)(pos.X - sz.X / 2), (int)(pos.Y - sz.Y));
+                smallFont.Draw(sbatch, str, pos, Color.White);
+            }
+
+            str = string.Format("{0:N1},{1:N1}", Ent.Position.X, Ent.Position.Y);
+            sz = smallFont.MeasureString(str);
+            pos = camera.WorldToScreen(Ent.Position + new Vector2(0, Ent.Radius + 2));
+            pos = new Vector2((int)(pos.X - sz.X / 2), (int)pos.Y);
+            smallFont.Draw(sbatch, str, pos, Color.White);
         }
     }
 }

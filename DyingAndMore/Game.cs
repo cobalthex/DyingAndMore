@@ -32,8 +32,6 @@ namespace DyingAndMore
             map.BuildMask(map.TilesImage, true);
             map.BuildSectors();
 
-            map.DebugFont = fnt;
-
             using (var stream = new System.IO.StreamReader("Defs/Entities/Player.ent.tk"))
                 player = Takai.Data.Serializer.TextDeserialize(stream) as Entities.Actor;
             
@@ -77,9 +75,6 @@ namespace DyingAndMore
             testEnt.Sprite = sprite;
 
             sbatch = new SpriteBatch(GraphicsDevice);
-            
-            map.debugOptions.showProfileInfo = true;
-            map.debugOptions.showEntInfo = true;
 
             camera = new Takai.Game.Camera(map, player);
             camera.MoveSpeed = 800;
@@ -97,12 +92,8 @@ namespace DyingAndMore
                 Takai.States.StateManager.Exit();
 
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.F1))
-                map.debugOptions.showProfileInfo ^= true;
-            if (Takai.Input.InputCatalog.IsKeyPress(Keys.F2))
-                map.debugOptions.showEntInfo ^= true;
-            if (Takai.Input.InputCatalog.IsKeyPress(Keys.F3))
                 map.debugOptions.showBlobReflectionMask ^= true;
-            if (Takai.Input.InputCatalog.IsKeyPress(Keys.F4))
+            if (Takai.Input.InputCatalog.IsKeyPress(Keys.F2))
                 map.debugOptions.showOnlyReflections ^= true;
 
             if (Takai.Input.InputCatalog.IsKeyPress(Keys.F5))
