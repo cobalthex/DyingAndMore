@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
-namespace DyingAndMore.Entities
+namespace DyingAndMore.Game.Entities
 {
     /// <summary>
     /// The different types of triggers

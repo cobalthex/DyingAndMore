@@ -182,6 +182,9 @@ namespace Takai.Game
         /// <param name="AddToActive">Add this entity to the active set (defaults to true)</param>
         public void SpawnEntity(Entity Entity, bool AddToActive = true)
         {
+            if (Entity.Map != null)
+                Destroy(Entity);
+
             Entity.Map = this;
             if (AddToActive)
                 ActiveEnts.Add(Entity);
@@ -276,12 +279,18 @@ namespace Takai.Game
         /// <param name="Scale">How much to scale the decal</param>
         public void AddDecal(Texture2D Texture, Vector2 Position, float Angle = 0, float Scale = 1)
         {
+            if (Texture == null)
+                return;
+
             var sector = GetSector(Position);
             Sectors[sector.Y, sector.X].decals.Add(new Decal { texture = Texture, position = Position, angle = Angle, scale = Scale });
         }
 
         public void AddDecal(Decal Decal)
         {
+            if (Decal.texture == null)
+                return;
+
             var sector = GetSector(Decal.position);
             Sectors[sector.Y, sector.X].decals.Add(Decal);
         }
@@ -290,7 +299,7 @@ namespace Takai.Game
         /// Remove an entity from the map
         /// </summary>
         /// <param name="Ent">The entity to remove</param>
-        /// <remarks>Will be marked for deletion to be deleted in the next Update cycle</remarks>
+        /// <remarks>Will be marked for removal to be removed during the next Update cycle</remarks>
         public void Destroy(Entity Ent)
         {
             Ent.Map = null;

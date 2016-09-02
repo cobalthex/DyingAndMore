@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace DyingAndMore.Weapons
+namespace DyingAndMore.Game.Weapons
 {
     /// <summary>
     /// The base for a weapon

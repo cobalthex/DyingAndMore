@@ -15,6 +15,7 @@ Actor {
     Velocity: [0 0];
     IsEnabled: True;
     AlwaysActive: False;
+    AlwaysUpright: True;
     Radius: 16;
     IsPhysical: True;
     IgnoreTrace: False;

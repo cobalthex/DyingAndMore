@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace DyingAndMore.Entities
+namespace DyingAndMore.Game.Entities
 {
     class Projectile : Takai.Game.Entity
     {

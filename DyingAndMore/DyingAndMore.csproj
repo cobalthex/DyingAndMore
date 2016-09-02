@@ -72,13 +72,14 @@
     <Compile Include="Editor\DecalSelector.cs" />
     <Compile Include="Editor\TileSelector.cs" />
     <Compile Include="Editor\Selector.cs" />
-    <Compile Include="Weapons\BlobGun.cs" />
-    <Compile Include="Weapons\Gun.cs" />
-    <Compile Include="Weapons\Weapon.cs" />
-    <Compile Include="Entities\Actor.cs" />
-    <Compile Include="Entities\Projectile.cs" />
-    <Compile Include="Entities\Trigger.cs" />
-    <Compile Include="Game.cs" />
+    <Compile Include="Game\Entities\Squad.cs" />
+    <Compile Include="Game\Weapons\BlobGun.cs" />
+    <Compile Include="Game\Weapons\Gun.cs" />
+    <Compile Include="Game\Weapons\Weapon.cs" />
+    <Compile Include="Game\Entities\Actor.cs" />
+    <Compile Include="Game\Entities\Projectile.cs" />
+    <Compile Include="Game\Entities\Trigger.cs" />
+    <Compile Include="Game\Game.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

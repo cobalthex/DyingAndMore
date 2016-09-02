@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Takai.Game;
 using Takai.Graphics;
 
-namespace DyingAndMore.Entities
+namespace DyingAndMore.Game.Entities
 {
     /// <summary>
     /// Available factions. Work as bit flags (one actor can have multiple factions)

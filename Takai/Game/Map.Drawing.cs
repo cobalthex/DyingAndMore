@@ -53,7 +53,7 @@ namespace Takai.Game
         /// <param name="End">The end position of the line</param>
         /// <param name="Color">The color of the line</param>
         /// <remarks>Lines are world relative</remarks>
-        public void DebugLine(Vector2 Start, Vector2 End, Color Color)
+        public void DrawLine(Vector2 Start, Vector2 End, Color Color)
         {
             debugLines.Add(new VertexPositionColor { Position = new Vector3(Start, 0), Color = Color });
             debugLines.Add(new VertexPositionColor { Position = new Vector3(End, 0), Color = Color });
@@ -178,7 +178,7 @@ namespace Takai.Game
                         outlined.Add(ent);
                     else
                     {
-                        var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                        var angle = ent.AlwaysUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
                         ent.Sprite.Draw(sbatch, ent.Position, angle);
                     }
                 }
@@ -193,7 +193,8 @@ namespace Takai.Game
             {
                 outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / ent.Sprite.Texture.Width, 1.0f / ent.Sprite.Texture.Height));
                 outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(ent.Sprite.Width, ent.Sprite.Height));
-                var angle = (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+
+                var angle = ent.AlwaysUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
                 ent.Sprite.Draw(sbatch, ent.Position, angle, ent.OutlineColor);
             }
 
@@ -240,7 +241,7 @@ namespace Takai.Game
             var projection = Matrix.CreateOrthographicOffCenter(Viewport, 0, 1);
             mapAlphaTest.Projection = projection;
             mapAlphaTest.View = Transform;
-            sbatch.Begin(SpriteSortMode.Deferred, null, null, stencilWrite, null, mapAlphaTest);
+            sbatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, stencilWrite, null, mapAlphaTest);
 
             for (var y = startY; y < endY; y++)
             {
@@ -322,7 +323,7 @@ namespace Takai.Game
 
             #endregion
 
-            #region debug lines
+            #region lines
 
             if (debugLines.Count > 0)
             {

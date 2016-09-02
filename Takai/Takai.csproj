@@ -80,16 +80,12 @@
     <Compile Include="GUI\TextBoxForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Input\InputCatalog.cs" />
-    <Compile Include="Input\InputSequence.cs" />
-    <Compile Include="Input\InputSequencer.cs" />
-    <Compile Include="Input\TouchAbstractor.cs" />
+    <Compile Include="Input\InputState.cs" />
     <Compile Include="Locale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="States\State.cs" />
     <Compile Include="States\StateManager.cs" />
     <Compile Include="States\StateStack.cs" />
-    <Compile Include="States\TestInputState.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
