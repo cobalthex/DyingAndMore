@@ -48,6 +48,8 @@ namespace DyingAndMore.Editor
         float startRotation, startScale;
         System.TimeSpan lastBlobTime = System.TimeSpan.Zero;
 
+        string lastFile = null;
+
         public Editor() : base(Takai.States.StateType.Full) { }
         
         void AddSelector(Selector Sel, int Index)
@@ -84,23 +86,31 @@ namespace DyingAndMore.Editor
         
         public override void Update(GameTime Time)
         {
-            if (InputCatalog.KBState.IsKeyDown(Keys.LeftControl) || InputCatalog.KBState.IsKeyDown(Keys.RightControl))
+            if (InputState.IsButtonDown(Keys.LeftControl) || InputState.IsButtonDown(Keys.RightControl))
             {
-                if (InputCatalog.IsKeyPress(Keys.S))
+                if (InputState.IsPress(Keys.S))
                 {
                     var sfd = new System.Windows.Forms.SaveFileDialog();
+                    sfd.SupportMultiDottedExtensions = true;
                     sfd.Filter = "Map (*.map.tk)|*.map.tk|All Files (*.*)|*.*";
+                    sfd.InitialDirectory = System.IO.Path.GetDirectoryName(lastFile);
+                    sfd.FileName = System.IO.Path.GetFileName(lastFile?.Substring(0, lastFile.IndexOf('.'))); //file dialog is retarded
                     if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         using (var stream = sfd.OpenFile())
                             map.Save(stream);
+                        
+                        lastFile = sfd.FileName;
                     }
                     return;
                 }
-                else if (InputCatalog.IsKeyPress(Keys.O))
+                else if (InputState.IsPress(Keys.O))
                 {
                     var ofd = new System.Windows.Forms.OpenFileDialog();
+                    ofd.SupportMultiDottedExtensions = true;
                     ofd.Filter = "Map (*.map.tk)|*.map.tk|All Files (*.*)|*.*";
+                    ofd.InitialDirectory = System.IO.Path.GetDirectoryName(lastFile);
+                    ofd.FileName = System.IO.Path.GetFileName(lastFile);
                     if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         using (var stream = ofd.OpenFile())
@@ -108,45 +118,47 @@ namespace DyingAndMore.Editor
 
                         selectedDecal = null;
                         selectedEntity = null;
+
+                        lastFile = ofd.FileName;
                     }
                     return;
                 }
             }
 
-            if (InputCatalog.IsKeyPress(Keys.Q))
+            if (InputState.IsPress(Keys.Q))
                 Takai.States.StateManager.Exit();
 
-            if (InputCatalog.IsKeyPress(Keys.F1))
+            if (InputState.IsPress(Keys.F1))
                 map.debugOptions.showBlobReflectionMask ^= true;
-            if (InputCatalog.IsKeyPress(Keys.F2))
+
+            if (InputState.IsPress(Keys.F2))
                 map.debugOptions.showOnlyReflections ^= true;
 
             foreach (int i in System.Enum.GetValues(typeof(EditorMode)))
             {
-                if (InputCatalog.IsKeyPress(Keys.D1 + i) || InputCatalog.IsKeyPress(Keys.NumPad1 + i))
+                if (InputState.IsPress(Keys.D1 + i) || InputState.IsPress(Keys.NumPad1 + i))
                 {
                     currentMode = (EditorMode)i;
                     break;
                 }
             }
 
-            var worldMousePos = camera.ScreenToWorld(InputCatalog.MouseState.Position.ToVector2());
+            var worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
 
-            if (InputCatalog.MouseState.MiddleButton == ButtonState.Pressed)
+            if (InputState.IsButtonDown(MouseButtons.Middle))
             {
-                var delta = InputCatalog.LastMouseState.Position - InputCatalog.MouseState.Position;
-                camera.MoveTo(camera.Position + Vector2.TransformNormal(delta.ToVector2(), Matrix.Invert(camera.Transform)));
+                camera.MoveTo(camera.Position + Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(camera.Transform)));
             }
             else
             {
                 var d = Vector2.Zero;
-                if (InputCatalog.KBState.IsKeyDown(Keys.A))
+                if (InputState.IsButtonDown(Keys.A))
                     d -= Vector2.UnitX;
-                if (InputCatalog.KBState.IsKeyDown(Keys.W))
+                if (InputState.IsButtonDown(Keys.W))
                     d -= Vector2.UnitY;
-                if (InputCatalog.KBState.IsKeyDown(Keys.D))
+                if (InputState.IsButtonDown(Keys.D))
                     d += Vector2.UnitX;
-                if (InputCatalog.KBState.IsKeyDown(Keys.S))
+                if (InputState.IsButtonDown(Keys.S))
                     d += Vector2.UnitY;
 
                 if (d != Vector2.Zero)
@@ -156,13 +168,13 @@ namespace DyingAndMore.Editor
                 }
             }
 
-            if (InputCatalog.IsKeyPress(Keys.Tab))
+            if (InputState.IsPress(Keys.Tab))
                 selectors[(int)currentMode]?.Activate();
 
-            if (InputCatalog.HasMouseScrolled())
+            if (InputState.HasScrolled())
             {
-                var delta = InputCatalog.ScrollDelta() / 1024f;
-                if (InputCatalog.KBState.IsKeyDown(Keys.LeftShift))
+                var delta = InputState.ScrollDelta() / 1024f;
+                if (InputState.IsButtonDown(Keys.LeftShift))
                 {
                     camera.Rotation += delta;
                 }
@@ -176,7 +188,7 @@ namespace DyingAndMore.Editor
 
             camera.Update(Time);
 
-            if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Left) && InputCatalog.KBState.IsKeyDown(Keys.LeftAlt))
+            if (InputState.IsPress(MouseButtons.Left) && InputState.IsButtonDown(Keys.LeftAlt))
             {
                 var ofd = new System.Windows.Forms.OpenFileDialog();
                 ofd.Filter = "Entity Definitions (*.ent.tk)|*.ent.tk";
@@ -194,12 +206,12 @@ namespace DyingAndMore.Editor
                 }
             }
 
-            if (InputCatalog.IsKeyPress(Keys.LeftControl))
+            if (InputState.IsPress(Keys.LeftControl))
             {
                 isPosSaved = true;
                 savedWorldPos = worldMousePos;
             }
-            else if (InputCatalog.IsKeyClick(Keys.LeftControl))
+            else if (InputState.IsClick(Keys.LeftControl))
                 isPosSaved = false;
 
             #region Tiles
@@ -207,14 +219,14 @@ namespace DyingAndMore.Editor
             {
                 var tile = short.MinValue;
 
-                if (InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
+                if (InputState.IsButtonDown(MouseButtons.Left))
                     tile = (short)selectors[0].SelectedItem;
-                else if (InputCatalog.MouseState.RightButton == ButtonState.Pressed)
+                else if (InputState.IsButtonDown(MouseButtons.Right))
                     tile = -1;
 
                 if (tile > short.MinValue)
                 {
-                    if (InputCatalog.KBState.IsKeyDown(Keys.LeftShift))
+                    if (InputState.IsButtonDown(Keys.LeftShift))
                         TileFill(worldMousePos, tile);
                     else if (isPosSaved)
                     {
@@ -230,7 +242,7 @@ namespace DyingAndMore.Editor
             #region Decals
             else if (currentMode == EditorMode.Decals)
             {
-                if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Left))
+                if (InputState.IsPress(MouseButtons.Left))
                 {
                     if (!SelectDecal(worldMousePos))
                     {
@@ -241,11 +253,11 @@ namespace DyingAndMore.Editor
                         selectedDecal = new DecalIndex { x = pos.X, y = pos.Y, index = map.Sectors[pos.Y, pos.X].decals.Count - 1 };
                     }
                 }
-                else if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Right))
+                else if (InputState.IsPress(MouseButtons.Right))
                 {
                     SelectDecal(worldMousePos);
                 }
-                else if (InputCatalog.IsMouseClick(InputCatalog.MouseButton.Right))
+                else if (InputState.IsClick(MouseButtons.Right))
                 {
                     var lastSelected = selectedDecal;
                     SelectDecal(worldMousePos);
@@ -261,28 +273,28 @@ namespace DyingAndMore.Editor
                 {
                     var decal = map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index];
 
-                    if (InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
+                    if (InputState.IsButtonDown(MouseButtons.Left))
                     {
                         var delta = worldMousePos - lastWorldPos;
                         decal.position += delta;
                     }
 
-                    if (InputCatalog.KBState.IsKeyDown(Keys.R))
+                    if (InputState.IsButtonDown(Keys.R))
                     {
                         var diff = worldMousePos - decal.position;
 
                         var theta = (float)System.Math.Atan2(diff.Y, diff.X);
-                        if (InputCatalog.lastKBState.IsKeyUp(Keys.R))
+                        if (InputState.IsButtonUp(Keys.R))
                             startRotation = theta - decal.angle;
 
                         decal.angle = theta - startRotation;
                     }
 
-                    if (InputCatalog.KBState.IsKeyDown(Keys.E))
+                    if (InputState.IsButtonDown(Keys.E))
                     {
                         float dist = Vector2.Distance(worldMousePos, decal.position);
 
-                        if (InputCatalog.lastKBState.IsKeyUp(Keys.E))
+                        if (InputState.IsButtonUp(Keys.E))
                             startScale = dist;
 
                         decal.scale = MathHelper.Clamp(decal.scale + (dist - startScale) / 25, 0.25f, 10f);
@@ -299,13 +311,13 @@ namespace DyingAndMore.Editor
             {
                 if (Time.TotalGameTime > lastBlobTime + System.TimeSpan.FromMilliseconds(50))
                 {
-                    if (InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
+                    if (InputState.IsButtonDown(MouseButtons.Left))
                     {
                         var sel = selectors[(int)EditorMode.Blobs] as BlobSelector;
                         map.SpawnBlob(sel.blobs[sel.SelectedItem], worldMousePos, Vector2.Zero);
                     }
 
-                    else if (InputCatalog.MouseState.RightButton == ButtonState.Pressed)
+                    else if (InputState.IsButtonDown(MouseButtons.Right))
                     {
                         var mapSz = new Vector2(map.Width, map.Height);
                         var start = Vector2.Clamp((worldMousePos / map.SectorPixelSize) - Vector2.One, Vector2.Zero, mapSz).ToPoint();
@@ -338,7 +350,7 @@ namespace DyingAndMore.Editor
             #region Entities
             else if (currentMode == EditorMode.Entities)
             {
-                if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Left))
+                if (InputState.IsPress(MouseButtons.Left))
                 {
                     var selected = map.FindNearbyEntities(worldMousePos, 1, true);
                     if (selected.Count < 1)
@@ -349,12 +361,12 @@ namespace DyingAndMore.Editor
                     else
                         selectedEntity = selected[0];
                 }
-                else if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Right))
+                else if (InputState.IsPress(MouseButtons.Right))
                 {
                     var selected = map.FindNearbyEntities(worldMousePos, 1, true);
                     selectedEntity = selected.Count > 0 ? selected[0] : null;
                 }
-                else if (InputCatalog.IsMouseClick(InputCatalog.MouseButton.Right))
+                else if (InputState.IsClick(MouseButtons.Right))
                 {
                     var selected = map.FindNearbyEntities(worldMousePos, 1, true);
                     if (selected.Count > 0 && selected[0] == selectedEntity)
@@ -366,13 +378,13 @@ namespace DyingAndMore.Editor
 
                 else if (selectedEntity != null)
                 {
-                    if (InputCatalog.MouseState.LeftButton == ButtonState.Pressed)
+                    if (InputState.IsButtonDown(MouseButtons.Left))
                     {
                         var delta = worldMousePos - lastWorldPos;
                         selectedEntity.Position += delta;
                     }
 
-                    if (InputCatalog.KBState.IsKeyDown(Keys.R))
+                    if (InputState.IsButtonDown(Keys.R))
                     {
                         var diff = worldMousePos - selectedEntity.Position;
                         diff.Normalize();
@@ -499,10 +511,10 @@ namespace DyingAndMore.Editor
         
         void MapLineRect(Rectangle Rect, Color Color)
         {
-            map.DebugLine(new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Right, Rect.Top), Color);
-            map.DebugLine(new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Left, Rect.Bottom), Color);
-            map.DebugLine(new Vector2(Rect.Right, Rect.Top), new Vector2(Rect.Right, Rect.Bottom), Color);
-            map.DebugLine(new Vector2(Rect.Left, Rect.Bottom), new Vector2(Rect.Right, Rect.Bottom), Color);
+            map.DrawLine(new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Right, Rect.Top), Color);
+            map.DrawLine(new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Left, Rect.Bottom), Color);
+            map.DrawLine(new Vector2(Rect.Right, Rect.Top), new Vector2(Rect.Right, Rect.Bottom), Color);
+            map.DrawLine(new Vector2(Rect.Left, Rect.Bottom), new Vector2(Rect.Right, Rect.Bottom), Color);
         }
 
         public override void Draw(GameTime Time)
@@ -520,7 +532,7 @@ namespace DyingAndMore.Editor
             fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
             var viewPos = camera.WorldToScreen(camera.ActualPosition);
-            var worldMousePos = camera.ScreenToWorld(InputCatalog.MouseState.Position.ToVector2());
+            var worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
 
             if (currentMode == EditorMode.Tiles)
             {
@@ -545,7 +557,7 @@ namespace DyingAndMore.Editor
                     var angle = (int)MathHelper.ToDegrees((float)System.Math.Atan2(-diff.Y, diff.X));
                     if (angle < 0)
                         angle += 360;
-                    map.DebugLine(savedWorldPos, worldMousePos, Color.GreenYellow);
+                    map.DrawLine(savedWorldPos, worldMousePos, Color.GreenYellow);
                     fnt.Draw(sbatch, string.Format("x:{0} y:{1} deg:{2}", diff.X, diff.Y, angle), camera.WorldToScreen(worldMousePos) + new Vector2(10, -10), Color.White);
                 }
             }
@@ -563,10 +575,10 @@ namespace DyingAndMore.Editor
                     var bl = Vector2.Transform(new Vector2(-w2, h2), transform);
                     var br = Vector2.Transform(new Vector2(w2, h2), transform);
 
-                    map.DebugLine(tl, tr, Color.GreenYellow);
-                    map.DebugLine(tr, br, Color.GreenYellow);
-                    map.DebugLine(br, bl, Color.GreenYellow);
-                    map.DebugLine(bl, tl, Color.GreenYellow);
+                    map.DrawLine(tl, tr, Color.GreenYellow);
+                    map.DrawLine(tr, br, Color.GreenYellow);
+                    map.DrawLine(br, bl, Color.GreenYellow);
+                    map.DrawLine(bl, tl, Color.GreenYellow);
                 }
             }
             else if (currentMode == EditorMode.Entities)
@@ -625,11 +637,11 @@ namespace DyingAndMore.Editor
         protected void DrawArrow(Vector2 Position, Vector2 Direction, float Magnitude)
         {
             var tip = Position + (Direction * Magnitude);
-            map.DebugLine(Position, tip, Color.Yellow);
+            map.DrawLine(Position, tip, Color.Yellow);
 
             Magnitude = MathHelper.Clamp(Magnitude * 0.333f, 5, 30);
-            map.DebugLine(tip, tip - (Magnitude * Vector2.Transform(Direction, ArrowRotation)), Color.Yellow);
-            map.DebugLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(ArrowRotation))), Color.Yellow);
+            map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, ArrowRotation)), Color.Yellow);
+            map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(ArrowRotation))), Color.Yellow);
         }
 
         protected void DrawEntInfo(Takai.Game.Entity Ent)

@@ -92,6 +92,11 @@ namespace Takai.Game
         public Graphics.Graphic Sprite { get; set; } = null;
 
         /// <summary>
+        /// Should the sprite always display upright (angle of sprite does not affect display)?
+        /// </summary>
+        public bool AlwaysUpright { get; set; } = false;
+
+        /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
         [Data.NonDesigned]

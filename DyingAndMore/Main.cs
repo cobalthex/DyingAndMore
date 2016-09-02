@@ -68,9 +68,7 @@ namespace DyingAndMore
 
             if (StateManager.isInitialized)
                 return;
-
-            Takai.Input.TouchAbstractor.Initialize();
-
+            
             #region Mouse Cursor
 #if WINDOWS
             if (useCustomCursor)
@@ -103,12 +101,11 @@ namespace DyingAndMore
         protected override void Update(GameTime gameTime)
         {
 #if WINDOWS
-            if (Takai.Input.InputCatalog.IsKeyPress(Microsoft.Xna.Framework.Input.Keys.F12))
+            if (Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.F12))
             takingScreenshot = true;
 #endif
 
-            Takai.Input.InputCatalog.Update();
-            Takai.Input.TouchAbstractor.Update();
+            Takai.Input.InputState.Update();
             StateManager.Update(gameTime);
         }
 

@@ -3,6 +3,7 @@ Entity {
     Direction: [1 0];
     IsEnabled: True;
     AlwaysActive: False;
+    AlwaysUpright: True;
     Radius: 21;
     IsPhysical: True;
     IgnoreTrace: False;

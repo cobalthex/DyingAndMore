@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace DyingAndMore.Weapons
+namespace DyingAndMore.Game.Weapons
 {
     class Gun : Weapon
     {

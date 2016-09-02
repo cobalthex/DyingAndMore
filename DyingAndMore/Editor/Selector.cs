@@ -79,17 +79,17 @@ namespace DyingAndMore.Editor
 
         public override void Update(GameTime time)
         {
-            if (InputCatalog.IsKeyClick(Keys.Tab))
+            if (InputState.IsClick(Keys.Tab))
                 Deactivate();
 
-            var mouse = InputCatalog.MouseState.Position;
+            var mouse = InputState.MousePoint;
 
             var scrollWidth = GetScrollbarWidth();
             var itemsPerRow = (width - Padding) / (ItemSize.X + Padding);
             var splitterX = GraphicsDevice.Viewport.Width - width - scrollWidth - splitterWidth;
             isHoveringSplitter = (mouse.X >= splitterX && mouse.X <= splitterX + splitterWidth);
 
-            if (InputCatalog.IsMousePress(InputCatalog.MouseButton.Left))
+            if (InputState.IsPress(MouseButtons.Left))
             {
                 if (isHoveringSplitter)
                 {
@@ -106,14 +106,14 @@ namespace DyingAndMore.Editor
                         SelectedItem = newSelect;
                 }
             }
-            else if (InputCatalog.IsMouseClick(InputCatalog.MouseButton.Left))
+            else if (InputState.IsClick(MouseButtons.Left))
                 isResizing = false;
 
             else if (isResizing)
                 width = GraphicsDevice.Viewport.Width - scrollWidth - splitterWidth - mouse.X + resizeXOffset;
 
-            if (InputCatalog.HasMouseScrolled())
-                ScrollPosition -= (InputCatalog.ScrollDelta() / 2);
+            if (InputState.HasScrolled())
+                ScrollPosition -= (InputState.ScrollDelta() / 2);
 
             width = MathHelper.Clamp(width, 0, GraphicsDevice.Viewport.Width - scrollWidth - splitterWidth);
             ScrollPosition = MathHelper.Clamp(ScrollPosition, 0, GetTotalHeight() - GraphicsDevice.Viewport.Height);
@@ -133,7 +133,7 @@ namespace DyingAndMore.Editor
             Takai.Graphics.Primitives2D.DrawFill
             (
                 sbatch, 
-                isHoveringSplitter ? (InputCatalog.MouseState.LeftButton == ButtonState.Pressed ? Color.DarkGray : Color.LightGray) : Color.Gray, 
+                isHoveringSplitter ? (InputState.IsButtonDown(MouseButtons.Left) ? Color.DarkGray : Color.LightGray) : Color.Gray, 
                 new Rectangle((int)Start.X - splitterWidth, (int)Start.Y, splitterWidth, viewHeight)
             );
 
@@ -150,7 +150,7 @@ namespace DyingAndMore.Editor
                 Takai.Graphics.Primitives2D.DrawFill
                 (
                     sbatch,
-                    isHoveringScroll ? (InputCatalog.MouseState.LeftButton == ButtonState.Pressed ? Color.DarkGray : Color.LightGray) : Color.Gray,
+                    isHoveringScroll ? (InputState.IsButtonDown(MouseButtons.Left) ? Color.DarkGray : Color.LightGray) : Color.Gray,
                     new Rectangle(x + 2, relScrollPos + 2, scrollWidth - 4, (int)thumbHeight)
                 );
             }
