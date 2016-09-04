@@ -22,7 +22,7 @@ namespace DyingAndMore.Game
 
         public override void Load()
         {
-            fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/Debug.bfnt");
+            fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
 
             map = new Takai.Game.Map(GraphicsDevice);
             using (var s = new System.IO.FileStream("data/maps/test.map.tk", System.IO.FileMode.Open))
