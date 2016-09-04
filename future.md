@@ -1,6 +1,7 @@
 Features to add in the future
 =============================
-0. Rewrite input catalog to provider better abstractions that are easy to use (IsPress IsClick, IsDragged, etc.)
+
+0. Tkz format that uses gzip. Add serializer helpers to check for compression (based on header) and automatically run correct handlers
 
 0. Rewrite asset manager to provide mark and sweep ability and to simply design.
 	- Provide ability to pass in folder to search to have for eg. map relative files

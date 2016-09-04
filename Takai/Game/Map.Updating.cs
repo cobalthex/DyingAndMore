@@ -30,7 +30,8 @@ namespace Takai.Game
 
             var deltaT = (float)Time.ElapsedGameTime.TotalSeconds;
 
-            //update active blobs
+            #region active blobs
+
             for (int i = 0; i < ActiveBlobs.Count; i++)
             {
                 var blob = ActiveBlobs[i];
@@ -42,7 +43,7 @@ namespace Takai.Game
 
                 if (System.Math.Abs(blob.velocity.X) < 1 && System.Math.Abs(blob.velocity.Y) < 1)
                 {
-                    SpawnBlob(blob.type, blob.position, Vector2.Zero); //this will move the blob to the static area of the map
+                    Spawn(blob.type, blob.position, Vector2.Zero); //this will move the blob to the static area of the map
                     ActiveBlobs[i] = ActiveBlobs[ActiveBlobs.Count - 1];
                     ActiveBlobs.RemoveAt(ActiveBlobs.Count - 1);
                     i--;
@@ -51,7 +52,10 @@ namespace Takai.Game
                     ActiveBlobs[i] = blob;
             }
 
-            //update active entities
+            #endregion
+
+            #region active entities
+
             for (int i = 0; i < ActiveEnts.Count; i++)
             {
                 var ent = ActiveEnts[i];
@@ -125,6 +129,8 @@ namespace Takai.Game
                 }
             }
 
+            #endregion
+
             //add new entities to active set (will be updated next frame)
             for (var y = System.Math.Max(activeRect.Top, 0); y < System.Math.Min(Height / SectorSize, activeRect.Bottom); y++)
             {
@@ -134,6 +140,33 @@ namespace Takai.Game
                     Sectors[y, x].entities.Clear();
                 }
             }
+
+            #region particles
+
+            var ts = (float)Time.ElapsedGameTime.TotalSeconds;
+            foreach (var p in Particles)
+            {
+                for (var i = 0; i < p.Value.Count; i++)
+                {
+                    var x = p.Value[i];
+                    x.position += x.velocity * ts;
+                    x.velocity -= x.velocity * (p.Key.Drag * ts);
+
+                    if (x.time == TimeSpan.Zero)
+                        x.time = Time.TotalGameTime;
+                    else if (Time.TotalGameTime > x.time + x.lifetime + x.delay)
+                    {
+                        p.Value[i] = p.Value[p.Value.Count - 1];
+                        p.Value.RemoveAt(p.Value.Count - 1);
+                        i--;
+                        continue;
+                    }
+
+                    p.Value[i] = x;
+                }
+            }
+
+            #endregion
         }
     }
 }

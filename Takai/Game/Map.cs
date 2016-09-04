@@ -6,6 +6,26 @@ using System.Runtime.Serialization;
 namespace Takai.Game
 {
     /// <summary>
+    /// Specifies a simple min/max range
+    /// </summary>
+    /// <typeparam name="T">The type of range</typeparam>
+    public struct Range<T>
+    {
+        public T min;
+        public T max;
+
+        public Range(T Value)
+        {
+            min = max = Value;
+        }
+        public Range(T Min, T Max)
+        {
+            min = Min;
+            max = Max;
+        }
+    }
+
+    /// <summary>
     /// A single type of blob
     /// This struct defines the graphics for the blob and physical properties that can affect the game
     /// </summary>
@@ -55,6 +75,56 @@ namespace Takai.Game
     }
 
     /// <summary>
+    /// A single type of particle
+    /// </summary>
+    [Data.DesignerCreatable]
+    public class ParticleType
+    {
+        /// <summary>
+        /// The grahpic used for each particle of this type
+        /// </summary>
+        public Graphics.Graphic Graphic { get; set; }
+        /// <summary>
+        /// How to blend this particle
+        /// </summary>
+        public BlendState BlendMode { get; set; }
+        /// <summary>
+        /// How quickly this icon should slow down, 0 for none, -1 for speed up
+        /// </summary>
+        public float Drag { get; set; }
+
+        //todo: maybe switch values to 'over time' values w/ curves
+    }
+
+    /// <summary>
+    /// An individual particle
+    /// </summary>
+    public struct Particle
+    {
+        public Vector2 position;
+        public Vector2 velocity;
+        public System.TimeSpan lifetime;
+        public System.TimeSpan delay;
+        public System.TimeSpan time; //spawn time
+        //angular velocity
+    }
+
+    /// <summary>
+    /// Description for spawning particles
+    /// </summary>
+    public struct ParticleSpawn
+    {
+        public ParticleType type;
+
+        public Range<int> count;
+        public Range<Vector2> position;
+        public Range<float> angle;
+        public Range<float> speed;
+        public Range<System.TimeSpan> lifetime;
+        public Range<System.TimeSpan> delay;
+    }
+
+    /// <summary>
     /// A single sector of the map, used for spacial calculations
     /// Sectors typically contain inactive entities that are not visible as well as dummy objects (inactive blobs, decals). 
     /// </summary>
@@ -70,6 +140,9 @@ namespace Takai.Game
     /// </summary>
     public partial class Map
     {
+        private System.Random random = new System.Random();
+        private byte[] _r64b = new byte[8];
+
         /// <summary>
         /// The file that this map was loaded for
         /// </summary>
@@ -132,6 +205,12 @@ namespace Takai.Game
         /// The list of live blobs. Once the blobs' velocity is zero, they are removed from this and not re-added
         /// </summary>
         public List<Blob> ActiveBlobs { get; protected set; } = new List<Blob>(32);
+
+        /// <summary>
+        /// The list of active particles. Not serialized
+        /// </summary>
+        [Data.NonSerialized]
+        public Dictionary<ParticleType, List<Particle>> Particles { get; protected set; } = new Dictionary<ParticleType, List<Particle>>();
         
         /// <summary>
         /// Build the tiles mask
@@ -180,7 +259,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="Entity">The entity to add</param>
         /// <param name="AddToActive">Add this entity to the active set (defaults to true)</param>
-        public void SpawnEntity(Entity Entity, bool AddToActive = true)
+        public void Spawn(Entity Entity, bool AddToActive = true)
         {
             if (Entity.Map != null)
                 Destroy(Entity);
@@ -204,7 +283,7 @@ namespace Takai.Game
         /// <param name="Velocity">The entity's initial velocity</param>
         /// <param name="LoadEntity">Should the entity be loaded, defaults to true</param>
         /// <returns>The entity spawned</returns>
-        public TEntity SpawnEntity<TEntity>(Vector2 Position, Vector2 Direction, Vector2 Velocity, bool LoadEntity = true) where TEntity : Entity, new()
+        public TEntity Spawn<TEntity>(Vector2 Position, Vector2 Direction, Vector2 Velocity, bool LoadEntity = true) where TEntity : Entity, new()
         {
             var ent = new TEntity();
             ent.Map = this;
@@ -232,7 +311,7 @@ namespace Takai.Game
         /// <param name="Velocity">The entity's initial velocity</param>
         /// <param name="LoadEntity">Should the entity be loaded, defaults to true</param>
         /// <returns>The new entity spawned</returns>
-        public TEntity SpawnEntity<TEntity>(TEntity Template, Vector2 Position, Vector2 Direction, Vector2 Velocity, bool LoadEntity = true) where TEntity : Entity, new()
+        public TEntity Spawn<TEntity>(TEntity Template, Vector2 Position, Vector2 Direction, Vector2 Velocity, bool LoadEntity = true) where TEntity : Entity, new()
         {
             var ent = (TEntity)Template.Clone();
             ent.Map = this;
@@ -257,7 +336,7 @@ namespace Takai.Game
         /// <param name="Position">The position of the blob</param>
         /// <param name="Velocity">The blob's initial velocity</param>
         /// <param name="Type">The blob's type</param>
-        public void SpawnBlob(BlobType Type, Vector2 Position, Vector2 Velocity)
+        public void Spawn(BlobType Type, Vector2 Position, Vector2 Velocity)
         {
             //todo: don't spawn blobs outside the map (position + radius)
 
@@ -268,6 +347,52 @@ namespace Takai.Game
             }
             else
                 ActiveBlobs.Add(new Blob { position = Position, velocity = Velocity, type = Type });
+        }
+
+        /// <summary>
+        /// Spawn particles
+        /// </summary>
+        /// <param name="Spawn">The rules for spawning</param>
+        public void Spawn(ParticleSpawn Spawn)
+        {
+            int count = random.Next(Spawn.count.min, Spawn.count.max);
+
+            if (!Particles.ContainsKey(Spawn.type))
+                Particles.Add(Spawn.type, new List<Particle>());
+
+            for (int i = 0; i < count; i++)
+            {
+                random.NextBytes(_r64b);
+                var lifetime = Spawn.lifetime.max.Ticks - Spawn.lifetime.min.Ticks;
+                if (lifetime < 0)
+                    continue;
+                lifetime = (lifetime > 0 ? (System.BitConverter.ToInt64(_r64b, 0) % lifetime) : 0) + Spawn.lifetime.min.Ticks;
+
+                random.NextBytes(_r64b);
+                var delay = Spawn.delay.max.Ticks - Spawn.delay.min.Ticks;
+                     delay = delay > 0 ? (System.BitConverter.ToInt64(_r64b, 0) % delay) + Spawn.delay.min.Ticks : 0;
+
+                var speed = (float)((random.NextDouble() * (Spawn.speed.max - Spawn.speed.min)) + Spawn.speed.min);
+
+                var theta = (random.NextDouble() * (Spawn.angle.max - Spawn.angle.min)) + Spawn.angle.min;
+
+                Particles[Spawn.type].Add(new Particle
+                {
+                    time = System.TimeSpan.Zero,
+                    lifetime = System.TimeSpan.FromTicks(lifetime),
+                    delay = System.TimeSpan.FromTicks(delay),
+                    position = new Vector2
+                    (
+                        (float)((random.NextDouble() * (Spawn.position.max.X - Spawn.position.min.X)) + Spawn.position.min.X),
+                        (float)((random.NextDouble() * (Spawn.position.max.Y - Spawn.position.min.Y)) + Spawn.position.min.Y)
+                    ),
+                    velocity = new Vector2
+                    (
+                        (float)System.Math.Cos(theta),
+                        (float)System.Math.Sin(theta)
+                    ) * (float)((random.NextDouble() * (Spawn.speed.max - Spawn.speed.min)) + Spawn.speed.min),
+                });
+            }
         }
 
         /// <summary>

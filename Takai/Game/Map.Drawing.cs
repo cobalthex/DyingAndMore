@@ -202,6 +202,27 @@ namespace Takai.Game
 
             #endregion
 
+            #region Particles
+
+            foreach (var p in Particles)
+            {
+                sbatch.Begin(SpriteSortMode.BackToFront, p.Key.BlendMode, null, stencilRead, null, null, Transform);
+
+                for (int i = 0; i < p.Value.Count; i++)
+                {
+                    p.Key.Graphic.Draw
+                    (
+                        sbatch,
+                        p.Value[i].position,
+                        0
+                    );
+                }
+
+                sbatch.End();
+            }
+
+            #endregion
+            
             #region blobs
 
             GraphicsDevice.SetRenderTargets(blobsRenderTarget, reflectionRenderTarget);
@@ -306,6 +327,8 @@ namespace Takai.Game
             }
             else
             {
+                //todo: transform correctly
+
                 sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead, null, blobEffect);
                 blobEffect.Parameters["Mask"].SetValue(reflectionRenderTarget);
                 blobEffect.Parameters["Reflection"].SetValue(reflectedRenderTarget);

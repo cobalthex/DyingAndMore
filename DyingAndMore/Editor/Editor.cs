@@ -26,14 +26,11 @@ namespace DyingAndMore.Editor
         EditorMode currentMode = EditorMode.Tiles;
 
         Takai.Game.Camera camera;
-
-        BitmapFont fnt;
-        string debugText = "";
-
+        
         SpriteBatch sbatch;
 
-        BitmapFont smallFont, largeFont;
-        
+        BitmapFont tinyFont, smallFont, largeFont;
+
         public Takai.Game.Map map;
 
         Color highlightColor = Color.Gold;
@@ -61,8 +58,7 @@ namespace DyingAndMore.Editor
 
         public override void Load()
         {
-            fnt = Takai.AssetManager.Load<BitmapFont>("Fonts/rct2.bfnt");
-
+            tinyFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UITiny.bfnt");
             smallFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UISmall.bfnt");
             largeFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UILarge.bfnt");
 
@@ -82,10 +78,20 @@ namespace DyingAndMore.Editor
             AddSelector(new DecalSelector(this), 1);
             AddSelector(new BlobSelector(this), 2);
             AddSelector(new EntSelector(this), 3);
+
+            ptype = new Takai.Game.ParticleType();
+            ptype.Drag = 1;
+            ptype.BlendMode = BlendState.Additive;
+            ptype.Graphic = new Graphic(Takai.AssetManager.Load<Texture2D>("Textures/Particles/Mucus.png"));
+            ptype.Graphic.CenterOrigin();
         }
+        Takai.Game.ParticleType ptype;
         
         public override void Update(GameTime Time)
         {
+            if (selectedEntity != null)
+                selectedEntity.OutlineColor = Color.Transparent;
+
             if (InputState.IsButtonDown(Keys.LeftControl) || InputState.IsButtonDown(Keys.RightControl))
             {
                 if (InputState.IsPress(Keys.S))
@@ -201,7 +207,7 @@ namespace DyingAndMore.Editor
                     if (ent != null)
                     {
                         ent.Position = worldMousePos;
-                        map.SpawnEntity(ent);
+                        map.Spawn(ent);
                     }
                 }
             }
@@ -215,6 +221,7 @@ namespace DyingAndMore.Editor
                 isPosSaved = false;
 
             #region Tiles
+
             if (currentMode == EditorMode.Tiles)
             {
                 var tile = short.MinValue;
@@ -237,9 +244,11 @@ namespace DyingAndMore.Editor
                         TileLine(lastWorldPos, worldMousePos, tile);
                 }
             }
+
             #endregion
 
             #region Decals
+
             else if (currentMode == EditorMode.Decals)
             {
                 if (InputState.IsPress(MouseButtons.Left))
@@ -264,6 +273,7 @@ namespace DyingAndMore.Editor
 
                     if (selectedDecal != null && selectedDecal.Equals(lastSelected))
                     {
+                        //todo: use swap
                         map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals.RemoveAt(selectedDecal.Value.index);
                         selectedDecal = null;
                     }
@@ -304,9 +314,11 @@ namespace DyingAndMore.Editor
                     map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index] = decal;
                 }
             }
+
             #endregion
 
             #region Blobs
+
             else if (currentMode == EditorMode.Blobs)
             {
                 if (Time.TotalGameTime > lastBlobTime + System.TimeSpan.FromMilliseconds(50))
@@ -314,7 +326,7 @@ namespace DyingAndMore.Editor
                     if (InputState.IsButtonDown(MouseButtons.Left))
                     {
                         var sel = selectors[(int)EditorMode.Blobs] as BlobSelector;
-                        map.SpawnBlob(sel.blobs[sel.SelectedItem], worldMousePos, Vector2.Zero);
+                        map.Spawn(sel.blobs[sel.SelectedItem], worldMousePos, Vector2.Zero);
                     }
 
                     else if (InputState.IsButtonDown(MouseButtons.Right))
@@ -336,6 +348,7 @@ namespace DyingAndMore.Editor
                                     {
                                         sect.blobs[i] = sect.blobs[sect.blobs.Count - 1];
                                         sect.blobs.RemoveAt(sect.blobs.Count - 1);
+                                        i--;
                                     }
                                 }
                             }
@@ -345,9 +358,11 @@ namespace DyingAndMore.Editor
                     lastBlobTime = Time.TotalGameTime;
                 }
             }
+
             #endregion
 
             #region Entities
+
             else if (currentMode == EditorMode.Entities)
             {
                 if (InputState.IsPress(MouseButtons.Left))
@@ -356,7 +371,7 @@ namespace DyingAndMore.Editor
                     if (selected.Count < 1)
                     {
                         var sel = selectors[(int)currentMode] as EntSelector;
-                        selectedEntity = map.SpawnEntity(sel.ents[sel.SelectedItem], worldMousePos, Vector2.UnitX, Vector2.Zero);
+                        selectedEntity = map.Spawn(sel.ents[sel.SelectedItem], worldMousePos, Vector2.UnitX, Vector2.Zero);
                     }
                     else
                         selectedEntity = selected[0];
@@ -392,10 +407,22 @@ namespace DyingAndMore.Editor
                     }
                 }
             }
+
             #endregion
             
             lastWorldPos = worldMousePos;
 
+            if (selectedEntity != null)
+                selectedEntity.OutlineColor = Color.YellowGreen;
+
+            var spawn = new Takai.Game.ParticleSpawn();
+            spawn.count = new Takai.Game.Range<int>(5, 10);
+            spawn.angle = new Takai.Game.Range<float>(0, MathHelper.TwoPi);
+            spawn.position = new Takai.Game.Range<Vector2>(worldMousePos);
+            spawn.speed = new Takai.Game.Range<float>(100, 500);
+            spawn.lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromSeconds(0.5f));
+            spawn.type = ptype;
+            map.Spawn(spawn);
         }
 
         bool SelectDecal(Vector2 WorldPosition)
@@ -525,11 +552,10 @@ namespace DyingAndMore.Editor
             camera.Draw();
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-
-            fnt.Draw(sbatch, debugText, new Vector2(10), Color.CornflowerBlue);
+            
             var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
-            var sSz = fnt.MeasureString(sFps);
-            fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
+            var sSz = tinyFont.MeasureString(sFps);
+            tinyFont.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
             var viewPos = camera.WorldToScreen(camera.ActualPosition);
             var worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
@@ -558,7 +584,7 @@ namespace DyingAndMore.Editor
                     if (angle < 0)
                         angle += 360;
                     map.DrawLine(savedWorldPos, worldMousePos, Color.GreenYellow);
-                    fnt.Draw(sbatch, string.Format("x:{0} y:{1} deg:{2}", diff.X, diff.Y, angle), camera.WorldToScreen(worldMousePos) + new Vector2(10, -10), Color.White);
+                    tinyFont.Draw(sbatch, string.Format("x:{0} y:{1} deg:{2}", diff.X, diff.Y, angle), camera.WorldToScreen(worldMousePos) + new Vector2(10, -10), Color.White);
                 }
             }
             else if (currentMode == EditorMode.Decals)
@@ -647,12 +673,12 @@ namespace DyingAndMore.Editor
         protected void DrawEntInfo(Takai.Game.Entity Ent)
         {
             //draw bounding box
-            MapLineRect(new Rectangle(
-                (int)(Ent.Position.X - Ent.Radius),
-                (int)(Ent.Position.Y - Ent.Radius),
-                (int)(Ent.Radius * 2),
-                (int)(Ent.Radius * 2)
-            ), Color.GreenYellow);
+            //MapLineRect(new Rectangle(
+            //    (int)(Ent.Position.X - Ent.Radius),
+            //    (int)(Ent.Position.Y - Ent.Radius),
+            //    (int)(Ent.Radius * 2),
+            //    (int)(Ent.Radius * 2)
+            //), Color.GreenYellow);
 
             //draw ent info string
             string str;
@@ -661,17 +687,17 @@ namespace DyingAndMore.Editor
             if (Ent.Name != null)
             {
                 str = Ent.Name;
-                sz = smallFont.MeasureString(str);
+                sz = tinyFont.MeasureString(str);
                 pos = camera.WorldToScreen(Ent.Position - new Vector2(0, Ent.Radius + 2));
                 pos = new Vector2((int)(pos.X - sz.X / 2), (int)(pos.Y - sz.Y));
-                smallFont.Draw(sbatch, str, pos, Color.White);
+                tinyFont.Draw(sbatch, str, pos, Color.White);
             }
 
             str = string.Format("{0:N1},{1:N1}", Ent.Position.X, Ent.Position.Y);
-            sz = smallFont.MeasureString(str);
+            sz = tinyFont.MeasureString(str);
             pos = camera.WorldToScreen(Ent.Position + new Vector2(0, Ent.Radius + 2));
             pos = new Vector2((int)(pos.X - sz.X / 2), (int)pos.Y);
-            smallFont.Draw(sbatch, str, pos, Color.White);
+            tinyFont.Draw(sbatch, str, pos, Color.White);
         }
     }
 }

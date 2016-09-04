@@ -16,7 +16,7 @@ namespace DyingAndMore.Game.Weapons
         protected override void SingleFire(Takai.Game.Entity Entity)
         {
             var pos = Entity.Position + (Entity.Direction * (Entity.Radius + blob.Radius + 1));
-            Entity.Map.SpawnBlob(blob, pos, Entity.Direction * speed);
+            Entity.Map.Spawn(blob, pos, Entity.Direction * speed);
         }
     }
 }
