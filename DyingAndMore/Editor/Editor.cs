@@ -45,8 +45,6 @@ namespace DyingAndMore.Editor
         float startRotation, startScale;
         System.TimeSpan lastBlobTime = System.TimeSpan.Zero;
 
-        string lastFile = null;
-
         public Editor() : base(Takai.States.StateType.Full) { }
         
         void AddSelector(Selector Sel, int Index)
@@ -78,14 +76,7 @@ namespace DyingAndMore.Editor
             AddSelector(new DecalSelector(this), 1);
             AddSelector(new BlobSelector(this), 2);
             AddSelector(new EntSelector(this), 3);
-
-            ptype = new Takai.Game.ParticleType();
-            ptype.Drag = 1;
-            ptype.BlendMode = BlendState.Additive;
-            ptype.Graphic = new Graphic(Takai.AssetManager.Load<Texture2D>("Textures/Particles/Mucus.png"));
-            ptype.Graphic.CenterOrigin();
         }
-        Takai.Game.ParticleType ptype;
         
         public override void Update(GameTime Time)
         {
@@ -99,14 +90,14 @@ namespace DyingAndMore.Editor
                     var sfd = new System.Windows.Forms.SaveFileDialog();
                     sfd.SupportMultiDottedExtensions = true;
                     sfd.Filter = "Map (*.map.tk)|*.map.tk|All Files (*.*)|*.*";
-                    sfd.InitialDirectory = System.IO.Path.GetDirectoryName(lastFile);
-                    sfd.FileName = System.IO.Path.GetFileName(lastFile?.Substring(0, lastFile.IndexOf('.'))); //file dialog is retarded
+                    sfd.InitialDirectory = System.IO.Path.GetDirectoryName(map.File);
+                    sfd.FileName = System.IO.Path.GetFileName(map.File?.Substring(0, map.File.IndexOf('.'))); //file dialog is retarded
                     if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         using (var stream = sfd.OpenFile())
                             map.Save(stream);
-                        
-                        lastFile = sfd.FileName;
+
+                        map.File = sfd.FileName;
                     }
                     return;
                 }
@@ -115,17 +106,17 @@ namespace DyingAndMore.Editor
                     var ofd = new System.Windows.Forms.OpenFileDialog();
                     ofd.SupportMultiDottedExtensions = true;
                     ofd.Filter = "Map (*.map.tk)|*.map.tk|All Files (*.*)|*.*";
-                    ofd.InitialDirectory = System.IO.Path.GetDirectoryName(lastFile);
-                    ofd.FileName = System.IO.Path.GetFileName(lastFile);
+                    ofd.InitialDirectory = System.IO.Path.GetDirectoryName(map.File);
+                    ofd.FileName = System.IO.Path.GetFileName(map.File);
                     if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         using (var stream = ofd.OpenFile())
                             map.Load(stream, true);
 
+                        map.File = ofd.FileName;
+
                         selectedDecal = null;
                         selectedEntity = null;
-
-                        lastFile = ofd.FileName;
                     }
                     return;
                 }
@@ -414,15 +405,6 @@ namespace DyingAndMore.Editor
 
             if (selectedEntity != null)
                 selectedEntity.OutlineColor = Color.YellowGreen;
-
-            var spawn = new Takai.Game.ParticleSpawn();
-            spawn.count = new Takai.Game.Range<int>(5, 10);
-            spawn.angle = new Takai.Game.Range<float>(0, MathHelper.TwoPi);
-            spawn.position = new Takai.Game.Range<Vector2>(worldMousePos);
-            spawn.speed = new Takai.Game.Range<float>(100, 500);
-            spawn.lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromSeconds(0.5f));
-            spawn.type = ptype;
-            map.Spawn(spawn);
         }
 
         bool SelectDecal(Vector2 WorldPosition)

@@ -6,6 +6,27 @@ namespace Takai.Game
 {
     public partial class Map
     {
+        protected System.Random random = new System.Random();
+        private byte[] _r64b = new byte[8];
+
+        protected float RandFloat(float Min, float Max)
+        {
+            return (float)(random.NextDouble() * (Max - Min)) + Min;
+        }
+        protected System.TimeSpan RandTime(System.TimeSpan Min, System.TimeSpan Max)
+        {
+            var diff = Max.Ticks - Min.Ticks;
+            return System.TimeSpan.FromTicks(diff != 0 ? (System.BitConverter.ToInt64(_r64b, 0) % diff) : 0) + Min;
+        }
+        protected Vector2 RandVector2(Vector2 Min, Vector2 Max)
+        {
+            return new Vector2
+            (
+                RandFloat(Min.X, Max.X),
+                RandFloat(Min.Y, Max.Y)
+            );
+        }
+
         /// <summary>
         /// Get the sector of a point
         /// </summary>
