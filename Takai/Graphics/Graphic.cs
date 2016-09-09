@@ -64,6 +64,11 @@ namespace Takai.Graphics
         }
         private int height;
 
+        /// <summary>
+        /// Width and height represented as a point
+        /// </summary>
+        public Point Size { get { return new Point(Width, Height); } }
+
         protected int framesPerRow;
 
         /// <summary>
@@ -130,7 +135,8 @@ namespace Takai.Graphics
             this.Texture = Texture;
             this.Width = Width;
             this.Height = Height;
-            this.ClipRect = Texture.Bounds;
+            if (Texture != null)
+                this.ClipRect = Texture.Bounds;
             this.Origin = Vector2.Zero;
             this.Tween = TweenStyle;
         }
@@ -191,13 +197,15 @@ namespace Takai.Graphics
             Draw(SpriteBatch, Bounds, Angle, Color.White);
         }
 
-        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle, Color Color)
+        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle, Color Color, float Scale = 1)
         {
-            Draw(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle, Color);   
+            Draw(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle);   
         }
 
         public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle, Color Color)
         {
+            //todo: bounds should maybe ignore origin
+
             float frame = CurrentFrameDelta;
             int cf = (int)frame;
             int nf = (IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount));

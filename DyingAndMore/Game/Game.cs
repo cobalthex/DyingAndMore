@@ -20,6 +20,13 @@ namespace DyingAndMore.Game
 
         public Game() : base(Takai.States.StateType.Full) { }
 
+        void StartMap()
+        {
+            player = map.FindEntityByName("Player") as Entities.Actor;
+            if (player != null)
+                player.CurrentState = "idle";
+        }
+
         public override void Load()
         {
             fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
@@ -28,6 +35,8 @@ namespace DyingAndMore.Game
             using (var s = new System.IO.FileStream("data/maps/test.map.tk", System.IO.FileMode.Open))
                 map.Load(s);
 
+            StartMap();
+
             //using (var s = new System.IO.FileStream("data/maps/test.csv", System.IO.FileMode.Open))
             //    map.LoadCsv(s);
             //map.TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles2.png");
@@ -35,13 +44,8 @@ namespace DyingAndMore.Game
             //map.BuildMask(map.TilesImage, true);
             //map.BuildSectors();
 
-            player = map.FindEntityByName("Player") as Entities.Actor;
-            player.States.Add("idle", player.Sprite);
-            player.CurrentState = "idle";
-            
             var gun = new Weapons.Gun();
             gun.projectile = new Entities.Projectile();
-            gun.projectile.Load();
             gun.speed = 800;
             gun.shotDelay = System.TimeSpan.FromMilliseconds(50);
             player.primaryWeapon = gun;
@@ -50,23 +54,61 @@ namespace DyingAndMore.Game
             blobber.blob = new Takai.Game.BlobType();
             blobber.blob.Radius = 54;
             blobber.blob.Drag = 1.5f;
-            blobber.blob.Texture = Takai.AssetManager.Load<Texture2D>("Textures/bblob.png");
-            blobber.blob.Reflection = Takai.AssetManager.Load<Texture2D>("Textures/bblobr.png");
+            blobber.blob.Texture = Takai.AssetManager.Load<Texture2D>("Textures/Blobs/blood.png");
+            blobber.blob.Reflection = Takai.AssetManager.Load<Texture2D>("Textures/Blobs/blood.r.png");
             blobber.speed = 100;
             player.altWeapon = blobber;
 
             //todo: change Load/Unload to OnSpawn/Destroy and call then
-            
+
             sbatch = new SpriteBatch(GraphicsDevice);
 
             camera = new Takai.Game.Camera(map, player);
             camera.MoveSpeed = 800;
             camera.Viewport = GraphicsDevice.Viewport.Bounds;
             //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
+
+            pt1 = new Takai.Game.ParticleType();
+            pt1.Graphic = new Takai.Graphics.Graphic(
+                Takai.AssetManager.Load<Texture2D>("Textures/Particles/Star.png"),
+                32,
+                32,
+                4,
+                System.TimeSpan.FromMilliseconds(100),
+                Takai.Graphics.TweenStyle.Sequential,
+                true
+            );
+            pt1.Graphic.CenterOrigin();
+
+            var curve = new Curve();
+            curve.Keys.Add(new CurveKey(0, 0));
+            curve.Keys.Add(new CurveKey(1, 1));
+
+            pt1.BlendMode = BlendState.AlphaBlend;
+            pt1.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Black);
+            pt1.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 5);
+            pt1.Speed = new Takai.Game.ValueCurve<float>(curve, 100, 0);
         }
+        Takai.Game.ParticleType pt1, pt2;
 
         public override void Update(GameTime Time)
         {
+            if (Takai.Input.InputState.IsButtonDown(Keys.LeftControl) && Takai.Input.InputState.IsPress(Keys.O))
+            {
+                var ofd = new System.Windows.Forms.OpenFileDialog();
+                ofd.SupportMultiDottedExtensions = true;
+                ofd.Filter = "Map (*.map.tk)|*.map.tk|All Files (*.*)|*.*";
+                ofd.InitialDirectory = System.IO.Path.GetDirectoryName(map.File);
+                ofd.FileName = System.IO.Path.GetFileName(map.File);
+                if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    using (var stream = ofd.OpenFile())
+                        map.Load(stream, true);
+                    StartMap();
+                }
+                return;
+            }
+
             if (Takai.Input.InputState.IsPress(Keys.Q))
                 Takai.States.StateManager.Exit();
 
@@ -129,6 +171,17 @@ namespace DyingAndMore.Game
             highlighted = map.FindNearbyEntities(camera.ScreenToWorld(Takai.Input.InputState.MouseVector), 5);
             foreach (var ent in highlighted)
                 ent.OutlineColor = Color.Yellow;
+
+            Vector2 worldMousePos = camera.ScreenToWorld(Takai.Input.InputState.MouseVector);
+
+            //Takai.Game.ParticleSpawn pspawn = new Takai.Game.ParticleSpawn();
+            //pspawn.type = pt1;
+            //pspawn.angle = new Takai.Game.Range<float>(0, MathHelper.TwoPi);
+            //pspawn.position = new Takai.Game.Range<Vector2>(worldMousePos);
+            //pspawn.count = new Takai.Game.Range<int>(3, 5);
+            //pspawn.lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800));
+            //map.Spawn(pspawn);
+
         }
         System.Collections.Generic.List<Takai.Game.Entity> highlighted = new System.Collections.Generic.List<Takai.Game.Entity>();
 

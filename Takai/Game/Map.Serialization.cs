@@ -11,6 +11,49 @@ namespace Takai.Game
     public partial class Map
     {
         /// <summary>
+        /// Build the tiles mask
+        /// </summary>
+        /// <param name="Texture">The source texture to use</param>
+        /// <param name="UseAlpha">Use alpha instead of color value</param>
+        /// <remarks>Values with luma/alpha < 0.5 are off and all others are on</remarks>
+        public void BuildTileMask(Texture2D Texture, bool UseAlpha = false)
+        {
+            Color[] pixels = new Color[Texture.Width * Texture.Height];
+            Texture.GetData(pixels);
+
+            TilesMask = new bool[Texture.Height * Texture.Width];
+            for (var i = 0; i < pixels.Length; i++)
+            {
+                if (UseAlpha)
+                    TilesMask[i] = pixels[i].A > 127;
+                else
+                    TilesMask[i] = (pixels[i].R + pixels[i].G + pixels[i].B) / 3 > 127;
+            }
+        }
+
+        /// <summary>
+        /// Create the spacial subdivisions for the map
+        /// </summary>
+        public void BuildSectors()
+        {
+            if (Tiles != null)
+            {
+                //round up
+                var width = 1 + ((Tiles.GetLength(1) - 1) / SectorSize);
+                var height = 1 + ((Tiles.GetLength(0) - 1) / SectorSize);
+
+                Sectors = new MapSector[height, width];
+
+                for (var y = 0; y < height; y++)
+                {
+                    for (var x = 0; x < width; x++)
+                        Sectors[y, x] = new MapSector();
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Load tile data from a CSV
         /// </summary>
         /// <remarks>Assumes csv is well formed (all rows are the same length)</remarks>
@@ -102,7 +145,7 @@ namespace Takai.Game
             Buffer.BlockCopy(load.tiles, 0, Tiles, 0, Width * Height * sizeof(short));
 
             BuildSectors();
-            BuildMask(TilesImage);
+            BuildTileMask(TilesImage);
 
             if (LoadState)
                 this.LoadState(load.state);

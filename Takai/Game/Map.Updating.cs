@@ -66,8 +66,7 @@ namespace Takai.Game
                         Sectors[(int)ent.Position.Y / SectorPixelSize, (int)ent.Position.X / SectorPixelSize].entities.Add(ent);
                     else
                     {
-                        ent.Map = null;
-                        ent.Unload();
+                        Destroy(ent);
                         continue;
                     }
 
@@ -125,7 +124,6 @@ namespace Takai.Game
                     }
                     else
                         ActiveEnts.Remove(ent);
-                    ent.Unload();
                 }
             }
 
@@ -149,8 +147,6 @@ namespace Takai.Game
                 for (var i = 0; i < p.Value.Count; i++)
                 {
                     var x = p.Value[i];
-                    x.position += x.velocity * ts;
-                    x.velocity -= x.velocity * (p.Key.Drag * ts);
 
                     if (x.time == TimeSpan.Zero)
                         x.time = Time.TotalGameTime;
@@ -162,11 +158,25 @@ namespace Takai.Game
                         continue;
                     }
 
+                    var life = (float)((Time.TotalGameTime - (x.time + x.delay)).TotalSeconds / x.lifetime.TotalSeconds);
+                    
+                    x.speed = MathHelper.Lerp(p.Key.Speed.start, p.Key.Speed.end, p.Key.Speed.curve.Evaluate(life));
+                    x.scale = MathHelper.Lerp(p.Key.Scale.start, p.Key.Scale.end, p.Key.Scale.curve.Evaluate(life));
+                    x.color = Color.Lerp(p.Key.Color.start, p.Key.Color.end, p.Key.Color.curve.Evaluate(life));
+
+                    x.position += (x.direction * x.speed) * ts;
+
                     p.Value[i] = x;
                 }
             }
 
             #endregion
+
+            //update triggers
+            var tempTriggers = triggers;
+            triggers = nextTriggers;
+            nextTriggers = tempTriggers;
+            nextTriggers.Clear();
         }
     }
 }

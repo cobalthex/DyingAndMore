@@ -95,7 +95,7 @@ namespace Takai.Game
         /// Should the sprite always display upright (angle of sprite does not affect display)?
         /// </summary>
         public bool AlwaysUpright { get; set; } = false;
-
+        
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
@@ -120,19 +120,19 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Called when the entity is loaded. Loads all components
-        /// </summary>
-        public virtual void Load() { }
-        /// <summary>
-        /// Called when the entity is unloaded. Unloads all components
-        /// </summary>
-        public virtual void Unload() { }
-
-        /// <summary>
         /// The basic think function for this entity, called once a frame
         /// </summary>
         /// <param name="Time">Frame time</param>
         public virtual void Think(GameTime Time) { }
+
+        /// <summary>
+        /// Called when the entity is spawned. (Not called during loads)
+        /// </summary>
+        public virtual void OnSpawn() { }
+        /// <summary>
+        /// Called when the entity is marked for deletion
+        /// </summary>
+        public virtual void OnDestroy() { }
 
         /// <summary>
         /// Called when there is a collision between this entity and another entity

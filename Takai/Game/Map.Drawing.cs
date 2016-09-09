@@ -210,11 +210,18 @@ namespace Takai.Game
 
                 for (int i = 0; i < p.Value.Count; i++)
                 {
+                    if (p.Value[i].time == System.TimeSpan.Zero)
+                        continue;
+
+                    var sz = p.Key.Graphic.Size.ToVector2();
+                    sz *= p.Value[i].scale;
+                    
                     p.Key.Graphic.Draw
                     (
                         sbatch,
-                        p.Value[i].position,
-                        0
+                        new Rectangle(p.Value[i].position.ToPoint(), sz.ToPoint()),
+                        p.Value[i].rotation,
+                        p.Value[i].color
                     );
                 }
 

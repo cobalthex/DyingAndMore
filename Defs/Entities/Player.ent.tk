@@ -3,7 +3,19 @@ Actor {
     altWeapon: Null;
     name: "Player";
     MaxHealth: 100;
-    States: { };
+    States: {
+        Idle: GraphicSave {
+            texture: "Textures/Player.png";
+            width: 48;
+            height: 48;
+            origin: [24 24];
+            frameCount: 2;
+            frameTime: 100;
+            isLooping: True;
+            isRunning: True;
+            tween: TweenStyle Overlap;
+        };
+    };
     CurrentState: Null;
     MaxSpeed: 400;
     MoveForce: 600;
@@ -13,15 +25,4 @@ Actor {
     IsPhysical: True;
     IgnoreTrace: False;
     Faction: Factions Player;
-    Sprite: GraphicSave {
-        texture: "Textures/Player.png";
-        width: 48;
-        height: 48;
-        origin: [24 24];
-        frameCount: 2;
-        frameTime: 100;
-        isLooping: True;
-        isRunning: True;
-        tween: TweenStyle Overlap;
-    }
-}
+};
