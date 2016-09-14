@@ -23,9 +23,9 @@ namespace DyingAndMore.Editor
 
     class Editor : Takai.States.State
     {
-        EditorMode currentMode = EditorMode.Tiles;
+        public EditorMode currentMode = EditorMode.Tiles;
 
-        Takai.Game.Camera camera;
+        public Takai.Game.Camera camera;
         
         SpriteBatch sbatch;
 
@@ -62,22 +62,21 @@ namespace DyingAndMore.Editor
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
-            map = new Takai.Game.Map(GraphicsDevice);
-
-            using (var stream = new System.IO.FileStream("Data/Maps/test.map.tk", System.IO.FileMode.Open))
-                map.Load(stream);
-            
-            camera = new Takai.Game.Camera(map, null);
-            camera.MoveSpeed = 1600;
-            camera.Viewport = GraphicsDevice.Viewport.Bounds;
-
             selectors = new Selector[System.Enum.GetValues(typeof(EditorMode)).Length];
             AddSelector(new TileSelector(this), 0);
             AddSelector(new DecalSelector(this), 1);
             AddSelector(new BlobSelector(this), 2);
             AddSelector(new EntSelector(this), 3);
         }
-        
+
+        public override void Unload()
+        {
+            Takai.States.StateManager.PopState();
+            Takai.States.StateManager.PopState();
+            Takai.States.StateManager.PopState();
+            Takai.States.StateManager.PopState();
+        }
+
         public override void Update(GameTime Time)
         {
             if (selectedEntity != null)
@@ -117,18 +116,31 @@ namespace DyingAndMore.Editor
 
                         selectedDecal = null;
                         selectedEntity = null;
+
+                        camera = new Takai.Game.Camera(map, null);
+                        camera.MoveSpeed = 1600;
+                        camera.Viewport = GraphicsDevice.Viewport.Bounds;
                     }
                     return;
                 }
             }
 
             if (InputState.IsPress(Keys.Q))
+            {
                 Takai.States.StateManager.Exit();
+                return;
+            }
 
-            if (InputState.IsPress(Keys.F1))
-                map.debugOptions.showBlobReflectionMask ^= true;
+            if (InputState.IsClick(Keys.F1))
+            {
+                Takai.States.StateManager.NextState(new Game.Game() { map = map });
+                return;
+            }
 
             if (InputState.IsPress(Keys.F2))
+                map.debugOptions.showBlobReflectionMask ^= true;
+
+            if (InputState.IsPress(Keys.F3))
                 map.debugOptions.showOnlyReflections ^= true;
 
             foreach (int i in System.Enum.GetValues(typeof(EditorMode)))
@@ -390,6 +402,12 @@ namespace DyingAndMore.Editor
                         selectedEntity.Position += delta;
                     }
 
+                    if (InputState.IsButtonDown(Keys.Delete))
+                    {
+                        map.Destroy(selectedEntity);
+                        selectedEntity = null;
+                    }
+
                     if (InputState.IsButtonDown(Keys.R))
                     {
                         var diff = worldMousePos - selectedEntity.Position;
@@ -528,6 +546,14 @@ namespace DyingAndMore.Editor
 
         public override void Draw(GameTime Time)
         {
+            if (map == null)
+            {
+                sbatch.Begin();
+                var pos = (new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height) - largeFont.MeasureString("No map loaded")) / 2;
+                largeFont.Draw(sbatch, "No map loaded", pos, Color.White);
+                sbatch.End();
+            }
+
             //draw border around map
             MapLineRect(new Rectangle(0, 0, map.Width * map.TileSize, map.Height * map.TileSize), Color.CornflowerBlue);
 

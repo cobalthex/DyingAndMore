@@ -214,25 +214,34 @@ namespace Takai.Graphics
             switch (Tween)
             {
                 case TweenStyle.None:
-                    DrawFrame(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color);
+                    DrawTexture(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color);
                     break;
 
                 case TweenStyle.Overlap:
                     //todo: overlap should fade in and then fade out (maybe multiply fd * 2 and Clamp)
                     var nd = MathHelper.Clamp(fd * 2, 0, 1);
                     fd = MathHelper.Clamp((fd * 2) - 1, 0, 1);
-                    DrawFrame(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
-                    DrawFrame(SpriteBatch, Bounds, GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, nd));
+                    DrawTexture(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
+                    DrawTexture(SpriteBatch, Bounds, GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, nd));
                     break;
 
                 case TweenStyle.Sequential:
-                    DrawFrame(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
-                    DrawFrame(SpriteBatch, Bounds, GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, fd));
+                    DrawTexture(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
+                    DrawTexture(SpriteBatch, Bounds, GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, fd));
                     break;
             }
         }
         
-        public void DrawFrame(SpriteBatch SpriteBatch, Rectangle Bounds, Rectangle SourceRect, float Angle, Color Color)
+        /// <summary>
+        /// Draw the actual texture of the graphic. Used by Draw()
+        /// </summary>
+        /// <param name="SpriteBatch">The spritebatch to use</param>
+        /// <param name="Bounds">Where to draw the frame</param>
+        /// <param name="SourceRect">What part of the graphic to draw</param>
+        /// <param name="Angle">The angle to rotate the drawing by (in radians)</param>
+        /// <param name="Color">The color to tint the image</param>
+        /// <remarks>Does not check if texture is null</remarks>
+        public void DrawTexture(SpriteBatch SpriteBatch, Rectangle Bounds, Rectangle SourceRect, float Angle, Color Color)
         {
             SpriteBatch.Draw(Texture, Bounds, SourceRect, Color, Angle, Origin, SpriteEffects.None, 0);
         }
@@ -333,6 +342,11 @@ namespace Takai.Graphics
                     if (save.clip.Height == 0)
                         save.clip.Height = MathHelper.Min(save.texture.Height - save.clip.Y, save.height * save.frameCount);
                 }
+                else
+                {
+                    save.clip.Width = MathHelper.Max(save.clip.Width, 1);
+                    save.clip.Height = MathHelper.Max(save.clip.Height, 1);
+                }
 
                 g.Texture = save.texture;
                 g.Width = save.width;
@@ -365,11 +379,10 @@ namespace Takai.Graphics
             {
                 using (var reader = new System.IO.StreamReader(File))
                 {
-                    Graphic g;
-                    Data.Serializer.EvaluateAs(Data.Serializer.TextDeserialize(reader), out g);
-                    if (g != null)
-                        g.File = File;
-                    return g;
+                    object g;
+                    if (Data.Serializer.EvaluateAs(typeof(Graphic), Data.Serializer.TextDeserialize(reader), out g))
+                        ((Graphic)g).File = File;
+                    return (Graphic)g;
                 }
             }
 

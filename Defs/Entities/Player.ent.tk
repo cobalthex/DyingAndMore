@@ -5,7 +5,7 @@ Actor {
     MaxHealth: 100;
     States: {
         Idle: GraphicSave {
-            texture: "Textures/Player.png";
+            texture: "Textures/Entities/Player.png";
             width: 48;
             height: 48;
             origin: [24 24];
@@ -16,7 +16,7 @@ Actor {
             tween: TweenStyle Overlap;
         };
     };
-    CurrentState: Null;
+    CurrentState: EntState Dead;
     MaxSpeed: 400;
     MoveForce: 600;
     IsEnabled: True;

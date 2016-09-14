@@ -6,17 +6,15 @@ namespace DyingAndMore.Game
 {
     class Game : Takai.States.State
     {
-        Entities.Actor player;
-        Entities.Actor testEnt;
+        public Takai.Game.Map map;
+        public Takai.Game.Camera camera;
 
-        Takai.Game.Camera camera;
+        Entities.Actor player;
 
         Takai.Graphics.BitmapFont fnt;
         string debugText = "";
 
         SpriteBatch sbatch;
-        
-        Takai.Game.Map map;
 
         public Game() : base(Takai.States.StateType.Full) { }
 
@@ -24,30 +22,26 @@ namespace DyingAndMore.Game
         {
             player = map.FindEntityByName("Player") as Entities.Actor;
             if (player != null)
-                player.CurrentState = "idle";
+                player.CurrentState = Takai.Game.EntState.Idle;
         }
 
         public override void Load()
         {
             fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
 
-            map = new Takai.Game.Map(GraphicsDevice);
-            using (var s = new System.IO.FileStream("data/maps/test.map.tk", System.IO.FileMode.Open))
-                map.Load(s);
+            if (map == null)
+            {
+                map = new Takai.Game.Map(GraphicsDevice);
+                using (var s = new System.IO.FileStream("data/maps/test.map.tk", System.IO.FileMode.Open))
+                    map.Load(s);
+            }
 
             StartMap();
-
-            //using (var s = new System.IO.FileStream("data/maps/test.csv", System.IO.FileMode.Open))
-            //    map.LoadCsv(s);
-            //map.TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles2.png");
-            //map.TileSize = 48;
-            //map.BuildMask(map.TilesImage, true);
-            //map.BuildSectors();
-
+            
             var gun = new Weapons.Gun();
-            gun.projectile = new Entities.Projectile();
-            gun.speed = 800;
-            gun.shotDelay = System.TimeSpan.FromMilliseconds(50);
+            gun.Projectile = new Entities.Projectile();
+            gun.Speed = 800;
+            gun.shotDelay = System.TimeSpan.FromMilliseconds(250);
             player.primaryWeapon = gun;
 
             var blobber = new Weapons.BlobGun();
@@ -109,12 +103,21 @@ namespace DyingAndMore.Game
                 return;
             }
 
-            if (Takai.Input.InputState.IsPress(Keys.Q))
-                Takai.States.StateManager.Exit();
+            if (Takai.Input.InputState.IsClick(Keys.F1))
+            {
+                Takai.States.StateManager.NextState(new Editor.Editor() { map = map, camera = new Takai.Game.Camera(map, camera.ActualPosition) { Viewport = camera.Viewport } });
+                return;
+            }
 
-            if (Takai.Input.InputState.IsPress(Keys.F1))
-                map.debugOptions.showBlobReflectionMask ^= true;
+            if (Takai.Input.InputState.IsPress(Keys.Q))
+            {
+                Takai.States.StateManager.Exit();
+                return;
+            }
+
             if (Takai.Input.InputState.IsPress(Keys.F2))
+                map.debugOptions.showBlobReflectionMask ^= true;
+            if (Takai.Input.InputState.IsPress(Keys.F3))
                 map.debugOptions.showOnlyReflections ^= true;
 
             if (Takai.Input.InputState.IsPress(Keys.F5))

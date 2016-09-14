@@ -92,22 +92,23 @@ namespace Takai.Game
         /// <summary>
         /// The list of live blobs. Once the blobs' velocity is zero, they are removed from this and not re-added
         /// </summary>
-        public List<Blob> ActiveBlobs { get; protected set; } = new List<Blob>(32);
+        public List<Blob> ActiveBlobs { get; protected set; } = new List<Blob>(128);
         
         /// <summary>
-        /// Event handlers for specific triggers
+        /// Event handlers for specific triggered events
+        /// Name -> Handlers
         /// </summary>
-        public Dictionary<string, TriggeredEvent> TriggerHandlers;
+        public Dictionary<string, TriggeredEvent> EventHandlers = new Dictionary<string, TriggeredEvent>();
 
         /// <summary>
         /// Trigger an event
         /// </summary>
         /// <param name="Name">The name of the trigger</param>
         /// <param name="Value">The value of the trigger. Value interpreted by the handler</param>
-        public void Trigger(string Name, int Value)
+        public void TriggerEvent(string Name, int Value)
         {
             TriggeredEvent handler;
-            if (TriggerHandlers.TryGetValue(Name, out handler))
+            if (EventHandlers.TryGetValue(Name, out handler))
                 handler(Name, Value);
         }   
 
@@ -122,6 +123,8 @@ namespace Takai.Game
                 Destroy(Entity);
 
             Entity.Map = this;
+            Entity.OnSpawn();
+
             if (AddToActive)
                 ActiveEnts.Add(Entity);
             else
@@ -144,6 +147,7 @@ namespace Takai.Game
         {
             var ent = new TEntity();
             ent.Map = this;
+            ent.OnSpawn();
 
             ent.Position = Position;
             ent.Direction = Direction;
@@ -169,6 +173,7 @@ namespace Takai.Game
         {
             var ent = (TEntity)Template.Clone();
             ent.Map = this;
+            ent.OnSpawn();
             
             ent.Position = Position;
             ent.Direction = Direction;

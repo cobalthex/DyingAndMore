@@ -177,6 +177,8 @@ namespace Takai.Data
             return null;
         }
 
+        //todo: use System.ComponentModel.TypeDescriptor.GetConverter (and ConvertFromString)
+
         private static bool DeserializeField(MemberInfo Member, Type Type, Dictionary<string, object> Props, out object Value)
         {
             //ignored
@@ -202,7 +204,7 @@ namespace Takai.Data
             }
 
             //user defined serializers
-            var deserial = Type.GetCustomAttribute<CustomDeserializeAttribute>();
+            var deserial = Member.GetCustomAttribute<CustomDeserializeAttribute>() ?? Type.GetCustomAttribute<CustomDeserializeAttribute>();
             if (deserial != null)
             {
                 Value = deserial.Deserialize.Invoke(null, new[] { prop });
@@ -215,16 +217,16 @@ namespace Takai.Data
                 Value = Serializers[Type].Deserialize(prop);
                 return true;
             }
-            
+
             if (prop is IList)
             {
                 var ety = Type.HasElementType ? Type.GetElementType() : Type.GetGenericArguments()[0];
                 var orig = (List<object>)prop;
-                
+
                 try
                 {
                     var casted = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { orig });
-                    
+
                     //exception only happens during ToArray/List
                     if (Type.IsArray)
                         Value = ToArrayMethod.MakeGenericMethod(ety).Invoke(null, new[] { casted });
@@ -245,20 +247,43 @@ namespace Takai.Data
                 return true;
             }
 
-            if (prop is IDictionary) 
+            if (prop is IDictionary)
             {
                 var gArgs = Type.GetGenericArguments(); //[key, value]
                 var orig = (Dictionary<string, object>)prop;
 
+                var converter = System.ComponentModel.TypeDescriptor.GetConverter(gArgs[0]);
+                if (converter != null)
+                {
+                    var dict = (IDictionary)Activator.CreateInstance(Type);
+
+                    foreach (var kv in orig)
+                    {
+                        try
+                        {
+                            object key;
+
+                            if (gArgs[0] == typeof(string))
+                                key = kv.Key;
+                            else if (gArgs[0].IsEnum)
+                                key = Enum.Parse(gArgs[0], kv.Key, true);
+                            else
+                                key = converter.ConvertFrom(kv.Key);
+
+                            object val;
+                            EvaluateAs(gArgs[1], kv.Value, out val);
+
+                            dict.Add(key, val);
+                        }
+                        catch { }
+                    }
+
+                    Value = dict;
+                    return true;
+                }
+
                 Value = null;
                 return false;
-                //todo
-
-                //var castItems = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { orig });
-                //var list = ToListMethod.MakeGenericMethod(ety).Invoke(null, new[] { castItems });
-
-                //Value = list;
-                //return true;
             }
 
             Value = prop;
@@ -268,31 +293,29 @@ namespace Takai.Data
         /// <summary>
         /// Attempt to deserialize an intermediate object as a specific type (Typically used when reading from dictionaries)
         /// </summary>
-        /// <typeparam name="T">The type to deserialize as</typeparam>
+        /// <param name="Type">The type to deserialize as</param>
         /// <param name="Source">The intermediate object to deserialize</param>
         /// <param name="Value">The value deserialized</param>
         /// <returns>True if the object was deserialized to Value, false if the type is unknown to the deserializer</returns>
         /// <remarks>If Intermediate type and T do not match, will likely throw an exception</remarks>
-        public static bool EvaluateAs<T>(object Source, out T Value)
+        public static bool EvaluateAs(Type Type, object Source, out object Value)
         {
-            var ty = typeof(T);
-
             //user defined serializers
-            var deserial = ty.GetCustomAttribute<CustomDeserializeAttribute>();
+            var deserial = Type.GetCustomAttribute<CustomDeserializeAttribute>();
             if (deserial != null)
             {
-                Value = (T)deserial.Deserialize.Invoke(null, new[] { Source });
+                Value = deserial.Deserialize.Invoke(null, new[] { Source });
                 return true;
             }
 
             //custom serializers
-            if (Serializers.ContainsKey(ty) && Serializers[ty].Deserialize != null)
+            if (Serializers.ContainsKey(Type) && Serializers[Type].Deserialize != null)
             {
-                Value = (T)Serializers[ty].Deserialize(Source);
+                Value = Serializers[Type].Deserialize(Source);
                 return true;
             }
 
-            Value = (T)Source;
+            Value = Convert.ChangeType(Source, Type);
             return true;
         }
 

@@ -17,7 +17,7 @@ Actor {
     IsPhysical: True;
     IgnoreTrace: False;
     Sprite: GraphicSave {
-        texture: "Textures/TestEnt.png";
+        texture: "Textures/Entities/Test.png";
         width: 96;
         height: 96;
         clipRect: [0 0 576 192];

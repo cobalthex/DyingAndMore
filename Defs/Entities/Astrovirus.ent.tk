@@ -12,7 +12,7 @@ Actor {
     IsPhysical: True;
     IgnoreTrace: False;
     Sprite: GraphicSave {
-        texture: "Textures/Astrovirus.png";
+        texture: "Textures/Entities/Astrovirus.png";
         width: 42;
         height: 42;
         clip: [0 84 0 0];

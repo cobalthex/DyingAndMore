@@ -236,14 +236,22 @@ namespace Takai.Game
 
         private void LoadState(MapState State)
         {
+            EventHandlers.Clear();
+
+            //todo: re-add map handlers
+
             var blobTypes = new Dictionary<int, BlobType>();
             for (var i = 0; i < State.blobTypes.Count; i++)
                 blobTypes[i] = State.blobTypes[i];
 
             foreach (var ent in State.entities)
+            {
                 ent.Map = this;
+                ent.OnSpawn();
+            }
 
             ActiveEnts = State.entities;
+
             ActiveBlobs = State.blobs.Select((BlobSave Save) =>
             {
                 return new Blob

@@ -59,6 +59,7 @@ namespace Takai.Game
             for (int i = 0; i < ActiveEnts.Count; i++)
             {
                 var ent = ActiveEnts[i];
+
                 if (!ent.AlwaysActive && !activeRect.Contains(ent.Position / SectorPixelSize))
                 {
                     //ents outside the map are deleted
@@ -106,6 +107,7 @@ namespace Takai.Game
                         if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
                         {
                             ent.OnEntityCollision(target, ent.Position + (nv * t));
+                            target.OnEntityCollision(ent, ent.Position + (nv * t));
 
                             if (ent.IsPhysical)
                                 ent.Velocity = Vector2.Zero;
@@ -115,6 +117,7 @@ namespace Takai.Game
                     ent.Position += ent.Velocity * deltaT;
                 }
 
+                //remove entity from map
                 if (ent.Map == null)
                 {
                     if (ent.Sector != null)
@@ -127,8 +130,6 @@ namespace Takai.Game
                 }
             }
 
-            #endregion
-
             //add new entities to active set (will be updated next frame)
             for (var y = System.Math.Max(activeRect.Top, 0); y < System.Math.Min(Height / SectorSize, activeRect.Bottom); y++)
             {
@@ -138,6 +139,8 @@ namespace Takai.Game
                     Sectors[y, x].entities.Clear();
                 }
             }
+
+            #endregion
 
             #region particles
 
@@ -171,12 +174,6 @@ namespace Takai.Game
             }
 
             #endregion
-
-            //update triggers
-            var tempTriggers = triggers;
-            triggers = nextTriggers;
-            nextTriggers = tempTriggers;
-            nextTriggers.Clear();
         }
     }
 }
