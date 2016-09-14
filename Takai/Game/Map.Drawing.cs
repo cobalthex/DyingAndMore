@@ -170,7 +170,7 @@ namespace Takai.Game
             
             foreach (var ent in ActiveEnts)
             {
-                if (ent.Sprite != null)
+                if (ent.Sprite?.Texture != null)
                 {
                     profilingInfo.visibleEnts++;
 
@@ -182,6 +182,30 @@ namespace Takai.Game
                         ent.Sprite.Draw(sbatch, ent.Position, angle);
                     }
                 }
+#if DEBUG
+                else
+                {
+                    Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
+                                                 -ent.Direction.Y, ent.Direction.X, 0, 0, 
+                                                  0, 0, 1, 0, 
+                                                  0, 0, 0, 1);
+
+                    Rectangle rect = new Rectangle(new Vector2(-ent.Radius).ToPoint(), new Vector2(ent.Radius * 2).ToPoint());
+
+                    var tl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Top), transform);
+                    var tr = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Top), transform);
+                    var bl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Bottom), transform);
+                    var br = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Bottom), transform);
+
+                    DrawLine(tl, tr, Color.Salmon);
+                    DrawLine(tr, br, Color.Salmon);
+                    DrawLine(br, bl, Color.Salmon);
+                    DrawLine(bl, tl, Color.Salmon);
+
+                    DrawLine(tl, br, Color.Salmon);
+                    DrawLine(bl, tr, Color.Salmon);
+                }
+#endif
             }
 
             sbatch.End();

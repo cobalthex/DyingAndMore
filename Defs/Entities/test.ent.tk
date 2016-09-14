@@ -20,7 +20,7 @@ Actor {
     IsPhysical: True;
     IgnoreTrace: False;
     Sprite: GraphicSave {
-        texture: "Data\\Textures/InfectedCell.png";
+        texture: "Textures/Entities/InfectedCell.png";
         width: 32;
         height: 32;
         clipRect: [0 0 256 96];

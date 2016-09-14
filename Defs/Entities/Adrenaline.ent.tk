@@ -8,7 +8,7 @@ Entity {
     IsPhysical: True;
     IgnoreTrace: False;
     Sprite: GraphicSave {
-        texture: "Textures/Adrenaline.png";
+        texture: "Textures/Entities/Adrenaline.png";
         width: 42;
         height: 42;
         origin: [21 21];
@@ -20,4 +20,5 @@ Entity {
         delay: 0;
         elapsed: 0;
     };
+    CurrentState: EntState Dead;
 }

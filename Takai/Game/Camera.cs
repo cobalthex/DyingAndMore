@@ -74,6 +74,15 @@ namespace Takai.Game
         {
             this.Map = Map;
             this.Follow = Follow;
+            if (this.Follow != null)
+                this.ActualPosition = this.Position = this.Follow.Position;
+        }
+
+        public Camera(Map Map, Vector2 Position)
+        {
+            this.Map = Map;
+            this.Follow = null;
+            this.ActualPosition = this.Position = Position;
         }
 
         /// <summary>

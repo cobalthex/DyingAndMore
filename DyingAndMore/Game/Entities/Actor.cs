@@ -19,7 +19,6 @@ namespace DyingAndMore.Game.Entities
     class Actor : Entity
     {
         private int maxHealth = 0;
-        private string currentState = null;
         private Vector2 lastVelocity = Vector2.Zero;
 
         /// <summary>
@@ -39,34 +38,6 @@ namespace DyingAndMore.Game.Entities
             {
                 CurrentHealth += (value - maxHealth);
                 maxHealth = value;
-            }
-        }
-        
-        /// <summary>
-        /// Different animation states for the actor
-        /// </summary>
-        public Dictionary<string, Graphic> States { get; set; } = new Dictionary<string, Graphic>();
-
-        /// <summary>
-        /// Get or set the current state.
-        /// Automatically updates entity sprite on set
-        /// </summary>
-        /// <remarks>Does nothing if the state does not exist</remarks>
-        [Takai.Data.NonDesigned]
-        public string CurrentState
-        {
-            get
-            {
-                return currentState;
-            }
-            set
-            {
-                if (value != null && States.ContainsKey(value))
-                {
-                    currentState = value;
-                    Sprite = States[currentState];
-                    Sprite.Restart();
-                }
             }
         }
 

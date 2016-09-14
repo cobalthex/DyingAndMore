@@ -36,13 +36,16 @@ namespace DyingAndMore.Editor
         {
             if (ItemIndex >= 0 && ItemIndex < ents.Count)
             {
-                if (ents[ItemIndex].Sprite != null)
+                if (ents[ItemIndex].Sprite?.Texture != null)
                 {
                     Bounds.X += Bounds.Width / 2;
                     Bounds.Y += Bounds.Height / 2;
                     ents[ItemIndex].Sprite.Draw(Sbatch ?? sbatch, Bounds, 0);
                 }
-                //todo: if no sprite, draw ?/X
+                else
+                {
+                    //todo: if no sprite, draw ?/X   
+                }
             }
         }
     }

@@ -104,7 +104,8 @@ namespace DyingAndMore
             if (Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.F12))
             takingScreenshot = true;
 #endif
-
+            //gameTime.ElapsedGameTime = System.TimeSpan.FromMilliseconds(gameTime.ElapsedGameTime.TotalMilliseconds * 0.1f);
+            //gameTime.TotalGameTime = System.TimeSpan.FromMilliseconds(gameTime.TotalGameTime.TotalMilliseconds * 0.1f);
             Takai.Input.InputState.Update();
             StateManager.Update(gameTime);
         }

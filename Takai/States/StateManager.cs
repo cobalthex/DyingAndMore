@@ -102,8 +102,7 @@ namespace Takai.States
                     s.Update(time);
 
                     if (resized)
-                        if (s.OnResize != null)
-                            s.OnResize();
+                        s.OnResize?.Invoke();
 
                     //only overlays allow updating under
                     if (s.type != StateType.Overlay)
@@ -189,13 +188,14 @@ namespace Takai.States
         {
             State last = states.Pop();
             last.Unload();
+            last.isLoaded = false;
             if (next == null)
                 throw new System.ArgumentNullException("next");
+            
+            if (next.type == StateType.Full)
+                firstDraw = states.Count;
 
             PushState(next);
-
-            if (next.type == StateType.Full)
-                firstDraw = states.Count - 1;
         }
 
         /// <summary>
@@ -221,7 +221,10 @@ namespace Takai.States
 
             s.Activate();
             if (!s.isLoaded)
+            {
                 s.Load();
+                s.isLoaded = true;
+            }
         }
 
         /// <summary>

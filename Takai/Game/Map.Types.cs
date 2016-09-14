@@ -22,6 +22,12 @@ namespace Takai.Game
             min = Min;
             max = Max;
         }
+
+        public static implicit operator Range<T>(T Value)
+        {
+            return new Range<T>
+                (Value);
+        }
     }
 
     public struct ValueCurve<T>

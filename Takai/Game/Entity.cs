@@ -1,8 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
+    /// <summary>
+    /// All of the possible entity states
+    /// </summary>
+    public enum EntState
+    {
+        Idle = 0,
+        Dead,
+        Pressed,
+    }
+
     /// <summary>
     /// The basic entity. All actors and objects inherit from this
     /// </summary>
@@ -86,7 +97,37 @@ namespace Takai.Game
         public bool IgnoreTrace { get; set; } = false;
 
         /// <summary>
-        /// The sprite for this entity (may be null for things like triggers)
+        /// Different animation states for the entity
+        /// </summary>
+        public Dictionary<EntState, Takai.Graphics.Graphic> States { get; set; } = null;
+        //todo: custom serializer
+
+        /// <summary>
+        /// Get or set the current state.
+        /// Automatically updates entity sprite on set
+        /// </summary>
+        /// <remarks>Does nothing if the state does not exist</remarks>
+        [Takai.Data.NonDesigned]
+        public EntState CurrentState
+        {
+            get
+            {
+                return currentState;
+            }
+            set
+            {
+                currentState = value;
+                if (States != null && States.ContainsKey(value))
+                {
+                    Sprite = States[currentState];
+                    Sprite.Restart();
+                }
+            }
+        }
+        private EntState currentState = EntState.Idle;
+
+        /// <summary>
+        /// The active sprite for this entity. Usually updated by the state machine
         /// Can be updated by components
         /// </summary>
         public Graphics.Graphic Sprite { get; set; } = null;
@@ -95,7 +136,7 @@ namespace Takai.Game
         /// Should the sprite always display upright (angle of sprite does not affect display)?
         /// </summary>
         public bool AlwaysUpright { get; set; } = false;
-        
+
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
@@ -126,8 +167,9 @@ namespace Takai.Game
         public virtual void Think(GameTime Time) { }
 
         /// <summary>
-        /// Called when the entity is spawned. (Not called during loads)
+        /// Called when the entity is spawned.
         /// </summary>
+        /// <remarks>Note: this is called during deserialization</remarks>
         public virtual void OnSpawn() { }
         /// <summary>
         /// Called when the entity is marked for deletion
