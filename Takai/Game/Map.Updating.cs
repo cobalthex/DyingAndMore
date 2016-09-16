@@ -71,6 +71,12 @@ namespace Takai.Game
                         continue;
                     }
 
+                    if (ent.DestroyOffScreenIfDead && ent.CurrentState == EntState.Dead)
+                    {
+                        Destroy(ent);
+                        continue;
+                    }
+
                     //remove from active set (swap with last)
                     ActiveEnts[i] = ActiveEnts[ActiveEnts.Count - 1];
                     ActiveEnts.RemoveAt(ActiveEnts.Count - 1);
@@ -80,6 +86,12 @@ namespace Takai.Game
                 {
                     if (!ent.IsEnabled)
                         continue;
+
+                    if (ent.DestroyOnDeath && ent.CurrentState == EntState.Dead)
+                    {
+                        if (ent.Sprite == null || ent.Sprite.IsLooping || ent.Sprite.IsFinished())
+                            ent.Map = null;
+                    }
 
                     ent.Think(Time);
 

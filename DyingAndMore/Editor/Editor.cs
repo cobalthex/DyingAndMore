@@ -421,7 +421,7 @@ namespace DyingAndMore.Editor
             
             lastWorldPos = worldMousePos;
 
-            if (selectedEntity != null)
+            if (selectedEntity != null && currentMode == EditorMode.Entities)
                 selectedEntity.OutlineColor = Color.YellowGreen;
         }
 

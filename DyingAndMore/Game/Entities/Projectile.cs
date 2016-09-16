@@ -20,21 +20,22 @@ namespace DyingAndMore.Game.Entities
             curve.Keys.Add(new CurveKey(1, 1));
 
             explosion = new ParticleType();
-            var tex = Takai.AssetManager.Load<Texture2D>("Textures/Particles/Blood.png");
+            var tex = Takai.AssetManager.Load<Texture2D>("Textures/Particles/Spark.png");
             explosion.Graphic = new Takai.Graphics.Graphic
             (
-                tex,
-                10,
-                10,
-                6,
-                System.TimeSpan.FromMilliseconds(200),
-                Takai.Graphics.TweenStyle.Overlap,
-                true
+                tex//,
+                //10,
+                //10,
+                //6,
+                //System.TimeSpan.FromMilliseconds(200),
+                //Takai.Graphics.TweenStyle.Overlap,
+                //true
             );
             explosion.Graphic.CenterOrigin();
+            explosion.BlendMode = BlendState.Additive;
             explosion.Color = new ValueCurve<Color>(curve, Color.White, Color.Transparent);
             explosion.Scale = new ValueCurve<float>(1);
-            explosion.Speed = new ValueCurve<float>(curve, 100, 0);
+            explosion.Speed = new ValueCurve<float>(curve, 100, 50);
 
             trail = new ParticleType();
             tex = Takai.AssetManager.Load<Texture2D>("Textures/Particles/trail.png");
@@ -51,7 +52,7 @@ namespace DyingAndMore.Game.Entities
             trailGlow.BlendMode = BlendState.Additive;
             trailGlow.Color = new ValueCurve<Color>(curve, Color.White, Color.Transparent);
             trailGlow.Scale = new ValueCurve<float>(1);
-            trailGlow.Speed = new ValueCurve<float>(curve, 100, 0);
+            trailGlow.Speed = new ValueCurve<float>(curve, 20, 5);
 
             tex = Takai.AssetManager.Load<Texture2D>("Textures/Projectiles/Sharp.png");
             Sprite = new Takai.Graphics.Graphic(tex);
@@ -67,7 +68,7 @@ namespace DyingAndMore.Game.Entities
             spawn.lifetime = System.TimeSpan.FromSeconds(0.25);
 
             var angle = (float)System.Math.Atan2(Direction.Y, Direction.X);
-            spawn.angle = new Range<float>(angle - 0.8f, angle + 0.8f);
+            spawn.angle = new Range<float>(angle - MathHelper.PiOver2, angle + MathHelper.PiOver2);
             spawn.count = 1;
             Map.Spawn(spawn);
 
@@ -87,10 +88,15 @@ namespace DyingAndMore.Game.Entities
         {
             ParticleSpawn spawn = new ParticleSpawn();
             spawn.type = explosion;
+            spawn.count = 20;
+            spawn.lifetime = new Range<System.TimeSpan>(System.TimeSpan.FromSeconds(1), System.TimeSpan.FromSeconds(2));
             spawn.position = Point;
-            spawn.lifetime = System.TimeSpan.FromSeconds(0.5);
-            spawn.angle = new Range<float>(0, MathHelper.TwoPi);
-            spawn.count = 10;
+
+            var normal = Vector2.Normalize(Point - Collider.Position);
+            //normal = Vector2.Reflect(Direction, normal);
+            var angle = (float)System.Math.Atan2(normal.Y, normal.X);
+            spawn.angle = new Range<float>(angle - 0.75f, angle + 0.75f);
+
             Map.Spawn(spawn);
 
             Map.Destroy(this);

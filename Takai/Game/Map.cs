@@ -98,7 +98,42 @@ namespace Takai.Game
         /// Event handlers for specific triggered events
         /// Name -> Handlers
         /// </summary>
-        public Dictionary<string, TriggeredEvent> EventHandlers = new Dictionary<string, TriggeredEvent>();
+        protected Dictionary<string, TriggeredEvent> eventHandlers = new Dictionary<string, TriggeredEvent>();
+
+        /// <summary>
+        /// Add an event handler
+        /// </summary>
+        /// <param name="Name">The name of the event to add a handler to. Null or empty names are ignored</param>
+        /// <param name="EventHandler">The event handler to add</param>
+        /// <returns>True if the handler was added, false otherwise</returns>
+        public bool AddEventHandler(string Name, TriggeredEvent EventHandler)
+        {
+            if (string.IsNullOrEmpty(Name))
+                return false;
+            
+            if (eventHandlers.ContainsKey(Name))
+                eventHandlers[Name] += EventHandler;
+            else
+                eventHandlers[Name] = EventHandler;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Remove an event handler
+        /// </summary>
+        /// <param name="Name">The name of the event to remove the handler from</param>
+        /// <param name="EventHandler">The event handler to remove</param>
+        /// <returns>True if the handler was removed, false otherwise</returns>
+        public bool RemoveEventHandler(string Name, TriggeredEvent EventHandler)
+        {
+            if (eventHandlers.ContainsKey(Name))
+            {
+                eventHandlers[Name] -= EventHandler;
+                return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Trigger an event
@@ -108,7 +143,7 @@ namespace Takai.Game
         public void TriggerEvent(string Name, int Value)
         {
             TriggeredEvent handler;
-            if (EventHandlers.TryGetValue(Name, out handler))
+            if (eventHandlers.TryGetValue(Name, out handler))
                 handler(Name, Value);
         }   
 

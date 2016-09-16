@@ -1,0 +1,7 @@
+Particle type:
+☐ relative position
+☐ Multiple particle emitters
+☐ better curve system
+☐ lifetime defined here
+☐ direction/velocity over angle
+☐ speed defined in spawn, use drag in type

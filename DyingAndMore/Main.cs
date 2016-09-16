@@ -4,23 +4,15 @@ using Takai.States;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-//empty class to test on pc with xbox settings
-#if XBOX && WINDOWS
-namespace GamerServices { class Guide { public static bool IsTrialMode = false; public static void ShowMarketplace(PlayerIndex p) { } } }
-#endif
-
 namespace DyingAndMore
 {
     #region startup (Windows/Xbox/Zune)
-#if !WINDOWS_PHONE
     static class Program
     {
         /// <summary>
         /// The main entry point for the game
         /// </summary>
-#if WINDOWS
         [System.STAThread]
-#endif
         static void Main(string[] args)
         {
             using (DyingAndMoreGame game = new DyingAndMoreGame())
@@ -32,7 +24,6 @@ namespace DyingAndMore
             }
         }
     }
-#endif
     #endregion
 
     /// <summary>
@@ -100,10 +91,9 @@ namespace DyingAndMore
 
         protected override void Update(GameTime gameTime)
         {
-#if WINDOWS
             if (Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.F12))
             takingScreenshot = true;
-#endif
+
             //gameTime.ElapsedGameTime = System.TimeSpan.FromMilliseconds(gameTime.ElapsedGameTime.TotalMilliseconds * 0.1f);
             //gameTime.TotalGameTime = System.TimeSpan.FromMilliseconds(gameTime.TotalGameTime.TotalMilliseconds * 0.1f);
             Takai.Input.InputState.Update();
@@ -112,7 +102,6 @@ namespace DyingAndMore
 
         protected override void Draw(GameTime gameTime)
         {
-#if WINDOWS
             if (takingScreenshot)
             {
                 takingScreenshot = false;
@@ -130,7 +119,6 @@ namespace DyingAndMore
                 rt.Dispose();
             }
             else
-#endif
                 StateManager.Draw(gameTime);
         }
     }

@@ -236,7 +236,7 @@ namespace Takai.Game
 
         private void LoadState(MapState State)
         {
-            EventHandlers.Clear();
+            eventHandlers.Clear();
 
             //todo: re-add map handlers
 
