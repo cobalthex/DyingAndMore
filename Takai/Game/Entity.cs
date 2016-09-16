@@ -11,7 +11,9 @@ namespace Takai.Game
     {
         Idle = 0,
         Dead,
-        Pressed,
+        Down,
+        Inactive,
+        Active,
     }
 
     /// <summary>
@@ -122,9 +124,23 @@ namespace Takai.Game
                     Sprite = States[currentState];
                     Sprite.Restart();
                 }
+
+                if (DestroyOnDeath && currentState == EntState.Dead)
+                    Map?.Destroy(this);
             }
         }
         private EntState currentState = EntState.Idle;
+
+        /// <summary>
+        /// Remove this entity from the map when it dies (CurrentState == Dead)
+        /// </summary>
+        /// <remarks>Will wait for animation to finish (if not looping)</remarks>
+        public bool DestroyOnDeath { get; set; } = true;
+
+        /// <summary>
+        /// Destroy this entity if it goes off screen and is dead
+        /// </summary>
+        public bool DestroyOffScreenIfDead { get; set; }
 
         /// <summary>
         /// The active sprite for this entity. Usually updated by the state machine

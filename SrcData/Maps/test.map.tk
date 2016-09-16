@@ -108,7 +108,7 @@ MapSave {
                     texture: "Textures/Entities/Astrovirus.png";
                     width: 42;
                     height: 42;
-                    clip: [0 84 252 40];
+                    clip: [0 0 252 40];
                     origin: [21 21];
                     frameCount: 6;
                     frameTime: 100;
@@ -146,7 +146,7 @@ MapSave {
                     texture: "Textures/Entities/Astrovirus.png";
                     width: 42;
                     height: 42;
-                    clip: [0 84 252 40];
+                    clip: [0 0 252 40];
                     origin: [21 21];
                     frameCount: 6;
                     frameTime: 100;

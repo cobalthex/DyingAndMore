@@ -22,7 +22,7 @@ Control {
 	        clip: [0 0 48 48];
 	    };
 
-    	Pressed: GraphicSave {
+    	Active: GraphicSave {
 	        texture: "Textures/Entities/Button.png";
 	        width: 48;
 	        height: 48;

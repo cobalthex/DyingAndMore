@@ -72,7 +72,7 @@ namespace Takai.Game
             if (GDevice != null)
             {
                 sbatch = new SpriteBatch(GDevice);
-                lineEffect = Takai.AssetManager.Load<Effect>("Shaders/Line.mgfx");
+                lineEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Line.mgfx");
                 lineRaster = new RasterizerState();
                 lineRaster.CullMode = CullMode.None;
                 lineRaster.MultiSampleAntiAlias = true;
@@ -106,9 +106,9 @@ namespace Takai.Game
                 reflectedRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
                 //todo: some of the render targets may be able to be combined
 
-                outlineEffect = Takai.AssetManager.Load<Effect>("Shaders/Outline.mgfx");
-                blobEffect = Takai.AssetManager.Load<Effect>("Shaders/Blob.mgfx");
-                reflectionEffect = Takai.AssetManager.Load<Effect>("Shaders/Reflection.mgfx");
+                outlineEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Outline.mgfx");
+                blobEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Blob.mgfx");
+                reflectionEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Reflection.mgfx");
             }
         }
         
