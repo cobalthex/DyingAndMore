@@ -41,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -72,9 +72,11 @@
     <Compile Include="Editor\DecalSelector.cs" />
     <Compile Include="Editor\TileSelector.cs" />
     <Compile Include="Editor\Selector.cs" />
+    <Compile Include="Game\Entities\AIController.cs" />
     <Compile Include="Game\Entities\Control.cs" />
+    <Compile Include="Game\Entities\Controller.cs" />
     <Compile Include="Game\Entities\Device.cs" />
-    <Compile Include="Game\Entities\Squad.cs" />
+    <Compile Include="Game\Entities\InputController.cs" />
     <Compile Include="Game\Weapons\BlobGun.cs" />
     <Compile Include="Game\Weapons\Gun.cs" />
     <Compile Include="Game\Weapons\Weapon.cs" />

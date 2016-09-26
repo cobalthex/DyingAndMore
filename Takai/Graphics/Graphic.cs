@@ -199,7 +199,7 @@ namespace Takai.Graphics
 
         public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle, Color Color, float Scale = 1)
         {
-            Draw(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle);   
+            Draw(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle, Color);   
         }
 
         public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle, Color Color)

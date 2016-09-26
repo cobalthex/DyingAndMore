@@ -24,7 +24,7 @@ technique Technique1
 {
     pass Pass1
     {
-        VertexShader = compile vs_5_0 vmain();
-        PixelShader = compile ps_5_0 pmain();
+        VertexShader = compile vs_4_0 vmain();
+        PixelShader = compile ps_4_0 pmain();
     }
 }

@@ -76,9 +76,6 @@
     <Compile Include="Graphics\BitmapFont.cs" />
     <Compile Include="Graphics\Graphic.cs" />
     <Compile Include="Graphics\Primitives2D.cs" />
-    <Compile Include="GUI\TextBoxForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Input\InputState.cs" />
     <Compile Include="Locale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

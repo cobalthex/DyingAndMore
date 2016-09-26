@@ -1,28 +1,51 @@
 Actor {
-    primaryWeapon: Null;
-    altWeapon: Null;
-    name: "Player";
+    CurrentHealth: 100;
     MaxHealth: 100;
     States: {
         Idle: GraphicSave {
             texture: "Textures/Entities/Player.png";
             width: 48;
             height: 48;
+            clip: [0 0 96 96];
             origin: [24 24];
             frameCount: 2;
             frameTime: 100;
             isLooping: True;
             isRunning: True;
             tween: TweenStyle Overlap;
+            delay: 0;
+            elapsed: 123;
         };
     };
-    CurrentState: EntState Dead;
+    CurrentState: EntState Idle;
+    FieldOfView: 2.356194;
     MaxSpeed: 400;
     MoveForce: 600;
+    Faction: Factions Player;
+    Controller: InputController { player: PlayerIndex One };
+    Name: "Player";
+    Position: [68 144];
+    Direction: [0.9918214 -0.1276339];
+    Velocity: [0 0];
     IsEnabled: True;
     AlwaysActive: False;
     Radius: 24;
     IsPhysical: True;
     IgnoreTrace: False;
-    Faction: Factions Player;
-};
+    AlwaysUpright: False;
+    OutlineColor: [0 0 0 0];
+    primaryWeapon: Gun {
+        Projectile: Projectile { };
+        Speed: 800;
+        shotDelay: 250;
+    };
+    altWeapon: BlobGun {
+        blob: BlobType {
+            Radius: 54;
+            Drag: 1.5;
+            Texture: "Textures/Blobs/blood.png";
+            Reflection: "Textures/Blobs/blood.r.png";
+        };
+        speed: 100;
+    };
+}

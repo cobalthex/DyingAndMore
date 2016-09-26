@@ -3,7 +3,7 @@ Actor {
     altWeapon: Null;
     MaxHealth: 100;
     States: { };
-    CurrentState: Null;
+    CurrentState: EntState Idle;
     MaxSpeed: 400;
     MoveForce: 600;
     IsEnabled: True;
@@ -11,15 +11,17 @@ Actor {
     Radius: 21;
     IsPhysical: True;
     IgnoreTrace: False;
-    Sprite: GraphicSave {
-        texture: "Textures/Entities/Astrovirus.png";
-        width: 42;
-        height: 42;
-        origin: [21 21];
-        frameCount: 6;
-        frameTime: 100;
-        isLooping: True;
-        isRunning: True;
-        tween: TweenStyle Overlap;
-    }
+    States: {
+        Idle: GraphicSave {
+            texture: "Textures/Entities/Astrovirus.png";
+            width: 42;
+            height: 42;
+            origin: [21 21];
+            frameCount: 6;
+            frameTime: 100;
+            isLooping: True;
+            isRunning: True;
+            tween: TweenStyle Overlap;
+        };
+    };
 }

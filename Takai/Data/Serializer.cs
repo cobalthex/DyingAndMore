@@ -54,6 +54,7 @@ namespace Takai.Data
             Serializers = new Dictionary<Type, CustomTypeSerializer>();
 
             LoadTypesFrom(Assembly.GetExecutingAssembly());
+            RegisteredTypes.Add(typeof(PlayerIndex).Name, typeof(PlayerIndex));
 
             //default custom serializers
             Serializers.Add(typeof(Vector2), new CustomTypeSerializer

@@ -5,8 +5,34 @@ using System;
 
 namespace Takai.Game
 {
+    public struct MapUpdateSettings
+    {
+        public bool isAiEnabled;
+        public bool isInputEnabled;
+        public bool isPhysicsEnabled;
+        public bool isCollisionEnabled;
+
+        public static readonly MapUpdateSettings Game = new MapUpdateSettings
+        {
+            isAiEnabled = true,
+            isInputEnabled = true,
+            isPhysicsEnabled = true,
+            isCollisionEnabled = true,
+        };
+
+        public static readonly MapUpdateSettings Editor = new MapUpdateSettings
+        {
+            isAiEnabled = false,
+            isInputEnabled = false,
+            isPhysicsEnabled = false,
+            isCollisionEnabled = true
+        };
+    }
+
     public partial class Map
     {
+        public MapUpdateSettings updateSettings = new MapUpdateSettings();
+
         /// <summary>
         /// Update the map state
         /// Updates the active set and then the contents of the active set
@@ -93,40 +119,44 @@ namespace Takai.Game
                             ent.Map = null;
                     }
 
-                    ent.Think(Time);
+                    if (updateSettings.isAiEnabled)
+                        ent.Think(Time);
 
                     var deltaV = ent.Velocity * deltaT;
                     var targetPos = ent.Position + deltaV;
                     var targetCell = (targetPos / tileSize).ToPoint();
                     var cellPos = new Point((int)targetPos.X % tileSize, (int)targetPos.Y % tileSize);
 
-                    short tile;
-                    if (!mapRect.Contains(ent.Position + deltaV) || (tile = Tiles[targetCell.Y, targetCell.X]) < 0)
-                    // || !TilesMask[(tile / tilesPerRow) + cellPos.Y, (tile % tileSize) + cellPos.X])
+                    if (updateSettings.isPhysicsEnabled)
                     {
-                        ent.OnMapCollision(targetCell, targetPos);
-
-                        if (ent.IsPhysical)
-                            ent.Velocity = Vector2.Zero;
-                    }
-
-                    else if (ent.Velocity != Vector2.Zero)
-                    {
-                        float t;
-                        var nv = ent.Velocity;
-                        nv.Normalize();
-                        var target = TraceLine(ent.Position, nv, out t);
-                        if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
+                        short tile;
+                        if (!mapRect.Contains(ent.Position + deltaV) || (tile = Tiles[targetCell.Y, targetCell.X]) < 0)
+                        // || !TilesMask[(tile / tilesPerRow) + cellPos.Y, (tile % tileSize) + cellPos.X])
                         {
-                            ent.OnEntityCollision(target, ent.Position + (nv * t));
-                            target.OnEntityCollision(ent, ent.Position + (nv * t));
+                            ent.OnMapCollision(targetCell, targetPos);
 
                             if (ent.IsPhysical)
                                 ent.Velocity = Vector2.Zero;
                         }
-                    }
 
-                    ent.Position += ent.Velocity * deltaT;
+                        else if (ent.Velocity != Vector2.Zero)
+                        {
+                            float t;
+                            var nv = ent.Velocity;
+                            nv.Normalize();
+                            var target = TraceLine(ent.Position, nv, out t);
+                            if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
+                            {
+                                ent.OnEntityCollision(target, ent.Position + (nv * t));
+                                target.OnEntityCollision(ent, ent.Position + (nv * t));
+
+                                if (ent.IsPhysical)
+                                    ent.Velocity = Vector2.Zero;
+                            }
+                        }
+
+                        ent.Position += ent.Velocity * deltaT;
+                    }
                 }
 
                 //remove entity from map

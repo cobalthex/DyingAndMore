@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using System.Linq;
 
 namespace DyingAndMore.Game
 {
@@ -20,9 +21,13 @@ namespace DyingAndMore.Game
 
         void StartMap()
         {
-            player = map.FindEntityByName("Player") as Entities.Actor;
-            if (player != null)
-                player.CurrentState = Takai.Game.EntState.Idle;
+            map.updateSettings = Takai.Game.MapUpdateSettings.Game;
+
+            var plyr = from Entities.Actor ent in map.ActiveEnts
+                       where ent.Faction == Entities.Factions.Player
+                       select ent;
+            
+            player = plyr.FirstOrDefault() as Entities.Actor ?? null;
         }
 
         public override void Load()
@@ -37,23 +42,6 @@ namespace DyingAndMore.Game
             }
 
             StartMap();
-            
-            var gun = new Weapons.Gun();
-            gun.Projectile = new Entities.Projectile();
-            gun.Speed = 800;
-            gun.shotDelay = System.TimeSpan.FromMilliseconds(250);
-            player.primaryWeapon = gun;
-
-            var blobber = new Weapons.BlobGun();
-            blobber.blob = new Takai.Game.BlobType();
-            blobber.blob.Radius = 54;
-            blobber.blob.Drag = 1.5f;
-            blobber.blob.Texture = Takai.AssetManager.Load<Texture2D>("Textures/Blobs/blood.png");
-            blobber.blob.Reflection = Takai.AssetManager.Load<Texture2D>("Textures/Blobs/blood.r.png");
-            blobber.speed = 100;
-            player.altWeapon = blobber;
-
-            //todo: change Load/Unload to OnSpawn/Destroy and call then
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
@@ -129,51 +117,10 @@ namespace DyingAndMore.Game
             {
                 using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Open))
                     map.LoadState(stream);
-                player = map.FindEntityByName("player") as Entities.Actor;
-                if (camera.Follow != null)
-                    camera.Follow = player;
+                StartMap();
             }
-
-            if (Takai.Input.InputState.IsPress(Keys.N))
-                camera.Follow = (camera.Follow == null ? player : null);
-
-            var d = Vector2.Zero;
-            if (Takai.Input.InputState.IsButtonDown(Keys.A))
-                d -= Vector2.UnitX;
-            if (Takai.Input.InputState.IsButtonDown(Keys.W))
-                d -= Vector2.UnitY;
-            if (Takai.Input.InputState.IsButtonDown(Keys.D))
-                d += Vector2.UnitX;
-            if (Takai.Input.InputState.IsButtonDown(Keys.S))
-                d += Vector2.UnitY;
-
-            if (camera.Follow != null)
-                player.Move(d);
-
-            if (player.primaryWeapon != null && Takai.Input.InputState.IsButtonDown(Takai.Input.MouseButtons.Left))
-                player.primaryWeapon.Fire(Time, player);
-            if (player.altWeapon != null && Takai.Input.InputState.IsButtonDown(Takai.Input.MouseButtons.Right))
-                player.altWeapon.Fire(Time, player);
-
-            var dir = Takai.Input.InputState.MouseVector;
-            dir -= new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height) / 2;
-            dir.Normalize();
-            player.Direction = dir;
-
-            if (camera.Follow == null)
-            {
-                if (d != Vector2.Zero)
-                    d.Normalize();
-                camera.Position += d * camera.MoveSpeed * (float)Time.ElapsedGameTime.TotalSeconds;
-            }
-
+            
             camera.Update(Time);
-
-            foreach (var ent in highlighted)
-                ent.OutlineColor = Color.Transparent;
-            highlighted = map.FindNearbyEntities(camera.ScreenToWorld(Takai.Input.InputState.MouseVector), 5);
-            foreach (var ent in highlighted)
-                ent.OutlineColor = Color.Yellow;
 
             Vector2 worldMousePos = camera.ScreenToWorld(Takai.Input.InputState.MouseVector);
 
@@ -186,7 +133,6 @@ namespace DyingAndMore.Game
             //map.Spawn(pspawn);
 
         }
-        System.Collections.Generic.List<Takai.Game.Entity> highlighted = new System.Collections.Generic.List<Takai.Game.Entity>();
 
         public override void Draw(GameTime Time)
         {
