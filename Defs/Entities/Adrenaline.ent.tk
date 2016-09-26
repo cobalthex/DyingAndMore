@@ -7,18 +7,20 @@ Entity {
     Radius: 21;
     IsPhysical: True;
     IgnoreTrace: False;
-    Sprite: GraphicSave {
-        texture: "Textures/Entities/Adrenaline.png";
-        width: 42;
-        height: 42;
-        origin: [21 21];
-        frameCount: 7;
-        frameTime: 100;
-        isLooping: True;
-        isRunning: True;
-        tween: TweenStyle Overlap;
-        delay: 0;
-        elapsed: 0;
+    States: {
+        Idle: GraphicSave {
+            texture: "Textures/Entities/Adrenaline.png";
+            width: 42;
+            height: 42;
+            origin: [21 21];
+            frameCount: 7;
+            frameTime: 100;
+            isLooping: True;
+            isRunning: True;
+            tween: TweenStyle Overlap;
+            delay: 0;
+            elapsed: 0;
+        };
     };
-    CurrentState: EntState Dead;
+    CurrentState: EntState Idle;
 }

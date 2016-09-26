@@ -145,6 +145,20 @@ namespace Takai.Game
         }
 
         /// <summary>
+        /// Find a path between two points
+        /// </summary>
+        /// <param name="Start">Where to start the search from</param>
+        /// <param name="End">Where to try and navigate to</param>
+        /// <returns>The points in the navigation set, or null if not able to path to</returns>
+        /// <remarks>Will navigate around entities that dont ignore trace</remarks>
+        public List<Vector2> GetPath(Vector2 Start, Vector2 End)
+        {
+            //use d* lite or mtd* lite
+
+            return null;
+        }
+
+        /// <summary>
         /// Calculate a list of entities that are potentially visible (in front of the viewer)
         /// Only searches through active entities.
         /// </summary>

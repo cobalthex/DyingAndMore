@@ -20,12 +20,16 @@ namespace DyingAndMore.Editor
             ents = new List<Takai.Game.Entity>();
             foreach (var file in System.IO.Directory.EnumerateFiles("Defs\\Entities", "*", System.IO.SearchOption.AllDirectories))
             {
-                using (var stream = new System.IO.StreamReader(file))
+                try
                 {
-                    var ent = Takai.Data.Serializer.TextDeserialize(stream) as Takai.Game.Entity;
-                    if (ent != null)
-                        ents.Add(ent);
+                    using (var stream = new System.IO.StreamReader(file))
+                    {
+                        var ent = Takai.Data.Serializer.TextDeserialize(stream) as Takai.Game.Entity;
+                        if (ent != null)
+                            ents.Add(ent);
+                    }
                 }
+                catch { }
             }
             ItemCount = ents.Count;
             ItemSize = new Point(64);

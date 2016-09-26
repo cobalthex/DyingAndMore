@@ -258,7 +258,7 @@ namespace Takai.Game
 
             GraphicsDevice.SetRenderTargets(blobsRenderTarget, reflectionRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, reflectionEffect, Transform);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, reflectionEffect, Transform);
 
             //inactive blobs
             for (var y = sStartY; y < sEndY; y++)

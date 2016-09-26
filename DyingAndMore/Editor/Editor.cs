@@ -67,6 +67,8 @@ namespace DyingAndMore.Editor
             AddSelector(new DecalSelector(this), 1);
             AddSelector(new BlobSelector(this), 2);
             AddSelector(new EntSelector(this), 3);
+
+            map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
         }
 
         public override void Unload()
@@ -113,6 +115,7 @@ namespace DyingAndMore.Editor
                             map.Load(stream, true);
 
                         map.File = ofd.FileName;
+                        map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
 
                         selectedDecal = null;
                         selectedEntity = null;

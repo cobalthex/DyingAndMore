@@ -166,11 +166,12 @@ MapSave {
                 MaxHealth: 100;
                 States: {
                 };
-                CurrentState: EntState Dead;
+                CurrentState: EntState Idle;
                 FieldOfView: 2.356194;
                 MaxSpeed: 400;
                 MoveForce: 600;
                 Faction: Factions Player;
+                Controller: InputController { player: PlayerIndex One };
                 Name: "Player";
                 Position: [68 144];
                 Direction: [0.9918214 -0.1276339];
@@ -196,8 +197,20 @@ MapSave {
                 };
                 AlwaysUpright: False;
                 OutlineColor: [0 0 0 0];
-                primaryWeapon: Null;
-                altWeapon: Null;
+                primaryWeapon: Gun {
+                    Projectile: Projectile { };
+                    Speed: 800;
+                    shotDelay: 250;
+                };
+                altWeapon: BlobGun {
+                    blob: BlobType {
+                        Radius: 54;
+                        Drag: 1.5;
+                        Texture: "Textures/Blobs/blood.png";
+                        Reflection: "Textures/Blobs/blood.r.png";
+                    };
+                    speed: 100;
+                };
             }
             Entity {
                 Name: Null;

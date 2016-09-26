@@ -52,8 +52,25 @@ namespace DyingAndMore.Game.Entities
         /// <remarks>0 is any/no faction</remarks>
         public Factions Faction { get; set; } = Factions.None;
         
-        public Weapons.Weapon primaryWeapon;
-        public Weapons.Weapon altWeapon;
+        /// <summary>
+        /// The current controller over this actor (null for none)
+        /// </summary>
+        public Controller Controller
+        {
+            get { return controller; }
+            set
+            {
+                if (controller != null)
+                    controller.actor = null;
+
+                controller = value;
+                controller.actor = this;
+            }
+        }
+        private Controller controller;
+
+        public Weapons.Weapon PrimaryWeapon { get; set; } = null;
+        public Weapons.Weapon AltWeapon { get; set; } = null;
 
         public Actor()
         {
@@ -61,6 +78,8 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(GameTime Time)
         {
+            Controller?.Think(Time);
+
             //todo: move to physics
             var vel = Velocity;
 
@@ -75,6 +94,19 @@ namespace DyingAndMore.Game.Entities
             lastVelocity = Velocity;
 
             base.Think(Time);
+        }
+
+        private Controller cachedController = null;
+        private System.TimeSpan bumpTime;
+        public override void OnEntityCollision(Entity Collider, Vector2 Point)
+        {
+            var actor = Collider as Actor;
+            if (actor != null)
+            {
+                actor.cachedController = actor.controller;
+                actor.controller = controller;
+                controller = cachedController;
+            }
         }
 
         #region Helpers

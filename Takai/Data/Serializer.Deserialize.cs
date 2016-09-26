@@ -52,6 +52,9 @@ namespace Takai.Data
         /// </remarks>
         public static object TextDeserialize(StreamReader Stream)
         {
+            //todo: comments
+            //todo: allow ; or , in arrays
+
             SkipWhitespace(Stream);
 
             var pk = (char)Stream.Peek();
@@ -98,10 +101,11 @@ namespace Takai.Data
                 {
                     var name = ReadWord(Stream).ToLower();
                     if (Stream.Read() != ':')
-                        throw new FormatException("Format is name:value;");
+                        throw new FormatException("Format is name: value;");
 
                     SkipWhitespace(Stream);
                     var value = TextDeserialize(Stream);
+                    
                     d[name] = value;
 
                     SkipWhitespace(Stream);
@@ -112,7 +116,7 @@ namespace Takai.Data
                         SkipWhitespace(Stream);
                     }
                     else if (pk != '}')
-                        throw new FormatException(string.Format("Missing semicolon for property {0}", name));
+                        throw new FormatException(string.Format("Missing semicolon for property '{0}'", name));
                 }
 
                 Stream.Read();
@@ -132,7 +136,10 @@ namespace Takai.Data
 
             System.Type ty;
             if (!RegisteredTypes.TryGetValue(word, out ty))
-                return null;
+            {
+                throw new FormatException("Type not found: " + word); //todo: add requested type and property
+                //return null;
+            }
 
             //enum
             if (ty.IsEnum)

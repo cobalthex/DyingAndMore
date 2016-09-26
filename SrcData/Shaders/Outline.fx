@@ -21,8 +21,8 @@ float4 main(float4 pos : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOOR
 
 	float d1 = Adjacent(uv, TexNormSize);
 
-    if (d1 < 0.5)
-        return color;
+    if (d1 < 1)
+        return lerp(color, px, d1);
     return px;
 }
 

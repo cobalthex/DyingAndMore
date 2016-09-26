@@ -20,12 +20,16 @@ namespace DyingAndMore.Editor
             blobs = new List<Takai.Game.BlobType>();
             foreach (var file in System.IO.Directory.EnumerateFiles("Defs\\Blobs", "*", System.IO.SearchOption.AllDirectories))
             {
-                using (var stream = new System.IO.StreamReader(file))
+                try
                 {
-                    var blob = Takai.Data.Serializer.TextDeserialize(stream) as Takai.Game.BlobType;
-                    if (blob != null)
-                        blobs.Add(blob);
+                    using (var stream = new System.IO.StreamReader(file))
+                    {
+                        var blob = Takai.Data.Serializer.TextDeserialize(stream) as Takai.Game.BlobType;
+                        if (blob != null)
+                            blobs.Add(blob);
+                    }
                 }
+                catch { } //add diagnostic output
             }
             ItemCount = blobs.Count;
             ItemSize = new Point(64);
