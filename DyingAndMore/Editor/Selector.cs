@@ -155,6 +155,9 @@ namespace DyingAndMore.Editor
                 );
             }
 
+            sbatch.End();
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+
             //items
             var iHeight = ItemSize.Y + Padding;
             var itemsPerRow = (width - Padding) / (ItemSize.X + Padding);

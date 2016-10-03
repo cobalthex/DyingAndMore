@@ -64,7 +64,8 @@ namespace DyingAndMore.Game.Entities
                     controller.actor = null;
 
                 controller = value;
-                controller.actor = this;
+                if (controller != null)
+                    controller.actor = this;
             }
         }
         private Controller controller;
@@ -74,6 +75,16 @@ namespace DyingAndMore.Game.Entities
 
         public Actor()
         {
+        }
+
+        public override object Clone()
+        {
+            var cloned = (Actor)base.Clone();
+
+            if (cloned.controller != null)
+                cloned.controller.actor = cloned;
+
+            return cloned;
         }
 
         public override void Think(GameTime Time)
@@ -98,7 +109,7 @@ namespace DyingAndMore.Game.Entities
 
         private Controller cachedController = null;
         private System.TimeSpan bumpTime;
-        public override void OnEntityCollision(Entity Collider, Vector2 Point)
+        public override void OnEntityCollision(Entity Collider, Vector2 Point, GameTime Time)
         {
             var actor = Collider as Actor;
             if (actor != null)

@@ -64,15 +64,30 @@
     <Compile Include="AssetManager.cs" />
     <Compile Include="Data\Designer.cs" />
     <Compile Include="Data\Serializer.cs" />
-    <Compile Include="Data\Serializer.Deserialize.cs" />
-    <Compile Include="Data\Serializer.Serialize.cs" />
+    <Compile Include="Data\Serializer.Deserialize.cs">
+      <DependentUpon>Serializer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Serializer.Serialize.cs">
+      <DependentUpon>Serializer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Entity.cs" />
     <Compile Include="Game\Map.cs" />
-    <Compile Include="Game\Map.Drawing.cs" />
-    <Compile Include="Game\Map.Helpers.cs" />
-    <Compile Include="Game\Map.Serialization.cs" />
-    <Compile Include="Game\Map.Updating.cs" />
+    <Compile Include="Game\Map.Drawing.cs">
+      <DependentUpon>Map.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Game\Map.Helpers.cs">
+      <DependentUpon>Map.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Game\Map.Serialization.cs">
+      <DependentUpon>Map.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Game\Map.Types.cs">
+      <DependentUpon>Map.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Game\Map.Updating.cs">
+      <DependentUpon>Map.cs</DependentUpon>
+    </Compile>
     <Compile Include="Graphics\BitmapFont.cs" />
     <Compile Include="Graphics\Graphic.cs" />
     <Compile Include="Graphics\Primitives2D.cs" />
@@ -85,9 +100,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Game\Map.Types.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

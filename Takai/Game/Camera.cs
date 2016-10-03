@@ -104,7 +104,7 @@ namespace Takai.Game
             */
             ActualPosition = Vector2.Lerp(ActualPosition, Position, (float)Time.ElapsedGameTime.TotalSeconds * (MoveSpeed / 100));
 
-            Map.Update(Time, ActualPosition, Viewport);
+            Map.Update(Time, this);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Takai.Game
         /// <param name="Viewport">An explicit viewport to draw to</param>
         public void Draw(Rectangle Viewport)
         {
-            Map.Draw(Transform, Viewport, PostEffect);
+            Map.Draw(this, PostEffect);
         }
 
         /// <summary>

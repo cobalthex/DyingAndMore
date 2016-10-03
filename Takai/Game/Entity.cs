@@ -32,18 +32,18 @@ namespace Takai.Game
         /// The current position of the entity
         /// </summary>
         [Data.NonDesigned]
-        public Vector2 Position { get; set; }
+        public virtual Vector2 Position { get; set; }
         /// <summary>
         /// The (normalized) direction the entity is facing
         /// </summary>
         /// <remarks>This vector should always be normalized</remarks>
         [Data.NonDesigned]
-        public Vector2 Direction { get; set; } = Vector2.UnitX;
+        public virtual Vector2 Direction { get; set; } = Vector2.UnitX;
         /// <summary>
         /// The direction the entity is moving
         /// </summary>
         [Data.NonDesigned]
-        public Vector2 Velocity { get; set; } = Vector2.Zero;
+        public virtual Vector2 Velocity { get; set; } = Vector2.Zero;
 
         /// <summary>
         /// The map the entity is in, null if none
@@ -185,29 +185,28 @@ namespace Takai.Game
         /// <summary>
         /// Called when the entity is spawned.
         /// </summary>
-        /// <remarks>Note: this is called during deserialization</remarks>
-        public virtual void OnSpawn() { }
+        public virtual void OnSpawn(GameTime Time) { }
         /// <summary>
         /// Called when the entity is marked for deletion
         /// </summary>
-        public virtual void OnDestroy() { }
+        public virtual void OnDestroy(GameTime Time) { }
 
         /// <summary>
         /// Called when there is a collision between this entity and another entity
         /// </summary>
         /// <param name="Collider">The entity collided with</param>
-        public virtual void OnEntityCollision(Entity Collider, Vector2 Point) { }
+        public virtual void OnEntityCollision(Entity Collider, Vector2 Point, GameTime Time) { }
 
         /// <summary>
         /// Called when there is a collision between this entity and the map
         /// </summary>
         /// <param name="Tile">The tile on the map where the collision occurred</param>
-        public virtual void OnMapCollision(Point Tile, Vector2 Point) { }
+        public virtual void OnMapCollision(Point Tile, Vector2 Point, GameTime Time) { }
 
         /// <summary>
         /// Called when there is a collision between this entity and a blob
         /// </summary>
         /// <param name="Type">The type of blob collided with</param>
-        public virtual void OnBlobCollision(BlobType Type) { }
+        public virtual void OnBlobCollision(BlobType Type, GameTime Time) { }
     }
 }

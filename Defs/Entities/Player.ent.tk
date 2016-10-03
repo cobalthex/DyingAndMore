@@ -1,5 +1,4 @@
 Actor {
-    CurrentHealth: 100;
     MaxHealth: 100;
     States: {
         Idle: GraphicSave {
@@ -24,8 +23,6 @@ Actor {
     Faction: Factions Player;
     Controller: InputController { player: PlayerIndex One };
     Name: "Player";
-    Position: [68 144];
-    Direction: [0.9918214 -0.1276339];
     Velocity: [0 0];
     IsEnabled: True;
     AlwaysActive: False;
@@ -33,7 +30,6 @@ Actor {
     IsPhysical: True;
     IgnoreTrace: False;
     AlwaysUpright: False;
-    OutlineColor: [0 0 0 0];
     primaryWeapon: Gun {
         Projectile: Projectile { };
         Speed: 800;

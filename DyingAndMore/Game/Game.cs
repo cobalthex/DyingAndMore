@@ -22,12 +22,13 @@ namespace DyingAndMore.Game
         void StartMap()
         {
             map.updateSettings = Takai.Game.MapUpdateSettings.Game;
-
-            var plyr = from Entities.Actor ent in map.ActiveEnts
-                       where ent.Faction == Entities.Factions.Player
+            
+            var plyr = from ent in map.ActiveEnts
+                       where ent is Entities.Actor
+                       where ((Entities.Actor)ent).Faction == Entities.Factions.Player
                        select ent;
             
-            player = plyr.FirstOrDefault() as Entities.Actor ?? null;
+            player = plyr.FirstOrDefault() as Entities.Actor;
         }
 
         public override void Load()
@@ -140,9 +141,10 @@ namespace DyingAndMore.Game
 
             sbatch.Begin(SpriteSortMode.Deferred);
 
-            fnt.Draw(sbatch, debugText, new Vector2(10), Color.CornflowerBlue);
+            //fps
             var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
-            fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - fnt.MeasureString(sFps).X - 10, 10), Color.LightSteelBlue);
+            var sSz = fnt.MeasureString(sFps);
+            fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
             
             sbatch.End();
         }

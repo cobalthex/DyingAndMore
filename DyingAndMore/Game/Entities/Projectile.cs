@@ -9,6 +9,27 @@ namespace DyingAndMore.Game.Entities
         ParticleType explosion;
         ParticleType trail, trailGlow;
 
+        public override Vector2 Velocity
+        {
+            get { return base.Velocity; }
+            set
+            {
+                Direction = Vector2.Normalize(value);
+                base.Velocity = value;
+            }
+        }
+
+        public override Vector2 Direction
+        {
+            get { return base.Direction; }
+
+            set
+            {
+                base.Velocity = base.Velocity.Length() * value;
+                base.Direction = value;
+            }
+        }
+
         public Projectile()
         {
             AlwaysActive = true;
@@ -41,7 +62,7 @@ namespace DyingAndMore.Game.Entities
             tex = Takai.AssetManager.Load<Texture2D>("Textures/Particles/trail.png");
             trail.Graphic = new Takai.Graphics.Graphic(tex);
             trail.Graphic.CenterOrigin();
-            trail.Color = new ValueCurve<Color>(curve, Color.White, Color.Transparent);
+            trail.Color = new ValueCurve<Color>(curve, Color.Orange, Color.Transparent);
             trail.Scale = new ValueCurve<float>(1);
             trail.Speed = new ValueCurve<float>(curve, 100, 0);
 
@@ -60,6 +81,7 @@ namespace DyingAndMore.Game.Entities
             Radius = Sprite.Width / 2;
         }
 
+        System.TimeSpan flipTIme;
         public override void Think(GameTime Time)
         {
             ParticleSpawn spawn = new ParticleSpawn();
@@ -76,15 +98,26 @@ namespace DyingAndMore.Game.Entities
             spawn.position = new Range<Vector2>(Position - (Direction * 10) - new Vector2(5), Position - (Direction * 10) + new Vector2(5));
             Map.Spawn(spawn);
 
+            if (Time.TotalGameTime - flipTIme > System.TimeSpan.FromSeconds(1))
+            {
+                Direction *= -1;
+                flipTIme = Time.TotalGameTime;
+            }
+
             base.Think(Time);
         }
 
-        public override void OnMapCollision(Point Tile, Vector2 Point)
+        public override void OnSpawn(GameTime Time)
+        {
+            flipTIme = Time.TotalGameTime;
+        }
+
+        public override void OnMapCollision(Point Tile, Vector2 Point, GameTime Time)
         {
             Map.Destroy(this);
         }
 
-        public override void OnEntityCollision(Entity Collider, Vector2 Point)
+        public override void OnEntityCollision(Entity Collider, Vector2 Point, GameTime Time)
         {
             ParticleSpawn spawn = new ParticleSpawn();
             spawn.type = explosion;
