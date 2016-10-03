@@ -174,7 +174,7 @@ MapSave {
                 Controller: InputController { player: PlayerIndex One };
                 Name: "Player";
                 Position: [68 144];
-                Direction: [0.9918214 -0.1276339];
+                Direction: [1 0];
                 Velocity: [0 0];
                 IsEnabled: True;
                 AlwaysActive: False;

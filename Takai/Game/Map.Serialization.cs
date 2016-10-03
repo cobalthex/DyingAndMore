@@ -247,7 +247,6 @@ namespace Takai.Game
             foreach (var ent in State.entities)
             {
                 ent.Map = this;
-                ent.OnSpawn();
             }
 
             ActiveEnts = State.entities;

@@ -40,15 +40,22 @@ namespace Takai.Game
         /// <param name="Time">Delta time</param>
         /// <param name="Camera">Where on the map to view</param>
         /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
-        public void Update(GameTime Time, Vector2 Camera, Rectangle Viewport)
+        public void Update(GameTime Time, Camera Camera)
         {
-            var half = Camera - (new Vector2(Viewport.Width, Viewport.Height) / 2);
+            var invTransform = Matrix.Invert(Camera.Transform);
 
-            var startX = (int)half.X / SectorPixelSize;
-            var startY = (int)half.Y / SectorPixelSize;
+            var translation = invTransform.Translation;
+            var scale = invTransform.Scale;
+            var rotation = Camera.Transform.Rotation;
 
-            var width = 1 + ((Viewport.Width - 1) / SectorPixelSize);
-            var height = 1 + ((Viewport.Height - 1) / SectorPixelSize);
+            var scaleWidth = (int)(Camera.Viewport.Width * scale.Z);
+            var scaleHeight = (int)(Camera.Viewport.Height * scale.Z);
+
+            var startX = (int)translation.X / SectorPixelSize;
+            var startY = (int)translation.Y / SectorPixelSize;
+            
+            var width = 1 + ((scaleWidth - 1) / SectorPixelSize);
+            var height = 1 + ((scaleHeight - 1) / SectorPixelSize);
 
             var activeRect = new Rectangle(startX - 1, startY - 1, width + 2, height + 2);
             var mapRect = new Rectangle(0, 0, Width * tileSize, Height * tileSize);
@@ -119,6 +126,12 @@ namespace Takai.Game
                             ent.Map = null;
                     }
 
+                    if (ent.SpawnTime == TimeSpan.Zero)
+                    {
+                        ent.SpawnTime = Time.TotalGameTime;
+                        ent.OnSpawn(Time);
+                    }
+
                     if (updateSettings.isAiEnabled)
                         ent.Think(Time);
 
@@ -133,7 +146,7 @@ namespace Takai.Game
                         if (!mapRect.Contains(ent.Position + deltaV) || (tile = Tiles[targetCell.Y, targetCell.X]) < 0)
                         // || !TilesMask[(tile / tilesPerRow) + cellPos.Y, (tile % tileSize) + cellPos.X])
                         {
-                            ent.OnMapCollision(targetCell, targetPos);
+                            ent.OnMapCollision(targetCell, targetPos, Time);
 
                             if (ent.IsPhysical)
                                 ent.Velocity = Vector2.Zero;
@@ -147,8 +160,8 @@ namespace Takai.Game
                             var target = TraceLine(ent.Position, nv, out t);
                             if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
                             {
-                                ent.OnEntityCollision(target, ent.Position + (nv * t));
-                                target.OnEntityCollision(ent, ent.Position + (nv * t));
+                                ent.OnEntityCollision(target, ent.Position + (nv * t), Time);
+                                target.OnEntityCollision(ent, ent.Position + (nv * t), Time);
 
                                 if (ent.IsPhysical)
                                     ent.Velocity = Vector2.Zero;
@@ -162,6 +175,9 @@ namespace Takai.Game
                 //remove entity from map
                 if (ent.Map == null)
                 {
+                    ent.OnDestroy(Time);
+                    ent.SpawnTime = TimeSpan.Zero;
+
                     if (ent.Sector != null)
                     {
                         ent.Sector.entities.Remove(ent);

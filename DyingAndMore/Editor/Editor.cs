@@ -300,7 +300,7 @@ namespace DyingAndMore.Editor
                         var diff = worldMousePos - decal.position;
 
                         var theta = (float)System.Math.Atan2(diff.Y, diff.X);
-                        if (InputState.IsButtonUp(Keys.R))
+                        if (InputState.IsPress(Keys.R))
                             startRotation = theta - decal.angle;
 
                         decal.angle = theta - startRotation;
@@ -310,14 +310,20 @@ namespace DyingAndMore.Editor
                     {
                         float dist = Vector2.Distance(worldMousePos, decal.position);
 
-                        if (InputState.IsButtonUp(Keys.E))
+                        if (InputState.IsPress(Keys.E))
                             startScale = dist;
 
                         decal.scale = MathHelper.Clamp(decal.scale + (dist - startScale) / 25, 0.25f, 10f);
                         startScale = dist;
                     }
-
-                    map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index] = decal;
+                    
+                    if (InputState.IsPress(Keys.Delete))
+                    {
+                        map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals.RemoveAt(selectedDecal.Value.index);
+                        selectedDecal = null;
+                    }
+                    else
+                        map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index] = decal;
                 }
             }
 
@@ -405,17 +411,17 @@ namespace DyingAndMore.Editor
                         selectedEntity.Position += delta;
                     }
 
-                    if (InputState.IsButtonDown(Keys.Delete))
-                    {
-                        map.Destroy(selectedEntity);
-                        selectedEntity = null;
-                    }
-
                     if (InputState.IsButtonDown(Keys.R))
                     {
                         var diff = worldMousePos - selectedEntity.Position;
                         diff.Normalize();
                         selectedEntity.Direction = diff;
+                    }
+                    
+                    if (InputState.IsPress(Keys.Delete))
+                    {
+                        map.Destroy(selectedEntity);
+                        selectedEntity = null;
                     }
                 }
             }
@@ -562,8 +568,9 @@ namespace DyingAndMore.Editor
 
             camera.Draw();
 
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             
+            //fps
             var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
             var sSz = tinyFont.MeasureString(sFps);
             tinyFont.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
@@ -634,6 +641,9 @@ namespace DyingAndMore.Editor
                 selectors[(int)currentMode].DrawItem(Time, selectors[(int)currentMode].SelectedItem, selectedItemRect, sbatch);
                 Primitives2D.DrawRect(sbatch, Color.White, selectedItemRect);
             }
+
+            sbatch.End();
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
 
             //draw modes
             {

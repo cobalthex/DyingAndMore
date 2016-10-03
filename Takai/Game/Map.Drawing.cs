@@ -123,27 +123,31 @@ namespace Takai.Game
         /// <param name="PostEffect">An optional fullscreen post effect to render with</param>
         /// <param name="DrawSectorEntities">Draw entities in sectors. Typically used for debugging/map editing</param>
         /// <remarks>All rendering management handled internally</remarks>
-        public void Draw(Matrix Transform, Rectangle Viewport, Effect PostEffect = null)
+        public void Draw(Camera Camera, Effect PostEffect = null)
         {
             profilingInfo = new MapProfilingInfo();
 
             #region setup
 
-            var invTransform = Matrix.Invert(Transform);
+            var invTransform = Matrix.Invert(Camera.Transform);
 
-            var invTranslation = invTransform.Translation;
+            var startPos = invTransform.Translation;
+            //startPos = new Vector3(Vector2.TransformNormal(new Vector2(startPos.X, startPos.Y), Transform), 0);
+            
             var scale = invTransform.Scale;
-            var rotation = Transform.Rotation;
+            var rotation = Camera.Transform.Rotation;
 
-            var scaleWidth = (int)(Viewport.Width * scale.Z);
-            var scaleHeight = (int)(Viewport.Height * scale.Z);
+            var scaleWidth = (int)(Camera.Viewport.Width * scale.Z);
+            var scaleHeight = (int)(Camera.Viewport.Height * scale.Z);
+
+            //todo: rotation broken
             
             var originalRt = GraphicsDevice.GetRenderTargets();
 
             var outlined = new List<Entity>();
             
-            var startX = (int)invTranslation.X / tileSize;
-            var startY = (int)invTranslation.Y / tileSize;
+            var startX = (int)startPos.X / tileSize;
+            var startY = (int)startPos.Y / tileSize;
 
             int endX = startX + 1 + ((scaleWidth - 1) / tileSize);
             int endY = startY + 1 + ((scaleHeight - 1) / tileSize);
@@ -163,10 +167,10 @@ namespace Takai.Game
             #endregion
 
             #region entities
-
+            
             GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Transform);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Camera.Transform);
             
             foreach (var ent in ActiveEnts)
             {
@@ -182,13 +186,13 @@ namespace Takai.Game
                         ent.Sprite.Draw(sbatch, ent.Position, angle);
                     }
                 }
-#if DEBUG
+#if DEBUG //Draw [X] in place of ent graphic
                 else
                 {
                     Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
                                                  -ent.Direction.Y, ent.Direction.X, 0, 0, 
-                                                  0, 0, 1, 0, 
-                                                  0, 0, 0, 1);
+                                                  0,               0,               1, 0, 
+                                                  0,               0,               0, 1);
 
                     Rectangle rect = new Rectangle(new Vector2(-ent.Radius).ToPoint(), new Vector2(ent.Radius * 2).ToPoint());
 
@@ -211,7 +215,7 @@ namespace Takai.Game
             sbatch.End();
 
             //outlined entities
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, outlineEffect, Transform);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, outlineEffect, Camera.Transform);
 
             foreach (var ent in outlined)
             {
@@ -230,7 +234,7 @@ namespace Takai.Game
 
             foreach (var p in Particles)
             {
-                sbatch.Begin(SpriteSortMode.BackToFront, p.Key.BlendMode, null, stencilRead, null, null, Transform);
+                sbatch.Begin(SpriteSortMode.BackToFront, p.Key.BlendMode, null, stencilRead, null, null, Camera.Transform);
 
                 for (int i = 0; i < p.Value.Count; i++)
                 {
@@ -258,7 +262,7 @@ namespace Takai.Game
 
             GraphicsDevice.SetRenderTargets(blobsRenderTarget, reflectionRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, reflectionEffect, Transform);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, reflectionEffect, Camera.Transform);
 
             //inactive blobs
             for (var y = sStartY; y < sEndY; y++)
@@ -290,9 +294,9 @@ namespace Takai.Game
 
             #region tiles
 
-            var projection = Matrix.CreateOrthographicOffCenter(Viewport, 0, 1);
+            var projection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
             mapAlphaTest.Projection = projection;
-            mapAlphaTest.View = Transform;
+            mapAlphaTest.View = Camera.Transform;
             sbatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, stencilWrite, null, mapAlphaTest);
 
             for (var y = startY; y < endY; y++)
@@ -319,7 +323,7 @@ namespace Takai.Game
 
             #region decals
 
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Transform);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Camera.Transform);
             
             for (var y = sStartY; y < sEndY; y++)
             {
@@ -385,7 +389,7 @@ namespace Takai.Game
                 GraphicsDevice.BlendState = BlendState.AlphaBlend;
                 GraphicsDevice.DepthStencilState = DepthStencilState.None;
                 var viewProjection = Matrix.CreateOrthographicOffCenter(GraphicsDevice.Viewport.Bounds, 0, 1);
-                lineEffect.Parameters["Transform"].SetValue(Transform * viewProjection);
+                lineEffect.Parameters["Transform"].SetValue(Camera.Transform * viewProjection);
                 foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();

@@ -158,7 +158,6 @@ namespace Takai.Game
                 Destroy(Entity);
 
             Entity.Map = this;
-            Entity.OnSpawn();
 
             if (AddToActive)
                 ActiveEnts.Add(Entity);
@@ -182,7 +181,6 @@ namespace Takai.Game
         {
             var ent = new TEntity();
             ent.Map = this;
-            ent.OnSpawn();
 
             ent.Position = Position;
             ent.Direction = Direction;
@@ -208,7 +206,6 @@ namespace Takai.Game
         {
             var ent = (TEntity)Template.Clone();
             ent.Map = this;
-            ent.OnSpawn();
             
             ent.Position = Position;
             ent.Direction = Direction;
@@ -316,7 +313,6 @@ namespace Takai.Game
         /// <remarks>Will be marked for removal to be removed during the next Update cycle</remarks>
         public void Destroy(Entity Ent)
         {
-            Ent.OnDestroy();
             Ent.Map = null;
         }
     }
