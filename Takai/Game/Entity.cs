@@ -102,7 +102,6 @@ namespace Takai.Game
         /// Different animation states for the entity
         /// </summary>
         public Dictionary<EntState, Takai.Graphics.Graphic> States { get; set; } = null;
-        //todo: custom serializer
 
         /// <summary>
         /// Get or set the current state.
@@ -159,6 +158,12 @@ namespace Takai.Game
         [Data.NonDesigned]
         public Color OutlineColor { get; set; } = Color.Transparent;
 
+        /// <summary>
+        /// When this entity was last spawned (in map time). Zero if destroyed or not spawned
+        /// </summary>
+        [Data.NonDesigned]
+        public TimeSpan SpawnTime { get; set; } = TimeSpan.Zero; //todo: use map time
+
         public Entity() { }
 
         /// <summary>
@@ -179,34 +184,37 @@ namespace Takai.Game
         /// <summary>
         /// The basic think function for this entity, called once a frame
         /// </summary>
-        /// <param name="Time">Frame time</param>
-        public virtual void Think(GameTime Time) { }
+        /// <param name="DeltaTime">How long since the last frame (in map time)</param>
+        public virtual void Think(System.TimeSpan DeltaTime) { }
 
         /// <summary>
-        /// Called when the entity is spawned.
+        /// Called when the entity is spawned. Also called on deserialization
         /// </summary>
-        public virtual void OnSpawn(GameTime Time) { }
+        public virtual void OnSpawn() { }
         /// <summary>
         /// Called when the entity is marked for deletion
         /// </summary>
-        public virtual void OnDestroy(GameTime Time) { }
+        public virtual void OnDestroy() { }
 
         /// <summary>
         /// Called when there is a collision between this entity and another entity
         /// </summary>
         /// <param name="Collider">The entity collided with</param>
-        public virtual void OnEntityCollision(Entity Collider, Vector2 Point, GameTime Time) { }
+        /// <param name="DeltaTime">How long since the last frame (in map time)</param>
+        public virtual void OnEntityCollision(Entity Collider, Vector2 Point, TimeSpan DeltaTime) { }
 
         /// <summary>
         /// Called when there is a collision between this entity and the map
         /// </summary>
         /// <param name="Tile">The tile on the map where the collision occurred</param>
-        public virtual void OnMapCollision(Point Tile, Vector2 Point, GameTime Time) { }
+        /// <param name="DeltaTime">How long since the last frame (in map time)</param>
+        public virtual void OnMapCollision(Point Tile, Vector2 Point, TimeSpan DeltaTime) { }
 
         /// <summary>
         /// Called when there is a collision between this entity and a blob
         /// </summary>
         /// <param name="Type">The type of blob collided with</param>
-        public virtual void OnBlobCollision(BlobType Type, GameTime Time) { }
+        /// <param name="DeltaTime">How long since the last frame (in map time)</param>
+        public virtual void OnBlobCollision(BlobType Type, TimeSpan DeltaTime) { }
     }
 }

@@ -32,7 +32,7 @@ namespace DyingAndMore.Game.Entities
 
         public ControlValue TriggerValue { get; set; } = ControlValue.Toggle;
 
-        public override void OnEntityCollision(Entity Collider, Vector2 Point, GameTime Time)
+        public override void OnEntityCollision(Entity Collider, Vector2 Point, System.TimeSpan DeltaTime)
         {
             Map.TriggerEvent(Trigger, (int)TriggerValue);
         }
@@ -42,15 +42,14 @@ namespace DyingAndMore.Game.Entities
             CurrentState = CurrentState == EntState.Idle ? EntState.Active : EntState.Idle;
         }
 
-        public override void OnSpawn(GameTime Time)
+        public override void OnSpawn()
         {
-            //todo: this will not work now
             Map.RemoveEventHandler(Trigger, SetState);
             Map.AddEventHandler(Trigger, SetState);
-            base.OnSpawn(Time);
+            base.OnSpawn();
         }
 
-        public override void OnDestroy(GameTime Time)
+        public override void OnDestroy()
         {
             Map.RemoveEventHandler(Trigger, SetState);
         }

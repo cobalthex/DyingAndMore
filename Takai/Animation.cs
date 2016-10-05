@@ -1,5 +1,6 @@
 ﻿namespace Takai
 {
+    //todo: move to Timeline
     /// <summary>
     /// A flexible animation system 
     /// </summary>

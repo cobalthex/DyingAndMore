@@ -87,15 +87,15 @@ namespace DyingAndMore.Game.Entities
             return cloned;
         }
 
-        public override void Think(GameTime Time)
+        public override void Think(System.TimeSpan DeltaTime)
         {
-            Controller?.Think(Time);
+            Controller?.Think(DeltaTime);
 
             //todo: move to physics
             var vel = Velocity;
 
             if (vel == lastVelocity)
-                vel = Vector2.Lerp(vel, Vector2.Zero, 10 * (float)Time.ElapsedGameTime.TotalSeconds);
+                vel = Vector2.Lerp(vel, Vector2.Zero, 10 * (float)DeltaTime.TotalSeconds);
             if (System.Math.Abs(vel.X) < 0.01f)
                 vel.X = 0;
             if (System.Math.Abs(vel.Y) < 0.01f)
@@ -104,12 +104,12 @@ namespace DyingAndMore.Game.Entities
             Velocity = vel;
             lastVelocity = Velocity;
 
-            base.Think(Time);
+            base.Think(DeltaTime);
         }
 
         private Controller cachedController = null;
         private System.TimeSpan bumpTime;
-        public override void OnEntityCollision(Entity Collider, Vector2 Point, GameTime Time)
+        public override void OnEntityCollision(Entity Collider, Vector2 Point, System.TimeSpan DeltaTime)
         {
             var actor = Collider as Actor;
             if (actor != null)

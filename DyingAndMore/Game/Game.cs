@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
+using Takai.Input;
 
 namespace DyingAndMore.Game
 {
@@ -76,7 +77,7 @@ namespace DyingAndMore.Game
 
         public override void Update(GameTime Time)
         {
-            if (Takai.Input.InputState.IsButtonDown(Keys.LeftControl) && Takai.Input.InputState.IsPress(Keys.O))
+            if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.O))
             {
                 var ofd = new System.Windows.Forms.OpenFileDialog();
                 ofd.SupportMultiDottedExtensions = true;
@@ -92,38 +93,44 @@ namespace DyingAndMore.Game
                 return;
             }
 
-            if (Takai.Input.InputState.IsClick(Keys.F1))
+            if (InputState.IsClick(Keys.F1))
             {
                 Takai.States.StateManager.NextState(new Editor.Editor() { map = map, camera = new Takai.Game.Camera(map, camera.ActualPosition) { Viewport = camera.Viewport } });
                 return;
             }
 
-            if (Takai.Input.InputState.IsPress(Keys.Q))
+            if (InputState.IsPress(Keys.Q))
             {
                 Takai.States.StateManager.Exit();
                 return;
             }
 
-            if (Takai.Input.InputState.IsPress(Keys.F2))
+            if (InputState.IsPress(Keys.F2))
                 map.debugOptions.showBlobReflectionMask ^= true;
-            if (Takai.Input.InputState.IsPress(Keys.F3))
+            if (InputState.IsPress(Keys.F3))
                 map.debugOptions.showOnlyReflections ^= true;
 
-            if (Takai.Input.InputState.IsPress(Keys.F5))
+            if (InputState.IsPress(Keys.F5))
             {
                 using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Create))
                     map.SaveState(stream);
             }
-            if (Takai.Input.InputState.IsPress(Keys.F9))
+            if (InputState.IsPress(Keys.F9))
             {
                 using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Open))
                     map.LoadState(stream);
                 StartMap();
             }
+
+            var scrollDelta = InputState.ScrollDelta();
+            if (InputState.IsMod(KeyMod.Control) && scrollDelta != 0)
+            {
+                map.TimeSpeed += scrollDelta / 1024f;
+            }
             
             camera.Update(Time);
 
-            Vector2 worldMousePos = camera.ScreenToWorld(Takai.Input.InputState.MouseVector);
+            Vector2 worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
 
             //Takai.Game.ParticleSpawn pspawn = new Takai.Game.ParticleSpawn();
             //pspawn.type = pt1;

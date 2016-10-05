@@ -7,7 +7,7 @@ namespace DyingAndMore.Game.Entities
     {
         public PlayerIndex player;
 
-        public override void Think(GameTime Time)
+        public override void Think(System.TimeSpan DeltaTime)
         {
             var d = Vector2.Zero;
             if (Takai.Input.InputState.IsButtonDown(Keys.A))
@@ -22,14 +22,13 @@ namespace DyingAndMore.Game.Entities
             actor.Move(d);
 
             if (actor.PrimaryWeapon != null && Takai.Input.InputState.IsButtonDown(Takai.Input.MouseButtons.Left))
-                actor.PrimaryWeapon.Fire(Time, actor);
+                actor.PrimaryWeapon.Fire(actor.Map.ElapsedTime, actor);
             if (actor.AltWeapon != null && Takai.Input.InputState.IsButtonDown(Takai.Input.MouseButtons.Right))
-                actor.AltWeapon.Fire(Time, actor);
+                actor.AltWeapon.Fire(actor.Map.ElapsedTime, actor);
 
-            //var dir = Takai.Input.InputState.MouseVector;
-            //dir -= new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height) / 2;
-            //dir.Normalize();
-            //actor.Direction = dir;
+            var dir = Takai.Input.InputState.PolarMouseVector;
+            dir.Normalize();
+            actor.Direction = dir;
         }
     }
 }
