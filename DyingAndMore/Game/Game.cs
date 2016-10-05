@@ -125,7 +125,7 @@ namespace DyingAndMore.Game
             var scrollDelta = InputState.ScrollDelta();
             if (InputState.IsMod(KeyMod.Control) && scrollDelta != 0)
             {
-                map.TimeSpeed += scrollDelta / 1024f;
+                map.TimeScale += scrollDelta / 1024f;
             }
             
             camera.Update(Time);
