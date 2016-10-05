@@ -84,7 +84,7 @@ namespace DyingAndMore.Editor
             if (selectedEntity != null)
                 selectedEntity.OutlineColor = Color.Transparent;
 
-            if (InputState.IsButtonDown(Keys.LeftControl) || InputState.IsButtonDown(Keys.RightControl))
+            if (InputState.IsMod(KeyMod.Control))
             {
                 if (InputState.IsPress(Keys.S))
                 {
@@ -200,7 +200,7 @@ namespace DyingAndMore.Editor
 
             camera.Update(Time);
 
-            if (InputState.IsPress(MouseButtons.Left) && InputState.IsButtonDown(Keys.LeftAlt))
+            if (InputState.IsPress(MouseButtons.Left) && InputState.IsMod(KeyMod.Alt))
             {
                 var ofd = new System.Windows.Forms.OpenFileDialog();
                 ofd.Filter = "Entity Definitions (*.ent.tk)|*.ent.tk";
@@ -218,12 +218,12 @@ namespace DyingAndMore.Editor
                 }
             }
 
-            if (InputState.IsPress(Keys.LeftControl))
+            if (InputState.IsPress(Keys.LeftControl) || InputState.IsPress(Keys.RightControl))
             {
                 isPosSaved = true;
                 savedWorldPos = worldMousePos;
             }
-            else if (InputState.IsClick(Keys.LeftControl))
+            else if (InputState.IsClick(Keys.LeftControl) || InputState.IsClick(Keys.RightControl))
                 isPosSaved = false;
 
             #region Tiles
@@ -239,7 +239,7 @@ namespace DyingAndMore.Editor
 
                 if (tile > short.MinValue)
                 {
-                    if (InputState.IsButtonDown(Keys.LeftShift))
+                    if (InputState.IsMod(KeyMod.Shift))
                         TileFill(worldMousePos, tile);
                     else if (isPosSaved)
                     {
@@ -324,6 +324,8 @@ namespace DyingAndMore.Editor
                     }
                     else
                         map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index] = decal;
+
+                    //todo: clone
                 }
             }
 
@@ -423,6 +425,7 @@ namespace DyingAndMore.Editor
                         map.Destroy(selectedEntity);
                         selectedEntity = null;
                     }
+                    //todo: clone
                 }
             }
 

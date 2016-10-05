@@ -8,6 +8,10 @@
         [Takai.Data.NonSerialized]
         public Actor actor;
 
-        public abstract void Think(Microsoft.Xna.Framework.GameTime Time);
+        /// <summary>
+        /// One frame of time to control the actor
+        /// </summary>
+        /// <param name="DeltaTime">How long since the last Think cycle</param>
+        public abstract void Think(System.TimeSpan DeltaTime);
     }
 }

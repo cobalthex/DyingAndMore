@@ -81,12 +81,12 @@ namespace DyingAndMore.Game.Entities
             Radius = Sprite.Width / 2;
         }
 
-        System.TimeSpan flipTIme;
-        public override void Think(GameTime Time)
+        System.TimeSpan flipTime;
+        public override void Think(System.TimeSpan DeltaTime)
         {
             ParticleSpawn spawn = new ParticleSpawn();
             spawn.type = trail;
-            spawn.position = new Range<Vector2>(Position - (Direction * 10), Position - (Direction * 10));
+            spawn.position = new Range<Vector2>(Position - (Direction * Radius), Position - (Direction * Radius));
             spawn.lifetime = System.TimeSpan.FromSeconds(0.25);
 
             var angle = (float)System.Math.Atan2(Direction.Y, Direction.X);
@@ -95,29 +95,23 @@ namespace DyingAndMore.Game.Entities
             Map.Spawn(spawn);
 
             spawn.type = trailGlow;
-            spawn.position = new Range<Vector2>(Position - (Direction * 10) - new Vector2(5), Position - (Direction * 10) + new Vector2(5));
+            spawn.position = new Range<Vector2>(Position - (Direction * Radius) - new Vector2(5), Position - (Direction * Radius) + new Vector2(5));
             Map.Spawn(spawn);
 
-            if (Time.TotalGameTime - flipTIme > System.TimeSpan.FromSeconds(1))
-            {
-                Direction *= -1;
-                flipTIme = Time.TotalGameTime;
-            }
-
-            base.Think(Time);
+            base.Think(DeltaTime);
         }
 
-        public override void OnSpawn(GameTime Time)
+        public override void OnSpawn()
         {
-            flipTIme = Time.TotalGameTime;
+            flipTime = Map.ElapsedTime;
         }
 
-        public override void OnMapCollision(Point Tile, Vector2 Point, GameTime Time)
+        public override void OnMapCollision(Point Tile, Vector2 Point, System.TimeSpan DeltaTime)
         {
             Map.Destroy(this);
         }
 
-        public override void OnEntityCollision(Entity Collider, Vector2 Point, GameTime Time)
+        public override void OnEntityCollision(Entity Collider, Vector2 Point, System.TimeSpan DeltaTime)
         {
             ParticleSpawn spawn = new ParticleSpawn();
             spawn.type = explosion;

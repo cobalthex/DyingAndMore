@@ -12,6 +12,16 @@ namespace Takai.Input
         X4,
         X5
     }
+    
+    public enum KeyMod
+    {
+        None,
+        Control,
+        Shift,
+        Alt,
+        Windows,
+        Super
+    }
 
     //todo: convert mouse points to use touch
 
@@ -40,10 +50,22 @@ namespace Takai.Input
         /// </summary>
         public static Point LastMousePoint { get { return lastMouseState.Position; } }
 
-        public static void Update()
+        /// <summary>
+        /// Mouse position based on center screen
+        /// </summary>
+        public static Vector2 PolarMouseVector { get; private set; }
+        /// <summary>
+        /// The previous mouse position based on center screen
+        /// </summary>
+        public static Vector2 LastPolarMouseVector { get; private set; }
+
+        public static void Update(Rectangle Viewport)
         {
             lastMouseState = mouseState;
             mouseState = Mouse.GetState();
+
+            LastPolarMouseVector = PolarMouseVector;
+            PolarMouseVector = MouseVector - new Vector2(Viewport.Width / 2, Viewport.Height / 2);
 
             lastKeyState = keyState;
             keyState = Keyboard.GetState();
@@ -224,6 +246,32 @@ namespace Takai.Input
         public static bool IsClick(Keys Key)
         {
             return (keyState.IsKeyUp(Key) && lastKeyState.IsKeyDown(Key));
+        }
+
+        /// <summary>
+        /// Checks if a modifier key is currently held down (both left or right)
+        /// </summary>
+        /// <param name="Mod">The modifier key to check</param>
+        /// <returns>True if the modifier key is down</returns>
+        public static bool IsMod(KeyMod Mod)
+        {
+            switch (Mod)
+            {
+                case KeyMod.Control:
+                    return (IsButtonDown(Keys.LeftControl) || IsButtonDown(Keys.RightControl));
+
+                case KeyMod.Shift:
+                    return (IsButtonDown(Keys.LeftShift) || IsButtonDown(Keys.RightShift));
+
+                case KeyMod.Alt:
+                    return (IsButtonDown(Keys.LeftAlt) || IsButtonDown(Keys.RightAlt));
+
+                case KeyMod.Windows:
+                    return (IsButtonDown(Keys.LeftWindows) || IsButtonDown(Keys.RightWindows));
+
+                default:
+                    return false;
+            }
         }
     }
 }

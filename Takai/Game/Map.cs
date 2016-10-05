@@ -158,6 +158,7 @@ namespace Takai.Game
                 Destroy(Entity);
 
             Entity.Map = this;
+            Entity.SpawnTime = ElapsedTime;
 
             if (AddToActive)
                 ActiveEnts.Add(Entity);
@@ -180,7 +181,9 @@ namespace Takai.Game
         public TEntity Spawn<TEntity>(Vector2 Position, Vector2 Direction, Vector2 Velocity) where TEntity : Entity, new()
         {
             var ent = new TEntity();
+
             ent.Map = this;
+            ent.SpawnTime = ElapsedTime;
 
             ent.Position = Position;
             ent.Direction = Direction;
@@ -205,8 +208,11 @@ namespace Takai.Game
         public TEntity Spawn<TEntity>(TEntity Template, Vector2 Position, Vector2 Direction, Vector2 Velocity) where TEntity : Entity, new()
         {
             var ent = (TEntity)Template.Clone();
+
             ent.Map = this;
-            
+            ent.SpawnTime = ElapsedTime;
+            ent.OnSpawn();
+
             ent.Position = Position;
             ent.Direction = Direction;
             ent.Velocity = Velocity;
@@ -265,7 +271,7 @@ namespace Takai.Game
 
                 Particles[Spawn.type].Add(new Particle
                 {
-                    time     = System.TimeSpan.Zero,
+                    time     = ElapsedTime,
                     lifetime = lifetime,
                     delay    = delay,
 

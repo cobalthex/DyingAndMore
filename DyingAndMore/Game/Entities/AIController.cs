@@ -6,7 +6,7 @@ namespace DyingAndMore.Game.Entities
     {
         //todo: multiple AI controllers (swarm, swat, etc)
 
-        public override void Think(GameTime Time)
+        public override void Think(System.TimeSpan DeltaTime)
         {
         }
     }

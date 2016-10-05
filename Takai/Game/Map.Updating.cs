@@ -34,14 +34,31 @@ namespace Takai.Game
         public MapUpdateSettings updateSettings = new MapUpdateSettings();
 
         /// <summary>
+        /// How long since this map started (updated every Update())
+        /// </summary>
+        [Takai.Data.NonDesigned]
+        public TimeSpan ElapsedTime { get; set; } = TimeSpan.Zero;
+        /// <summary>
+        /// How fast time is moving (default = 1)
+        /// </summary>
+        public float TimeSpeed { get; set; } = 0;
+
+        //todo: switch update method to add tiem to total game time
+
+        /// <summary>
         /// Update the map state
         /// Updates the active set and then the contents of the active set
         /// </summary>
-        /// <param name="Time">Delta time</param>
+        /// <param name="RealTime">(Real) game time</param>
         /// <param name="Camera">Where on the map to view</param>
         /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
-        public void Update(GameTime Time, Camera Camera)
+        public void Update(GameTime RealTime, Camera Camera)
         {
+            var deltaTicks = (long)(RealTime.ElapsedGameTime.Ticks * TimeSpeed);
+            var deltaTime = System.TimeSpan.FromTicks(deltaTicks);
+            var deltaSeconds = (float)deltaTime.TotalSeconds;
+            ElapsedTime += deltaTime;
+
             var invTransform = Matrix.Invert(Camera.Transform);
 
             var translation = invTransform.Translation;
@@ -60,15 +77,13 @@ namespace Takai.Game
             var activeRect = new Rectangle(startX - 1, startY - 1, width + 2, height + 2);
             var mapRect = new Rectangle(0, 0, Width * tileSize, Height * tileSize);
             var tileSq = new Vector2(tileSize).LengthSquared();
-
-            var deltaT = (float)Time.ElapsedGameTime.TotalSeconds;
-
+            
             #region active blobs
 
             for (int i = 0; i < ActiveBlobs.Count; i++)
             {
                 var blob = ActiveBlobs[i];
-                var deltaV = blob.velocity * deltaT;
+                var deltaV = blob.velocity * deltaSeconds;
                 blob.position += deltaV;
                 blob.velocity -= deltaV * blob.type.Drag;
 
@@ -126,16 +141,10 @@ namespace Takai.Game
                             ent.Map = null;
                     }
 
-                    if (ent.SpawnTime == TimeSpan.Zero)
-                    {
-                        ent.SpawnTime = Time.TotalGameTime;
-                        ent.OnSpawn(Time);
-                    }
-
                     if (updateSettings.isAiEnabled)
-                        ent.Think(Time);
+                        ent.Think(deltaTime);
 
-                    var deltaV = ent.Velocity * deltaT;
+                    var deltaV = ent.Velocity * deltaSeconds;
                     var targetPos = ent.Position + deltaV;
                     var targetCell = (targetPos / tileSize).ToPoint();
                     var cellPos = new Point((int)targetPos.X % tileSize, (int)targetPos.Y % tileSize);
@@ -146,7 +155,7 @@ namespace Takai.Game
                         if (!mapRect.Contains(ent.Position + deltaV) || (tile = Tiles[targetCell.Y, targetCell.X]) < 0)
                         // || !TilesMask[(tile / tilesPerRow) + cellPos.Y, (tile % tileSize) + cellPos.X])
                         {
-                            ent.OnMapCollision(targetCell, targetPos, Time);
+                            ent.OnMapCollision(targetCell, targetPos, deltaTime);
 
                             if (ent.IsPhysical)
                                 ent.Velocity = Vector2.Zero;
@@ -160,22 +169,22 @@ namespace Takai.Game
                             var target = TraceLine(ent.Position, nv, out t);
                             if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
                             {
-                                ent.OnEntityCollision(target, ent.Position + (nv * t), Time);
-                                target.OnEntityCollision(ent, ent.Position + (nv * t), Time);
+                                ent.OnEntityCollision(target, ent.Position + (nv * t), deltaTime);
+                                target.OnEntityCollision(ent, ent.Position + (nv * t), deltaTime);
 
                                 if (ent.IsPhysical)
                                     ent.Velocity = Vector2.Zero;
                             }
                         }
 
-                        ent.Position += ent.Velocity * deltaT;
+                        ent.Position += ent.Velocity * deltaSeconds;
                     }
                 }
 
                 //remove entity from map
                 if (ent.Map == null)
                 {
-                    ent.OnDestroy(Time);
+                    ent.OnDestroy();
                     ent.SpawnTime = TimeSpan.Zero;
 
                     if (ent.Sector != null)
@@ -201,17 +210,14 @@ namespace Takai.Game
             #endregion
 
             #region particles
-
-            var ts = (float)Time.ElapsedGameTime.TotalSeconds;
+            
             foreach (var p in Particles)
             {
                 for (var i = 0; i < p.Value.Count; i++)
                 {
                     var x = p.Value[i];
-
-                    if (x.time == TimeSpan.Zero)
-                        x.time = Time.TotalGameTime;
-                    else if (Time.TotalGameTime > x.time + x.lifetime + x.delay)
+                    
+                    if (ElapsedTime > x.time + x.lifetime + x.delay)
                     {
                         p.Value[i] = p.Value[p.Value.Count - 1];
                         p.Value.RemoveAt(p.Value.Count - 1);
@@ -219,13 +225,13 @@ namespace Takai.Game
                         continue;
                     }
 
-                    var life = (float)((Time.TotalGameTime - (x.time + x.delay)).TotalSeconds / x.lifetime.TotalSeconds);
+                    var life = (float)((ElapsedTime - (x.time + x.delay)).TotalSeconds / x.lifetime.TotalSeconds);
                     
                     x.speed = MathHelper.Lerp(p.Key.Speed.start, p.Key.Speed.end, p.Key.Speed.curve.Evaluate(life));
                     x.scale = MathHelper.Lerp(p.Key.Scale.start, p.Key.Scale.end, p.Key.Scale.curve.Evaluate(life));
                     x.color = Color.Lerp(p.Key.Color.start, p.Key.Color.end, p.Key.Color.curve.Evaluate(life));
 
-                    x.position += (x.direction * x.speed) * ts;
+                    x.position += (x.direction * x.speed) * deltaSeconds;
 
                     p.Value[i] = x;
                 }
