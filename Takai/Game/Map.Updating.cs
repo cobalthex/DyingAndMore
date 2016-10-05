@@ -41,7 +41,7 @@ namespace Takai.Game
         /// <summary>
         /// How fast time is moving (default = 1)
         /// </summary>
-        public float TimeSpeed { get; set; } = 0;
+        public float TimeSpeed { get; set; } = 1;
 
         //todo: switch update method to add tiem to total game time
 
@@ -55,7 +55,7 @@ namespace Takai.Game
         public void Update(GameTime RealTime, Camera Camera)
         {
             var deltaTicks = (long)(RealTime.ElapsedGameTime.Ticks * TimeSpeed);
-            var deltaTime = System.TimeSpan.FromTicks(deltaTicks);
+            var deltaTime = TimeSpan.FromTicks(deltaTicks);
             var deltaSeconds = (float)deltaTime.TotalSeconds;
             ElapsedTime += deltaTime;
 
