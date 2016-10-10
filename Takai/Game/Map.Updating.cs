@@ -34,12 +34,12 @@ namespace Takai.Game
         public MapUpdateSettings updateSettings = new MapUpdateSettings();
 
         /// <summary>
-        /// How long since this map started (updated every Update())
+        /// How long since this map started (updated every Update()). Affected by <see cref="TimeScale"/>
         /// </summary>
         [Takai.Data.NonDesigned]
         public TimeSpan ElapsedTime { get; set; } = TimeSpan.Zero;
         /// <summary>
-        /// How fast time is moving (default = 1)
+        /// How fast the game is moving (default = 1)
         /// </summary>
         public float TimeScale { get; set; } = 1;
 
@@ -54,7 +54,7 @@ namespace Takai.Game
         /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
         public void Update(GameTime RealTime, Camera Camera)
         {
-            var deltaTicks = (long)(RealTime.ElapsedGameTime.Ticks * TimeScale);
+            var deltaTicks = (long)(RealTime.ElapsedGameTime.Ticks * (double)TimeScale);
             var deltaTime = TimeSpan.FromTicks(deltaTicks);
             var deltaSeconds = (float)deltaTime.TotalSeconds;
             ElapsedTime += deltaTime;
@@ -147,8 +147,7 @@ namespace Takai.Game
                     var deltaV = ent.Velocity * deltaSeconds;
                     var targetPos = ent.Position + deltaV;
                     var targetCell = (targetPos / tileSize).ToPoint();
-                    var cellPos = new Point((int)targetPos.X % tileSize, (int)targetPos.Y % tileSize);
-
+                    
                     if (updateSettings.isPhysicsEnabled)
                     {
                         short tile;
@@ -163,9 +162,11 @@ namespace Takai.Game
 
                         else if (ent.Velocity != Vector2.Zero)
                         {
+                            //entity collision
                             float t;
                             var nv = ent.Velocity;
                             nv.Normalize();
+
                             var target = TraceLine(ent.Position, nv, out t);
                             if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
                             {
@@ -174,6 +175,29 @@ namespace Takai.Game
 
                                 if (ent.IsPhysical)
                                     ent.Velocity = Vector2.Zero;
+                            }
+
+                            //todo: GetOverlappingSectors
+
+                            //blob collision
+                            if (!ent.IgnoreTrace)
+                            {
+                                var drag = 0f;
+                                var dc = 0u;
+                                var sector = Sectors[targetCell.Y / SectorSize, targetCell.X / SectorSize];
+                                foreach (var blob in sector.blobs)
+                                {
+                                    if (Vector2.DistanceSquared(blob.position, targetPos) <= (blob.type.Radius * blob.type.Radius) + ent.RadiusSq)
+                                    {
+                                        drag += blob.type.Drag;
+                                        dc++;
+                                    }
+                                }
+                                if (dc > 0)
+                                {
+                                    var fd = (drag / dc / 7.5f) * ent.Velocity.LengthSquared();
+                                    ent.Velocity += ((-fd * nv) * (deltaSeconds / TimeScale)); //todo: radius affects
+                                }
                             }
                         }
 

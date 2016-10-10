@@ -22,8 +22,6 @@ Actor {
     MoveForce: 600;
     Faction: Factions Player;
     Controller: InputController { player: PlayerIndex One };
-    Name: "Player";
-    Velocity: [0 0];
     IsEnabled: True;
     AlwaysActive: False;
     Radius: 24;
@@ -33,12 +31,12 @@ Actor {
     primaryWeapon: Gun {
         Projectile: Projectile { };
         Speed: 800;
-        shotDelay: 250;
+        shotDelay: 50;
     };
     altWeapon: BlobGun {
         blob: BlobType {
             Radius: 54;
-            Drag: 1.5;
+            Drag: 0.2;
             Texture: "Textures/Blobs/blood.png";
             Reflection: "Textures/Blobs/blood.r.png";
         };

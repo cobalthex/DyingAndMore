@@ -98,6 +98,8 @@ namespace DyingAndMore.Game.Entities
             spawn.position = new Range<Vector2>(Position - (Direction * Radius) - new Vector2(5), Position - (Direction * Radius) + new Vector2(5));
             Map.Spawn(spawn);
 
+            //todo: destroy if 0 velocity
+
             base.Think(DeltaTime);
         }
 

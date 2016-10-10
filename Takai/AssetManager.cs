@@ -15,7 +15,7 @@ namespace Takai
         /// <summary>
         /// The root directory to search for files for this asset manager
         /// </summary>
-        public static string RootDirectory { get; set; }
+        public static string RootDirectory { get; set; } = "";
 
         /// <summary>
         /// The assets themselves
