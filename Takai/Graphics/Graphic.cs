@@ -103,10 +103,13 @@ namespace Takai.Graphics
             : base()
         {
             this.Texture = Texture;
-            File = Texture.Name;
-            Width = Texture.Width;
-            Height = Texture.Height;
-            ClipRect = Texture.Bounds;
+            if (Texture != null)
+            {
+                File = Texture.Name;
+                Width = Texture.Width;
+                Height = Texture.Height;
+                ClipRect = Texture.Bounds;
+            }
         }
 
         public Graphic(Texture2D Texture, Rectangle ClipRect)

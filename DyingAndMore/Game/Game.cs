@@ -24,14 +24,14 @@ namespace DyingAndMore.Game
         {
             map.updateSettings = Takai.Game.MapUpdateSettings.Game;
             
-            var plyr = from ent in map.ActiveEnts
-                       where ent is Entities.Actor
+            var plyr = from ent in map.FindEntitiesByType<Entities.Actor>(true)
                        where ((Entities.Actor)ent).Faction == Entities.Factions.Player
                        select ent;
             
             player = plyr.FirstOrDefault() as Entities.Actor;
+            camera.Follow = player;
         }
-
+        
         public override void Load()
         {
             fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
@@ -43,14 +43,14 @@ namespace DyingAndMore.Game
                     map.Load(s);
             }
 
-            StartMap();
-
             sbatch = new SpriteBatch(GraphicsDevice);
 
             camera = new Takai.Game.Camera(map, player);
             camera.MoveSpeed = 800;
             camera.Viewport = GraphicsDevice.Viewport.Bounds;
             //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
+
+            StartMap();
 
             pt1 = new Takai.Game.ParticleType();
             pt1.Graphic = new Takai.Graphics.Graphic(
@@ -69,8 +69,8 @@ namespace DyingAndMore.Game
             curve.Keys.Add(new CurveKey(1, 1));
 
             pt1.BlendMode = BlendState.AlphaBlend;
-            pt1.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Black);
-            pt1.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 5);
+            pt1.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Red);
+            pt1.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 2);
             pt1.Speed = new Takai.Game.ValueCurve<float>(curve, 100, 0);
         }
         Takai.Game.ParticleType pt1, pt2;
@@ -125,20 +125,20 @@ namespace DyingAndMore.Game
             var scrollDelta = InputState.ScrollDelta();
             if (InputState.IsMod(KeyMod.Control) && scrollDelta != 0)
             {
-                map.TimeScale += scrollDelta / 1024f;
+                map.TimeScale += System.Math.Sign(scrollDelta) * 0.1f;
             }
             
             camera.Update(Time);
 
             Vector2 worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
 
-            //Takai.Game.ParticleSpawn pspawn = new Takai.Game.ParticleSpawn();
-            //pspawn.type = pt1;
-            //pspawn.angle = new Takai.Game.Range<float>(0, MathHelper.TwoPi);
-            //pspawn.position = new Takai.Game.Range<Vector2>(worldMousePos);
-            //pspawn.count = new Takai.Game.Range<int>(3, 5);
-            //pspawn.lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800));
-            //map.Spawn(pspawn);
+            Takai.Game.ParticleSpawn pspawn = new Takai.Game.ParticleSpawn();
+            pspawn.type = pt1;
+            pspawn.angle = new Takai.Game.Range<float>(0, MathHelper.TwoPi);
+            pspawn.position = new Takai.Game.Range<Vector2>(worldMousePos);
+            pspawn.count = new Takai.Game.Range<int>(3, 5);
+            pspawn.lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800));
+            map.Spawn(pspawn);
 
         }
 
@@ -152,6 +152,12 @@ namespace DyingAndMore.Game
             var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
             var sSz = fnt.MeasureString(sFps);
             fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
+
+            var sDebugInfo =
+                $"TimeScale: {map.TimeScale:0.#}x"
+            ;
+
+            fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White);
             
             sbatch.End();
         }

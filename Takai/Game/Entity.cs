@@ -70,7 +70,7 @@ namespace Takai.Game
 
         /// <summary>
         /// The radius of this entity. Used mainly for broad-phase collision
-        /// </summary>
+        /// </summary>  
         public float Radius
         {
             get

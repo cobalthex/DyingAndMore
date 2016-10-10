@@ -425,7 +425,7 @@ namespace DyingAndMore.Editor
                         map.Destroy(selectedEntity);
                         selectedEntity = null;
                     }
-                    //todo: clone
+                    //todo
                 }
             }
 
