@@ -99,7 +99,7 @@ namespace DyingAndMore.Game
                 return;
             }
 
-            if (InputState.IsPress(Keys.Q))
+            if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
                 Takai.States.StateManager.Exit();
                 return;
@@ -138,7 +138,7 @@ namespace DyingAndMore.Game
             pspawn.position = new Takai.Game.Range<Vector2>(worldMousePos);
             pspawn.count = new Takai.Game.Range<int>(3, 5);
             pspawn.lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800));
-            map.Spawn(pspawn);
+            //map.Spawn(pspawn);
 
         }
 
