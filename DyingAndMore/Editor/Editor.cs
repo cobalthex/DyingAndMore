@@ -132,7 +132,7 @@ namespace DyingAndMore.Editor
                 }
             }
 
-            if (InputState.IsPress(Keys.Q))
+            if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
                 Takai.States.StateManager.Exit();
                 return;
@@ -168,8 +168,6 @@ namespace DyingAndMore.Editor
                 var gesture = TouchPanel.ReadGesture();
                 switch (gesture.GestureType)
                 {
-                    //todo: dragging does not work correctly (in tile mode for eg)
-
                     case GestureType.Pinch:
                         {
                             //move
@@ -283,7 +281,7 @@ namespace DyingAndMore.Editor
                         TileLine(savedWorldPos, worldMousePos, tile);
                         savedWorldPos = worldMousePos;
                     }
-                    else
+                    else if (InputState.IsButtonHeld(tile == -1 ? MouseButtons.Right : MouseButtons.Left)) //todo: improve
                         TileLine(lastWorldPos, worldMousePos, tile);
                 }
             }
