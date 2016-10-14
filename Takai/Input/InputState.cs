@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Takai.Input
 {
@@ -22,15 +22,13 @@ namespace Takai.Input
         Windows,
         Super
     }
-
-    //todo: convert mouse points to use touch
-
-    //todo: touchdownPoint and press/release time (maybe)
+    
+    //todo: touchdownPoint (where first touched?) and press/release time (maybe)
 
     public static class InputState
     {
-        private static MouseState mouseState, lastMouseState;
         private static KeyboardState keyState, lastKeyState;
+        private static MouseState mouseState, lastMouseState;
 
         /// <summary>
         /// Get a vector2 of the current mouse position
@@ -61,14 +59,14 @@ namespace Takai.Input
 
         public static void Update(Rectangle Viewport)
         {
+            lastKeyState = keyState;
+            keyState = Keyboard.GetState();
+
             lastMouseState = mouseState;
             mouseState = Mouse.GetState();
 
             LastPolarMouseVector = PolarMouseVector;
             PolarMouseVector = MouseVector - new Vector2(Viewport.Width / 2, Viewport.Height / 2);
-
-            lastKeyState = keyState;
-            keyState = Keyboard.GetState();
         }
 
         /// <summary>
