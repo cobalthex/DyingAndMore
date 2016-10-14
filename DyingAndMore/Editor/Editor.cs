@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.Graphics;
@@ -26,7 +27,7 @@ namespace DyingAndMore.Editor
         public EditorMode currentMode = EditorMode.Tiles;
 
         public Takai.Game.Camera camera;
-        
+
         SpriteBatch sbatch;
 
         BitmapFont tinyFont, smallFont, largeFont;
@@ -36,7 +37,7 @@ namespace DyingAndMore.Editor
         Color highlightColor = Color.Gold;
 
         Selector[] selectors;
-        
+
         bool isPosSaved = false;
         Vector2 savedWorldPos, lastWorldPos;
 
@@ -46,7 +47,7 @@ namespace DyingAndMore.Editor
         System.TimeSpan lastBlobTime = System.TimeSpan.Zero;
 
         public Editor() : base(Takai.States.StateType.Full) { }
-        
+
         void AddSelector(Selector Sel, int Index)
         {
             selectors[Index] = Sel;
@@ -69,14 +70,19 @@ namespace DyingAndMore.Editor
             AddSelector(new EntSelector(this), 3);
 
             map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
+
+            TouchPanel.EnabledGestures = GestureType.Tap | GestureType.FreeDrag | GestureType.Pinch;
         }
 
         public override void Unload()
         {
+            //todo: PopAll<type>()
             Takai.States.StateManager.PopState();
             Takai.States.StateManager.PopState();
             Takai.States.StateManager.PopState();
             Takai.States.StateManager.PopState();
+
+            TouchPanel.EnabledGestures = GestureType.None;
         }
 
         public override void Update(GameTime Time)
@@ -316,7 +322,7 @@ namespace DyingAndMore.Editor
                         decal.scale = MathHelper.Clamp(decal.scale + (dist - startScale) / 25, 0.25f, 10f);
                         startScale = dist;
                     }
-                    
+
                     if (InputState.IsPress(Keys.Delete))
                     {
                         map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals.RemoveAt(selectedDecal.Value.index);
@@ -348,7 +354,7 @@ namespace DyingAndMore.Editor
                         var mapSz = new Vector2(map.Width, map.Height);
                         var start = Vector2.Clamp((worldMousePos / map.SectorPixelSize) - Vector2.One, Vector2.Zero, mapSz).ToPoint();
                         var end = Vector2.Clamp((worldMousePos / map.SectorPixelSize) + Vector2.One, Vector2.Zero, mapSz).ToPoint();
-                        
+
                         for (int y = start.Y; y < end.Y; y++)
                         {
                             for (int x = start.X; x < end.X; x++)
@@ -357,7 +363,7 @@ namespace DyingAndMore.Editor
                                 for (var i = 0; i < sect.blobs.Count; i++)
                                 {
                                     var blob = sect.blobs[i];
-                                    
+
                                     if (Vector2.DistanceSquared(blob.position, worldMousePos) < blob.type.Radius * blob.type.Radius)
                                     {
                                         sect.blobs[i] = sect.blobs[sect.blobs.Count - 1];
@@ -419,7 +425,7 @@ namespace DyingAndMore.Editor
                         diff.Normalize();
                         selectedEntity.Direction = diff;
                     }
-                    
+
                     if (InputState.IsPress(Keys.Delete))
                     {
                         map.Destroy(selectedEntity);
@@ -430,7 +436,22 @@ namespace DyingAndMore.Editor
             }
 
             #endregion
-            
+
+            while (TouchPanel.IsGestureAvailable)
+            {
+                var gesture = TouchPanel.ReadGesture();
+                switch (gesture.GestureType)
+                {
+                    case GestureType.FreeDrag:
+                        camera.Position -= Vector2.TransformNormal(gesture.Delta, Matrix.Invert(camera.Transform));
+                        break;
+
+                    case GestureType.Pinch:
+                        camera.Scale += gesture.Delta.X;
+                        break;
+                }
+            }
+
             lastWorldPos = worldMousePos;
 
             if (selectedEntity != null && currentMode == EditorMode.Entities)
@@ -529,12 +550,12 @@ namespace DyingAndMore.Editor
 
                 //if (map.Tiles[first.Y, first.X] != initialValue)
                 //    continue;
-                
+
                 var left = first.X;
                 var right = first.X;
                 for (; left > 0 && map.Tiles[first.Y, left - 1] == initialValue; left--) ;
-                for (; right < map.Width - 1&& map.Tiles[first.Y, right + 1] == initialValue; right++) ;
-                
+                for (; right < map.Width - 1 && map.Tiles[first.Y, right + 1] == initialValue; right++) ;
+
                 for (; left <= right; left++)
                 {
                     map.Tiles[first.Y, left] = TileValue;
@@ -547,7 +568,7 @@ namespace DyingAndMore.Editor
                 }
             }
         }
-        
+
         void MapLineRect(Rectangle Rect, Color Color)
         {
             map.DrawLine(new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Right, Rect.Top), Color);
@@ -572,7 +593,7 @@ namespace DyingAndMore.Editor
             camera.Draw();
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-            
+
             //fps
             var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
             var sSz = tinyFont.MeasureString(sFps);
@@ -609,7 +630,7 @@ namespace DyingAndMore.Editor
                 }
             }
             else if (currentMode == EditorMode.Decals)
-            {   
+            {
                 if (selectedDecal.HasValue)
                 {
                     var decal = map.Sectors[selectedDecal.Value.y, selectedDecal.Value.x].decals[selectedDecal.Value.index];
