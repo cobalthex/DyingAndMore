@@ -46,7 +46,7 @@ namespace DyingAndMore.Editor
         float startRotation, startScale;
         System.TimeSpan lastBlobTime = System.TimeSpan.Zero;
 
-        public Editor() : base(Takai.States.StateType.Full) { }
+        public Editor() : base(false, false) { }
 
         void AddSelector(Selector Sel, int Index)
         {
@@ -71,16 +71,14 @@ namespace DyingAndMore.Editor
 
             map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
 
-            TouchPanel.EnabledGestures = GestureType.Tap | GestureType.FreeDrag | GestureType.Pinch;
+            TouchPanel.EnabledGestures = GestureType.FreeDrag | GestureType.DragComplete | GestureType.Pinch;
         }
 
         public override void Unload()
         {
-            //todo: PopAll<type>()
-            Takai.States.StateManager.PopState();
-            Takai.States.StateManager.PopState();
-            Takai.States.StateManager.PopState();
-            Takai.States.StateManager.PopState();
+            while (Takai.States.StateManager.TopState != this
+                && Takai.States.StateManager.Count > 0)
+                Takai.States.StateManager.PopState();
 
             TouchPanel.EnabledGestures = GestureType.None;
         }
@@ -162,6 +160,39 @@ namespace DyingAndMore.Editor
             }
 
             var worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
+
+            //touch gestures
+            bool gestured = false;
+            while (TouchPanel.IsGestureAvailable)
+            {
+                var gesture = TouchPanel.ReadGesture();
+                switch (gesture.GestureType)
+                {
+                    //todo: dragging does not work correctly (in tile mode for eg)
+
+                    case GestureType.Pinch:
+                        {
+                            //move
+                            if (Vector2.Dot(gesture.Delta, gesture.Delta2) > 0)
+                            {
+                                camera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(camera.Transform)) / 2;
+                            }
+                            //scale
+                            else
+                            {
+                                var lp1 = gesture.Position - gesture.Delta;
+                                var lp2 = gesture.Position2 - gesture.Delta2;
+                                var dist = Vector2.Distance(gesture.Position2, gesture.Position2);
+                                var ld = Vector2.Distance(lp1, lp2);
+
+                                var scale = (dist / ld) / 1024;
+                                camera.Scale += scale;
+                            }
+                            gestured = true;
+                            break;
+                        }
+                }
+            }
 
             if (InputState.IsButtonDown(MouseButtons.Middle))
             {
@@ -437,20 +468,7 @@ namespace DyingAndMore.Editor
 
             #endregion
 
-            while (TouchPanel.IsGestureAvailable)
-            {
-                var gesture = TouchPanel.ReadGesture();
-                switch (gesture.GestureType)
-                {
-                    case GestureType.FreeDrag:
-                        camera.Position -= Vector2.TransformNormal(gesture.Delta, Matrix.Invert(camera.Transform));
-                        break;
-
-                    case GestureType.Pinch:
-                        camera.Scale += gesture.Delta.X;
-                        break;
-                }
-            }
+            camera.Scale = MathHelper.Clamp(camera.Scale, 0.1f, 10f); //todo: make global and move to some game settings
 
             lastWorldPos = worldMousePos;
 
@@ -581,10 +599,31 @@ namespace DyingAndMore.Editor
         {
             if (map == null)
             {
+                GraphicsDevice.Clear(new Color(24, 24, 24)); //replace w/ graphic maybe
                 sbatch.Begin();
-                var pos = (new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height) - largeFont.MeasureString("No map loaded")) / 2;
-                largeFont.Draw(sbatch, "No map loaded", pos, Color.White);
+
+                var noMapStr = new [] {
+                    "No map loaded",
+                    " ",
+                    "Press Ctrl+N to create a new map",
+                    "or Ctrl+O to load one"
+                };
+                float h = 0;
+                var   sz = new Vector2[noMapStr.Length];
+                for (var i = 0; i < noMapStr.Length; ++i)
+                {
+                    var mz = largeFont.MeasureString(noMapStr[i]);
+                    sz[i] = mz;
+                    h += mz.Y;
+                }
+                h = (GraphicsDevice.Viewport.Height - h) / 2;
+                for (var i = 0; i < noMapStr.Length; ++i)
+                {
+                    largeFont.Draw(sbatch, noMapStr[i], new Vector2((GraphicsDevice.Viewport.Width - sz[i].X) / 2, h), Color.White);
+                    h += sz[i].Y;
+                }
                 sbatch.End();
+                return;
             }
 
             //draw border around map
@@ -600,19 +639,18 @@ namespace DyingAndMore.Editor
             tinyFont.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
             var viewPos = camera.WorldToScreen(camera.ActualPosition);
-            var worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
 
             if (currentMode == EditorMode.Tiles)
             {
                 //draw rect around tile under cursor
-                if (map.IsInside(worldMousePos))
+                if (map.IsInside(lastWorldPos))
                 {
                     MapLineRect
                     (
                         new Rectangle
                         (
-                            (int)(worldMousePos.X / map.TileSize) * map.TileSize,
-                            (int)(worldMousePos.Y / map.TileSize) * map.TileSize,
+                            (int)(lastWorldPos.X / map.TileSize) * map.TileSize,
+                            (int)(lastWorldPos.Y / map.TileSize) * map.TileSize,
                             map.TileSize, map.TileSize
                         ),
                         highlightColor
@@ -621,12 +659,12 @@ namespace DyingAndMore.Editor
 
                 if (isPosSaved)
                 {
-                    var diff = worldMousePos - savedWorldPos;
+                    var diff = lastWorldPos - savedWorldPos;
                     var angle = (int)MathHelper.ToDegrees((float)System.Math.Atan2(-diff.Y, diff.X));
                     if (angle < 0)
                         angle += 360;
-                    map.DrawLine(savedWorldPos, worldMousePos, Color.GreenYellow);
-                    tinyFont.Draw(sbatch, string.Format("x:{0} y:{1} deg:{2}", diff.X, diff.Y, angle), camera.WorldToScreen(worldMousePos) + new Vector2(10, -10), Color.White);
+                    map.DrawLine(savedWorldPos, lastWorldPos, Color.GreenYellow);
+                    tinyFont.Draw(sbatch, string.Format("x:{0} y:{1} deg:{2}", diff.X, diff.Y, angle), camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
             }
             else if (currentMode == EditorMode.Decals)

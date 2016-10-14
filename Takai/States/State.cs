@@ -5,65 +5,55 @@
     /// </summary>
     public class State
     {
-        #region Data
+        /// <summary>
+        /// Draw states below this one in the state manager's state stack
+        /// </summary>
+        public bool DrawBelow { get; set; }
 
         /// <summary>
-        /// The type of this state
+        /// Update states below this one in the state manager's state stack
         /// </summary>
-        public StateType type;
-
-        /// <summary>
-        /// When this state started
-        /// (Reset on reactivation)
-        /// </summary>
-        public System.TimeSpan startTime { get; internal set; }
+        public bool UpdateBelow { get; set; }
 
         /// <summary>
         /// Is the state visible?
         /// </summary>
-        public bool isVisible;
+        public bool IsVisible { get; set; }
         /// <summary>
         /// Is the state updating?
         /// </summary>
-        public bool isEnabled;
+        public bool IsEnabled { get; set; }
 
         /// <summary>
         /// Has the state been loaded?
         /// </summary>
-        public bool isLoaded = false;
-        
-        /// <summary>
-        /// Force this state to draw to its render target (Disabled becauase breaks rendering)
-        /// </summary>
-        //public bool forceRenderTarget = false;
+        public bool IsLoaded { get; set; }
 
         /// <summary>
         /// The graphics device for this game (only set if state is active)
         /// </summary>
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice { get; internal set; }
 
-        #endregion
-
-        #region Functions
-
         /// <summary>
         /// Create a new state
         /// (defaults to invisible and inactive)
         /// </summary>
-        /// <param name="screenType">The type of state this is</param>
-        public State(StateType screenType)
+        /// <param name="DrawBelow">Allow states below this one in the state stack to draw</param>
+        /// <param name="UpdateBelow">Allow states below this one in the state stack to update</param>
+        public State(bool DrawBelow, bool UpdateBelow)
         {
-            type = screenType;
+            this.DrawBelow = DrawBelow;
+            this.UpdateBelow = UpdateBelow;
         }
 
         /// <summary>
         /// Load data for the state (The screen can either create its own content manager or use the state manager's content manager)
         /// </summary>
-        public virtual void Load() { isLoaded = true; }
+        public virtual void Load() { IsLoaded = true; }
         /// <summary>
         /// Unload data from the state
         /// </summary>
-        public virtual void Unload() { isLoaded = false; }
+        public virtual void Unload() { IsLoaded = false; }
 
         /// <summary>
         /// Update the state
@@ -76,20 +66,14 @@
         /// <param name="time">game time</param>
         public virtual void Draw(Microsoft.Xna.Framework.GameTime Time) { }
 
-        #region Helper functions
-
         /// <summary>
         /// Enable and show the state
         /// </summary>
-        public void Activate() { isEnabled = true; isVisible = true; }
+        public void Activate() { IsEnabled = true; IsVisible = true; }
         /// <summary>
         /// Disable and hide the state
         /// </summary>
-        public void Deactivate() { isEnabled = isVisible = false; }
-
-        #endregion
-
-        #region Events
+        public void Deactivate() { IsEnabled = IsVisible = false; }
 
         /// <summary>
         /// Called when the state is activated
@@ -99,32 +83,5 @@
         /// Called when the game window is resized
         /// </summary>
         public StateManager.StateEventHandler OnResize;
-
-        #endregion
-
-        #endregion
     }
-
-    #region Enums
-
-    /// <summary>
-    /// The type of state
-    /// </summary>
-    public enum StateType
-    {
-        /// <summary>
-        /// A full state (disables drawing and updating for any state under)
-        /// </summary>
-        Full,
-        /// <summary>
-        /// A modal popup (allows drawing but disables updating under)
-        /// </summary>
-        Popup,
-        /// <summary>
-        /// A non blocking popup (allows drawing and updating under)
-        /// </summary>
-        Overlay
-    }
-
-    #endregion
 }

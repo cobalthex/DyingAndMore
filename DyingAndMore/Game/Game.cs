@@ -18,20 +18,20 @@ namespace DyingAndMore.Game
 
         SpriteBatch sbatch;
 
-        public Game() : base(Takai.States.StateType.Full) { }
+        public Game() : base(false, false) { }
 
         void StartMap()
         {
             map.updateSettings = Takai.Game.MapUpdateSettings.Game;
-            
+
             var plyr = from ent in map.FindEntitiesByType<Entities.Actor>(true)
                        where ((Entities.Actor)ent).Faction == Entities.Factions.Player
                        select ent;
-            
+
             player = plyr.FirstOrDefault() as Entities.Actor;
             camera.Follow = player;
         }
-        
+
         public override void Load()
         {
             fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
@@ -127,7 +127,7 @@ namespace DyingAndMore.Game
             {
                 map.TimeScale += System.Math.Sign(scrollDelta) * 0.1f;
             }
-            
+
             camera.Update(Time);
 
             Vector2 worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
@@ -158,7 +158,7 @@ namespace DyingAndMore.Game
             ;
 
             fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White);
-            
+
             sbatch.End();
         }
     }
