@@ -41,7 +41,7 @@ namespace DyingAndMore.Editor
         public int SelectedItem { get; set; } = 0;
 
         public Selector(Editor Editor)
-            : base(Takai.States.StateType.Popup)
+            : base(true, false)
         {
             editor = Editor;
         }

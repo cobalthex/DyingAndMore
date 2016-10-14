@@ -37,6 +37,8 @@ namespace Takai.Game
         /// </summary>
         public float MoveSpeed = 1000;
 
+        //todo: switch to physics based system
+
         /// <summary>
         /// The target position of the camera
         /// </summary>
@@ -67,7 +69,7 @@ namespace Takai.Game
                        Matrix.CreateTranslation(new Vector3(GetCameraOrigin(Viewport.Width, Viewport.Height), 0));
             }
         }
-        
+
         public Camera() { }
 
         public Camera(Map Map, Entity Follow = null)
@@ -144,7 +146,7 @@ namespace Takai.Game
         {
             return new Vector2(ViewWidth / 2, ViewHeight / 2);
         }
-        
+
         /// <summary>
         /// Unproject a world position to a screen position
         /// </summary>

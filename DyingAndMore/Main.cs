@@ -57,9 +57,9 @@ namespace DyingAndMore
         {
             Takai.Data.Serializer.LoadTypesFrom(System.Reflection.Assembly.GetEntryAssembly());
 
-            if (StateManager.isInitialized)
+            if (StateManager.IsInitialized)
                 return;
-            
+
             #region Mouse Cursor
 #if WINDOWS
             if (useCustomCursor)
@@ -73,7 +73,7 @@ namespace DyingAndMore
             }
 #endif
             #endregion
-            
+
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
             Takai.AssetManager.Initialize(GraphicsDevice, "Data\\");
@@ -88,12 +88,12 @@ namespace DyingAndMore
         {
             StateManager.Exit();
         }
-        
+
         protected override void Update(GameTime gameTime)
         {
             if (Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.F12))
                 takingScreenshot = true;
-            
+
             Takai.Input.InputState.Update(GraphicsDevice.Viewport.Bounds);
             StateManager.Update(gameTime);
         }

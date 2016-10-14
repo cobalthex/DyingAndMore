@@ -8,8 +8,6 @@ Features to add in the future
 
 0. Invisibility
 
-0. Change debug info rendering to move to editor/game class. (Map can build debug info that classes can use)
-
 0. Ambient sounds and sound scenery
 
 0. Game AI
@@ -27,3 +25,5 @@ Features to add in the future
 0. Triggers
 	0. Activation values (triggers set values or vise versa) - affect door/etc positions
 	0. activation groups (all doors part of group open when activated)
+
+0. Radial menus for editor. Creates own state in state manager (hides on mouse/touch release) - automatically displays n items
