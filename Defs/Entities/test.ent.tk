@@ -19,19 +19,16 @@ Actor {
     Radius: 16;
     IsPhysical: True;
     IgnoreTrace: False;
-    Sprite: GraphicSave {
+    Sprite: Graphic {
         texture: "Textures/Entities/InfectedCell.png";
         width: 32;
         height: 32;
         clipRect: [0 0 256 96];
         origin: [16 16];
-        frameCount: 8;
-        frameTime: 100;
-        isLooping: True;
-        isRunning: True;
-        tween: TweenStyle Overlap;
-        delay: 0;
-        elapsed: 0;
+        FrameCount: 8;
+        FrameLength: 100;
+        IsLooping: True;
+        Tween: TweenStyle Overlap;
     };
     OutlineColor: [0 0 0 0];
 }

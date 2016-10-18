@@ -47,8 +47,6 @@ namespace Takai.States
         /// </summary>
         public static Microsoft.Xna.Framework.Game Game { get; internal set; }
 
-        static Microsoft.Xna.Framework.Rectangle lastBounds;
-
         /// <summary>
         /// Initialize state manager
         /// </summary>
@@ -68,7 +66,6 @@ namespace Takai.States
         public static void Update(Microsoft.Xna.Framework.GameTime Time)
         {
             var bounds = Game.GraphicsDevice.Viewport.Bounds;
-            bool resized = lastBounds != bounds;
 
             if (IsExiting)
                 Game.Exit();
@@ -84,10 +81,7 @@ namespace Takai.States
                 if (s.IsEnabled)
                 {
                     s.Update(Time);
-
-                    if (resized)
-                        s.OnResize?.Invoke();
-
+                   
                     if (!s.UpdateBelow)
                         break;
                 }

@@ -16,19 +16,16 @@ Actor {
     Radius: 48;
     IsPhysical: True;
     IgnoreTrace: False;
-    Sprite: GraphicSave {
+    Sprite: Graphic {
         texture: "Textures/Entities/Test.png";
         width: 96;
         height: 96;
-        clipRect: [0 0 576 192];
+        ClipRect: [0 0 576 192];
         origin: [48 48];
-        frameCount: 6;
-        frameTime: 100;
-        isLooping: True;
-        isRunning: True;
-        tween: TweenStyle Overlap;
-        delay: 0;
-        elapsed: 0;
+        FrameCount: 6;
+        FrameTime: 100;
+        IsLooping: True;
+        Tween: TweenStyle Overlap;
     };
     OutlineColor: [0 0 0 0];
 }

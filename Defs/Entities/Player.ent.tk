@@ -1,19 +1,16 @@
 Actor {
     MaxHealth: 100;
     States: {
-        Idle: GraphicSave {
+        Idle: Graphic {
             texture: "Textures/Entities/Player.png";
             width: 48;
             height: 48;
             clip: [0 0 96 96];
             origin: [24 24];
-            frameCount: 2;
-            frameTime: 100;
-            isLooping: True;
-            isRunning: True;
-            tween: TweenStyle Overlap;
-            delay: 0;
-            elapsed: 123;
+            FrameCount: 2;
+            FrameLength: 100;
+            IsLooping: True;
+            Tween: TweenStyle Overlap;
         };
     };
     CurrentState: EntState Idle;
