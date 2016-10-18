@@ -44,7 +44,7 @@ namespace DyingAndMore.Editor
                 {
                     Bounds.X += Bounds.Width / 2;
                     Bounds.Y += Bounds.Height / 2;
-                    ents[ItemIndex].Sprite.Draw(Sbatch ?? sbatch, Bounds, 0);
+                    ents[ItemIndex].Sprite.Draw(Time.TotalGameTime, Sbatch ?? sbatch, Bounds, 0);
                 }
                 else
                 {

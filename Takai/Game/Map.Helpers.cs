@@ -153,7 +153,35 @@ namespace Takai.Game
         /// <remarks>Will navigate around entities that dont ignore trace</remarks>
         public List<Vector2> GetPath(Vector2 Start, Vector2 End)
         {
-            //use d* lite or mtd* lite
+            //todo: use d* lite or mtd* lite
+
+            //jps
+            /*var successors:Vector.< Node > = new Vector.< Node > ();
+            var neighbours:Vector.< Node > = nodeNeighbours(current);
+
+            for each(var neighbour: Node in neighbours) {
+                // Direction from current node to neighbor:
+                var dX:int = clamp(neighbour.x - current.x, -1, 1);
+                var dY:int = clamp(neighbour.y - current.y, -1, 1);
+
+
+                // Try to find a node to jump to:
+                var jumpPoint:Node = jump(current.x, current.y, dX, dY, start, end);
+
+
+                // If found add it to the list:
+                if (jumpPoint) successors.push(jumpPoint);
+            }*/
+
+            var successors = new List<Vector2>();
+            var neighbors = new List<Vector2>(new[] { Start });
+
+            for (var i = 0; i < neighbors.Count; ++i)
+            {
+
+            }
+
+            //return successors;
 
             return null;
         }

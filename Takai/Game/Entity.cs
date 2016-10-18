@@ -121,7 +121,7 @@ namespace Takai.Game
                 if (States != null && States.ContainsKey(value))
                 {
                     Sprite = States[currentState];
-                    Sprite.Restart();
+                    Sprite.Start(Map != null ? Map.ElapsedTime : TimeSpan.Zero);
                 }
 
                 if (DestroyOnDeath && currentState == EntState.Dead)

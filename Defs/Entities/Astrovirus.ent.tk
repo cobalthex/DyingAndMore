@@ -17,11 +17,10 @@ Actor {
             width: 42;
             height: 42;
             origin: [21 21];
-            frameCount: 6;
-            frameTime: 100;
-            isLooping: True;
-            isRunning: True;
-            tween: TweenStyle Overlap;
+            FrameCount: 6;
+            FrameTime: 100;
+            IsLooping: True;
+            Tween: TweenStyle Overlap;
         };
     };
 }

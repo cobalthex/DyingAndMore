@@ -3,177 +3,259 @@ MapSave {
     width: 72;
     height: 45;
     tileSize: 48;
-    tilesImage: "Textures/Tiles.png";
-    tiles: [
-        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 26 40 48 0 0 0 105 104 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 91 -1 -1 -1 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 14 0 0 0 15 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 19 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 91 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 24 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 87 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 101 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 55 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 47 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 10 0 0 0 0 11 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
-        ];
+    tilesImage: "Data\\Textures/Tiles.png";
+    tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 26 40 48 0 0 0 105 104 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 91 -1 -1 -1 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 14 0 0 0 15 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 19 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 91 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 24 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 87 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 101 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 55 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 47 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 10 0 0 0 0 11 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1];
     state: MapState {
         entities: [
             Actor {
                 CurrentHealth: 0;
                 MaxHealth: 0;
-                States: {
-                };
-                CurrentState: Null;
                 FieldOfView: 2.356194;
                 MaxSpeed: 0;
                 MoveForce: 0;
                 Faction: Factions None;
+                Controller: Null;
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
                 Name: Null;
-                Position: [559 107];
-                Direction: [-0.8549396 -0.5187274];
+                Position: [268 149];
+                Direction: [0.2425356 0.9701425];
                 Velocity: [0 0];
                 IsEnabled: True;
                 AlwaysActive: False;
                 Radius: 16;
                 IsPhysical: True;
                 IgnoreTrace: False;
-                Sprite: GraphicSave {
-                    texture: "Textures/Entities/InfectedCell.png";
-                    width: 32;
-                    height: 32;
-                    clip: [0 0 256 96];
-                    origin: [16 16];
-                    frameCount: 8;
-                    frameTime: 100;
-                    isLooping: True;
-                    isRunning: True;
-                    tween: TweenStyle Overlap;
-                    delay: 0;
-                    elapsed: 118;
+                States: {
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: False;
+                    ElapsedTime: 427959581;
+                    FrameCount: 8;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    CurrentFrame: 3;
+                    NextFrame: 4;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/InfectedCell.png";
+                    Width: 32;
+                    Height: 32;
+                    Size: [32 32];
+                    ClipRect: [0 0 256 96];
+                    Origin: [16 16];
+                    Tween: TweenStyle Overlap;
                 };
                 AlwaysUpright: True;
                 OutlineColor: [0 0 0 0];
-                primaryWeapon: Null;
-                altWeapon: Null;
+                SpawnTime: 7905;
             }
             Actor {
                 CurrentHealth: 0;
                 MaxHealth: 0;
-                States: {
-                };
-                CurrentState: Null;
                 FieldOfView: 2.356194;
                 MaxSpeed: 0;
                 MoveForce: 0;
                 Faction: Factions None;
+                Controller: Null;
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
                 Name: Null;
-                Position: [458 175];
-                Direction: [-0.8481866 -0.5296976];
+                Position: [312 67];
+                Direction: [NaN NaN];
                 Velocity: [0 0];
                 IsEnabled: True;
                 AlwaysActive: False;
-                Radius: 48;
+                Radius: 16;
                 IsPhysical: True;
                 IgnoreTrace: False;
-                Sprite: GraphicSave {
-                    texture: "Textures/Entities/Test.png";
-                    width: 96;
-                    height: 96;
-                    clip: [0 0 576 192];
-                    origin: [48 48];
-                    frameCount: 6;
-                    frameTime: 100;
-                    isLooping: True;
-                    isRunning: True;
-                    tween: TweenStyle Overlap;
-                    delay: 0;
-                    elapsed: 116;
-                };
-                AlwaysUpright: False;
-                OutlineColor: [0 0 0 0];
-                primaryWeapon: Null;
-                altWeapon: Null;
-            }
-            Actor {
-                CurrentHealth: 100;
-                MaxHealth: 100;
-                States: {
-                };
-                CurrentState: Null;
-                FieldOfView: 2.356194;
-                MaxSpeed: 400;
-                MoveForce: 600;
-                Faction: Factions None;
-                Name: Null;
-                Position: [294 87];
-                Direction: [-0.973715 -0.2277696];
-                Velocity: [0 0];
-                IsEnabled: True;
-                AlwaysActive: False;
-                Radius: 21;
-                IsPhysical: True;
-                IgnoreTrace: False;
-                Sprite: GraphicSave {
-                    texture: "Textures/Entities/Astrovirus.png";
-                    width: 42;
-                    height: 42;
-                    clip: [0 0 252 40];
-                    origin: [21 21];
-                    frameCount: 6;
-                    frameTime: 100;
-                    isLooping: True;
-                    isRunning: True;
-                    tween: TweenStyle Overlap;
-                    delay: 0;
-                    elapsed: 123;
-                };
-                AlwaysUpright: False;
-                OutlineColor: [0 0 0 0];
-                primaryWeapon: Null;
-                altWeapon: Null;
-            }
-            Actor {
-                CurrentHealth: 100;
-                MaxHealth: 100;
-                States: {
-                };
-                CurrentState: Null;
-                FieldOfView: 2.356194;
-                MaxSpeed: 400;
-                MoveForce: 600;
-                Faction: Factions None;
-                Name: Null;
-                Position: [454 30];
-                Direction: [-0.9945865 -0.103912];
-                Velocity: [0 0];
-                IsEnabled: True;
-                AlwaysActive: False;
-                Radius: 21;
-                IsPhysical: True;
-                IgnoreTrace: False;
-                Sprite: GraphicSave {
-                    texture: "Textures/Entities/Astrovirus.png";
-                    width: 42;
-                    height: 42;
-                    clip: [0 0 252 40];
-                    origin: [21 21];
-                    frameCount: 6;
-                    frameTime: 100;
-                    isLooping: True;
-                    isRunning: True;
-                    tween: TweenStyle Overlap;
-                    delay: 0;
-                    elapsed: 124;
-                };
-                AlwaysUpright: False;
-                OutlineColor: [0 0 0 0];
-                primaryWeapon: Null;
-                altWeapon: Null;
-            }
-            Actor {
-                CurrentHealth: 100;
-                MaxHealth: 100;
                 States: {
                 };
                 CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: False;
+                    ElapsedTime: 427959581;
+                    FrameCount: 8;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    CurrentFrame: 3;
+                    NextFrame: 4;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/InfectedCell.png";
+                    Width: 32;
+                    Height: 32;
+                    Size: [32 32];
+                    ClipRect: [0 0 256 96];
+                    Origin: [16 16];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 9129;
+            }
+            Actor {
+                CurrentHealth: 0;
+                MaxHealth: 0;
+                FieldOfView: 2.356194;
+                MaxSpeed: 0;
+                MoveForce: 0;
+                Faction: Factions None;
+                Controller: Null;
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [385 45];
+                Direction: [NaN NaN];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: False;
+                    ElapsedTime: 427959581;
+                    FrameCount: 8;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    CurrentFrame: 3;
+                    NextFrame: 4;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/InfectedCell.png";
+                    Width: 32;
+                    Height: 32;
+                    Size: [32 32];
+                    ClipRect: [0 0 256 96];
+                    Origin: [16 16];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 12274;
+            }
+            Actor {
+                CurrentHealth: 0;
+                MaxHealth: 0;
+                FieldOfView: 2.356194;
+                MaxSpeed: 0;
+                MoveForce: 0;
+                Faction: Factions None;
+                Controller: Null;
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [351 159];
+                Direction: [NaN NaN];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: False;
+                    ElapsedTime: 427959581;
+                    FrameCount: 8;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    CurrentFrame: 3;
+                    NextFrame: 4;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/InfectedCell.png";
+                    Width: 32;
+                    Height: 32;
+                    Size: [32 32];
+                    ClipRect: [0 0 256 96];
+                    Origin: [16 16];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 13872;
+            }
+            Actor {
+                CurrentHealth: 100;
+                MaxHealth: 100;
                 FieldOfView: 2.356194;
                 MaxSpeed: 400;
                 MoveForce: 600;
                 Faction: Factions Player;
-                Controller: InputController { player: PlayerIndex One };
-                Name: "Player";
-                Position: [68 144];
+                Controller: InputController {
+                    player: PlayerIndex One;
+                };
+                PrimaryWeapon: Gun {
+                    Projectile: Projectile {
+                        Velocity: [0 0];
+                        Direction: [1 0];
+                        Name: Null;
+                        Position: [0 0];
+                        IsEnabled: True;
+                        AlwaysActive: True;
+                        Radius: 8;
+                        IsPhysical: True;
+                        IgnoreTrace: True;
+                        States: Null;
+                        CurrentState: EntState Idle;
+                        DestroyOnDeath: True;
+                        DestroyOffScreenIfDead: False;
+                        Sprite: Graphic {
+                            IsRunning: False;
+                            ElapsedTime: 0;
+                            FrameCount: 1;
+                            FrameLength: 0.0001;
+                            IsLooping: False;
+                            CurrentFrame: 0;
+                            NextFrame: 1;
+                            FrameDelta: 0;
+                            File: "Data\\Textures/Projectiles/Sharp.png";
+                            Texture: "Data\\Textures/Projectiles/Sharp.png";
+                            Width: 16;
+                            Height: 8;
+                            Size: [16 8];
+                            ClipRect: [0 0 16 8];
+                            Origin: [8 4];
+                            Tween: TweenStyle None;
+                        };
+                        AlwaysUpright: False;
+                        OutlineColor: [0 0 0 0];
+                        SpawnTime: 0;
+                    };
+                    Speed: 800;
+                    AddVelocity: False;
+                    shotDelay: 50;
+                    maxShots: 0;
+                };
+                AltWeapon: BlobGun {
+                    blob: BlobType {
+                        Texture: "Data\\Textures/Blobs/blood.png";
+                        Reflection: "Data\\Textures/Blobs/blood.r.png";
+                        Radius: 54;
+                        Drag: 0.2;
+                    };
+                    speed: 100;
+                    shotDelay: 100;
+                    maxShots: 0;
+                };
+                Name: Null;
+                Position: [116 118];
                 Direction: [1 0];
                 Velocity: [0 0];
                 IsEnabled: True;
@@ -181,40 +263,256 @@ MapSave {
                 Radius: 24;
                 IsPhysical: True;
                 IgnoreTrace: False;
-                Sprite: GraphicSave {
-                    texture: "Textures/Entities/Player.png";
-                    width: 48;
-                    height: 48;
-                    clip: [0 0 96 96];
-                    origin: [24 24];
-                    frameCount: 2;
-                    frameTime: 100;
-                    isLooping: True;
-                    isRunning: True;
-                    tween: TweenStyle Overlap;
-                    delay: 0;
-                    elapsed: 123;
+                States: {
+                    Idle: Graphic {
+                        IsRunning: True;
+                        ElapsedTime: 204852550;
+                        FrameCount: 2;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        CurrentFrame: 1;
+                        NextFrame: 0;
+                        FrameDelta: 0;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Player.png";
+                        Width: 48;
+                        Height: 48;
+                        Size: [48 48];
+                        ClipRect: [0 0 96 144];
+                        Origin: [24 24];
+                        Tween: TweenStyle Overlap;
+                    };
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: True;
+                    ElapsedTime: 204852550;
+                    FrameCount: 2;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    CurrentFrame: 1;
+                    NextFrame: 0;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Player.png";
+                    Width: 48;
+                    Height: 48;
+                    Size: [48 48];
+                    ClipRect: [0 0 96 144];
+                    Origin: [24 24];
+                    Tween: TweenStyle Overlap;
                 };
                 AlwaysUpright: False;
                 OutlineColor: [0 0 0 0];
-                primaryWeapon: Gun {
-                    Projectile: Projectile { };
-                    Speed: 800;
-                    shotDelay: 250;
+                SpawnTime: 25024;
+            }
+            Actor {
+                CurrentHealth: 0;
+                MaxHealth: 0;
+                FieldOfView: 2.356194;
+                MaxSpeed: 0;
+                MoveForce: 0;
+                Faction: Factions None;
+                Controller: Null;
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [529 135];
+                Direction: [-0.9900276 -0.1408735];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 48;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
                 };
-                altWeapon: BlobGun {
-                    blob: BlobType {
-                        Radius: 54;
-                        Drag: 1.5;
-                        Texture: "Textures/Blobs/blood.png";
-                        Reflection: "Textures/Blobs/blood.r.png";
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: False;
+                    ElapsedTime: 100180864;
+                    FrameCount: 6;
+                    FrameLength: 0.0001;
+                    IsLooping: True;
+                    CurrentFrame: 2;
+                    NextFrame: 3;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Test.png";
+                    Width: 96;
+                    Height: 96;
+                    Size: [96 96];
+                    ClipRect: [0 0 576 192];
+                    Origin: [48 48];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: False;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 25942;
+            }
+            Control {
+                PlayerOnly: False;
+                Trigger: "Test";
+                TriggerValue: ControlValue Toggle;
+                IsPowered: False;
+                PowerGroup: "Test";
+                Name: Null;
+                Position: [212 46];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 24;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                    Idle: Graphic {
+                        IsRunning: True;
+                        ElapsedTime: 172543591;
+                        FrameCount: 1;
+                        FrameLength: 0.0001;
+                        IsLooping: False;
+                        CurrentFrame: 0;
+                        NextFrame: 0;
+                        FrameDelta: 0;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Button.png";
+                        Width: 48;
+                        Height: 48;
+                        Size: [48 48];
+                        ClipRect: [0 0 96 48];
+                        Origin: [24 24];
+                        Tween: TweenStyle None;
                     };
-                    speed: 100;
+                    Active: Graphic {
+                        IsRunning: False;
+                        ElapsedTime: 0;
+                        FrameCount: 1;
+                        FrameLength: 0.0001;
+                        IsLooping: False;
+                        CurrentFrame: 0;
+                        NextFrame: 1;
+                        FrameDelta: 0;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Button.png";
+                        Width: 48;
+                        Height: 48;
+                        Size: [48 48];
+                        ClipRect: [0 0 96 48];
+                        Origin: [24 24];
+                        Tween: TweenStyle None;
+                    };
                 };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: True;
+                    ElapsedTime: 172543591;
+                    FrameCount: 1;
+                    FrameLength: 0.0001;
+                    IsLooping: False;
+                    CurrentFrame: 0;
+                    NextFrame: 0;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Button.png";
+                    Width: 48;
+                    Height: 48;
+                    Size: [48 48];
+                    ClipRect: [0 0 96 48];
+                    Origin: [24 24];
+                    Tween: TweenStyle None;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 27931;
+            }
+            Control {
+                PlayerOnly: False;
+                Trigger: "Test";
+                TriggerValue: ControlValue Toggle;
+                IsPowered: False;
+                PowerGroup: "Test";
+                Name: Null;
+                Position: [359 253];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 24;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                    Idle: Graphic {
+                        IsRunning: True;
+                        ElapsedTime: 172543591;
+                        FrameCount: 1;
+                        FrameLength: 0.0001;
+                        IsLooping: False;
+                        CurrentFrame: 0;
+                        NextFrame: 0;
+                        FrameDelta: 0;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Button.png";
+                        Width: 48;
+                        Height: 48;
+                        Size: [48 48];
+                        ClipRect: [0 0 96 48];
+                        Origin: [24 24];
+                        Tween: TweenStyle None;
+                    };
+                    Active: Graphic {
+                        IsRunning: False;
+                        ElapsedTime: 0;
+                        FrameCount: 1;
+                        FrameLength: 0.0001;
+                        IsLooping: False;
+                        CurrentFrame: 0;
+                        NextFrame: 1;
+                        FrameDelta: 0;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Button.png";
+                        Width: 48;
+                        Height: 48;
+                        Size: [48 48];
+                        ClipRect: [0 0 96 48];
+                        Origin: [24 24];
+                        Tween: TweenStyle None;
+                    };
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: True;
+                    ElapsedTime: 172543591;
+                    FrameCount: 1;
+                    FrameLength: 0.0001;
+                    IsLooping: False;
+                    CurrentFrame: 0;
+                    NextFrame: 0;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Button.png";
+                    Width: 48;
+                    Height: 48;
+                    Size: [48 48];
+                    ClipRect: [0 0 96 48];
+                    Origin: [24 24];
+                    Tween: TweenStyle None;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 29019;
             }
             Entity {
                 Name: Null;
-                Position: [301 165];
+                Position: [419 102];
                 Direction: [1 0];
                 Velocity: [0 0];
                 IsEnabled: True;
@@ -222,55 +520,166 @@ MapSave {
                 Radius: 21;
                 IsPhysical: True;
                 IgnoreTrace: False;
-                Sprite: GraphicSave {
-                    texture: "Textures/Entities/Adrenaline.png";
-                    width: 42;
-                    height: 42;
-                    clip: [0 0 294 42];
-                    origin: [21 21];
-                    frameCount: 7;
-                    frameTime: 100;
-                    isLooping: True;
-                    isRunning: True;
-                    tween: TweenStyle Overlap;
-                    delay: 0;
-                    elapsed: 329;
+                States: {
+                    Idle: Graphic {
+                        IsRunning: True;
+                        ElapsedTime: 109855173;
+                        FrameCount: 7;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        CurrentFrame: 6;
+                        NextFrame: 0;
+                        FrameDelta: 0;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Adrenaline.png";
+                        Width: 42;
+                        Height: 42;
+                        Size: [42 42];
+                        ClipRect: [0 0 294 42];
+                        Origin: [21 21];
+                        Tween: TweenStyle Overlap;
+                    };
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: True;
+                    ElapsedTime: 109855173;
+                    FrameCount: 7;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    CurrentFrame: 6;
+                    NextFrame: 0;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Adrenaline.png";
+                    Width: 42;
+                    Height: 42;
+                    Size: [42 42];
+                    ClipRect: [0 0 294 42];
+                    Origin: [21 21];
+                    Tween: TweenStyle Overlap;
                 };
                 AlwaysUpright: True;
                 OutlineColor: [0 0 0 0];
+                SpawnTime: 51204;
             }
             Entity {
-                Name: Null;
-                Position: [173 87];
-                Direction: [1 0];
                 Velocity: [0 0];
+                Direction: [1 0];
+                Name: Null;
+                Position: [440 201];
                 IsEnabled: True;
                 AlwaysActive: False;
                 Radius: 21;
                 IsPhysical: True;
                 IgnoreTrace: False;
-                Sprite: GraphicSave {
-                    texture: "Textures/Entities/Adrenaline.png";
-                    width: 42;
-                    height: 42;
-                    clip: [0 0 294 42];
-                    origin: [21 21];
-                    frameCount: 7;
-                    frameTime: 100;
-                    isLooping: True;
-                    isRunning: True;
-                    tween: TweenStyle Overlap;
-                    delay: 0;
-                    elapsed: 330;
+                States: {
+                    Idle: Graphic {
+                        IsRunning: True;
+                        ElapsedTime: 109855173;
+                        FrameCount: 7;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        CurrentFrame: 6;
+                        NextFrame: 0;
+                        FrameDelta: 0;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Adrenaline.png";
+                        Width: 42;
+                        Height: 42;
+                        Size: [42 42];
+                        ClipRect: [0 0 294 42];
+                        Origin: [21 21];
+                        Tween: TweenStyle Overlap;
+                    };
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: True;
+                    ElapsedTime: 109855173;
+                    FrameCount: 7;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    CurrentFrame: 6;
+                    NextFrame: 0;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Adrenaline.png";
+                    Width: 42;
+                    Height: 42;
+                    Size: [42 42];
+                    ClipRect: [0 0 294 42];
+                    Origin: [21 21];
+                    Tween: TweenStyle Overlap;
                 };
                 AlwaysUpright: True;
                 OutlineColor: [0 0 0 0];
+                SpawnTime: 52071;
+            }
+            Entity {
+                Velocity: [0 0];
+                Direction: [1 0];
+                Name: Null;
+                Position: [196 202];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 21;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                    Idle: Graphic {
+                        IsRunning: True;
+                        ElapsedTime: 109855173;
+                        FrameCount: 7;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        CurrentFrame: 6;
+                        NextFrame: 0;
+                        FrameDelta: 0;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Adrenaline.png";
+                        Width: 42;
+                        Height: 42;
+                        Size: [42 42];
+                        ClipRect: [0 0 294 42];
+                        Origin: [21 21];
+                        Tween: TweenStyle Overlap;
+                    };
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Graphic {
+                    IsRunning: True;
+                    ElapsedTime: 109855173;
+                    FrameCount: 7;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    CurrentFrame: 6;
+                    NextFrame: 0;
+                    FrameDelta: 0;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Adrenaline.png";
+                    Width: 42;
+                    Height: 42;
+                    Size: [42 42];
+                    ClipRect: [0 0 294 42];
+                    Origin: [21 21];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 53312;
             }
         ];
         blobTypes: [
             BlobType {
-                Texture: "Textures\\Blobs\\Blood.png";
-                Reflection: "Textures\\Blobs\\Blood.r.png";
+                Texture: "Data\\Textures\\Blobs\\Blood.png";
+                Reflection: "Data\\Textures\\Blobs\\Blood.r.png";
                 Radius: 54;
                 Drag: 0.2;
             }
@@ -283,12 +692,7 @@ MapSave {
             }
             BlobSave {
                 type: 0;
-                position: [516 112];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [561 106];
+                position: [562 148];
                 velocity: [0 0];
             }
             BlobSave {
@@ -298,142 +702,12 @@ MapSave {
             }
             BlobSave {
                 type: 0;
-                position: [562 148];
+                position: [561 106];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [709 111];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [708 119];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [716 124];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [759 65];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [751 131];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [750 133];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [728 174];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [737 172];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [723 173];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [710 180];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [642 140];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [689 127];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [673 137];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [649 148];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [652 131];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [657 111];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [657 111];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [657 110];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [638 69];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [605 36];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [628 83];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [672 41];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [672 41];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [637 58];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [659 97];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [642 95];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [586 97];
+                position: [516 112];
                 velocity: [0 0];
             }
             BlobSave {
@@ -443,117 +717,137 @@ MapSave {
             }
             BlobSave {
                 type: 0;
-                position: [791 29];
+                position: [586 97];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [780 69];
+                position: [642 95];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [781 101];
+                position: [659 97];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [797 93];
+                position: [637 58];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [793 122];
+                position: [672 41];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [788 145];
+                position: [672 41];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [802 137];
+                position: [628 83];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [848 115];
+                position: [605 36];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [849 127];
+                position: [638 69];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [837 171];
+                position: [657 110];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [845 165];
+                position: [657 111];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [893 116];
+                position: [657 111];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [901 120];
+                position: [652 131];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [885 175];
+                position: [649 148];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [888 172];
+                position: [673 137];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [917 103];
+                position: [689 127];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [930 79];
+                position: [642 140];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [934 109];
+                position: [710 180];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [945 143];
+                position: [723 173];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [795 172];
+                position: [737 172];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [854 168];
+                position: [728 174];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [852 175];
+                position: [750 133];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [859 180];
+                position: [751 131];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [759 65];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [716 124];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [708 119];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [709 111];
                 velocity: [0 0];
             }
             BlobSave {
@@ -563,42 +857,122 @@ MapSave {
             }
             BlobSave {
                 type: 0;
-                position: [974 106];
+                position: [859 180];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1007 69];
+                position: [852 175];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1012 80];
+                position: [854 168];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1030 150];
+                position: [795 172];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1039 180];
+                position: [945 143];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1043 190];
+                position: [934 109];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1043 191];
+                position: [930 79];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [978 119];
+                position: [917 103];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [888 172];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [885 175];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [901 120];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [893 116];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [845 165];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [837 171];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [849 127];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [848 115];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [802 137];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [788 145];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [793 122];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [797 93];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [781 101];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [780 69];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [791 29];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [969 167];
                 velocity: [0 0];
             }
             BlobSave {
@@ -608,7 +982,42 @@ MapSave {
             }
             BlobSave {
                 type: 0;
-                position: [969 167];
+                position: [978 119];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [1043 191];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [1043 190];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [1039 180];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [1030 150];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [1012 80];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [1007 69];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [974 106];
                 velocity: [0 0];
             }
             BlobSave {
@@ -619,19 +1028,19 @@ MapSave {
         ];
         decals: [
             Decal {
-                texture: "Textures\\Decals\\crack.png";
+                texture: "Data\\Textures\\Decals\\crack.png";
                 position: [1124 39];
                 angle: 0;
                 scale: 1;
             }
             Decal {
-                texture: "Textures\\Decals\\crack.png";
+                texture: "Data\\Textures\\Decals\\crack.png";
                 position: [377 261];
                 angle: 0;
                 scale: 1;
             }
             Decal {
-                texture: "Textures\\Decals\\crack.png";
+                texture: "Data\\Textures\\Decals\\crack.png";
                 position: [588 223];
                 angle: 0;
                 scale: 1;

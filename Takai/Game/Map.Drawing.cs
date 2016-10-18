@@ -183,7 +183,7 @@ namespace Takai.Game
                     else
                     {
                         var angle = ent.AlwaysUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                        ent.Sprite.Draw(sbatch, ent.Position, angle);
+                        ent.Sprite.Draw(ElapsedTime, sbatch, ent.Position, angle);
                     }
                 }
 #if DEBUG //Draw [X] in place of ent graphic
@@ -223,7 +223,7 @@ namespace Takai.Game
                 outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(ent.Sprite.Width, ent.Sprite.Height));
 
                 var angle = ent.AlwaysUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                ent.Sprite.Draw(sbatch, ent.Position, angle, ent.OutlineColor);
+                ent.Sprite.Draw(ElapsedTime, sbatch, ent.Position, angle, ent.OutlineColor);
             }
 
             sbatch.End();
@@ -246,6 +246,7 @@ namespace Takai.Game
                     
                     p.Key.Graphic.Draw
                     (
+                        ElapsedTime,
                         sbatch,
                         new Rectangle(p.Value[i].position.ToPoint(), sz.ToPoint()),
                         p.Value[i].rotation,
