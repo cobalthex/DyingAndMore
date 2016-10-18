@@ -153,7 +153,7 @@ namespace Takai.Game
         /// <remarks>Will navigate around entities that dont ignore trace</remarks>
         public List<Vector2> GetPath(Vector2 Start, Vector2 End)
         {
-            //todo: use d* lite or mtd* lite
+            //todo: use mtd* lite
 
             //jps
             /*var successors:Vector.< Node > = new Vector.< Node > ();
