@@ -108,7 +108,7 @@ namespace Takai.Game
         /// <summary>
         /// The grahpic used for each particle of this type
         /// </summary>
-        public Graphics.Graphic Graphic { get; set; }
+        public Graphics.Sprite Graphic { get; set; }
         /// <summary>
         /// How to blend this particle
         /// </summary>

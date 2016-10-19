@@ -101,7 +101,7 @@ namespace Takai.Game
         /// <summary>
         /// Different animation states for the entity
         /// </summary>
-        public Dictionary<EntState, Takai.Graphics.Graphic> States { get; set; } = null;
+        public Dictionary<EntState, Takai.Graphics.Sprite> States { get; set; } = null;
 
         /// <summary>
         /// Get or set the current state.
@@ -145,7 +145,7 @@ namespace Takai.Game
         /// The active sprite for this entity. Usually updated by the state machine
         /// Can be updated by components
         /// </summary>
-        public Graphics.Graphic Sprite { get; set; } = null;
+        public Graphics.Sprite Sprite { get; set; } = null;
 
         /// <summary>
         /// Should the sprite always display upright (angle of sprite does not affect display)?
