@@ -8,190 +8,6 @@ MapSave {
     state: MapState {
         entities: [
             Actor {
-                CurrentHealth: 0;
-                MaxHealth: 0;
-                FieldOfView: 2.356194;
-                MaxSpeed: 0;
-                MoveForce: 0;
-                Faction: Factions None;
-                Controller: Null;
-                PrimaryWeapon: Null;
-                AltWeapon: Null;
-                Name: Null;
-                Position: [268 149];
-                Direction: [0.2425356 0.9701425];
-                Velocity: [0 0];
-                IsEnabled: True;
-                AlwaysActive: False;
-                Radius: 16;
-                IsPhysical: True;
-                IgnoreTrace: False;
-                States: {
-                };
-                CurrentState: EntState Idle;
-                DestroyOnDeath: True;
-                DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
-                    IsRunning: False;
-                    ElapsedTime: 427959581;
-                    FrameCount: 8;
-                    FrameLength: 100;
-                    IsLooping: True;
-                    CurrentFrame: 3;
-                    NextFrame: 4;
-                    FrameDelta: 0;
-                    File: Null;
-                    Texture: "Data\\Textures/Entities/InfectedCell.png";
-                    Width: 32;
-                    Height: 32;
-                    Size: [32 32];
-                    ClipRect: [0 0 256 96];
-                    Origin: [16 16];
-                    Tween: TweenStyle Overlap;
-                };
-                AlwaysUpright: True;
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 7905;
-            }
-            Actor {
-                CurrentHealth: 0;
-                MaxHealth: 0;
-                FieldOfView: 2.356194;
-                MaxSpeed: 0;
-                MoveForce: 0;
-                Faction: Factions None;
-                Controller: Null;
-                PrimaryWeapon: Null;
-                AltWeapon: Null;
-                Name: Null;
-                Position: [312 67];
-                Direction: [NaN NaN];
-                Velocity: [0 0];
-                IsEnabled: True;
-                AlwaysActive: False;
-                Radius: 16;
-                IsPhysical: True;
-                IgnoreTrace: False;
-                States: {
-                };
-                CurrentState: EntState Idle;
-                DestroyOnDeath: True;
-                DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
-                    IsRunning: False;
-                    ElapsedTime: 427959581;
-                    FrameCount: 8;
-                    FrameLength: 100;
-                    IsLooping: True;
-                    CurrentFrame: 3;
-                    NextFrame: 4;
-                    FrameDelta: 0;
-                    File: Null;
-                    Texture: "Data\\Textures/Entities/InfectedCell.png";
-                    Width: 32;
-                    Height: 32;
-                    Size: [32 32];
-                    ClipRect: [0 0 256 96];
-                    Origin: [16 16];
-                    Tween: TweenStyle Overlap;
-                };
-                AlwaysUpright: True;
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 9129;
-            }
-            Actor {
-                CurrentHealth: 0;
-                MaxHealth: 0;
-                FieldOfView: 2.356194;
-                MaxSpeed: 0;
-                MoveForce: 0;
-                Faction: Factions None;
-                Controller: Null;
-                PrimaryWeapon: Null;
-                AltWeapon: Null;
-                Name: Null;
-                Position: [385 45];
-                Direction: [NaN NaN];
-                Velocity: [0 0];
-                IsEnabled: True;
-                AlwaysActive: False;
-                Radius: 16;
-                IsPhysical: True;
-                IgnoreTrace: False;
-                States: {
-                };
-                CurrentState: EntState Idle;
-                DestroyOnDeath: True;
-                DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
-                    IsRunning: False;
-                    ElapsedTime: 427959581;
-                    FrameCount: 8;
-                    FrameLength: 100;
-                    IsLooping: True;
-                    CurrentFrame: 3;
-                    NextFrame: 4;
-                    FrameDelta: 0;
-                    File: Null;
-                    Texture: "Data\\Textures/Entities/InfectedCell.png";
-                    Width: 32;
-                    Height: 32;
-                    Size: [32 32];
-                    ClipRect: [0 0 256 96];
-                    Origin: [16 16];
-                    Tween: TweenStyle Overlap;
-                };
-                AlwaysUpright: True;
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 12274;
-            }
-            Actor {
-                CurrentHealth: 0;
-                MaxHealth: 0;
-                FieldOfView: 2.356194;
-                MaxSpeed: 0;
-                MoveForce: 0;
-                Faction: Factions None;
-                Controller: Null;
-                PrimaryWeapon: Null;
-                AltWeapon: Null;
-                Name: Null;
-                Position: [351 159];
-                Direction: [NaN NaN];
-                Velocity: [0 0];
-                IsEnabled: True;
-                AlwaysActive: False;
-                Radius: 16;
-                IsPhysical: True;
-                IgnoreTrace: False;
-                States: {
-                };
-                CurrentState: EntState Idle;
-                DestroyOnDeath: True;
-                DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
-                    IsRunning: False;
-                    ElapsedTime: 427959581;
-                    FrameCount: 8;
-                    FrameLength: 100;
-                    IsLooping: True;
-                    CurrentFrame: 3;
-                    NextFrame: 4;
-                    FrameDelta: 0;
-                    File: Null;
-                    Texture: "Data\\Textures/Entities/InfectedCell.png";
-                    Width: 32;
-                    Height: 32;
-                    Size: [32 32];
-                    ClipRect: [0 0 256 96];
-                    Origin: [16 16];
-                    Tween: TweenStyle Overlap;
-                };
-                AlwaysUpright: True;
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 13872;
-            }
-            Actor {
                 CurrentHealth: 100;
                 MaxHealth: 100;
                 FieldOfView: 2.356194;
@@ -216,23 +32,19 @@ MapSave {
                         CurrentState: EntState Idle;
                         DestroyOnDeath: True;
                         DestroyOffScreenIfDead: False;
-                        Sprite: Graphic {
+                        Sprite: Sprite {
                             IsRunning: False;
                             ElapsedTime: 0;
                             FrameCount: 1;
-                            FrameLength: 0.0001;
+                            FrameLength: 100;
                             IsLooping: False;
-                            CurrentFrame: 0;
-                            NextFrame: 1;
-                            FrameDelta: 0;
                             File: "Data\\Textures/Projectiles/Sharp.png";
                             Texture: "Data\\Textures/Projectiles/Sharp.png";
                             Width: 16;
                             Height: 8;
-                            Size: [16 8];
                             ClipRect: [0 0 16 8];
                             Origin: [8 4];
-                            Tween: TweenStyle None;
+                            Tween: TweenStyle Overlap;
                         };
                         AlwaysUpright: False;
                         OutlineColor: [0 0 0 0];
@@ -255,8 +67,8 @@ MapSave {
                     maxShots: 0;
                 };
                 Name: Null;
-                Position: [116 118];
-                Direction: [1 0];
+                Position: [76.99994 115];
+                Direction: [0.9995677 -0.02939905];
                 Velocity: [0 0];
                 IsEnabled: True;
                 AlwaysActive: False;
@@ -264,20 +76,16 @@ MapSave {
                 IsPhysical: True;
                 IgnoreTrace: False;
                 States: {
-                    Idle: Graphic {
+                    Idle: Sprite {
                         IsRunning: True;
-                        ElapsedTime: 204852550;
+                        ElapsedTime: 27879490;
                         FrameCount: 2;
                         FrameLength: 100;
                         IsLooping: True;
-                        CurrentFrame: 1;
-                        NextFrame: 0;
-                        FrameDelta: 0;
                         File: Null;
                         Texture: "Data\\Textures/Entities/Player.png";
                         Width: 48;
                         Height: 48;
-                        Size: [48 48];
                         ClipRect: [0 0 96 144];
                         Origin: [24 24];
                         Tween: TweenStyle Overlap;
@@ -286,27 +94,23 @@ MapSave {
                 CurrentState: EntState Idle;
                 DestroyOnDeath: True;
                 DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
+                Sprite: Sprite {
                     IsRunning: True;
-                    ElapsedTime: 204852550;
+                    ElapsedTime: 27879490;
                     FrameCount: 2;
                     FrameLength: 100;
                     IsLooping: True;
-                    CurrentFrame: 1;
-                    NextFrame: 0;
-                    FrameDelta: 0;
                     File: Null;
                     Texture: "Data\\Textures/Entities/Player.png";
                     Width: 48;
                     Height: 48;
-                    Size: [48 48];
                     ClipRect: [0 0 96 144];
                     Origin: [24 24];
                     Tween: TweenStyle Overlap;
                 };
                 AlwaysUpright: False;
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 25024;
+                SpawnTime: 6443;
             }
             Actor {
                 CurrentHealth: 0;
@@ -319,8 +123,337 @@ MapSave {
                 PrimaryWeapon: Null;
                 AltWeapon: Null;
                 Name: Null;
-                Position: [529 135];
-                Direction: [-0.9900276 -0.1408735];
+                Position: [332.9999 83];
+                Direction: [-0.9946052 0.1037318];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Sprite {
+                    IsRunning: False;
+                    ElapsedTime: 48746480;
+                    FrameCount: 8;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/InfectedCell.png";
+                    Width: 32;
+                    Height: 32;
+                    ClipRect: [0 0 256 96];
+                    Origin: [16 16];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 8500;
+            }
+            Actor {
+                CurrentHealth: 0;
+                MaxHealth: 0;
+                FieldOfView: 2.356194;
+                MaxSpeed: 0;
+                MoveForce: 0;
+                Faction: Factions None;
+                Controller: Null;
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [369.9999 192];
+                Direction: [-0.9678837 -0.2513984];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Sprite {
+                    IsRunning: False;
+                    ElapsedTime: 48746480;
+                    FrameCount: 8;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/InfectedCell.png";
+                    Width: 32;
+                    Height: 32;
+                    ClipRect: [0 0 256 96];
+                    Origin: [16 16];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 9673;
+            }
+            Entity {
+                Name: Null;
+                Position: [448.9999 140];
+                Direction: [-0.99998 0.006328987];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 21;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                    Idle: Sprite {
+                        IsRunning: True;
+                        ElapsedTime: 25535921;
+                        FrameCount: 7;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Adrenaline.png";
+                        Width: 42;
+                        Height: 42;
+                        ClipRect: [0 0 294 42];
+                        Origin: [21 21];
+                        Tween: TweenStyle Overlap;
+                    };
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Sprite {
+                    IsRunning: True;
+                    ElapsedTime: 25535921;
+                    FrameCount: 7;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Adrenaline.png";
+                    Width: 42;
+                    Height: 42;
+                    ClipRect: [0 0 294 42];
+                    Origin: [21 21];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 10863;
+            }
+            Control {
+                PlayerOnly: False;
+                Trigger: "Test";
+                TriggerValue: ControlValue Toggle;
+                IsPowered: False;
+                PowerGroup: "Test";
+                Name: Null;
+                Position: [168.9999 41];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 24;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                    Idle: Sprite {
+                        IsRunning: True;
+                        ElapsedTime: 60781035;
+                        FrameCount: 1;
+                        FrameLength: 100;
+                        IsLooping: False;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Button.png";
+                        Width: 48;
+                        Height: 48;
+                        ClipRect: [0 0 96 48];
+                        Origin: [24 24];
+                        Tween: TweenStyle Overlap;
+                    };
+                    Active: Sprite {
+                        IsRunning: False;
+                        ElapsedTime: 0;
+                        FrameCount: 1;
+                        FrameLength: 100;
+                        IsLooping: False;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Button.png";
+                        Width: 48;
+                        Height: 48;
+                        ClipRect: [0 0 96 48];
+                        Origin: [24 24];
+                        Tween: TweenStyle Overlap;
+                    };
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Sprite {
+                    IsRunning: True;
+                    ElapsedTime: 60781035;
+                    FrameCount: 1;
+                    FrameLength: 100;
+                    IsLooping: False;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Button.png";
+                    Width: 48;
+                    Height: 48;
+                    ClipRect: [0 0 96 48];
+                    Origin: [24 24];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 12495;
+            }
+            Control {
+                PlayerOnly: False;
+                Trigger: "Test";
+                TriggerValue: ControlValue Toggle;
+                IsPowered: False;
+                PowerGroup: "Test";
+                Name: Null;
+                Position: [161.9999 197];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 24;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                    Idle: Sprite {
+                        IsRunning: True;
+                        ElapsedTime: 60781035;
+                        FrameCount: 1;
+                        FrameLength: 100;
+                        IsLooping: False;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Button.png";
+                        Width: 48;
+                        Height: 48;
+                        ClipRect: [0 0 96 48];
+                        Origin: [24 24];
+                        Tween: TweenStyle Overlap;
+                    };
+                    Active: Sprite {
+                        IsRunning: False;
+                        ElapsedTime: 0;
+                        FrameCount: 1;
+                        FrameLength: 100;
+                        IsLooping: False;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Button.png";
+                        Width: 48;
+                        Height: 48;
+                        ClipRect: [0 0 96 48];
+                        Origin: [24 24];
+                        Tween: TweenStyle Overlap;
+                    };
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Sprite {
+                    IsRunning: True;
+                    ElapsedTime: 60781035;
+                    FrameCount: 1;
+                    FrameLength: 100;
+                    IsLooping: False;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Button.png";
+                    Width: 48;
+                    Height: 48;
+                    ClipRect: [0 0 96 48];
+                    Origin: [24 24];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 13073;
+            }
+            Control {
+                PlayerOnly: False;
+                Trigger: "Test";
+                TriggerValue: ControlValue Toggle;
+                IsPowered: False;
+                PowerGroup: "Test";
+                Name: Null;
+                Position: [761.9999 130];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsEnabled: True;
+                AlwaysActive: False;
+                Radius: 24;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                States: {
+                    Idle: Sprite {
+                        IsRunning: True;
+                        ElapsedTime: 60781035;
+                        FrameCount: 1;
+                        FrameLength: 100;
+                        IsLooping: False;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Button.png";
+                        Width: 48;
+                        Height: 48;
+                        ClipRect: [0 0 96 48];
+                        Origin: [24 24];
+                        Tween: TweenStyle Overlap;
+                    };
+                    Active: Sprite {
+                        IsRunning: False;
+                        ElapsedTime: 0;
+                        FrameCount: 1;
+                        FrameLength: 100;
+                        IsLooping: False;
+                        File: Null;
+                        Texture: "Data\\Textures/Entities/Button.png";
+                        Width: 48;
+                        Height: 48;
+                        ClipRect: [0 0 96 48];
+                        Origin: [24 24];
+                        Tween: TweenStyle Overlap;
+                    };
+                };
+                CurrentState: EntState Idle;
+                DestroyOnDeath: True;
+                DestroyOffScreenIfDead: False;
+                Sprite: Sprite {
+                    IsRunning: True;
+                    ElapsedTime: 60781035;
+                    FrameCount: 1;
+                    FrameLength: 100;
+                    IsLooping: False;
+                    File: Null;
+                    Texture: "Data\\Textures/Entities/Button.png";
+                    Width: 48;
+                    Height: 48;
+                    ClipRect: [0 0 96 48];
+                    Origin: [24 24];
+                    Tween: TweenStyle Overlap;
+                };
+                AlwaysUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 13855;
+            }
+            Actor {
+                CurrentHealth: 0;
+                MaxHealth: 0;
+                FieldOfView: 2.356194;
+                MaxSpeed: 0;
+                MoveForce: 0;
+                Faction: Factions None;
+                Controller: Null;
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [571.9999 67];
+                Direction: [-0.9429904 0.3328201];
                 Velocity: [0 0];
                 IsEnabled: True;
                 AlwaysActive: False;
@@ -332,348 +465,65 @@ MapSave {
                 CurrentState: EntState Idle;
                 DestroyOnDeath: True;
                 DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
+                Sprite: Sprite {
                     IsRunning: False;
-                    ElapsedTime: 100180864;
+                    ElapsedTime: 52683272;
                     FrameCount: 6;
-                    FrameLength: 0.0001;
+                    FrameLength: 100;
                     IsLooping: True;
-                    CurrentFrame: 2;
-                    NextFrame: 3;
-                    FrameDelta: 0;
                     File: Null;
                     Texture: "Data\\Textures/Entities/Test.png";
                     Width: 96;
                     Height: 96;
-                    Size: [96 96];
                     ClipRect: [0 0 576 192];
                     Origin: [48 48];
                     Tween: TweenStyle Overlap;
                 };
                 AlwaysUpright: False;
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 25942;
+                SpawnTime: 14348;
             }
-            Control {
-                PlayerOnly: False;
-                Trigger: "Test";
-                TriggerValue: ControlValue Toggle;
-                IsPowered: False;
-                PowerGroup: "Test";
+            Actor {
+                CurrentHealth: 0;
+                MaxHealth: 0;
+                FieldOfView: 2.356194;
+                MaxSpeed: 0;
+                MoveForce: 0;
+                Faction: Factions None;
+                Controller: Null;
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
                 Name: Null;
-                Position: [212 46];
-                Direction: [1 0];
+                Position: [551.9999 175];
+                Direction: [-0.9425349 -0.3341075];
                 Velocity: [0 0];
                 IsEnabled: True;
                 AlwaysActive: False;
-                Radius: 24;
+                Radius: 48;
                 IsPhysical: True;
                 IgnoreTrace: False;
                 States: {
-                    Idle: Graphic {
-                        IsRunning: True;
-                        ElapsedTime: 172543591;
-                        FrameCount: 1;
-                        FrameLength: 0.0001;
-                        IsLooping: False;
-                        CurrentFrame: 0;
-                        NextFrame: 0;
-                        FrameDelta: 0;
-                        File: Null;
-                        Texture: "Data\\Textures/Entities/Button.png";
-                        Width: 48;
-                        Height: 48;
-                        Size: [48 48];
-                        ClipRect: [0 0 96 48];
-                        Origin: [24 24];
-                        Tween: TweenStyle None;
-                    };
-                    Active: Graphic {
-                        IsRunning: False;
-                        ElapsedTime: 0;
-                        FrameCount: 1;
-                        FrameLength: 0.0001;
-                        IsLooping: False;
-                        CurrentFrame: 0;
-                        NextFrame: 1;
-                        FrameDelta: 0;
-                        File: Null;
-                        Texture: "Data\\Textures/Entities/Button.png";
-                        Width: 48;
-                        Height: 48;
-                        Size: [48 48];
-                        ClipRect: [0 0 96 48];
-                        Origin: [24 24];
-                        Tween: TweenStyle None;
-                    };
                 };
                 CurrentState: EntState Idle;
                 DestroyOnDeath: True;
                 DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
-                    IsRunning: True;
-                    ElapsedTime: 172543591;
-                    FrameCount: 1;
-                    FrameLength: 0.0001;
-                    IsLooping: False;
-                    CurrentFrame: 0;
-                    NextFrame: 0;
-                    FrameDelta: 0;
-                    File: Null;
-                    Texture: "Data\\Textures/Entities/Button.png";
-                    Width: 48;
-                    Height: 48;
-                    Size: [48 48];
-                    ClipRect: [0 0 96 48];
-                    Origin: [24 24];
-                    Tween: TweenStyle None;
-                };
-                AlwaysUpright: True;
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 27931;
-            }
-            Control {
-                PlayerOnly: False;
-                Trigger: "Test";
-                TriggerValue: ControlValue Toggle;
-                IsPowered: False;
-                PowerGroup: "Test";
-                Name: Null;
-                Position: [359 253];
-                Direction: [1 0];
-                Velocity: [0 0];
-                IsEnabled: True;
-                AlwaysActive: False;
-                Radius: 24;
-                IsPhysical: True;
-                IgnoreTrace: False;
-                States: {
-                    Idle: Graphic {
-                        IsRunning: True;
-                        ElapsedTime: 172543591;
-                        FrameCount: 1;
-                        FrameLength: 0.0001;
-                        IsLooping: False;
-                        CurrentFrame: 0;
-                        NextFrame: 0;
-                        FrameDelta: 0;
-                        File: Null;
-                        Texture: "Data\\Textures/Entities/Button.png";
-                        Width: 48;
-                        Height: 48;
-                        Size: [48 48];
-                        ClipRect: [0 0 96 48];
-                        Origin: [24 24];
-                        Tween: TweenStyle None;
-                    };
-                    Active: Graphic {
-                        IsRunning: False;
-                        ElapsedTime: 0;
-                        FrameCount: 1;
-                        FrameLength: 0.0001;
-                        IsLooping: False;
-                        CurrentFrame: 0;
-                        NextFrame: 1;
-                        FrameDelta: 0;
-                        File: Null;
-                        Texture: "Data\\Textures/Entities/Button.png";
-                        Width: 48;
-                        Height: 48;
-                        Size: [48 48];
-                        ClipRect: [0 0 96 48];
-                        Origin: [24 24];
-                        Tween: TweenStyle None;
-                    };
-                };
-                CurrentState: EntState Idle;
-                DestroyOnDeath: True;
-                DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
-                    IsRunning: True;
-                    ElapsedTime: 172543591;
-                    FrameCount: 1;
-                    FrameLength: 0.0001;
-                    IsLooping: False;
-                    CurrentFrame: 0;
-                    NextFrame: 0;
-                    FrameDelta: 0;
-                    File: Null;
-                    Texture: "Data\\Textures/Entities/Button.png";
-                    Width: 48;
-                    Height: 48;
-                    Size: [48 48];
-                    ClipRect: [0 0 96 48];
-                    Origin: [24 24];
-                    Tween: TweenStyle None;
-                };
-                AlwaysUpright: True;
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 29019;
-            }
-            Entity {
-                Name: Null;
-                Position: [419 102];
-                Direction: [1 0];
-                Velocity: [0 0];
-                IsEnabled: True;
-                AlwaysActive: False;
-                Radius: 21;
-                IsPhysical: True;
-                IgnoreTrace: False;
-                States: {
-                    Idle: Graphic {
-                        IsRunning: True;
-                        ElapsedTime: 109855173;
-                        FrameCount: 7;
-                        FrameLength: 100;
-                        IsLooping: True;
-                        CurrentFrame: 6;
-                        NextFrame: 0;
-                        FrameDelta: 0;
-                        File: Null;
-                        Texture: "Data\\Textures/Entities/Adrenaline.png";
-                        Width: 42;
-                        Height: 42;
-                        Size: [42 42];
-                        ClipRect: [0 0 294 42];
-                        Origin: [21 21];
-                        Tween: TweenStyle Overlap;
-                    };
-                };
-                CurrentState: EntState Idle;
-                DestroyOnDeath: True;
-                DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
-                    IsRunning: True;
-                    ElapsedTime: 109855173;
-                    FrameCount: 7;
+                Sprite: Sprite {
+                    IsRunning: False;
+                    ElapsedTime: 52683272;
+                    FrameCount: 6;
                     FrameLength: 100;
                     IsLooping: True;
-                    CurrentFrame: 6;
-                    NextFrame: 0;
-                    FrameDelta: 0;
                     File: Null;
-                    Texture: "Data\\Textures/Entities/Adrenaline.png";
-                    Width: 42;
-                    Height: 42;
-                    Size: [42 42];
-                    ClipRect: [0 0 294 42];
-                    Origin: [21 21];
+                    Texture: "Data\\Textures/Entities/Test.png";
+                    Width: 96;
+                    Height: 96;
+                    ClipRect: [0 0 576 192];
+                    Origin: [48 48];
                     Tween: TweenStyle Overlap;
                 };
-                AlwaysUpright: True;
+                AlwaysUpright: False;
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 51204;
-            }
-            Entity {
-                Velocity: [0 0];
-                Direction: [1 0];
-                Name: Null;
-                Position: [440 201];
-                IsEnabled: True;
-                AlwaysActive: False;
-                Radius: 21;
-                IsPhysical: True;
-                IgnoreTrace: False;
-                States: {
-                    Idle: Graphic {
-                        IsRunning: True;
-                        ElapsedTime: 109855173;
-                        FrameCount: 7;
-                        FrameLength: 100;
-                        IsLooping: True;
-                        CurrentFrame: 6;
-                        NextFrame: 0;
-                        FrameDelta: 0;
-                        File: Null;
-                        Texture: "Data\\Textures/Entities/Adrenaline.png";
-                        Width: 42;
-                        Height: 42;
-                        Size: [42 42];
-                        ClipRect: [0 0 294 42];
-                        Origin: [21 21];
-                        Tween: TweenStyle Overlap;
-                    };
-                };
-                CurrentState: EntState Idle;
-                DestroyOnDeath: True;
-                DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
-                    IsRunning: True;
-                    ElapsedTime: 109855173;
-                    FrameCount: 7;
-                    FrameLength: 100;
-                    IsLooping: True;
-                    CurrentFrame: 6;
-                    NextFrame: 0;
-                    FrameDelta: 0;
-                    File: Null;
-                    Texture: "Data\\Textures/Entities/Adrenaline.png";
-                    Width: 42;
-                    Height: 42;
-                    Size: [42 42];
-                    ClipRect: [0 0 294 42];
-                    Origin: [21 21];
-                    Tween: TweenStyle Overlap;
-                };
-                AlwaysUpright: True;
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 52071;
-            }
-            Entity {
-                Velocity: [0 0];
-                Direction: [1 0];
-                Name: Null;
-                Position: [196 202];
-                IsEnabled: True;
-                AlwaysActive: False;
-                Radius: 21;
-                IsPhysical: True;
-                IgnoreTrace: False;
-                States: {
-                    Idle: Graphic {
-                        IsRunning: True;
-                        ElapsedTime: 109855173;
-                        FrameCount: 7;
-                        FrameLength: 100;
-                        IsLooping: True;
-                        CurrentFrame: 6;
-                        NextFrame: 0;
-                        FrameDelta: 0;
-                        File: Null;
-                        Texture: "Data\\Textures/Entities/Adrenaline.png";
-                        Width: 42;
-                        Height: 42;
-                        Size: [42 42];
-                        ClipRect: [0 0 294 42];
-                        Origin: [21 21];
-                        Tween: TweenStyle Overlap;
-                    };
-                };
-                CurrentState: EntState Idle;
-                DestroyOnDeath: True;
-                DestroyOffScreenIfDead: False;
-                Sprite: Graphic {
-                    IsRunning: True;
-                    ElapsedTime: 109855173;
-                    FrameCount: 7;
-                    FrameLength: 100;
-                    IsLooping: True;
-                    CurrentFrame: 6;
-                    NextFrame: 0;
-                    FrameDelta: 0;
-                    File: Null;
-                    Texture: "Data\\Textures/Entities/Adrenaline.png";
-                    Width: 42;
-                    Height: 42;
-                    Size: [42 42];
-                    ClipRect: [0 0 294 42];
-                    Origin: [21 21];
-                    Tween: TweenStyle Overlap;
-                };
-                AlwaysUpright: True;
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 53312;
+                SpawnTime: 17969;
             }
         ];
         blobTypes: [
@@ -692,12 +542,7 @@ MapSave {
             }
             BlobSave {
                 type: 0;
-                position: [562 148];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [563 143];
+                position: [516 112];
                 velocity: [0 0];
             }
             BlobSave {
@@ -707,142 +552,12 @@ MapSave {
             }
             BlobSave {
                 type: 0;
-                position: [516 112];
+                position: [563 143];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [623 163];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [586 97];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [642 95];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [659 97];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [637 58];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [672 41];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [672 41];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [628 83];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [605 36];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [638 69];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [657 110];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [657 111];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [657 111];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [652 131];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [649 148];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [673 137];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [689 127];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [642 140];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [710 180];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [723 173];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [737 172];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [728 174];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [750 133];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [751 131];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [759 65];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [716 124];
-                velocity: [0 0];
-            }
-            BlobSave {
-                type: 0;
-                position: [708 119];
+                position: [562 148];
                 velocity: [0 0];
             }
             BlobSave {
@@ -852,117 +567,137 @@ MapSave {
             }
             BlobSave {
                 type: 0;
-                position: [935 144];
+                position: [708 119];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [859 180];
+                position: [716 124];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [852 175];
+                position: [759 65];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [854 168];
+                position: [751 131];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [795 172];
+                position: [750 133];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [945 143];
+                position: [728 174];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [934 109];
+                position: [737 172];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [930 79];
+                position: [723 173];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [917 103];
+                position: [710 180];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [888 172];
+                position: [642 140];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [885 175];
+                position: [689 127];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [901 120];
+                position: [673 137];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [893 116];
+                position: [649 148];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [845 165];
+                position: [652 131];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [837 171];
+                position: [657 111];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [849 127];
+                position: [657 111];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [848 115];
+                position: [657 110];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [802 137];
+                position: [638 69];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [788 145];
+                position: [605 36];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [793 122];
+                position: [628 83];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [797 93];
+                position: [672 41];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [781 101];
+                position: [672 41];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [780 69];
+                position: [637 58];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [659 97];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [642 95];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [586 97];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [623 163];
                 velocity: [0 0];
             }
             BlobSave {
@@ -972,42 +707,122 @@ MapSave {
             }
             BlobSave {
                 type: 0;
-                position: [969 167];
+                position: [780 69];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [973 139];
+                position: [781 101];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [978 119];
+                position: [797 93];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1043 191];
+                position: [793 122];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1043 190];
+                position: [788 145];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1039 180];
+                position: [802 137];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1030 150];
+                position: [848 115];
                 velocity: [0 0];
             }
             BlobSave {
                 type: 0;
-                position: [1012 80];
+                position: [849 127];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [837 171];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [845 165];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [893 116];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [901 120];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [885 175];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [888 172];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [917 103];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [930 79];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [934 109];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [945 143];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [795 172];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [854 168];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [852 175];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [859 180];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [935 144];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [974 106];
                 velocity: [0 0];
             }
             BlobSave {
@@ -1017,7 +832,42 @@ MapSave {
             }
             BlobSave {
                 type: 0;
-                position: [974 106];
+                position: [1012 80];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [1030 150];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [1039 180];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [1043 190];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [1043 191];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [978 119];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [973 139];
+                velocity: [0 0];
+            }
+            BlobSave {
+                type: 0;
+                position: [969 167];
                 velocity: [0 0];
             }
             BlobSave {

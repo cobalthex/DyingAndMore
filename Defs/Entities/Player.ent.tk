@@ -1,7 +1,7 @@
 Actor {
     MaxHealth: 100;
     States: {
-        Idle: Graphic {
+        Idle: Sprite {
             texture: "Textures/Entities/Player.png";
             width: 48;
             height: 48;
@@ -26,7 +26,13 @@ Actor {
     IgnoreTrace: False;
     AlwaysUpright: False;
     primaryWeapon: Gun {
-        Projectile: Projectile { };
+        Projectile: Projectile {
+            Sprite: {
+                texture: 'Textures/Projectiles/sharp.png';
+                width: 16;
+                height: 8;
+            }
+        };
         Speed: 800;
         shotDelay: 50;
     };

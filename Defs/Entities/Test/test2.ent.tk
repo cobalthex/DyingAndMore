@@ -16,7 +16,7 @@ Actor {
     Radius: 48;
     IsPhysical: True;
     IgnoreTrace: False;
-    Sprite: Graphic {
+    Sprite: Sprite {
         texture: "Textures/Entities/Test.png";
         width: 96;
         height: 96;

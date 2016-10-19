@@ -19,7 +19,7 @@ Actor {
     Radius: 16;
     IsPhysical: True;
     IgnoreTrace: False;
-    Sprite: Graphic {
+    Sprite: Sprite {
         texture: "Textures/Entities/InfectedCell.png";
         width: 32;
         height: 32;

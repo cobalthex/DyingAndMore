@@ -32,6 +32,8 @@ namespace DyingAndMore.Game
             camera.Follow = player;
         }
 
+        Takai.Graphics.Sprite animation;
+
         public override void Load()
         {
             fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
@@ -50,10 +52,22 @@ namespace DyingAndMore.Game
             camera.Viewport = GraphicsDevice.Viewport.Bounds;
             //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
 
+            animation = new Takai.Graphics.Sprite
+            (
+                Takai.AssetManager.Load<Texture2D>("Textures/animation.png"),
+                34,
+                49,
+                10,
+                System.TimeSpan.FromSeconds(1),
+                Takai.Graphics.TweenStyle.Sequential,
+                true
+            );
+            animation.Start(System.TimeSpan.Zero);
+
             StartMap();
 
             pt1 = new Takai.Game.ParticleType();
-            pt1.Graphic = new Takai.Graphics.Graphic(
+            pt1.Graphic = new Takai.Graphics.Sprite(
                 Takai.AssetManager.Load<Texture2D>("Textures/Particles/Star.png"),
                 32,
                 32,
@@ -141,7 +155,6 @@ namespace DyingAndMore.Game
             //map.Spawn(pspawn);
 
         }
-
         public override void Draw(GameTime Time)
         {
             camera.Draw();
@@ -158,6 +171,8 @@ namespace DyingAndMore.Game
             ;
 
             fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White);
+
+            animation.Draw(map.ElapsedTime, sbatch, new Vector2(30), 0);
 
             sbatch.End();
         }

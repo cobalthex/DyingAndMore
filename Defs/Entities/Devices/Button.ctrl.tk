@@ -14,7 +14,7 @@ Control {
     IsPhysical: True;
     IgnoreTrace: False;
     States: {
-    	Idle: Graphic {
+    	Idle: Sprite {
 	        texture: "Textures/Entities/Button.png";
 	        width: 48;
 	        height: 48;
@@ -22,7 +22,7 @@ Control {
 	        clip: [0 0 48 48];
 	    };
 
-    	Active: Graphic {
+    	Active: Sprite {
 	        texture: "Textures/Entities/Button.png";
 	        width: 48;
 	        height: 48;

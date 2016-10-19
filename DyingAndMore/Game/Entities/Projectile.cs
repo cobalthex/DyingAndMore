@@ -34,6 +34,11 @@ namespace DyingAndMore.Game.Entities
         {
             AlwaysActive = true;
             IgnoreTrace = true;
+
+            Sprite = new Takai.Graphics.Sprite(
+                Takai.AssetManager.Load<Texture2D>("textures/projectiles/sharp.png")
+            );
+            Sprite.Origin = new Vector2(12, 4);
             
             var curve = new Curve();
             curve.Keys.Add(new CurveKey(0, 0));
@@ -42,7 +47,7 @@ namespace DyingAndMore.Game.Entities
 
             explosion = new ParticleType();
             var tex = Takai.AssetManager.Load<Texture2D>("Textures/Particles/Spark.png");
-            explosion.Graphic = new Takai.Graphics.Graphic
+            explosion.Graphic = new Takai.Graphics.Sprite
             (
                 tex//,
                 //10,
@@ -60,7 +65,7 @@ namespace DyingAndMore.Game.Entities
 
             trail = new ParticleType();
             tex = Takai.AssetManager.Load<Texture2D>("Textures/Particles/trail.png");
-            trail.Graphic = new Takai.Graphics.Graphic(tex);
+            trail.Graphic = new Takai.Graphics.Sprite(tex);
             trail.Graphic.CenterOrigin();
             trail.Color = new ValueCurve<Color>(curve, Color.Orange, Color.Transparent);
             trail.Scale = new ValueCurve<float>(1);
@@ -68,7 +73,7 @@ namespace DyingAndMore.Game.Entities
 
             trailGlow = new ParticleType();
             tex = Takai.AssetManager.Load<Texture2D>("Textures/Particles/trailglow.png");
-            trailGlow.Graphic = new Takai.Graphics.Graphic(tex);
+            trailGlow.Graphic = new Takai.Graphics.Sprite(tex);
             trailGlow.Graphic.CenterOrigin();
             trailGlow.BlendMode = BlendState.Additive;
             trailGlow.Color = new ValueCurve<Color>(curve, Color.White, Color.Transparent);
@@ -76,7 +81,7 @@ namespace DyingAndMore.Game.Entities
             trailGlow.Speed = new ValueCurve<float>(curve, 20, 5);
 
             tex = Takai.AssetManager.Load<Texture2D>("Textures/Projectiles/Sharp.png");
-            Sprite = new Takai.Graphics.Graphic(tex);
+            Sprite = new Takai.Graphics.Sprite(tex);
             Sprite.CenterOrigin();
             Radius = Sprite.Width / 2;
         }

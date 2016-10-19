@@ -24,10 +24,10 @@ namespace Takai.Graphics
     }
 
     /// <summary>
-    /// A graphic animation (A sprite). Typically played using map's timer
+    /// A graphic animation. Typically synchronized with a map's timer
     /// </summary>
     [Data.DesignerCreatable]
-    public class Graphic
+    public class Sprite
     {
         /// <summary>
         /// Is the graphic currently running
@@ -63,6 +63,7 @@ namespace Takai.Graphics
         /// <summary>
         /// The current frame
         /// </summary>
+        [Data.NonSerialized]
         public int CurrentFrame
         {
             get
@@ -75,6 +76,7 @@ namespace Takai.Graphics
         /// <summary>
         /// THe next frame
         /// </summary>
+        [Data.NonSerialized]
         public int NextFrame
         {
             get
@@ -87,12 +89,12 @@ namespace Takai.Graphics
         /// <summary>
         /// The fractional amount between the current and next frame
         /// </summary>
+        [Data.NonSerialized]
         public float FrameDelta
         {
             get
             {
                 var f = (float)((double)ElapsedTime.Ticks / FrameLength.Ticks);
-                f = MathHelper.Clamp(f, 0, FrameCount);
                 return f - (int)f;
             }
         }
@@ -149,6 +151,7 @@ namespace Takai.Graphics
         /// <summary>
         /// Width and height represented as a point
         /// </summary>
+        [Data.NonSerialized]
         public Point Size { get { return new Point(Width, Height); } }
 
         protected int framesPerRow;
@@ -179,9 +182,9 @@ namespace Takai.Graphics
         /// </summary>
         public TweenStyle Tween { get; set; } = TweenStyle.None;
 
-        public Graphic() { }
+        public Sprite() { }
 
-        public Graphic(Texture2D Texture)
+        public Sprite(Texture2D Texture)
             : base()
         {
             this.Texture = Texture;
@@ -194,7 +197,7 @@ namespace Takai.Graphics
             }
         }
 
-        public Graphic(Texture2D Texture, Rectangle ClipRect)
+        public Sprite(Texture2D Texture, Rectangle ClipRect)
             : base()
         {
             this.Texture = Texture;
@@ -212,7 +215,7 @@ namespace Takai.Graphics
             return !IsLooping && lastTime >= TimeSpan.FromTicks(FrameLength.Ticks * FrameCount);
         }
 
-        public Graphic
+        public Sprite
         (
             Texture2D Texture,
             int Width,
@@ -227,11 +230,13 @@ namespace Takai.Graphics
             this.Height = Height;
             if (Texture != null)
                 this.ClipRect = Texture.Bounds;
+            this.FrameCount = FrameCount;
+            this.FrameLength = FrameLength;
             this.Tween = TweenStyle;
             this.IsLooping = ShouldLoop;
         }
 
-        public Graphic
+        public Sprite
         (
             Texture2D Texture,
             int Width,
@@ -246,6 +251,8 @@ namespace Takai.Graphics
             this.Width = Width;
             this.Height = Height;
             this.ClipRect = ClipRect;
+            this.FrameCount = FrameCount;
+            this.FrameLength = FrameLength;
             this.Tween = TweenStyle;
             this.IsLooping = ShouldLoop;
         }
@@ -261,9 +268,9 @@ namespace Takai.Graphics
             IsRunning = true;
         }
 
-        public Graphic Clone()
+        public Sprite Clone()
         {
-            return (Graphic)this.MemberwiseClone();
+            return (Sprite)this.MemberwiseClone();
         }
 
         /// <summary>
@@ -306,10 +313,9 @@ namespace Takai.Graphics
             ElapsedTime += Time - lastTime;
             //todo: bounds should maybe ignore origin
 
-            float frame = FrameDelta;
-            int cf = (int)frame;
-            int nf = (IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount));
-            float fd = frame - cf;
+            var cf = CurrentFrame;
+            var nf = NextFrame;
+            var fd = FrameDelta;
 
             switch (Tween)
             {
@@ -330,6 +336,8 @@ namespace Takai.Graphics
                     DrawTexture(SpriteBatch, Bounds, GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, fd));
                     break;
             }
+
+            lastTime = Time;
         }
         
         /// <summary>

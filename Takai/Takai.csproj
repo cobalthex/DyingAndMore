@@ -89,7 +89,7 @@
       <DependentUpon>Map.cs</DependentUpon>
     </Compile>
     <Compile Include="Graphics\BitmapFont.cs" />
-    <Compile Include="Graphics\Graphic.cs" />
+    <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\Primitives2D.cs" />
     <Compile Include="Input\InputState.cs" />
     <Compile Include="Locale.cs" />
