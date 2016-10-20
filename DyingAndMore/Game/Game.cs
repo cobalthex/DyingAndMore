@@ -30,6 +30,7 @@ namespace DyingAndMore.Game
 
             player = plyr.FirstOrDefault() as Entities.Actor;
             camera.Follow = player;
+            map.TimeScale = 0.01f;
         }
 
         Takai.Graphics.Sprite animation;
@@ -153,8 +154,8 @@ namespace DyingAndMore.Game
             pspawn.count = new Takai.Game.Range<int>(3, 5);
             pspawn.lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800));
             //map.Spawn(pspawn);
-
         }
+
         public override void Draw(GameTime Time)
         {
             camera.Draw();
@@ -173,6 +174,11 @@ namespace DyingAndMore.Game
             fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White);
 
             animation.Draw(map.ElapsedTime, sbatch, new Vector2(30), 0);
+
+            foreach (var ent in map.ActiveEnts)
+            {
+                fnt.Draw(sbatch, (ent.Sprite.CurrentFrame + ent.Sprite.FrameDelta).ToString("N2"), camera.WorldToScreen(new Vector2(ent.Position.X, ent.Position.Y + ent.Radius + 5)), Color.LightSeaGreen);
+            }
 
             sbatch.End();
         }
