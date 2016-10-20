@@ -68,7 +68,7 @@ namespace Takai.Graphics
         {
             get
             {
-                int frame = (int)(ElapsedTime.Ticks / FrameLength.Ticks);
+                var frame = (int)((double)ElapsedTime.Ticks / FrameLength.Ticks);
                 return IsLooping ? (frame % FrameCount) : MathHelper.Clamp(frame, 0, FrameCount);
             }
         }
@@ -94,8 +94,8 @@ namespace Takai.Graphics
         {
             get
             {
-                var f = (float)((double)ElapsedTime.Ticks / FrameLength.Ticks);
-                return f - (int)f;
+                var frame = (float)((double)ElapsedTime.Ticks / FrameLength.Ticks);
+                return frame - (int)frame;
             }
         }
 
@@ -313,10 +313,11 @@ namespace Takai.Graphics
             ElapsedTime += Time - lastTime;
             //todo: bounds should maybe ignore origin
 
-            var cf = CurrentFrame;
-            var nf = NextFrame;
-            var fd = FrameDelta;
-
+            var elapsed = ElapsedTime.Ticks / FrameLength.Ticks;
+            var cf = (int)(IsLooping ? (elapsed % FrameCount) : MathHelper.Clamp(elapsed, 0, FrameCount));
+            var nf = (int)(IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount));
+            var fd = (elapsed / (float)FrameLength.Ticks);
+            
             switch (Tween)
             {
                 case TweenStyle.None:
@@ -324,7 +325,7 @@ namespace Takai.Graphics
                     break;
 
                 case TweenStyle.Overlap:
-                    //todo: overlap should fade in and then fade out (maybe multiply fd * 2 and Clamp)
+                    //todo: verify works
                     var nd = MathHelper.Clamp(fd * 2, 0, 1);
                     fd = MathHelper.Clamp((fd * 2) - 1, 0, 1);
                     DrawTexture(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
