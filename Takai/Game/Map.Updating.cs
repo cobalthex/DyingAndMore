@@ -208,6 +208,7 @@ namespace Takai.Game
                 //remove entity from map
                 if (ent.Map == null)
                 {
+                    ent.Map = this;
                     ent.OnDestroy();
                     ent.SpawnTime = TimeSpan.Zero;
 
@@ -218,6 +219,7 @@ namespace Takai.Game
                     }
                     else
                         ActiveEnts.Remove(ent);
+                    ent.Map = null;
                 }
             }
 

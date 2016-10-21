@@ -30,11 +30,6 @@ namespace Takai.Graphics
     public class Sprite
     {
         /// <summary>
-        /// Is the graphic currently running
-        /// </summary>
-        public bool IsRunning { get; set; } = false; //todo: maybe not necessary
-
-        /// <summary>
         /// The last time the graphic was drawn
         /// </summary>
         protected TimeSpan lastTime;
@@ -48,7 +43,7 @@ namespace Takai.Graphics
         /// <summary>
         /// The number of frames of this graphic
         /// </summary>
-        public int FrameCount { get; set; } = 1;
+        public int FrameCount { get; set; } = 0;
 
         /// <summary>
         /// The length of time of each frame
@@ -68,8 +63,8 @@ namespace Takai.Graphics
         {
             get
             {
-                var frame = (int)((double)ElapsedTime.Ticks / FrameLength.Ticks);
-                return IsLooping ? (frame % FrameCount) : MathHelper.Clamp(frame, 0, FrameCount);
+                var frame = (int)(ElapsedTime.TotalSeconds / FrameLength.TotalSeconds);
+                return IsLooping ? (frame % FrameCount) : MathHelper.Clamp(frame, 0, FrameCount - 1);
             }
         }
 
@@ -81,8 +76,8 @@ namespace Takai.Graphics
         {
             get
             {
-                int frame = (int)(ElapsedTime.Ticks / FrameLength.Ticks) + 1;
-                return IsLooping ? (frame % FrameCount) : MathHelper.Clamp(frame, 0, FrameCount);
+                var frame = (int)(ElapsedTime.TotalSeconds / FrameLength.TotalSeconds) + 1;
+                return IsLooping ? (frame % FrameCount) : MathHelper.Clamp(frame, 0, FrameCount - 1);
             }
         }
 
@@ -94,8 +89,8 @@ namespace Takai.Graphics
         {
             get
             {
-                var frame = (float)((double)ElapsedTime.Ticks / FrameLength.Ticks);
-                return frame - (int)frame;
+                var frame = ElapsedTime.TotalSeconds / FrameLength.TotalSeconds;
+                return (float)frame - (int)frame;
             }
         }
 
@@ -258,14 +253,13 @@ namespace Takai.Graphics
         }
 
         /// <summary>
-        /// Restart the animation
+        /// (Re)start the animation
         /// </summary>
         /// <param name="Time">The time to start counting from</param>
         public void Start(TimeSpan Time)
         {
             lastTime = Time;
             ElapsedTime = TimeSpan.Zero;
-            IsRunning = true;
         }
 
         public Sprite Clone()
@@ -311,13 +305,14 @@ namespace Takai.Graphics
         public void Draw(TimeSpan Time, SpriteBatch SpriteBatch, Rectangle Bounds, float Angle, Color Color)
         {
             ElapsedTime += Time - lastTime;
+            
+            var elapsed = (float)(ElapsedTime.TotalSeconds / FrameLength.TotalSeconds);
+            var cf = IsLooping ? ((int)elapsed % FrameCount) : MathHelper.Clamp((int)elapsed, 0, FrameCount - 1);
+            var nf = IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount - 1);
+            var fd = elapsed % 1;
+
             //todo: bounds should maybe ignore origin
 
-            var elapsed = ElapsedTime.Ticks / FrameLength.Ticks;
-            var cf = (int)(IsLooping ? (elapsed % FrameCount) : MathHelper.Clamp(elapsed, 0, FrameCount));
-            var nf = (int)(IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount));
-            var fd = (elapsed / (float)FrameLength.Ticks);
-            
             switch (Tween)
             {
                 case TweenStyle.None:
