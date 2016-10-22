@@ -30,7 +30,6 @@ namespace DyingAndMore.Game
 
             player = plyr.FirstOrDefault() as Entities.Actor;
             camera.Follow = player;
-            map.TimeScale = 0.01f;
         }
 
         public override void Load()
@@ -144,6 +143,11 @@ namespace DyingAndMore.Game
 
         public override void Draw(GameTime Time)
         {
+            Vector2 worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
+            float line;
+            var ent = map.TraceLine(player.Position, player.Direction, out line, 1000);
+            map.DrawLine(player.Position, player.Position + player.Direction * line, Color.White);
+
             camera.Draw();
 
             sbatch.Begin(SpriteSortMode.Deferred);
