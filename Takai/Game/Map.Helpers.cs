@@ -221,13 +221,13 @@ namespace Takai.Game
 
             return ents;
         }
-
+        public string debugOut;
         /// <summary>
-        /// Trace a line and return for the first entity hit. Uses PotentialVisibleSet (same rules apply)
+        /// Trace a line and check for collisions with entities and the map. Uses PotentialVisibleSet (same rules apply)
         /// </summary>
         /// <param name="Start">The starting position to search</param>
         /// <param name="Direction">The direction to search from</param>
-        /// <param name="T">How far in <paramref name="Direction"/> from <paramref name="Start"/> the collision occcured</param>
+        /// <param name="Ent">The entity found, null if none</param>
         /// <param name="MaxDistance">The maximum search distance (not used if EntsToSearch is provided)</param>
         /// <param name="EntsToSearch">
         /// Provide an explicit list of entities to search through
@@ -236,14 +236,44 @@ namespace Takai.Game
         /// </param>
         /// <returns>An entity, if found. Null if none</returns>
         /// <remarks>Does not perform any map testing (use CanSee)</remarks>
-        public Entity TraceLine(Vector2 Start, Vector2 Direction, out float T, float MaxDistance = 0, SortedDictionary<float, Entity> EntsToSearch = null)
+        public float TraceLine(Vector2 Start, Vector2 Direction, out Entity Ent, float MaxDistance = 0, SortedDictionary<float, Entity> EntsToSearch = null)
         {
+            var lastT = 0f;
+            var mapRect = new Rectangle(0, 0, Width, Height);
+
             //check for intersections
             foreach (var ent in EntsToSearch ?? PotentialVisibleSet(Start, Direction, MathHelper.Pi, MaxDistance))
             {
                 var diff = ent.Value.Position - Start;
                 var lf = Vector2.Dot(Direction, diff);
                 var s = ent.Value.RadiusSq - ent.Key + (lf * lf);
+
+                var nextT = diff.Length(); //todo: find a better way
+                //trace line along map to see if there are any collisions
+                for (var t = lastT; t < nextT; t += TileSize / 2) //test out granularities (or may assumptions about map corners
+                {
+                    var pos = (Start + (t * Direction)).ToPoint();
+                    var tilePos = new Point(pos.X / TileSize, pos.Y / TileSize);
+                    var tileRelPos = new Point(pos.X % TileSize, pos.Y % TileSize);
+
+                    //may not be necessary
+                    if (!mapRect.Contains(tilePos))
+                    {
+                        Ent = null;
+                        return t;
+                    }
+
+                    var tile = Tiles[tilePos.Y, tilePos.X];
+                    var mask = (tile * TileSize) + ((tile / TilesPerRow) * TileSize);
+                    mask += (tileRelPos.Y * TilesImage.Width);
+                    mask += tileRelPos.X;
+                    if (tile < 0 || (mask < 0 || TilesMask[mask] == false))
+                    {
+                        Ent = null;
+                        return t;
+                    }
+                }
+                lastT = nextT;
 
                 if (s < 0)
                     continue; //no intersection
@@ -253,21 +283,21 @@ namespace Takai.Game
                 {
                     if (lf + s >= 0)
                     {
-                        T = lf + s;
-                        return ent.Value;
+                        Ent = ent.Value;
+                        return lf + s;
                     }
                     else
                         System.Diagnostics.Debug.WriteLine("wtf");
                 }
                 else
                 {
-                    T = lf - s;
-                    return ent.Value;
+                    Ent = ent.Value;
+                    return lf - s;
                 }
             }
             
-            T = 0;
-            return null;
+            Ent = null;
+            return lastT;
         }
     }
 }

@@ -150,25 +150,23 @@ namespace Takai.Game
                     
                     if (updateSettings.isPhysicsEnabled)
                     {
-                        short tile;
-                        if (!mapRect.Contains(ent.Position + deltaV) || (tile = Tiles[targetCell.Y, targetCell.X]) < 0)
-                        // || !TilesMask[(tile / tilesPerRow) + cellPos.Y, (tile % tileSize) + cellPos.X])
-                        {
-                            ent.OnMapCollision(targetCell, targetPos, deltaTime);
-
-                            if (ent.IsPhysical)
-                                ent.Velocity = Vector2.Zero;
-                        }
-
-                        else if (ent.Velocity != Vector2.Zero)
+                        if (ent.Velocity != Vector2.Zero)
                         {
                             //entity collision
-                            float t;
                             var nv = ent.Velocity;
                             nv.Normalize();
 
-                            var target = TraceLine(ent.Position, nv, out t);
-                            if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
+                            Entity target;
+                            float t = TraceLine(ent.Position, nv, out target);
+
+                            if (target == null)
+                            {
+                                ent.OnMapCollision(targetCell, ent.Position + (ent.Direction * t), deltaTime); //todo: update w/ correct tile
+
+                                if (ent.IsPhysical)
+                                    ent.Velocity = Vector2.Zero;
+                            }
+                            else if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
                             {
                                 ent.OnEntityCollision(target, ent.Position + (nv * t), deltaTime);
                                 target.OnEntityCollision(ent, ent.Position + (nv * t), deltaTime);

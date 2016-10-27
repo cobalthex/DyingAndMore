@@ -144,8 +144,8 @@ namespace DyingAndMore.Game
         public override void Draw(GameTime Time)
         {
             Vector2 worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
-            float line;
-            var ent = map.TraceLine(player.Position, player.Direction, out line, 1000);
+            Takai.Game.Entity traceEnt;
+            var line = map.TraceLine(player.Position, player.Direction, out traceEnt, 1000);
             map.DrawLine(player.Position, player.Position + player.Direction * line, Color.White);
 
             camera.Draw();
@@ -158,10 +158,11 @@ namespace DyingAndMore.Game
             fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
             var sDebugInfo =
-                $"TimeScale: {map.TimeScale:0.#}x"
+                $"TimeScale: {map.TimeScale:0.#}x\n" +
+                $"    Debug: {map.debugOut}"
             ;
 
-            fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White);
+            fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White, true);
 
             sbatch.End();
         }

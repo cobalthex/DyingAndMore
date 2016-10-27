@@ -26,6 +26,11 @@ namespace Takai.Graphics
         /// </summary>
         public Point Spacing { get; set; }
 
+        /// <summary>
+        /// The maximum width of all characters (for monospacing)
+        /// </summary>
+        public int MaxCharWidth { get; protected set; }
+
         #endregion
 
         #region Loading
@@ -48,6 +53,7 @@ namespace Takai.Graphics
             read.Read(block, 0, 4);
             int len = BitConverter.ToInt32(block, 0);
             font.Characters = new System.Collections.Generic.Dictionary<char, Rectangle>(len);
+            font.MaxCharWidth = 0;
             for (int i = 0; i < len; i++)
             {
 #if XBOX
@@ -59,7 +65,7 @@ namespace Takai.Graphics
                 read.Read(block, 0, 4); y = BitConverter.ToInt32(block, 0);
                 read.Read(block, 0, 4); w = BitConverter.ToInt32(block, 0);
                 read.Read(block, 0, 4); h = BitConverter.ToInt32(block, 0);
-
+                font.MaxCharWidth = MathHelper.Max(font.MaxCharWidth, w);
                 font.Characters.Add(c, new Rectangle(x, y, w, h));
             }
             block = new byte[8];
@@ -106,8 +112,9 @@ namespace Takai.Graphics
         /// <param name="String">The string to draw (New lines included)</param>
         /// <param name="Position">Where to draw the string</param>
         /// <param name="Color">The hue to draw the string with</param>
+        /// <param name="MonoSpace">Draw the font, treating all characters as equal width</param>
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and www (base 33) to set the color in RGB. use `x to reset the color</remarks>
-        public void Draw(SpriteBatch Spritebatch, string String, Vector2 Position, Color Color)
+        public void Draw(SpriteBatch Spritebatch, string String, Vector2 Position, Color Color, bool MonoSpace = false)
         {
             if (String == null)
                 return;
@@ -164,7 +171,8 @@ namespace Takai.Graphics
                     continue;
 
                 Spritebatch.Draw(Texture, pos, rgn, curColor);
-                pos.X += rgn.Width + Spacing.X;
+                
+                pos.X += (MonoSpace ? MaxCharWidth : rgn.Width) + Spacing.X;
                 maxH = (int)MathHelper.Max(maxH, rgn.Height);
             }
         }
@@ -176,10 +184,11 @@ namespace Takai.Graphics
         /// <param name="String">The string to draw</param>
         /// <param name="Bounds">The clipping bounds and location</param>
         /// <param name="Color">The default font color</param>
+        /// <param name="MonoSpace">Draw the font, treating all characters as equal width</param>
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and www (base 33) to set the color in RGB. use `x to reset the color</remarks>
-        public void Draw(SpriteBatch Spritebatch, string String, Rectangle Bounds, Color Color)
+        public void Draw(SpriteBatch Spritebatch, string String, Rectangle Bounds, Color Color, bool MonoSpace = false)
         {
-            Draw(Spritebatch, String, 0, -1, Bounds, Point.Zero, Color);
+            Draw(Spritebatch, String, 0, -1, Bounds, Point.Zero, Color, MonoSpace);
         }
 
         /// <summary>
@@ -192,8 +201,9 @@ namespace Takai.Graphics
         /// <param name="Bounds">The bounds of the </param>
         /// <param name="Offset">The pixel offset of the text</param>
         /// <param name="Color">The color of the text</param>
+        /// <param name="MonoSpace">Draw the font, treating all characters as equal width</param>
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and www (base 33) to set the color in RGB. use `x to reset the color</remarks>
-        public void Draw(SpriteBatch Spritebatch, string String, int StartIndex, int Length, Rectangle Bounds, Point Offset, Color Color)
+        public void Draw(SpriteBatch Spritebatch, string String, int StartIndex, int Length, Rectangle Bounds, Point Offset, Color Color, bool MonoSpace = false)
         {
             Vector2 pos = Vector2.Zero;
             Point off = Offset;
@@ -293,7 +303,8 @@ namespace Takai.Graphics
                     rgn.Height = (rgn.Height > Bounds.Height ? Bounds.Height : rgn.Height);
 
                 Spritebatch.Draw(Texture, new Vector2(Bounds.X + pos.X, Bounds.Y + pos.Y), rgn, curColor);
-                pos.X += rgn.Width + Spacing.X;
+
+                pos.X += (MonoSpace ? MaxCharWidth : rgn.Width) + Spacing.X;
                 maxH = (int)MathHelper.Max(maxH, rgn.Height);
             }
         }
