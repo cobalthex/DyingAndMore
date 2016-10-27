@@ -145,7 +145,7 @@ namespace Takai.Game
             Buffer.BlockCopy(load.tiles, 0, Tiles, 0, Width * Height * sizeof(short));
 
             BuildSectors();
-            BuildTileMask(TilesImage);
+            BuildTileMask(TilesImage, true);
 
             if (LoadState)
                 this.LoadState(load.state);
