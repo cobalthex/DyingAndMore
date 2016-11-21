@@ -237,8 +237,10 @@ namespace DyingAndMore.Editor
 
             if (InputState.IsPress(MouseButtons.Left) && InputState.IsMod(KeyMod.Alt))
             {
-                var ofd = new System.Windows.Forms.OpenFileDialog();
-                ofd.Filter = "Entity Definitions (*.ent.tk)|*.ent.tk";
+                var ofd = new System.Windows.Forms.OpenFileDialog()
+                {
+                    Filter = "Entity Definitions (*.ent.tk)|*.ent.tk"
+                };
                 if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     Takai.Game.Entity ent;
