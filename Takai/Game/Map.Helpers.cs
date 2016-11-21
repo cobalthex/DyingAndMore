@@ -4,6 +4,15 @@ using System.Collections.Generic;
 
 namespace Takai.Game
 {
+    /// <summary>
+    /// The outcome of a trace
+    /// </summary>
+    public struct TraceHit
+    {
+        public float distance;
+        public Entity entity;
+    }
+
     public partial class Map
     {
         protected System.Random random = new System.Random();
@@ -216,41 +225,44 @@ namespace Takai.Game
 
                 var lsq = diff.LengthSquared();
                 if (MaxDistance == 0 || lsq <= MaxDistance)
-                    ents.Add(lsq, ent);
+                    ents[lsq] = ent;
             }
 
             return ents;
         }
         public string debugOut;
+
         /// <summary>
         /// Trace a line and check for collisions with entities and the map. Uses PotentialVisibleSet (same rules apply)
         /// </summary>
         /// <param name="Start">The starting position to search</param>
         /// <param name="Direction">The direction to search from</param>
-        /// <param name="Ent">The entity found, null if none</param>
+        /// <param name="Hit">Collision info, if collided</param>
         /// <param name="MaxDistance">The maximum search distance (not used if EntsToSearch is provided)</param>
         /// <param name="EntsToSearch">
         /// Provide an explicit list of entities to search through
         /// Key should be the squared distance between start and the entity
         /// If null, uses PotentialVisibleSet()
         /// </param>
-        /// <returns>An entity, if found. Null if none</returns>
+        /// <returns>True if there was a collision</returns>
         /// <remarks>Does not perform any map testing (use CanSee)</remarks>
-        public float TraceLine(Vector2 Start, Vector2 Direction, out Entity Ent, float MaxDistance = 0, SortedDictionary<float, Entity> EntsToSearch = null)
+        public bool TraceLine(Vector2 Start, Vector2 Direction, out TraceHit Hit, float MaxDistance = 0, SortedDictionary<float, Entity> EntsToSearch = null)
         {
             var lastT = 0f;
             var mapRect = new Rectangle(0, 0, Width, Height);
 
+            const float JumpSize = 10;
+            
             //check for intersections
             foreach (var ent in EntsToSearch ?? PotentialVisibleSet(Start, Direction, MathHelper.Pi, MaxDistance))
             {
                 var diff = ent.Value.Position - Start;
                 var lf = Vector2.Dot(Direction, diff);
                 var s = ent.Value.RadiusSq - ent.Key + (lf * lf);
-
+                
                 var nextT = diff.Length(); //todo: find a better way
                 //trace line along map to see if there are any collisions
-                for (var t = lastT; t < nextT; t += TileSize / 2) //test out granularities (or may assumptions about map corners
+                for (var t = lastT; t < nextT; t += JumpSize) //test out granularities (or may assumptions about map corners)
                 {
                     var pos = (Start + (t * Direction)).ToPoint();
                     var tilePos = new Point(pos.X / TileSize, pos.Y / TileSize);
@@ -259,8 +271,11 @@ namespace Takai.Game
                     //may not be necessary
                     if (!mapRect.Contains(tilePos))
                     {
-                        Ent = null;
-                        return t;
+                        TraceHit hit = new TraceHit();
+                        hit.entity = null;
+                        hit.distance = t;
+                        Hit = hit;
+                        return true;
                     }
 
                     var tile = Tiles[tilePos.Y, tilePos.X];
@@ -269,12 +284,17 @@ namespace Takai.Game
                     mask += tileRelPos.X;
                     if (tile < 0 || (mask < 0 || TilesMask[mask] == false))
                     {
-                        Ent = null;
-                        return t;
+                        TraceHit hit = new TraceHit();
+                        hit.entity = null;
+                        hit.distance = t;
+                        Hit = hit;
+                        return true;
                     }
+
+                    //todo: if tile == 0 (full tile), skip to next tile
                 }
                 lastT = nextT;
-
+                
                 if (s < 0)
                     continue; //no intersection
 
@@ -283,21 +303,59 @@ namespace Takai.Game
                 {
                     if (lf + s >= 0)
                     {
-                        Ent = ent.Value;
-                        return lf + s;
+                        TraceHit hit = new TraceHit();
+                        hit.entity = ent.Value;
+                        hit.distance = lf + s;
+                        Hit = hit;
+                        return true;
                     }
                     else
-                        System.Diagnostics.Debug.WriteLine("wtf");
+                        throw new System.Exception("When does this happen?");
                 }
                 else
                 {
-                    Ent = ent.Value;
-                    return lf - s;
+                    TraceHit hit = new TraceHit();
+                    hit.entity = ent.Value;
+                    hit.distance = lf - s;
+                    Hit = hit;
+                    return true;
                 }
             }
-            
-            Ent = null;
-            return lastT;
+
+            //todo+ factor out map check code
+            //todo: check forward pos
+            for (var t2 = lastT; t2 < MathHelper.Min(MaxDistance, 100000); t2 += JumpSize)
+            {
+                var pos = (Start + (t2 * Direction)).ToPoint();
+                var tilePos = new Point(pos.X / TileSize, pos.Y / TileSize);
+                var tileRelPos = new Point(pos.X % TileSize, pos.Y % TileSize);
+
+                //may not be necessary
+                if (!mapRect.Contains(tilePos))
+                {
+                    TraceHit hit = new TraceHit();
+                    hit.entity = null;
+                    hit.distance = t2;
+                    Hit = hit;
+                    return true;
+                }
+
+                var tile = Tiles[tilePos.Y, tilePos.X];
+                var mask = (tile * TileSize) + ((tile / TilesPerRow) * TileSize);
+                mask += (tileRelPos.Y * TilesImage.Width);
+                mask += tileRelPos.X;
+                if (tile < 0 || (mask < 0 || TilesMask[mask] == false))
+                {
+                    TraceHit hit = new TraceHit();
+                    hit.entity = null;
+                    hit.distance = t2;
+                    Hit = hit;
+                    return true;
+                }
+            }
+
+            Hit = new TraceHit();
+            return false;
         }
     }
 }

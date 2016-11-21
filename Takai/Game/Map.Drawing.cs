@@ -111,9 +111,11 @@ namespace Takai.Game
                 reflectionEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Reflection.mgfx");
             }
         }
-        
+
         //todo: separate debug text
         //todo: curves (and volumetric curves) (things like rivers/flows)
+
+        private List<Entity> _drawEntsOutlined = new List<Entity>();
 
         /// <summary>
         /// Draw the map, centered around the Camera
@@ -129,6 +131,8 @@ namespace Takai.Game
 
             #region setup
 
+            _drawEntsOutlined.Clear();
+
             var invTransform = Matrix.Invert(Camera.Transform);
 
             var startPos = invTransform.Translation;
@@ -143,8 +147,6 @@ namespace Takai.Game
             //todo: rotation broken
             
             var originalRt = GraphicsDevice.GetRenderTargets();
-
-            var outlined = new List<Entity>();
             
             var startX = (int)startPos.X / tileSize;
             var startY = (int)startPos.Y / tileSize;
@@ -179,7 +181,7 @@ namespace Takai.Game
                     profilingInfo.visibleEnts++;
 
                     if (ent.OutlineColor.A > 0)
-                        outlined.Add(ent);
+                        _drawEntsOutlined.Add(ent);
                     else
                     {
                         var angle = ent.AlwaysUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
@@ -217,7 +219,7 @@ namespace Takai.Game
             //outlined entities
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, outlineEffect, Camera.Transform);
 
-            foreach (var ent in outlined)
+            foreach (var ent in _drawEntsOutlined)
             {
                 outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / ent.Sprite.Texture.Width, 1.0f / ent.Sprite.Texture.Height));
                 outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(ent.Sprite.Width, ent.Sprite.Height));

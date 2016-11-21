@@ -145,34 +145,37 @@ namespace Takai.Game
                         ent.Think(deltaTime);
 
                     var deltaV = ent.Velocity * deltaSeconds;
+                    var deltaVLen = deltaV.Length();
                     var targetPos = ent.Position + deltaV;
                     var targetCell = (targetPos / tileSize).ToPoint();
-                    
+
                     if (updateSettings.isPhysicsEnabled)
                     {
                         if (ent.Velocity != Vector2.Zero)
                         {
                             //entity collision
-                            var nv = ent.Velocity;
-                            nv.Normalize();
+                            var nv = deltaV / deltaVLen;
 
-                            Entity target;
-                            float t = TraceLine(ent.Position, nv, out target);
+                            TraceHit hit;
+                            bool didCollide = TraceLine(ent.Position, nv, out hit, deltaVLen);
 
-                            if (target == null)
+                            if (didCollide)
                             {
-                                ent.OnMapCollision(targetCell, ent.Position + (ent.Direction * t), deltaTime); //todo: update w/ correct tile
+                                if (hit.entity != null)
+                                {
+                                    ent.OnEntityCollision(hit.entity, ent.Position + (nv * hit.distance), deltaTime);
+                                    hit.entity.OnEntityCollision(ent, ent.Position + (nv * hit.distance), deltaTime);
 
-                                if (ent.IsPhysical)
-                                    ent.Velocity = Vector2.Zero;
-                            }
-                            else if (target != null && t * t < ent.RadiusSq + target.RadiusSq)
-                            {
-                                ent.OnEntityCollision(target, ent.Position + (nv * t), deltaTime);
-                                target.OnEntityCollision(ent, ent.Position + (nv * t), deltaTime);
+                                    if (ent.IsPhysical)
+                                        ent.Velocity = Vector2.Zero;
+                                }
+                                else
+                                {
+                                    ent.OnMapCollision(targetCell, ent.Position + (ent.Direction * hit.distance), deltaTime); //todo: update w/ correct tile
 
-                                if (ent.IsPhysical)
-                                    ent.Velocity = Vector2.Zero;
+                                    if (ent.IsPhysical)
+                                        ent.Velocity = Vector2.Zero;
+                                }
                             }
 
                             //todo: GetOverlappingSectors

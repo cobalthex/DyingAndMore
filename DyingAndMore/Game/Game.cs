@@ -144,9 +144,10 @@ namespace DyingAndMore.Game
         public override void Draw(GameTime Time)
         {
             Vector2 worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
-            Takai.Game.Entity traceEnt;
-            var line = map.TraceLine(player.Position, player.Direction, out traceEnt, 1000);
-            map.DrawLine(player.Position, player.Position + player.Direction * line, Color.White);
+
+            Takai.Game.TraceHit hit;
+            var line = map.TraceLine(player.Position, player.Direction, out hit, 1000);
+            map.DrawLine(player.Position, player.Position + player.Direction * hit.distance, Color.White);
 
             camera.Draw();
 
