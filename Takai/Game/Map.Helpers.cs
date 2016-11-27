@@ -271,10 +271,11 @@ namespace Takai.Game
                     //may not be necessary
                     if (!mapRect.Contains(tilePos))
                     {
-                        TraceHit hit = new TraceHit();
-                        hit.entity = null;
-                        hit.distance = t;
-                        Hit = hit;
+                        Hit = new TraceHit()
+                        {
+                            entity = null,
+                            distance = t
+                        };
                         return true;
                     }
 
@@ -284,10 +285,11 @@ namespace Takai.Game
                     mask += tileRelPos.X;
                     if (tile < 0 || (mask < 0 || TilesMask[mask] == false))
                     {
-                        TraceHit hit = new TraceHit();
-                        hit.entity = null;
-                        hit.distance = t;
-                        Hit = hit;
+                        Hit = new TraceHit()
+                        {
+                            entity = null,
+                            distance = t
+                        };
                         return true;
                     }
 
@@ -303,10 +305,11 @@ namespace Takai.Game
                 {
                     if (lf + s >= 0)
                     {
-                        TraceHit hit = new TraceHit();
-                        hit.entity = ent.Value;
-                        hit.distance = lf + s;
-                        Hit = hit;
+                        Hit = new TraceHit()
+                        {
+                            entity = ent.Value,
+                            distance = lf + s
+                        };
                         return true;
                     }
                     else
@@ -314,10 +317,11 @@ namespace Takai.Game
                 }
                 else
                 {
-                    TraceHit hit = new TraceHit();
-                    hit.entity = ent.Value;
-                    hit.distance = lf - s;
-                    Hit = hit;
+                    Hit = new TraceHit()
+                    {
+                        entity = ent.Value,
+                        distance = lf - s
+                    };
                     return true;
                 }
             }
@@ -333,10 +337,11 @@ namespace Takai.Game
                 //may not be necessary
                 if (!mapRect.Contains(tilePos))
                 {
-                    TraceHit hit = new TraceHit();
-                    hit.entity = null;
-                    hit.distance = t2;
-                    Hit = hit;
+                    Hit = new TraceHit()
+                    {
+                        entity = null,
+                        distance = t2
+                    };
                     return true;
                 }
 
@@ -346,10 +351,11 @@ namespace Takai.Game
                 mask += tileRelPos.X;
                 if (tile < 0 || (mask < 0 || TilesMask[mask] == false))
                 {
-                    TraceHit hit = new TraceHit();
-                    hit.entity = null;
-                    hit.distance = t2;
-                    Hit = hit;
+                    Hit = new TraceHit()
+                    {
+                        entity = null,
+                        distance = t2 - JumpSize
+                    };
                     return true;
                 }
             }
