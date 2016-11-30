@@ -6,8 +6,14 @@ namespace DyingAndMore.Game.Entities
 {
     class Projectile : Entity
     {
-        ParticleType explosion;
-        ParticleType trail, trailGlow;
+        public ParticleType explosion;
+        public ParticleType trail, trailGlow;
+
+        /// <summary>
+        /// How far this shot will go before destroying itself
+        /// </summary>
+        /// <remarks>Use zero for infinite</remarks>
+        public float Range { get; set; } = 0;
 
         public override Vector2 Velocity
         {
