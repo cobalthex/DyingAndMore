@@ -72,6 +72,12 @@ namespace DyingAndMore.Game
             pt1.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Red);
             pt1.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 2);
             pt1.Speed = new Takai.Game.ValueCurve<float>(curve, 100, 0);
+
+            var wpn = player.PrimaryWeapon as Weapons.Gun;
+            if (wpn != null)
+            {
+                wpn.Speed = 0;
+            }
         }
         Takai.Game.ParticleType pt1, pt2;
 
@@ -147,7 +153,7 @@ namespace DyingAndMore.Game
 
             Takai.Game.TraceHit hit;
             var line = map.TraceLine(player.Position, player.Direction, out hit, 1000);
-            map.DrawLine(player.Position, player.Position + player.Direction * hit.distance, Color.White);
+            //map.DrawLine(player.Position, player.Position + player.Direction * hit.distance, Color.White);
 
             camera.Draw();
 
