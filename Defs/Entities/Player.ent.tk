@@ -33,7 +33,7 @@ Actor {
                 height: 8;
             }
         };
-        Speed: 800;
+        Speed: 0;
         shotDelay: 50;
     };
     altWeapon: BlobGun {

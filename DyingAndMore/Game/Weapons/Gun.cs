@@ -58,3 +58,9 @@ namespace DyingAndMore.Game.Weapons
         }
     }
 }
+
+/*todo:
+    Muzzle blast
+    Smoke trail (for trace fire)
+
+*/
