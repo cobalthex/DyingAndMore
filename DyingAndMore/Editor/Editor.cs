@@ -48,9 +48,9 @@ namespace DyingAndMore.Editor
 
         public Editor() : base(false, false) { }
 
-        void AddSelector(Selector Sel, int Index)
+        void AddSelector(Selector Sel, EditorMode Index)
         {
-            selectors[Index] = Sel;
+            selectors[(uint)Index] = Sel;
             Takai.States.StateManager.PushState(Sel);
             Sel.Deactivate();
         }
@@ -64,10 +64,10 @@ namespace DyingAndMore.Editor
             sbatch = new SpriteBatch(GraphicsDevice);
 
             selectors = new Selector[System.Enum.GetValues(typeof(EditorMode)).Length];
-            AddSelector(new TileSelector(this), 0);
-            AddSelector(new DecalSelector(this), 1);
-            AddSelector(new BlobSelector(this), 2);
-            AddSelector(new EntSelector(this), 3);
+            AddSelector(new TileSelector(this), EditorMode.Tiles);
+            AddSelector(new DecalSelector(this), EditorMode.Decals);
+            AddSelector(new BlobSelector(this), EditorMode.Blobs);
+            AddSelector(new EntSelector(this), EditorMode.Entities);
 
             map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
 
@@ -422,7 +422,8 @@ namespace DyingAndMore.Editor
                     if (selected.Count < 1)
                     {
                         var sel = selectors[(int)currentMode] as EntSelector;
-                        selectedEntity = map.Spawn(sel.ents[sel.SelectedItem], worldMousePos, Vector2.UnitX, Vector2.Zero);
+                        if (sel != null && sel.ents.Count > 0)
+                            selectedEntity = map.Spawn(sel.ents[sel.SelectedItem], worldMousePos, Vector2.UnitX, Vector2.Zero);
                     }
                     else
                         selectedEntity = selected[0];

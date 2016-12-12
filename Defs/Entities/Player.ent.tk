@@ -1,19 +1,23 @@
 Actor {
     MaxHealth: 100;
-    States: {
-        Idle: Sprite {
-            texture: "Textures/Entities/Player.png";
-            width: 48;
-            height: 48;
-            clip: [0 0 96 96];
-            origin: [24 24];
-            FrameCount: 2;
-            FrameLength: 100;
-            IsLooping: True;
-            Tween: TweenStyle Overlap;
+    State: {
+        Idle: EntState {
+            Sprite: Sprite {
+                texture: "Textures/Entities/Player.png";
+                width: 48;
+                height: 48;
+                clip: [0 0 96 96];
+                origin: [24 24];
+                FrameCount: 2;
+                FrameLength: 100;
+                IsLooping: True;
+                Tween: TweenStyle Overlap;
+            };
         };
     };
-    CurrentState: EntState Idle;
+    ActiveStates: [
+        EntStateKey Idle;
+    ]
     FieldOfView: 2.356194;
     MaxSpeed: 400;
     MoveForce: 600;
@@ -25,7 +29,7 @@ Actor {
     IsPhysical: True;
     IgnoreTrace: False;
     AlwaysUpright: False;
-    primaryWeapon: Gun {
+    PrimaryWeapon: Gun {
         Projectile: Projectile {
             Sprite: {
                 texture: 'Textures/Projectiles/sharp.png';
@@ -36,7 +40,7 @@ Actor {
         Speed: 0;
         shotDelay: 50;
     };
-    altWeapon: BlobGun {
+    AltWeapon: BlobGun {
         blob: BlobType {
             Radius: 54;
             Drag: 0.2;

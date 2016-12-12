@@ -88,6 +88,7 @@
     <Compile Include="Game\Map.Updating.cs">
       <DependentUpon>Map.cs</DependentUpon>
     </Compile>
+    <Compile Include="StateMachine.cs" />
     <Compile Include="Graphics\BitmapFont.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\Primitives2D.cs" />

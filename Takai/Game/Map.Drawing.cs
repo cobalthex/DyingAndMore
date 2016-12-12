@@ -73,10 +73,11 @@ namespace Takai.Game
             {
                 sbatch = new SpriteBatch(GDevice);
                 lineEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Line.mgfx");
-                lineRaster = new RasterizerState();
-                lineRaster.CullMode = CullMode.None;
-                lineRaster.MultiSampleAntiAlias = true;
-
+                lineRaster = new RasterizerState()
+                {
+                    CullMode = CullMode.None,
+                    MultiSampleAntiAlias = true
+                };
                 stencilWrite = new DepthStencilState()
                 {
                     StencilEnable = true,
@@ -97,9 +98,10 @@ namespace Takai.Game
                 var width = GDevice.PresentationParameters.BackBufferWidth;
                 var height = GDevice.PresentationParameters.BackBufferHeight;
 
-                mapAlphaTest = new AlphaTestEffect(GDevice);
-                mapAlphaTest.ReferenceAlpha = 1;
-
+                mapAlphaTest = new AlphaTestEffect(GDevice)
+                {
+                    ReferenceAlpha = 1
+                };
                 preRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
                 blobsRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
                 reflectionRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
@@ -176,20 +178,25 @@ namespace Takai.Game
             
             foreach (var ent in ActiveEnts)
             {
-                if (ent.Sprite?.Texture != null)
+                foreach (var key in ent.State.ActiveStates)
                 {
+                    var state = ent.State.States[key];
+                    if (state.Sprite?.Texture == null)
+                        continue;
+
                     profilingInfo.visibleEnts++;
 
                     if (ent.OutlineColor.A > 0)
                         _drawEntsOutlined.Add(ent);
                     else
                     {
-                        var angle = ent.AlwaysUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                        ent.Sprite.Draw(ElapsedTime, sbatch, ent.Position, angle);
+                        var angle = ent.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                        state.Sprite.Draw(sbatch, ent.Position, angle);
                     }
                 }
+                
 #if DEBUG //Draw [X] in place of ent graphic
-                else
+                if (true)
                 {
                     Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
                                                  -ent.Direction.Y, ent.Direction.X, 0, 0, 
@@ -221,11 +228,18 @@ namespace Takai.Game
 
             foreach (var ent in _drawEntsOutlined)
             {
-                outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / ent.Sprite.Texture.Width, 1.0f / ent.Sprite.Texture.Height));
-                outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(ent.Sprite.Width, ent.Sprite.Height));
+                foreach (var key in ent.State.ActiveStates)
+                {
+                    var state = ent.State.States[key];
+                    if (state.Sprite?.Texture == null)
+                        continue;
+                    
+                    outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / state.Sprite.Texture.Width, 1.0f / state.Sprite.Texture.Height));
+                    outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(state.Sprite.Width, state.Sprite.Height));
 
-                var angle = ent.AlwaysUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                ent.Sprite.Draw(ElapsedTime, sbatch, ent.Position, angle, ent.OutlineColor);
+                    var angle = ent.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                    state.Sprite.Draw(sbatch, ent.Position, angle, ent.OutlineColor);
+                }
             }
 
             sbatch.End();
@@ -245,14 +259,14 @@ namespace Takai.Game
 
                     var sz = p.Key.Graphic.Size.ToVector2();
                     sz *= p.Value[i].scale;
-                    
+
                     p.Key.Graphic.Draw
                     (
-                        ElapsedTime,
                         sbatch,
                         new Rectangle(p.Value[i].position.ToPoint(), sz.ToPoint()),
                         p.Value[i].rotation,
-                        p.Value[i].color
+                        p.Value[i].color,
+                        ElapsedTime - p.Value[i].time
                     );
                 }
 
@@ -415,3 +429,4 @@ namespace Takai.Game
         }
     }
 }
+;
