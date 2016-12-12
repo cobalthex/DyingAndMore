@@ -38,7 +38,10 @@ namespace Takai.Game
         /// </summary>
         public string Name { get; set; }
         
-        public bool[] TilesMask { get; set; }
+        /// <summary>
+        /// The collision mask for the tilemap
+        /// </summary>
+        public System.Collections.BitArray TilesMask { get; set; }
 
         public int TileSize
         {
@@ -142,8 +145,7 @@ namespace Takai.Game
         /// <param name="Value">The value of the trigger. Value interpreted by the handler</param>
         public void TriggerEvent(string Name, int Value)
         {
-            TriggeredEvent handler;
-            if (eventHandlers.TryGetValue(Name, out handler))
+            if (eventHandlers.TryGetValue(Name, out var handler))
                 handler(Name, Value);
         }   
 
@@ -180,14 +182,15 @@ namespace Takai.Game
         /// <returns>The entity spawned</returns>
         public TEntity Spawn<TEntity>(Vector2 Position, Vector2 Direction, Vector2 Velocity) where TEntity : Entity, new()
         {
-            var ent = new TEntity();
+            var ent = new TEntity()
+            {
+                Map = this,
+                SpawnTime = ElapsedTime,
 
-            ent.Map = this;
-            ent.SpawnTime = ElapsedTime;
-
-            ent.Position = Position;
-            ent.Direction = Direction;
-            ent.Velocity = Velocity;
+                Position = Position,
+                Direction = Direction,
+                Velocity = Velocity
+            };
 
             //will be removed in next update if out of visible range
             //only inactive entities are placed in sectors

@@ -41,65 +41,69 @@ namespace DyingAndMore.Game.Entities
             AlwaysActive = true;
             IgnoreTrace = true;
 
-            Sprite = new Takai.Graphics.Sprite(
-                Takai.AssetManager.Load<Texture2D>("textures/projectiles/sharp.png")
-            );
-            Sprite.Origin = new Vector2(12, 4);
+            var sprite = new Takai.Graphics.Sprite(Takai.AssetManager.Load<Texture2D>("Textures/Projectiles/Sharp.png"))
+            {
+                Origin = new Vector2(12, 4)
+            };
+            State.AddState(EntStateKey.Idle, new EntState { Sprite = sprite, IsLooping = true }, true);
+            Radius = sprite.Width / 2;
             
             var curve = new Curve();
             curve.Keys.Add(new CurveKey(0, 0));
             curve.Keys.Add(new CurveKey(0.25f, 0.5f));
             curve.Keys.Add(new CurveKey(1, 1));
 
-            explosion = new ParticleType();
             var tex = Takai.AssetManager.Load<Texture2D>("Textures/Particles/Spark.png");
-            explosion.Graphic = new Takai.Graphics.Sprite
-            (
-                tex//,
-                //10,
-                //10,
-                //6,
-                //System.TimeSpan.FromMilliseconds(200),
-                //Takai.Graphics.TweenStyle.Overlap,
-                //true
-            );
+            explosion = new ParticleType()
+            {
+                Graphic = new Takai.Graphics.Sprite
+                (
+                    tex//,
+                       //10,
+                       //10,
+                       //6,
+                       //System.TimeSpan.FromMilliseconds(200),
+                       //Takai.Graphics.TweenStyle.Overlap,
+                       //true
+                ),
+                BlendMode = BlendState.Additive,
+                Color = new ValueCurve<Color>(curve, Color.White, Color.Transparent),
+                Scale = new ValueCurve<float>(1),
+                Speed = new ValueCurve<float>(curve, 100, 50)
+            };
             explosion.Graphic.CenterOrigin();
-            explosion.BlendMode = BlendState.Additive;
-            explosion.Color = new ValueCurve<Color>(curve, Color.White, Color.Transparent);
-            explosion.Scale = new ValueCurve<float>(1);
-            explosion.Speed = new ValueCurve<float>(curve, 100, 50);
 
-            trail = new ParticleType();
             tex = Takai.AssetManager.Load<Texture2D>("Textures/Particles/trail.png");
-            trail.Graphic = new Takai.Graphics.Sprite(tex);
+            trail = new ParticleType()
+            {
+                Graphic = new Takai.Graphics.Sprite(tex),
+                Color = new ValueCurve<Color>(curve, Color.Orange, Color.Transparent),
+                Scale = new ValueCurve<float>(1),
+                Speed = new ValueCurve<float>(curve, 100, 0)
+            };
             trail.Graphic.CenterOrigin();
-            trail.Color = new ValueCurve<Color>(curve, Color.Orange, Color.Transparent);
-            trail.Scale = new ValueCurve<float>(1);
-            trail.Speed = new ValueCurve<float>(curve, 100, 0);
 
-            trailGlow = new ParticleType();
             tex = Takai.AssetManager.Load<Texture2D>("Textures/Particles/trailglow.png");
-            trailGlow.Graphic = new Takai.Graphics.Sprite(tex);
+            trailGlow = new ParticleType()
+            {
+                Graphic = new Takai.Graphics.Sprite(tex),
+                BlendMode = BlendState.Additive,
+                Color = new ValueCurve<Color>(curve, Color.White, Color.Transparent),
+                Scale = new ValueCurve<float>(1),
+                Speed = new ValueCurve<float>(curve, 20, 5)
+            };
             trailGlow.Graphic.CenterOrigin();
-            trailGlow.BlendMode = BlendState.Additive;
-            trailGlow.Color = new ValueCurve<Color>(curve, Color.White, Color.Transparent);
-            trailGlow.Scale = new ValueCurve<float>(1);
-            trailGlow.Speed = new ValueCurve<float>(curve, 20, 5);
-
-            tex = Takai.AssetManager.Load<Texture2D>("Textures/Projectiles/Sharp.png");
-            Sprite = new Takai.Graphics.Sprite(tex);
-            Sprite.CenterOrigin();
-            Radius = Sprite.Width / 2;
         }
 
         System.TimeSpan flipTime;
         public override void Think(System.TimeSpan DeltaTime)
         {
-            ParticleSpawn spawn = new ParticleSpawn();
-            spawn.type = trail;
-            spawn.position = new Range<Vector2>(Position - (Direction * Radius), Position - (Direction * Radius));
-            spawn.lifetime = System.TimeSpan.FromSeconds(0.25);
-
+            ParticleSpawn spawn = new ParticleSpawn()
+            {
+                type = trail,
+                position = new Range<Vector2>(Position - (Direction * Radius), Position - (Direction * Radius)),
+                lifetime = System.TimeSpan.FromSeconds(0.25)
+            };
             var angle = (float)System.Math.Atan2(Direction.Y, Direction.X);
             spawn.angle = new Range<float>(angle - MathHelper.PiOver2, angle + MathHelper.PiOver2);
             spawn.count = 1;
@@ -126,12 +130,13 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnEntityCollision(Entity Collider, Vector2 Point, System.TimeSpan DeltaTime)
         {
-            ParticleSpawn spawn = new ParticleSpawn();
-            spawn.type = explosion;
-            spawn.count = 20;
-            spawn.lifetime = new Range<System.TimeSpan>(System.TimeSpan.FromSeconds(1), System.TimeSpan.FromSeconds(2));
-            spawn.position = Point;
-
+            ParticleSpawn spawn = new ParticleSpawn()
+            {
+                type = explosion,
+                count = 20,
+                lifetime = new Range<System.TimeSpan>(System.TimeSpan.FromSeconds(1), System.TimeSpan.FromSeconds(2)),
+                position = Point
+            };
             var normal = Vector2.Normalize(Point - Collider.Position);
             //normal = Vector2.Reflect(Direction, normal);
             var angle = (float)System.Math.Atan2(normal.Y, normal.X);

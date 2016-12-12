@@ -21,7 +21,7 @@ namespace Takai.Game
             Color[] pixels = new Color[Texture.Width * Texture.Height];
             Texture.GetData(pixels);
 
-            TilesMask = new bool[Texture.Height * Texture.Width];
+            TilesMask = new System.Collections.BitArray(Texture.Height * Texture.Width);
             for (var i = 0; i < pixels.Length; i++)
             {
                 if (UseAlpha)
@@ -180,8 +180,7 @@ namespace Takai.Game
                 foreach (var blob in Map.ActiveBlobs)
                 {
                     var type = blob.type;
-                    int index;
-                    if (!typeIndices.TryGetValue(type, out index))
+                    if (!typeIndices.TryGetValue(type, out var index))
                     {
                         index = blobTypes.Count;
                         blobTypes.Add(type);
@@ -200,8 +199,7 @@ namespace Takai.Game
                     foreach (var blob in s.blobs)
                     {
                         var type = blob.type;
-                        int index;
-                        if (!typeIndices.TryGetValue(type, out index))
+                        if (!typeIndices.TryGetValue(type, out var index))
                         {
                             index = blobTypes.Count;
                             blobTypes.Add(type);
@@ -244,13 +242,12 @@ namespace Takai.Game
             for (var i = 0; i < State.blobTypes.Count; i++)
                 blobTypes[i] = State.blobTypes[i];
 
-            foreach (var ent in State.entities)
+            ActiveEnts = State.entities ?? new List<Entity>();
+            foreach (var ent in ActiveEnts)
             {
                 ent.Map = this;
                 ent.OnSpawn();
             }
-
-            ActiveEnts = State.entities;
 
             ActiveBlobs = State.blobs.Select((BlobSave Save) =>
             {

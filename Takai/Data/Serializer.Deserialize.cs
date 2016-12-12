@@ -5,8 +5,6 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Data
 {
@@ -31,302 +29,161 @@ namespace Takai.Data
         private static readonly MethodInfo CastMethod = typeof(Enumerable).GetMethod("Cast");
         private static readonly MethodInfo ToListMethod = typeof(Enumerable).GetMethod("ToList");
         private static readonly MethodInfo ToArrayMethod = typeof(Enumerable).GetMethod("ToArray");
+        
+        private static string ExceptString(string BaseExceptionMessage, Stream Stream)
+        {
+            try { return BaseExceptionMessage + $" [Offset:{Stream.Position}]"; }
+            catch { return BaseExceptionMessage; }
+        }
 
         /// <summary>
-        /// Desearialize an object from a text file (In the same format created by TextSerialize)
+        /// Deserialize a stream into an object (only reads the first object)
         /// </summary>
         /// <param name="Stream">The stream to read from</param>
         /// <returns>The object created</returns>
-        /// <remarks>
-        /// Return types:
-        ///     [] - List&lt;object&gt;
-        ///     "string" - string
-        ///     'string' - string
-        ///     0.000 - float (or double if too large)
-        ///     00000 - int (or long if too large)
-        ///     true/false - bool
-        ///     null - null
-        ///     Type prop1 prop2 - Enum
-        ///     Type {...} - Type
-        ///     {...} - Dictionary&lt;string, object&gt; -- all keys converte to lowercase if CaseSensitiveMembers is false
-        /// </remarks>
         public static object TextDeserialize(StreamReader Stream)
         {
-            //todo: comments
-            //todo: allow ; or , in arrays
+            SkipIgnored(Stream);
 
-            SkipWhitespace(Stream);
-
-            var pk = (char)Stream.Peek();
-            if (pk == ';')
+            if (Stream.EndOfStream)
                 return null;
-            //strings
-            if (pk == '"' || pk == '\'')
-                return ReadString(Stream);
-            //numbers
-            if (char.IsDigit(pk) || pk == '-' || pk == '.' || pk == ',')
+            
+            var ch = Stream.Peek();
+            
+            //read dictionary
+            if (ch == '{')
             {
-                var num = ReadWord(Stream);
-                if (num.Contains(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator))
-                {
-                    try { return float.Parse(num); }
-                    catch (OverflowException) { return double.Parse(num); }
-                }
-                try { return int.Parse(num); }
-                catch (OverflowException) { return long.Parse(num); }
-            }
-            //arrays
-            if (pk == '[')
-            {
-                Stream.Read();
-                SkipWhitespace(Stream);
+                Stream.Read(); //skip {
+                SkipIgnored(Stream);
 
-                var list = new List<object>();
+                var dict = new Dictionary<string, object>();
+
+                while ((ch = Stream.Peek()) != -1 && ch != '}')
+                {
+                    var key = new StringBuilder();
+                    while ((ch = Stream.Peek()) != ':')
+                    {
+                        if (ch == -1)
+                            throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected '}' to close object", Stream.BaseStream));
+
+                        if (ch == ';' && key.Length == 0)
+                        {
+                            Stream.Read();
+                            break;
+                        }
+
+                        key.Append((char)Stream.Read());
+                    }
+                    
+                    if (Stream.Read() == -1)
+                        throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read object", Stream.BaseStream));
+
+                    var value = TextDeserialize(Stream);
+                    dict[key.ToString().TrimEnd()] = value;
+
+                    SkipIgnored(Stream);
+
+                    if ((ch = Stream.Peek()) == -1)
+                        throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected '}' to close object", Stream.BaseStream));
+
+                    if (ch == ';')
+                    {
+                        Stream.Read(); //skip ;
+                        SkipIgnored(Stream);
+                    }
+                    else if (ch != '}')
+                        throw new InvalidDataException(ExceptString("Unexpected token. Expected ';' or '}' while trying to read object", Stream.BaseStream));
+                }
+
+                Stream.Read(); 
+                return dict;
+            }
+
+            //read list
+            if (ch == '[')
+            {
+                Stream.Read(); //skip [
+                SkipIgnored(Stream);
+
+                var values = new List<object>();
                 while (!Stream.EndOfStream && Stream.Peek() != ']')
                 {
-                    list.Add(TextDeserialize(Stream));
-                    SkipWhitespace(Stream);
-                }
-                Stream.Read();
-                return list;
-            }
-            //dict
-            if (pk == '{')
-            {
-                Stream.Read();
-                SkipWhitespace(Stream);
-
-                var d = new Dictionary<string, object>(System.StringComparer.OrdinalIgnoreCase);
-                while (!Stream.EndOfStream && Stream.Peek() != '}')
-                {
-                    var name = ReadWord(Stream).ToLower();
-                    if (Stream.Read() != ':')
-                        throw new FormatException("Format is name: value;");
-
-                    SkipWhitespace(Stream);
-                    var value = TextDeserialize(Stream);
-                    
-                    d[name] = value;
-
-                    SkipWhitespace(Stream);
-                    pk = (char)Stream.Peek();
-                    if (pk == ';')
+                    if ((ch = Stream.Peek()) == ';')
                     {
-                        Stream.Read();
-                        SkipWhitespace(Stream);
+                        Stream.Read(); //skip ;
+                        SkipIgnored(Stream);
+
+                        if (Stream.Peek() == ';')
+                            throw new InvalidDataException(ExceptString("Unexpected ';' in list (missing value)", Stream.BaseStream));
                     }
-                    else if (pk != '}')
-                        throw new FormatException(string.Format("Missing semicolon for property '{0}'", name));
+
+                    if (ch == -1)
+                        throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read list", Stream.BaseStream));
+
+                    values.Add(TextDeserialize(Stream));
+                    SkipIgnored(Stream);
                 }
 
-                Stream.Read();
-                return d;
+                if (Stream.Read() == -1) //skip ]
+                    throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected ']' to close list", Stream.BaseStream));
+
+                return values;
             }
 
-            var word = ReadWord(Stream);
-            var lword = word.ToLower();
-            SkipWhitespace(Stream);
+            //file reference
+            if (ch == '@')
+                throw new NotImplementedException("Maybe later");
 
-            if (lword == "true")
-                return true;
-            if (lword == "false")
-                return false;
-            if (lword == "null")
+            if (ch == '"' || ch == '\'')
+                return ReadString(Stream);
+
+            string word;
+            if (ch == '-' || ch == '+')
+                word = (char)Stream.Read() + ReadWord(Stream);
+            else
+                word = ReadWord(Stream);
+
+            if (Stream.Peek() == '.') //maybe handle ,
+                word += (char)Stream.Read() + ReadWord(Stream);
+
+            if (word.ToLower() == "null")
                 return null;
 
-            System.Type ty;
-            if (!RegisteredTypes.TryGetValue(word, out ty))
+            if (bool.TryParse(word, out var @bool))
+                return @bool;
+            
+            if (long.TryParse(word, out var @int))
+                return @int;
+
+            if (double.TryParse(word, out var @float))
+                return @float;
+            
+            if (RegisteredTypes.TryGetValue(word, out var type))
             {
-                throw new FormatException("Type not found: " + word); //todo: add requested type and property
-                //return null;
-            }
+                SkipIgnored(Stream);
 
-            //enum
-            if (ty.IsEnum)
-            {
-
-                ulong values = 0;
-
-                do
+                if (type.IsEnum)
                 {
-                    var value = ReadWord(Stream);
-                    values |= Convert.ToUInt64(Enum.Parse(ty, value));
+                    if (Stream.Peek() != '.')
+                        throw new InvalidDataException(ExceptString($"Expected a '.' when reading enum value (EnumType.Key) while attempting to read '{word}'", Stream.BaseStream));
 
-                    SkipWhitespace(Stream);
-                } while (!IsTerminator((char)Stream.Peek()));
-
-                return Enum.ToObject(ty, values);
-            }
-
-            var dict = TextDeserialize(Stream) as Dictionary<string, object>;
-
-            if (dict != null)
-            {
-                var inst = Activator.CreateInstance(ty);
-
-                foreach (var field in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance | (CaseSensitiveMembers ? 0 : BindingFlags.IgnoreCase)))
-                {
-                    object val;
-                    if (DeserializeField(field, field.PropertyType, dict, out val))
-                        field.SetValue(inst, val);
+                    var eval = ReadWord(Stream);
+                    return Enum.Parse(type, eval);
                 }
 
-                foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance | (CaseSensitiveMembers ? 0 : BindingFlags.IgnoreCase)))
-                {
-                    object val;
-                    if (DeserializeField(field, field.FieldType, dict, out val))
-                        field.SetValue(inst, val);
-                }
+                //read object
+                if (Stream.Peek() != '{')
+                    throw new InvalidDataException(ExceptString($"Expected an object definition when reading type '{word}' (Type {{ }})", Stream.BaseStream));
+                
+                var dict = TextDeserialize(Stream);
 
-                return inst;
+                throw new NotImplementedException("Todo: parsing dict into object");
             }
 
-            return null;
+            throw new NotSupportedException(ExceptString($"Unknown identifier: '{word}'", Stream.BaseStream));
         }
 
-        //todo: use System.ComponentModel.TypeDescriptor.GetConverter (and ConvertFromString)
-
-        private static bool DeserializeField(MemberInfo Member, Type Type, Dictionary<string, object> Props, out object Value)
-        {
-            //ignored
-            if (Member.GetCustomAttribute<Data.NonSerializedAttribute>() != null)
-            {
-                Value = null;
-                return false;
-            }
-
-            object prop;
-
-            //not set
-            if (!Props.TryGetValue(Member.Name, out prop))
-            {
-                Value = null;
-                return false;
-            }
-
-            if (prop == null)
-            {
-                Value = prop;
-                return true;
-            }
-
-            //user defined serializers
-            var deserial = Member.GetCustomAttribute<CustomDeserializeAttribute>() ?? Type.GetCustomAttribute<CustomDeserializeAttribute>();
-            if (deserial != null)
-            {
-                Value = deserial.Deserialize.Invoke(null, new[] { prop });
-                return true;
-            }
-
-            //custom serializers
-            if (Serializers.ContainsKey(Type) && Serializers[Type].Deserialize != null)
-            {
-                Value = Serializers[Type].Deserialize(prop);
-                return true;
-            }
-
-            if (prop is IList)
-            {
-                var ety = Type.HasElementType ? Type.GetElementType() : Type.GetGenericArguments()[0];
-                var orig = (List<object>)prop;
-
-                try
-                {
-                    var casted = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { orig });
-
-                    //exception only happens during ToArray/List
-                    if (Type.IsArray)
-                        Value = ToArrayMethod.MakeGenericMethod(ety).Invoke(null, new[] { casted });
-                    else
-                        Value = ToListMethod.MakeGenericMethod(ety).Invoke(null, new[] { casted });
-                }
-                catch
-                {
-                    var cvt = orig.Select(x => Convert.ChangeType(x, ety));
-                    var casted = CastMethod.MakeGenericMethod(ety).Invoke(null, new[] { cvt });
-
-                    if (Type.IsArray)
-                        Value = ToArrayMethod.MakeGenericMethod(ety).Invoke(null, new[] { casted });
-                    else
-                        Value = ToListMethod.MakeGenericMethod(ety).Invoke(null, new[] { casted });
-                }
-
-                return true;
-            }
-
-            if (prop is IDictionary)
-            {
-                var gArgs = Type.GetGenericArguments(); //[key, value]
-                var orig = (Dictionary<string, object>)prop;
-
-                var converter = System.ComponentModel.TypeDescriptor.GetConverter(gArgs[0]);
-                if (converter != null)
-                {
-                    var dict = (IDictionary)Activator.CreateInstance(Type);
-
-                    foreach (var kv in orig)
-                    {
-                        try
-                        {
-                            object key;
-
-                            if (gArgs[0] == typeof(string))
-                                key = kv.Key;
-                            else if (gArgs[0].IsEnum)
-                                key = Enum.Parse(gArgs[0], kv.Key, true);
-                            else
-                                key = converter.ConvertFrom(kv.Key);
-
-                            object val;
-                            EvaluateAs(gArgs[1], kv.Value, out val);
-
-                            dict.Add(key, val);
-                        }
-                        catch { }
-                    }
-
-                    Value = dict;
-                    return true;
-                }
-
-                Value = null;
-                return false;
-            }
-
-            Value = prop;
-            return true;
-        }
-
-        /// <summary>
-        /// Attempt to deserialize an intermediate object as a specific type (Typically used when reading from dictionaries)
-        /// </summary>
-        /// <param name="Type">The type to deserialize as</param>
-        /// <param name="Source">The intermediate object to deserialize</param>
-        /// <param name="Value">The value deserialized</param>
-        /// <returns>True if the object was deserialized to Value, false if the type is unknown to the deserializer</returns>
-        /// <remarks>If Intermediate type and T do not match, will likely throw an exception</remarks>
-        public static bool EvaluateAs(Type Type, object Source, out object Value)
-        {
-            //user defined serializers
-            var deserial = Type.GetCustomAttribute<CustomDeserializeAttribute>();
-            if (deserial != null)
-            {
-                Value = deserial.Deserialize.Invoke(null, new[] { Source });
-                return true;
-            }
-
-            //custom serializers
-            if (Serializers.ContainsKey(Type) && Serializers[Type].Deserialize != null)
-            {
-                Value = Serializers[Type].Deserialize(Source);
-                return true;
-            }
-
-            Value = Convert.ChangeType(Source, Type);
-            return true;
-        }
-
-        private static char FromLiteral(char EscapeChar)
+        public static char FromLiteral(char EscapeChar)
         {
             switch (EscapeChar)
             {
@@ -348,7 +205,7 @@ namespace Takai.Data
         /// </summary>
         /// <param name="Stream">The stream to read from</param>
         /// <returns>The string (without quotes)</returns>
-        private static string ReadString(StreamReader Stream)
+        public static string ReadString(StreamReader Stream)
         {
             var builder = new StringBuilder();
             var end = Stream.Read();
@@ -364,42 +221,61 @@ namespace Takai.Data
             return builder.ToString();
         }
 
-        private static string ReadWord(StreamReader Stream)
+        public static string ReadWord(StreamReader Stream)
         {
             var builder = new StringBuilder();
             char pk;
-            while (!Stream.EndOfStream && !Char.IsSeparator(pk = (char)Stream.Peek()) && !IsTerminator(pk))
+            while (!Stream.EndOfStream &&
+                   !Char.IsSeparator(pk = (char)Stream.Peek()) &&
+                   !Char.IsPunctuation(pk))
                 builder.Append((char)Stream.Read());
             return builder.ToString();
         }
 
-        private static string ReadUntil(StreamReader Stream, Func<char, bool> TestFn)
+        /// <summary>
+        /// Assumes immediately at a comment (Post SkipWhitespace)
+        /// </summary>
+        /// <param name="Stream"></param>
+        public static void SkipComments(StreamReader Stream)
         {
-            var builder = new StringBuilder();
-            while (!Stream.EndOfStream && !TestFn((char)Stream.Peek()))
-                builder.Append((char)Stream.Read());
-            return builder.ToString();
-        }
+            var ch = Stream.Peek();
+            if (ch == -1 || ch != '#')
+                return;
 
-        private static void SkipWhitespace(StreamReader Stream)
+            Stream.Read(); //skip #
+            ch = Stream.Read();
+
+            if (ch == -1)
+                return;
+
+            //multiline comment #* .... *#
+            if (ch == '*')
+            {
+                //read until *#
+                while ((ch = Stream.Read()) != -1 && ch != '*' &&
+                       (ch = Stream.Read()) != -1 && ch != '#') ;
+            }
+            else
+                while ((ch = Stream.Read()) != -1 && ch != '\n') ;
+        }
+        
+        public static void SkipWhitespace(StreamReader Stream)
         {
-            while (Char.IsWhiteSpace((char)Stream.Peek()))
+            int ch;
+            while ((ch = Stream.Peek()) != -1 && Char.IsWhiteSpace((char)ch))
                 Stream.Read();
         }
 
-        private static bool IsTerminator(Char Char)
+        /// <summary>
+        /// Skip comments and whitespace
+        /// </summary>
+        public static void SkipIgnored(StreamReader Stream)
         {
-            switch (Char)
+            SkipWhitespace(Stream);
+            while (!Stream.EndOfStream && Stream.Peek() == '#')
             {
-                case ':':
-                case ';':
-                case '[':
-                case ']':
-                case '{':
-                case '}':
-                    return true;
-                default:
-                    return false;
+                SkipComments(Stream);
+                SkipWhitespace(Stream);
             }
         }
     }

@@ -98,7 +98,7 @@ namespace Takai.Graphics
             Texture.Dispose();
             Spacing = Point.Zero;
             Characters.Clear();
-            System.GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
         }
 
         #endregion
@@ -166,8 +166,7 @@ namespace Takai.Graphics
                     }
                 }
 
-                Rectangle rgn;
-                if (!Characters.TryGetValue(String[i], out rgn))
+                if (!Characters.TryGetValue(String[i], out var rgn))
                     continue;
 
                 Spritebatch.Draw(Texture, pos, rgn, curColor);
@@ -262,8 +261,7 @@ namespace Takai.Graphics
                     }
                 }
 
-                Rectangle rgn;
-                if (!Characters.TryGetValue(ch, out rgn))
+                if (!Characters.TryGetValue(ch, out var rgn))
                     continue;
 
                 int ofx = off.X, ofy = off.Y;
@@ -369,8 +367,8 @@ namespace Takai.Graphics
                         continue;
                     }
                 }
-                Rectangle rgn;
-                if (Characters.TryGetValue(String[i], out rgn))
+
+                if (Characters.TryGetValue(String[i], out var rgn))
                 {
                     nW += rgn.Width;
                     nH = (int)MathHelper.Max(nH, rgn.Height);

@@ -7,13 +7,45 @@ namespace Takai.Game
     /// <summary>
     /// All of the possible entity states
     /// </summary>
-    public enum EntState
+    public enum EntStateKey
     {
-        Idle = 0,
         Dead,
+        Idle,
         Down,
         Inactive,
         Active,
+    }
+
+    public class EntState : Takai.IState
+    {
+        public Takai.Graphics.Sprite Sprite { get; set; }
+
+        public bool IsLooping
+        {
+            get
+            {
+                return Sprite.IsLooping;
+            }
+            set
+            {
+                Sprite.IsLooping = value;
+            }
+        }
+
+        public bool HasFinished()
+        {
+            return Sprite.HasFinished();
+        }
+
+        public void Start()
+        {
+            Sprite.Start();
+        }
+
+        public void Update(TimeSpan DeltaTime)
+        {
+            Sprite.ElapsedTime += DeltaTime;
+        }
     }
 
     /// <summary>
@@ -99,58 +131,23 @@ namespace Takai.Game
         public bool IgnoreTrace { get; set; } = false;
 
         /// <summary>
-        /// Different animation states for the entity
+        /// Defines the entity's available and active state and handles transitions. Primarily for tracking actions
         /// </summary>
-        public Dictionary<EntState, Takai.Graphics.Sprite> States { get; set; } = null;
-
-        /// <summary>
-        /// Get or set the current state.
-        /// Automatically updates entity sprite on set
-        /// </summary>
-        /// <remarks>Does nothing if the state does not exist</remarks>
-        [Takai.Data.NonDesigned]
-        public EntState CurrentState
-        {
-            get
-            {
-                return currentState;
-            }
-            set
-            {
-                currentState = value;
-                if (States != null && States.ContainsKey(value))
-                {
-                    Sprite = States[currentState];
-                    Sprite.Start(Map != null ? Map.ElapsedTime : TimeSpan.Zero);
-                }
-
-                if (DestroyOnDeath && currentState == EntState.Dead)
-                    Map?.Destroy(this);
-            }
-        }
-        private EntState currentState = EntState.Idle;
-
-        /// <summary>
-        /// Remove this entity from the map when it dies (CurrentState == Dead)
-        /// </summary>
-        /// <remarks>Will wait for animation to finish (if not looping)</remarks>
-        public bool DestroyOnDeath { get; set; } = true;
-
+        /// <remarks>
+        /// If State.Dead:
+        ///     Entity will be removed if IsLooping is false (or if DestroyOffScreenIsDead applies)
+        /// </remarks>
+        public Takai.StateMachine<EntStateKey, EntState> State { get; set; } = new Takai.StateMachine<EntStateKey, EntState>();
+ 
         /// <summary>
         /// Destroy this entity if it goes off screen and is dead
         /// </summary>
         public bool DestroyOffScreenIfDead { get; set; }
 
         /// <summary>
-        /// The active sprite for this entity. Usually updated by the state machine
-        /// Can be updated by components
+        /// Should the sprite always be drawn with the original sprite orientation?
         /// </summary>
-        public Graphics.Sprite Sprite { get; set; } = null;
-
-        /// <summary>
-        /// Should the sprite always display upright (angle of sprite does not affect display)?
-        /// </summary>
-        public bool AlwaysUpright { get; set; } = false;
+        public bool AlwaysDrawUpright { get; set; } = false;
 
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
@@ -185,7 +182,10 @@ namespace Takai.Game
         /// The basic think function for this entity, called once a frame
         /// </summary>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void Think(System.TimeSpan DeltaTime) { }
+        public virtual void Think(System.TimeSpan DeltaTime)
+        {
+            State.Update(DeltaTime);
+        }
 
         /// <summary>
         /// Called when the entity is spawned. Also called on deserialization

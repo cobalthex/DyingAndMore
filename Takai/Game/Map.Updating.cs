@@ -119,7 +119,7 @@ namespace Takai.Game
                         continue;
                     }
 
-                    if (ent.DestroyOffScreenIfDead && ent.CurrentState == EntState.Dead)
+                    if (ent.DestroyOffScreenIfDead && ent.State.HasActive(EntStateKey.Dead))
                     {
                         Destroy(ent);
                         continue;
@@ -135,11 +135,8 @@ namespace Takai.Game
                     if (!ent.IsEnabled)
                         continue;
 
-                    if (ent.DestroyOnDeath && ent.CurrentState == EntState.Dead)
-                    {
-                        if (ent.Sprite == null || ent.Sprite.IsLooping || ent.Sprite.IsFinished())
-                            ent.Map = null;
-                    }
+                    if (ent.State.ActiveStates.Count == 0)
+                        ent.Map = null;
 
                     if (updateSettings.isAiEnabled)
                         ent.Think(deltaTime);

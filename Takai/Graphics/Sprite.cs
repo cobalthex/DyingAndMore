@@ -30,11 +30,6 @@ namespace Takai.Graphics
     public class Sprite
     {
         /// <summary>
-        /// The last time the graphic was drawn
-        /// </summary>
-        protected TimeSpan lastTime;
-
-        /// <summary>
         /// The elapsed time of this graphic (used for calculating current frame)
         /// Set this value to update the animation
         /// </summary>
@@ -205,9 +200,9 @@ namespace Takai.Graphics
         /// Is the animation finished playing?
         /// </summary>
         /// <returns></returns>
-        public bool IsFinished()
+        public bool HasFinished()
         {
-            return !IsLooping && lastTime >= TimeSpan.FromTicks(FrameLength.Ticks * FrameCount);
+            return !IsLooping && ElapsedTime >= TimeSpan.FromTicks(FrameLength.Ticks * FrameCount);
         }
 
         public Sprite
@@ -256,9 +251,8 @@ namespace Takai.Graphics
         /// (Re)start the animation
         /// </summary>
         /// <param name="Time">The time to start counting from</param>
-        public void Start(TimeSpan Time)
+        public void Start()
         {
-            lastTime = Time;
             ElapsedTime = TimeSpan.Zero;
         }
 
@@ -280,32 +274,30 @@ namespace Takai.Graphics
         /// <summary>
         /// Get the clip rect for a single frame of the image
         /// </summary>
-        /// <param name="Frame"></param>
-        /// <returns></returns>
+        /// <param name="Frame">Which frame of the animation to use (No bounds checking)</param>
+        /// <returns>The clipping rectangle of the requested frame</returns>
         public Rectangle GetFrameRect(int Frame)
         {
             var src = new Rectangle(ClipRect.X + (Frame % framesPerRow) * Width, ClipRect.Y + (Frame / framesPerRow) * Height, Width, Height);
             return Rectangle.Intersect(src, ClipRect);
         }
 
-        public void Draw(TimeSpan Time, SpriteBatch SpriteBatch, Vector2 Position, float Angle)
+        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle)
         {
-            Draw(Time, SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle, Color.White);
+            Draw(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle, Color.White, ElapsedTime);
         }
-        public void Draw(TimeSpan Time, SpriteBatch SpriteBatch, Rectangle Bounds, float Angle)
+        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle)
         {
-            Draw(Time, SpriteBatch, Bounds, Angle, Color.White);
-        }
-
-        public void Draw(TimeSpan Time, SpriteBatch SpriteBatch, Vector2 Position, float Angle, Color Color, float Scale = 1)
-        {
-            Draw(Time, SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle, Color);   
+            Draw(SpriteBatch, Bounds, Angle, Color.White, ElapsedTime);
         }
 
-        public void Draw(TimeSpan Time, SpriteBatch SpriteBatch, Rectangle Bounds, float Angle, Color Color)
+        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle, Color Color, float Scale = 1)
         {
-            ElapsedTime += Time - lastTime;
-            
+            Draw(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle, Color, ElapsedTime);
+        }
+
+        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle, Color Color, TimeSpan  ElapsedTime)
+        {
             var elapsed = (float)(ElapsedTime.TotalSeconds / FrameLength.TotalSeconds);
             var cf = IsLooping ? ((int)elapsed % FrameCount) : MathHelper.Clamp((int)elapsed, 0, FrameCount - 1);
             var nf = IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount - 1);
@@ -332,8 +324,6 @@ namespace Takai.Graphics
                     DrawTexture(SpriteBatch, Bounds, GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, fd));
                     break;
             }
-
-            lastTime = Time;
         }
         
         /// <summary>

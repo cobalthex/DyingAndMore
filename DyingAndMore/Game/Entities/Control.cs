@@ -39,7 +39,7 @@ namespace DyingAndMore.Game.Entities
 
         void SetState(string Name, int Value)
         {
-            CurrentState = CurrentState == EntState.Idle ? EntState.Active : EntState.Idle;
+            //todo
         }
 
         public override void OnSpawn()
