@@ -6,6 +6,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
+using TFloat = System.Double;
+using TInt   = System.Int64;
+
 namespace Takai.Data
 {
     /// <summary>
@@ -152,10 +155,10 @@ namespace Takai.Data
             if (bool.TryParse(word, out var @bool))
                 return @bool;
             
-            if (long.TryParse(word, out var @int))
+            if (TInt.TryParse(word, out var @int))
                 return @int;
 
-            if (double.TryParse(word, out var @float))
+            if (TFloat.TryParse(word, out var @float))
                 return @float;
             
             if (RegisteredTypes.TryGetValue(word, out var type))
@@ -175,12 +178,169 @@ namespace Takai.Data
                 if (Stream.Peek() != '{')
                     throw new InvalidDataException(ExceptString($"Expected an object definition when reading type '{word}' (Type {{ }})", Stream.BaseStream));
                 
-                var dict = TextDeserialize(Stream);
+                var dict = TextDeserialize(Stream) as Dictionary<string, object>;
+                if (dict == null)
+                    throw new InvalidDataException(ExceptString($"Expected an object definition when reading type '{word}' (Type {{ }})", Stream.BaseStream));
 
-                throw new NotImplementedException("Todo: parsing dict into object");
+                var obj = Activator.CreateInstance(type);
+                foreach (var pair in dict)
+                {
+                    try
+                    {
+                        var field = type.GetField(pair.Key, DefaultBindingFlags);
+                        if (field != null)
+                        {
+                            var cast = CastType(field.FieldType, pair.Value);
+                            field.SetValue(obj, cast);
+                        }
+                        else
+                        {
+                            var prop = type.GetProperty(pair.Key, DefaultBindingFlags);
+                            if (prop != null)
+                            {
+                                var cast = CastType(prop.PropertyType, pair.Value);
+                                prop.SetValue(obj, cast);
+                            }
+
+                            //ignore, unknown value
+                        }
+                    }
+                    catch (InvalidCastException expt)
+                    {
+                        throw new InvalidCastException(ExceptString($"Error casting to field:{pair.Key} in type:{type.Name}: {expt.Message}", Stream.BaseStream), expt);
+                    }
+                    catch (Exception expt)
+                    {
+                        throw new Exception(ExceptString($"Error parsing field:{pair.Key} in type:{type.Name}: {expt.Message}", Stream.BaseStream), expt);
+                    }
+                }
+                return obj;
             }
 
             throw new NotSupportedException(ExceptString($"Unknown identifier: '{word}'", Stream.BaseStream));
+        }
+
+        public const BindingFlags DefaultBindingFlags = BindingFlags.IgnoreCase
+                                                      | BindingFlags.Instance
+                                                      | BindingFlags.Public;
+
+        public static bool IsIntType(Type SourceType)
+        {
+            switch (Type.GetTypeCode(SourceType))
+            {
+                case TypeCode.SByte:
+                case TypeCode.Byte:
+                case TypeCode.Int16:
+                case TypeCode.UInt16:
+                case TypeCode.Int32:
+                case TypeCode.UInt32:
+                case TypeCode.Int64:
+                case TypeCode.UInt64:
+                case TypeCode.Char:
+                    return true;
+
+                case TypeCode.Object:
+                    if (SourceType.IsGenericType && SourceType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        return IsIntType(Nullable.GetUnderlyingType(SourceType));
+                    return false;
+
+                default:
+                    return false;
+            }
+        }
+
+        public static bool IsFloatType(Type SourceType)
+        {
+            switch (Type.GetTypeCode(SourceType))
+            {
+                case TypeCode.Single:
+                case TypeCode.Double:
+                    return true;
+
+                case TypeCode.Object:
+                    if (SourceType.IsGenericType && SourceType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        return IsFloatType(Nullable.GetUnderlyingType(SourceType));
+                    return false;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Convert <see cref="Source"/> to type <see cref="Ty"/>
+        /// Utilizes CustomSerializers
+        /// </summary>
+        /// <param name="DestType">The type to cast to</param>
+        /// <param name="Source">The source object</param>
+        /// <param name="Strict">Should only cast between equivelent types (If true, casting int to bool would fail)</param>
+        /// <returns>The correctly casted object</returns>
+        public static object CastType(Type DestType, object Source, bool Strict = true)
+        {
+            var sourceType = Source.GetType();
+
+            if (Serializers.TryGetValue(DestType, out var deserial) && deserial.Deserialize != null)
+                return deserial.Deserialize(Source);
+
+            if (sourceType == DestType)
+                return Source;
+
+            if (!Strict)
+            {
+                try { return Convert.ChangeType(Source, DestType); }
+                catch { }
+            }
+
+            if (Source == null && DestType.IsPrimitive)
+                throw new InvalidCastException($"Type:{DestType} is primative and cannot be null");
+
+            if (DestType.IsArray)
+            {
+                var list = Source as List<object>;
+                if (list == null)
+                    throw new InvalidCastException($"Type:{DestType.Name} is an array but '{Source}' is of type:{sourceType.Name}");
+
+                var elType = DestType.GetElementType();
+                list = list.ConvertAll(i => CastType(elType, i, Strict));
+                var casted = CastMethod.MakeGenericMethod(elType).Invoke(null, new[] { list });
+                return ToArrayMethod.MakeGenericMethod(elType).Invoke(null, new[] { casted });
+            }
+
+            if (DestType.IsGenericType)
+            {
+                var genericType = DestType.GetGenericTypeDefinition();
+                var genericArgs = DestType.GetGenericArguments();
+
+                if (genericType == typeof(List<>))
+                {
+                    var list = Source as List<object>;
+                    if (list == null)
+                        throw new InvalidCastException($"Type:{DestType.Name} is a list but '{Source}' is of type:{sourceType.Name}");
+
+                    list = list.ConvertAll(i => CastType(genericArgs[0], i, Strict));
+                    var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { list });
+                    return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
+                }
+
+                if (genericType == typeof(Dictionary<,>))
+                    throw new NotImplementedException("blah");
+            }
+
+            bool canConvert = false;
+
+            bool isSourceInt = IsIntType(sourceType);
+            bool isSourceFloat = IsFloatType(sourceType);
+
+            bool isDestInt = IsIntType(sourceType);
+            bool isDestFloat = IsFloatType(sourceType);
+
+            canConvert |= (isDestInt && isSourceInt);
+            canConvert |= (isDestFloat || isDestInt) && (isSourceFloat || isSourceInt);
+
+            if (canConvert)
+                return Convert.ChangeType(Source, DestType);
+            
+            throw new InvalidCastException($"Error converting '{Source}' from type:{sourceType.Name} to type:{DestType.Name}");
         }
 
         public static char FromLiteral(char EscapeChar)
