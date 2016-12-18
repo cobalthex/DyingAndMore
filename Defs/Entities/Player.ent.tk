@@ -1,28 +1,30 @@
 Actor {
     MaxHealth: 100;
-    State: {
-        Idle: EntState {
-            Sprite: Sprite {
-                texture: "Textures/Entities/Player.png";
-                width: 48;
-                height: 48;
-                clip: [0 0 96 96];
-                origin: [24 24];
-                FrameCount: 2;
-                FrameLength: 100;
-                IsLooping: True;
-                Tween: TweenStyle Overlap;
+    State: EntityStateMachine {
+        ActiveStates: [
+            EntStateKey [Idle];
+        ];
+        States: {
+            Idle: EntState {
+                Sprite: Sprite {
+                    texture: "Textures/Entities/Player.png";
+                    width: 48;
+                    height: 48;
+                    clip: [0 0 96 96];
+                    origin: [24 24];
+                    FrameCount: 2;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    Tween: TweenStyle [Overlap];
+                };
             };
         };
     };
-    ActiveStates: [
-        EntStateKey Idle;
-    ]
     FieldOfView: 2.356194;
     MaxSpeed: 400;
     MoveForce: 600;
-    Faction: Factions Player;
-    Controller: InputController { player: PlayerIndex One };
+    Faction: Factions [Player];
+    Controller: InputController { player: PlayerIndex [One] };
     IsEnabled: True;
     AlwaysActive: False;
     Radius: 24;

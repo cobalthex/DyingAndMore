@@ -57,7 +57,7 @@ namespace DyingAndMore
         {
             Takai.Data.Serializer.LoadTypesFrom(System.Reflection.Assembly.GetEntryAssembly());
 
-            if (StateManager.IsInitialized)
+            if (GameStateManager.IsInitialized)
                 return;
 
             #region Mouse Cursor
@@ -78,15 +78,15 @@ namespace DyingAndMore
 
             Takai.AssetManager.Initialize(GraphicsDevice, "Data\\");
 
-            StateManager.Initialize(this);
-            StateManager.PushState(new Game.Game());
+            GameStateManager.Initialize(this);
+            GameStateManager.PushState(new Game.Game());
 
             base.Initialize();
         }
 
         protected override void OnExiting(object sender, System.EventArgs args)
         {
-            StateManager.Exit();
+            GameStateManager.Exit();
         }
 
         protected override void Update(GameTime gameTime)
@@ -95,7 +95,7 @@ namespace DyingAndMore
                 takingScreenshot = true;
 
             Takai.Input.InputState.Update(GraphicsDevice.Viewport.Bounds);
-            StateManager.Update(gameTime);
+            GameStateManager.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -108,7 +108,7 @@ namespace DyingAndMore
                     GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
                 GraphicsDevice.SetRenderTarget(rt);
-                StateManager.Draw(gameTime);
+                GameStateManager.Draw(gameTime);
                 GraphicsDevice.SetRenderTarget(null);
 
                 var fs = new System.IO.FileStream(System.DateTime.Now.ToString("dd_MMM_HH-mm-ss-fff") + ".png", System.IO.FileMode.Create);
@@ -117,7 +117,7 @@ namespace DyingAndMore
                 rt.Dispose();
             }
             else
-                StateManager.Draw(gameTime);
+                GameStateManager.Draw(gameTime);
         }
     }
 }
