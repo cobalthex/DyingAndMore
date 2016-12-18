@@ -48,14 +48,23 @@ namespace Takai.Game
         }
     }
 
+    public class EntityStateMachine : StateMachine<EntStateKey, EntState> { }
+
     /// <summary>
     /// The basic entity. All actors and objects inherit from this
     /// </summary>
     [Data.DesignerCreatable]
     public class Entity
     {
+        static UInt64 nextId = 0;
         /// <summary>
-        /// The name of this entity. Typically used by other entities for locating
+        /// A unique ID for each entity. Generated at runtime. Used for debugging
+        /// </summary>
+        [Data.NonSerialized]
+        private UInt64 id = (++nextId);
+
+        /// <summary>
+        /// The name of this entity. Typically used by other entities for locating (and therefore should be unique)
         /// </summary>
         [Data.NonDesigned]
         public string Name { get; set; } = null;
@@ -137,7 +146,7 @@ namespace Takai.Game
         /// If State.Dead:
         ///     Entity will be removed if IsLooping is false (or if DestroyOffScreenIsDead applies)
         /// </remarks>
-        public Takai.StateMachine<EntStateKey, EntState> State { get; set; } = new Takai.StateMachine<EntStateKey, EntState>();
+        public EntityStateMachine State { get; set; } = new EntityStateMachine();
  
         /// <summary>
         /// Destroy this entity if it goes off screen and is dead

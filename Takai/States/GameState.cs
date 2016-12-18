@@ -3,7 +3,7 @@
     /// <summary>
     /// A single state for a state manager
     /// </summary>
-    public class State
+    public class GameState
     {
         /// <summary>
         /// Draw states below this one in the state manager's state stack
@@ -40,7 +40,7 @@
         /// </summary>
         /// <param name="DrawBelow">Allow states below this one in the state stack to draw</param>
         /// <param name="UpdateBelow">Allow states below this one in the state stack to update</param>
-        public State(bool DrawBelow, bool UpdateBelow)
+        public GameState(bool DrawBelow, bool UpdateBelow)
         {
             this.DrawBelow = DrawBelow;
             this.UpdateBelow = UpdateBelow;
@@ -78,10 +78,10 @@
         /// <summary>
         /// Called when the state is activated
         /// </summary>
-        public StateManager.StateEventHandler OnEnter;
+        public GameStateManager.StateEventHandler OnEnter;
         /// <summary>
         /// Called when the game window is resized
         /// </summary>
-        public StateManager.StateEventHandler OnResize;
+        public GameStateManager.StateEventHandler OnResize;
     }
 }

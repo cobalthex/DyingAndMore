@@ -22,7 +22,7 @@ namespace DyingAndMore.Editor
         public int x, y, index;
     }
 
-    class Editor : Takai.States.State
+    class Editor : Takai.States.GameState
     {
         public EditorMode currentMode = EditorMode.Tiles;
 
@@ -51,7 +51,7 @@ namespace DyingAndMore.Editor
         void AddSelector(Selector Sel, EditorMode Index)
         {
             selectors[(uint)Index] = Sel;
-            Takai.States.StateManager.PushState(Sel);
+            Takai.States.GameStateManager.PushState(Sel);
             Sel.Deactivate();
         }
 
@@ -76,9 +76,9 @@ namespace DyingAndMore.Editor
 
         public override void Unload()
         {
-            while (Takai.States.StateManager.TopState != this
-                && Takai.States.StateManager.Count > 0)
-                Takai.States.StateManager.PopState();
+            while (Takai.States.GameStateManager.TopState != this
+                && Takai.States.GameStateManager.Count > 0)
+                Takai.States.GameStateManager.PopState();
 
             TouchPanel.EnabledGestures = GestureType.None;
         }
@@ -134,13 +134,13 @@ namespace DyingAndMore.Editor
 
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
-                Takai.States.StateManager.Exit();
+                Takai.States.GameStateManager.Exit();
                 return;
             }
 
             if (InputState.IsClick(Keys.F1))
             {
-                Takai.States.StateManager.NextState(new Game.Game() { map = map });
+                Takai.States.GameStateManager.NextState(new Game.Game() { map = map });
                 return;
             }
 

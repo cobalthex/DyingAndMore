@@ -49,7 +49,7 @@ namespace Takai.Data
             if (ty.IsPrimitive)
                 Stream.Write(Object);
 
-            else if (ty.IsEnum) //todo: flags
+            else if (ty.IsEnum)
             {
                 Stream.Write(WriteFullTypeNames ? ty.FullName : ty.Name);
 

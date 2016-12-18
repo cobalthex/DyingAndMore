@@ -55,6 +55,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The current controller over this actor (null for none)
         /// </summary>
+        /// <remarks>The controller's actor is automatically updated when this is set</remarks>
         public Controller Controller
         {
             get { return controller; }

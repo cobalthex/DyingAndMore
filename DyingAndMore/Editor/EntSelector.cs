@@ -29,7 +29,7 @@ namespace DyingAndMore.Editor
                             ents.Add(ent);
                     }
                 }
-                catch { }
+                catch (DeviceLostException) { }
             }
             ItemCount = ents.Count;
             ItemSize = new Point(64);
@@ -42,8 +42,8 @@ namespace DyingAndMore.Editor
             {
                 foreach (var key in ents[ItemIndex].State.ActiveStates)
                 {
-                    var state = ents[ItemIndex].State.States[key];
-                    if (state.Sprite?.Texture != null)
+                    var state = ents[ItemIndex].State.States?[key];
+                    if (state?.Sprite?.Texture != null)
                     {
                         Bounds.X += Bounds.Width / 2;
                         Bounds.Y += Bounds.Height / 2;

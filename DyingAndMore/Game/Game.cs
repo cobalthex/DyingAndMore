@@ -8,12 +8,13 @@ using Takai;
 
 namespace DyingAndMore.Game
 {
-    class Game : Takai.States.State
+    class Game : Takai.States.GameState
     {
         public Takai.Game.Map map;
         public Takai.Game.Camera camera;
 
-        Entities.Actor player;
+        Entities.Actor player = null;
+        Entities.Controller lastController = null;
 
         Takai.Graphics.BitmapFont fnt;
         string debugText = "";
@@ -141,13 +142,13 @@ namespace DyingAndMore.Game
 
             if (InputState.IsClick(Keys.F1))
             {
-                Takai.States.StateManager.NextState(new Editor.Editor() { map = map, camera = new Takai.Game.Camera(map, camera.ActualPosition) { Viewport = camera.Viewport } });
+                Takai.States.GameStateManager.NextState(new Editor.Editor() { map = map, camera = new Takai.Game.Camera(map, camera.ActualPosition) { Viewport = camera.Viewport } });
                 return;
             }
 
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
-                Takai.States.StateManager.Exit();
+                Takai.States.GameStateManager.Exit();
                 return;
             }
 
@@ -167,6 +168,34 @@ namespace DyingAndMore.Game
                     map.LoadState(stream);
                 StartMap();
             }
+
+            //possess actors
+#if DEBUG
+            if (InputState.IsMod(KeyMod.Alt) && InputState.IsPress(MouseButtons.Left))
+            {
+                var targets = map.FindNearbyEntities(camera.ScreenToWorld(InputState.MouseVector), 5, false);
+
+                foreach (var ent in targets)
+                {
+                    var actor = ent as Entities.Actor;
+                    if (actor != null)
+                    {
+                        Entities.Controller inputCtrl = null;
+                        if (player != null)
+                        {
+                            inputCtrl = player.Controller;
+                            player.Controller = lastController;
+                        }
+
+                        player = actor;
+                        lastController = player.Controller;
+                        player.Controller = inputCtrl ?? new Entities.InputController();
+                        camera.Follow = player;
+                        break;
+                    }
+                }
+            }
+#endif
 
             var scrollDelta = InputState.ScrollDelta();
             if (InputState.IsMod(KeyMod.Control) && scrollDelta != 0)

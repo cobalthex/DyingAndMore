@@ -196,7 +196,7 @@ namespace Takai.Game
                 }
                 
 #if DEBUG //Draw [X] in place of ent graphic
-                if (true)
+                if (false)
                 {
                     Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
                                                  -ent.Direction.Y, ent.Direction.X, 0, 0, 
@@ -407,6 +407,14 @@ namespace Takai.Game
                 GraphicsDevice.DepthStencilState = DepthStencilState.None;
                 var viewProjection = Matrix.CreateOrthographicOffCenter(GraphicsDevice.Viewport.Bounds, 0, 1);
                 lineEffect.Parameters["Transform"].SetValue(Camera.Transform * viewProjection);
+
+                var blackLines = debugLines.ConvertAll(line => { line.Color = Color.Black; line.Position += new Vector3(1, 1, 0); return line; });
+                foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, blackLines.ToArray(), 0, blackLines.Count / 2);
+                }
+
                 foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();

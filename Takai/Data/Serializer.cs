@@ -128,7 +128,10 @@ namespace Takai.Data
 
             Type[] types = Ass.GetTypes();
             foreach (var type in types)
-                RegisteredTypes[WriteFullTypeNames ? type.FullName : type.Name] = type;
+            {
+                if (!type.IsGenericType && !Attribute.IsDefined(type, typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false))
+                    RegisteredTypes[WriteFullTypeNames ? type.FullName : type.Name] = type;
+            }
         }
     }
 }

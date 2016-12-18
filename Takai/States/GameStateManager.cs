@@ -5,7 +5,7 @@ namespace Takai.States
     /// <summary>
     /// Manages multiple program/game states
     /// </summary>
-    public static class StateManager
+    public static class GameStateManager
     {
         /// <summary>
         /// has the state manager been initialized
@@ -15,12 +15,12 @@ namespace Takai.States
         /// <summary>
         /// All of the active states
         /// </summary>
-        static List<State> states;
+        static List<GameState> states;
 
         /// <summary>
         /// Get the top most state in the state stack
         /// </summary>
-        public static State TopState { get { return states[states.Count - 1]; } }
+        public static GameState TopState { get { return states[states.Count - 1]; } }
 
         /// <summary>
         /// The number of states in the state manager
@@ -53,8 +53,8 @@ namespace Takai.States
         /// <param name="Game">The game this state manager is part of</param>
         public static void Initialize(Microsoft.Xna.Framework.Game Game)
         {
-            states = new List<State>();
-            StateManager.Game = Game;
+            states = new List<GameState>();
+            GameStateManager.Game = Game;
 
             IsInitialized = true;
         }
@@ -77,7 +77,7 @@ namespace Takai.States
             //update the states in reverse order
             for (int i = states.Count - 1; i >= 0; --i)
             {
-                State s = states[i];
+                GameState s = states[i];
                 if (s.IsEnabled)
                 {
                     s.Update(Time);
@@ -115,7 +115,7 @@ namespace Takai.States
         /// Add a state to the top of the State stack
         /// </summary>
         /// <param name="State">The State to add</param>
-        public static void PushState(State State)
+        public static void PushState(GameState State)
         {
             if (State == null)
                 throw new System.ArgumentNullException("add");
@@ -130,11 +130,11 @@ namespace Takai.States
         /// <param name="NextState">State to replace the top</param>
         /// <returns>the previous state that was popped off the state stack</returns>
         /// <remarks>The previous state is unloaded</remarks>
-        public static void NextState(State NextState)
+        public static void NextState(GameState NextState)
         {
             System.Diagnostics.Contracts.Contract.Assert(NextState != null);
 
-            State s;
+            GameState s;
             while (states.Count > 0 && ((s = states[states.Count - 1]).DrawBelow))
             {
                 s.Unload();
@@ -152,9 +152,9 @@ namespace Takai.States
         /// Remove the top most State from the state stack
         /// </summary>
         /// <returns>The previous top most State</returns>
-        public static State PopState()
+        public static GameState PopState()
         {
-            State s = states[states.Count - 1];
+            GameState s = states[states.Count - 1];
             states.RemoveAt(states.Count - 1);
             s.Deactivate();
             return s;
@@ -164,7 +164,7 @@ namespace Takai.States
         /// Loads the state and sets all properties
         /// </summary>
         /// <param name="State">State to activate</param>
-        static void ActivateState(State State)
+        static void ActivateState(GameState State)
         {
             State.GraphicsDevice = Game.GraphicsDevice;
 
@@ -181,7 +181,7 @@ namespace Takai.States
         /// </summary>
         /// <param name="State">The state to check</param>
         /// <returns>true if the state is updating, false otherwise</returns>
-        public static bool IsUpdating(State State)
+        public static bool IsUpdating(GameState State)
         {
             for (var i = states.Count - 1; i >= 0; --i)
             {
