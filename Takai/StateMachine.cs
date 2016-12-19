@@ -86,12 +86,12 @@ namespace Takai
         /// <returns>False if the states did not exist in the state machine</returns>
         public virtual bool Transition(TKey CurrentState, TKey NextState)
         {
-            if (CurrentState != null)
+            if (!EqualityComparer<TKey>.Default.Equals(CurrentState, default(TKey)))
             {
-                Transitions.Add(CurrentState, NextState);
+                Transitions[CurrentState] = NextState;
                 return true;
             }
-            if (NextState != null && States.TryGetValue(NextState, out var next))
+            if (!EqualityComparer<TKey>.Default.Equals(NextState, default(TKey)) && States.TryGetValue(NextState, out var next))
             {
                 next.Start();
                 ActiveStates.Add(NextState);

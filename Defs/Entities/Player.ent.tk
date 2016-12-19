@@ -10,7 +10,7 @@ Actor {
                     texture: "Textures/Entities/Player.png";
                     width: 48;
                     height: 48;
-                    clip: [0 0 96 96];
+                    ClipRect: [0 0 96 96];
                     origin: [24 24];
                     FrameCount: 2;
                     FrameLength: 100;
@@ -30,7 +30,7 @@ Actor {
     Radius: 24;
     IsPhysical: True;
     IgnoreTrace: False;
-    AlwaysUpright: False;
+    AlwaysDrawUpright: False;
     PrimaryWeapon: Gun {
         Projectile: Projectile {
             Sprite: {
@@ -40,7 +40,7 @@ Actor {
             }
         };
         Speed: 0;
-        shotDelay: 50;
+        shotDelay: 250;
     };
     AltWeapon: BlobGun {
         blob: BlobType {

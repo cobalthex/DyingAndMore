@@ -1,0 +1,47 @@
+Actor {
+    MaxHealth: 20;
+    State: EntityStateMachine {
+        ActiveStates: [
+            EntStateKey [Idle];
+        ];
+        States: {
+            Idle: EntState {
+                Sprite: Sprite {
+                    texture: "Textures/Entities/InfectedCell.png";
+                    width: 32;
+                    height: 32;
+                    ClipRect: [0 0 256 32];
+                    origin: [16 16];
+                    FrameCount: 8;
+                    FrameLength: 200;
+                    IsLooping: True;
+                    Tween: TweenStyle [Overlap];
+                };
+            };
+            Dying: EntState {
+                Sprite: Sprite {
+                    texture: "Textures/Entities/InfectedCell.png";
+                    width: 64;
+                    height: 64;
+                    ClipRect: [0 32 256 64];
+                    origin: [32 32];
+                    FrameCount: 4;
+                    FrameLength: 500;
+                    IsLooping: False;
+                    Tween: TweenStyle [Overlap];
+                };
+            };
+        };
+    };
+    FieldOfView: 2.356194;
+    MaxSpeed: 300;
+    MoveForce: 500;
+    Faction: Factions [Enemy Common];
+    Controller: AIController { };
+    IsEnabled: True;
+    AlwaysActive: False;
+    Radius: 16;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: True;
+}

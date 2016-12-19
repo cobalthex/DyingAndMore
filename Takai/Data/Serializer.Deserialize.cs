@@ -268,8 +268,8 @@ namespace Takai.Data
                                     prop.SetValue(obj, cast);
                                 }
                             }
-
-                            System.Diagnostics.Debug.WriteLine($"Unknown field:{pair.Key} in type:{type.Name}. Ignoring");
+                            else
+                                System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in type:{type.Name}");
                         }
                     }
                     //catch (InvalidCastException expt)

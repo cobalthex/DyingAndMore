@@ -9,6 +9,8 @@ namespace DyingAndMore.Game.Entities
         public ParticleType explosion;
         public ParticleType trail, trailGlow;
 
+        public int damage = 20;
+
         /// <summary>
         /// How far this shot will go before destroying itself
         /// </summary>
@@ -143,8 +145,13 @@ namespace DyingAndMore.Game.Entities
             spawn.angle = new Range<float>(angle - 0.75f, angle + 0.75f);
 
             Map.Spawn(spawn);
-
             Map.Destroy(this);
+
+            var actor = Collider as Actor;
+            if (actor != null)
+            {
+                actor.CurrentHealth -= damage;
+            }
         }
     }
 }

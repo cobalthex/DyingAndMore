@@ -9,9 +9,10 @@ namespace Takai.Game
     /// </summary>
     public enum EntStateKey
     {
+        Invalid,
         Dead,
-        Idle,
-        Down,
+        Idle, 
+        Dying,
         Inactive,
         Active,
     }
@@ -56,12 +57,14 @@ namespace Takai.Game
     [Data.DesignerCreatable]
     public class Entity
     {
-        static UInt64 nextId = 0;
+        private static UInt64 nextId = 0; //generator for the unique IDs
         /// <summary>
-        /// A unique ID for each entity. Generated at runtime. Used for debugging
+        /// A unique ID for each entity
+        /// Generated at runtime
+        /// Primarily used for debugging
         /// </summary>
         [Data.NonSerialized]
-        private UInt64 id = (++nextId);
+        public UInt64 Id { get; } = (++nextId);
 
         /// <summary>
         /// The name of this entity. Typically used by other entities for locating (and therefore should be unique)
@@ -149,9 +152,9 @@ namespace Takai.Game
         public EntityStateMachine State { get; set; } = new EntityStateMachine();
  
         /// <summary>
-        /// Destroy this entity if it goes off screen and is dead
+        /// Destroy this entity if it goes off screen (becomes inactive) and is dead
         /// </summary>
-        public bool DestroyOffScreenIfDead { get; set; }
+        public bool DestroyIfDeadAndInactive { get; set; }
 
         /// <summary>
         /// Should the sprite always be drawn with the original sprite orientation?

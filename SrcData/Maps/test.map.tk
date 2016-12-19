@@ -24,7 +24,7 @@ MapSave {
         decals: [
             Decal {
                 texture: "Textures/Decals/crack.png";
-                position: [1124 39];
+                position: [800 39];
                 angle: 0;
                 scale: 1;
             }
