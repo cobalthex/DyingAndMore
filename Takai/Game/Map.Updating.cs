@@ -119,7 +119,7 @@ namespace Takai.Game
                         continue;
                     }
 
-                    if (ent.DestroyOffScreenIfDead && ent.State.HasActive(EntStateKey.Dead))
+                    if (ent.DestroyIfDeadAndInactive && ent.State.HasActive(EntStateKey.Dead))
                     {
                         Destroy(ent);
                         continue;

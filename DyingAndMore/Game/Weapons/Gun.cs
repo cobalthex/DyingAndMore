@@ -25,6 +25,8 @@ namespace DyingAndMore.Game.Weapons
         {
             var origin = Entity.Position + (Entity.Direction * (Entity.Radius + Projectile.Radius + 1));
             
+            //todo: merge projectiles with this
+
             //trace fire
             if (Speed == 0)
             {
@@ -47,6 +49,12 @@ namespace DyingAndMore.Game.Weapons
 
                     Entity.Map.Spawn(particles);
                     Entity.Map.DrawLine(Entity.Position, hitPos, Color.NavajoWhite);
+
+                    var actor = hit.entity as Entities.Actor;
+                    if (actor != null)
+                    {
+                        actor.CurrentHealth -= Projectile.damage;
+                    }
                 }
                 else
                 {

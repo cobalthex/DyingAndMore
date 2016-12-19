@@ -1,6 +1,6 @@
 BlobType {
     Texture: "Textures\\Blobs\\water.png";
     Reflection: "Textures\\Blobs\\water.r.png";
-    Radius: 54;
+    Radius: 42;
     Drag: 0.55;
 }

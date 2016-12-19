@@ -53,15 +53,17 @@ namespace Takai.Data
             {
                 Stream.Write(WriteFullTypeNames ? ty.FullName : ty.Name);
 
-                if (Attribute.IsDefined(ty, typeof(FlagsAttribute)) && Convert.ToInt32(Object) != 0)
+                Stream.Write("[");
+                if (Attribute.IsDefined(ty, typeof(FlagsAttribute)) && Convert.ToUInt64(Object) != 0)
                 {
                     var e = Object as Enum;
                     foreach (Enum flag in Enum.GetValues(ty))
-                        if (Convert.ToInt32(flag) != 0 && e.HasFlag(flag))
+                        if (Convert.ToUInt64(flag) != 0 && e.HasFlag(flag))
                             Stream.Write(" {0}", flag.ToString());
                 }
                 else
                     Stream.Write(" {0}", Object.ToString());
+                Stream.Write(" ]");
             }
 
             else if (ty == typeof(string) || ty == typeof(char[]))

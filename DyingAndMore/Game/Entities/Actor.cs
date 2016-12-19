@@ -9,11 +9,20 @@ namespace DyingAndMore.Game.Entities
     /// Available factions. Work as bit flags (one actor can have multiple factions)
     /// </summary>
     [System.Flags]
-    enum Factions : int
+    enum Factions
     {
-        None = 0,
-        Player = 1,
-        Powerup = 2,
+        None        = 0,
+        Player      = (1 << 0),
+        Enemy       = (1 << 1),
+        Powerup     = (1 << 2),
+                    
+        Virus       = (1 << 24),
+
+        Common      = (1 << 56),
+        //auto-immune
+        //cancerous
+
+        //max = 1 << 63
     }
 
     class Actor : Entity
@@ -105,19 +114,23 @@ namespace DyingAndMore.Game.Entities
             Velocity = vel;
             lastVelocity = Velocity;
 
+            if (CurrentHealth <= 0 && !(State.HasActive(EntStateKey.Dying) || State.HasActive(EntStateKey.Dead)))
+                State.Transition(0, EntStateKey.Dying);
+
+            if (State.HasActive(EntStateKey.Dying) && State.States[EntStateKey.Dying].HasFinished())
+            {
+                State.ActiveStates.Clear();
+                State.Transition(0, EntStateKey.Dead);
+            }
+
             base.Think(DeltaTime);
         }
 
-        private Controller cachedController = null;
-        private System.TimeSpan bumpTime;
         public override void OnEntityCollision(Entity Collider, Vector2 Point, System.TimeSpan DeltaTime)
         {
             var actor = Collider as Actor;
             if (actor != null)
             {
-                actor.cachedController = actor.controller;
-                actor.controller = controller;
-                controller = cachedController;
             }
         }
 
