@@ -33,23 +33,26 @@ namespace Takai.Data
         private static readonly MethodInfo ToListMethod = typeof(Enumerable).GetMethod("ToList");
         private static readonly MethodInfo ToArrayMethod = typeof(Enumerable).GetMethod("ToArray");
 
+        public static long GetStreamOffset(StreamReader Stream)
+        {
+            int charPos = (int)Stream.GetType().InvokeMember("charPos",
+                            BindingFlags.DeclaredOnly |
+                            BindingFlags.Public | BindingFlags.NonPublic |
+                            BindingFlags.Instance | BindingFlags.GetField,
+                            null, Stream, null);
+
+            int charLen = (int)Stream.GetType().InvokeMember("charLen",
+                            BindingFlags.DeclaredOnly |
+                            BindingFlags.Public | BindingFlags.NonPublic |
+                            BindingFlags.Instance | BindingFlags.GetField,
+                            null, Stream, null);
+
+            return Stream.BaseStream.Position - charLen + charPos;
+        }
+
         private static string ExceptString(string BaseExceptionMessage, StreamReader Stream)
         {
-            Int32 charPos = (Int32)Stream.GetType().InvokeMember("charPos",
-                            BindingFlags.DeclaredOnly |
-                            BindingFlags.Public | BindingFlags.NonPublic |
-                            BindingFlags.Instance | BindingFlags.GetField,
-                            null, Stream, null);
-
-            Int32 charLen = (Int32)Stream.GetType().InvokeMember("charLen",
-                            BindingFlags.DeclaredOnly |
-                            BindingFlags.Public | BindingFlags.NonPublic |
-                            BindingFlags.Instance | BindingFlags.GetField,
-                            null, Stream, null);
-
-            var pos = (Int32)Stream.BaseStream.Position - charLen + charPos;
-
-            try { return BaseExceptionMessage + $" [Offset:{pos}]"; }
+            try { return BaseExceptionMessage + $" [Offset:{GetStreamOffset(Stream)}]"; }
             catch { return BaseExceptionMessage; }
         }
 
@@ -235,61 +238,70 @@ namespace Takai.Data
                 if (dict == null)
                     throw new InvalidDataException(ExceptString($"Expected an object definition when reading type '{word}' (Type {{ }})", Stream));
 
-                var obj = Activator.CreateInstance(type);
-                foreach (var pair in dict)
+                try
                 {
-                    //try
-                    {
-                        var field = type.GetField(pair.Key, DefaultBindingFlags);
-                        if (field != null)
-                        {
-                            if (!Attribute.IsDefined(field, typeof(NonSerializedAttribute)))
-                            {
-                                var customDeserial = field.GetCustomAttribute<CustomDeserializeAttribute>(false)?.Deserialize;
-                                if (customDeserial != null)
-                                    return customDeserial.Invoke(null, new[] { pair.Value });
-
-                                var cast = CastType(field.FieldType, pair.Value);
-                                field.SetValue(obj, cast);
-                            }
-                        }
-                        else
-                        {
-                            var prop = type.GetProperty(pair.Key, DefaultBindingFlags);
-                            if (prop != null)
-                            {
-                                if (!Attribute.IsDefined(prop, typeof(NonSerializedAttribute)))
-                                {
-                                    var customDeserial = prop.GetCustomAttribute<CustomDeserializeAttribute>(false)?.Deserialize;
-                                    if (customDeserial != null)
-                                        return customDeserial.Invoke(null, new[] { pair.Value });
-
-                                    var cast = CastType(prop.PropertyType, pair.Value);
-                                    prop.SetValue(obj, cast);
-                                }
-                            }
-                            else
-                                System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in type:{type.Name}");
-                        }
-                    }
-                    //catch (InvalidCastException expt)
-                    //{
-                    //    throw new InvalidCastException(ExceptString($"Error casting to field:{pair.Key} in type:{type.Name}: {expt.Message}", Stream), expt);
-                    //}
-                    //catch (Exception expt)
-                    //{
-                    //    throw new Exception(ExceptString($"Error parsing field:{pair.Key} in type:{type.Name}: {expt.Message}", Stream), expt);
-                    //}
+                    return ParseDictionary(type, dict);
                 }
-                return obj;
+                catch (Exception expt)
+                {
+                    expt.Data.Add("Offset", GetStreamOffset(Stream));
+                    throw expt;
+                }
             }
 
             throw new NotSupportedException(ExceptString($"Unknown identifier: '{word}'", Stream));
         }
 
-        public const BindingFlags DefaultBindingFlags = BindingFlags.IgnoreCase
-                                                      | BindingFlags.Instance
-                                                      | BindingFlags.Public;
+        public static object ParseDictionary(Type DestType, Dictionary<string, object> Dict)
+        {
+            var obj = Activator.CreateInstance(DestType); //todo: use lambda to create
+            foreach (var pair in Dict)
+            {
+                try
+                {
+                    var field = DestType.GetField(pair.Key, DefaultBindingFlags);
+                    if (field != null)
+                    {
+                        if (!Attribute.IsDefined(field, typeof(NonSerializedAttribute)))
+                        {
+                            var customDeserial = field.GetCustomAttribute<CustomDeserializeAttribute>(false)?.Deserialize;
+                            if (customDeserial != null)
+                                return customDeserial.Invoke(null, new[] { pair.Value });
+
+                            var cast = pair.Value == null ? null : CastType(field.FieldType, pair.Value);
+                            field.SetValue(obj, cast);
+                        }
+                    }
+                    else
+                    {
+                        var prop = DestType.GetProperty(pair.Key, DefaultBindingFlags);
+                        if (prop != null)
+                        {
+                            if (!Attribute.IsDefined(prop, typeof(NonSerializedAttribute)))
+                            {
+                                var customDeserial = prop.GetCustomAttribute<CustomDeserializeAttribute>(false)?.Deserialize;
+                                if (customDeserial != null)
+                                    return customDeserial.Invoke(null, new[] { pair.Value });
+
+                                var cast = pair.Value == null ? null : CastType(prop.PropertyType, pair.Value);
+                                prop.SetValue(obj, cast);
+                            }
+                        }
+                        else
+                            System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in DestType:{DestType.Name}");
+                    }
+                }
+                catch (InvalidCastException expt)
+                {
+                    throw new InvalidCastException($"Error casting to field:{pair.Key} in DestType:{DestType.Name}: {expt.Message}", expt);
+                }
+                catch (Exception expt)
+                {
+                    throw new Exception($"Error parsing field:{pair.Key} in DestType:{DestType.Name}: {expt.Message}", expt);
+                }
+            }
+            return obj;
+        }
 
         public static bool IsIntType(Type SourceType)
         {
@@ -333,6 +345,10 @@ namespace Takai.Data
                     return false;
             }
         }
+
+        public const BindingFlags DefaultBindingFlags = BindingFlags.IgnoreCase
+                                                      | BindingFlags.Instance
+                                                      | BindingFlags.Public;
 
         /// <summary>
         /// Convert <see cref="Source"/> to type <see cref="Ty"/>
@@ -426,6 +442,9 @@ namespace Takai.Data
                     return dict;
                 }
             }
+
+            if (sourceType == typeof(Dictionary<string, object>))
+                return ParseDictionary(DestType, (Dictionary<string, object>)Source);
 
             bool canConvert = false;
 

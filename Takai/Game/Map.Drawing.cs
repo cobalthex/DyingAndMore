@@ -34,7 +34,7 @@ namespace Takai.Game
         protected List<VertexPositionColor> debugLines = new List<VertexPositionColor>(32);
         protected Effect lineEffect;
         protected RasterizerState lineRaster;
-        
+
         /// <summary>
         /// Configurable debug options
         /// </summary>
@@ -43,9 +43,9 @@ namespace Takai.Game
             public bool showBlobReflectionMask;
             public bool showOnlyReflections;
         }
-        
+
         public DebugOptions debugOptions;
-        
+
         /// <summary>
         /// Draw a line the next frame
         /// </summary>
@@ -61,7 +61,7 @@ namespace Takai.Game
 
         public MapProfilingInfo ProfilingInfo { get { return profilingInfo; } }
         protected MapProfilingInfo profilingInfo;
-        
+
         /// <summary>
         /// Create a new map
         /// </summary>
@@ -139,7 +139,7 @@ namespace Takai.Game
 
             var startPos = invTransform.Translation;
             //startPos = new Vector3(Vector2.TransformNormal(new Vector2(startPos.X, startPos.Y), Transform), 0);
-            
+
             var scale = invTransform.Scale;
             var rotation = Camera.Transform.Rotation;
 
@@ -147,9 +147,9 @@ namespace Takai.Game
             var scaleHeight = (int)(Camera.Viewport.Height * scale.Z);
 
             //todo: rotation broken
-            
+
             var originalRt = GraphicsDevice.GetRenderTargets();
-            
+
             var startX = (int)startPos.X / tileSize;
             var startY = (int)startPos.Y / tileSize;
 
@@ -171,19 +171,20 @@ namespace Takai.Game
             #endregion
 
             #region entities
-            
+
             GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Camera.Transform);
-            
+
             foreach (var ent in ActiveEnts)
             {
-                foreach (var key in ent.State.ActiveStates)
+                bool didDraw = false;
+                foreach (var sprite in ent.Sprites)
                 {
-                    var state = ent.State.States[key];
-                    if (state.Sprite?.Texture == null)
+                    if (sprite?.Texture == null)
                         continue;
 
+                    didDraw = true;
                     profilingInfo.visibleEnts++;
 
                     if (ent.OutlineColor.A > 0)
@@ -191,16 +192,17 @@ namespace Takai.Game
                     else
                     {
                         var angle = ent.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                        state.Sprite.Draw(sbatch, ent.Position, angle);
+                        sprite.Draw(sbatch, ent.Position, angle);
+                        //todo: draw all overlays
                     }
                 }
-                
+
 #if DEBUG //Draw [X] in place of ent graphic
-                if (false)
+                if (!didDraw)
                 {
                     Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
-                                                 -ent.Direction.Y, ent.Direction.X, 0, 0, 
-                                                  0,               0,               1, 0, 
+                                                 -ent.Direction.Y, ent.Direction.X, 0, 0,
+                                                  0,               0,               1, 0,
                                                   0,               0,               0, 1);
 
                     Rectangle rect = new Rectangle(new Vector2(-ent.Radius).ToPoint(), new Vector2(ent.Radius * 2).ToPoint());
@@ -228,17 +230,19 @@ namespace Takai.Game
 
             foreach (var ent in _drawEntsOutlined)
             {
-                foreach (var key in ent.State.ActiveStates)
+                bool first = true;
+                foreach (var sprite in ent.Sprites)
                 {
-                    var state = ent.State.States[key];
-                    if (state.Sprite?.Texture == null)
+                    if (sprite?.Texture == null)
                         continue;
-                    
-                    outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / state.Sprite.Texture.Width, 1.0f / state.Sprite.Texture.Height));
-                    outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(state.Sprite.Width, state.Sprite.Height));
+
+                    outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
+                    outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
 
                     var angle = ent.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                    state.Sprite.Draw(sbatch, ent.Position, angle, ent.OutlineColor);
+                    sprite.Draw(sbatch, ent.Position, angle, first ? ent.OutlineColor : Color.Transparent);
+
+                    first = false;
                 }
             }
 
@@ -274,7 +278,7 @@ namespace Takai.Game
             }
 
             #endregion
-            
+
             #region blobs
 
             GraphicsDevice.SetRenderTargets(blobsRenderTarget, reflectionRenderTarget);
@@ -290,7 +294,7 @@ namespace Takai.Game
                     {
                         profilingInfo.visibleInactiveBlobs++;
                         reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
-                        sbatch.Draw(blob.type.Texture, blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
+                        sbatch.Draw(blob.type.Texture, blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), new Color(1, 1, 1, blob.type.Alpha));
                     }
                 }
             }
@@ -299,7 +303,7 @@ namespace Takai.Game
             {
                 profilingInfo.visibleActiveBlobs++;
                 reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
-                sbatch.Draw(blob.type.Texture, blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), Color.White);
+                sbatch.Draw(blob.type.Texture, blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), new Color(1, 1, 1, blob.type.Alpha));
             }
 
             sbatch.End();
@@ -323,7 +327,7 @@ namespace Takai.Game
                     var tile = Tiles[y, x];
                     if (tile < 0)
                         continue;
-                    
+
                     sbatch.Draw
                     (
                         TilesImage,
@@ -341,7 +345,7 @@ namespace Takai.Game
             #region decals
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Camera.Transform);
-            
+
             for (var y = sStartY; y < sEndY; y++)
             {
                 for (var x = sStartX; x < sEndX; x++)
@@ -371,13 +375,13 @@ namespace Takai.Game
             #region blob effects
 
             //draw blobs onto map (with reflections)
-            if (debugOptions.showBlobReflectionMask)
+            if (debugOptions.showBlobReflectionMask) //draw blobs as reflection mask
             {
                 sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
                 sbatch.Draw(reflectionRenderTarget, Vector2.Zero, Color.White);
                 sbatch.End();
             }
-            else
+            else //draw blobs
             {
                 //todo: transform correctly
 
@@ -426,9 +430,9 @@ namespace Takai.Game
             #endregion
 
             #region present
-            
+
             GraphicsDevice.SetRenderTargets(originalRt);
-            
+
             sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, PostEffect);
             sbatch.Draw(preRenderTarget, Vector2.Zero, Color.White);
             sbatch.End();

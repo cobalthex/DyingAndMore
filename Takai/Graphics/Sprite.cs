@@ -27,7 +27,7 @@ namespace Takai.Graphics
     /// A graphic animation. Typically synchronized with a map's timer
     /// </summary>
     [Data.DesignerCreatable]
-    public class Sprite
+    public class Sprite : ICloneable
     {
         /// <summary>
         /// The elapsed time of this graphic (used for calculating current frame)
@@ -38,7 +38,7 @@ namespace Takai.Graphics
         /// <summary>
         /// The number of frames of this graphic
         /// </summary>
-        public int FrameCount { get; set; } = 0;
+        public int FrameCount { get; set; } = 1;
 
         /// <summary>
         /// The length of time of each frame
@@ -196,15 +196,6 @@ namespace Takai.Graphics
             this.ClipRect = ClipRect;
         }
 
-        /// <summary>
-        /// Is the animation finished playing?
-        /// </summary>
-        /// <returns></returns>
-        public bool HasFinished()
-        {
-            return !IsLooping && ElapsedTime >= TimeSpan.FromTicks(FrameLength.Ticks * FrameCount);
-        }
-
         public Sprite
         (
             Texture2D Texture,
@@ -247,6 +238,21 @@ namespace Takai.Graphics
             this.IsLooping = ShouldLoop;
         }
 
+        public virtual object Clone()
+        {
+            return MemberwiseClone();
+        }
+
+        /// <summary>
+        /// Is the animation finished playing?
+        /// </summary>
+        /// <returns></returns>
+        public bool HasFinished()
+        {
+            return !IsLooping && ElapsedTime >= TimeSpan.FromTicks(FrameLength.Ticks * FrameCount);
+        }
+
+
         /// <summary>
         /// (Re)start the animation
         /// </summary>
@@ -254,11 +260,6 @@ namespace Takai.Graphics
         public void Start()
         {
             ElapsedTime = TimeSpan.Zero;
-        }
-
-        public Sprite Clone()
-        {
-            return (Sprite)this.MemberwiseClone();
         }
 
         /// <summary>
@@ -325,7 +326,7 @@ namespace Takai.Graphics
                     break;
             }
         }
-        
+
         /// <summary>
         /// Draw the actual texture of the graphic. Used by Draw()
         /// </summary>

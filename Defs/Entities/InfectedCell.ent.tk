@@ -1,9 +1,7 @@
 Actor {
     MaxHealth: 20;
     State: EntityStateMachine {
-        ActiveStates: [
-            EntStateKey [Idle];
-        ];
+        BaseState: EntStateKey [Idle];
         States: {
             Idle: EntState {
                 Sprite: Sprite {
@@ -13,8 +11,8 @@ Actor {
                     ClipRect: [0 0 256 32];
                     origin: [16 16];
                     FrameCount: 8;
-                    FrameLength: 200;
-                    IsLooping: True;
+                    FrameLength: 100;
+                    IsLooping: true;
                     Tween: TweenStyle [Overlap];
                 };
             };
@@ -26,8 +24,8 @@ Actor {
                     ClipRect: [0 32 256 64];
                     origin: [32 32];
                     FrameCount: 4;
-                    FrameLength: 500;
-                    IsLooping: False;
+                    FrameLength: 100;
+                    IsLooping: false;
                     Tween: TweenStyle [Overlap];
                 };
             };
@@ -38,10 +36,10 @@ Actor {
     MoveForce: 500;
     Faction: Factions [Enemy Common];
     Controller: AIController { };
-    IsEnabled: True;
-    AlwaysActive: False;
+    IsAlive: true;
+    AlwaysActive: false;
     Radius: 16;
-    IsPhysical: True;
-    IgnoreTrace: False;
-    AlwaysDrawUpright: True;
+    IsPhysical: true;
+    IgnoreTrace: false;
+    AlwaysDrawUpright: true;
 }

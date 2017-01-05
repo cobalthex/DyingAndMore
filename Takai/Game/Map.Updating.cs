@@ -70,14 +70,14 @@ namespace Takai.Game
 
             var startX = (int)translation.X / SectorPixelSize;
             var startY = (int)translation.Y / SectorPixelSize;
-            
+
             var width = 1 + ((scaleWidth - 1) / SectorPixelSize);
             var height = 1 + ((scaleHeight - 1) / SectorPixelSize);
 
             var activeRect = new Rectangle(startX - 1, startY - 1, width + 2, height + 2);
             var mapRect = new Rectangle(0, 0, Width * tileSize, Height * tileSize);
             var tileSq = new Vector2(tileSize).LengthSquared();
-            
+
             #region active blobs
 
             for (int i = 0; i < ActiveBlobs.Count; i++)
@@ -119,7 +119,7 @@ namespace Takai.Game
                         continue;
                     }
 
-                    if (ent.DestroyIfDeadAndInactive && ent.State.HasActive(EntStateKey.Dead))
+                    if (ent.DestroyIfDeadAndInactive && ent.State.Is(EntStateKey.Dead))
                     {
                         Destroy(ent);
                         continue;
@@ -132,11 +132,11 @@ namespace Takai.Game
                 }
                 else
                 {
-                    if (!ent.IsEnabled)
+                    if (!ent.IsAlive)
                         continue;
 
-                    if (ent.State.ActiveStates.Count == 0)
-                        ent.Map = null;
+                    if (ent.State.BaseState == EntStateKey.Invalid)
+                        Destroy(ent);
 
                     if (updateSettings.isAiEnabled)
                         ent.Think(deltaTime);
@@ -217,6 +217,7 @@ namespace Takai.Game
                     else
                         ActiveEnts.Remove(ent);
                     ent.Map = null;
+                    TotalEntitiesCount--;
                 }
             }
 
@@ -233,13 +234,13 @@ namespace Takai.Game
             #endregion
 
             #region particles
-            
+
             foreach (var p in Particles)
             {
                 for (var i = 0; i < p.Value.Count; i++)
                 {
                     var x = p.Value[i];
-                    
+
                     if (ElapsedTime > x.time + x.lifetime + x.delay)
                     {
                         p.Value[i] = p.Value[p.Value.Count - 1];
@@ -249,7 +250,7 @@ namespace Takai.Game
                     }
 
                     var life = (float)((ElapsedTime - (x.time + x.delay)).TotalSeconds / x.lifetime.TotalSeconds);
-                    
+
                     x.speed = MathHelper.Lerp(p.Key.Speed.start, p.Key.Speed.end, p.Key.Speed.curve.Evaluate(life));
                     x.scale = MathHelper.Lerp(p.Key.Scale.start, p.Key.Scale.end, p.Key.Scale.curve.Evaluate(life));
                     x.color = Color.Lerp(p.Key.Color.start, p.Key.Color.end, p.Key.Color.curve.Evaluate(life));

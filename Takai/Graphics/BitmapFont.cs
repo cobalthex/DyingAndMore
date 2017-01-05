@@ -114,10 +114,11 @@ namespace Takai.Graphics
         /// <param name="Color">The hue to draw the string with</param>
         /// <param name="MonoSpace">Draw the font, treating all characters as equal width</param>
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and www (base 33) to set the color in RGB. use `x to reset the color</remarks>
-        public void Draw(SpriteBatch Spritebatch, string String, Vector2 Position, Color Color, bool MonoSpace = false)
+        /// <returns>Returns the size of the text drawn</returns>
+        public Vector2 Draw(SpriteBatch Spritebatch, string String, Vector2 Position, Color Color, bool MonoSpace = false)
         {
             if (String == null)
-                return;
+                return Vector2.Zero;
 
             Position.X = (int)Position.X;
             Position.Y = (int)Position.Y;
@@ -170,10 +171,12 @@ namespace Takai.Graphics
                     continue;
 
                 Spritebatch.Draw(Texture, pos, rgn, curColor);
-                
+
                 pos.X += (MonoSpace ? MaxCharWidth : rgn.Width) + Spacing.X;
                 maxH = (int)MathHelper.Max(maxH, rgn.Height);
             }
+
+            return pos - Position;
         }
 
         /// <summary>

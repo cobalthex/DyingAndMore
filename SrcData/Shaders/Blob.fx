@@ -9,7 +9,7 @@ float4 main(float4 pos : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOOR
 {
     float4 px = tex2D(Tex, uv);
     float4 mask = tex2D(Mask, uv);
-    mask.xyz = (mask.xyz * 2) - 1;
+    mask.x = (mask.x * 2) - 1;
 
     float4 refl = tex2D(Reflection, uv + mask.xy * Depth);
     refl.a *= mask.a * Reflectivity;
@@ -17,7 +17,7 @@ float4 main(float4 pos : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOOR
     if (px.a > 0.5) //todo: replace with sdf
     {
         px.rgb = (px.rgb * (1 - refl.a)) + (refl.rgb * refl.a);
-        return px * color; 
+        return px * float4(color.rgb, mask.y);
     }
     return 0;
 }

@@ -1,12 +1,10 @@
 Actor {
     MaxHealth: 100;
-    State: EntityStateMachine {
-        ActiveStates: [
-            EntStateKey [Idle];
-        ];
+    State: {
+        BaseState: EntStateKey [Idle];
         States: {
-            Idle: EntState {
-                Sprite: Sprite {
+            Idle: {
+                Sprite: {
                     texture: "Textures/Entities/Player.png";
                     width: 48;
                     height: 48;
@@ -25,7 +23,7 @@ Actor {
     MoveForce: 600;
     Faction: Factions [Player];
     Controller: InputController { player: PlayerIndex [One] };
-    IsEnabled: True;
+    IsAlive: True;
     AlwaysActive: False;
     Radius: 24;
     IsPhysical: True;
