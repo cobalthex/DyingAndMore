@@ -11,7 +11,7 @@ namespace Takai.Game
     {
         Invalid,
         Dead,
-        Idle, 
+        Idle,
         Dying,
         Inactive,
         Active,
@@ -33,6 +33,8 @@ namespace Takai.Game
             }
         }
 
+        public bool IsOverlay { get; set; }
+
         public bool HasFinished()
         {
             return Sprite.HasFinished();
@@ -47,6 +49,13 @@ namespace Takai.Game
         {
             Sprite.ElapsedTime += DeltaTime;
         }
+
+        public object Clone()
+        {
+            var clone = (EntState)MemberwiseClone();
+            clone.Sprite = (Takai.Graphics.Sprite)Sprite.Clone();
+            return clone;
+        }
     }
 
     public class EntityStateMachine : StateMachine<EntStateKey, EntState> { }
@@ -55,16 +64,16 @@ namespace Takai.Game
     /// The basic entity. All actors and objects inherit from this
     /// </summary>
     [Data.DesignerCreatable]
-    public class Entity
+    public class Entity : ICloneable
     {
-        private static UInt64 nextId = 0; //generator for the unique IDs
+        private static UInt64 nextId = 1; //generator for the unique IDs
         /// <summary>
         /// A unique ID for each entity
         /// Generated at runtime
         /// Primarily used for debugging
         /// </summary>
         [Data.NonSerialized]
-        public UInt64 Id { get; } = (++nextId);
+        public UInt64 Id { get; private set; } = (nextId++);
 
         /// <summary>
         /// The name of this entity. Typically used by other entities for locating (and therefore should be unique)
@@ -101,10 +110,9 @@ namespace Takai.Game
         public MapSector Sector { get; internal set; } = null;
 
         /// <summary>
-        /// Determines if the entity is thinking (alive)
+        /// Determines if the entity is thinking
         /// </summary>
-        [Data.NonDesigned]
-        public bool IsEnabled { get; set; } = true;
+        public bool IsAlive { get; set; } = true;
 
         /// <summary>
         /// Determines if this entity is always part of the active set and therefore always updated
@@ -114,7 +122,7 @@ namespace Takai.Game
 
         /// <summary>
         /// The radius of this entity. Used mainly for broad-phase collision
-        /// </summary>  
+        /// </summary>
         public float Radius
         {
             get
@@ -150,7 +158,25 @@ namespace Takai.Game
         ///     Entity will be removed if IsLooping is false (or if DestroyOffScreenIsDead applies)
         /// </remarks>
         public EntityStateMachine State { get; set; } = new EntityStateMachine();
- 
+
+        /// <summary>
+        /// Enumerate through active sprites for this entity
+        /// </summary>
+        public IEnumerable<Graphics.Sprite> Sprites
+        {
+            get
+            {
+                if (State.States.TryGetValue(State.BaseState, out var state))
+                    yield return state.Sprite;
+
+                foreach (var overlay in State.OverlaidStates)
+                {
+                    if (State.States.TryGetValue(overlay, out state))
+                        yield return state.Sprite;
+                }
+            }
+        }
+
         /// <summary>
         /// Destroy this entity if it goes off screen (becomes inactive) and is dead
         /// </summary>
@@ -184,8 +210,10 @@ namespace Takai.Game
         {
             var cloned = (Entity)MemberwiseClone();
 
+            cloned.Id = (nextId++);
             cloned.Map = null;
             cloned.Sector = null;
+            cloned.State = (EntityStateMachine)State.Clone();
 
             return cloned;
         }

@@ -15,7 +15,7 @@ namespace DyingAndMore.Game.Entities
         Player      = (1 << 0),
         Enemy       = (1 << 1),
         Powerup     = (1 << 2),
-                    
+
         Virus       = (1 << 24),
 
         Common      = (1 << 56),
@@ -60,7 +60,7 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         /// <remarks>0 is any/no faction</remarks>
         public Factions Faction { get; set; } = Factions.None;
-        
+
         /// <summary>
         /// The current controller over this actor (null for none)
         /// </summary>
@@ -110,16 +110,16 @@ namespace DyingAndMore.Game.Entities
                 vel.X = 0;
             if (System.Math.Abs(vel.Y) < 0.01f)
                 vel.Y = 0;
-            
+
             Velocity = vel;
             lastVelocity = Velocity;
 
-            if (CurrentHealth <= 0 && !(State.HasActive(EntStateKey.Dying) || State.HasActive(EntStateKey.Dead)))
+            if (CurrentHealth <= 0 && !(State.Is(EntStateKey.Dying) || State.Is(EntStateKey.Dead)))
                 State.Transition(0, EntStateKey.Dying);
 
-            if (State.HasActive(EntStateKey.Dying) && State.States[EntStateKey.Dying].HasFinished())
+            if (State.BaseState == EntStateKey.Dying && State.States[EntStateKey.Dying].HasFinished())
             {
-                State.ActiveStates.Clear();
+                State.OverlaidStates.Clear();
                 State.Transition(0, EntStateKey.Dead);
             }
 

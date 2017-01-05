@@ -79,7 +79,7 @@ namespace Takai.Game
                 var mapSz = new Vector2(Width, Height);
                 var start = Vector2.Clamp((Position - vr) / SectorPixelSize, Vector2.Zero, mapSz).ToPoint();
                 var end = (Vector2.Clamp((Position + vr) / SectorPixelSize, Vector2.Zero, mapSz) + Vector2.One).ToPoint();
-                
+
                 for (int y = start.Y; y < end.Y; y++)
                 {
                     for (int x = start.X; x < end.X; x++)
@@ -97,7 +97,7 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Find all of the entities 
+        /// Find all of the entities
         /// </summary>
         /// <typeparam name="TEntity">The type of entity to find</typeparam>
         /// <returns>A list of entities found</returns>
@@ -208,10 +208,10 @@ namespace Takai.Game
         public SortedDictionary<float, Entity> PotentialVisibleSet(Vector2 Start, Vector2 Direction, float FieldOfView = MathHelper.Pi, float MaxDistance = 0)
         {
             var ents = new SortedDictionary<float, Entity>();
-           
+
             MaxDistance *= MaxDistance;
             FieldOfView = 1 - MathHelper.Clamp(FieldOfView / MathHelper.Pi, 0, 1);
-            
+
             foreach (var ent in ActiveEnts)
             {
                 if (ent.IgnoreTrace || ent.Position == Start)
@@ -252,14 +252,14 @@ namespace Takai.Game
             var mapRect = new Rectangle(0, 0, Width, Height);
 
             const float JumpSize = 10;
-            
+
             //check for intersections
             foreach (var ent in EntsToSearch ?? PotentialVisibleSet(Start, Direction, MathHelper.Pi, MaxDistance))
             {
                 var diff = ent.Value.Position - Start;
                 var lf = Vector2.Dot(Direction, diff);
                 var s = ent.Value.RadiusSq - ent.Key + (lf * lf);
-                
+
                 var nextT = diff.Length(); //todo: find a better way
                 //trace line along map to see if there are any collisions
                 for (var t = lastT; t < nextT; t += JumpSize) //test out granularities (or may assumptions about map corners)
@@ -296,7 +296,7 @@ namespace Takai.Game
                     //todo: if tile == 0 (full tile), skip to next tile
                 }
                 lastT = nextT;
-                
+
                 if (s < 0)
                     continue; //no intersection
 

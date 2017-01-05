@@ -12,6 +12,7 @@ PSOutput main(float4 pos : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCO
     PSOutput output;
     output.color = tex2D(Tex, uv) * color;
     output.reflection = tex2D(Reflection, uv);
+    output.reflection.y = color.a;
     return output;
 }
 

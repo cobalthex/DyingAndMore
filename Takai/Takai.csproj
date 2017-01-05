@@ -60,7 +60,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Animation.cs" />
     <Compile Include="AssetManager.cs" />
     <Compile Include="Data\Designer.cs" />
     <Compile Include="Data\Serializer.cs" />

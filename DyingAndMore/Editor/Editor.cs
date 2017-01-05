@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.Graphics;
+using System.Linq;
 
 namespace DyingAndMore.Editor
 {
@@ -57,7 +58,7 @@ namespace DyingAndMore.Editor
 
         public override void Load()
         {
-            tinyFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UITiny.bfnt");
+            tinyFont = Takai.AssetManager.Load<BitmapFont>("Fonts/rct2.bfnt");
             smallFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UISmall.bfnt");
             largeFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UILarge.bfnt");
 
@@ -124,9 +125,11 @@ namespace DyingAndMore.Editor
                         selectedDecal = null;
                         selectedEntity = null;
 
-                        camera = new Takai.Game.Camera(map, null);
-                        camera.MoveSpeed = 1600;
-                        camera.Viewport = GraphicsDevice.Viewport.Bounds;
+                        camera = new Takai.Game.Camera(map, null)
+                        {
+                            MoveSpeed = 1600,
+                            Viewport = GraphicsDevice.Viewport.Bounds
+                        };
                     }
                     return;
                 }
@@ -705,6 +708,9 @@ namespace DyingAndMore.Editor
                 Primitives2D.DrawRect(sbatch, Color.White, selectedItemRect);
             }
 
+            //draw basic info about entity screen
+            smallFont.Draw(sbatch, $"Visible Entities: {map.ActiveEnts.Count}\nTotal Entities:   {map.TotalEntitiesCount}", new Vector2(20, 80), Color.LightSeaGreen);
+
             sbatch.End();
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
 
@@ -742,7 +748,7 @@ namespace DyingAndMore.Editor
             sbatch.End();
         }
 
-        static readonly Matrix ArrowRotation = Matrix.CreateRotationZ(120);
+        static readonly Matrix arrowWingTransform = Matrix.CreateRotationZ(120);
 
         protected void DrawArrow(Vector2 Position, Vector2 Direction, float Magnitude)
         {
@@ -750,38 +756,28 @@ namespace DyingAndMore.Editor
             map.DrawLine(Position, tip, Color.Yellow);
 
             Magnitude = MathHelper.Clamp(Magnitude * 0.333f, 5, 30);
-            map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, ArrowRotation)), Color.Yellow);
-            map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(ArrowRotation))), Color.Yellow);
+            map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, arrowWingTransform)), Color.Yellow);
+            map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(arrowWingTransform))), Color.Yellow);
         }
 
+        static readonly string[] entInfoKeys = { "Name", "ID", "Type", "Position", "State" };
         protected void DrawEntInfo(Takai.Game.Entity Ent)
         {
-            //draw bounding box
-            //MapLineRect(new Rectangle(
-            //    (int)(Ent.Position.X - Ent.Radius),
-            //    (int)(Ent.Position.Y - Ent.Radius),
-            //    (int)(Ent.Radius * 2),
-            //    (int)(Ent.Radius * 2)
-            //), Color.GreenYellow);
+            var props = new[] { Ent.Name, Ent.Id.ToString(), Ent.GetType().Name, Ent.Position.ToString(), Ent.State.ToString() };
+            var font = tinyFont;
 
-            //draw ent info string
-            string str;
-            Vector2 sz, pos;
+            var lineHeight = font.Characters[' '].Height;
+            var totalHeight = (entInfoKeys.Length * lineHeight) + 10;
 
-            if (Ent.Name != null)
+            var maxWidth = 0;
+            for (var i = 0; i < entInfoKeys.Length; ++i)
             {
-                str = Ent.Name;
-                sz = tinyFont.MeasureString(str);
-                pos = camera.WorldToScreen(Ent.Position - new Vector2(0, Ent.Radius + 2));
-                pos = new Vector2((int)(pos.X - sz.X / 2), (int)(pos.Y - sz.Y));
-                tinyFont.Draw(sbatch, str, pos, Color.White);
+                var sz = font.Draw(sbatch, entInfoKeys[i] + ": ", new Vector2(10, GraphicsDevice.Viewport.Height - totalHeight + (lineHeight * i)), Color.White);
+                maxWidth = MathHelper.Max(maxWidth, (int)sz.X);
             }
 
-            str = string.Format("{0:N1},{1:N1}", Ent.Position.X, Ent.Position.Y);
-            sz = tinyFont.MeasureString(str);
-            pos = camera.WorldToScreen(Ent.Position + new Vector2(0, Ent.Radius + 2));
-            pos = new Vector2((int)(pos.X - sz.X / 2), (int)pos.Y);
-            tinyFont.Draw(sbatch, str, pos, Color.White);
+            for (var i = 0; i < props.Length; ++i)
+                font.Draw(sbatch, props[i] ?? "Null", new Vector2(10 + maxWidth, GraphicsDevice.Viewport.Height - totalHeight + (lineHeight * i)), props[i] == null ? Color.Gray : Color.White);
         }
     }
 }

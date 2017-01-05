@@ -6,7 +6,7 @@ namespace Takai.Game
 {
     /// <summary>
     /// A single sector of the map, used for spacial calculations
-    /// Sectors typically contain inactive entities that are not visible as well as dummy objects (inactive blobs, decals). 
+    /// Sectors typically contain inactive entities that are not visible as well as dummy objects (inactive blobs, decals).
     /// </summary>
     public class MapSector
     {
@@ -37,7 +37,7 @@ namespace Takai.Game
         /// The human-friendly map name
         /// </summary>
         public string Name { get; set; }
-        
+
         /// <summary>
         /// The collision mask for the tilemap
         /// </summary>
@@ -96,7 +96,9 @@ namespace Takai.Game
         /// The list of live blobs. Once the blobs' velocity is zero, they are removed from this and not re-added
         /// </summary>
         public List<Blob> ActiveBlobs { get; protected set; } = new List<Blob>(128);
-        
+
+        public int TotalEntitiesCount { get; private set; } = 0;
+
         /// <summary>
         /// Event handlers for specific triggered events
         /// Name -> Handlers
@@ -113,7 +115,7 @@ namespace Takai.Game
         {
             if (string.IsNullOrEmpty(Name))
                 return false;
-            
+
             if (eventHandlers.ContainsKey(Name))
                 eventHandlers[Name] += EventHandler;
             else
@@ -147,7 +149,7 @@ namespace Takai.Game
         {
             if (eventHandlers.TryGetValue(Name, out var handler))
                 handler(Name, Value);
-        }   
+        }
 
         /// <summary>
         /// Adds an existing entity to the map
@@ -169,6 +171,7 @@ namespace Takai.Game
                 var sector = GetSector(Entity.Position);
                 Sectors[sector.Y, sector.X].entities.Add(Entity);
             }
+            TotalEntitiesCount++;
         }
 
         /// <summary>
@@ -195,7 +198,8 @@ namespace Takai.Game
             //will be removed in next update if out of visible range
             //only inactive entities are placed in sectors
             ActiveEnts.Add(ent);
-            
+            TotalEntitiesCount++;
+
             return ent;
         }
 
@@ -223,6 +227,7 @@ namespace Takai.Game
             //will be removed in next update if out of visible range
             //only inactive entities are placed in sectors
             ActiveEnts.Add(ent);
+            TotalEntitiesCount++;
 
             return ent;
         }

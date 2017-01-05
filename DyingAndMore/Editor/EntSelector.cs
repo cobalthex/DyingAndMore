@@ -40,18 +40,27 @@ namespace DyingAndMore.Editor
         {
             if (ItemIndex >= 0 && ItemIndex < ents.Count)
             {
-                foreach (var key in ents[ItemIndex].State.ActiveStates)
+                var ent = ents[ItemIndex];
+
+                bool didDraw = false;
+                foreach (var sprite in ent.Sprites)
                 {
-                    var state = ents[ItemIndex].State.States?[key];
-                    if (state?.Sprite?.Texture != null)
-                    {
-                        Bounds.X += Bounds.Width / 2;
-                        Bounds.Y += Bounds.Height / 2;
-                        state.Sprite.Draw(Sbatch ?? sbatch, Bounds, 0, Color.White, Time.TotalGameTime);
-                    }
-                    else
-                        ; //todo: draw some missing icon
+                    if (sprite?.Texture == null)
+                        continue;
+
+                    Bounds.X += Bounds.Width / 2;
+                    Bounds.Y += Bounds.Height / 2;
+                    sprite.Draw(Sbatch ?? sbatch, Bounds, 0, Color.White, Time.TotalGameTime);
+
+                    didDraw = true;
                 }
+
+#if DEBUG //Draw [X] in place of ent graphic
+                if (!didDraw)
+                {
+                    //todo: draw x as placeholder
+                }
+#endif
             }
         }
     }

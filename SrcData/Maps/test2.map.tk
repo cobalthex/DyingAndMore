@@ -4,4 +4,616 @@ MapSave {
     height: 45;
     tileSize: 48;
     tilesImage: "Data\\Textures/Tiles.png";
-    tiles: [0 0 0 0 0 62 -1 -1 63 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 66 67 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 26 40 48 0 0 0 105 104 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 91 -1 -1 -1 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 25 0 0 0 0 0 0 0 0 24 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 19 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 10 0 0 0 0 0 0 11 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 74 58 59 75 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 91 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 24 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 87 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 101 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 55 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 
+    tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 26 40 48 0 0 0 105 104 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 91 -1 -1 -1 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 14 0 0 0 15 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 19 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 91 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 24 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 87 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 101 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 55 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 47 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 10 0 0 0 0 11 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1];
+    state: MapState {
+        entities: [
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions[ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [424 65];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 2805;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                File: Null;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle[ Overlap ];
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                File: Null;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle[ Overlap ];
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey[ Idle ];
+                    OverlaidStates: [];
+                };
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 4199;
+            }
+            Actor {
+                MaxHealth: 20;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 2805;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                File: Null;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle[ Overlap ];
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                File: Null;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle[ Overlap ];
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey[ Idle ];
+                    OverlaidStates: [];
+                };
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions[ Enemy Common Common ];
+                Controller: AIController {
+                };
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                AlwaysDrawUpright: True;
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                CurrentHealth: 20;
+                Name: Null;
+                Position: [365 140];
+                Direction: [1 0];
+                Velocity: [0 0];
+                DestroyIfDeadAndInactive: False;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 4692;
+            }
+            Actor {
+                MaxHealth: 20;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 2805;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                File: Null;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle[ Overlap ];
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                File: Null;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle[ Overlap ];
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey[ Idle ];
+                    OverlaidStates: [];
+                };
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions[ Enemy Common Common ];
+                Controller: AIController {
+                };
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                AlwaysDrawUpright: True;
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                CurrentHealth: 20;
+                Name: Null;
+                Position: [473 157];
+                Direction: [1 0];
+                Velocity: [0 0];
+                DestroyIfDeadAndInactive: False;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 5406;
+            }
+            Actor {
+                MaxHealth: 100;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 2805;
+                                FrameCount: 2;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                File: Null;
+                                Texture: "Data\\Textures/Entities/Player.png";
+                                Width: 48;
+                                Height: 48;
+                                ClipRect: [0 0 96 96];
+                                Origin: [24 24];
+                                Tween: TweenStyle[ Overlap ];
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey[ Idle ];
+                    OverlaidStates: [];
+                };
+                FieldOfView: 2.356194;
+                MaxSpeed: 400;
+                MoveForce: 600;
+                Faction: Factions[ Player ];
+                Controller: InputController {
+                    player: PlayerIndex[ One ];
+                };
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 24;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                AlwaysDrawUpright: False;
+                PrimaryWeapon: Gun {
+                    Projectile: Projectile {
+                        Range: 0;
+                        Velocity: [0 0];
+                        Direction: [1 0];
+                        Name: Null;
+                        Position: [0 0];
+                        IsAlive: True;
+                        AlwaysActive: True;
+                        Radius: 8;
+                        IsPhysical: True;
+                        IgnoreTrace: True;
+                        State: EntityStateMachine {
+                            States: {
+                                Idle: EntState {
+                                    Sprite: Sprite {
+                                        ElapsedTime: 0;
+                                        FrameCount: 1;
+                                        FrameLength: 0.0001;
+                                        IsLooping: True;
+                                        File: "Data\\Textures/Projectiles/Sharp.png";
+                                        Texture: "Data\\Textures/Projectiles/Sharp.png";
+                                        Width: 16;
+                                        Height: 8;
+                                        ClipRect: [0 0 16 8];
+                                        Origin: [12 4];
+                                        Tween: TweenStyle[ None ];
+                                    };
+                                    IsLooping: True;
+                                    IsOverlay: False;
+                                };
+                            };
+                            BaseState: EntStateKey[ Idle ];
+                            OverlaidStates: [];
+                        };
+                        DestroyIfDeadAndInactive: False;
+                        AlwaysDrawUpright: False;
+                        OutlineColor: [0 0 0 0];
+                        SpawnTime: 0;
+                        explosion: ParticleType {
+                            Graphic: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                IsLooping: False;
+                                File: "Data\\Textures/Particles/Spark.png";
+                                Texture: "Data\\Textures/Particles/Spark.png";
+                                Width: 8;
+                                Height: 8;
+                                ClipRect: [0 0 8 8];
+                                Origin: [4 4];
+                                Tween: TweenStyle[ None ];
+                            };
+                            BlendMode: "Additive";
+                            Color: {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType[ Constant ];
+                                    PreLoop: CurveLoopType[ Constant ];
+                                };
+                                start: [255 255 255 255];
+                                end: [0 0 0 0];
+                            };
+                            Speed: {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType[ Constant ];
+                                    PreLoop: CurveLoopType[ Constant ];
+                                };
+                                start: 100;
+                                end: 50;
+                            };
+                            Scale: {
+                                curve: Curve {
+                                    IsConstant: True;
+                                    Keys: [];
+                                    PostLoop: CurveLoopType[ Constant ];
+                                    PreLoop: CurveLoopType[ Constant ];
+                                };
+                                start: 1;
+                                end: 1;
+                            };
+                            Angle: {
+                                curve: Null;
+                                start: 0;
+                                end: 0;
+                            };
+                        };
+                        trail: ParticleType {
+                            Graphic: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                IsLooping: False;
+                                File: "Data\\Textures/Particles/trail.png";
+                                Texture: "Data\\Textures/Particles/trail.png";
+                                Width: 8;
+                                Height: 8;
+                                ClipRect: [0 0 8 8];
+                                Origin: [4 4];
+                                Tween: TweenStyle[ None ];
+                            };
+                            BlendMode: Null;
+                            Color: {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType[ Constant ];
+                                    PreLoop: CurveLoopType[ Constant ];
+                                };
+                                start: [255 165 0 255];
+                                end: [0 0 0 0];
+                            };
+                            Speed: {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType[ Constant ];
+                                    PreLoop: CurveLoopType[ Constant ];
+                                };
+                                start: 100;
+                                end: 0;
+                            };
+                            Scale: {
+                                curve: Curve {
+                                    IsConstant: True;
+                                    Keys: [];
+                                    PostLoop: CurveLoopType[ Constant ];
+                                    PreLoop: CurveLoopType[ Constant ];
+                                };
+                                start: 1;
+                                end: 1;
+                            };
+                            Angle: {
+                                curve: Null;
+                                start: 0;
+                                end: 0;
+                            };
+                        };
+                        trailGlow: ParticleType {
+                            Graphic: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                IsLooping: False;
+                                File: "Data\\Textures/Particles/trailglow.png";
+                                Texture: "Data\\Textures/Particles/trailglow.png";
+                                Width: 8;
+                                Height: 8;
+                                ClipRect: [0 0 8 8];
+                                Origin: [4 4];
+                                Tween: TweenStyle[ None ];
+                            };
+                            BlendMode: "Additive";
+                            Color: {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType[ Constant ];
+                                    PreLoop: CurveLoopType[ Constant ];
+                                };
+                                start: [255 255 255 255];
+                                end: [0 0 0 0];
+                            };
+                            Speed: {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity[ Smooth ];
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType[ Constant ];
+                                    PreLoop: CurveLoopType[ Constant ];
+                                };
+                                start: 20;
+                                end: 5;
+                            };
+                            Scale: {
+                                curve: Curve {
+                                    IsConstant: True;
+                                    Keys: [];
+                                    PostLoop: CurveLoopType[ Constant ];
+                                    PreLoop: CurveLoopType[ Constant ];
+                                };
+                                start: 1;
+                                end: 1;
+                            };
+                            Angle: {
+                                curve: Null;
+                                start: 0;
+                                end: 0;
+                            };
+                        };
+                        damage: 20;
+                    };
+                    Speed: 0;
+                    AddVelocity: False;
+                    shotDelay: 250;
+                    maxShots: 0;
+                };
+                AltWeapon: BlobGun {
+                    blob: BlobType {
+                        Texture: "Data\\Textures/Blobs/blood.png";
+                        Reflection: "Data\\Textures/Blobs/blood.r.png";
+                        Radius: 54;
+                        Drag: 0.2;
+                    };
+                    speed: 100;
+                    shotDelay: 100;
+                    maxShots: 0;
+                };
+                CurrentHealth: 100;
+                Name: Null;
+                Position: [99 104];
+                Direction: [0.9978669 -0.06528101];
+                Velocity: [0 0];
+                DestroyIfDeadAndInactive: False;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 6222;
+            }
+        ];
+        blobTypes: [
+            BlobType {
+                Texture: "Data\\Textures/Blobs/Blood.png";
+                Reflection: "Data\\Textures/Blobs/Blood.r.png";
+                Radius: 54;
+                Drag: 0.2;
+            }
+        ];
+        blobs: [
+            BlobSave {
+                type: 0;
+                position: [549 98];
+                velocity: [0 0];
+            }
+        ];
+        decals: [
+            Decal {
+                texture: "Data\\Textures/Decals/crack.png";
+                position: [800 39];
+                angle: 0;
+                scale: 1;
+            }
+        ];
+    };
+}

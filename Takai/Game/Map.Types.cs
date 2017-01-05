@@ -68,6 +68,11 @@ namespace Takai.Game
         public Texture2D Reflection { get; set; }
 
         /// <summary>
+        /// The alpha value to draw the texture with
+        /// </summary>
+        public float Alpha { get; set; } = 1;
+
+        /// <summary>
         /// The radius of an individual blob
         /// </summary>
         public float Radius { get; set; }

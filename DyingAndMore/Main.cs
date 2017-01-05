@@ -79,7 +79,20 @@ namespace DyingAndMore
             Takai.AssetManager.Initialize(GraphicsDevice, "Data\\");
 
             GameStateManager.Initialize(this);
-            GameStateManager.PushState(new Game.Game());
+
+            var map = new Takai.Game.Map(GraphicsDevice)
+            {
+                updateSettings = Takai.Game.MapUpdateSettings.Editor
+            };
+            using (var stream = new System.IO.FileStream("Data/Maps/Test.map.tk", System.IO.FileMode.Open))
+                map.Load(stream);
+
+            var state = new Editor.Editor()
+            {
+                map = map,
+                camera = new Takai.Game.Camera(map) { Viewport = GraphicsDevice.Viewport.Bounds }
+            };
+            GameStateManager.PushState(state);
 
             base.Initialize();
         }

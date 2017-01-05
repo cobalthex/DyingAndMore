@@ -37,7 +37,7 @@ namespace DyingAndMore.Game
 
         public override void Load()
         {
-            fnt = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
+            fnt = AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
 
             if (map == null)
             {
@@ -53,7 +53,7 @@ namespace DyingAndMore.Game
                 MoveSpeed = 800,
                 Viewport = GraphicsDevice.Viewport.Bounds
             };
-            //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
+            camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
 
             StartMap();
 
@@ -85,40 +85,8 @@ namespace DyingAndMore.Game
             {
                 wpn.Speed = 0;
             }
-
-            sm.States.Add("A", new TestSMState());
-            sm.States.Add("B", new TestSMState());
-            sm.States.Add("C", new TestSMState());
-            sm.Transition(null, "A");
-            sm.Transition("A", "B");
-            sm.Transition("B", "C");
-            sm.Transition("C", "A");
         }
         Takai.Game.ParticleType pt1, pt2;
-
-        class TestSMState : Takai.IState
-        {
-            protected TimeSpan elapsed;
-
-            public bool IsLooping { get; set; }
-
-            public bool HasFinished()
-            {
-                return elapsed > TimeSpan.FromSeconds(3);
-            }
-
-            public void Start()
-            {
-                elapsed = TimeSpan.Zero;
-            }
-
-            public void Update(TimeSpan DeltaTime)
-            {
-                elapsed += DeltaTime;
-            }
-        }
-
-        Takai.StateMachine<string, TestSMState> sm = new Takai.StateMachine<string, TestSMState>();
 
         public override void Update(GameTime Time)
         {
@@ -216,8 +184,6 @@ namespace DyingAndMore.Game
                 lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800))
             };
             //map.Spawn(pspawn);
-
-            sm.Update(Time.ElapsedGameTime);
         }
 
         public override void Draw(GameTime Time)
@@ -244,8 +210,6 @@ namespace DyingAndMore.Game
             ;
 
             fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White, true);
-
-            fnt.Draw(sbatch, "States: " + string.Join(",", sm.ActiveStates), new Vector2(100), Color.Aquamarine);
 
             sbatch.End();
         }

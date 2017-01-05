@@ -24,7 +24,7 @@ namespace DyingAndMore.Game.Weapons
         protected override void SingleFire(Takai.Game.Entity Entity)
         {
             var origin = Entity.Position + (Entity.Direction * (Entity.Radius + Projectile.Radius + 1));
-            
+
             //todo: merge projectiles with this
 
             //trace fire

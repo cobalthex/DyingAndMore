@@ -6,12 +6,17 @@ namespace Takai
     /// <summary>
     /// Forms the base of any state in the state machine
     /// </summary>
-    public interface IState
+    public interface IState : ICloneable
     {
         /// <summary>
         /// Should this state stay active even after finishing
         /// </summary>
         bool IsLooping { get; set; }
+
+        /// <summary>
+        /// If false, this state replaces the active state, otherwise it is added to a list with all other overlay states
+        /// </summary>
+        bool IsOverlay { get; set; }
 
         /// <summary>
         /// Restart the animation (Called automatically if IsLooping = true and HasFinished() = true)
@@ -36,23 +41,41 @@ namespace Takai
     /// </summary>
     /// <typeparam name="TKey">The Identifier identifying each state</typeparam>
     /// <typeparam name="TState">The individual states</typeparam>
-    public class StateMachine<TKey, TState> where TState : IState
+    public class StateMachine<TKey, TState> : ICloneable where TState : IState
     {
         /// <summary>
-        /// All of the available states 
+        /// All of the available states
         /// </summary>
-        public Dictionary<TKey, TState> States { get; set; } = new Dictionary<TKey, TState>(); //todo: check not null
+        public Dictionary<TKey, TState> States { get; set; } = new Dictionary<TKey, TState>();
 
         /// <summary>
-        /// THe currently active states, and cached state values
+        /// The currently active 'base' state. Only one base state can be active at a time
         /// </summary>
-        public HashSet<TKey> ActiveStates { get; set; } = new HashSet<TKey>(); //todo: make private w/ public enumerator
+        public TKey BaseState { get; set; }
+
+        /// <summary>
+        /// THe currently active overlaid states
+        /// </summary>
+        public HashSet<TKey> OverlaidStates { get; set; } = new HashSet<TKey>(); //todo: make private w/ public enumerator
 
         /// <summary>
         /// Active transitions between states
         /// </summary>
         /// <remarks>Transitions are removed after they finish</remarks>
         protected Dictionary<TKey, TKey> Transitions { get; set; } = new Dictionary<TKey, TKey>();
+
+        protected static readonly EqualityComparer<TKey> EqComparer = EqualityComparer<TKey>.Default;
+
+        public virtual object Clone()
+        {
+            var cloned = (StateMachine<TKey, TState>)MemberwiseClone();
+            cloned.OverlaidStates = new HashSet<TKey>(OverlaidStates);
+            cloned.Transitions = new Dictionary<TKey, TKey>(Transitions);
+            cloned.States = new Dictionary<TKey, TState>(States.Count);
+            foreach (var kvp in States)
+                cloned.States.Add(kvp.Key, (TState)kvp.Value.Clone());
+            return cloned;
+        }
 
         /// <summary>
         /// Add a state and optionally make it active
@@ -65,19 +88,19 @@ namespace Takai
         {
             States[Key] = State;
             if (AddToActive)
-                ActiveStates.Add(Key);
+                Transition(default(TKey), Key);
         }
 
         /// <summary>
-        /// A helper method to check if a state is active
+        /// Check if a state is active
         /// </summary>
         /// <param name="State">The state to check</param>
         /// <returns>True if the state is currently active</returns>
-        public bool HasActive(TKey State)
+        public bool Is(TKey State)
         {
-            return ActiveStates.Contains(State);
+            return (EqComparer.Equals(BaseState, State) || OverlaidStates.Contains(State));
         }
-        
+
         /// <summary>
         /// Transition from one state to another
         /// </summary>
@@ -86,15 +109,19 @@ namespace Takai
         /// <returns>False if the states did not exist in the state machine</returns>
         public virtual bool Transition(TKey CurrentState, TKey NextState)
         {
-            if (!EqualityComparer<TKey>.Default.Equals(CurrentState, default(TKey)))
+            if (!EqComparer.Equals(CurrentState, default(TKey)))
             {
                 Transitions[CurrentState] = NextState;
                 return true;
             }
-            if (!EqualityComparer<TKey>.Default.Equals(NextState, default(TKey)) && States.TryGetValue(NextState, out var next))
+            if (!EqComparer.Equals(NextState, default(TKey)) && States.TryGetValue(NextState, out var next))
             {
                 next.Start();
-                ActiveStates.Add(NextState);
+                if (next.IsOverlay)
+                    OverlaidStates.Add(NextState);
+                else
+                    BaseState = NextState;
+                return true;
             }
             return false;
         }
@@ -102,21 +129,64 @@ namespace Takai
         List<TKey> added = new List<TKey>();
         List<TKey> removed = new List<TKey>();
 
+        void UpdateState(TKey StateKey, TimeSpan DeltaTime)
+        {
+            var state = States[StateKey];
+            state.Update(DeltaTime);
+
+            if (state.HasFinished())
+            {
+                if (Transitions.TryGetValue(StateKey, out var transition))
+                {
+                    if (EqComparer.Equals(transition, default(TKey)))
+                        BaseState = default(TKey);
+                    else
+                        BaseState = transition;
+
+                    Transitions.Remove(StateKey);
+                }
+                else if (state.IsLooping)
+                    state.Start();
+                else
+                    BaseState = default(TKey);
+            }
+        }
+
         /// <summary>
-        /// Update all of the animations 
+        /// Update all of the animations
         /// </summary>
         /// <param name="DeltaTime">How much time has passed since the last update</param>
-        public virtual void Update(System.TimeSpan DeltaTime)
+        public virtual void Update(TimeSpan DeltaTime)
         {
+            //update active state
+            var activeVal = States[BaseState];
+            activeVal.Update(DeltaTime);
+            if (activeVal.HasFinished())
+            {
+                if (Transitions.TryGetValue(BaseState, out var transition))
+                {
+                    if (transition != null)
+                        added.Add(transition);
+                    else
+
+                    Transitions.Remove(BaseState);
+                }
+                else if (activeVal.IsLooping)
+                    activeVal.Start();
+                else
+                    BaseState = default(TKey);
+            }
+
+            //update overlays
             added.Clear();
             removed.Clear();
 
-            foreach (var key in ActiveStates)
+            foreach (var key in OverlaidStates)
             {
-                var state = States[key];
-                state.Update(DeltaTime);
-                
-                if (state.HasFinished())
+                var overlayVal = States[key];
+                overlayVal.Update(DeltaTime);
+
+                if (overlayVal.HasFinished())
                 {
                     if (Transitions.TryGetValue(key, out var transition))
                     {
@@ -125,8 +195,8 @@ namespace Takai
                             added.Add(transition);
                         Transitions.Remove(key);
                     }
-                    else if (state.IsLooping)
-                        state.Start();
+                    else if (overlayVal.IsLooping)
+                        overlayVal.Start();
                     else
                         removed.Add(key);
                 }
@@ -135,10 +205,15 @@ namespace Takai
             foreach (var key in added)
             {
                 States[key].Start();
-                ActiveStates.Add(key);
+                OverlaidStates.Add(key);
             }
             foreach (var key in removed)
-                ActiveStates.Remove(key);
+                OverlaidStates.Remove(key);
+        }
+
+        public override string ToString()
+        {
+            return $"{BaseState};{String.Join(", ", OverlaidStates)}";
         }
     }
 }

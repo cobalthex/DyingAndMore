@@ -68,6 +68,7 @@ namespace Takai.Data
                     return new Vector2(x, y);
                 }
             });
+
             Serializers.Add(typeof(Point), new CustomTypeSerializer
             {
                 Serialize = (object Value) => { var v = (Point)Value; return new[] { v.X, v.Y }; },
@@ -79,6 +80,7 @@ namespace Takai.Data
                     return new Point(x, y);
                 }
             });
+
             Serializers.Add(typeof(Rectangle), new CustomTypeSerializer
             {
                 Serialize = (object Value) => { var v = (Rectangle)Value; return new[] { v.X, v.Y, v.Width, v.Height }; },
@@ -92,6 +94,7 @@ namespace Takai.Data
                     return new Rectangle(x, y, width, height);
                 }
             });
+
             Serializers.Add(typeof(Color), new CustomTypeSerializer
             {
                 Serialize = (object Value) => { var v = (Color)Value; return new[] { v.R, v.G, v.B, v.A }; },
@@ -105,15 +108,56 @@ namespace Takai.Data
                     return new Color(r, g, b, a);
                 }
             });
+
             Serializers.Add(typeof(Texture2D), new CustomTypeSerializer
             {
                 Serialize = (object Value) => { return ((Texture2D)Value).Name; },
                 Deserialize = (object Value) => { return Takai.AssetManager.Load<Texture2D>((string)Value); }
             });
+
             Serializers.Add(typeof(TimeSpan), new CustomTypeSerializer
             {
                 Serialize = (object Value) => { return ((TimeSpan)Value).TotalMilliseconds; },
                 Deserialize = (object Value) => { return TimeSpan.FromMilliseconds((double)Convert.ChangeType(Value, typeof(double))); }
+            });
+
+            Serializers.Add(typeof(BlendState), new CustomTypeSerializer
+            {
+                Serialize = (object Value) =>
+                {
+                    if (Value == BlendState.Additive)
+                        return "Additive";
+                    if (Value == BlendState.AlphaBlend)
+                        return "AlphaBlend";
+                    if (Value == BlendState.NonPremultiplied)
+                        return "NonPremultiplied";
+                    if (Value == BlendState.Opaque)
+                        return "Opaque";
+
+                    return "todo";
+                },
+                Deserialize = (object Value) =>
+                {
+                    var strValue = Value as string;
+                    if (strValue != null)
+                    {
+                        switch ((string)Value)
+                        {
+                            case "Additive":
+                                return BlendState.Additive;
+                            case "AlphaBlend":
+                                return BlendState.AlphaBlend;
+                            case "NonPremultiplied":
+                                return BlendState.NonPremultiplied;
+                            case "Opaque":
+                                return BlendState.Opaque;
+                            default:
+                                return null;
+                        }
+                    }
+
+                    return null;
+                }
             });
         }
 
