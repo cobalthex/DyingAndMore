@@ -21,6 +21,8 @@ namespace DyingAndMore.Editor
         private bool isHoveringSplitter = false;
         private bool isHoveringScroll = false;
 
+        public bool DidClickOpen { get; set; } = false;
+
         public int Padding { get; set; } = 2; //todo: make x,y
 
         /// <summary>
@@ -79,7 +81,9 @@ namespace DyingAndMore.Editor
 
         public override void Update(GameTime time)
         {
-            if (InputState.IsClick(Keys.Tab))
+            //todo: test gestures
+
+            if (!DidClickOpen && InputState.IsClick(Keys.Tab))
                 Deactivate();
 
             var mouse = InputState.MousePoint;
@@ -91,7 +95,10 @@ namespace DyingAndMore.Editor
 
             if (InputState.IsPress(MouseButtons.Left))
             {
-                if (isHoveringSplitter)
+                if (DidClickOpen && mouse.X < splitterX)
+                    Deactivate();
+
+                else if (isHoveringSplitter)
                 {
                     isResizing = true;
                     resizeXOffset = mouse.X - splitterX;
@@ -103,7 +110,12 @@ namespace DyingAndMore.Editor
                     var mx = mouse.X - splitterX - splitterWidth - Padding;
                     var newSelect = (((mouse.Y + ScrollPosition - Padding) / (ItemSize.Y + Padding)) * itemsPerRow) + (mx / (ItemSize.X + Padding));
                     if (newSelect >= 0 && newSelect < ItemCount)
+                    {
                         SelectedItem = newSelect;
+
+                        if (DidClickOpen)
+                            Deactivate();
+                    }
                 }
             }
             else if (InputState.IsClick(MouseButtons.Left))
@@ -118,47 +130,14 @@ namespace DyingAndMore.Editor
             width = MathHelper.Clamp(width, 0, GraphicsDevice.Viewport.Width - scrollWidth - splitterWidth);
             ScrollPosition = MathHelper.Clamp(ScrollPosition, 0, GetTotalHeight() - GraphicsDevice.Viewport.Height);
         }
-        
+
         public override void Draw(GameTime Time)
         {
-            var viewHeight = GraphicsDevice.Viewport.Height;
-
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-
-            var scrollWidth = GetScrollbarWidth();
-
-            Takai.Graphics.Primitives2D.DrawFill(sbatch, new Color(1, 1, 1, 0.85f), new Rectangle((int)Start.X, (int)Start.Y, width + scrollWidth, viewHeight));
-
-            //splitter
-            Takai.Graphics.Primitives2D.DrawFill
-            (
-                sbatch, 
-                isHoveringSplitter ? (InputState.IsButtonDown(MouseButtons.Left) ? Color.DarkGray : Color.LightGray) : Color.Gray, 
-                new Rectangle((int)Start.X - splitterWidth, (int)Start.Y, splitterWidth, viewHeight)
-            );
-
-            var relHeight = (viewHeight / (float)GetTotalHeight());
-            var relScrollPos = (int)(relHeight * ScrollPosition);
-
-            //scrollbar
-            if (scrollWidth > 0)
-            {
-                var x = (int)Start.X + width;
-                Takai.Graphics.Primitives2D.DrawLine(sbatch, Color.DarkGray, new Vector2(x, 0), new Vector2(x, viewHeight));
-
-                var thumbHeight = (viewHeight - 4) * relHeight;
-                Takai.Graphics.Primitives2D.DrawFill
-                (
-                    sbatch,
-                    isHoveringScroll ? (InputState.IsButtonDown(MouseButtons.Left) ? Color.DarkGray : Color.LightGray) : Color.Gray,
-                    new Rectangle(x + 2, relScrollPos + 2, scrollWidth - 4, (int)thumbHeight)
-                );
-            }
-
-            sbatch.End();
+            DrawBackground();
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
             //items
+            var viewHeight = GraphicsDevice.Viewport.Height;
             var iHeight = ItemSize.Y + Padding;
             var itemsPerRow = (width - Padding) / (ItemSize.X + Padding);
             if (itemsPerRow > 0)
@@ -182,6 +161,45 @@ namespace DyingAndMore.Editor
                         Takai.Graphics.Primitives2D.DrawRect(sbatch, Color.Black, bounds);
                     }
                 }
+            }
+
+            sbatch.End();
+        }
+
+        void DrawBackground()
+        {
+            var viewHeight = GraphicsDevice.Viewport.Height;
+
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+
+            var scrollWidth = GetScrollbarWidth();
+
+            Takai.Graphics.Primitives2D.DrawFill(sbatch, new Color(1, 1, 1, 0.85f), new Rectangle((int)Start.X, (int)Start.Y, width + scrollWidth, viewHeight));
+
+            //splitter
+            Takai.Graphics.Primitives2D.DrawFill
+            (
+                sbatch,
+                isHoveringSplitter ? (InputState.IsButtonDown(MouseButtons.Left) ? Color.DarkGray : Color.LightGray) : Color.Gray,
+                new Rectangle((int)Start.X - splitterWidth, (int)Start.Y, splitterWidth, viewHeight)
+            );
+
+            var relHeight = (viewHeight / (float)GetTotalHeight());
+            var relScrollPos = (int)(relHeight * ScrollPosition);
+
+            //scrollbar
+            if (scrollWidth > 0)
+            {
+                var x = (int)Start.X + width;
+                Takai.Graphics.Primitives2D.DrawLine(sbatch, Color.DarkGray, new Vector2(x, 0), new Vector2(x, viewHeight));
+
+                var thumbHeight = (viewHeight - 4) * relHeight;
+                Takai.Graphics.Primitives2D.DrawFill
+                (
+                    sbatch,
+                    isHoveringScroll ? (InputState.IsButtonDown(MouseButtons.Left) ? Color.DarkGray : Color.LightGray) : Color.Gray,
+                    new Rectangle(x + 2, relScrollPos + 2, scrollWidth - 4, (int)thumbHeight)
+                );
             }
 
             sbatch.End();

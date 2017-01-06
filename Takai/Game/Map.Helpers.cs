@@ -60,11 +60,12 @@ namespace Takai.Game
         /// Find all entities within a certain radius
         /// </summary>
         /// <param name="Position">The origin search point</param>
-        /// <param name="Radius">The maximum search radius</param>
-        public List<Entity> FindNearbyEntities(Vector2 Position, float Radius, bool SearchInSectors = false)
+        /// <param name="SearchRadius">The maximum search radius</param>
+        /// <param name="SearchInSectors">Also search entities in sectors</param>
+        public List<Entity> FindEntities(Vector2 Position, float SearchRadius, bool SearchInSectors = false)
         {
-            var radiusSq = Radius * Radius;
-            var vr = new Vector2(Radius);
+            var radiusSq = SearchRadius * SearchRadius;
+            var vr = new Vector2(SearchRadius);
 
             List<Entity> ents = new List<Entity>();
 
@@ -87,6 +88,47 @@ namespace Takai.Game
                         foreach (var ent in Sectors[y, x].entities)
                         {
                             if (Vector2.DistanceSquared(ent.Position, Position) < radiusSq + ent.RadiusSq)
+                                ents.Add(ent);
+                        }
+                    }
+                }
+            }
+
+            return ents;
+        }
+
+        /// <summary>
+        /// Find entities inside a rectangle
+        /// </summary>
+        /// <param name="Region">The rectangle to search</param>
+        /// <param name="SearchInSectors">Also search entities in sectors</param>
+        /// <returns></returns>
+        public List<Entity> FindEntities(Rectangle Region, bool SearchInSectors = false)
+        {
+            List<Entity> ents = new List<Entity>();
+
+            foreach (var ent in ActiveEnts)
+            {
+                if (Rectangle.Union(Region, ent.Bounds).Contains(ent.Position))
+                    ents.Add(ent);
+            }
+
+            if (SearchInSectors)
+            {
+                var searchSectors = new Rectangle(
+                    Region.X / SectorPixelSize,
+                    Region.Y / SectorPixelSize,
+                    ((Region.Width - 1) / SectorPixelSize) + 1,
+                    ((Region.Height - 1) / SectorPixelSize) + 1
+                );
+
+                for (int y = searchSectors.Top; y < searchSectors.Bottom; y++)
+                {
+                    for (int x = searchSectors.Left; x < searchSectors.Right; x++)
+                    {
+                        foreach (var ent in Sectors[y, x].entities)
+                        {
+                            if (Rectangle.Union(Region, ent.Bounds).Contains(ent.Position))
                                 ents.Add(ent);
                         }
                     }

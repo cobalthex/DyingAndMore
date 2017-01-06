@@ -47,6 +47,8 @@ namespace DyingAndMore.Editor
         float startRotation, startScale;
         System.TimeSpan lastBlobTime = System.TimeSpan.Zero;
 
+        int uiMargin = 20;
+
         public Editor() : base(false, false) { }
 
         void AddSelector(Selector Sel, EditorMode Index)
@@ -72,7 +74,7 @@ namespace DyingAndMore.Editor
 
             map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
 
-            TouchPanel.EnabledGestures = GestureType.FreeDrag | GestureType.DragComplete | GestureType.Pinch;
+            TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap;
         }
 
         public override void Unload()
@@ -88,6 +90,13 @@ namespace DyingAndMore.Editor
         {
             if (selectedEntity != null)
                 selectedEntity.OutlineColor = Color.Transparent;
+
+            var selectedItemRect = new Rectangle(
+                GraphicsDevice.Viewport.Width - 10 - map.TileSize,
+                10,
+                map.TileSize,
+                map.TileSize
+            );
 
             if (InputState.IsMod(KeyMod.Control))
             {
@@ -164,8 +173,9 @@ namespace DyingAndMore.Editor
 
             var worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
 
+            bool isTapping = false, isDoubleTapping = false;
+
             //touch gestures
-            bool gestured = false;
             while (TouchPanel.IsGestureAvailable)
             {
                 var gesture = TouchPanel.ReadGesture();
@@ -189,9 +199,22 @@ namespace DyingAndMore.Editor
                                 var scale = (dist / ld) / 1024;
                                 camera.Scale += scale;
                             }
-                            gestured = true;
                             break;
                         }
+
+                    case GestureType.Tap:
+                        if (selectedItemRect.Contains(gesture.Position))
+                        {
+                            OpenCurrentSelector(true);
+                            return;
+                        }
+
+                        isTapping = true;
+                        break;
+
+                    case GestureType.DoubleTap:
+                        isDoubleTapping = true;
+                        break;
                 }
             }
 
@@ -218,8 +241,27 @@ namespace DyingAndMore.Editor
                 }
             }
 
+            void OpenCurrentSelector(bool ClickedOpen)
+            {
+                var selector = selectors[(uint)currentMode];
+                if (selector != null)
+                {
+                    selector.DidClickOpen = ClickedOpen;
+                    selector.Activate();
+                }
+            }
+
             if (InputState.IsPress(Keys.Tab))
-                selectors[(int)currentMode]?.Activate();
+            {
+                OpenCurrentSelector(false);
+                return;
+            }
+
+            if (InputState.IsPress(MouseButtons.Left) && selectedItemRect.Contains(InputState.MousePoint))
+            {
+                OpenCurrentSelector(true);
+                return;
+            }
 
             if (InputState.HasScrolled())
             {
@@ -238,6 +280,7 @@ namespace DyingAndMore.Editor
 
             camera.Update(Time);
 
+            //todo: move to entities only
             if (InputState.IsPress(MouseButtons.Left) && InputState.IsMod(KeyMod.Alt))
             {
                 var ofd = new System.Windows.Forms.OpenFileDialog()
@@ -419,9 +462,10 @@ namespace DyingAndMore.Editor
 
             else if (currentMode == EditorMode.Entities)
             {
-                if (InputState.IsPress(MouseButtons.Left))
+                if (InputState.IsPress(MouseButtons.Left) || isTapping)
                 {
-                    var selected = map.FindNearbyEntities(worldMousePos, 1, true);
+                    var searchRadius = isTapping ? 10 : 1;
+                    var selected = map.FindEntities(worldMousePos, searchRadius, true);
                     if (selected.Count < 1)
                     {
                         var sel = selectors[(int)currentMode] as EntSelector;
@@ -433,12 +477,13 @@ namespace DyingAndMore.Editor
                 }
                 else if (InputState.IsPress(MouseButtons.Right))
                 {
-                    var selected = map.FindNearbyEntities(worldMousePos, 1, true);
+                    var selected = map.FindEntities(worldMousePos, 1, true);
                     selectedEntity = selected.Count > 0 ? selected[0] : null;
                 }
-                else if (InputState.IsClick(MouseButtons.Right))
+                else if (InputState.IsClick(MouseButtons.Right) || isDoubleTapping)
                 {
-                    var selected = map.FindNearbyEntities(worldMousePos, 1, true);
+                    var searchRadius = isTapping ? 10 : 1;
+                    var selected = map.FindEntities(worldMousePos, searchRadius, true);
                     if (selected.Count > 0 && selected[0] == selectedEntity)
                     {
                         map.Destroy(selectedEntity);
@@ -703,13 +748,13 @@ namespace DyingAndMore.Editor
             //draw selected item in top right corner
             if (selectors[(int)currentMode] != null)
             {
-                var selectedItemRect = new Rectangle(GraphicsDevice.Viewport.Width - map.TileSize - 20, 20, map.TileSize, map.TileSize);
+                var selectedItemRect = new Rectangle(GraphicsDevice.Viewport.Width - map.TileSize - uiMargin, uiMargin, map.TileSize, map.TileSize);
                 selectors[(int)currentMode].DrawItem(Time, selectors[(int)currentMode].SelectedItem, selectedItemRect, sbatch);
                 Primitives2D.DrawRect(sbatch, Color.White, selectedItemRect);
             }
 
             //draw basic info about entity screen
-            smallFont.Draw(sbatch, $"Visible Entities: {map.ActiveEnts.Count}\nTotal Entities:   {map.TotalEntitiesCount}", new Vector2(20, 80), Color.LightSeaGreen);
+            smallFont.Draw(sbatch, $"Visible Entities: {map.ActiveEnts.Count}\nTotal Entities:   {map.TotalEntitiesCount}", new Vector2(uiMargin, 80), Color.LightSeaGreen);
 
             sbatch.End();
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
@@ -723,7 +768,7 @@ namespace DyingAndMore.Editor
                 for (var i = 0; i < modes.Length; i++)
                 {
                     modeSz[i] = largeFont.MeasureString(modes[i]);
-                    modeSz[i].X += 20;
+                    modeSz[i].X += uiMargin;
                     modeTotalWidth += modeSz[i].X;
                     modeMaxHeight = MathHelper.Max(modeMaxHeight, modeSz[i].Y);
                 }
@@ -738,7 +783,7 @@ namespace DyingAndMore.Editor
                     (
                         sbatch,
                         str,
-                        CenterInRect(font.MeasureString(str), new Rectangle(startX, 20, (int)modeSz[i].X, (int)modeSz[i].Y)),
+                        CenterInRect(font.MeasureString(str), new Rectangle(startX, uiMargin, (int)modeSz[i].X, (int)modeSz[i].Y)),
                         isSel ? Color.White : new Color(1, 1, 1, 0.5f)
                     );
                     startX += (int)modeSz[i].X;

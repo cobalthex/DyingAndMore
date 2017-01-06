@@ -90,7 +90,8 @@ namespace DyingAndMore
             var state = new Editor.Editor()
             {
                 map = map,
-                camera = new Takai.Game.Camera(map) { Viewport = GraphicsDevice.Viewport.Bounds }
+                camera = new Takai.Game.Camera(map) { Viewport = GraphicsDevice.Viewport.Bounds,
+                    PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx") }
             };
             GameStateManager.PushState(state);
 

@@ -53,7 +53,7 @@ namespace DyingAndMore.Game
                 MoveSpeed = 800,
                 Viewport = GraphicsDevice.Viewport.Bounds
             };
-            camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
+            //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
 
             StartMap();
 
@@ -141,7 +141,7 @@ namespace DyingAndMore.Game
 #if DEBUG
             if (InputState.IsMod(KeyMod.Alt) && InputState.IsPress(MouseButtons.Left))
             {
-                var targets = map.FindNearbyEntities(camera.ScreenToWorld(InputState.MouseVector), 5, false);
+                var targets = map.FindEntities(camera.ScreenToWorld(InputState.MouseVector), 5, false);
 
                 foreach (var ent in targets)
                 {
