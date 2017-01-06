@@ -140,6 +140,18 @@ namespace Takai.Game
         private float radius = 1;
 
         /// <summary>
+        /// the axis aligned bounding box of this entity, based on radius
+        /// </summary>
+        [Data.NonSerialized]
+        public Rectangle Bounds
+        {
+            get
+            {
+                return new Rectangle((int)Position.X, (int)Position.Y, (int)Radius, (int)Radius);
+            }
+        }
+
+        /// <summary>
         /// On collision, should this entity try to 'uncollide' with the entity
         /// </summary>
         /// <example>Triggers would have this set to false</example>
