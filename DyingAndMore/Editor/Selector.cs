@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
@@ -83,7 +84,8 @@ namespace DyingAndMore.Editor
         {
             //todo: test gestures
 
-            if (!DidClickOpen && InputState.IsClick(Keys.Tab))
+            if ((!DidClickOpen && InputState.IsClick(Keys.Tab)) ||
+                (DidClickOpen && InputState.IsPress(Keys.Tab)))
                 Deactivate();
 
             var mouse = InputState.MousePoint;
@@ -92,6 +94,23 @@ namespace DyingAndMore.Editor
             var itemsPerRow = (width - Padding) / (ItemSize.X + Padding);
             var splitterX = GraphicsDevice.Viewport.Width - width - scrollWidth - splitterWidth;
             isHoveringSplitter = (mouse.X >= splitterX && mouse.X <= splitterX + splitterWidth);
+
+            bool isTapping = false, isDragging = false;
+            while (TouchPanel.IsGestureAvailable)
+            {
+                var gesture = TouchPanel.ReadGesture();
+                switch (gesture.GestureType)
+                {
+                    case GestureType.Tap:
+                        isTapping = true;
+                        break;
+
+                    case GestureType.FreeDrag:
+                        if (gesture.Delta.Y != 0 && gesture.Position.X > splitterX)
+                            ScrollPosition -= (int)gesture.Delta.Y;
+                        break;
+                }
+            }
 
             if (InputState.IsPress(MouseButtons.Left))
             {
