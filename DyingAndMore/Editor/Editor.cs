@@ -74,7 +74,7 @@ namespace DyingAndMore.Editor
 
             map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
 
-            TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap;
+            TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap | GestureType.FreeDrag;
         }
 
         public override void Unload()
