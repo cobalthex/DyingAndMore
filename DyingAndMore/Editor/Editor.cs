@@ -48,6 +48,7 @@ namespace DyingAndMore.Editor
         System.TimeSpan lastBlobTime = System.TimeSpan.Zero;
 
         int uiMargin = 20;
+        ModeSelector modeSelector;
 
         public Editor() : base(false, false) { }
 
@@ -74,6 +75,13 @@ namespace DyingAndMore.Editor
 
             map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
 
+            modeSelector = new ModeSelector(largeFont, smallFont)
+            {
+                HorizontalOrientation = Takai.UI.Orientation.Middle,
+                VerticalOrientation = Takai.UI.Orientation.Middle,
+                Position = new Vector2(0, 40)
+            };
+
             TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap | GestureType.FreeDrag;
         }
 
@@ -97,6 +105,9 @@ namespace DyingAndMore.Editor
                 map.TileSize,
                 map.TileSize
             );
+
+            modeSelector.Update(Time.ElapsedGameTime);
+            modeSelector.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
             if (InputState.IsMod(KeyMod.Control))
             {
@@ -173,6 +184,17 @@ namespace DyingAndMore.Editor
 
             var worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
 
+
+            void OpenCurrentSelector(bool ClickedOpen)
+            {
+                var selector = selectors[(uint)currentMode];
+                if (selector != null)
+                {
+                    selector.DidClickOpen = ClickedOpen;
+                    selector.Activate();
+                }
+            }
+            
             bool isTapping = false, isDoubleTapping = false;
 
             //touch gestures
@@ -238,16 +260,6 @@ namespace DyingAndMore.Editor
                 {
                     d.Normalize();
                     camera.Position += d * camera.MoveSpeed * (float)Time.ElapsedGameTime.TotalSeconds; //(camera velocity)
-                }
-            }
-
-            void OpenCurrentSelector(bool ClickedOpen)
-            {
-                var selector = selectors[(uint)currentMode];
-                if (selector != null)
-                {
-                    selector.DidClickOpen = ClickedOpen;
-                    selector.Activate();
                 }
             }
 
@@ -658,7 +670,7 @@ namespace DyingAndMore.Editor
                     "or Ctrl+O to load one"
                 };
                 float h = 0;
-                var   sz = new Vector2[noMapStr.Length];
+                var sz = new Vector2[noMapStr.Length];
                 for (var i = 0; i < noMapStr.Length; ++i)
                 {
                     var mz = largeFont.MeasureString(noMapStr[i]);
@@ -759,36 +771,7 @@ namespace DyingAndMore.Editor
             sbatch.End();
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
 
-            //draw modes
-            {
-                var modes = System.Enum.GetNames(typeof(EditorMode));
-                var modeSz = new Vector2[modes.Length];
-                var modeTotalWidth = 0f;
-                var modeMaxHeight = 0f;
-                for (var i = 0; i < modes.Length; i++)
-                {
-                    modeSz[i] = largeFont.MeasureString(modes[i]);
-                    modeSz[i].X += uiMargin;
-                    modeTotalWidth += modeSz[i].X;
-                    modeMaxHeight = MathHelper.Max(modeMaxHeight, modeSz[i].Y);
-                }
-
-                var startX = (int)(GraphicsDevice.Viewport.Width - modeTotalWidth) / 2;
-                for (var i = 0; i < modes.Length; i++)
-                {
-                    var isSel = (int)currentMode == i;
-                    var font = isSel ? largeFont : smallFont;
-                    var str = modes[i];
-                    font.Draw
-                    (
-                        sbatch,
-                        str,
-                        CenterInRect(font.MeasureString(str), new Rectangle(startX, uiMargin, (int)modeSz[i].X, (int)modeSz[i].Y)),
-                        isSel ? Color.White : new Color(1, 1, 1, 0.5f)
-                    );
-                    startX += (int)modeSz[i].X;
-                }
-            }
+            modeSelector.Draw(sbatch);
 
             sbatch.End();
         }
