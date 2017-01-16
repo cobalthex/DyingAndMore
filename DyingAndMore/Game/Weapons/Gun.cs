@@ -58,6 +58,7 @@ namespace DyingAndMore.Game.Weapons
                 }
                 else
                 {
+                    Entity.Map.DrawLine(Entity.Position, Entity.Position + Entity.Direction * (Projectile.Range == 0 ? 100000 : Projectile.Range), Color.NavajoWhite);
                     //explosion at the end
                 }
             }
