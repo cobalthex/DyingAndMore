@@ -7,10 +7,35 @@ namespace DyingAndMore.Editor
     {
         protected static readonly string[] editorModes = Enum.GetNames(typeof(EditorMode));
 
-        public EditorMode Mode { get; set; } = EditorMode.Tiles;
+        public EditorMode Mode
+        {
+            get { return mode; }
+            set
+            {
+                mode = value;
+
+                for (int i = 0; i < Children.Count; ++i)
+                {
+                    if (i == (int)mode)
+                    {
+                        Children[i].Font = ActiveFont;
+                        Children[i].Color = ActiveColor;
+                    }
+                    else
+                    {
+                        Children[i].Font = InactiveFont;
+                        Children[i].Color = InactiveColor;
+                    }
+                }
+            }
+        }
+        private EditorMode mode;
 
         public Takai.Graphics.BitmapFont ActiveFont { get; set; }
         public Takai.Graphics.BitmapFont InactiveFont { get; set; }
+
+        public Color ActiveColor { get; set; } = Color.White;
+        public Color InactiveColor { get; set; } = Color.LightGray;
 
         public ModeSelector(Takai.Graphics.BitmapFont ActiveFont, Takai.Graphics.BitmapFont InactiveFont)
         {
@@ -18,24 +43,31 @@ namespace DyingAndMore.Editor
             this.InactiveFont = InactiveFont;
 
             float x = 0;
-            foreach (var mode in editorModes)
+            for (int i = 0; i < editorModes.Length; ++i)
             {
                 var child = new Takai.UI.Element()
                 {
-                    Text = mode,
+                    Text = editorModes[i],
                     Font = ActiveFont,
-                    Color = Color.LightGray,
+                    Color = InactiveColor
                 };
-                child.AutoSize(20);
+                child.AutoSize(Padding: 20);
                 child.Position += new Vector2(x, 0);
                 x += child.Size.X;
                 child.Font = InactiveFont;
+
+                var n = i;
+                child.OnClick += delegate (Takai.UI.Element sender, Takai.UI.ClickEventArgs args)
+                {
+                    Mode = (EditorMode)n;
+                };
+
                 AddChild(child);
             }
 
-            AutoSize(20);
+            AutoSize();
 
-            Children[(int)Mode].Color = Color.White;
+            Children[(int)Mode].Color = ActiveColor;
             Children[(int)Mode].Font = ActiveFont;
         }
     }

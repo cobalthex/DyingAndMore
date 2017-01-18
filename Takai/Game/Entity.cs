@@ -209,7 +209,7 @@ namespace Takai.Game
         /// When this entity was last spawned (in map time). Zero if destroyed or not spawned
         /// </summary>
         [Data.NonDesigned]
-        public TimeSpan SpawnTime { get; set; } = TimeSpan.Zero; //todo: use map time
+        public TimeSpan SpawnTime { get; set; } = TimeSpan.Zero;
 
         public Entity() { }
 
