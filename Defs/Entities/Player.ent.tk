@@ -38,7 +38,7 @@ Actor {
             }
         };
         Speed: 0;
-        shotDelay: 250;
+        shotDelay: 100;
     };
     AltWeapon: BlobGun {
         blob: BlobType {

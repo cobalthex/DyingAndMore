@@ -25,8 +25,6 @@ namespace DyingAndMore.Editor
 
     class Editor : Takai.States.GameState
     {
-        public EditorMode currentMode = EditorMode.Tiles;
-
         public Takai.Game.Camera camera;
 
         SpriteBatch sbatch;
@@ -48,7 +46,8 @@ namespace DyingAndMore.Editor
         System.TimeSpan lastBlobTime = System.TimeSpan.Zero;
 
         int uiMargin = 20;
-        ModeSelector modeSelector;
+        Takai.UI.Element uiContainer;
+        public ModeSelector modeSelector;
 
         public Editor() : base(false, false) { }
 
@@ -75,12 +74,13 @@ namespace DyingAndMore.Editor
 
             map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
 
-            modeSelector = new ModeSelector(largeFont, smallFont)
+            uiContainer = new Takai.UI.Element();
+            uiContainer.AddChild(modeSelector = new ModeSelector(largeFont, smallFont)
             {
                 HorizontalOrientation = Takai.UI.Orientation.Middle,
-                VerticalOrientation = Takai.UI.Orientation.Middle,
+                VerticalOrientation = Takai.UI.Orientation.Start,
                 Position = new Vector2(0, 40)
-            };
+            });
 
             TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap | GestureType.FreeDrag;
         }
@@ -106,8 +106,8 @@ namespace DyingAndMore.Editor
                 map.TileSize
             );
 
-            modeSelector.Update(Time.ElapsedGameTime);
-            modeSelector.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            uiContainer.Update(Time.ElapsedGameTime);
+            uiContainer.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
             if (InputState.IsMod(KeyMod.Control))
             {
@@ -177,24 +177,23 @@ namespace DyingAndMore.Editor
             {
                 if (InputState.IsPress(Keys.D1 + i) || InputState.IsPress(Keys.NumPad1 + i))
                 {
-                    currentMode = (EditorMode)i;
+                    modeSelector.Mode = (EditorMode)i;
                     break;
                 }
             }
 
             var worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
 
-
             void OpenCurrentSelector(bool ClickedOpen)
             {
-                var selector = selectors[(uint)currentMode];
+                var selector = selectors[(uint)modeSelector.Mode];
                 if (selector != null)
                 {
                     selector.DidClickOpen = ClickedOpen;
                     selector.Activate();
                 }
             }
-            
+
             bool isTapping = false, isDoubleTapping = false;
 
             //touch gestures
@@ -208,6 +207,7 @@ namespace DyingAndMore.Editor
                             //move
                             if (Vector2.Dot(gesture.Delta, gesture.Delta2) > 0)
                             {
+                                //todo: maybe add velocity
                                 camera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(camera.Transform)) / 2;
                             }
                             //scale
@@ -247,13 +247,13 @@ namespace DyingAndMore.Editor
             else
             {
                 var d = Vector2.Zero;
-                if (InputState.IsButtonDown(Keys.A))
+                if (InputState.IsButtonDown(Keys.A) || InputState.IsButtonDown(Keys.Left))
                     d -= Vector2.UnitX;
-                if (InputState.IsButtonDown(Keys.W))
+                if (InputState.IsButtonDown(Keys.W) || InputState.IsButtonDown(Keys.Up))
                     d -= Vector2.UnitY;
-                if (InputState.IsButtonDown(Keys.D))
+                if (InputState.IsButtonDown(Keys.D) || InputState.IsButtonDown(Keys.Right))
                     d += Vector2.UnitX;
-                if (InputState.IsButtonDown(Keys.S))
+                if (InputState.IsButtonDown(Keys.S) || InputState.IsButtonDown(Keys.Down))
                     d += Vector2.UnitY;
 
                 if (d != Vector2.Zero)
@@ -323,7 +323,7 @@ namespace DyingAndMore.Editor
 
             #region Tiles
 
-            if (currentMode == EditorMode.Tiles)
+            if (modeSelector.Mode == EditorMode.Tiles)
             {
                 var tile = short.MinValue;
 
@@ -350,14 +350,14 @@ namespace DyingAndMore.Editor
 
             #region Decals
 
-            else if (currentMode == EditorMode.Decals)
+            else if (modeSelector.Mode == EditorMode.Decals)
             {
                 if (InputState.IsPress(MouseButtons.Left))
                 {
                     if (!SelectDecal(worldMousePos))
                     {
                         //add new decal none under cursor
-                        var sel = selectors[(int)currentMode] as DecalSelector;
+                        var sel = selectors[(int)modeSelector.Mode] as DecalSelector;
                         map.AddDecal(sel.textures[sel.SelectedItem], worldMousePos);
                         var pos = (worldMousePos / map.SectorPixelSize).ToPoint();
                         selectedDecal = new DecalIndex { x = pos.X, y = pos.Y, index = map.Sectors[pos.Y, pos.X].decals.Count - 1 };
@@ -428,7 +428,7 @@ namespace DyingAndMore.Editor
 
             #region Blobs
 
-            else if (currentMode == EditorMode.Blobs)
+            else if (modeSelector.Mode == EditorMode.Blobs)
             {
                 if (Time.TotalGameTime > lastBlobTime + System.TimeSpan.FromMilliseconds(50))
                 {
@@ -472,7 +472,7 @@ namespace DyingAndMore.Editor
 
             #region Entities
 
-            else if (currentMode == EditorMode.Entities)
+            else if (modeSelector.Mode == EditorMode.Entities)
             {
                 if (InputState.IsPress(MouseButtons.Left) || isTapping)
                 {
@@ -480,7 +480,7 @@ namespace DyingAndMore.Editor
                     var selected = map.FindEntities(worldMousePos, searchRadius, true);
                     if (selected.Count < 1)
                     {
-                        var sel = selectors[(int)currentMode] as EntSelector;
+                        var sel = selectors[(int)modeSelector.Mode] as EntSelector;
                         if (sel != null && sel.ents.Count > 0)
                             selectedEntity = map.Spawn(sel.ents[sel.SelectedItem], worldMousePos, Vector2.UnitX, Vector2.Zero);
                     }
@@ -533,7 +533,7 @@ namespace DyingAndMore.Editor
 
             lastWorldPos = worldMousePos;
 
-            if (selectedEntity != null && currentMode == EditorMode.Entities)
+            if (selectedEntity != null && modeSelector.Mode == EditorMode.Entities)
                 selectedEntity.OutlineColor = Color.YellowGreen;
         }
 
@@ -701,7 +701,7 @@ namespace DyingAndMore.Editor
 
             var viewPos = camera.WorldToScreen(camera.ActualPosition);
 
-            if (currentMode == EditorMode.Tiles)
+            if (modeSelector.Mode == EditorMode.Tiles)
             {
                 //draw rect around tile under cursor
                 if (map.IsInside(lastWorldPos))
@@ -728,7 +728,7 @@ namespace DyingAndMore.Editor
                     tinyFont.Draw(sbatch, string.Format("x:{0} y:{1} deg:{2}", diff.X, diff.Y, angle), camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
             }
-            else if (currentMode == EditorMode.Decals)
+            else if (modeSelector.Mode == EditorMode.Decals)
             {
                 if (selectedDecal.HasValue)
                 {
@@ -748,7 +748,7 @@ namespace DyingAndMore.Editor
                     map.DrawLine(bl, tl, Color.GreenYellow);
                 }
             }
-            else if (currentMode == EditorMode.Entities)
+            else if (modeSelector.Mode == EditorMode.Entities)
             {
                 if (selectedEntity != null)
                     DrawEntInfo(selectedEntity);
@@ -758,10 +758,10 @@ namespace DyingAndMore.Editor
             }
 
             //draw selected item in top right corner
-            if (selectors[(int)currentMode] != null)
+            if (selectors[(int)modeSelector.Mode] != null)
             {
                 var selectedItemRect = new Rectangle(GraphicsDevice.Viewport.Width - map.TileSize - uiMargin, uiMargin, map.TileSize, map.TileSize);
-                selectors[(int)currentMode].DrawItem(Time, selectors[(int)currentMode].SelectedItem, selectedItemRect, sbatch);
+                selectors[(int)modeSelector.Mode].DrawItem(Time, selectors[(int)modeSelector.Mode].SelectedItem, selectedItemRect, sbatch);
                 Primitives2D.DrawRect(sbatch, Color.White, selectedItemRect);
             }
 
@@ -771,7 +771,7 @@ namespace DyingAndMore.Editor
             sbatch.End();
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
 
-            modeSelector.Draw(sbatch);
+            uiContainer.Draw(sbatch);
 
             sbatch.End();
         }
