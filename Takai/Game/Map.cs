@@ -69,6 +69,14 @@ namespace Takai.Game
         public int SectorPixelSize { get; private set; } = 0;
 
         /// <summary>
+        /// The bounds of the map in pixels
+        /// </summary>
+        public Rectangle Bounds
+        {
+            get { return new Rectangle(0, 0, Width * TileSize, Height * TileSize); }
+        }
+
+        /// <summary>
         /// All of the tiles in the map
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>

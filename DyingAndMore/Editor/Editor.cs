@@ -354,7 +354,7 @@ namespace DyingAndMore.Editor
             {
                 if (InputState.IsPress(MouseButtons.Left))
                 {
-                    if (!SelectDecal(worldMousePos))
+                    if (!SelectDecal(worldMousePos) && map.Bounds.Contains(worldMousePos))
                     {
                         //add new decal none under cursor
                         var sel = selectors[(int)modeSelector.Mode] as DecalSelector;
@@ -432,7 +432,7 @@ namespace DyingAndMore.Editor
             {
                 if (Time.TotalGameTime > lastBlobTime + System.TimeSpan.FromMilliseconds(50))
                 {
-                    if (InputState.IsButtonDown(MouseButtons.Left))
+                    if (InputState.IsButtonDown(MouseButtons.Left) && map.Bounds.Contains(worldMousePos))
                     {
                         var sel = selectors[(int)EditorMode.Blobs] as BlobSelector;
                         map.Spawn(sel.blobs[sel.SelectedItem], worldMousePos, Vector2.Zero);
@@ -478,7 +478,7 @@ namespace DyingAndMore.Editor
                 {
                     var searchRadius = isTapping ? 10 : 1;
                     var selected = map.FindEntities(worldMousePos, searchRadius, true);
-                    if (selected.Count < 1)
+                    if (selected.Count < 1 && map.Bounds.Contains(worldMousePos))
                     {
                         var sel = selectors[(int)modeSelector.Mode] as EntSelector;
                         if (sel != null && sel.ents.Count > 0)
