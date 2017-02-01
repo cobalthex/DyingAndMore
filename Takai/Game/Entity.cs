@@ -17,7 +17,7 @@ namespace Takai.Game
         Active,
     }
 
-    public class EntState : Takai.IState
+    public class EntState : IState
     {
         public Takai.Graphics.Sprite Sprite { get; set; }
 
@@ -66,7 +66,8 @@ namespace Takai.Game
     [Data.DesignerCreatable]
     public class Entity : ICloneable
     {
-        private static UInt64 nextId = 1; //generator for the unique IDs
+        private static UInt64 nextId = 1; //generator for the unique (runtime) IDs
+
         /// <summary>
         /// A unique ID for each entity
         /// Generated at runtime

@@ -66,6 +66,10 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Editor\Editor.Entities.cs" />
+    <Compile Include="Editor\Editor.Blobs.cs" />
+    <Compile Include="Editor\Editor.Decals.cs" />
+    <Compile Include="Editor\Editor.Tiles.cs" />
     <Compile Include="Editor\EntSelector.cs" />
     <Compile Include="Editor\BlobSelector.cs" />
     <Compile Include="Editor\Editor.cs" />

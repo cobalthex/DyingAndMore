@@ -46,7 +46,7 @@ namespace Takai.States
         /// A reference to the game and its properties
         /// </summary>
         public static Microsoft.Xna.Framework.Game Game { get; internal set; }
-
+        
         /// <summary>
         /// Initialize state manager
         /// </summary>
@@ -65,8 +65,6 @@ namespace Takai.States
         /// <param name="time">Game time</param>
         public static void Update(Microsoft.Xna.Framework.GameTime Time)
         {
-            var bounds = Game.GraphicsDevice.Viewport.Bounds;
-
             if (IsExiting)
                 Game.Exit();
 

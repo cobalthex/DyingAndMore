@@ -87,12 +87,7 @@ namespace DyingAndMore
             using (var stream = new System.IO.FileStream("Data/Maps/Test.map.tk", System.IO.FileMode.Open))
                 map.Load(stream);
 
-            var state = new Editor.Editor()
-            {
-                map = map,
-                camera = new Takai.Game.Camera(map) { Viewport = GraphicsDevice.Viewport.Bounds,
-                    PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx") }
-            };
+            var state = new Editor.Editor();
             GameStateManager.PushState(state);
 
             base.Initialize();
