@@ -28,7 +28,6 @@ namespace Takai.Data
 
     public static partial class Serializer
     {
-
         /// <summary>
         /// Serialize an object to a text stream
         /// </summary>
@@ -82,10 +81,17 @@ namespace Takai.Data
                 Stream.WriteLine("{");
 
                 var dict = (IDictionary)Object;
+                var keyType = ty.GetGenericArguments()[0];
                 foreach (var prop in dict.Keys)
                 {
                     Indent(Stream, IndentLevel + 1);
-                    Stream.Write("{0}: ", prop.ToString());
+                    
+                    if (keyType == typeof(char))
+                        Stream.Write((UInt16)(char)prop);
+                    else
+                        Stream.Write(prop.ToString());
+                    
+                    Stream.Write(": ");
                     TextSerialize(Stream, dict[prop], IndentLevel + 1);
                     Stream.WriteLine(";");
                 }

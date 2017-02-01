@@ -24,11 +24,12 @@ namespace Takai.Graphics
         /// <summary>
         /// Spacing between each character when drawn
         /// </summary>
-        public Point Spacing { get; set; }
+        public Point Tracking { get; set; }
 
         /// <summary>
         /// The maximum width of all characters (for monospacing)
         /// </summary>
+        [Data.NonSerialized]
         public int MaxCharWidth { get; protected set; }
 
         #endregion
@@ -42,9 +43,10 @@ namespace Takai.Graphics
         /// <returns>The bitmap font if created, null if not</returns>
         public static BitmapFont FromStream(GraphicsDevice GDev, System.IO.Stream Stream)
         {
-            BitmapFont font = new BitmapFont();
-            font.Spacing = Point.Zero;
-
+            BitmapFont font = new BitmapFont()
+            {
+                Tracking = Point.Zero
+            };
             var read = new DeflateStream(Stream, CompressionMode.Decompress);
 
             //broken up because of flipped endians on xbox
@@ -96,7 +98,7 @@ namespace Takai.Graphics
         public void Dispose()
         {
             Texture.Dispose();
-            Spacing = Point.Zero;
+            Tracking = Point.Zero;
             Characters.Clear();
             GC.SuppressFinalize(this);
         }
@@ -133,7 +135,7 @@ namespace Takai.Graphics
                 if (String[i] == '\n')
                 {
                     pos.X = Position.X;
-                    pos.Y += maxH + Spacing.Y;
+                    pos.Y += maxH + Tracking.Y;
                     maxH = 0;
                     esc++;
                     continue;
@@ -172,7 +174,7 @@ namespace Takai.Graphics
 
                 Spritebatch.Draw(Texture, pos, rgn, curColor);
 
-                pos.X += (MonoSpace ? MaxCharWidth : rgn.Width) + Spacing.X;
+                pos.X += (MonoSpace ? MaxCharWidth : rgn.Width) + Tracking.X;
                 maxH = (int)MathHelper.Max(maxH, rgn.Height);
             }
 
@@ -204,7 +206,7 @@ namespace Takai.Graphics
         /// <param name="Offset">The pixel offset of the text</param>
         /// <param name="Color">The color of the text</param>
         /// <param name="MonoSpace">Draw the font, treating all characters as equal width</param>
-        /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and www (base 33) to set the color in RGB. use `x to reset the color</remarks>
+        /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and fff (base 16) to set the color in RGB. use `x to reset the color</remarks>
         public void Draw(SpriteBatch Spritebatch, string String, int StartIndex, int Length, Rectangle Bounds, Point Offset, Color Color, bool MonoSpace = false)
         {
             Vector2 pos = Vector2.Zero;
@@ -221,7 +223,7 @@ namespace Takai.Graphics
                 if (ch == '\n')
                 {
                     pos.X = Bounds.X;
-                    pos.Y += maxH + Spacing.Y;
+                    pos.Y += maxH + Tracking.Y;
                     off.X = Offset.X;
                     off.Y -= maxH;
                     if (off.Y < 0)
@@ -250,9 +252,9 @@ namespace Takai.Graphics
                         for (int j = 0; j < 3; j++)
                         {
                             char cch = String[j + i + start + 1];
-                            if (cch >= 'a' && cch <= 'w')
+                            if (cch >= 'a' && cch <= 'f')
                                 col[j] = 10 + (int)(cch - 'a');
-                            else if (cch >= 'A' && cch <= 'W')
+                            else if (cch >= 'A' && cch <= 'F')
                                 col[j] = 10 + (int)(cch - 'A');
                             else if (cch >= '0' && cch <= '9')
                                 col[j] = (int)(cch - '0');
@@ -305,7 +307,7 @@ namespace Takai.Graphics
 
                 Spritebatch.Draw(Texture, new Vector2(Bounds.X + pos.X, Bounds.Y + pos.Y), rgn, curColor);
 
-                pos.X += (MonoSpace ? MaxCharWidth : rgn.Width) + Spacing.X;
+                pos.X += (MonoSpace ? MaxCharWidth : rgn.Width) + Tracking.X;
                 maxH = (int)MathHelper.Max(maxH, rgn.Height);
             }
         }
@@ -346,7 +348,7 @@ namespace Takai.Graphics
                 if (String[i] == '\n')
                 {
                     nW = 0;
-                    pos.Y += nH + Spacing.Y;
+                    pos.Y += nH + Tracking.Y;
                     nH = 0;
                     continue;
                 }
@@ -379,7 +381,7 @@ namespace Takai.Graphics
 
                 pos.X = (int)MathHelper.Max(pos.X, nW);
             }
-            pos.Y += nH + Spacing.Y;
+            pos.Y += nH + Tracking.Y;
             return pos;
         }
 

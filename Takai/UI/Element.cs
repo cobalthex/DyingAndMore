@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -27,8 +28,22 @@ namespace Takai.UI
     {
         public static bool DrawBoundingRects = false;
 
-        public Element Parent { get; set; } = null;
-        public List<Element> Children { get; set; } = new List<Element>();
+        public Element Parent
+        {
+            get { return parent; }
+            set
+            {
+                parent = value;
+                UpdateBounds();
+            }
+        }
+        private Element parent = null;
+
+        /// <summary>
+        /// A readonly collection of all of the children in this element
+        /// </summary>
+        public ReadOnlyCollection<Element> Children { get; set; } //todo: maybe observable
+        protected List<Element> children = new List<Element>();
 
         public string Text
         {
@@ -52,10 +67,36 @@ namespace Takai.UI
             }
         }
         private Graphics.BitmapFont font;
+
         public Color Color { get; set; } = Color.White;
 
-        public Orientation HorizontalOrientation { get; set; } = Orientation.Start;
-        public Orientation VerticalOrientation { get; set; } = Orientation.Start;
+        /// <summary>
+        /// How this element is positioned in its container horizontally
+        /// </summary>
+        public Orientation HorizontalOrientation
+        {
+            get { return horizontalOrientation; }
+            set
+            {
+                horizontalOrientation = value;
+                UpdateBounds();
+            }
+        }
+        private Orientation horizontalOrientation;
+
+        /// <summary>
+        /// How this element is positioned in its container vertically
+        /// </summary>
+        public Orientation VerticalOrientation
+        {
+            get { return verticalOrientation; }
+            set
+            {
+                verticalOrientation = value;
+                UpdateBounds();
+            }
+        }
+        private Orientation verticalOrientation;
 
         /// <summary>
         /// The position relative to the orientation.
@@ -63,12 +104,30 @@ namespace Takai.UI
         /// Center moves down and to the right from the center
         /// End moves in the opposite direction
         /// </summary>
-        public virtual Vector2 Position { get; set; } = Vector2.Zero;
+        public Vector2 Position
+        {
+            get { return position; }
+            set
+            {
+                position = value;
+                UpdateBounds();
+            }
+        }
+        private Vector2 position = Vector2.Zero;
 
         /// <summary>
         /// The size of the element
         /// </summary>
-        public virtual Vector2 Size { get; set; } = Vector2.One;
+        public Vector2 Size
+        {
+            get { return size; }
+            set
+            {
+                size = value;
+                UpdateBounds();
+            }
+        }
+        private Vector2 size = Vector2.One;
 
         public Rectangle Bounds
         {
@@ -81,19 +140,52 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// The input must start inside the element to register a click
+        /// Bounds relative to the outermost container
         /// </summary>
-        bool didPress = false;
+        public Rectangle AbsoluteBounds
+        {
+            get { return absoluteBounds; }
+        }
+        private Rectangle absoluteBounds; //cached bounds
+
+        //todo: focus
 
         /// <summary>
         /// The click handler. If null, this item is not clickable/focusable (Does not apply to children)
         /// </summary>
         public event ClickHandler OnClick = null;
 
+        /// <summary>
+        /// Can this element be focused
+        /// </summary>
+        public virtual bool CanFocus { get { return OnClick != null; } }
+
+        /// <summary>
+        /// The input must start inside the element to register a click
+        /// </summary>
+        protected bool didPress = false;
+
+        public Element()
+        {
+            Children = new ReadOnlyCollection<Element>(children);
+        }
+
         public void AddChild(Element Child)
         {
             Child.Parent = this;
-            Children.Add(Child);
+            children.Add(Child);
+        }
+
+        public void RemoveChild(Element Child)
+        {
+            children.Remove(Child);
+        }
+
+        public Element RemoveChildAt(int Index)
+        {
+            var child = children[Index];
+            children.RemoveAt(Index);
+            return child;
         }
 
         /// <summary>
@@ -148,17 +240,43 @@ namespace Takai.UI
             return new Rectangle(pos.ToPoint() + Container.Location, Size.ToPoint());
         }
 
-        public Rectangle CalculateAbsoluteBounds()
+        /// <summary>
+        /// Calculate the absolute bounds of this element relative to its parents
+        /// </summary>
+        /// <returns></returns>
+        Rectangle CalculateAbsoluteBounds()
         {
-            return Parent != null ? CalculateBounds(Parent.CalculateAbsoluteBounds()) :
+            absoluteBounds = Parent != null ? CalculateBounds(Parent.CalculateAbsoluteBounds()) :
                 new Rectangle(Position.ToPoint(), Size.ToPoint());
+            return absoluteBounds;
+        }
+
+        /// <summary>
+        /// Update the bounds of this element and all its children
+        /// </summary>
+        void UpdateBounds()
+        {
+            CalculateAbsoluteBounds();
+
+            var elements = new Queue<Element>();
+            foreach (var child in Children)
+                elements.Enqueue(child);
+
+            while (elements.Count > 0)
+            {
+                var element = elements.Dequeue();
+                element.absoluteBounds = element.CalculateBounds(element.parent.absoluteBounds);
+
+                foreach (var child in element.Children)
+                    elements.Enqueue(child);
+            }
         }
 
         /// <summary>
         /// Update this element
         /// </summary>
         /// <param name="DeltaTime">Elapsed time since the last update</param>
-        /// <returns>True if the element should update (based on children), false otherwise (should cascade)</returns>
+        /// <returns>Returns true if this element was clicked/triggered. This will prevent parent items from being triggered as well</returns>
         public virtual bool Update(System.TimeSpan DeltaTime)
         {
             for (var i = Children.Count - 1; i >= 0 ; --i)
@@ -166,17 +284,22 @@ namespace Takai.UI
                 if (!Children[i].Update(DeltaTime))
                     return false;
             }
-
-            var bounds = CalculateAbsoluteBounds();
+            
             var mouse = Input.InputState.MousePoint;
 
-            if (Input.InputState.IsPress(Input.MouseButtons.Left) && bounds.Contains(mouse))
+            //todo: focus
+
+            if (Input.InputState.IsPress(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
                 didPress = true;
 
-            if (Input.InputState.IsClick(Input.MouseButtons.Left))
+            else if (Input.InputState.IsClick(Input.MouseButtons.Left))
             {
-                if (didPress && bounds.Contains(mouse) && OnClick != null)
-                    OnClick(this, new ClickEventArgs { position = (mouse - bounds.Location).ToVector2() });
+                if (didPress && AbsoluteBounds.Contains(mouse) && OnClick != null)
+                {
+                    OnClick(this, new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() });
+                    didPress = false;
+                    return false;
+                }
 
                 didPress = false;
             }
@@ -186,22 +309,20 @@ namespace Takai.UI
 
         public virtual void Draw(SpriteBatch SpriteBatch)
         {
-            var bounds = CalculateAbsoluteBounds();
-
             var size = new Point(
-                MathHelper.Min(bounds.Width, (int)textSize.X),
-                MathHelper.Min(bounds.Height, (int)textSize.Y)
+                MathHelper.Min(AbsoluteBounds.Width, (int)textSize.X),
+                MathHelper.Min(AbsoluteBounds.Height, (int)textSize.Y)
             );
 
             if (DrawBoundingRects)
-                Takai.Graphics.Primitives2D.DrawRect(SpriteBatch, new Color(0, 0.75f, 1, 0.35f), bounds);
+                Takai.Graphics.Primitives2D.DrawRect(SpriteBatch, new Color(0, 0.75f, 1, 0.35f), AbsoluteBounds);
 
             font?.Draw(
                 SpriteBatch,
                 Text,
                 new Rectangle(
-                    bounds.X + ((bounds.Width - size.X) / 2),
-                    bounds.Y + ((bounds.Height - size.Y) / 2),
+                    AbsoluteBounds.X + ((AbsoluteBounds.Width - size.X) / 2),
+                    AbsoluteBounds.Y + ((AbsoluteBounds.Height - size.Y) / 2),
                     size.X,
                     size.Y
                 ),

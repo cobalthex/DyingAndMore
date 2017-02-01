@@ -7,7 +7,7 @@ namespace DyingAndMore.Game.Weapons
         /// <summary>
         /// The type of blob to fire
         /// </summary>
-        public Takai.Game.BlobType blob;
+        public Takai.Game.BlobType blob = null;
         /// <summary>
         /// The intial speed of the blob
         /// </summary>
