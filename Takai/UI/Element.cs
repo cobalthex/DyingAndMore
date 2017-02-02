@@ -3,6 +3,9 @@ using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+//todo: add serializeation (maybe use names for linking events)
+//todo: change custom serializer to export as correct type (Map exports as map and not MapSave; use dictionaries for temporaries) (and import)
+
 namespace Takai.UI
 {
     public enum Orientation
@@ -28,6 +31,14 @@ namespace Takai.UI
     {
         public static bool DrawBoundingRects = false;
 
+        /// <summary>
+        /// A unique name for this element. Can be null
+        /// </summary>
+        public string Name { get; set; } = null;
+
+        /// <summary>
+        /// Who owns/contains this element
+        /// </summary>
         public Element Parent
         {
             get { return parent; }
@@ -153,6 +164,7 @@ namespace Takai.UI
         /// <summary>
         /// The click handler. If null, this item is not clickable/focusable (Does not apply to children)
         /// </summary>
+        [Data.NonSerialized]
         public event ClickHandler OnClick = null;
 
         /// <summary>
@@ -163,6 +175,7 @@ namespace Takai.UI
         /// <summary>
         /// The input must start inside the element to register a click
         /// </summary>
+        [Data.NonSerialized]
         protected bool didPress = false;
 
         public Element()
@@ -284,7 +297,7 @@ namespace Takai.UI
                 if (!Children[i].Update(DeltaTime))
                     return false;
             }
-            
+
             var mouse = Input.InputState.MousePoint;
 
             //todo: focus

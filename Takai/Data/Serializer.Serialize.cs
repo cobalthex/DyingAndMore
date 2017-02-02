@@ -85,12 +85,12 @@ namespace Takai.Data
                 foreach (var prop in dict.Keys)
                 {
                     Indent(Stream, IndentLevel + 1);
-                    
+
                     if (keyType == typeof(char))
                         Stream.Write((UInt16)(char)prop);
                     else
                         Stream.Write(prop.ToString());
-                    
+
                     Stream.Write(": ");
                     TextSerialize(Stream, dict[prop], IndentLevel + 1);
                     Stream.WriteLine(";");
