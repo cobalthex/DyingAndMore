@@ -35,7 +35,7 @@ namespace DyingAndMore.Editor
         Color highlightColor = Color.Gold;
 
         Selector[] selectors;
-        
+
         int uiMargin = 20;
         Takai.UI.Element uiContainer;
         Takai.UI.Element selectorPreview;
@@ -166,7 +166,7 @@ namespace DyingAndMore.Editor
             selectorPreview.OnClick += delegate
             {
                 OpenCurrentSelector(true);
-                //todo: fix line draw after closing
+                isPosSaved = false;
             };
 
             selectedDecal = null;
@@ -197,7 +197,7 @@ namespace DyingAndMore.Editor
 
             return false;
         }
-        
+
         public bool SaveMap()
         {
             if (map == null)
@@ -238,7 +238,7 @@ namespace DyingAndMore.Editor
 
             if (InputState.IsMod(KeyMod.Control))
             {
-                if ((InputState.IsPress(Keys.S) && SaveMap()) || 
+                if ((InputState.IsPress(Keys.S) && SaveMap()) ||
                     (InputState.IsPress(Keys.O) && OpenMap()))
                     return;
 
@@ -304,7 +304,7 @@ namespace DyingAndMore.Editor
                             }
                             break;
                         }
-                        
+
                 }
             }
 
@@ -339,7 +339,7 @@ namespace DyingAndMore.Editor
                 OpenCurrentSelector(false);
                 return;
             }
-            
+
             if (InputState.HasScrolled())
             {
                 var delta = InputState.ScrollDelta() / 1024f;
@@ -441,7 +441,7 @@ namespace DyingAndMore.Editor
             var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
             var sSz = tinyFont.MeasureString(sFps);
             tinyFont.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
-            
+
             switch (modeSelector.Mode)
             {
                 case EditorMode.Tiles:
