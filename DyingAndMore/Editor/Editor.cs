@@ -13,6 +13,7 @@ namespace DyingAndMore.Editor
         Decals,
         Blobs,
         Entities,
+        Groups,
         Regions,
         Paths,
     }
@@ -22,7 +23,7 @@ namespace DyingAndMore.Editor
         public int x, y, index;
     }
 
-    partial class Editor : Takai.States.GameState
+    partial class Editor : Takai.GameState.GameState
     {
         public Takai.Game.Camera camera;
 
@@ -48,7 +49,7 @@ namespace DyingAndMore.Editor
         void AddSelector(Selector Sel, EditorMode Index)
         {
             selectors[(uint)Index] = Sel;
-            Takai.States.GameStateManager.PushState(Sel);
+            Takai.GameState.GameStateManager.PushState(Sel);
             Sel.Deactivate();
         }
 
@@ -124,9 +125,9 @@ namespace DyingAndMore.Editor
 
         public override void Unload()
         {
-            while (Takai.States.GameStateManager.TopState != this
-                && Takai.States.GameStateManager.Count > 0)
-                Takai.States.GameStateManager.PopState();
+            while (Takai.GameState.GameStateManager.TopState != this
+                && Takai.GameState.GameStateManager.Count > 0)
+                Takai.GameState.GameStateManager.PopState();
 
             TouchPanel.EnabledGestures = GestureType.None;
         }
@@ -187,7 +188,7 @@ namespace DyingAndMore.Editor
             {
                 map = new Takai.Game.Map(GraphicsDevice);
                 using (var stream = ofd.OpenFile())
-                    map.Load(stream, true);
+                    map.Load(stream);
 
                 map.File = ofd.FileName;
                 StartMap();
@@ -213,8 +214,8 @@ namespace DyingAndMore.Editor
 
             if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                using (var stream = sfd.OpenFile())
-                    map.Save(stream);
+                using (var stream = new System.IO.StreamWriter(sfd.OpenFile()))
+                    Takai.Data.Serializer.TextSerialize(stream, map);
 
                 map.File = sfd.FileName;
                 return true;
@@ -244,7 +245,7 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsPress(Keys.Q))
                 {
-                    Takai.States.GameStateManager.Exit();
+                    Takai.GameState.GameStateManager.Exit();
                     return;
                 }
             }
@@ -257,7 +258,7 @@ namespace DyingAndMore.Editor
 
             if (InputState.IsClick(Keys.F1))
             {
-                Takai.States.GameStateManager.NextState(new Game.Game() { map = map });
+                Takai.GameState.GameStateManager.NextState(new Game.Game() { map = map });
                 return;
             }
 

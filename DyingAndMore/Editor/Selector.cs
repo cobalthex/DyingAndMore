@@ -6,7 +6,7 @@ using Takai.Input;
 
 namespace DyingAndMore.Editor
 {
-    abstract class Selector : Takai.States.GameState
+    abstract class Selector : Takai.GameState.GameState
     {
         public Editor editor;
 

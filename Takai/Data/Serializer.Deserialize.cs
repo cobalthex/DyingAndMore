@@ -16,13 +16,13 @@ namespace Takai.Data
     /// </summary>
     [AttributeUsage(AttributeTargets.All)]
     [System.Runtime.InteropServices.ComVisible(true)]
-    public class CustomDeserializeAttribute : System.Attribute
+    public class CustomDeserializeAttribute : Attribute
     {
         internal MethodInfo Deserialize;
 
-        public CustomDeserializeAttribute(Type Type, string MethodName, bool IsStatic = true)
+        public CustomDeserializeAttribute(Type Type, string MethodName)
         {
-            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | (IsStatic ? BindingFlags.Static : 0));
+            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
             this.Deserialize = method;
         }
     }
@@ -76,7 +76,7 @@ namespace Takai.Data
                 Stream.Read(); //skip {
                 SkipIgnored(Stream);
 
-                var dict = new Dictionary<string, object>();
+                var dict = new Dictionary<string, object>(CaseSensitiveMembers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
 
                 while ((ch = Stream.Peek()) != -1 && ch != '}')
                 {
@@ -254,6 +254,10 @@ namespace Takai.Data
 
         public static object ParseDictionary(Type DestType, Dictionary<string, object> Dict)
         {
+            var deserial = DestType.GetCustomAttribute<CustomDeserializeAttribute>();
+            if (deserial?.Deserialize != null)
+                return deserial.Deserialize.Invoke(null, new[] { Dict });
+
             var obj = Activator.CreateInstance(DestType); //todo: use lambda to create
             foreach (var pair in Dict)
             {
@@ -350,8 +354,13 @@ namespace Takai.Data
                                                       | BindingFlags.Instance
                                                       | BindingFlags.Public;
 
+        public static T CastType<T>(object Source, bool Strict = true)
+        {
+            return (T)CastType(typeof(T), Source, Strict);
+        }
+
         /// <summary>
-        /// Convert <see cref="Source"/> to type <see cref="Ty"/>
+        /// Convert <see cref="Source"/> to type <see cref="DestType"/>
         /// Utilizes CustomSerializers
         /// </summary>
         /// <param name="DestType">The type to cast to</param>
@@ -360,6 +369,9 @@ namespace Takai.Data
         /// <returns>The correctly casted object</returns>
         public static object CastType(Type DestType, object Source, bool Strict = true)
         {
+            if (Source == null)
+                return null;
+
             var sourceType = Source.GetType();
 
             if (Serializers.TryGetValue(DestType, out var deserial) && deserial.Deserialize != null)
@@ -377,8 +389,7 @@ namespace Takai.Data
                 try { return Convert.ChangeType(Source, DestType); }
                 catch { }
 
-                var sourceString = Source as string;
-                if (sourceString != null && DestType.IsEnum)
+                if (Source is string sourceString && DestType.IsEnum)
                     return Enum.Parse(DestType, sourceString);
             }
 

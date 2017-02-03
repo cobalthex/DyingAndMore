@@ -7,7 +7,7 @@ using Takai.Graphics;
 
 namespace DyingAndMore.Editor
 {
-    partial class Editor : Takai.States.GameState
+    partial class Editor : Takai.GameState.GameState
     {
         Takai.Game.Entity selectedEntity = null;
         

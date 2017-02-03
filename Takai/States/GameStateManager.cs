@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Takai.States
+namespace Takai.GameState
 {
     /// <summary>
     /// Manages multiple program/game states

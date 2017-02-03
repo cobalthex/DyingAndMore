@@ -1,6 +1,6 @@
 //Main.cs
 
-using Takai.States;
+using Takai.GameState;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -85,7 +85,7 @@ namespace DyingAndMore
                 updateSettings = Takai.Game.MapUpdateSettings.Editor
             };
             using (var stream = new System.IO.FileStream("Data/Maps/Test.map.tk", System.IO.FileMode.Open))
-                map.Load(stream);
+                ;// map.Load(stream);
 
             var state = new Editor.Editor();
             GameStateManager.PushState(state);
