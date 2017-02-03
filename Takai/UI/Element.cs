@@ -3,9 +3,6 @@ using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-//todo: add serializeation (maybe use names for linking events)
-//todo: change custom serializer to export as correct type (Map exports as map and not MapSave; use dictionaries for temporaries) (and import)
-
 namespace Takai.UI
 {
     public enum Orientation

@@ -1,4 +1,4 @@
-﻿namespace Takai.States
+﻿namespace Takai.GameState
 {
     /// <summary>
     /// A single state for a state manager

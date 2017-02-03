@@ -3,11 +3,12 @@ using System.IO;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Runtime.Serialization;
 using System.Linq;
 
 namespace Takai.Game
 {
+    [Data.CustomSerialize(typeof(Map), "Save"),
+     Data.CustomDeserialize(typeof(Map), "Deserialize")]
     public partial class Map
     {
         /// <summary>
@@ -52,103 +53,51 @@ namespace Takai.Game
             }
         }
 
-
-        /// <summary>
-        /// Load tile data from a CSV
-        /// </summary>
-        /// <remarks>Assumes csv is well formed (all rows are the same length)</remarks>
-        public void LoadCsv(Stream Stream)
+        public static object Save(Object Source)
         {
-            var reader = new StreamReader(Stream);
-            
-            var rows = new List<short[]>();
-
-            while (!reader.EndOfStream)
+            var map = (Map)Source;
+            return new Dictionary<string, object>
             {
-                var line = reader.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                var split = line.Split(',');
-                var values = new short[split.Length];
-                for (var i = 0; i < split.Length; i++)
-                    values[i] = short.Parse(split[i]);
-
-                if (rows.Count > 0 && Width != values.Length)
-                    throw new InvalidDataException("All rows must be the same length");
-
-                rows.Add(values);
-                Width = values.Length;
-            }
-            
-            Height = rows.Count;
-
-            Tiles = new short[Height, Width];
-            for (var i = 0; i < Height; i++)
-                for (var j = 0; j < Width; j++)
-                    Tiles[i, j] = rows[i][j];
+                ["Name"] = map.Name,
+                ["width"] = map.Width,
+                ["height"] = map.Height,
+                ["tilesImage"] = map.TilesImage,
+                ["tileSize"] = map.TileSize,
+                ["Tiles"] = map.Tiles,
+                ["State"] = new MapState(map)
+            };
         }
 
-        /// <summary>
-        /// A temporary struct for organizing data to be serialized
-        /// </summary>
-        struct MapSave
+        //todo: re-add save as tradition. integrate with new save functionality
+
+        static object Deserialize(Object des) { return des; }
+
+        public void Load(Stream Stream)
         {
-            public string name;
-
-            public int width, height;
-            public int tileSize;
-            public Texture2D tilesImage;
-            public short[] tiles;
-
-            public MapState state;
-            
-            public MapSave(Map Map)
-            {
-                name = Map.Name;
-                width = Map.Width;
-                height = Map.Height;
-                tilesImage = Map.TilesImage;
-                tileSize = Map.TileSize;
-                tiles = new short[width * height];
-                Buffer.BlockCopy(Map.Tiles, 0, tiles, 0, width * height * sizeof(short));
-
-                state = new MapState(Map);
-            }
-        }
-
-        public void Save(Stream Stream)
-        {
-            var save = new MapSave(this);
-            using (var writer = new StreamWriter(Stream))
-                Data.Serializer.TextSerialize(writer, save);
-        }
-
-        public void Load(Stream Stream, bool LoadState = true)
-        {
-            MapSave load;
+            Dictionary<string, object> load;
             using (var reader = new StreamReader(Stream))
+                load = (Dictionary<string, object>)Data.Serializer.TextDeserialize(reader);
+
+            T TryGet<T>(string Entry)
             {
-                var temp = Data.Serializer.TextDeserialize(reader);
-                if (!(temp is MapSave))
-                    return;
-                load = (MapSave)temp;
+                if (load.TryGetValue(Entry, out var value))
+                    return Data.Serializer.CastType<T>(value);
+                return default(T);
             }
             
-            Name = load.name;
-            Width = load.width;
-            Height = load.height;
-            TilesImage = load.tilesImage;
-            TileSize = load.tileSize;
+            Name = TryGet<string>("Name");
+            Width = TryGet<int>("Width");
+            Height = TryGet<int>("Height");
+            TilesImage = TryGet<Texture2D>("TilesImage");
+            TileSize = TryGet<int>("TileSize");
             Tiles = new short[Height, Width];
-            Buffer.BlockCopy(load.tiles, 0, Tiles, 0, Width * Height * sizeof(short));
+            var tiles = TryGet<short[]>("Tiles");
+            Buffer.BlockCopy(tiles, 0, Tiles, 0, Width * Height * sizeof(short));
 
             BuildSectors();
             BuildTileMask(TilesImage, true);
-
-            if (LoadState)
-                this.LoadState(load.state);
+            
+            LoadState(TryGet<MapState>("State"));
         }
 
         struct BlobSave
@@ -239,7 +188,7 @@ namespace Takai.Game
             eventHandlers.Clear();
             
             var blobTypes = new Dictionary<int, BlobType>();
-            for (var i = 0; i < State.blobTypes.Count; i++)
+            for (var i = 0; i < State.blobTypes?.Count; i++)
                 blobTypes[i] = State.blobTypes[i];
 
             ActiveEnts = State.entities ?? new List<Entity>();
@@ -249,7 +198,7 @@ namespace Takai.Game
                 ent.OnSpawn();
             }
 
-            ActiveBlobs = State.blobs.Select((BlobSave Save) =>
+            ActiveBlobs = State.blobs?.Select((BlobSave Save) =>
             {
                 return new Blob
                 {
@@ -257,12 +206,15 @@ namespace Takai.Game
                     position = Save.position,
                     velocity = Save.velocity
                 };
-            }).ToList();
+            }).ToList() ?? new List<Blob>();
 
             BuildSectors();
 
-            foreach (var decal in State.decals)
-                AddDecal(decal);
+            if (State.decals != null)
+            {
+                foreach (var decal in State.decals)
+                    AddDecal(decal);
+            }
         }
     }
 }

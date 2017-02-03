@@ -128,8 +128,7 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnEntityCollision(Entity Collider, Vector2 Point, System.TimeSpan DeltaTime)
         {
-            var actor = Collider as Actor;
-            if (actor != null)
+            if (Collider is Actor actor)
             {
             }
         }

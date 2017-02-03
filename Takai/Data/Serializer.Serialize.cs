@@ -11,18 +11,26 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Takai.Data
 {
     /// <summary>
-    /// This member/object should be serizlied with the specified method
+    /// This member/object should be serizlied with the specified (static) method
     /// </summary>
     [AttributeUsage(AttributeTargets.All)]
     [System.Runtime.InteropServices.ComVisible(true)]
-    public class CustomSerializeAttribute : System.Attribute
+    public class CustomSerializeAttribute : Attribute
     {
-        internal MethodInfo Serialize;
+        internal MethodInfo serialize;
+        internal bool overrideType;
 
-        public CustomSerializeAttribute(Type Type, string MethodName, bool IsStatic = true)
+        /// <summary>
+        /// Create a custom serializer
+        /// </summary>
+        /// <param name="Type">The type containing the method to use for serializing</param>
+        /// <param name="MethodName">The name of the method</param>
+        /// <param name="OverrideSerializeType">If the object returned is a dictionary, export it as type <see cref="Type"/></param>
+        public CustomSerializeAttribute(Type Type, string MethodName, bool OverrideSerializeType = true)
         {
-            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | (IsStatic ? BindingFlags.Static : 0));
-            this.Serialize = method;
+            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+            serialize = method;
+            overrideType = OverrideSerializeType;
         }
     }
 
@@ -43,7 +51,7 @@ namespace Takai.Data
             }
 
             var ty = Object.GetType();
-            var custSerial = ty.GetCustomAttribute<CustomSerializeAttribute>(false)?.Serialize;
+            var custSerial = ty.GetCustomAttribute<CustomSerializeAttribute>(false);
 
             if (ty.IsPrimitive)
                 Stream.Write(Object);
@@ -69,8 +77,15 @@ namespace Takai.Data
                 Stream.Write(Object.ToString().ToLiteral());
 
             //user-defined serializer
-            else if (custSerial != null)
-                TextSerialize(Stream, custSerial.Invoke(null, new[] { Object }), IndentLevel);
+            else if (custSerial?.serialize != null)
+            {
+                var serialized = custSerial.serialize.Invoke(null, new[] { Object });
+
+                if (custSerial.overrideType && serialized is Dictionary<string, object>)
+                    Stream.Write($"{(WriteFullTypeNames ? ty.FullName : ty.Name)} ");
+
+                TextSerialize(Stream, serialized, IndentLevel);
+            }
 
             //custom serializer
             else if (Serializers.ContainsKey(ty) && Serializers[ty].Serialize != null)
@@ -129,7 +144,7 @@ namespace Takai.Data
 
             else
             {
-                Stream.WriteLine("{0} {{", WriteFullTypeNames ? ty.FullName : ty.Name);
+                Stream.WriteLine($"{(WriteFullTypeNames ? ty.FullName : ty.Name)} {{");
 
                 foreach (var field in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                     SerializeMember(Stream, field, field.GetValue(Object), IndentLevel);
@@ -151,9 +166,9 @@ namespace Takai.Data
             Stream.Write("{0}: ", Member.Name);
 
             //user-defined serializer
-            var attr = Member.GetCustomAttribute<CustomSerializeAttribute>()?.Serialize;
-            if (attr != null)
-                TextSerialize(Stream, attr.Invoke(null, new[] { Value }), IndentLevel + 1);
+            var custSerial = Member.GetCustomAttribute<CustomSerializeAttribute>();
+            if (custSerial?.serialize != null)
+                TextSerialize(Stream, custSerial.serialize.Invoke(null, new[] { Value }), IndentLevel + 1);
             //normal serializer
             else
                 TextSerialize(Stream, Value, IndentLevel + 1);

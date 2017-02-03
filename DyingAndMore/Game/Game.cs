@@ -8,7 +8,7 @@ using Takai;
 
 namespace DyingAndMore.Game
 {
-    class Game : Takai.States.GameState
+    class Game : Takai.GameState.GameState
     {
         public Takai.Game.Map map;
         public Takai.Game.Camera camera;
@@ -80,8 +80,7 @@ namespace DyingAndMore.Game
             pt1.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 2);
             pt1.Speed = new Takai.Game.ValueCurve<float>(curve, 100, 0);
 
-            var wpn = player?.PrimaryWeapon as Weapons.Gun;
-            if (wpn != null)
+            if (player?.PrimaryWeapon is Weapons.Gun wpn)
             {
                 wpn.Speed = 0;
             }
@@ -102,7 +101,7 @@ namespace DyingAndMore.Game
                 if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     using (var stream = ofd.OpenFile())
-                        map.Load(stream, true);
+                        map.Load(stream);
                     StartMap();
                 }
                 return;
@@ -110,13 +109,13 @@ namespace DyingAndMore.Game
 
             if (InputState.IsClick(Keys.F1))
             {
-                Takai.States.GameStateManager.NextState(new Editor.Editor() { map = map, camera = new Takai.Game.Camera(map, camera.ActualPosition) { Viewport = camera.Viewport } });
+                Takai.GameState.GameStateManager.NextState(new Editor.Editor() { map = map, camera = new Takai.Game.Camera(map, camera.ActualPosition) { Viewport = camera.Viewport } });
                 return;
             }
 
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
-                Takai.States.GameStateManager.Exit();
+                Takai.GameState.GameStateManager.Exit();
                 return;
             }
 
@@ -145,8 +144,7 @@ namespace DyingAndMore.Game
 
                 foreach (var ent in targets)
                 {
-                    var actor = ent as Entities.Actor;
-                    if (actor != null)
+                    if (ent is Entities.Actor actor)
                     {
                         Entities.Controller inputCtrl = null;
                         if (player != null)

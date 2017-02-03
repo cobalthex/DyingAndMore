@@ -1,4 +1,4 @@
-MapSave {
+Map {
     name: "Test Map";
     width: 72;
     height: 45;
