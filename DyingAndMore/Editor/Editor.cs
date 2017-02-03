@@ -172,6 +172,12 @@ namespace DyingAndMore.Editor
 
             selectedDecal = null;
             selectedEntity = null;
+
+            //start zoomed out to see the whole map
+            var mapSize = new Vector2(map.Width, map.Height) * map.TileSize;
+            var xyScale = new Vector2(GraphicsDevice.Viewport.Width - 20, GraphicsDevice.Viewport.Height - 20) / mapSize;
+            camera.Scale = MathHelper.Clamp(MathHelper.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
+            camera.Position = mapSize / 2;
         }
 
         public bool OpenMap()
@@ -179,7 +185,7 @@ namespace DyingAndMore.Editor
             var ofd = new System.Windows.Forms.OpenFileDialog()
             {
                 SupportMultiDottedExtensions = true,
-                Filter = "Map (*.map.tk)|*.map.tk|All Files (*.*)|*.*",
+                Filter = "Map (*.map.tk,*.map.tkz)|*.map.tk;*.map.tkz|All Files (*.*)|*.*",
                 InitialDirectory = System.IO.Path.GetDirectoryName(map?.File),
                 FileName = System.IO.Path.GetFileName(map?.File)
             };
@@ -188,7 +194,15 @@ namespace DyingAndMore.Editor
             {
                 map = new Takai.Game.Map(GraphicsDevice);
                 using (var stream = ofd.OpenFile())
-                    map.Load(stream);
+                {
+                    if (ofd.FileName.EndsWith("tkz"))
+                    {
+                        using (var decompress = new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionMode.Decompress))
+                            map.Load(decompress);
+                    }
+                    else
+                        map.Load(stream);
+                }
 
                 map.File = ofd.FileName;
                 StartMap();
@@ -214,6 +228,7 @@ namespace DyingAndMore.Editor
 
             if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                //todo: optional compression
                 using (var stream = new System.IO.StreamWriter(sfd.OpenFile()))
                     Takai.Data.Serializer.TextSerialize(stream, map);
 
@@ -432,7 +447,7 @@ namespace DyingAndMore.Editor
             }
 
             //draw border around map
-            MapLineRect(new Rectangle(0, 0, map.Width * map.TileSize, map.Height * map.TileSize), Color.CornflowerBlue);
+            MapLineRect(new Rectangle(0, 0, map.Width * map.TileSize, map.Height * map.TileSize), Color.Orange);
 
             camera.Draw();
 
