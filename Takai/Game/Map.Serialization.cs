@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Takai.Game
 {
-    [Data.CustomSerialize(typeof(Map), "Save"),
+    [Data.CustomSerialize(typeof(Map), "Serialize"),
      Data.CustomDeserialize(typeof(Map), "Deserialize")]
     public partial class Map
     {
@@ -37,23 +37,27 @@ namespace Takai.Game
         /// </summary>
         public void BuildSectors()
         {
-            if (Tiles != null)
+            //round up
+            var width = 1 + ((Width - 1) / SectorSize);
+            var height = 1 + ((Height - 1) / SectorSize);
+
+            Sectors = new MapSector[height, width];
+
+            for (var y = 0; y < height; y++)
             {
-                //round up
-                var width = 1 + ((Tiles.GetLength(1) - 1) / SectorSize);
-                var height = 1 + ((Tiles.GetLength(0) - 1) / SectorSize);
-
-                Sectors = new MapSector[height, width];
-
-                for (var y = 0; y < height; y++)
-                {
-                    for (var x = 0; x < width; x++)
-                        Sectors[y, x] = new MapSector();
-                }
+                for (var x = 0; x < width; x++)
+                    Sectors[y, x] = new MapSector();
             }
         }
 
-        public static object Save(Object Source)
+        public void Save()
+        {
+
+        }
+
+        //todo: re-add save as tradition. integrate with new save functionality
+
+        static object Serialize(Object Source)
         {
             var map = (Map)Source;
             return new Dictionary<string, object>
@@ -67,9 +71,6 @@ namespace Takai.Game
                 ["State"] = new MapState(map)
             };
         }
-
-        //todo: re-add save as tradition. integrate with new save functionality
-
         static object Deserialize(Object des) { return des; }
 
         public void Load(Stream Stream)
@@ -84,7 +85,7 @@ namespace Takai.Game
                     return Data.Serializer.CastType<T>(value);
                 return default(T);
             }
-            
+
             Name = TryGet<string>("Name");
             Width = TryGet<int>("Width");
             Height = TryGet<int>("Height");
@@ -96,7 +97,7 @@ namespace Takai.Game
 
             BuildSectors();
             BuildTileMask(TilesImage, true);
-            
+
             LoadState(TryGet<MapState>("State"));
         }
 
@@ -116,14 +117,14 @@ namespace Takai.Game
             public List<BlobType> blobTypes;
             public List<BlobSave> blobs;
             public List<Decal> decals;
-            
+
             public MapState(Map Map)
             {
                 entities = new List<Entity>(Map.ActiveEnts);
                 blobTypes = new List<BlobType>();
                 blobs = new List<BlobSave>();
                 decals = new List<Decal>();
-                
+
                 var typeIndices = new Dictionary<BlobType, int>();
 
                 foreach (var blob in Map.ActiveBlobs)
@@ -154,7 +155,12 @@ namespace Takai.Game
                             blobTypes.Add(type);
                             typeIndices.Add(type, index);
                         }
-                        blobs.Add(new BlobSave { type = index, position = blob.position, velocity = blob.velocity });
+                        blobs.Add(new BlobSave
+                        {
+                            type = index,
+                            position = blob.position,
+                            velocity = blob.velocity
+                        });
                     }
                 }
             }
@@ -186,7 +192,7 @@ namespace Takai.Game
             //todo: map time (cache delta time)
 
             eventHandlers.Clear();
-            
+
             var blobTypes = new Dictionary<int, BlobType>();
             for (var i = 0; i < State.blobTypes?.Count; i++)
                 blobTypes[i] = State.blobTypes[i];

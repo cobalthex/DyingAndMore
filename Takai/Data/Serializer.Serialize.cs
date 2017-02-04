@@ -18,7 +18,6 @@ namespace Takai.Data
     public class CustomSerializeAttribute : Attribute
     {
         internal MethodInfo serialize;
-        internal bool overrideType;
 
         /// <summary>
         /// Create a custom serializer
@@ -26,11 +25,28 @@ namespace Takai.Data
         /// <param name="Type">The type containing the method to use for serializing</param>
         /// <param name="MethodName">The name of the method</param>
         /// <param name="OverrideSerializeType">If the object returned is a dictionary, export it as type <see cref="Type"/></param>
-        public CustomSerializeAttribute(Type Type, string MethodName, bool OverrideSerializeType = true)
+        public CustomSerializeAttribute(Type Type, string MethodName)
         {
             var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
             serialize = method;
-            overrideType = OverrideSerializeType;
+        }
+    }
+
+    /// <summary>
+    /// The object should use the specified method to add custom fields to the serialized object
+    /// Useful for adding aggregate/derived data to a serialized type
+    /// </summary>
+    /// <remarks>Only used if a typed object is serialized (dictionaries/primatives ignored)</remarks>
+    [AttributeUsage(AttributeTargets.All)]
+    [System.Runtime.InteropServices.ComVisible(true)]
+    public class DerivedTypeSerializeAttribute : Attribute
+    {
+        internal MethodInfo serialize;
+
+        public DerivedTypeSerializeAttribute(Type Type, string MethodName)
+        {
+            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+            serialize = method;
         }
     }
 
@@ -80,13 +96,10 @@ namespace Takai.Data
             else if (custSerial?.serialize != null)
             {
                 var serialized = custSerial.serialize.Invoke(null, new[] { Object });
-
-                if (custSerial.overrideType && serialized is Dictionary<string, object>)
-                    Stream.Write($"{(WriteFullTypeNames ? ty.FullName : ty.Name)} ");
-
                 TextSerialize(Stream, serialized, IndentLevel);
             }
 
+            //todo: maybe remove and just add a bunch of custom serializers
             //custom serializer
             else if (Serializers.ContainsKey(ty) && Serializers[ty].Serialize != null)
                 TextSerialize(Stream, Serializers[ty].Serialize(Object), IndentLevel);
