@@ -43,7 +43,7 @@ namespace DyingAndMore.Game
             {
                 map = new Takai.Game.Map(GraphicsDevice);
                 using (var s = new System.IO.FileStream("data/maps/test.map.tk", System.IO.FileMode.Open))
-                    map.Load(s);
+                    map = Takai.Game.Map.Load(s);
             }
 
             sbatch = new SpriteBatch(GraphicsDevice);
@@ -101,7 +101,7 @@ namespace DyingAndMore.Game
                 if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     using (var stream = ofd.OpenFile())
-                        map.Load(stream);
+                        map = Takai.Game.Map.Load(stream);
                     StartMap();
                 }
                 return;
@@ -203,8 +203,7 @@ namespace DyingAndMore.Game
             fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
             var sDebugInfo =
-                $"TimeScale: {map.TimeScale:0.#}x\n" +
-                $"    Debug: {map.debugOut}"
+                $"TimeScale: {map.TimeScale:0.#}x\n"
             ;
 
             fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White, true);

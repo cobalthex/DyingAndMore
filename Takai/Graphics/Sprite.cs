@@ -92,6 +92,7 @@ namespace Takai.Graphics
         /// <summary>
         /// The file that this graphic was loaded from
         /// </summary>
+        [Data.NonSerialized]
         public string File { get; set; }
 
         /// <summary>
