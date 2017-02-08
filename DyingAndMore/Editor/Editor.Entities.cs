@@ -10,7 +10,7 @@ namespace DyingAndMore.Editor
     partial class Editor : Takai.GameState.GameState
     {
         Takai.Game.Entity selectedEntity = null;
-        
+
         void UpdateEntitiesMode(GameTime Time)
         {
             if (selectedEntity != null)
@@ -104,7 +104,7 @@ namespace DyingAndMore.Editor
 
             foreach (var ent in map.ActiveEnts)
                 DrawArrow(ent.Position, ent.Direction, ent.Radius * 1.5f);
-            
+
             //draw basic info about entity screen
             smallFont.Draw(sbatch, $"Visible Entities: {map.ActiveEnts.Count}\nTotal Entities:   {map.TotalEntitiesCount}", new Vector2(uiMargin, 80), Color.LightSeaGreen);
         }

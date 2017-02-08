@@ -69,6 +69,7 @@
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Blobs.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
+    <Compile Include="Editor\Editor.Groups.cs" />
     <Compile Include="Editor\Editor.Tiles.cs" />
     <Compile Include="Editor\EntSelector.cs" />
     <Compile Include="Editor\BlobSelector.cs" />
