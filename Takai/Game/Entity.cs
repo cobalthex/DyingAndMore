@@ -212,6 +212,27 @@ namespace Takai.Game
         [Data.NonDesigned]
         public TimeSpan SpawnTime { get; set; } = TimeSpan.Zero;
 
+        /// <summary>
+        /// The group an entity belongs to
+        /// </summary>
+        [Data.NonSerialized]
+        public Group Group
+        {
+            get { return group; }
+            set
+            {
+                if (group != null)
+                    group.Entities.Remove(this);
+
+                group = value;
+
+                if (group != null)
+                    group.Entities.Add(this);
+            }
+        }
+        private Group group;
+
+
         public Entity() { }
 
         /// <summary>

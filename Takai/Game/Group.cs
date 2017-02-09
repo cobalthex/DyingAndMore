@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Takai.Game
 {
@@ -16,6 +12,9 @@ namespace Takai.Game
         /// </summary>
         public string Name { get; set; }
 
-        public List<Entity> Entities { get; set; }
+        /// <summary>
+        /// All of the entities in this group
+        /// </summary>
+        public HashSet<Entity> Entities { get; set; } = new HashSet<Entity>();
     }
 }

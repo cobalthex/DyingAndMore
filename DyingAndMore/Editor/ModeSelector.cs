@@ -5,9 +5,17 @@ namespace DyingAndMore.Editor
 {
     class ModeSelector : Takai.UI.Element
     {
-        protected static readonly string[] editorModes = Enum.GetNames(typeof(EditorMode));
+        private System.Collections.Generic.List<EditorMode> modes;
 
         public EditorMode Mode
+        {
+            get { return modes[mode]; }
+            set
+            {
+                ModeIndex = modes.IndexOf(value);
+            }
+        }
+        public int ModeIndex
         {
             get { return mode; }
             set
@@ -16,7 +24,7 @@ namespace DyingAndMore.Editor
 
                 for (int i = 0; i < Children.Count; ++i)
                 {
-                    if (i == (int)mode)
+                    if (i == mode)
                     {
                         Children[i].Font = ActiveFont;
                         Children[i].Color = ActiveColor;
@@ -29,7 +37,7 @@ namespace DyingAndMore.Editor
                 }
             }
         }
-        private EditorMode mode;
+        private int mode;
 
         public Takai.Graphics.BitmapFont ActiveFont { get; set; }
         public Takai.Graphics.BitmapFont InactiveFont { get; set; }
@@ -37,38 +45,50 @@ namespace DyingAndMore.Editor
         public Color ActiveColor { get; set; } = Color.White;
         public Color InactiveColor { get; set; } = Color.LightGray;
 
-        public ModeSelector(Takai.Graphics.BitmapFont ActiveFont, Takai.Graphics.BitmapFont InactiveFont)
+        public ModeSelector(Takai.Graphics.BitmapFont ActiveFont,
+                            Takai.Graphics.BitmapFont InactiveFont)
         {
             this.ActiveFont = ActiveFont;
             this.InactiveFont = InactiveFont;
+        }
 
-            float x = 0;
-            for (int i = 0; i < editorModes.Length; ++i)
+        void AddMode(EditorMode Mode)
+        {
+            modes.Add(Mode);
+
+            var child = new Takai.UI.Element()
             {
-                var child = new Takai.UI.Element()
-                {
-                    Text = editorModes[i],
-                    Font = ActiveFont,
-                    Color = InactiveColor
-                };
-                child.AutoSize(Padding: 20);
-                child.Position += new Vector2(x, 0);
-                x += child.Size.X;
-                child.Font = InactiveFont;
+                Text = Mode.Name,
+                Font = ActiveFont,
+                Color = InactiveColor
+            };
+            child.AutoSize(Padding: 20);
+            child.Font = InactiveFont;
 
-                var n = i;
-                child.OnClick += delegate (Takai.UI.Element sender, Takai.UI.ClickEventArgs args)
-                {
-                    Mode = (EditorMode)n;
-                };
+            if (children.Count > 0)
+                child.Position += new Vector2(children[children.Count - 1].Bounds.Right, 0);
 
-                AddChild(child);
-            }
+            child.OnClick += delegate (Takai.UI.Element sender, Takai.UI.ClickEventArgs args)
+            {
+                this.Mode = Mode;
+            };
+            AddChild(child);
 
             AutoSize();
+        }
 
-            Children[(int)Mode].Color = ActiveColor;
-            Children[(int)Mode].Font = ActiveFont;
+        public override bool Update(TimeSpan DeltaTime)
+        {
+            for (int i = 0; i < editorModes.Count; ++i)
+            {
+                //set editor mode
+                if (InputState.IsPress(Keys.D1 + i) || InputState.IsPress(Keys.NumPad1 + i))
+                {
+                    modes.ModeIndex = i;
+                }
+            }
+
+            return base.Update(DeltaTime);
         }
     }
 }

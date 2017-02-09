@@ -7,15 +7,16 @@ using Takai.Graphics;
 
 namespace DyingAndMore.Editor
 {
-    enum EditorMode
+    class EditorMode
     {
-        Tiles,
-        Decals,
-        Blobs,
-        Entities,
-        Groups,
-        Regions,
-        Paths,
+        public string Name { get; set; }
+
+        public Selector Selector { get; set; }
+
+        public System.Action Start { get; set; }
+        public System.Action End { get; set; }
+        public System.Action<GameTime> Update { get; set; }
+        public System.Action Draw { get; set; }
     }
 
     struct DecalIndex
@@ -35,33 +36,15 @@ namespace DyingAndMore.Editor
 
         Color highlightColor = Color.Gold;
 
-        Selector[] selectors;
-
         int uiMargin = 20;
         Takai.UI.Element uiContainer;
         Takai.UI.Element selectorPreview;
-        public ModeSelector modeSelector;
+
+        public ModeSelector modes;
 
         Vector2 lastWorldPos, currentWorldPos;
 
         public Editor() : base(false, false) { }
-
-        void AddSelector(Selector Sel, EditorMode Index)
-        {
-            selectors[(uint)Index] = Sel;
-            Takai.GameState.GameStateManager.PushState(Sel);
-            Sel.Deactivate();
-        }
-
-        void OpenCurrentSelector(bool ClickedOpen)
-        {
-            var selector = selectors[(uint)modeSelector.Mode];
-            if (selector != null)
-            {
-                selector.DidClickOpen = ClickedOpen;
-                selector.Activate();
-            }
-        }
 
         public override void Load()
         {
@@ -141,14 +124,8 @@ namespace DyingAndMore.Editor
 
             map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
 
-            selectors = new Selector[System.Enum.GetValues(typeof(EditorMode)).Length];
-            AddSelector(new TileSelector(this), EditorMode.Tiles);
-            AddSelector(new DecalSelector(this), EditorMode.Decals);
-            AddSelector(new BlobSelector(this), EditorMode.Blobs);
-            AddSelector(new EntSelector(this), EditorMode.Entities);
-
             uiContainer = new Takai.UI.Element();
-            uiContainer.AddChild(modeSelector = new ModeSelector(largeFont, smallFont)
+            uiContainer.AddChild(modes = new ModeSelector(largeFont, smallFont)
             {
                 HorizontalOrientation = Takai.UI.Orientation.Middle,
                 VerticalOrientation = Takai.UI.Orientation.Start,
@@ -283,16 +260,6 @@ namespace DyingAndMore.Editor
             if (InputState.IsPress(Keys.F3))
                 map.debugOptions.showOnlyReflections ^= true;
 
-            //set editor mode
-            foreach (int i in System.Enum.GetValues(typeof(EditorMode)))
-            {
-                if (InputState.IsPress(Keys.D1 + i) || InputState.IsPress(Keys.NumPad1 + i))
-                {
-                    modeSelector.Mode = (EditorMode)i;
-                    break;
-                }
-            }
-
             //touch gestures
             while (TouchPanel.IsGestureAvailable)
             {
@@ -374,7 +341,7 @@ namespace DyingAndMore.Editor
             camera.Scale = MathHelper.Clamp(camera.Scale, 0.1f, 10f); //todo: make global and move to some game settings
             camera.Update(Time);
 
-            switch (modeSelector.Mode)
+            switch (modes.Mode)
             {
                 case EditorMode.Tiles:
                     UpdateTilesMode(Time);
@@ -387,6 +354,9 @@ namespace DyingAndMore.Editor
                     break;
                 case EditorMode.Entities:
                     UpdateEntitiesMode(Time);
+                    break;
+                case EditorMode.Groups:
+                    UpdateGroupsMode(Time);
                     break;
             }
         }
@@ -458,7 +428,7 @@ namespace DyingAndMore.Editor
             var sSz = tinyFont.MeasureString(sFps);
             tinyFont.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
-            switch (modeSelector.Mode)
+            switch (modes.Mode)
             {
                 case EditorMode.Tiles:
                     DrawTilesMode();
@@ -472,12 +442,15 @@ namespace DyingAndMore.Editor
                 case EditorMode.Entities:
                     DrawEntitiesMode();
                     break;
+                case EditorMode.Groups:
+                    DrawGroupsMode();
+                    break;
             }
 
             //draw selected item in top right corner
-            if (selectors[(int)modeSelector.Mode] != null)
+            if (selectors[(int)modes.Mode] != null)
             {
-                selectors[(int)modeSelector.Mode].DrawItem(Time, selectors[(int)modeSelector.Mode].SelectedItem, selectorPreview.AbsoluteBounds, sbatch);
+                selectors[(int)modes.Mode].DrawItem(Time, selectors[(int)modes.Mode].SelectedItem, selectorPreview.AbsoluteBounds, sbatch);
                 Primitives2D.DrawRect(sbatch, Color.White, selectorPreview.AbsoluteBounds);
             }
 

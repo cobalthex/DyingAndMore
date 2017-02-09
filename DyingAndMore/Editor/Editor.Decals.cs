@@ -18,7 +18,7 @@ namespace DyingAndMore.Editor
                 if (!SelectDecal(currentWorldPos) && map.Bounds.Contains(currentWorldPos))
                 {
                     //add new decal none under cursor
-                    var sel = selectors[(int)modeSelector.Mode] as DecalSelector;
+                    var sel = selectors[(int)modes.Mode] as DecalSelector;
                     map.AddDecal(sel.textures[sel.SelectedItem], currentWorldPos);
                     var pos = (currentWorldPos / map.SectorPixelSize).ToPoint();
                     selectedDecal = new DecalIndex { x = pos.X, y = pos.Y, index = map.Sectors[pos.Y, pos.X].decals.Count - 1 };
