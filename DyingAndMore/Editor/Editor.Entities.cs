@@ -46,7 +46,7 @@ namespace DyingAndMore.Editor
                 {
                     if (map.Bounds.Contains(currentWorldPos))
                     {
-                        var sel = selectors[(int)modeSelector.Mode] as EntSelector;
+                        var sel = selectors[(int)modes.Mode] as EntSelector;
                         if (sel != null && sel.ents.Count > 0)
                             selectedEntity = map.Spawn(sel.ents[sel.SelectedItem], currentWorldPos, Vector2.UnitX, Vector2.Zero);
                     }

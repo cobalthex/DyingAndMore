@@ -11,14 +11,21 @@ namespace DyingAndMore.Editor
     {
         //todo: on mode load, set all existing groups to purple colored
 
+        Takai.Game.Group activeGroup;
+
         void UpdateGroupsMode(GameTime Time)
         {
-
+            foreach (var ent in map.ActiveEnts)
+            {
+                if (activeGroup != null && activeGroup.Entities.Contains(ent))
+                    ent.OutlineColor = Color.GreenYellow; //todo: unify
+                else
+                    ent.OutlineColor = Color.Purple; //todo: unify
+            }
         }
 
         void DrawGroupsMode()
         {
-
         }
     }
 }
