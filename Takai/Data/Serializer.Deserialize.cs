@@ -18,12 +18,36 @@ namespace Takai.Data
     [System.Runtime.InteropServices.ComVisible(true)]
     public class CustomDeserializeAttribute : Attribute
     {
-        internal MethodInfo Deserialize;
+        internal MethodInfo deserialize;
 
         public CustomDeserializeAttribute(Type Type, string MethodName)
         {
             var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
-            this.Deserialize = method;
+            deserialize = method;
+        }
+    }
+
+    /// <summary>
+    /// The object should use the specified method to read custom dictionary fields from a deserialized object
+    /// The reverse of DerivedTypeSerialize
+    /// </summary>
+    /// <remarks>Only used if a typed object is serialized (dictionaries/primatives ignored)</remarks>
+    [AttributeUsage(AttributeTargets.All)]
+    [System.Runtime.InteropServices.ComVisible(true)]
+    public class DerivedTypeDeserializeAttribute : Attribute
+    {
+        internal MethodInfo deserialize;
+
+        /// <summary>
+        /// Create a derived type serializer
+        /// </summary>
+        /// <param name="Type">The object to look in for the serialize method</param>
+        /// <param name="MethodName">The name of the method to search for (Must be non-static, can be public or non public)</param>
+        /// <remarks>format: Dictionary&lt;string, object&gt;(object Source)</remarks>
+        public DerivedTypeDeserializeAttribute(Type Type, string MethodName)
+        {
+            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            deserialize = method;
         }
     }
 
@@ -228,8 +252,6 @@ namespace Takai.Data
                     return Enum.ToObject(type, values);
                 }
 
-                //todo: factor [] and {} code into functions that take in callback for parsing args (and then have Type { } use directly)
-
                 //read object
                 if (Stream.Peek() != '{')
                     throw new InvalidDataException(ExceptString($"Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", Stream));
@@ -255,10 +277,12 @@ namespace Takai.Data
         public static object ParseDictionary(Type DestType, Dictionary<string, object> Dict)
         {
             var deserial = DestType.GetCustomAttribute<CustomDeserializeAttribute>();
-            if (deserial?.Deserialize != null)
-                return deserial.Deserialize.Invoke(null, new[] { Dict });
+            if (deserial?.deserialize != null)
+                return deserial.deserialize.Invoke(null, new[] { Dict });
 
             var obj = Activator.CreateInstance(DestType); //todo: use lambda to create
+            //https://vagifabilov.wordpress.com/2010/04/02/dont-use-activator-createinstance-or-constructorinfo-invoke-use-compiled-lambda-expressions/
+
             foreach (var pair in Dict)
             {
                 try
@@ -268,7 +292,7 @@ namespace Takai.Data
                     {
                         if (!Attribute.IsDefined(field, typeof(NonSerializedAttribute)))
                         {
-                            var customDeserial = field.GetCustomAttribute<CustomDeserializeAttribute>(false)?.Deserialize;
+                            var customDeserial = field.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
                             if (customDeserial != null)
                                 return customDeserial.Invoke(null, new[] { pair.Value });
 
@@ -283,7 +307,7 @@ namespace Takai.Data
                         {
                             if (!Attribute.IsDefined(prop, typeof(NonSerializedAttribute)))
                             {
-                                var customDeserial = prop.GetCustomAttribute<CustomDeserializeAttribute>(false)?.Deserialize;
+                                var customDeserial = prop.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
                                 if (customDeserial != null)
                                     return customDeserial.Invoke(null, new[] { pair.Value });
 
@@ -304,6 +328,11 @@ namespace Takai.Data
                     throw new Exception($"Error parsing field:{pair.Key} in DestType:{DestType.Name}: {expt.Message}", expt);
                 }
             }
+
+            var derived = DestType.GetCustomAttribute<DerivedTypeDeserializeAttribute>();
+            if (derived != null)
+                derived.deserialize.Invoke(obj, new[] { Dict });
+
             return obj;
         }
 
@@ -377,7 +406,7 @@ namespace Takai.Data
             if (Serializers.TryGetValue(DestType, out var deserial) && deserial.Deserialize != null)
                 return deserial.Deserialize(Source);
 
-            var customDeserial = DestType.GetCustomAttribute<CustomDeserializeAttribute>(false)?.Deserialize;
+            var customDeserial = DestType.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
             if (customDeserial != null)
                 return customDeserial.Invoke(null, new[] { Source });
 

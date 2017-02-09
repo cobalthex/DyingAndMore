@@ -7,8 +7,8 @@ using System.Linq;
 
 namespace Takai.Game
 {
-    [Data.CustomSerialize(typeof(Map), "Serialize"),
-     Data.CustomDeserialize(typeof(Map), "Deserialize")]
+    [Data.DerivedTypeSerialize(typeof(Map), "Serialize"),
+     Data.DerivedTypeDeserialize(typeof(Map), "Deserialize")]
     public partial class Map
     {
         /// <summary>
@@ -50,55 +50,43 @@ namespace Takai.Game
             }
         }
 
-        public void Save()
+        public void Save(Stream Stream)
         {
-
+            using (var writer = new StreamWriter(Stream))
+                Data.Serializer.TextSerialize(writer, this);
         }
 
-        //todo: re-add save as tradition. integrate with new save functionality
-
-        static object Serialize(Object Source)
+        public static Map Load(Stream Stream)
         {
-            var map = (Map)Source;
+            Map map;
+            using (var reader = new StreamReader(Stream))
+                map = (Map)Data.Serializer.TextDeserialize(reader);
+
+            map.InitializeGraphics(GameState.GameStateManager.Game.GraphicsDevice);
+            return map;
+        }
+
+        Dictionary<string, object> Serialize()
+        {
             return new Dictionary<string, object>
             {
-                ["Name"] = map.Name,
-                ["width"] = map.Width,
-                ["height"] = map.Height,
-                ["tilesImage"] = map.TilesImage,
-                ["tileSize"] = map.TileSize,
-                ["Tiles"] = map.Tiles,
-                ["State"] = new MapState(map)
+                ["Tiles"] = Tiles,
+                ["State"] = new MapState(this)
             };
         }
-        static object Deserialize(Object des) { return des; }
-
-        public void Load(Stream Stream)
+        void Deserialize(Dictionary<string, object> Props)
         {
-            Dictionary<string, object> load;
-            using (var reader = new StreamReader(Stream))
-                load = (Dictionary<string, object>)Data.Serializer.TextDeserialize(reader);
-
-            T TryGet<T>(string Entry)
-            {
-                if (load.TryGetValue(Entry, out var value))
-                    return Data.Serializer.CastType<T>(value);
-                return default(T);
-            }
-
-            Name = TryGet<string>("Name");
-            Width = TryGet<int>("Width");
-            Height = TryGet<int>("Height");
-            TilesImage = TryGet<Texture2D>("TilesImage");
-            TileSize = TryGet<int>("TileSize");
+            LoadState((MapState)Props["State"]);
+            
             Tiles = new short[Height, Width];
-            var tiles = TryGet<short[]>("Tiles");
-            Buffer.BlockCopy(tiles, 0, Tiles, 0, Width * Height * sizeof(short));
+            var tiles = Data.Serializer.CastType<List<short>>(Props["Tiles"]);
+            Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, Width * Height * sizeof(short));
+
+            TilesPerRow = (TilesImage != null ? (TilesImage.Width / TileSize) : 0);
+            SectorPixelSize = SectorSize * TileSize;
 
             BuildSectors();
             BuildTileMask(TilesImage, true);
-
-            LoadState(TryGet<MapState>("State"));
         }
 
         struct BlobSave
@@ -118,12 +106,19 @@ namespace Takai.Game
             public List<BlobSave> blobs;
             public List<Decal> decals;
 
+            public TimeSpan elapsedTime;
+            public float timeScale;
+
             public MapState(Map Map)
             {
                 entities = new List<Entity>(Map.ActiveEnts);
                 blobTypes = new List<BlobType>();
                 blobs = new List<BlobSave>();
                 decals = new List<Decal>();
+                elapsedTime = Map.ElapsedTime;
+                timeScale = Map.TimeScale;
+
+                //todo: particles?
 
                 var typeIndices = new Dictionary<BlobType, int>();
 
@@ -221,6 +216,9 @@ namespace Takai.Game
                 foreach (var decal in State.decals)
                     AddDecal(decal);
             }
+
+            TimeScale = State.timeScale == 0 ? 1 : State.timeScale;
+            ElapsedTime = State.elapsedTime;
         }
     }
 }

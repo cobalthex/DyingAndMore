@@ -43,9 +43,15 @@ namespace Takai.Data
     {
         internal MethodInfo serialize;
 
+        /// <summary>
+        /// Create a derived type serializer
+        /// </summary>
+        /// <param name="Type">The object to look in for the serialize method</param>
+        /// <param name="MethodName">The name of the method to search for (Must be non-static, can be public or non public)</param>
+        /// <remarks>format: Dictionary&lt;string, object&gt;(object Source)</remarks>
         public DerivedTypeSerializeAttribute(Type Type, string MethodName)
         {
-            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             serialize = method;
         }
     }
@@ -76,13 +82,16 @@ namespace Takai.Data
             {
                 Stream.Write(WriteFullTypeNames ? ty.FullName : ty.Name);
 
-                Stream.Write("[");
+                Stream.Write(" [");
                 if (Attribute.IsDefined(ty, typeof(FlagsAttribute)) && Convert.ToUInt64(Object) != 0)
                 {
                     var e = Object as Enum;
-                    foreach (Enum flag in Enum.GetValues(ty))
+                    var enumValues = Enum.GetValues(ty);
+                    foreach (Enum flag in enumValues)
+                    {
                         if (Convert.ToUInt64(flag) != 0 && e.HasFlag(flag))
                             Stream.Write(" {0}", flag.ToString());
+                    }
                 }
                 else
                     Stream.Write(" {0}", Object.ToString());
@@ -164,6 +173,21 @@ namespace Takai.Data
 
                 foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance))
                     SerializeMember(Stream, field, field.GetValue(Object), IndentLevel);
+
+                //derived values
+                var derived = ty.GetCustomAttribute<DerivedTypeSerializeAttribute>();
+                if (derived != null)
+                {
+                    var props = (Dictionary<string, object>)derived.serialize.Invoke(Object, null);
+
+                    foreach (var prop in props)
+                    {
+                        Indent(Stream, IndentLevel + 1);
+                        Stream.Write("{0}: ", prop.Key);
+                        TextSerialize(Stream, prop.Value, IndentLevel + 1);
+                        Stream.WriteLine(";");
+                    }
+                }
 
                 Indent(Stream, IndentLevel);
                 Stream.Write("}");

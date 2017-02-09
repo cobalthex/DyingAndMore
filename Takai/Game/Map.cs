@@ -31,6 +31,7 @@ namespace Takai.Game
         /// The file that this map was loaded for
         /// </summary>
         /// <remarks>This must be set in order to create a save-state</remarks>
+        [Data.NonSerialized]
         public string File { get; set; }
 
         /// <summary>
@@ -41,6 +42,7 @@ namespace Takai.Game
         /// <summary>
         /// The collision mask for the tilemap
         /// </summary>
+        [Data.NonSerialized]
         public System.Collections.BitArray TilesMask { get; set; }
 
         public int TileSize
@@ -54,6 +56,7 @@ namespace Takai.Game
             }
         }
         private int tileSize;
+        [Data.NonSerialized]
         public int TilesPerRow { get; private set; }
 
         /// <summary>
@@ -64,13 +67,15 @@ namespace Takai.Game
         /// The vertical size of the map in tiles
         /// </summary>
         public int Height { get; set; }
-
+        
         public const int SectorSize = 4; //The number of tiles in a map sector
+        [Data.NonSerialized]
         public int SectorPixelSize { get; private set; } = 0;
 
         /// <summary>
         /// The bounds of the map in pixels
         /// </summary>
+        [Data.NonSerialized]
         public Rectangle Bounds
         {
             get { return new Rectangle(0, 0, Width * TileSize, Height * TileSize); }
@@ -80,18 +85,21 @@ namespace Takai.Game
         /// All of the tiles in the map
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>
+        [Data.NonSerialized]
         public short[,] Tiles { get; set; }
         /// <summary>
         /// All of the sectors in the map
         /// Typically inactive entities are stored here
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>
+        [Data.NonSerialized]
         public MapSector[,] Sectors { get; protected set; }
         protected Point NumSectors { get; private set; }
 
         /// <summary>
         /// The list of active particles. Not serialized
         /// </summary>
+        [Data.NonSerialized]
         public Dictionary<ParticleType, List<Particle>> Particles { get; protected set; } = new Dictionary<ParticleType, List<Particle>>();
 
         /// <summary>
@@ -99,12 +107,15 @@ namespace Takai.Game
         /// Entities not in this list are not updated
         /// Automatically updated as the view changes
         /// </summary>
+        [Data.NonSerialized]
         public List<Entity> ActiveEnts { get; protected set; } = new List<Entity>(128);
         /// <summary>
         /// The list of live blobs. Once the blobs' velocity is zero, they are removed from this and not re-added
         /// </summary>
+        [Data.NonSerialized]
         public List<Blob> ActiveBlobs { get; protected set; } = new List<Blob>(128);
 
+        [Data.NonSerialized]
         public int TotalEntitiesCount { get; private set; } = 0;
 
         /// <summary>
@@ -112,6 +123,8 @@ namespace Takai.Game
         /// Name -> Handlers
         /// </summary>
         protected Dictionary<string, TriggeredEvent> eventHandlers = new Dictionary<string, TriggeredEvent>();
+
+        public Map() { }
 
         /// <summary>
         /// Add an event handler

@@ -169,16 +169,15 @@ namespace DyingAndMore.Editor
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                map = new Takai.Game.Map(GraphicsDevice);
                 using (var stream = ofd.OpenFile())
                 {
                     if (ofd.FileName.EndsWith("tkz"))
                     {
                         using (var decompress = new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionMode.Decompress))
-                            map.Load(decompress);
+                            map = Takai.Game.Map.Load(decompress);
                     }
                     else
-                        map.Load(stream);
+                        map = Takai.Game.Map.Load(stream);
                 }
 
                 map.File = ofd.FileName;
