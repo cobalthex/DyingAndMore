@@ -31,16 +31,18 @@ namespace Takai.Game
 
     public partial class Map
     {
+        [Data.NonSerialized]
         public MapUpdateSettings updateSettings = new MapUpdateSettings();
 
         /// <summary>
         /// How long since this map started (updated every Update()). Affected by <see cref="TimeScale"/>
         /// </summary>
-        [Takai.Data.NonDesigned]
+        [Takai.Data.NonSerialized] //serialized in state
         public TimeSpan ElapsedTime { get; set; } = TimeSpan.Zero;
         /// <summary>
         /// How fast the game is moving (default = 1)
         /// </summary>
+        [Takai.Data.NonSerialized] //serialized in state
         public float TimeScale { get; set; } = 1;
 
         //todo: switch update method to add tiem to total game time
@@ -54,6 +56,9 @@ namespace Takai.Game
         /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
         public void Update(GameTime RealTime, Camera Camera)
         {
+            if (TimeScale == 0)
+                return; //may need to revisit
+
             var deltaTicks = (long)(RealTime.ElapsedGameTime.Ticks * (double)TimeScale);
             var deltaTime = TimeSpan.FromTicks(deltaTicks);
             var deltaSeconds = (float)deltaTime.TotalSeconds;
@@ -141,17 +146,18 @@ namespace Takai.Game
                     if (updateSettings.isAiEnabled)
                         ent.Think(deltaTime);
 
-                    var deltaV = ent.Velocity * deltaSeconds;
-                    var deltaVLen = deltaV.Length();
-                    var direction = deltaV / deltaVLen;
-                    var startPos = ent.Position + (ent.Radius * direction);
-                    var targetPos = startPos + deltaV;
-                    var targetCell = (targetPos / tileSize).ToPoint();
-
                     if (updateSettings.isPhysicsEnabled)
                     {
                         if (ent.Velocity != Vector2.Zero)
                         {
+                            var deltaV = ent.Velocity * deltaSeconds;
+                            var deltaVLen = deltaV.Length();
+                            
+                            var direction = deltaV / deltaVLen;
+                            var startPos = ent.Position + (ent.Radius * direction);
+                            var targetPos = startPos + deltaV;
+                            var targetCell = (targetPos / tileSize).ToPoint();
+
                             //entity collision
                             bool didCollide = TraceLine(startPos, direction, out var hit, deltaVLen);
 

@@ -44,6 +44,7 @@ namespace Takai.Game
             public bool showOnlyReflections;
         }
 
+        [Data.NonSerialized]
         public DebugOptions debugOptions;
 
         /// <summary>
@@ -59,14 +60,20 @@ namespace Takai.Game
             debugLines.Add(new VertexPositionColor { Position = new Vector3(End, 0), Color = Color });
         }
 
+        [Data.NonSerialized]
         public MapProfilingInfo ProfilingInfo { get { return profilingInfo; } }
         protected MapProfilingInfo profilingInfo;
+
+        public Map(GraphicsDevice GDevice)
+        {
+            InitializeGraphics(GDevice);
+        }
 
         /// <summary>
         /// Create a new map
         /// </summary>
         /// <param name="GDevice">The graphics device to use for rendering the map</param>
-        public Map(GraphicsDevice GDevice)
+        public void InitializeGraphics(GraphicsDevice GDevice)
         {
             GraphicsDevice = GDevice;
             if (GDevice != null)
@@ -146,7 +153,7 @@ namespace Takai.Game
             var scaleWidth = (int)(Camera.Viewport.Width * scale.Z);
             var scaleHeight = (int)(Camera.Viewport.Height * scale.Z);
 
-            //todo: rotation broken
+            //todo: camera/transform rotation broken
 
             var originalRt = GraphicsDevice.GetRenderTargets();
 

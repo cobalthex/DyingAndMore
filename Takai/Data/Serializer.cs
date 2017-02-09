@@ -8,9 +8,7 @@ namespace Takai.Data
 {
     [AttributeUsage(AttributeTargets.All, Inherited = true)]
     [System.Runtime.InteropServices.ComVisible(true)]
-    public class NonSerializedAttribute : System.Attribute { }
-
-    //todo: maybe NonSerializedFieldAttribute
+    public class NonSerializedAttribute : Attribute { }
 
     /// <summary>
     /// Allows for custom serializers of specific types
@@ -134,8 +132,7 @@ namespace Takai.Data
                 },
                 Deserialize = (object Value) =>
                 {
-                    var strValue = Value as string;
-                    if (strValue != null)
+                    if (Value is string strValue)
                     {
                         switch ((string)Value)
                         {

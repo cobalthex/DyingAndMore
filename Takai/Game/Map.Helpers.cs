@@ -272,7 +272,6 @@ namespace Takai.Game
 
             return ents;
         }
-        public string debugOut;
 
         /// <summary>
         /// Trace a line and check for collisions with entities and the map. Uses PotentialVisibleSet (same rules apply)
