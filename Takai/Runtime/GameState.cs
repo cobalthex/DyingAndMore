@@ -1,4 +1,4 @@
-﻿namespace Takai.GameState
+﻿namespace Takai.Runtime
 {
     /// <summary>
     /// A single state for a state manager
@@ -30,9 +30,9 @@
         public bool IsLoaded { get; set; }
 
         /// <summary>
-        /// The graphics device for this game (only set if state is active)
+        /// The graphics device for this game
         /// </summary>
-        public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice { get; internal set; }
+        public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice { get; set; }
 
         /// <summary>
         /// Create a new state
@@ -76,12 +76,17 @@
         public void Deactivate() { IsEnabled = IsVisible = false; }
 
         /// <summary>
+        /// Remove this state from the state stack
+        /// </summary>
+        public void RemoveSelf() { GameManager.RemoveState(this); }
+
+        /// <summary>
         /// Called when the state is activated
         /// </summary>
-        public GameStateManager.StateEventHandler OnEnter;
+        public GameManager.StateEventHandler OnEnter;
         /// <summary>
         /// Called when the game window is resized
         /// </summary>
-        public GameStateManager.StateEventHandler OnResize;
+        public GameManager.StateEventHandler OnResize;
     }
 }

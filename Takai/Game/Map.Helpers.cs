@@ -39,47 +39,65 @@ namespace Takai.Game
         /// <summary>
         /// Get the sector of a point
         /// </summary>
-        /// <param name="Position">The point in the map</param>
+        /// <param name="position">The point in the map</param>
         /// <returns>The sector coordinates. Clamped to the map bounds</returns>
-        public Point GetSector(Vector2 Position)
+        public Point GetSector(Vector2 position)
         {
-            return Vector2.Clamp(Position / SectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+            return Vector2.Clamp(position / SectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+        }
+
+        /// <summary>
+        /// Get the region of sectors visible in a certain viewport
+        /// </summary>
+        /// <param name="visibleRegion">The visible region of the map to consider</param>
+        /// <returns><The region of sectors visible/returns>
+        public Rectangle GetVisibleSectors(Rectangle visibleRegion)
+        {
+            var rect = new Rectangle(
+                MathHelper.Max(0, visibleRegion.X / SectorPixelSize),
+                MathHelper.Max(0, visibleRegion.Y / SectorPixelSize),
+                (visibleRegion.Width - 1) / SectorPixelSize + 1,
+                (visibleRegion.Height - 1) / SectorPixelSize + 1
+            );
+            rect.Width = MathHelper.Min(Width / SectorSize - rect.X, rect.Width);
+            rect.Height = MathHelper.Min(Height / SectorSize - rect.Y, rect.Height);
+            return rect;
         }
 
         /// <summary>
         /// Check if a point is 'inside' the map
         /// </summary>
-        /// <param name="Point">The point to test</param>
+        /// <param name="position">The point to test</param>
         /// <returns>True if the point is in a navicable area</returns>
-        public bool IsInside(Vector2 Point)
+        public bool IsInside(Vector2 position)
         {
-            return (Point.X >= 0 && Point.X < (Width * TileSize) && Point.Y >= 0 && Point.Y < (Height * TileSize));
+            return (position.X >= 0 && position.X < (Width * TileSize) && position.Y >= 0 && position.Y < (Height * TileSize));
         }
 
         /// <summary>
         /// Find all entities within a certain radius
         /// </summary>
-        /// <param name="Position">The origin search point</param>
-        /// <param name="SearchRadius">The maximum search radius</param>
-        /// <param name="SearchInSectors">Also search entities in sectors</param>
-        public List<Entity> FindEntities(Vector2 Position, float SearchRadius, bool SearchInSectors = false)
+        /// <param name="position">The origin search point</param>
+        /// <param name="searchRadius">The maximum search radius</param>
+        /// <param name="searchInSectors">Also search entities in sectors</param>
+        public List<Entity> FindEntities(Vector2 position, float searchRadius, bool searchInSectors = false)
         {
-            var radiusSq = SearchRadius * SearchRadius;
-            var vr = new Vector2(SearchRadius);
+            var radiusSq = searchRadius * searchRadius;
+            var vr = new Vector2(searchRadius);
 
             List<Entity> ents = new List<Entity>();
 
             foreach (var ent in ActiveEnts)
             {
-                if (Vector2.DistanceSquared(ent.Position, Position) < radiusSq + ent.RadiusSq)
+                if (Vector2.DistanceSquared(ent.Position, position) < radiusSq + ent.RadiusSq)
                     ents.Add(ent);
             }
 
-            if (SearchInSectors)
+            if (searchInSectors)
             {
                 var mapSz = new Vector2(Width, Height);
-                var start = Vector2.Clamp((Position - vr) / SectorPixelSize, Vector2.Zero, mapSz).ToPoint();
-                var end = (Vector2.Clamp((Position + vr) / SectorPixelSize, Vector2.Zero, mapSz) + Vector2.One).ToPoint();
+                var start = Vector2.Clamp((position - vr) / SectorPixelSize, Vector2.Zero, mapSz).ToPoint();
+                var end = (Vector2.Clamp((position + vr) / SectorPixelSize, Vector2.Zero, mapSz) + Vector2.One).ToPoint();
 
                 for (int y = start.Y; y < end.Y; y++)
                 {
@@ -87,7 +105,7 @@ namespace Takai.Game
                     {
                         foreach (var ent in Sectors[y, x].entities)
                         {
-                            if (Vector2.DistanceSquared(ent.Position, Position) < radiusSq + ent.RadiusSq)
+                            if (Vector2.DistanceSquared(ent.Position, position) < radiusSq + ent.RadiusSq)
                                 ents.Add(ent);
                         }
                     }

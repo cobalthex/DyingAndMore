@@ -95,9 +95,11 @@
     <Compile Include="Input\InputState.cs" />
     <Compile Include="Locale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="States\GameState.cs" />
-    <Compile Include="States\GameStateManager.cs" />
+    <Compile Include="Runtime\GameManager.cs" />
+    <Compile Include="Runtime\GameState.cs" />
     <Compile Include="UI\Element.cs" />
+    <Compile Include="UI\List.cs" />
+    <Compile Include="UI\TextBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

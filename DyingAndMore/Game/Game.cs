@@ -8,7 +8,7 @@ using Takai;
 
 namespace DyingAndMore.Game
 {
-    class Game : Takai.GameState.GameState
+    class Game : Takai.Runtime.GameState
     {
         public Takai.Game.Map map;
         public Takai.Game.Camera camera;
@@ -109,13 +109,13 @@ namespace DyingAndMore.Game
 
             if (InputState.IsClick(Keys.F1))
             {
-                Takai.GameState.GameStateManager.NextState(new Editor.Editor() { map = map, camera = new Takai.Game.Camera(map, camera.ActualPosition) { Viewport = camera.Viewport } });
+                Takai.Runtime.GameManager.NextState(new Editor.Editor() { Map = map, Camera = new Takai.Game.Camera(map, camera.ActualPosition) { Viewport = camera.Viewport } });
                 return;
             }
 
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
-                Takai.GameState.GameStateManager.Exit();
+                Takai.Runtime.GameManager.Exit();
                 return;
             }
 

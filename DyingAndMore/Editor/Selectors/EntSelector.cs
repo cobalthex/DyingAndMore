@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Takai.Input;
 
-namespace DyingAndMore.Editor
+namespace DyingAndMore.Editor.Selectors
 {
     class EntSelector : Selector
     {
@@ -15,7 +14,8 @@ namespace DyingAndMore.Editor
         {
             base.Load();
 
-            base.ItemSize = new Point(64, 64);
+            ItemSize = new Point(64);
+            Padding = 5;
 
             ents = new List<Takai.Game.Entity>();
             foreach (var file in System.IO.Directory.EnumerateFiles("Defs\\Entities", "*", System.IO.SearchOption.AllDirectories))
@@ -24,16 +24,14 @@ namespace DyingAndMore.Editor
                 {
                     using (var stream = new System.IO.StreamReader(file))
                     {
-                        var ent = Takai.Data.Serializer.TextDeserialize(stream) as Takai.Game.Entity;
-                        if (ent != null)
+                        if (Takai.Data.Serializer.TextDeserialize(stream) is Takai.Game.Entity ent)
                             ents.Add(ent);
                     }
                 }
                 catch (DeviceLostException) { }
             }
+
             ItemCount = ents.Count;
-            ItemSize = new Point(64);
-            Padding = 5;
         }
 
         public override void DrawItem(GameTime Time, int ItemIndex, Rectangle Bounds, SpriteBatch Sbatch = null)

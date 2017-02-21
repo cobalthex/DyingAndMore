@@ -7,12 +7,45 @@ using Takai.Graphics;
 
 namespace DyingAndMore.Editor
 {
-    partial class Editor : Takai.GameState.GameState
+    class EntitiesEditorMode : EditorMode
     {
         Takai.Game.Entity selectedEntity = null;
 
-        void UpdateEntitiesMode(GameTime Time)
+        Vector2 lastWorldPos;
+
+        Selectors.EntSelector selector;
+
+        public EntitiesEditorMode(Editor editor)
+            : base("Entities", editor)
         {
+            selector = new Selectors.EntSelector(editor);
+            selector.Load();
+        }
+
+        public override void OpenConfigurator(bool DidClickOpen)
+        {
+            selector.DidClickOpen = DidClickOpen;
+            Takai.Runtime.GameManager.PushState(selector);
+        }
+
+        public override void Start()
+        {
+            lastWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+        }
+
+        public override void End()
+        {
+            if (selectedEntity != null)
+            {
+                selectedEntity.OutlineColor = Color.Transparent;
+                selectedEntity = null;
+            }
+        }
+
+        public override void Update(GameTime Time)
+        {
+            var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+
             if (selectedEntity != null)
                 selectedEntity.OutlineColor = Color.Transparent;
 
@@ -34,22 +67,18 @@ namespace DyingAndMore.Editor
                         if (ent != null)
                         {
                             ent.Position = currentWorldPos;
-                            map.Spawn(ent);
+                            editor.Map.Spawn(ent);
                         }
                     }
                     return;
                 }
 
                 var searchRadius = /*isTapping*/ false ? 10 : 1;
-                var selected = map.FindEntities(currentWorldPos, searchRadius, true);
+                var selected = editor.Map.FindEntities(currentWorldPos, searchRadius, true);
                 if (selected.Count < 1)
                 {
-                    if (map.Bounds.Contains(currentWorldPos))
-                    {
-                        var sel = selectors[(int)modes.Mode] as EntSelector;
-                        if (sel != null && sel.ents.Count > 0)
-                            selectedEntity = map.Spawn(sel.ents[sel.SelectedItem], currentWorldPos, Vector2.UnitX, Vector2.Zero);
-                    }
+                    if (editor.Map.Bounds.Contains(currentWorldPos))
+                        selectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedItem], currentWorldPos, Vector2.UnitX, Vector2.Zero);
                     else
                         selectedEntity = null;
                 }
@@ -58,16 +87,16 @@ namespace DyingAndMore.Editor
             }
             else if (InputState.IsPress(MouseButtons.Right))
             {
-                var selected = map.FindEntities(currentWorldPos, 1, true);
+                var selected = editor.Map.FindEntities(currentWorldPos, 1, true);
                 selectedEntity = selected.Count > 0 ? selected[0] : null;
             }
             else if (InputState.IsClick(MouseButtons.Right)/* || isDoubleTapping*/)
             {
                 var searchRadius = /*isTapping*/ false ? 10 : 1;
-                var selected = map.FindEntities(currentWorldPos, searchRadius, true);
+                var selected = editor.Map.FindEntities(currentWorldPos, searchRadius, true);
                 if (selected.Count > 0 && selected[0] == selectedEntity)
                 {
-                    map.Destroy(selectedEntity);
+                    editor.Map.Destroy(selectedEntity);
                     selectedEntity = null;
                 }
             }
@@ -91,30 +120,32 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsPress(Keys.Delete))
                 {
-                    map.Destroy(selectedEntity);
+                    editor.Map.Destroy(selectedEntity);
                     selectedEntity = null;
                 }
             }
+
+            lastWorldPos = currentWorldPos;
         }
 
-        void DrawEntitiesMode()
+        public override void Draw(SpriteBatch sbatch)
         {
             if (selectedEntity != null)
-                DrawEntInfo(selectedEntity);
+                DrawEntInfo(sbatch, selectedEntity);
 
-            foreach (var ent in map.ActiveEnts)
-                DrawArrow(ent.Position, ent.Direction, ent.Radius * 1.5f);
+            foreach (var ent in editor.Map.ActiveEnts)
+                editor.DrawArrow(ent.Position, ent.Direction, ent.Radius * 1.5f);
 
             //draw basic info about entity screen
-            smallFont.Draw(sbatch, $"Visible Entities: {map.ActiveEnts.Count}\nTotal Entities:   {map.TotalEntitiesCount}", new Vector2(uiMargin, 80), Color.LightSeaGreen);
+            editor.SmallFont.Draw(sbatch, $"Visible Entities: {editor.Map.ActiveEnts.Count}\nTotal Entities:   {editor.Map.TotalEntitiesCount}", new Vector2(20, 80), Color.LightSeaGreen);
         }
 
 
         static readonly string[] entInfoKeys = { "Name", "ID", "Type", "Position", "State" };
-        protected void DrawEntInfo(Takai.Game.Entity Ent)
+        protected void DrawEntInfo(SpriteBatch sbatch, Takai.Game.Entity ent)
         {
-            var props = new[] { Ent.Name, Ent.Id.ToString(), Ent.GetType().Name, Ent.Position.ToString(), Ent.State.ToString() };
-            var font = tinyFont;
+            var props = new[] { ent.Name, ent.Id.ToString(), ent.GetType().Name, ent.Position.ToString(), ent.State.ToString() };
+            var font = editor.DebugFont;
 
             var lineHeight = font.Characters[' '].Height;
             var totalHeight = (entInfoKeys.Length * lineHeight) + 10;
@@ -122,12 +153,12 @@ namespace DyingAndMore.Editor
             var maxWidth = 0;
             for (var i = 0; i < entInfoKeys.Length; ++i)
             {
-                var sz = font.Draw(sbatch, entInfoKeys[i] + ": ", new Vector2(10, GraphicsDevice.Viewport.Height - totalHeight + (lineHeight * i)), Color.White);
+                var sz = font.Draw(sbatch, entInfoKeys[i] + ": ", new Vector2(10, editor.GraphicsDevice.Viewport.Height - totalHeight + (lineHeight * i)), Color.White);
                 maxWidth = MathHelper.Max(maxWidth, (int)sz.X);
             }
 
             for (var i = 0; i < props.Length; ++i)
-                font.Draw(sbatch, props[i] ?? "Null", new Vector2(10 + maxWidth, GraphicsDevice.Viewport.Height - totalHeight + (lineHeight * i)), props[i] == null ? Color.Gray : Color.White);
+                font.Draw(sbatch, props[i] ?? "Null", new Vector2(10 + maxWidth, editor.GraphicsDevice.Viewport.Height - totalHeight + (lineHeight * i)), props[i] == null ? Color.Gray : Color.White);
         }
     }
 }

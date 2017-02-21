@@ -1,15 +1,18 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Takai.Input;
 
 namespace DyingAndMore.Editor
 {
-    class ModeSelector : Takai.UI.Element
+    class ModeSelector : Takai.UI.List
     {
-        private System.Collections.Generic.List<EditorMode> modes;
+        private List<EditorMode> modes = new List<EditorMode>();
 
         public EditorMode Mode
         {
-            get { return modes[mode]; }
+            get { return (mode >= 0 && mode < modes.Count ? modes[mode] : null); }
             set
             {
                 ModeIndex = modes.IndexOf(value);
@@ -20,6 +23,8 @@ namespace DyingAndMore.Editor
             get { return mode; }
             set
             {
+                int lastMode = mode;
+
                 mode = value;
 
                 for (int i = 0; i < Children.Count; ++i)
@@ -28,16 +33,20 @@ namespace DyingAndMore.Editor
                     {
                         Children[i].Font = ActiveFont;
                         Children[i].Color = ActiveColor;
+                        modes[i].Start();
                     }
                     else
                     {
                         Children[i].Font = InactiveFont;
                         Children[i].Color = InactiveColor;
+
+                        if (i == lastMode)
+                            modes[lastMode].End();
                     }
                 }
             }
         }
-        private int mode;
+        private int mode = -1;
 
         public Takai.Graphics.BitmapFont ActiveFont { get; set; }
         public Takai.Graphics.BitmapFont InactiveFont { get; set; }
@@ -45,50 +54,58 @@ namespace DyingAndMore.Editor
         public Color ActiveColor { get; set; } = Color.White;
         public Color InactiveColor { get; set; } = Color.LightGray;
 
-        public ModeSelector(Takai.Graphics.BitmapFont ActiveFont,
-                            Takai.Graphics.BitmapFont InactiveFont)
+        public ModeSelector(Takai.Graphics.BitmapFont activeFont,
+                            Takai.Graphics.BitmapFont inactiveFont)
         {
-            this.ActiveFont = ActiveFont;
-            this.InactiveFont = InactiveFont;
+            Direction = Takai.UI.Direction.Horizontal;
+
+            ActiveFont = activeFont;
+            InactiveFont = inactiveFont;
         }
 
-        void AddMode(EditorMode Mode)
+        public void AddMode(EditorMode mode)
         {
-            modes.Add(Mode);
+            modes.Add(mode);
 
             var child = new Takai.UI.Element()
             {
-                Text = Mode.Name,
+                Text = mode.Name,
                 Font = ActiveFont,
                 Color = InactiveColor
             };
             child.AutoSize(Padding: 20);
             child.Font = InactiveFont;
-
-            if (children.Count > 0)
-                child.Position += new Vector2(children[children.Count - 1].Bounds.Right, 0);
-
+            
             child.OnClick += delegate (Takai.UI.Element sender, Takai.UI.ClickEventArgs args)
             {
-                this.Mode = Mode;
+                Mode = mode;
             };
             AddChild(child);
 
             AutoSize();
         }
 
-        public override bool Update(TimeSpan DeltaTime)
+        public override bool Update(GameTime time)
         {
-            for (int i = 0; i < editorModes.Count; ++i)
+            Mode?.Update(time);
+
+            for (int i = 0; i < MathHelper.Min(10, modes.Count); ++i)
             {
                 //set editor mode
                 if (InputState.IsPress(Keys.D1 + i) || InputState.IsPress(Keys.NumPad1 + i))
                 {
-                    modes.ModeIndex = i;
+                    ModeIndex = i;
+                    return false;
                 }
             }
 
-            return base.Update(DeltaTime);
+            return base.Update(time);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            Mode?.Draw(spriteBatch);
+            base.Draw(spriteBatch);
         }
     }
 }

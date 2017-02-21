@@ -49,6 +49,38 @@ namespace Takai.Game
         public float Rotation { get; set; } = 0;
 
         /// <summary>
+        /// The visible (AABB) region of the map that this camera encompasses
+        /// </summary>
+        public Rectangle VisibleRegion
+        {
+            get
+            {
+                // a - b
+                // |   |
+                // c - d
+
+                var centerTransform = new Vector2(Viewport.Width / 2, Viewport.Height / 2);
+                var transform = Matrix.Invert(
+                                    Matrix.CreateTranslation(-ActualPosition.X, -ActualPosition.Y, 0) *
+                                    Matrix.CreateRotationZ(Rotation) *
+                                    Matrix.CreateScale(Scale));
+
+                var a = Vector2.Transform(new Vector2(-centerTransform.X, -centerTransform.Y), transform);
+                var b = Vector2.Transform(new Vector2( centerTransform.X, -centerTransform.Y), transform);
+                var c = Vector2.Transform(new Vector2(-centerTransform.X,  centerTransform.Y), transform);
+                var d = Vector2.Transform(new Vector2( centerTransform.X,  centerTransform.Y), transform);
+                
+                Vector2 min = Vector2.Min(Vector2.Min(Vector2.Min(a, b), c), d);
+                Vector2 max = Vector2.Max(Vector2.Max(Vector2.Max(a, b), c), d);
+
+                return new Rectangle(min.ToPoint(), (max - min).ToPoint());
+            }
+        }
+
+        //todo: camera viewport, transformed
+        //todo: use map get visible sectors in render calculation
+
+        /// <summary>
         /// An entity to follow
         /// </summary>
         [Data.NonDesigned]
@@ -72,26 +104,26 @@ namespace Takai.Game
 
         public Camera() { }
 
-        public Camera(Map Map, Entity Follow = null)
+        public Camera(Map map, Entity follow = null)
         {
-            this.Map = Map;
-            this.Follow = Follow;
-            if (this.Follow != null)
-                this.ActualPosition = this.Position = this.Follow.Position;
+            this.Map = map;
+            this.Follow = follow;
+            if (Follow != null)
+                ActualPosition = Position = Follow.Position;
         }
 
-        public Camera(Map Map, Vector2 Position)
+        public Camera(Map map, Vector2 position)
         {
-            this.Map = Map;
+            this.Map = map;
             this.Follow = null;
-            this.ActualPosition = this.Position = Position;
+            this.ActualPosition = this.Position = position;
         }
 
         /// <summary>
         /// Update the camera (and map)
         /// </summary>
-        /// <param name="Time">Game time</param>
-        public void Update(GameTime Time)
+        /// <param name="time">Game time</param>
+        public void Update(GameTime time)
         {
             if (Follow != null)
                 Position = Follow.Position;
@@ -104,9 +136,9 @@ namespace Takai.Game
             else
                 LastPosition = Vector2.Lerp(LastPosition, Position, (1 / dist) * deltaS);
             */
-            ActualPosition = Vector2.Lerp(ActualPosition, Position, (float)Time.ElapsedGameTime.TotalSeconds * (MoveSpeed / 100));
+            ActualPosition = Vector2.Lerp(ActualPosition, Position, (float)time.ElapsedGameTime.TotalSeconds * (MoveSpeed / 100));
 
-            Map.Update(Time, this);
+            Map.Update(time, this);
         }
 
         /// <summary>
@@ -120,8 +152,8 @@ namespace Takai.Game
         /// <summary>
         /// Draw the map at the camera's position
         /// </summary>
-        /// <param name="Viewport">An explicit viewport to draw to</param>
-        public void Draw(Rectangle Viewport)
+        /// <param name="viewport">An explicit viewport to draw to</param>
+        public void Draw(Rectangle viewport)
         {
             Map.Draw(this, PostEffect);
         }
@@ -129,77 +161,42 @@ namespace Takai.Game
         /// <summary>
         /// Teleport the camera to a position
         /// </summary>
-        /// <param name="Position">The position to move to</param>
-        public void MoveTo(Vector2 Position)
+        /// <param name="position">The position to move to</param>
+        public void MoveTo(Vector2 position)
         {
-            ActualPosition = this.Position = Position;
+            ActualPosition = this.Position = position;
         }
 
 
         /// <summary>
         /// Get the camera origin point in a specified region
         /// </summary>
-        /// <param name="ViewWidth">The viewport width (transformed)</param>
-        /// <param name="ViewHeight">The viewport height (transformed)</param>
+        /// <param name="viewWidth">The viewport width (transformed)</param>
+        /// <param name="viewHeight">The viewport height (transformed)</param>
         /// <returns>The origin point for the camera</returns>
-        public static Vector2 GetCameraOrigin(float ViewWidth, float ViewHeight)
+        public static Vector2 GetCameraOrigin(float viewWidth, float viewHeight)
         {
-            return new Vector2(ViewWidth / 2, ViewHeight / 2);
+            return new Vector2(viewWidth / 2, viewHeight / 2);
         }
 
         /// <summary>
         /// Unproject a world position to a screen position
         /// </summary>
-        /// <param name="WorldPosition">The world position to convert</param>
+        /// <param name="worldPosition">The world position to convert</param>
         /// <returns>The screen position of a world position</returns>
-        public Vector2 WorldToScreen(Vector2 WorldPosition)
+        public Vector2 WorldToScreen(Vector2 worldPosition)
         {
-            return Vector2.Transform(WorldPosition, Transform);
+            return Vector2.Transform(worldPosition, Transform);
         }
 
         /// <summary>
         /// Project a screen position to a world position using the current camera's viewport
         /// </summary>
-        /// <param name="ScreenPosition">The screen position</param>
+        /// <param name="screenPosition">The screen position</param>
         /// <returns>The world position</returns>
-        public Vector2 ScreenToWorld(Vector2 ScreenPosition)
+        public Vector2 ScreenToWorld(Vector2 screenPosition)
         {
-            return Vector2.Transform(ScreenPosition, Matrix.Invert(Transform));
+            return Vector2.Transform(screenPosition, Matrix.Invert(Transform));
         }
-        /*
-        /// <summary>
-        /// Is a world position visible on screen? (Based on the camera's position and viewport)
-        /// </summary>
-        /// <param name="Point">The world position to test</param>
-        /// <returns>True if the position is inside the screen boundaries</returns>
-        public bool IsVisible(Vector2 WorldPosition)
-        {
-            WorldPosition = Vector2.Transform(WorldPosition, Transform);
-            return IsVisible(new Rectangle((int)WorldPosition.X, (int)WorldPosition.Y, 1, 1), ActualPosition, Viewport);
-        }
-
-        /// <summary>
-        /// Is a world position and boundary visible on screen? (Based on the camera's position and viewport)
-        /// </summary>
-        /// <param name="WorldRect">The boundaries to check</param>
-        /// <returns>True if the rectangle intersects the screen boundaries</returns>
-        public bool IsVisible(Rectangle WorldRect)
-        {
-            return IsVisible(WorldRect, ActualPosition, Viewport);
-        }
-
-        /// <summary>
-        /// Is a world position and boundary visible on screen? (Based on the camera's position and viewport)
-        /// </summary>
-        /// <param name="WorldRect">The boundaries to check</param>
-        /// <param name="CameraPosition">The position of the camera</param>
-        /// <param name="Viewport">The screen boundaries</param>
-        /// <returns>True if the rectangle intersects the screen boundaries</returns>
-        public static bool IsVisible(Rectangle WorldRect, Vector2 CameraPosition, Rectangle Viewport)
-        {
-            var w2s = WorldToScreen(WorldRect);
-            Viewport.Offset(-CameraPosition);
-            return Viewport.Intersects(w2s);
-        }*/
     }
 }

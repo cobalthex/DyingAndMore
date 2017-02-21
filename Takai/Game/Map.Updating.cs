@@ -65,22 +65,12 @@ namespace Takai.Game
             ElapsedTime += deltaTime;
 
             var invTransform = Matrix.Invert(Camera.Transform);
-
-            var translation = invTransform.Translation;
-            var scale = invTransform.Scale;
-            var rotation = Camera.Transform.Rotation;
-
-            var scaleWidth = (int)(Camera.Viewport.Width * scale.Z);
-            var scaleHeight = (int)(Camera.Viewport.Height * scale.Z);
-
-            var startX = (int)translation.X / SectorPixelSize;
-            var startY = (int)translation.Y / SectorPixelSize;
-
-            var width = 1 + ((scaleWidth - 1) / SectorPixelSize);
-            var height = 1 + ((scaleHeight - 1) / SectorPixelSize);
-
-            var activeRect = new Rectangle(startX - 1, startY - 1, width + 2, height + 2);
-            var mapRect = new Rectangle(0, 0, Width * tileSize, Height * tileSize);
+            
+            var visibleRegion = Camera.VisibleRegion;
+            var visibleSectors = GetVisibleSectors(visibleRegion);
+            visibleSectors.Inflate(1, 1);
+            var mapBounds = Bounds;
+            
             var tileSq = new Vector2(tileSize).LengthSquared();
 
             #region active blobs
@@ -113,10 +103,10 @@ namespace Takai.Game
             {
                 var ent = ActiveEnts[i];
 
-                if (!ent.AlwaysActive && !activeRect.Contains(ent.Position / SectorPixelSize))
+                if (!ent.AlwaysActive && !visibleSectors.Contains(ent.Position / SectorPixelSize))
                 {
                     //ents outside the map are deleted
-                    if (mapRect.Contains((ent.Position / tileSize).ToPoint()))
+                    if (mapBounds.Contains((ent.Position / tileSize).ToPoint()))
                         Sectors[(int)ent.Position.Y / SectorPixelSize, (int)ent.Position.X / SectorPixelSize].entities.Add(ent);
                     else
                     {
@@ -228,9 +218,9 @@ namespace Takai.Game
             }
 
             //add new entities to active set (will be updated next frame)
-            for (var y = System.Math.Max(activeRect.Top, 0); y < System.Math.Min(Height / SectorSize, activeRect.Bottom); y++)
+            for (var y = System.Math.Max(visibleSectors.Top, 0); y < System.Math.Min(Height / SectorSize, visibleSectors.Bottom); y++)
             {
-                for (var x = System.Math.Max(activeRect.Left, 0); x < System.Math.Min(Width / SectorSize, activeRect.Right); x++)
+                for (var x = System.Math.Max(visibleSectors.Left, 0); x < System.Math.Min(Width / SectorSize, visibleSectors.Right); x++)
                 {
                     ActiveEnts.AddRange(Sectors[y, x].entities);
                     Sectors[y, x].entities.Clear();

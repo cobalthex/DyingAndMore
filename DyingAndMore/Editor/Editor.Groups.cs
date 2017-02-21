@@ -1,30 +1,76 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
-using Takai.Input;
-using Takai.Graphics;
 
 namespace DyingAndMore.Editor
 {
-    partial class Editor : Takai.GameState.GameState
+    class GroupsConfigurator : Takai.Runtime.GameState
+    {
+        SpriteBatch sbatch;
+
+        Takai.UI.Element uiContainer;
+
+        public GroupsConfigurator()
+            : base(true, false) { }
+
+        public override void Load()
+        {
+            sbatch = new SpriteBatch(GraphicsDevice);
+            uiContainer = new Takai.UI.Element();
+            uiContainer.AddChild(new Takai.UI.TextBox()
+            {
+                Text = "Test",
+                Position = new Vector2(10, 10)
+            });
+        }
+
+        public override void Update(GameTime time)
+        {
+            uiContainer.Update(time);
+        }
+
+        public override void Draw(GameTime time)
+        {
+            sbatch.Begin();
+            uiContainer.Draw(sbatch);
+            sbatch.End();
+        }
+    }
+
+    class GroupsEditorMode : EditorMode
     {
         //todo: on mode load, set all existing groups to purple colored
 
-        Takai.Game.Group activeGroup;
+        Takai.Game.Group selectedGroup = null;
 
-        void UpdateGroupsMode(GameTime Time)
+        GroupsConfigurator configurator;
+
+        public GroupsEditorMode(Editor editor)
+            : base("Groups", editor)
         {
-            foreach (var ent in map.ActiveEnts)
+        }
+
+        public override void OpenConfigurator(bool DidClickOpen)
+        {
+        }
+
+        public override void End()
+        {
+            //clear all group colors
+            selectedGroup = null;
+        }
+
+        public override void Update(GameTime time)
+        {
+            foreach (var ent in editor.Map.ActiveEnts)
             {
-                if (activeGroup != null && activeGroup.Entities.Contains(ent))
-                    ent.OutlineColor = Color.GreenYellow; //todo: unify
+                if (selectedGroup != null && selectedGroup.Entities.Contains(ent))
+                    ent.OutlineColor = Color.GreenYellow; //todo: unify color
                 else
-                    ent.OutlineColor = Color.Purple; //todo: unify
+                    ent.OutlineColor = Color.Purple; //todo: unify color
             }
         }
 
-        void DrawGroupsMode()
+        public override void Draw(SpriteBatch sbatch)
         {
         }
     }

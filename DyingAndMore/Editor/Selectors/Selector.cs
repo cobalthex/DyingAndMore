@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
-namespace DyingAndMore.Editor
+namespace DyingAndMore.Editor.Selectors
 {
-    abstract class Selector : Takai.GameState.GameState
+    abstract class Selector : Takai.Runtime.GameState
     {
         public Editor editor;
 
@@ -47,6 +47,7 @@ namespace DyingAndMore.Editor
             : base(true, false)
         {
             editor = Editor;
+            GraphicsDevice = editor.GraphicsDevice;
         }
 
         public override void Load()
@@ -86,12 +87,12 @@ namespace DyingAndMore.Editor
 
             if ((!DidClickOpen && InputState.IsClick(Keys.Tab)) ||
                 (DidClickOpen && InputState.IsPress(Keys.Tab)))
-                Deactivate();
+                RemoveSelf();
 
             var mouse = InputState.MousePoint;
 
             var scrollWidth = GetScrollbarWidth();
-            var itemsPerRow = (width - Padding) / (ItemSize.X + Padding);
+            var itemsPerRow = MathHelper.Max(1, (width - Padding) / (ItemSize.X + Padding));
             var splitterX = GraphicsDevice.Viewport.Width - width - scrollWidth - splitterWidth;
             isHoveringSplitter = (mouse.X >= splitterX && mouse.X <= splitterX + splitterWidth);
 
@@ -115,7 +116,7 @@ namespace DyingAndMore.Editor
             if (InputState.IsPress(MouseButtons.Left))
             {
                 if (DidClickOpen && mouse.X < splitterX)
-                    Deactivate();
+                    RemoveSelf();
 
                 else if (isHoveringSplitter)
                 {
@@ -133,7 +134,7 @@ namespace DyingAndMore.Editor
                         SelectedItem = newSelect;
 
                         if (DidClickOpen)
-                            Deactivate();
+                            RemoveSelf();
                     }
                 }
             }
@@ -158,27 +159,25 @@ namespace DyingAndMore.Editor
             //items
             var viewHeight = GraphicsDevice.Viewport.Height;
             var iHeight = ItemSize.Y + Padding;
-            var itemsPerRow = (width - Padding) / (ItemSize.X + Padding);
-            if (itemsPerRow > 0)
-            {
-                var first = ((ScrollPosition / iHeight) - 1) * itemsPerRow;
-                for (var i = MathHelper.Max(0, first); i < MathHelper.Min(ItemCount, first + ((viewHeight - 1) / itemsPerRow) + 1); i++)
-                {
-                    var bounds = new Rectangle
-                    (
-                        Padding + (int)Start.X + (i % itemsPerRow) * (ItemSize.X + Padding),
-                        Padding + (int)Start.Y + (i / itemsPerRow) * (ItemSize.Y + Padding) - ScrollPosition,
-                        ItemSize.X,
-                        ItemSize.Y
-                    );
-                    DrawItem(Time, i, bounds);
+            var itemsPerRow = MathHelper.Max(1, (width - Padding) / (ItemSize.X + Padding));
 
-                    if (i == SelectedItem)
-                    {
-                        Takai.Graphics.Primitives2D.DrawRect(sbatch, new Color(1, 1, 1, 0.5f), bounds);
-                        bounds.Inflate(1, 1);
-                        Takai.Graphics.Primitives2D.DrawRect(sbatch, Color.Black, bounds);
-                    }
+            var first = ((ScrollPosition / iHeight) - 1) * itemsPerRow;
+            for (var i = MathHelper.Max(0, first); i < MathHelper.Min(ItemCount, first + ((viewHeight - 1) / itemsPerRow) + 1); i++)
+            {
+                var bounds = new Rectangle
+                (
+                    Padding + (int)Start.X + (i % itemsPerRow) * (ItemSize.X + Padding),
+                    Padding + (int)Start.Y + (i / itemsPerRow) * (ItemSize.Y + Padding) - ScrollPosition,
+                    ItemSize.X,
+                    ItemSize.Y
+                );
+                DrawItem(Time, i, bounds);
+
+                if (i == SelectedItem)
+                {
+                    Takai.Graphics.Primitives2D.DrawRect(sbatch, new Color(1, 1, 1, 0.5f), bounds);
+                    bounds.Inflate(1, 1);
+                    Takai.Graphics.Primitives2D.DrawRect(sbatch, Color.Black, bounds);
                 }
             }
 

@@ -42,7 +42,7 @@ namespace Takai.UI
             set
             {
                 parent = value;
-                UpdateBounds();
+                Reflow();
             }
         }
         private Element parent = null;
@@ -87,7 +87,7 @@ namespace Takai.UI
             set
             {
                 horizontalOrientation = value;
-                UpdateBounds();
+                Reflow();
             }
         }
         private Orientation horizontalOrientation;
@@ -101,7 +101,7 @@ namespace Takai.UI
             set
             {
                 verticalOrientation = value;
-                UpdateBounds();
+                Reflow();
             }
         }
         private Orientation verticalOrientation;
@@ -118,7 +118,7 @@ namespace Takai.UI
             set
             {
                 position = value;
-                UpdateBounds();
+                Reflow();
             }
         }
         private Vector2 position = Vector2.Zero;
@@ -132,7 +132,7 @@ namespace Takai.UI
             set
             {
                 size = value;
-                UpdateBounds();
+                ResizeAndReflow();
             }
         }
         private Vector2 size = Vector2.One;
@@ -142,8 +142,9 @@ namespace Takai.UI
             get { return new Rectangle(Position.ToPoint(), Size.ToPoint()); }
             set
             {
-                Position = value.Location.ToVector2();
-                Size = value.Size.ToVector2();
+                position = value.Location.ToVector2();
+                size = value.Size.ToVector2();
+                ResizeAndReflow();
             }
         }
 
@@ -175,9 +176,16 @@ namespace Takai.UI
         [Data.NonSerialized]
         protected bool didPress = false;
 
-        public Element()
+        /// <summary>
+        /// Create a new element
+        /// </summary>
+        /// <param name="Children">Optionally add children to this element</param>
+        public Element(params Element[] Children)
         {
-            Children = new ReadOnlyCollection<Element>(children);
+            this.Children = new ReadOnlyCollection<Element>(children);
+
+            foreach (var child in Children)
+                AddChild(child);
         }
 
         public void AddChild(Element Child)
@@ -198,27 +206,34 @@ namespace Takai.UI
             return child;
         }
 
-        /// <summary>
-        /// Update the size of this element based on its text
-        /// </summary>
-        /// <remarks>Optional extra padding to inflate the element. This will adjust childrens' positioning</remarks>
-        public void AutoSize(float Padding = 0)
+        protected void ResizeAndReflow()
         {
-            var bounds = new Rectangle(Position.ToPoint(), textSize.ToPoint());
-            foreach (var child in Children)
-            {
-                child.Position += new Vector2(Padding);
-                bounds = Rectangle.Union(bounds, child.Bounds);
-            }
-            Size = bounds.Size.ToVector2() + new Vector2(Padding);
+            CalculateAbsoluteBounds();
+
+            //OnResized()
+
+            Reflow();
         }
 
+        /// <summary>
+        /// Reflow child elements relative to this element
+        /// Called whenever this element's position or size is adjusted
+        /// </summary>
+        public virtual void Reflow()
+        {
+            foreach (var child in Children)
+            {
+                child.absoluteBounds = child.CalculateBounds(absoluteBounds);
+                child.Reflow();
+            }
+        }
+       
         /// <summary>
         /// Calculate the bounds of this element based on a parent container
         /// </summary>
         /// <param name="Container">The region that this element is relative to</param>
         /// <returns>The calculate rectangle relative to the container</returns>
-        public Rectangle CalculateBounds(Rectangle Container)
+        public virtual Rectangle CalculateBounds(Rectangle Container)
         {
             var pos = new Vector2();
 
@@ -247,51 +262,50 @@ namespace Takai.UI
                     break;
             }
 
-            return new Rectangle(pos.ToPoint() + Container.Location, Size.ToPoint());
+            return new Rectangle(pos.ToPoint() + Container.Location, Size.ToPoint()); //if size is changed, changes may need to be made elsewhere
         }
 
-        /// <summary>
-        /// Calculate the absolute bounds of this element relative to its parents
-        /// </summary>
-        /// <returns></returns>
-        Rectangle CalculateAbsoluteBounds()
+        public static int callCount = 0;
+        protected Rectangle CalculateAbsoluteBounds()
         {
-            absoluteBounds = Parent != null ? CalculateBounds(Parent.CalculateAbsoluteBounds()) :
-                new Rectangle(Position.ToPoint(), Size.ToPoint());
+            callCount++;
+            absoluteBounds = Parent != null 
+                ? CalculateBounds(Parent.CalculateAbsoluteBounds())
+                : new Rectangle(Position.ToPoint(), Size.ToPoint());
             return absoluteBounds;
+
         }
 
         /// <summary>
-        /// Update the bounds of this element and all its children
+        /// Automatically size this element. By default, will size based on text
+        /// This does not affect the position of the element
+        /// Padding affects child positioning
         /// </summary>
-        void UpdateBounds()
+        public virtual void AutoSize(float Padding = 0)
         {
-            CalculateAbsoluteBounds();
-
-            var elements = new Queue<Element>();
+            var bounds = new Rectangle(Position.ToPoint(), textSize.ToPoint());
             foreach (var child in Children)
-                elements.Enqueue(child);
-
-            while (elements.Count > 0)
             {
-                var element = elements.Dequeue();
-                element.absoluteBounds = element.CalculateBounds(element.parent.absoluteBounds);
-
-                foreach (var child in element.Children)
-                    elements.Enqueue(child);
+                child.Position += new Vector2(Padding);
+                bounds = Rectangle.Union(bounds, child.Bounds);
             }
+            Size = bounds.Size.ToVector2() + new Vector2(Padding);
         }
+
 
         /// <summary>
         /// Update this element
         /// </summary>
-        /// <param name="DeltaTime">Elapsed time since the last update</param>
+        /// <param name="Time">Game time</param>
         /// <returns>Returns true if this element was clicked/triggered. This will prevent parent items from being triggered as well</returns>
-        public virtual bool Update(System.TimeSpan DeltaTime)
+        public virtual bool Update(GameTime Time)
         {
+            if (!Runtime.GameManager.HasFocus)
+                return false;
+
             for (var i = Children.Count - 1; i >= 0 ; --i)
             {
-                if (!Children[i].Update(DeltaTime))
+                if (!Children[i].Update(Time))
                     return false;
             }
 
@@ -325,9 +339,9 @@ namespace Takai.UI
             );
 
             if (DrawBoundingRects)
-                Takai.Graphics.Primitives2D.DrawRect(SpriteBatch, new Color(0, 0.75f, 1, 0.35f), AbsoluteBounds);
+                Graphics.Primitives2D.DrawRect(SpriteBatch, new Color(0, 0.75f, 1, 0.35f), AbsoluteBounds);
 
-            font?.Draw(
+            Font?.Draw(
                 SpriteBatch,
                 Text,
                 new Rectangle(
