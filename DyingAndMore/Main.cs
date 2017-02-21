@@ -1,6 +1,6 @@
 //Main.cs
 
-using Takai.GameState;
+using Takai.Runtime;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -57,7 +57,7 @@ namespace DyingAndMore
         {
             Takai.Data.Serializer.LoadTypesFrom(System.Reflection.Assembly.GetEntryAssembly());
 
-            if (GameStateManager.IsInitialized)
+            if (GameManager.IsInitialized)
                 return;
 
             #region Mouse Cursor
@@ -78,24 +78,22 @@ namespace DyingAndMore
 
             Takai.AssetManager.Initialize(GraphicsDevice, "Data\\");
 
-            GameStateManager.Initialize(this);
+            GameManager.Initialize(this);
 
             var map = new Takai.Game.Map(GraphicsDevice)
             {
                 updateSettings = Takai.Game.MapUpdateSettings.Editor
             };
-            using (var stream = new System.IO.FileStream("Data/Maps/Test.map.tk", System.IO.FileMode.Open))
-                ;// map.Load(stream);
 
             var state = new Editor.Editor();
-            GameStateManager.PushState(state);
+            GameManager.PushState(state);
 
             base.Initialize();
         }
 
         protected override void OnExiting(object sender, System.EventArgs args)
         {
-            GameStateManager.Exit();
+            GameManager.Exit();
         }
 
         protected override void Update(GameTime gameTime)
@@ -104,7 +102,7 @@ namespace DyingAndMore
                 takingScreenshot = true;
 
             Takai.Input.InputState.Update(GraphicsDevice.Viewport.Bounds);
-            GameStateManager.Update(gameTime);
+            GameManager.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -117,7 +115,7 @@ namespace DyingAndMore
                     GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
                 GraphicsDevice.SetRenderTarget(rt);
-                GameStateManager.Draw(gameTime);
+                GameManager.Draw(gameTime);
                 GraphicsDevice.SetRenderTarget(null);
 
                 var fs = new System.IO.FileStream(System.DateTime.Now.ToString("dd_MMM_HH-mm-ss-fff") + ".png", System.IO.FileMode.Create);
@@ -126,7 +124,7 @@ namespace DyingAndMore
                 rt.Dispose();
             }
             else
-                GameStateManager.Draw(gameTime);
+                GameManager.Draw(gameTime);
         }
     }
 }

@@ -96,7 +96,7 @@ namespace Takai.Game
     }
 
     [Data.DesignerCreatable]
-    public struct Decal
+    public class Decal
     {
         public Texture2D texture;
         public Vector2 position;

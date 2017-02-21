@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
-namespace DyingAndMore.Editor
+namespace DyingAndMore.Editor.Selectors
 {
     class BlobSelector : Selector
     {

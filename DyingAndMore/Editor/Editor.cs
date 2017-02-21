@@ -10,31 +10,36 @@ namespace DyingAndMore.Editor
     class EditorMode
     {
         public string Name { get; set; }
+        
+        protected readonly Editor editor;
 
-        public Selector Selector { get; set; }
+        public EditorMode(string name, Editor editor)
+        {
+            Name = name;
+            this.editor = editor;
+        }
 
-        public System.Action Start { get; set; }
-        public System.Action End { get; set; }
-        public System.Action<GameTime> Update { get; set; }
-        public System.Action Draw { get; set; }
+        public virtual void OpenConfigurator(bool DidClickOpen) { }
+
+        public virtual void Start() { }
+        public virtual void End() { }
+        public virtual void Update(GameTime time) { }
+        public virtual void Draw(SpriteBatch sbatch) { }
     }
-
-    struct DecalIndex
+   
+    partial class Editor : Takai.Runtime.GameState
     {
-        public int x, y, index;
-    }
+        public Takai.Game.Map Map { get; set; }
+        public Takai.Game.Camera Camera { get; set; }
 
-    partial class Editor : Takai.GameState.GameState
-    {
-        public Takai.Game.Camera camera;
+        public BitmapFont LargeFont { get; set; }
+        public BitmapFont SmallFont { get; set; }
+        public BitmapFont DebugFont { get; set; }
 
         SpriteBatch sbatch;
-
-        BitmapFont tinyFont, smallFont, largeFont;
-
-        public Takai.Game.Map map;
-
-        Color highlightColor = Color.Gold;
+        
+        public static readonly Color ActiveColor = Color.GreenYellow;
+        public static readonly Color InactiveColor = new Color(Color.Purple, 0.5f);
 
         int uiMargin = 20;
         Takai.UI.Element uiContainer;
@@ -48,12 +53,12 @@ namespace DyingAndMore.Editor
 
         public override void Load()
         {
-            tinyFont = Takai.AssetManager.Load<BitmapFont>("Fonts/rct2.bfnt");
-            smallFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UISmall.bfnt");
-            largeFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UILarge.bfnt");
+            DebugFont = Takai.AssetManager.Load<BitmapFont>("Fonts/rct2.bfnt");
+            SmallFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UISmall.bfnt");
+            LargeFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UILarge.bfnt");
 
             using (var file = new System.IO.StreamWriter("UISmall.fnt.tk"))
-                Takai.Data.Serializer.TextSerialize(file, tinyFont);
+                Takai.Data.Serializer.TextSerialize(file, DebugFont);
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
@@ -61,46 +66,43 @@ namespace DyingAndMore.Editor
 
             TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap | GestureType.FreeDrag;
 
-            if (map == null)
+            if (Map == null)
             {
-                var container = new Takai.UI.Element()
+                var list = new Takai.UI.List()
                 {
                     HorizontalOrientation = Takai.UI.Orientation.Middle,
-                    VerticalOrientation = Takai.UI.Orientation.Middle
+                    VerticalOrientation = Takai.UI.Orientation.Middle,
+                    Size = GraphicsDevice.Viewport.Bounds.Size.ToVector2()
                 };
 
-                var el = new Takai.UI.Element()
+                Takai.UI.Element elem;
+                list.AddChild(elem = new Takai.UI.Element()
                 {
                     Text = "No map loaded",
-                    Font = largeFont,
+                    Font = LargeFont,
                     HorizontalOrientation = Takai.UI.Orientation.Middle
-                };
-                el.AutoSize();
-                container.AddChild(el);
+                });
+                elem.AutoSize(20);
 
-                el = new Takai.UI.Element()
+                list.AddChild(elem = new Takai.UI.Element()
                 {
                     Text = "Press Ctrl+N to create a new map",
-                    Font = smallFont,
-                    Position = new Vector2(0, 50),
+                    Font = SmallFont,
                     HorizontalOrientation = Takai.UI.Orientation.Middle
-                };
-                el.AutoSize();
-                container.AddChild(el);
+                });
+                elem.AutoSize(10);
 
-                el = new Takai.UI.Element()
+                list.AddChild(elem = new Takai.UI.Element()
                 {
-                    Text = "or Ctrl+O to load one",
-                    Font = smallFont,
-                    Position = new Vector2(0, 75),
+                    Text = "or Ctrl+O to open a map",
+                    Font = SmallFont,
                     HorizontalOrientation = Takai.UI.Orientation.Middle
-                };
-                el.AutoSize();
-                container.AddChild(el);
+                });
+                elem.AutoSize(10);
+                elem.OnClick += delegate { OpenMap(); };
 
-                container.AutoSize();
-                uiContainer.AddChild(container);
-                //todo: create list view (stack panel?)
+                list.AutoSize();
+                uiContainer.AddChild(list);
             }
             else
                 StartMap();
@@ -108,53 +110,61 @@ namespace DyingAndMore.Editor
 
         public override void Unload()
         {
-            while (Takai.GameState.GameStateManager.TopState != this
-                && Takai.GameState.GameStateManager.Count > 0)
-                Takai.GameState.GameStateManager.PopState();
+            while (Takai.Runtime.GameManager.TopState != this
+                && Takai.Runtime.GameManager.Count > 0)
+                Takai.Runtime.GameManager.PopState();
 
             TouchPanel.EnabledGestures = GestureType.None;
         }
 
         public void StartMap()
         {
-            camera = new Takai.Game.Camera(map)
+            Camera = new Takai.Game.Camera(Map)
             {
                 Viewport = GraphicsDevice.Viewport.Bounds
             };
 
-            map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
+            Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
 
-            uiContainer = new Takai.UI.Element();
-            uiContainer.AddChild(modes = new ModeSelector(largeFont, smallFont)
+            if (modes == null)
             {
-                HorizontalOrientation = Takai.UI.Orientation.Middle,
-                VerticalOrientation = Takai.UI.Orientation.Start,
-                Position = new Vector2(0, 40)
-            });
+                modes = new ModeSelector(LargeFont, SmallFont)
+                {
+                    HorizontalOrientation = Takai.UI.Orientation.Middle,
+                    VerticalOrientation = Takai.UI.Orientation.Start,
+                    Position = new Vector2(0, 40)
+                };
+                
+                modes.AddMode(new TilesEditorMode(this));
+                modes.AddMode(new DecalsEditorMode(this));
+                modes.AddMode(new BlobsEditorMode(this));
+                modes.AddMode(new EntitiesEditorMode(this));
+                modes.AddMode(new GroupsEditorMode(this));
+                modes.ModeIndex = 0;
 
-            uiContainer.AddChild(selectorPreview = new Takai.UI.Element()
-            {
-                HorizontalOrientation = Takai.UI.Orientation.End,
-                VerticalOrientation = Takai.UI.Orientation.Start,
-                Position = new Vector2(10),
-                Size = new Vector2(map.TileSize)
-            });
-            uiContainer.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+                selectorPreview = new Takai.UI.Element()
+                {
+                    HorizontalOrientation = Takai.UI.Orientation.End,
+                    VerticalOrientation = Takai.UI.Orientation.Start,
+                    Position = new Vector2(10),
+                    Size = new Vector2(Map.TileSize)
+                };
+                selectorPreview.OnClick += delegate
+                {
+                    modes.Mode?.OpenConfigurator(true);
+                };
 
-            selectorPreview.OnClick += delegate
-            {
-                OpenCurrentSelector(true);
-                isPosSaved = false;
-            };
-
-            selectedDecal = null;
-            selectedEntity = null;
+                uiContainer = new Takai.UI.Element(modes, selectorPreview)
+                {
+                    Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height)
+                };
+            }
 
             //start zoomed out to see the whole map
-            var mapSize = new Vector2(map.Width, map.Height) * map.TileSize;
+            var mapSize = new Vector2(Map.Width, Map.Height) * Map.TileSize;
             var xyScale = new Vector2(GraphicsDevice.Viewport.Width - 20, GraphicsDevice.Viewport.Height - 20) / mapSize;
-            camera.Scale = MathHelper.Clamp(MathHelper.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
-            camera.Position = mapSize / 2;
+            Camera.Scale = MathHelper.Clamp(MathHelper.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
+            Camera.Position = mapSize / 2;
         }
 
         public bool OpenMap()
@@ -163,8 +173,8 @@ namespace DyingAndMore.Editor
             {
                 SupportMultiDottedExtensions = true,
                 Filter = "Map (*.map.tk,*.map.tkz)|*.map.tk;*.map.tkz|All Files (*.*)|*.*",
-                InitialDirectory = System.IO.Path.GetDirectoryName(map?.File),
-                FileName = System.IO.Path.GetFileName(map?.File)
+                InitialDirectory = System.IO.Path.GetDirectoryName(Map?.File),
+                FileName = System.IO.Path.GetFileName(Map?.File)
             };
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -174,13 +184,13 @@ namespace DyingAndMore.Editor
                     if (ofd.FileName.EndsWith("tkz"))
                     {
                         using (var decompress = new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionMode.Decompress))
-                            map = Takai.Game.Map.Load(decompress);
+                            Map = Takai.Game.Map.Load(decompress);
                     }
                     else
-                        map = Takai.Game.Map.Load(stream);
+                        Map = Takai.Game.Map.Load(stream);
                 }
 
-                map.File = ofd.FileName;
+                Map.File = ofd.FileName;
                 StartMap();
 
                 return true;
@@ -191,32 +201,32 @@ namespace DyingAndMore.Editor
 
         public bool SaveMap()
         {
-            if (map == null)
+            if (Map == null)
                 return false;
 
             var sfd = new System.Windows.Forms.SaveFileDialog()
             {
                 SupportMultiDottedExtensions = true,
                 Filter = "Map (*.map.tk)|*.map.tk|All Files (*.*)|*.*",
-                InitialDirectory = System.IO.Path.GetDirectoryName(map.File),
-                FileName = System.IO.Path.GetFileName(map.File?.Substring(0, map.File.IndexOf('.'))) //file dialog is retarded
+                InitialDirectory = System.IO.Path.GetDirectoryName(Map.File),
+                FileName = System.IO.Path.GetFileName(Map.File?.Substring(0, Map.File.IndexOf('.'))) //file dialog is retarded
             };
 
             if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 //todo: optional compression
                 using (var stream = new System.IO.StreamWriter(sfd.OpenFile()))
-                    Takai.Data.Serializer.TextSerialize(stream, map);
+                    Takai.Data.Serializer.TextSerialize(stream, Map);
 
-                map.File = sfd.FileName;
+                Map.File = sfd.FileName;
                 return true;
             }
 
             return false;
         }
-
+        
         private Rectangle lastViewport;
-        public override void Update(GameTime Time)
+        public override void Update(GameTime time)
         {
             var viewport = GraphicsDevice.Viewport.Bounds;
             if (viewport != lastViewport)
@@ -225,7 +235,7 @@ namespace DyingAndMore.Editor
                 uiContainer.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             }
 
-            if (!uiContainer.Update(Time.ElapsedGameTime))
+            if (!uiContainer.Update(time))
                 return;
 
             if (InputState.IsMod(KeyMod.Control))
@@ -236,28 +246,28 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsPress(Keys.Q))
                 {
-                    Takai.GameState.GameStateManager.Exit();
+                    Takai.Runtime.GameManager.Exit();
                     return;
                 }
             }
 
-            if (map == null)
+            if (Map == null)
                 return;
 
             lastWorldPos = currentWorldPos;
-            currentWorldPos = camera.ScreenToWorld(InputState.MouseVector);
+            currentWorldPos = Camera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsClick(Keys.F1))
             {
-                Takai.GameState.GameStateManager.NextState(new Game.Game() { map = map });
+                Takai.Runtime.GameManager.NextState(new Game.Game() { map = Map });
                 return;
             }
 
             if (InputState.IsPress(Keys.F2))
-                map.debugOptions.showBlobReflectionMask ^= true;
+                Map.debugOptions.showBlobReflectionMask ^= true;
 
             if (InputState.IsPress(Keys.F3))
-                map.debugOptions.showOnlyReflections ^= true;
+                Map.debugOptions.showOnlyReflections ^= true;
 
             //touch gestures
             while (TouchPanel.IsGestureAvailable)
@@ -271,7 +281,7 @@ namespace DyingAndMore.Editor
                             if (Vector2.Dot(gesture.Delta, gesture.Delta2) > 0)
                             {
                                 //todo: maybe add velocity
-                                camera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(camera.Transform)) / 2;
+                                Camera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(Camera.Transform)) / 2;
                             }
                             //scale
                             else
@@ -282,7 +292,7 @@ namespace DyingAndMore.Editor
                                 var ld = Vector2.Distance(lp1, lp2);
 
                                 var scale = (dist / ld) / 1024;
-                                camera.Scale += scale;
+                                Camera.Scale += scale;
                             }
                             break;
                         }
@@ -293,7 +303,7 @@ namespace DyingAndMore.Editor
             //camera
             if (InputState.IsButtonDown(MouseButtons.Middle))
             {
-                camera.MoveTo(camera.Position + Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(camera.Transform)));
+                Camera.MoveTo(Camera.Position + Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(Camera.Transform)));
             }
             else
             {
@@ -310,15 +320,15 @@ namespace DyingAndMore.Editor
                 if (d != Vector2.Zero)
                 {
                     d.Normalize();
-                    d = d * camera.MoveSpeed * (float)Time.ElapsedGameTime.TotalSeconds; //(camera velocity)
-                    camera.Position += Vector2.TransformNormal(d, Matrix.Invert(camera.Transform));
+                    d = d * Camera.MoveSpeed * (float)time.ElapsedGameTime.TotalSeconds; //(camera velocity)
+                    Camera.Position += Vector2.TransformNormal(d, Matrix.Invert(Camera.Transform));
                 }
             }
 
             //open current selector
             if (InputState.IsPress(Keys.Tab))
             {
-                OpenCurrentSelector(false);
+                modes.Mode?.OpenConfigurator(false);
                 return;
             }
 
@@ -327,85 +337,28 @@ namespace DyingAndMore.Editor
                 var delta = InputState.ScrollDelta() / 1024f;
                 if (InputState.IsButtonDown(Keys.LeftShift))
                 {
-                    camera.Rotation += delta;
+                    Camera.Rotation += delta;
                 }
                 else
                 {
-                    camera.Scale += delta;
-                    camera.Scale = MathHelper.Clamp(camera.Scale, 0.1f, 2f);
+                    Camera.Scale += delta;
+                    Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 2f);
                 }
                 //todo: translate to mouse cursor
             }
 
-            camera.Scale = MathHelper.Clamp(camera.Scale, 0.1f, 10f); //todo: make global and move to some game settings
-            camera.Update(Time);
-
-            switch (modes.Mode)
-            {
-                case EditorMode.Tiles:
-                    UpdateTilesMode(Time);
-                    break;
-                case EditorMode.Decals:
-                    UpdateDecalsMode(Time);
-                    break;
-                case EditorMode.Blobs:
-                    UpdateBlobsMode(Time);
-                    break;
-                case EditorMode.Entities:
-                    UpdateEntitiesMode(Time);
-                    break;
-                case EditorMode.Groups:
-                    UpdateGroupsMode(Time);
-                    break;
-            }
+            Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 10f); //todo: make global and move to some game settings
+            Camera.Update(time);
         }
 
-        bool SelectDecal(Vector2 WorldPosition)
+        Vector2 CenterInRect(Vector2 size, Rectangle region)
         {
-            //find closest decal
-            var mapSz = new Vector2(map.Width, map.Height);
-            var start = Vector2.Clamp((WorldPosition / map.SectorPixelSize) - Vector2.One, Vector2.Zero, mapSz).ToPoint();
-            var end = Vector2.Clamp((WorldPosition / map.SectorPixelSize) + Vector2.One, Vector2.Zero, mapSz).ToPoint();
-
-            selectedDecal = null;
-            for (int y = start.Y; y < end.Y; y++)
-            {
-                for (int x = start.X; x < end.X; x++)
-                {
-                    for (var i = 0; i < map.Sectors[y, x].decals.Count; i++)
-                    {
-                        var decal = map.Sectors[y, x].decals[i];
-
-                        //todo: transform worldPosition by decal matrix and perform transformed comparison
-                        var transform = Matrix.CreateScale(decal.scale) * Matrix.CreateRotationZ(decal.angle) * Matrix.CreateTranslation(new Vector3(decal.position, 0));
-
-                        if (Vector2.DistanceSquared(decal.position, WorldPosition) < decal.texture.Width * decal.texture.Width * decal.scale)
-                        {
-                            selectedDecal = new DecalIndex { x = x, y = y, index = i };
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
+            return new Vector2(region.X + (region.Width - size.X) / 2, region.Y + (region.Height - size.Y) / 2);
         }
 
-        Vector2 CenterInRect(Vector2 Size, Rectangle Region)
+        public override void Draw(GameTime time)
         {
-            return new Vector2(Region.X + (Region.Width - Size.X) / 2, Region.Y + (Region.Height - Size.Y) / 2);
-        }
-
-        void MapLineRect(Rectangle Rect, Color Color)
-        {
-            map.DrawLine(new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Right, Rect.Top), Color);
-            map.DrawLine(new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Left, Rect.Bottom), Color);
-            map.DrawLine(new Vector2(Rect.Right, Rect.Top), new Vector2(Rect.Right, Rect.Bottom), Color);
-            map.DrawLine(new Vector2(Rect.Left, Rect.Bottom), new Vector2(Rect.Right, Rect.Bottom), Color);
-        }
-
-        public override void Draw(GameTime Time)
-        {
-            if (map == null)
+            if (Map == null)
             {
                 GraphicsDevice.Clear(new Color(24, 24, 24)); //todo: replace w/ graphic maybe
 
@@ -416,42 +369,25 @@ namespace DyingAndMore.Editor
             }
 
             //draw border around map
-            MapLineRect(new Rectangle(0, 0, map.Width * map.TileSize, map.Height * map.TileSize), Color.Orange);
+            Map.DrawRect(new Rectangle(0, 0, Map.Width * Map.TileSize, Map.Height * Map.TileSize), Color.Orange);
 
-            camera.Draw();
+            Camera.Draw();
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
             //fps
-            var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
-            var sSz = tinyFont.MeasureString(sFps);
-            tinyFont.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
+            var sFps = (1 / time.ElapsedGameTime.TotalSeconds).ToString("N2");
+            var sSz = DebugFont.MeasureString(sFps);
+            DebugFont.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
-            switch (modes.Mode)
-            {
-                case EditorMode.Tiles:
-                    DrawTilesMode();
-                    break;
-                case EditorMode.Decals:
-                    DrawDecalsMode();
-                    break;
-                case EditorMode.Blobs:
-                    DrawBlobsMode();
-                    break;
-                case EditorMode.Entities:
-                    DrawEntitiesMode();
-                    break;
-                case EditorMode.Groups:
-                    DrawGroupsMode();
-                    break;
-            }
+            DebugFont.Draw(sbatch, $"Zoom: {(Camera.Scale * 100):N1}%", new Vector2(10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
             //draw selected item in top right corner
-            if (selectors[(int)modes.Mode] != null)
-            {
-                selectors[(int)modes.Mode].DrawItem(Time, selectors[(int)modes.Mode].SelectedItem, selectorPreview.AbsoluteBounds, sbatch);
-                Primitives2D.DrawRect(sbatch, Color.White, selectorPreview.AbsoluteBounds);
-            }
+            //if (modes.Mode?.Selector != null)
+            //{
+            //    modes.Mode.Selector.DrawItem(time, modes.Mode.Selector.SelectedItem, selectorPreview.AbsoluteBounds, sbatch);
+            //    Primitives2D.DrawRect(sbatch, Color.White, selectorPreview.AbsoluteBounds);
+            //}
 
             sbatch.End();
 
@@ -461,14 +397,14 @@ namespace DyingAndMore.Editor
         }
 
         static readonly Matrix arrowWingTransform = Matrix.CreateRotationZ(120);
-        protected void DrawArrow(Vector2 Position, Vector2 Direction, float Magnitude)
+        public void DrawArrow(Vector2 Position, Vector2 Direction, float Magnitude)
         {
             var tip = Position + (Direction * Magnitude);
-            map.DrawLine(Position, tip, Color.Yellow);
+            Map.DrawLine(Position, tip, Color.Yellow);
 
             Magnitude = MathHelper.Clamp(Magnitude * 0.333f, 5, 30);
-            map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, arrowWingTransform)), Color.Yellow);
-            map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(arrowWingTransform))), Color.Yellow);
+            Map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, arrowWingTransform)), Color.Yellow);
+            Map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(arrowWingTransform))), Color.Yellow);
         }
     }
 }

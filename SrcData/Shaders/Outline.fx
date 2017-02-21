@@ -13,8 +13,24 @@ float Adjacent(float2 UV, float2 Distance)
 	return ne.a * se.a * nw.a * sw.a;
 }
 
+
+float offset[] = { 0.0, 1.3846153846, 3.2307692308 };
+float weight[] = { 0.2270270270, 0.3162162162, 0.0702702703 };
+
 float4 main(float4 pos : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0) : SV_Target
 {
+    /*float4 tex = tex2D(Tex, uv / 1024.0) * weight[0];
+
+    for (int i = 1; i < 3; ++i)
+    {
+        tex += tex2D(Tex, (uv + float2(0.0, offset[i])) / 1024.0) * weight[i];
+        tex += tex2D(Tex, (uv - float2(0.0, offset[i])) / 1024.0) * weight[i];
+    }
+
+    return tex;
+*/
+    //deprecated
+
     float4 px = tex2D(Tex, uv);
     if (px.a == 0)
         return px;

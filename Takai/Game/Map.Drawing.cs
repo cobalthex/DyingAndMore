@@ -4,14 +4,6 @@ using System.Collections.Generic;
 
 namespace Takai.Game
 {
-    public struct MapProfilingInfo
-    {
-        public int visibleEnts;
-        public int visibleInactiveBlobs;
-        public int visibleActiveBlobs;
-        public int visibleDecals;
-    }
-
     public partial class Map
     {
         protected GraphicsDevice GraphicsDevice { get; set; }
@@ -38,47 +30,68 @@ namespace Takai.Game
         /// <summary>
         /// Configurable debug options
         /// </summary>
-        public struct DebugOptions
+        public struct MapDebugOptions
         {
             public bool showBlobReflectionMask;
             public bool showOnlyReflections;
+            public bool showEntitiesWithoutSprites;
         }
 
         [Data.NonSerialized]
-        public DebugOptions debugOptions;
+        public MapDebugOptions debugOptions;
 
         /// <summary>
-        /// Draw a line the next frame
+        /// Draw a line next frame
         /// </summary>
-        /// <param name="Start">The start position of the line</param>
-        /// <param name="End">The end position of the line</param>
-        /// <param name="Color">The color of the line</param>
+        /// <param name="start">The start position of the line</param>
+        /// <param name="end">The end position of the line</param>
+        /// <param name="color">The color of the line</param>
         /// <remarks>Lines are world relative</remarks>
-        public void DrawLine(Vector2 Start, Vector2 End, Color Color)
+        public void DrawLine(Vector2 start, Vector2 end, Color color)
         {
-            debugLines.Add(new VertexPositionColor { Position = new Vector3(Start, 0), Color = Color });
-            debugLines.Add(new VertexPositionColor { Position = new Vector3(End, 0), Color = Color });
+            debugLines.Add(new VertexPositionColor { Position = new Vector3(start, 0), Color = color });
+            debugLines.Add(new VertexPositionColor { Position = new Vector3(end, 0), Color = color });
         }
 
+        /// <summary>
+        /// Draw an outlined rectangle next frame
+        /// </summary>
+        /// <param name="rect">the region to draw</param>
+        /// <param name="color">The color to use</param>
+        public void DrawRect(Rectangle rect, Color color)
+        {
+            DrawLine(new Vector2(rect.Left, rect.Top), new Vector2(rect.Right, rect.Top), color);
+            DrawLine(new Vector2(rect.Left, rect.Top), new Vector2(rect.Left, rect.Bottom), color);
+            DrawLine(new Vector2(rect.Right, rect.Top), new Vector2(rect.Right, rect.Bottom), color);
+            DrawLine(new Vector2(rect.Left, rect.Bottom), new Vector2(rect.Right, rect.Bottom), color);
+        }
+
+        public struct MapProfilingInfo
+        {
+            public int visibleEnts;
+            public int visibleInactiveBlobs;
+            public int visibleActiveBlobs;
+            public int visibleDecals;
+        }
         [Data.NonSerialized]
         public MapProfilingInfo ProfilingInfo { get { return profilingInfo; } }
         protected MapProfilingInfo profilingInfo;
 
-        public Map(GraphicsDevice GDevice)
+        public Map(GraphicsDevice gDevice)
         {
-            InitializeGraphics(GDevice);
+            InitializeGraphics(gDevice);
         }
 
         /// <summary>
         /// Create a new map
         /// </summary>
-        /// <param name="GDevice">The graphics device to use for rendering the map</param>
-        public void InitializeGraphics(GraphicsDevice GDevice)
+        /// <param name="gDevice">The graphics device to use for rendering the map</param>
+        public void InitializeGraphics(GraphicsDevice gDevice)
         {
-            GraphicsDevice = GDevice;
-            if (GDevice != null)
+            GraphicsDevice = gDevice;
+            if (gDevice != null)
             {
-                sbatch = new SpriteBatch(GDevice);
+                sbatch = new SpriteBatch(gDevice);
                 lineEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Line.mgfx");
                 lineRaster = new RasterizerState()
                 {
@@ -102,17 +115,17 @@ namespace Takai.Game
                     DepthBufferEnable = false,
                 };
 
-                var width = GDevice.PresentationParameters.BackBufferWidth;
-                var height = GDevice.PresentationParameters.BackBufferHeight;
+                var width = gDevice.PresentationParameters.BackBufferWidth;
+                var height = gDevice.PresentationParameters.BackBufferHeight;
 
-                mapAlphaTest = new AlphaTestEffect(GDevice)
+                mapAlphaTest = new AlphaTestEffect(gDevice)
                 {
                     ReferenceAlpha = 1
                 };
-                preRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
-                blobsRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-                reflectionRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-                reflectedRenderTarget = new RenderTarget2D(GDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                preRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                blobsRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                reflectionRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                reflectedRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
                 //todo: some of the render targets may be able to be combined
 
                 outlineEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Outline.mgfx");
@@ -141,39 +154,14 @@ namespace Takai.Game
             #region setup
 
             _drawEntsOutlined.Clear();
-
-            var invTransform = Matrix.Invert(Camera.Transform);
-
-            var startPos = invTransform.Translation;
-            //startPos = new Vector3(Vector2.TransformNormal(new Vector2(startPos.X, startPos.Y), Transform), 0);
-
-            var scale = invTransform.Scale;
-            var rotation = Camera.Transform.Rotation;
-
-            var scaleWidth = (int)(Camera.Viewport.Width * scale.Z);
-            var scaleHeight = (int)(Camera.Viewport.Height * scale.Z);
-
-            //todo: camera/transform rotation broken
-
+            
             var originalRt = GraphicsDevice.GetRenderTargets();
 
-            var startX = (int)startPos.X / tileSize;
-            var startY = (int)startPos.Y / tileSize;
-
-            int endX = startX + 1 + ((scaleWidth - 1) / tileSize);
-            int endY = startY + 1 + ((scaleHeight - 1) / tileSize);
-
-            startX = System.Math.Max(startX, 0);
-            startY = System.Math.Max(startY, 0);
-
-            endX = System.Math.Min(endX + 1, Width);
-            endY = System.Math.Min(endY + 1, Height);
-
-            //visible sector region
-            int sStartX = System.Math.Max((startX / SectorSize) - 1, 0);
-            int sStartY = System.Math.Max((startY / SectorSize) - 1, 0);
-            int sEndX = System.Math.Min(1 + (endX - 1) / SectorSize, Width / SectorSize);
-            int sEndY = System.Math.Min(1 + (endY - 1) / SectorSize, Height / SectorSize);
+            var visibleRegion = Rectangle.Intersect(Camera.VisibleRegion, Bounds);
+            var visibleTiles = new Rectangle(visibleRegion.X / TileSize, visibleRegion.Y / tileSize,
+                                             (visibleRegion.Width - 1) / tileSize + 1, (visibleRegion.Height - 1) / tileSize + 1);
+            var visibleSectors = new Rectangle(visibleTiles.X / SectorSize, visibleTiles.Y / SectorSize,
+                                               (visibleTiles.Width - 1) / SectorSize + 1, (visibleTiles.Height - 1) / SectorSize + 1);
 
             #endregion
 
@@ -203,9 +191,8 @@ namespace Takai.Game
                         //todo: draw all overlays
                     }
                 }
-
-#if DEBUG //Draw [X] in place of ent graphic
-                if (!didDraw)
+                
+                if (debugOptions.showEntitiesWithoutSprites && !didDraw)
                 {
                     Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
                                                  -ent.Direction.Y, ent.Direction.X, 0, 0,
@@ -227,7 +214,6 @@ namespace Takai.Game
                     DrawLine(tl, br, Color.Salmon);
                     DrawLine(bl, tr, Color.Salmon);
                 }
-#endif
             }
 
             sbatch.End();
@@ -243,8 +229,8 @@ namespace Takai.Game
                     if (sprite?.Texture == null)
                         continue;
 
-                    outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
-                    outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
+                    //outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
+                    //outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
 
                     var angle = ent.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
                     sprite.Draw(sbatch, ent.Position, angle, first ? ent.OutlineColor : Color.Transparent);
@@ -293,9 +279,9 @@ namespace Takai.Game
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, reflectionEffect, Camera.Transform);
 
             //inactive blobs
-            for (var y = sStartY; y < sEndY; y++)
+            for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
             {
-                for (var x = sStartX; x < sEndX; x++)
+                for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
                 {
                     foreach (var blob in Sectors[y, x].blobs)
                     {
@@ -327,9 +313,9 @@ namespace Takai.Game
             mapAlphaTest.View = Camera.Transform;
             sbatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, stencilWrite, null, mapAlphaTest);
 
-            for (var y = startY; y < endY; y++)
+            for (var y = visibleTiles.Top; y < visibleTiles.Bottom; ++y)
             {
-                for (var x = startX; x < endX; x++)
+                for (var x = visibleTiles.Left; x < visibleTiles.Right; ++x)
                 {
                     var tile = Tiles[y, x];
                     if (tile < 0)
@@ -353,9 +339,9 @@ namespace Takai.Game
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Camera.Transform);
 
-            for (var y = sStartY; y < sEndY; y++)
+            for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
             {
-                for (var x = sStartX; x < sEndX; x++)
+                for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
                 {
                     foreach (var decal in Sectors[y, x].decals)
                     {

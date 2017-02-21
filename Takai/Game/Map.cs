@@ -18,9 +18,9 @@ namespace Takai.Game
     /// <summary>
     /// An event handler for triggered events
     /// </summary>
-    /// <param name="TriggerType"></param>
-    /// <param name="TriggerValue"></param>
-    public delegate void TriggeredEvent(string TriggerType, int TriggerValue);
+    /// <param name="triggerType"></param>
+    /// <param name="triggerValue"></param>
+    public delegate void TriggeredEvent(string triggerType, int triggerValue);
 
     /// <summary>
     /// A 2D, tile based map system that handles logic and rendering of the map
@@ -129,18 +129,18 @@ namespace Takai.Game
         /// <summary>
         /// Add an event handler
         /// </summary>
-        /// <param name="Name">The name of the event to add a handler to. Null or empty names are ignored</param>
-        /// <param name="EventHandler">The event handler to add</param>
+        /// <param name="name">The name of the event to add a handler to. Null or empty names are ignored</param>
+        /// <param name="eventHandler">The event handler to add</param>
         /// <returns>True if the handler was added, false otherwise</returns>
-        public bool AddEventHandler(string Name, TriggeredEvent EventHandler)
+        public bool AddEventHandler(string name, TriggeredEvent eventHandler)
         {
-            if (string.IsNullOrEmpty(Name))
+            if (string.IsNullOrEmpty(name))
                 return false;
 
-            if (eventHandlers.ContainsKey(Name))
-                eventHandlers[Name] += EventHandler;
+            if (eventHandlers.ContainsKey(name))
+                eventHandlers[name] += eventHandler;
             else
-                eventHandlers[Name] = EventHandler;
+                eventHandlers[name] = eventHandler;
 
             return true;
         }
@@ -148,14 +148,14 @@ namespace Takai.Game
         /// <summary>
         /// Remove an event handler
         /// </summary>
-        /// <param name="Name">The name of the event to remove the handler from</param>
-        /// <param name="EventHandler">The event handler to remove</param>
+        /// <param name="name">The name of the event to remove the handler from</param>
+        /// <param name="eventHandler">The event handler to remove</param>
         /// <returns>True if the handler was removed, false otherwise</returns>
-        public bool RemoveEventHandler(string Name, TriggeredEvent EventHandler)
+        public bool RemoveEventHandler(string name, TriggeredEvent eventHandler)
         {
-            if (eventHandlers.ContainsKey(Name))
+            if (eventHandlers.ContainsKey(name))
             {
-                eventHandlers[Name] -= EventHandler;
+                eventHandlers[name] -= eventHandler;
                 return true;
             }
             return false;
@@ -164,33 +164,33 @@ namespace Takai.Game
         /// <summary>
         /// Trigger an event
         /// </summary>
-        /// <param name="Name">The name of the trigger</param>
-        /// <param name="Value">The value of the trigger. Value interpreted by the handler</param>
-        public void TriggerEvent(string Name, int Value)
+        /// <param name="name">The name of the trigger</param>
+        /// <param name="value">The value of the trigger. Value interpreted by the handler</param>
+        public void TriggerEvent(string name, int value)
         {
-            if (eventHandlers.TryGetValue(Name, out var handler))
-                handler(Name, Value);
+            if (eventHandlers.TryGetValue(name, out var handler))
+                handler(name, value);
         }
 
         /// <summary>
         /// Adds an existing entity to the map
         /// </summary>
-        /// <param name="Entity">The entity to add</param>
-        /// <param name="AddToActive">Add this entity to the active set (defaults to true)</param>
-        public void Spawn(Entity Entity, bool AddToActive = true)
+        /// <param name="entity">The entity to add</param>
+        /// <param name="addToActive">Add this entity to the active set (defaults to true)</param>
+        public void Spawn(Entity entity, bool addToActive = true)
         {
-            if (Entity.Map != null)
-                Destroy(Entity);
+            if (entity.Map != null)
+                Destroy(entity);
 
-            Entity.Map = this;
-            Entity.SpawnTime = ElapsedTime;
+            entity.Map = this;
+            entity.SpawnTime = ElapsedTime;
 
-            if (AddToActive)
-                ActiveEnts.Add(Entity);
+            if (addToActive)
+                ActiveEnts.Add(entity);
             else
             {
-                var sector = GetSector(Entity.Position);
-                Sectors[sector.Y, sector.X].entities.Add(Entity);
+                var sector = GetSector(entity.Position);
+                Sectors[sector.Y, sector.X].entities.Add(entity);
             }
             TotalEntitiesCount++;
         }
@@ -199,21 +199,21 @@ namespace Takai.Game
         /// Spawn an entity in the map
         /// </summary>
         /// <typeparam name="TEntity">The type of entity to spawn</typeparam>
-        /// <param name="Position">Where to spawn the entity</param>
-        /// <param name="Direction">The direction the entity should face</param>
-        /// <param name="Velocity">The entity's initial velocity</param>
+        /// <param name="position">Where to spawn the entity</param>
+        /// <param name="direction">The direction the entity should face</param>
+        /// <param name="velocity">The entity's initial velocity</param>
         /// <param name="LoadEntity">Should the entity be loaded, defaults to true</param>
         /// <returns>The entity spawned</returns>
-        public TEntity Spawn<TEntity>(Vector2 Position, Vector2 Direction, Vector2 Velocity) where TEntity : Entity, new()
+        public TEntity Spawn<TEntity>(Vector2 position, Vector2 direction, Vector2 velocity) where TEntity : Entity, new()
         {
             var ent = new TEntity()
             {
                 Map = this,
                 SpawnTime = ElapsedTime,
 
-                Position = Position,
-                Direction = Direction,
-                Velocity = Velocity
+                Position = position,
+                Direction = direction,
+                Velocity = velocity
             };
 
             //will be removed in next update if out of visible range
@@ -227,23 +227,23 @@ namespace Takai.Game
         /// <summary>
         /// Spawn an entity, cloning another
         /// </summary>
-        /// <param name="Template">The entity to clone</param>
-        /// <param name="Position">Where to spawn the entity</param>
-        /// <param name="Direction">The direction the entity should face</param>
-        /// <param name="Velocity">The entity's initial velocity</param>
+        /// <param name="template">The entity to clone</param>
+        /// <param name="position">Where to spawn the entity</param>
+        /// <param name="direction">The direction the entity should face</param>
+        /// <param name="velocity">The entity's initial velocity</param>
         /// <param name="LoadEntity">Should the entity be loaded, defaults to true</param>
         /// <returns>The new entity spawned</returns>
-        public TEntity Spawn<TEntity>(TEntity Template, Vector2 Position, Vector2 Direction, Vector2 Velocity) where TEntity : Entity, new()
+        public TEntity Spawn<TEntity>(TEntity template, Vector2 position, Vector2 direction, Vector2 velocity) where TEntity : Entity, new()
         {
-            var ent = (TEntity)Template.Clone();
+            var ent = (TEntity)template.Clone();
 
             ent.Map = this;
             ent.SpawnTime = ElapsedTime;
             ent.OnSpawn();
 
-            ent.Position = Position;
-            ent.Direction = Direction;
-            ent.Velocity = Velocity;
+            ent.Position = position;
+            ent.Direction = direction;
+            ent.Velocity = velocity;
 
             //will be removed in next update if out of visible range
             //only inactive entities are placed in sectors
@@ -256,61 +256,61 @@ namespace Takai.Game
         /// <summary>
         /// Spawn a single blob onto the map
         /// </summary>
-        /// <param name="Position">The position of the blob</param>
-        /// <param name="Velocity">The blob's initial velocity</param>
-        /// <param name="Type">The blob's type</param>
-        public void Spawn(BlobType Type, Vector2 Position, Vector2 Velocity)
+        /// <param name="position">The position of the blob</param>
+        /// <param name="velocity">The blob's initial velocity</param>
+        /// <param name="type">The blob's type</param>
+        public void Spawn(BlobType type, Vector2 position, Vector2 velocity)
         {
             //todo: don't spawn blobs outside the map (position + radius)
 
-            if (Velocity == Vector2.Zero)
+            if (velocity == Vector2.Zero)
             {
-                var sector = GetSector(Position);
-                Sectors[sector.Y, sector.X].blobs.Add(new Blob { position = Position, velocity = Velocity, type = Type });
+                var sector = GetSector(position);
+                Sectors[sector.Y, sector.X].blobs.Add(new Blob { position = position, velocity = velocity, type = type });
             }
             else
-                ActiveBlobs.Add(new Blob { position = Position, velocity = Velocity, type = Type });
+                ActiveBlobs.Add(new Blob { position = position, velocity = velocity, type = type });
         }
 
         /// <summary>
         /// Spawn particles
         /// </summary>
-        /// <param name="Spawn">The rules for spawning</param>
-        public void Spawn(ParticleSpawn Spawn)
+        /// <param name="spawn">The rules for spawning</param>
+        public void Spawn(ParticleSpawn spawn)
         {
-            int count = random.Next(Spawn.count.min, Spawn.count.max);
+            int count = random.Next(spawn.count.min, spawn.count.max);
 
-            if (!Particles.ContainsKey(Spawn.type))
-                Particles.Add(Spawn.type, new List<Particle>());
+            if (!Particles.ContainsKey(spawn.type))
+                Particles.Add(spawn.type, new List<Particle>());
 
             for (int i = 0; i < count; i++)
             {
-                var lifetime = RandTime(Spawn.lifetime.min, Spawn.lifetime.max);
+                var lifetime = RandTime(spawn.lifetime.min, spawn.lifetime.max);
                 if (lifetime <= System.TimeSpan.Zero)
                     continue;
 
-                var delay = RandTime(Spawn.delay.min, Spawn.delay.max);
+                var delay = RandTime(spawn.delay.min, spawn.delay.max);
 
-                var theta = RandFloat(Spawn.angle.min, Spawn.angle.max);
+                var theta = RandFloat(spawn.angle.min, spawn.angle.max);
                 var dir = new Vector2
                 (
                     (float)System.Math.Cos(theta),
                     (float)System.Math.Sin(theta)
                 );
 
-                Particles[Spawn.type].Add(new Particle
+                Particles[spawn.type].Add(new Particle
                 {
                     time     = ElapsedTime,
                     lifetime = lifetime,
                     delay    = delay,
 
-                    position = RandVector2(Spawn.position.min, Spawn.position.max),
+                    position = RandVector2(spawn.position.min, spawn.position.max),
                     direction = dir,
 
                     //cached
-                    speed = Spawn.type.Speed.start,
-                    scale = Spawn.type.Scale.start,
-                    color = Spawn.type.Color.start
+                    speed = spawn.type.Speed.start,
+                    scale = spawn.type.Scale.start,
+                    color = spawn.type.Color.start
                 });
             }
         }
@@ -318,37 +318,39 @@ namespace Takai.Game
         /// <summary>
         /// Add a decal to the map
         /// </summary>
-        /// <param name="Texture"></param>
-        /// <param name="Position">The position of the decal on the map</param>
-        /// <param name="Angle">The angle the decal faces</param>
-        /// <param name="Scale">How much to scale the decal</param>
-        public void AddDecal(Texture2D Texture, Vector2 Position, float Angle = 0, float Scale = 1)
+        /// <param name="texture"></param>
+        /// <param name="position">The position of the decal on the map</param>
+        /// <param name="angle">The angle the decal faces</param>
+        /// <param name="scale">How much to scale the decal</param>
+        public Decal AddDecal(Texture2D texture, Vector2 position, float angle = 0, float scale = 1)
         {
-            if (Texture == null)
-                return;
+            if (texture == null)
+                return null;
 
-            var sector = GetSector(Position);
-            Sectors[sector.Y, sector.X].decals.Add(new Decal { texture = Texture, position = Position, angle = Angle, scale = Scale });
+            var sector = GetSector(position);
+            var decal = new Decal { texture = texture, position = position, angle = angle, scale = scale };
+            Sectors[sector.Y, sector.X].decals.Add(decal);
+            return decal;
         }
 
-        public void AddDecal(Decal Decal)
+        public void AddDecal(Decal decal)
         {
-            if (Decal.texture == null)
+            if (decal.texture == null)
                 return;
 
-            var sector = GetSector(Decal.position);
-            Sectors[sector.Y, sector.X].decals.Add(Decal);
+            var sector = GetSector(decal.position);
+            Sectors[sector.Y, sector.X].decals.Add(decal);
         }
 
         /// <summary>
         /// Remove an entity from the map.
         /// Entity.OnDestroy() is called immediately
         /// </summary>
-        /// <param name="Ent">The entity to remove</param>
+        /// <param name="ent">The entity to remove</param>
         /// <remarks>Will be marked for removal to be removed during the next Update cycle</remarks>
-        public void Destroy(Entity Ent)
+        public void Destroy(Entity ent)
         {
-            Ent.Map = null;
+            ent.Map = null;
         }
     }
 }

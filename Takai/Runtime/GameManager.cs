@@ -1,12 +1,22 @@
 ﻿using System.Collections.Generic;
 
-namespace Takai.GameState
+namespace Takai.Runtime
 {
     /// <summary>
-    /// Manages multiple program/game states
+    /// A helper/wrapper around the game. Also manages game state
     /// </summary>
-    public static class GameStateManager
-    {
+    public static class GameManager
+    {   
+        /// <summary>
+        /// A reference to the game and its properties
+        /// </summary>
+        public static Microsoft.Xna.Framework.Game Game { get; internal set; }
+
+        /// <summary>
+        /// A pointer to the game's graphics device
+        /// </summary>
+        public static Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice { get { return Game.GraphicsDevice; } }
+
         /// <summary>
         /// has the state manager been initialized
         /// </summary>
@@ -41,20 +51,17 @@ namespace Takai.GameState
         /// Does the game window have focus?
         /// </summary>
         public static bool HasFocus { get { return Game.IsActive; } }
-
-        /// <summary>
-        /// A reference to the game and its properties
-        /// </summary>
-        public static Microsoft.Xna.Framework.Game Game { get; internal set; }
         
         /// <summary>
         /// Initialize state manager
         /// </summary>
-        /// <param name="Game">The game this state manager is part of</param>
-        public static void Initialize(Microsoft.Xna.Framework.Game Game)
+        /// <param name="game">The game this state manager is part of</param>
+        public static void Initialize(Microsoft.Xna.Framework.Game game)
         {
             states = new List<GameState>();
-            GameStateManager.Game = Game;
+            Game = game;
+
+            //Todo: maybe switch to use game components, and add automatic management
 
             IsInitialized = true;
         }
@@ -63,7 +70,7 @@ namespace Takai.GameState
         /// Update the state manager and all of the states in it
         /// </summary>
         /// <param name="time">Game time</param>
-        public static void Update(Microsoft.Xna.Framework.GameTime Time)
+        public static void Update(Microsoft.Xna.Framework.GameTime time)
         {
             if (IsExiting)
                 Game.Exit();
@@ -78,7 +85,7 @@ namespace Takai.GameState
                 GameState s = states[i];
                 if (s.IsEnabled)
                 {
-                    s.Update(Time);
+                    s.Update(time);
                    
                     if (!s.UpdateBelow)
                         break;
@@ -90,13 +97,13 @@ namespace Takai.GameState
         /// Draw all of the states in the state manager
         /// </summary>
         /// <param name="time">game time</param>
-        public static void Draw(Microsoft.Xna.Framework.GameTime Time)
+        public static void Draw(Microsoft.Xna.Framework.GameTime time)
         {
             for (int i = firstDraw; i < states.Count; i++)
             {
                 if (states[i].IsVisible)
                 {
-                    states[i].Draw(Time);
+                    states[i].Draw(time);
                 }
             }
         }
@@ -112,25 +119,25 @@ namespace Takai.GameState
         /// <summary>
         /// Add a state to the top of the State stack
         /// </summary>
-        /// <param name="State">The State to add</param>
-        public static void PushState(GameState State)
+        /// <param name="state">The State to add</param>
+        public static void PushState(GameState state)
         {
-            if (State == null)
-                throw new System.ArgumentNullException("add");
+            if (state == null)
+                throw new System.ArgumentNullException("state");
 
-            states.Add(State);
-            ActivateState(State);
+            states.Add(state);
+            ActivateState(state);
         }
 
         /// <summary>
         /// Remove all states until a no below draw state is found and swap it with next
         /// </summary>
-        /// <param name="NextState">State to replace the top</param>
+        /// <param name="nextState">State to replace the top</param>
         /// <returns>the previous state that was popped off the state stack</returns>
         /// <remarks>The previous state is unloaded</remarks>
-        public static void NextState(GameState NextState)
+        public static void NextState(GameState nextState)
         {
-            System.Diagnostics.Contracts.Contract.Assert(NextState != null);
+            System.Diagnostics.Contracts.Contract.Assert(nextState != null);
 
             GameState s;
             while (states.Count > 0 && ((s = states[states.Count - 1]).DrawBelow))
@@ -140,10 +147,10 @@ namespace Takai.GameState
                 states.RemoveAt(states.Count - 1);
             }
 
-            if (!NextState.DrawBelow)
+            if (!nextState.DrawBelow)
                 firstDraw = states.Count;
 
-            PushState(NextState);
+            PushState(nextState);
         }
 
         /// <summary>
@@ -159,33 +166,45 @@ namespace Takai.GameState
         }
 
         /// <summary>
+        /// Remove a state from the state stack
+        /// </summary>
+        /// <param name="state">The state to remove</param>
+        internal static void RemoveState(GameState state)
+        {
+            state.Deactivate();
+            states.Remove(state);
+        }
+
+        /// <summary>
         /// Loads the state and sets all properties
         /// </summary>
-        /// <param name="State">State to activate</param>
-        static void ActivateState(GameState State)
+        /// <param name="state">State to activate</param>
+        static void ActivateState(GameState state)
         {
-            State.GraphicsDevice = Game.GraphicsDevice;
+            if (state.GraphicsDevice == null)
+                state.GraphicsDevice = Game.GraphicsDevice;
 
-            State.Activate();
-            if (!State.IsLoaded)
+            if (!state.IsLoaded)
             {
-                State.Load();
-                State.IsLoaded = true;
+                state.Load();
+                state.IsLoaded = true;
             }
+
+            state.Activate();
         }
 
         /// <summary>
         /// Is this state being updated (checks states above it)
         /// </summary>
-        /// <param name="State">The state to check</param>
+        /// <param name="state">The state to check</param>
         /// <returns>true if the state is updating, false otherwise</returns>
-        public static bool IsUpdating(GameState State)
+        public static bool IsUpdating(GameState state)
         {
             for (var i = states.Count - 1; i >= 0; --i)
             {
-                if (states[i] != State && !states[i].UpdateBelow)
+                if (states[i] != state && !states[i].UpdateBelow)
                     return false;
-                if (states[i] == State)
+                if (states[i] == state)
                     return true;
             }
 
@@ -196,12 +215,12 @@ namespace Takai.GameState
         /// Get a rectangle with the TV safe area to draw to (defaults to the inner 85% of the screen)
         /// </summary>
         /// <returns>A rectangle with the safe area</returns>
-        public static Microsoft.Xna.Framework.Rectangle GetTitleSafeArea(Microsoft.Xna.Framework.Rectangle Viewport, float SafeRegion = 0.85f)
+        public static Microsoft.Xna.Framework.Rectangle GetTitleSafeArea(Microsoft.Xna.Framework.Rectangle viewport, float safeRegion = 0.85f)
         {
-            int w = (int)(Viewport.Width * SafeRegion);
-            int h = (int)(Viewport.Height * SafeRegion);
+            int w = (int)(viewport.Width * safeRegion);
+            int h = (int)(viewport.Height * safeRegion);
 
-            return new Microsoft.Xna.Framework.Rectangle((Viewport.Width - w) >> 1, (Viewport.Height - h) >> 1, w, h);
+            return new Microsoft.Xna.Framework.Rectangle((viewport.Width - w) >> 1, (viewport.Height - h) >> 1, w, h);
         }
 
         /// <summary>
