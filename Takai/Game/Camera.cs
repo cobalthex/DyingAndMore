@@ -49,8 +49,28 @@ namespace Takai.Game
         public float Rotation { get; set; } = 0;
 
         /// <summary>
+        /// The actual rotation, which is rotation + shake (randomized)
+        /// </summary>
+        private float actualRotation = 0;
+
+        /// <summary>
+        /// How much the camera should shake every frame (random amount up to this value) in radians
+        /// 0 for none
+        /// </summary>
+        public float Shake
+        {
+            get { return shake; }
+            set {
+                shake = value;
+                actualRotation = Rotation;
+            }
+        }
+        private float shake = 0;
+
+        /// <summary>
         /// The visible (AABB) region of the map that this camera encompasses
         /// </summary>
+        [Data.NonSerialized]
         public Rectangle VisibleRegion
         {
             get
@@ -61,9 +81,10 @@ namespace Takai.Game
 
                 var centerTransform = new Vector2(Viewport.Width / 2, Viewport.Height / 2);
                 var transform = Matrix.Invert(
-                                    Matrix.CreateTranslation(-ActualPosition.X, -ActualPosition.Y, 0) *
-                                    Matrix.CreateRotationZ(Rotation) *
-                                    Matrix.CreateScale(Scale));
+                    Matrix.CreateTranslation(-ActualPosition.X, -ActualPosition.Y, 0) *
+                    Matrix.CreateRotationZ(actualRotation) *
+                    Matrix.CreateScale(Scale)
+                );
 
                 var a = Vector2.Transform(new Vector2(-centerTransform.X, -centerTransform.Y), transform);
                 var b = Vector2.Transform(new Vector2( centerTransform.X, -centerTransform.Y), transform);
@@ -73,7 +94,8 @@ namespace Takai.Game
                 Vector2 min = Vector2.Min(Vector2.Min(Vector2.Min(a, b), c), d);
                 Vector2 max = Vector2.Max(Vector2.Max(Vector2.Max(a, b), c), d);
 
-                return new Rectangle(min.ToPoint(), (max - min).ToPoint());
+                var size = max - min;
+                return new Rectangle(min.ToPoint(), new Point((int)System.Math.Ceiling(size.X), (int)System.Math.Ceiling(size.Y)));
             }
         }
 
@@ -91,32 +113,35 @@ namespace Takai.Game
         /// Calculated from Position, offset, Zoom, and Angle
         /// </summary>
         /// <remarks>Setting transform will set position, scale and angle; and offset to zero</remarks>
+        [Data.NonSerialized]
         public Matrix Transform
         {
             get
             {
                 return Matrix.CreateTranslation(-ActualPosition.X, -ActualPosition.Y, 0) *
-                       Matrix.CreateRotationZ(Rotation) *
+                       Matrix.CreateRotationZ(actualRotation) *
                        Matrix.CreateScale(Scale) *
                        Matrix.CreateTranslation(new Vector3(GetCameraOrigin(Viewport.Width, Viewport.Height), 0));
             }
         }
 
+        private System.Random randGen = new System.Random();
+
         public Camera() { }
 
         public Camera(Map map, Entity follow = null)
         {
-            this.Map = map;
-            this.Follow = follow;
+            Map = map;
+            Follow = follow;
             if (Follow != null)
                 ActualPosition = Position = Follow.Position;
         }
 
         public Camera(Map map, Vector2 position)
         {
-            this.Map = map;
-            this.Follow = null;
-            this.ActualPosition = this.Position = position;
+            Map = map;
+            Follow = null;
+            ActualPosition = Position = position;
         }
 
         /// <summary>
@@ -127,6 +152,9 @@ namespace Takai.Game
         {
             if (Follow != null)
                 Position = Follow.Position;
+
+            if (Shake != 0)
+                actualRotation = Rotation + ((float)randGen.NextDouble() * 2 * Shake - Shake);
 
             /* linear interpolation
             var deltaS = (float)Time.ElapsedGameTime.TotalSeconds * MoveSpeed;

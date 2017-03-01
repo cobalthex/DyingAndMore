@@ -324,8 +324,8 @@ namespace Takai.Game
                     sbatch.Draw
                     (
                         TilesImage,
-                        new Vector2(x * tileSize, y * tileSize),
-                        new Rectangle((tile % TilesPerRow) * tileSize, (tile / TilesPerRow) * tileSize, tileSize, tileSize),
+                        new Vector2(x * TileSize, y * TileSize),
+                        new Rectangle((tile % TilesPerRow) * TileSize, (tile / TilesPerRow) * TileSize, TileSize, TileSize),
                         Color.White
                     );
                 }

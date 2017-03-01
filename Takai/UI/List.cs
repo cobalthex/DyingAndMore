@@ -56,10 +56,10 @@ namespace Takai.UI
         /// <summary>
         /// Resize this list to fit to the children
         /// </summary>
-        /// <param name="Padding">Optional padding around the element. Will adjust childrens' positions</param>
-        public override void AutoSize(float Padding = 0)
+        /// <param name="padding">Optional padding around the element. Will adjust childrens' positions</param>
+        public override void AutoSize(float padding = 0)
         {
-            Vector2 size = new Vector2(Padding);
+            Vector2 size = new Vector2(padding);
 
             if (Direction == Direction.Horizontal)
             {
@@ -71,7 +71,7 @@ namespace Takai.UI
                     size.X += Children[i].Size.X;
                     size.Y = MathHelper.Max(size.Y, Children[i].Size.Y);
 
-                    Children[i].Position += new Vector2(Padding);
+                    Children[i].Position += new Vector2(padding);
                 }
             }
             else if (Direction == Direction.Vertical)
@@ -84,7 +84,7 @@ namespace Takai.UI
                     size.X = MathHelper.Max(size.X, Children[i].Size.X);
                     size.Y += Children[i].Size.Y;
 
-                    Children[i].Position += new Vector2(Padding);
+                    Children[i].Position += new Vector2(padding);
                 }
             }
 

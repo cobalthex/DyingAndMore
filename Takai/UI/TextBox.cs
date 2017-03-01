@@ -6,15 +6,17 @@ namespace Takai.UI
     public class TextBox : Element
     {
 
-        public override void Draw(SpriteBatch SpriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
+            Graphics.Primitives2D.DrawRect(spriteBatch, Color.White, AbsoluteBounds);
+
             var size = new Point(
                 MathHelper.Min(AbsoluteBounds.Width, (int)textSize.X),
                 MathHelper.Min(AbsoluteBounds.Height, (int)textSize.Y)
             );
 
             Font?.Draw(
-                SpriteBatch,
+                spriteBatch,
                 Text,
                 0, -1,
                 new Rectangle(
@@ -28,7 +30,7 @@ namespace Takai.UI
             );
 
             foreach (var child in Children)
-                child.Draw(SpriteBatch);
+                child.Draw(spriteBatch);
         }
     }
 }
