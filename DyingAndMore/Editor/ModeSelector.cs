@@ -73,7 +73,7 @@ namespace DyingAndMore.Editor
                 Font = ActiveFont,
                 Color = InactiveColor
             };
-            child.AutoSize(Padding: 20);
+            child.AutoSize(padding: 20);
             child.Font = InactiveFont;
             
             child.OnClick += delegate (Takai.UI.Element sender, Takai.UI.ClickEventArgs args)
