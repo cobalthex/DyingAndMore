@@ -21,24 +21,25 @@ namespace Takai.Game
         public Texture2D TilesImage { get; set; }
 
         /// <summary>
-        /// A set of lines to draw during the next frame
+        /// A set of lines to draw during the next frame (map relative coordinates)
         /// </summary>
         protected List<VertexPositionColor> debugLines = new List<VertexPositionColor>(32);
         protected Effect lineEffect;
         protected RasterizerState lineRaster;
 
         /// <summary>
-        /// Configurable debug options
+        /// Configurable render settings (primarily for debugging)
         /// </summary>
-        public struct MapDebugOptions
+        public struct MapRenderSettings
         {
+            public bool showGrid;
             public bool showBlobReflectionMask;
             public bool showOnlyReflections;
             public bool showEntitiesWithoutSprites;
         }
 
         [Data.NonSerialized]
-        public MapDebugOptions debugOptions;
+        public MapRenderSettings renderSettings;
 
         /// <summary>
         /// Draw a line next frame
@@ -139,6 +140,8 @@ namespace Takai.Game
 
         private List<Entity> _drawEntsOutlined = new List<Entity>();
 
+        public string debugOut;
+
         /// <summary>
         /// Draw the map, centered around the Camera
         /// </summary>
@@ -154,7 +157,7 @@ namespace Takai.Game
             #region setup
 
             _drawEntsOutlined.Clear();
-            
+
             var originalRt = GraphicsDevice.GetRenderTargets();
 
             var visibleRegion = Rectangle.Intersect(Camera.VisibleRegion, Bounds);
@@ -162,6 +165,8 @@ namespace Takai.Game
                                              (visibleRegion.Width - 1) / tileSize + 1, (visibleRegion.Height - 1) / tileSize + 1);
             var visibleSectors = new Rectangle(visibleTiles.X / SectorSize, visibleTiles.Y / SectorSize,
                                                (visibleTiles.Width - 1) / SectorSize + 1, (visibleTiles.Height - 1) / SectorSize + 1);
+
+            debugOut = $"{visibleRegion} {visibleTiles}";
 
             #endregion
 
@@ -191,8 +196,8 @@ namespace Takai.Game
                         //todo: draw all overlays
                     }
                 }
-                
-                if (debugOptions.showEntitiesWithoutSprites && !didDraw)
+
+                if (renderSettings.showEntitiesWithoutSprites && !didDraw)
                 {
                     Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
                                                  -ent.Direction.Y, ent.Direction.X, 0, 0,
@@ -368,7 +373,7 @@ namespace Takai.Game
             #region blob effects
 
             //draw blobs onto map (with reflections)
-            if (debugOptions.showBlobReflectionMask) //draw blobs as reflection mask
+            if (renderSettings.showBlobReflectionMask) //draw blobs as reflection mask
             {
                 sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
                 sbatch.Draw(reflectionRenderTarget, Vector2.Zero, Color.White);
@@ -385,7 +390,7 @@ namespace Takai.Game
                 sbatch.End();
             }
 
-            if (!debugOptions.showOnlyReflections)
+            if (!renderSettings.showOnlyReflections)
             {
                 //draw entities (and any other reflected objects)
                 sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead);
@@ -400,9 +405,9 @@ namespace Takai.Game
             if (debugLines.Count > 0)
             {
                 GraphicsDevice.RasterizerState = lineRaster;
-                GraphicsDevice.BlendState = BlendState.AlphaBlend;
+                GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                 GraphicsDevice.DepthStencilState = DepthStencilState.None;
-                var viewProjection = Matrix.CreateOrthographicOffCenter(GraphicsDevice.Viewport.Bounds, 0, 1);
+                var viewProjection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
                 lineEffect.Parameters["Transform"].SetValue(Camera.Transform * viewProjection);
 
                 var blackLines = debugLines.ConvertAll(line => { line.Color = Color.Black; line.Position += new Vector3(1, 1, 0); return line; });
@@ -418,6 +423,44 @@ namespace Takai.Game
                     GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, debugLines.ToArray(), 0, debugLines.Count / 2);
                 }
                 debugLines.Clear();
+            }
+
+            if (renderSettings.showGrid)
+            {
+                GraphicsDevice.RasterizerState = lineRaster;
+                GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+                GraphicsDevice.DepthStencilState = DepthStencilState.None;
+                var viewProjection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
+                lineEffect.Parameters["Transform"].SetValue(Camera.Transform * viewProjection);
+
+                var columns = visibleRegion.Width / TileSize;
+                var rows = visibleRegion.Height / TileSize;
+                var grids = new VertexPositionColor[columns * 2 + rows * 2];
+                var gridColor = new Color(Color.Gray, 0.3f);
+                var sectorColor = new Color(Color.Azure, 0.6f);
+                var cameraOffset = -new Vector2(visibleRegion.X % TileSize, visibleRegion.Y % TileSize);
+                for (int i = 0; i < columns; ++i)
+                {
+                    var n = i * 2;
+                    grids[n].Position = new Vector3(cameraOffset.X + visibleRegion.X + i * TileSize, visibleRegion.Top, 0);
+                    grids[n].Color = (int)grids[n].Position.X % SectorPixelSize < TileSize ? sectorColor : gridColor;
+                    grids[n + 1] = grids[n];
+                    grids[n + 1].Position.Y += visibleRegion.Height;
+                }
+                for (int i = 0; i < rows; ++i)
+                {
+                    var n = columns * 2 + i * 2;
+                    grids[n].Position = new Vector3(visibleRegion.Left, cameraOffset.Y + visibleRegion.Y + i * TileSize, 0);
+                    grids[n].Color = (int)grids[n].Position.Y % SectorPixelSize < TileSize ? sectorColor : gridColor;
+                    grids[n + 1] = grids[n];
+                    grids[n + 1].Position.X += visibleRegion.Width;
+                }
+
+                foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, grids, 0, grids.Length / 2);
+                }
             }
 
             #endregion

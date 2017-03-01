@@ -10,7 +10,7 @@ namespace DyingAndMore.Editor
     class EditorMode
     {
         public string Name { get; set; }
-        
+
         protected readonly Editor editor;
 
         public EditorMode(string name, Editor editor)
@@ -26,7 +26,7 @@ namespace DyingAndMore.Editor
         public virtual void Update(GameTime time) { }
         public virtual void Draw(SpriteBatch sbatch) { }
     }
-   
+
     partial class Editor : Takai.Runtime.GameState
     {
         public Takai.Game.Map Map { get; set; }
@@ -37,7 +37,7 @@ namespace DyingAndMore.Editor
         public BitmapFont DebugFont { get; set; }
 
         SpriteBatch sbatch;
-        
+
         public static readonly Color ActiveColor = Color.GreenYellow;
         public static readonly Color InactiveColor = new Color(Color.Purple, 0.5f);
 
@@ -134,7 +134,7 @@ namespace DyingAndMore.Editor
                     VerticalOrientation = Takai.UI.Orientation.Start,
                     Position = new Vector2(0, 40)
                 };
-                
+
                 modes.AddMode(new TilesEditorMode(this));
                 modes.AddMode(new DecalsEditorMode(this));
                 modes.AddMode(new BlobsEditorMode(this));
@@ -163,8 +163,8 @@ namespace DyingAndMore.Editor
             //start zoomed out to see the whole map
             var mapSize = new Vector2(Map.Width, Map.Height) * Map.TileSize;
             var xyScale = new Vector2(GraphicsDevice.Viewport.Width - 20, GraphicsDevice.Viewport.Height - 20) / mapSize;
-            Camera.Scale = MathHelper.Clamp(MathHelper.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
-            Camera.Position = mapSize / 2;
+            //Camera.Scale = MathHelper.Clamp(MathHelper.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
+            //Camera.Position = mapSize / 2;
         }
 
         public bool OpenMap()
@@ -224,7 +224,7 @@ namespace DyingAndMore.Editor
 
             return false;
         }
-        
+
         private Rectangle lastViewport;
         public override void Update(GameTime time)
         {
@@ -264,10 +264,13 @@ namespace DyingAndMore.Editor
             }
 
             if (InputState.IsPress(Keys.F2))
-                Map.debugOptions.showBlobReflectionMask ^= true;
+                Map.renderSettings.showBlobReflectionMask ^= true;
 
             if (InputState.IsPress(Keys.F3))
-                Map.debugOptions.showOnlyReflections ^= true;
+                Map.renderSettings.showOnlyReflections ^= true;
+
+            if (InputState.IsPress(Keys.G))
+                Map.renderSettings.showGrid ^= true;
 
             //touch gestures
             while (TouchPanel.IsGestureAvailable)
@@ -393,6 +396,7 @@ namespace DyingAndMore.Editor
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
             uiContainer.Draw(sbatch);
+            DebugFont.Draw(sbatch, Map.debugOut, new Vector2(100), Color.ForestGreen);
             sbatch.End();
         }
 
