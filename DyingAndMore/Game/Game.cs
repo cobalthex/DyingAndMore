@@ -120,9 +120,9 @@ namespace DyingAndMore.Game
             }
 
             if (InputState.IsPress(Keys.F2))
-                map.debugOptions.showBlobReflectionMask ^= true;
+                map.renderSettings.showBlobReflectionMask ^= true;
             if (InputState.IsPress(Keys.F3))
-                map.debugOptions.showOnlyReflections ^= true;
+                map.renderSettings.showOnlyReflections ^= true;
 
             if (InputState.IsPress(Keys.F5))
             {
