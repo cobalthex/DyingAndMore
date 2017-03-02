@@ -67,7 +67,7 @@ namespace Takai.Game
         /// The vertical size of the map in tiles
         /// </summary>
         public int Height { get; set; }
-        
+
         public const int SectorSize = 4; //The number of tiles in a map sector
         [Data.NonSerialized]
         public int SectorPixelSize { get; private set; } = 0;
@@ -124,6 +124,11 @@ namespace Takai.Game
         /// </summary>
         protected Dictionary<string, TriggeredEvent> eventHandlers = new Dictionary<string, TriggeredEvent>();
 
+        /// <summary>
+        /// Active scripts running on this map
+        /// </summary>
+        protected Dictionary<string, Script> scripts = new Dictionary<string, Script>();
+
         public Map() { }
 
         /// <summary>
@@ -170,6 +175,34 @@ namespace Takai.Game
         {
             if (eventHandlers.TryGetValue(name, out var handler))
                 handler(name, value);
+        }
+
+
+        /// <summary>
+        /// Add a script to the map, overwrites any existing scripts with the sane name
+        /// </summary>
+        /// <param name="script">The script to add</param>
+        /// <returns>False if the script is null</returns>
+        public bool AddScript(Script script)
+        {
+            if (script == null)
+                return false;
+
+            if (scripts.TryGetValue(script.Name, out var old))
+                old.Map = null;
+
+            script.Map = this;
+            scripts[script.Name] = script;
+            return true;
+        }
+
+        public bool RemoveScript(string Name)
+        {
+            return scripts.Remove(Name);
+        }
+        public bool RemoveScript(Script script)
+        {
+            return scripts.Remove(script?.Name);
         }
 
         /// <summary>
