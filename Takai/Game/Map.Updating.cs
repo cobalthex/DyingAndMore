@@ -65,12 +65,12 @@ namespace Takai.Game
             ElapsedTime += deltaTime;
 
             var invTransform = Matrix.Invert(Camera.Transform);
-            
+
             var visibleRegion = Camera.VisibleRegion;
             var visibleSectors = GetVisibleSectors(visibleRegion);
             visibleSectors.Inflate(1, 1);
             var mapBounds = Bounds;
-            
+
             var tileSq = new Vector2(tileSize).LengthSquared();
 
             #region active blobs
@@ -142,7 +142,7 @@ namespace Takai.Game
                         {
                             var deltaV = ent.Velocity * deltaSeconds;
                             var deltaVLen = deltaV.Length();
-                            
+
                             var direction = deltaV / deltaVLen;
                             var startPos = ent.Position + (ent.Radius * direction);
                             var targetPos = startPos + deltaV;
@@ -258,6 +258,9 @@ namespace Takai.Game
             }
 
             #endregion
+
+            foreach (var script in scripts)
+                script.Value.Step(deltaTime);
         }
     }
 }
