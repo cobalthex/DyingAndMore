@@ -26,7 +26,7 @@ namespace DyingAndMore.Editor
         public virtual void Update(GameTime time) { }
         public virtual void Draw(SpriteBatch sbatch) { }
     }
-
+    
     partial class Editor : Takai.Runtime.GameState
     {
         public Takai.Game.Map Map { get; set; }
@@ -41,7 +41,6 @@ namespace DyingAndMore.Editor
         public static readonly Color ActiveColor = Color.GreenYellow;
         public static readonly Color InactiveColor = new Color(Color.Purple, 0.5f);
 
-        int uiMargin = 20;
         Takai.UI.Element uiContainer;
         Takai.UI.Element selectorPreview;
 
@@ -240,6 +239,8 @@ namespace DyingAndMore.Editor
             if (viewport != lastViewport)
             {
                 lastViewport = viewport;
+                if (Camera != null)
+                    Camera.Viewport = GraphicsDevice.Viewport.Bounds;
                 uiContainer.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             }
 

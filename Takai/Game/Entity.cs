@@ -77,7 +77,7 @@ namespace Takai.Game
         public UInt64 Id { get; private set; } = (nextId++);
 
         /// <summary>
-        /// The name of this entity. Typically used by other entities for locating (and therefore should be unique)
+        /// The name of this entity. Typically used by other entities or scripts for referencing (and therefore should be unique)
         /// </summary>
         [Data.NonDesigned]
         public string Name { get; set; } = null;
