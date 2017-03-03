@@ -160,13 +160,20 @@ namespace Takai.Game
 
             var originalRt = GraphicsDevice.GetRenderTargets();
 
-            var visibleRegion = Rectangle.Intersect(Camera.VisibleRegion, Bounds);
-            var visibleTiles = new Rectangle(visibleRegion.X / TileSize, visibleRegion.Y / tileSize,
-                                             (visibleRegion.Width - 1) / tileSize + 1, (visibleRegion.Height - 1) / tileSize + 1);
+            var visibleRegion = Camera.VisibleRegion;
+            var visibleTiles = Rectangle.Intersect(
+                new Rectangle(
+                    visibleRegion.X / TileSize,
+                    visibleRegion.Y / tileSize,
+                    (visibleRegion.Width) / tileSize + 2,
+                    (visibleRegion.Height) / tileSize + 2
+                ),
+                new Rectangle(0, 0, Width, Height)
+            );
             var visibleSectors = new Rectangle(visibleTiles.X / SectorSize, visibleTiles.Y / SectorSize,
                                                (visibleTiles.Width - 1) / SectorSize + 1, (visibleTiles.Height - 1) / SectorSize + 1);
 
-            debugOut = $"{visibleRegion} {visibleTiles}";
+            debugOut = $"{visibleRegion}\n{visibleTiles}";
 
             #endregion
 
@@ -425,6 +432,10 @@ namespace Takai.Game
                 debugLines.Clear();
             }
 
+            #endregion
+
+            #region grid
+
             if (renderSettings.showGrid)
             {
                 GraphicsDevice.RasterizerState = lineRaster;
@@ -433,11 +444,11 @@ namespace Takai.Game
                 var viewProjection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
                 lineEffect.Parameters["Transform"].SetValue(Camera.Transform * viewProjection);
 
-                var columns = visibleRegion.Width / TileSize;
-                var rows = visibleRegion.Height / TileSize;
+                var columns = (visibleRegion.Width - 1) / TileSize + 1;
+                var rows = (visibleRegion.Height - 1) / TileSize + 1;
                 var grids = new VertexPositionColor[columns * 2 + rows * 2];
                 var gridColor = new Color(Color.Gray, 0.3f);
-                var sectorColor = new Color(Color.Azure, 0.6f);
+                var sectorColor = new Color(Color.Gray, 0.65f);
                 var cameraOffset = -new Vector2(visibleRegion.X % TileSize, visibleRegion.Y % TileSize);
                 for (int i = 0; i < columns; ++i)
                 {
