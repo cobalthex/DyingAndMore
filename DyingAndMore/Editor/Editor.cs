@@ -26,7 +26,7 @@ namespace DyingAndMore.Editor
         public virtual void Update(GameTime time) { }
         public virtual void Draw(SpriteBatch sbatch) { }
     }
-
+    
     partial class Editor : Takai.Runtime.GameState
     {
         public Takai.Game.Map Map { get; set; }
@@ -41,7 +41,6 @@ namespace DyingAndMore.Editor
         public static readonly Color ActiveColor = Color.GreenYellow;
         public static readonly Color InactiveColor = new Color(Color.Purple, 0.5f);
 
-        int uiMargin = 20;
         Takai.UI.Element uiContainer;
         Takai.UI.Element selectorPreview;
 
@@ -70,8 +69,8 @@ namespace DyingAndMore.Editor
             {
                 var list = new Takai.UI.List()
                 {
-                    HorizontalOrientation = Takai.UI.Orientation.Middle,
-                    VerticalOrientation = Takai.UI.Orientation.Middle,
+                    HorizontalAlignment = Takai.UI.Alignment.Middle,
+                    VerticalAlignment = Takai.UI.Alignment.Middle,
                     Size = GraphicsDevice.Viewport.Bounds.Size.ToVector2()
                 };
 
@@ -80,7 +79,7 @@ namespace DyingAndMore.Editor
                 {
                     Text = "No map loaded",
                     Font = LargeFont,
-                    HorizontalOrientation = Takai.UI.Orientation.Middle
+                    HorizontalAlignment = Takai.UI.Alignment.Middle
                 });
                 elem.AutoSize(20);
 
@@ -88,7 +87,7 @@ namespace DyingAndMore.Editor
                 {
                     Text = "Press Ctrl+N to create a new map",
                     Font = SmallFont,
-                    HorizontalOrientation = Takai.UI.Orientation.Middle
+                    HorizontalAlignment = Takai.UI.Alignment.Middle
                 });
                 elem.AutoSize(10);
 
@@ -96,10 +95,18 @@ namespace DyingAndMore.Editor
                 {
                     Text = "or Ctrl+O to open a map",
                     Font = SmallFont,
-                    HorizontalOrientation = Takai.UI.Orientation.Middle
+                    HorizontalAlignment = Takai.UI.Alignment.Middle
                 });
                 elem.AutoSize(10);
                 elem.OnClick += delegate { OpenMap(); };
+
+                list.AddChild(elem = new Takai.UI.TextBox()
+                {
+                    Text = "Test",
+                    Size = new Vector2(200, 30),
+                    Font = SmallFont,
+                    HorizontalAlignment = Takai.UI.Alignment.Middle
+                });
 
                 list.AutoSize();
                 uiContainer.AddChild(list);
@@ -130,8 +137,8 @@ namespace DyingAndMore.Editor
             {
                 modes = new ModeSelector(LargeFont, SmallFont)
                 {
-                    HorizontalOrientation = Takai.UI.Orientation.Middle,
-                    VerticalOrientation = Takai.UI.Orientation.Start,
+                    HorizontalAlignment = Takai.UI.Alignment.Middle,
+                    VerticalAlignment = Takai.UI.Alignment.Start,
                     Position = new Vector2(0, 40)
                 };
 
@@ -144,8 +151,8 @@ namespace DyingAndMore.Editor
 
                 selectorPreview = new Takai.UI.Element()
                 {
-                    HorizontalOrientation = Takai.UI.Orientation.End,
-                    VerticalOrientation = Takai.UI.Orientation.Start,
+                    HorizontalAlignment = Takai.UI.Alignment.End,
+                    VerticalAlignment = Takai.UI.Alignment.Start,
                     Position = new Vector2(10),
                     Size = new Vector2(Map.TileSize)
                 };
@@ -232,6 +239,8 @@ namespace DyingAndMore.Editor
             if (viewport != lastViewport)
             {
                 lastViewport = viewport;
+                if (Camera != null)
+                    Camera.Viewport = GraphicsDevice.Viewport.Bounds;
                 uiContainer.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             }
 
@@ -271,6 +280,12 @@ namespace DyingAndMore.Editor
 
             if (InputState.IsPress(Keys.G))
                 Map.renderSettings.showGrid ^= true;
+
+            if (InputState.IsPress(Keys.F4))
+            {
+                Camera.Position = Vector2.Zero;
+                Camera.Scale = 1;
+            }
 
             //touch gestures
             while (TouchPanel.IsGestureAvailable)
@@ -345,7 +360,10 @@ namespace DyingAndMore.Editor
                 else
                 {
                     Camera.Scale += delta;
-                    Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 2f);
+                    if (System.Math.Abs(Camera.Scale - 1) < 0.1f) //snap to 100% when near
+                        Camera.Scale = 1;
+                    else
+                        Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 2f);
                 }
                 //todo: translate to mouse cursor
             }

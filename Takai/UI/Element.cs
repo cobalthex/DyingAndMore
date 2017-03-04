@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
-    public enum Orientation
+    public enum Alignment
     {
         Start,
         Middle,
@@ -81,30 +81,30 @@ namespace Takai.UI
         /// <summary>
         /// How this element is positioned in its container horizontally
         /// </summary>
-        public Orientation HorizontalOrientation
+        public Alignment HorizontalAlignment
         {
-            get { return horizontalOrientation; }
+            get { return horizontalAlignment; }
             set
             {
-                horizontalOrientation = value;
+                horizontalAlignment = value;
                 Reflow();
             }
         }
-        private Orientation horizontalOrientation;
+        private Alignment horizontalAlignment;
 
         /// <summary>
         /// How this element is positioned in its container vertically
         /// </summary>
-        public Orientation VerticalOrientation
+        public Alignment VerticalAlignment
         {
-            get { return verticalOrientation; }
+            get { return verticalAlignment; }
             set
             {
-                verticalOrientation = value;
+                verticalAlignment = value;
                 Reflow();
             }
         }
-        private Orientation verticalOrientation;
+        private Alignment verticalAlignment;
 
         /// <summary>
         /// The position relative to the orientation.
@@ -179,30 +179,30 @@ namespace Takai.UI
         /// <summary>
         /// Create a new element
         /// </summary>
-        /// <param name="Children">Optionally add children to this element</param>
-        public Element(params Element[] Children)
+        /// <param name="children">Optionally add children to this element</param>
+        public Element(params Element[] children)
         {
-            this.Children = new ReadOnlyCollection<Element>(children);
+            this.Children = new ReadOnlyCollection<Element>(this.children);
 
-            foreach (var child in Children)
+            foreach (var child in children)
                 AddChild(child);
         }
 
-        public void AddChild(Element Child)
+        public void AddChild(Element child)
         {
-            Child.Parent = this;
-            children.Add(Child);
+            child.Parent = this;
+            children.Add(child);
         }
 
-        public void RemoveChild(Element Child)
+        public void RemoveChild(Element child)
         {
-            children.Remove(Child);
+            children.Remove(child);
         }
 
-        public Element RemoveChildAt(int Index)
+        public Element RemoveChildAt(int index)
         {
-            var child = children[Index];
-            children.RemoveAt(Index);
+            var child = children[index];
+            children.RemoveAt(index);
             return child;
         }
 
@@ -231,38 +231,38 @@ namespace Takai.UI
         /// <summary>
         /// Calculate the bounds of this element based on a parent container
         /// </summary>
-        /// <param name="Container">The region that this element is relative to</param>
+        /// <param name="container">The region that this element is relative to</param>
         /// <returns>The calculate rectangle relative to the container</returns>
-        public virtual Rectangle CalculateBounds(Rectangle Container)
+        public virtual Rectangle CalculateBounds(Rectangle container)
         {
             var pos = new Vector2();
 
-            switch (HorizontalOrientation)
+            switch (HorizontalAlignment)
             {
-                case Orientation.Start:
+                case Alignment.Start:
                     pos.X = Position.X;
                     break;
-                case Orientation.Middle:
-                    pos.X = (Container.Width - Size.X) / 2 + Position.X;
+                case Alignment.Middle:
+                    pos.X = (container.Width - Size.X) / 2 + Position.X;
                     break;
-                case Orientation.End:
-                    pos.X = (Container.Width - Size.X) - Position.X;
+                case Alignment.End:
+                    pos.X = (container.Width - Size.X) - Position.X;
                     break;
             }
-            switch (VerticalOrientation)
+            switch (VerticalAlignment)
             {
-                case Orientation.Start:
+                case Alignment.Start:
                     pos.Y = Position.Y;
                     break;
-                case Orientation.Middle:
-                    pos.Y = (Container.Height - Size.Y) / 2 + Position.Y;
+                case Alignment.Middle:
+                    pos.Y = (container.Height - Size.Y) / 2 + Position.Y;
                     break;
-                case Orientation.End:
-                    pos.Y = (Container.Height - Size.Y) - Position.Y;
+                case Alignment.End:
+                    pos.Y = (container.Height - Size.Y) - Position.Y;
                     break;
             }
 
-            return new Rectangle(pos.ToPoint() + Container.Location, Size.ToPoint()); //if size is changed, changes may need to be made elsewhere
+            return new Rectangle(pos.ToPoint() + container.Location, Size.ToPoint()); //if size is changed, changes may need to be made elsewhere
         }
 
         public static int callCount = 0;
@@ -281,31 +281,31 @@ namespace Takai.UI
         /// This does not affect the position of the element
         /// Padding affects child positioning
         /// </summary>
-        public virtual void AutoSize(float Padding = 0)
+        public virtual void AutoSize(float padding = 0)
         {
             var bounds = new Rectangle(Position.ToPoint(), textSize.ToPoint());
             foreach (var child in Children)
             {
-                child.Position += new Vector2(Padding);
+                child.Position += new Vector2(padding);
                 bounds = Rectangle.Union(bounds, child.Bounds);
             }
-            Size = bounds.Size.ToVector2() + new Vector2(Padding);
+            Size = bounds.Size.ToVector2() + new Vector2(padding);
         }
 
 
         /// <summary>
         /// Update this element
         /// </summary>
-        /// <param name="Time">Game time</param>
+        /// <param name="time">Game time</param>
         /// <returns>Returns true if this element was clicked/triggered. This will prevent parent items from being triggered as well</returns>
-        public virtual bool Update(GameTime Time)
+        public virtual bool Update(GameTime time)
         {
             if (!Runtime.GameManager.HasFocus)
                 return false;
 
             for (var i = Children.Count - 1; i >= 0 ; --i)
             {
-                if (!Children[i].Update(Time))
+                if (!Children[i].Update(time))
                     return false;
             }
 
@@ -331,7 +331,7 @@ namespace Takai.UI
             return true;
         }
 
-        public virtual void Draw(SpriteBatch SpriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             var size = new Point(
                 MathHelper.Min(AbsoluteBounds.Width, (int)textSize.X),
@@ -339,10 +339,10 @@ namespace Takai.UI
             );
 
             if (DrawBoundingRects)
-                Graphics.Primitives2D.DrawRect(SpriteBatch, new Color(0, 0.75f, 1, 0.35f), AbsoluteBounds);
+                Graphics.Primitives2D.DrawRect(spriteBatch, new Color(0, 0.75f, 1, 0.35f), AbsoluteBounds);
 
             Font?.Draw(
-                SpriteBatch,
+                spriteBatch,
                 Text,
                 new Rectangle(
                     AbsoluteBounds.X + ((AbsoluteBounds.Width - size.X) / 2),
@@ -354,7 +354,7 @@ namespace Takai.UI
             );
 
             foreach (var child in Children)
-                child.Draw(SpriteBatch);
+                child.Draw(spriteBatch);
         }
     }
 }
