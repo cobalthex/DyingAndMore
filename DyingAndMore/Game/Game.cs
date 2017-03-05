@@ -17,7 +17,6 @@ namespace DyingAndMore.Game
         Entities.Controller lastController = null;
 
         Takai.Graphics.BitmapFont fnt;
-        string debugText = "";
 
         SpriteBatch sbatch;
 
@@ -26,6 +25,11 @@ namespace DyingAndMore.Game
         void StartMap()
         {
             map.updateSettings = Takai.Game.MapUpdateSettings.Game;
+            map.renderSettings = new Takai.Game.Map.MapRenderSettings()
+            {
+                showEntitiesWithoutSprites = false,
+                showGrid = false
+            };
 
             var plyr = from ent in map.FindEntitiesByType<Entities.Actor>(true)
                        where ((Entities.Actor)ent).Faction == Entities.Factions.Player
@@ -118,11 +122,6 @@ namespace DyingAndMore.Game
                 Takai.Runtime.GameManager.Exit();
                 return;
             }
-
-            if (InputState.IsPress(Keys.F2))
-                map.renderSettings.showBlobReflectionMask ^= true;
-            if (InputState.IsPress(Keys.F3))
-                map.renderSettings.showOnlyReflections ^= true;
 
             if (InputState.IsPress(Keys.F5))
             {

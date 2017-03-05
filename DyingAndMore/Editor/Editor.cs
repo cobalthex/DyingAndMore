@@ -132,6 +132,11 @@ namespace DyingAndMore.Editor
             };
 
             Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
+            Map.renderSettings = new Takai.Game.Map.MapRenderSettings()
+            {
+                showEntitiesWithoutSprites = true,
+                showGrid = true
+            };
 
             if (modes == null)
             {
@@ -273,11 +278,8 @@ namespace DyingAndMore.Editor
             }
 
             if (InputState.IsPress(Keys.F2))
-                Map.renderSettings.showBlobReflectionMask ^= true;
-
-            if (InputState.IsPress(Keys.F3))
-                Map.renderSettings.showOnlyReflections ^= true;
-
+                Map.renderSettings.showReflectionMask ^= true;
+           
             if (InputState.IsPress(Keys.G))
                 Map.renderSettings.showGrid ^= true;
 
