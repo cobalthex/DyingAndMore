@@ -30,16 +30,20 @@ namespace Takai.Game
         /// <summary>
         /// Configurable render settings (primarily for debugging)
         /// </summary>
-        public struct MapRenderSettings
+        public class MapRenderSettings
         {
             public bool showGrid;
-            public bool showBlobReflectionMask;
-            public bool showOnlyReflections;
             public bool showEntitiesWithoutSprites;
+            public bool showReflectionMask;
         }
 
         [Data.NonSerialized]
-        public MapRenderSettings renderSettings;
+        public MapRenderSettings renderSettings = new MapRenderSettings()
+        {
+            showGrid = false,
+            showEntitiesWithoutSprites = false,
+            showReflectionMask = false
+        };
 
         /// <summary>
         /// Draw a line next frame
@@ -160,18 +164,27 @@ namespace Takai.Game
 
             var originalRt = GraphicsDevice.GetRenderTargets();
 
-            var visibleRegion = Camera.VisibleRegion;
+            var cameraTransform = Camera.Transform;
+
+            var visibleRegion = Rectangle.Intersect(Camera.VisibleRegion, Bounds);
             var visibleTiles = Rectangle.Intersect(
                 new Rectangle(
                     visibleRegion.X / TileSize,
                     visibleRegion.Y / tileSize,
-                    (visibleRegion.Width) / tileSize + 2,
-                    (visibleRegion.Height) / tileSize + 2
+                    visibleRegion.Width / tileSize + 2,
+                    visibleRegion.Height / tileSize + 2
                 ),
                 new Rectangle(0, 0, Width, Height)
             );
-            var visibleSectors = new Rectangle(visibleTiles.X / SectorSize, visibleTiles.Y / SectorSize,
-                                               (visibleTiles.Width - 1) / SectorSize + 1, (visibleTiles.Height - 1) / SectorSize + 1);
+            var visibleSectors = Rectangle.Intersect(
+                new Rectangle(
+                    visibleTiles.X / SectorSize - 1,
+                    visibleTiles.Y / SectorSize - 1,
+                    visibleTiles.Width / SectorSize + 3,
+                    visibleTiles.Height / SectorSize + 3
+                ),
+                new Rectangle(0, 0, Sectors.GetLength(1), Sectors.GetLength(0))
+            );
 
             debugOut = $"{visibleRegion}\n{visibleTiles}";
 
@@ -181,7 +194,7 @@ namespace Takai.Game
 
             GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Camera.Transform);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, cameraTransform);
 
             foreach (var ent in ActiveEnts)
             {
@@ -231,7 +244,7 @@ namespace Takai.Game
             sbatch.End();
 
             //outlined entities
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, outlineEffect, Camera.Transform);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, outlineEffect, cameraTransform);
 
             foreach (var ent in _drawEntsOutlined)
             {
@@ -259,7 +272,7 @@ namespace Takai.Game
 
             foreach (var p in Particles)
             {
-                sbatch.Begin(SpriteSortMode.BackToFront, p.Key.BlendMode, null, stencilRead, null, null, Camera.Transform);
+                sbatch.Begin(SpriteSortMode.BackToFront, p.Key.BlendMode, null, stencilRead, null, null, cameraTransform);
 
                 for (int i = 0; i < p.Value.Count; i++)
                 {
@@ -288,7 +301,7 @@ namespace Takai.Game
 
             GraphicsDevice.SetRenderTargets(blobsRenderTarget, reflectionRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, reflectionEffect, Camera.Transform);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, reflectionEffect, cameraTransform);
 
             //inactive blobs
             for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
@@ -322,7 +335,7 @@ namespace Takai.Game
 
             var projection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
             mapAlphaTest.Projection = projection;
-            mapAlphaTest.View = Camera.Transform;
+            mapAlphaTest.View = cameraTransform;
             sbatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, stencilWrite, null, mapAlphaTest);
 
             for (var y = visibleTiles.Top; y < visibleTiles.Bottom; ++y)
@@ -349,7 +362,7 @@ namespace Takai.Game
 
             #region decals
 
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, Camera.Transform);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, cameraTransform);
 
             for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
             {
@@ -380,7 +393,7 @@ namespace Takai.Game
             #region blob effects
 
             //draw blobs onto map (with reflections)
-            if (renderSettings.showBlobReflectionMask) //draw blobs as reflection mask
+            if (renderSettings.showReflectionMask) //draw blobs as reflection mask
             {
                 sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
                 sbatch.Draw(reflectionRenderTarget, Vector2.Zero, Color.White);
@@ -396,14 +409,11 @@ namespace Takai.Game
                 sbatch.Draw(blobsRenderTarget, Vector2.Zero, Color.White);
                 sbatch.End();
             }
-
-            if (!renderSettings.showOnlyReflections)
-            {
-                //draw entities (and any other reflected objects)
-                sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead);
-                sbatch.Draw(reflectedRenderTarget, Vector2.Zero, Color.White);
-                sbatch.End();
-            }
+            
+            //draw entities (and any other reflected objects)
+            sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead);
+            sbatch.Draw(reflectedRenderTarget, Vector2.Zero, Color.White);
+            sbatch.End();
 
             #endregion
 
@@ -415,7 +425,7 @@ namespace Takai.Game
                 GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                 GraphicsDevice.DepthStencilState = DepthStencilState.None;
                 var viewProjection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
-                lineEffect.Parameters["Transform"].SetValue(Camera.Transform * viewProjection);
+                lineEffect.Parameters["Transform"].SetValue(cameraTransform * viewProjection);
 
                 var blackLines = debugLines.ConvertAll(line => { line.Color = Color.Black; line.Position += new Vector3(1, 1, 0); return line; });
                 foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
@@ -442,15 +452,13 @@ namespace Takai.Game
                 GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                 GraphicsDevice.DepthStencilState = DepthStencilState.None;
                 var viewProjection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
-                lineEffect.Parameters["Transform"].SetValue(Camera.Transform * viewProjection);
-
-                var columns = (visibleRegion.Width - 1) / TileSize + 1;
-                var rows = (visibleRegion.Height - 1) / TileSize + 1;
-                var grids = new VertexPositionColor[columns * 2 + rows * 2];
+                lineEffect.Parameters["Transform"].SetValue(cameraTransform * viewProjection);
+                
+                var grids = new VertexPositionColor[visibleTiles.Width * 2 + visibleTiles.Height * 2];
                 var gridColor = new Color(Color.Gray, 0.3f);
                 var sectorColor = new Color(Color.Gray, 0.65f);
                 var cameraOffset = -new Vector2(visibleRegion.X % TileSize, visibleRegion.Y % TileSize);
-                for (int i = 0; i < columns; ++i)
+                for (int i = 0; i < visibleTiles.Width; ++i)
                 {
                     var n = i * 2;
                     grids[n].Position = new Vector3(cameraOffset.X + visibleRegion.X + i * TileSize, visibleRegion.Top, 0);
@@ -458,9 +466,9 @@ namespace Takai.Game
                     grids[n + 1] = grids[n];
                     grids[n + 1].Position.Y += visibleRegion.Height;
                 }
-                for (int i = 0; i < rows; ++i)
+                for (int i = 0; i < visibleTiles.Height; ++i)
                 {
-                    var n = columns * 2 + i * 2;
+                    var n = visibleTiles.Width * 2 + i * 2;
                     grids[n].Position = new Vector3(visibleRegion.Left, cameraOffset.Y + visibleRegion.Y + i * TileSize, 0);
                     grids[n].Color = (int)grids[n].Position.Y % SectorPixelSize < TileSize ? sectorColor : gridColor;
                     grids[n + 1] = grids[n];

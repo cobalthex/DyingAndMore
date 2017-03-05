@@ -274,7 +274,7 @@ namespace Takai.Game
         public virtual void Think(System.TimeSpan DeltaTime)
         {
             State.Update(DeltaTime);
-            Script.Step(DeltaTime);
+            Script?.Step(DeltaTime);
         }
 
         /// <summary>
