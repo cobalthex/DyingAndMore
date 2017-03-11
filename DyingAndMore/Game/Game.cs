@@ -11,7 +11,6 @@ namespace DyingAndMore.Game
     class Game : Takai.Runtime.GameState
     {
         public Takai.Game.Map map;
-        public Takai.Game.Camera camera;
 
         Entities.Actor player = null;
         Entities.Controller lastController = null;
@@ -36,7 +35,9 @@ namespace DyingAndMore.Game
                        select ent;
 
             player = plyr.FirstOrDefault() as Entities.Actor;
-            camera.Follow = player;
+            map.ActiveCamera = new Takai.Game.Camera(map, player);
+
+            //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
         }
 
         public override void Load()
@@ -51,13 +52,6 @@ namespace DyingAndMore.Game
             }
 
             sbatch = new SpriteBatch(GraphicsDevice);
-
-            camera = new Takai.Game.Camera(map, player)
-            {
-                MoveSpeed = 800,
-                Viewport = GraphicsDevice.Viewport.Bounds
-            };
-            //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
 
             StartMap();
 
@@ -91,7 +85,7 @@ namespace DyingAndMore.Game
         }
         Takai.Game.ParticleType pt1, pt2;
 
-        public override void Update(GameTime Time)
+        public override void Update(GameTime time)
         {
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.O))
             {
@@ -113,7 +107,10 @@ namespace DyingAndMore.Game
 
             if (InputState.IsClick(Keys.F1))
             {
-                Takai.Runtime.GameManager.NextState(new Editor.Editor() { Map = map, Camera = new Takai.Game.Camera(map, camera.ActualPosition) { Viewport = camera.Viewport } });
+                Takai.Runtime.GameManager.NextState(new Editor.Editor()
+                {
+                    Map = map
+                });
                 return;
             }
 
@@ -139,7 +136,7 @@ namespace DyingAndMore.Game
 #if DEBUG
             if (InputState.IsMod(KeyMod.Alt) && InputState.IsPress(MouseButtons.Left))
             {
-                var targets = map.FindEntities(camera.ScreenToWorld(InputState.MouseVector), 5, false);
+                var targets = map.FindEntities(map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 5, false);
 
                 foreach (var ent in targets)
                 {
@@ -155,7 +152,7 @@ namespace DyingAndMore.Game
                         player = actor;
                         lastController = player.Controller;
                         player.Controller = inputCtrl ?? new Entities.InputController();
-                        camera.Follow = player;
+                        map.ActiveCamera.Follow = player;
                         break;
                     }
                 }
@@ -168,9 +165,7 @@ namespace DyingAndMore.Game
                 map.TimeScale += System.Math.Sign(scrollDelta) * 0.1f;
             }
 
-            camera.Update(Time);
-
-            Vector2 worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
+            Vector2 worldMousePos = map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             Takai.Game.ParticleSpawn pspawn = new Takai.Game.ParticleSpawn()
             {
@@ -181,23 +176,25 @@ namespace DyingAndMore.Game
                 lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800))
             };
             //map.Spawn(pspawn);
+
+            map.Update(time);
         }
 
-        public override void Draw(GameTime Time)
+        public override void Draw(GameTime time)
         {
-            Vector2 worldMousePos = camera.ScreenToWorld(InputState.MouseVector);
+            Vector2 worldMousePos = map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
             if (player != null)
             {
                 var line = map.TraceLine(player.Position, player.Direction, out var hit, 1000);
                 //map.DrawLine(player.Position, player.Position + player.Direction * hit.distance, Color.White);
             }
 
-            camera.Draw();
+            map.Draw();
 
             sbatch.Begin(SpriteSortMode.Deferred);
 
             //fps
-            var sFps = (1 / Time.ElapsedGameTime.TotalSeconds).ToString("N2");
+            var sFps = (1 / time.ElapsedGameTime.TotalSeconds).ToString("N2");
             var sSz = fnt.MeasureString(sFps);
             fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 

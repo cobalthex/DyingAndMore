@@ -24,7 +24,7 @@ namespace DyingAndMore.Editor
 
         public override void Update(GameTime time)
         {
-            var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+            var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (time.TotalGameTime > lastBlobTime + System.TimeSpan.FromMilliseconds(50))
             {

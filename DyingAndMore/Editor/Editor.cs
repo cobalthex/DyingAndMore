@@ -26,11 +26,10 @@ namespace DyingAndMore.Editor
         public virtual void Update(GameTime time) { }
         public virtual void Draw(SpriteBatch sbatch) { }
     }
-    
+
     partial class Editor : Takai.Runtime.GameState
     {
         public Takai.Game.Map Map { get; set; }
-        public Takai.Game.Camera Camera { get; set; }
 
         public BitmapFont LargeFont { get; set; }
         public BitmapFont SmallFont { get; set; }
@@ -117,26 +116,19 @@ namespace DyingAndMore.Editor
 
         public override void Unload()
         {
-            while (Takai.Runtime.GameManager.TopState != this
-                && Takai.Runtime.GameManager.Count > 0)
-                Takai.Runtime.GameManager.PopState();
-
             TouchPanel.EnabledGestures = GestureType.None;
+            modes.Mode?.End();
         }
 
         public void StartMap()
         {
-            Camera = new Takai.Game.Camera(Map)
-            {
-                Viewport = GraphicsDevice.Viewport.Bounds
-            };
-
             Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
             Map.renderSettings = new Takai.Game.Map.MapRenderSettings()
             {
                 showEntitiesWithoutSprites = true,
                 showGrid = true
             };
+            Map.ActiveCamera = new Takai.Game.Camera(Map);
 
             if (modes == null)
             {
@@ -244,8 +236,6 @@ namespace DyingAndMore.Editor
             if (viewport != lastViewport)
             {
                 lastViewport = viewport;
-                if (Camera != null)
-                    Camera.Viewport = GraphicsDevice.Viewport.Bounds;
                 uiContainer.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             }
 
@@ -268,8 +258,10 @@ namespace DyingAndMore.Editor
             if (Map == null)
                 return;
 
+            Map.ActiveCamera.Viewport = viewport;
+
             lastWorldPos = currentWorldPos;
-            currentWorldPos = Camera.ScreenToWorld(InputState.MouseVector);
+            currentWorldPos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsClick(Keys.F1))
             {
@@ -279,14 +271,14 @@ namespace DyingAndMore.Editor
 
             if (InputState.IsPress(Keys.F2))
                 Map.renderSettings.showReflectionMask ^= true;
-           
+
             if (InputState.IsPress(Keys.G))
                 Map.renderSettings.showGrid ^= true;
 
             if (InputState.IsPress(Keys.F4))
             {
-                Camera.Position = Vector2.Zero;
-                Camera.Scale = 1;
+                Map.ActiveCamera.Position = Vector2.Zero;
+                Map.ActiveCamera.Scale = 1;
             }
 
             //touch gestures
@@ -301,7 +293,7 @@ namespace DyingAndMore.Editor
                             if (Vector2.Dot(gesture.Delta, gesture.Delta2) > 0)
                             {
                                 //todo: maybe add velocity
-                                Camera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(Camera.Transform)) / 2;
+                                Map.ActiveCamera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(Map.ActiveCamera.Transform)) / 2;
                             }
                             //scale
                             else
@@ -312,7 +304,7 @@ namespace DyingAndMore.Editor
                                 var ld = Vector2.Distance(lp1, lp2);
 
                                 var scale = (dist / ld) / 1024;
-                                Camera.Scale += scale;
+                                Map.ActiveCamera.Scale += scale;
                             }
                             break;
                         }
@@ -323,7 +315,7 @@ namespace DyingAndMore.Editor
             //camera
             if (InputState.IsButtonDown(MouseButtons.Middle))
             {
-                Camera.MoveTo(Camera.Position + Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(Camera.Transform)));
+                Map.ActiveCamera.MoveTo(Map.ActiveCamera.Position + Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(Map.ActiveCamera.Transform)));
             }
             else
             {
@@ -340,8 +332,8 @@ namespace DyingAndMore.Editor
                 if (d != Vector2.Zero)
                 {
                     d.Normalize();
-                    d = d * Camera.MoveSpeed * (float)time.ElapsedGameTime.TotalSeconds; //(camera velocity)
-                    Camera.Position += Vector2.TransformNormal(d, Matrix.Invert(Camera.Transform));
+                    d = d * Map.ActiveCamera.MoveSpeed * (float)time.ElapsedGameTime.TotalSeconds; //(camera velocity)
+                    Map.ActiveCamera.Position += Vector2.TransformNormal(d, Matrix.Invert(Map.ActiveCamera.Transform));
                 }
             }
 
@@ -357,21 +349,22 @@ namespace DyingAndMore.Editor
                 var delta = InputState.ScrollDelta() / 1024f;
                 if (InputState.IsButtonDown(Keys.LeftShift))
                 {
-                    Camera.Rotation += delta;
+                    Map.ActiveCamera.Rotation += delta;
                 }
                 else
                 {
-                    Camera.Scale += delta;
-                    if (System.Math.Abs(Camera.Scale - 1) < 0.1f) //snap to 100% when near
-                        Camera.Scale = 1;
+                    Map.ActiveCamera.Scale += delta;
+                    if (System.Math.Abs(Map.ActiveCamera.Scale - 1) < 0.1f) //snap to 100% when near
+                        Map.ActiveCamera.Scale = 1;
                     else
-                        Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 2f);
+                        Map.ActiveCamera.Scale = MathHelper.Clamp(Map.ActiveCamera.Scale, 0.1f, 2f);
                 }
                 //todo: translate to mouse cursor
             }
 
-            Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 10f); //todo: make global and move to some game settings
-            Camera.Update(time);
+            Map.ActiveCamera.Scale = MathHelper.Clamp(Map.ActiveCamera.Scale, 0.1f, 10f); //todo: make global and move to some game settings
+            Map.ActiveCamera.Update(time);
+            Map.Update(time);
         }
 
         Vector2 CenterInRect(Vector2 size, Rectangle region)
@@ -393,8 +386,7 @@ namespace DyingAndMore.Editor
 
             //draw border around map
             Map.DrawRect(new Rectangle(0, 0, Map.Width * Map.TileSize, Map.Height * Map.TileSize), Color.Orange);
-
-            Camera.Draw();
+            Map.Draw();
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
@@ -403,8 +395,9 @@ namespace DyingAndMore.Editor
             var sSz = DebugFont.MeasureString(sFps);
             DebugFont.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
-            DebugFont.Draw(sbatch, $"Zoom: {(Camera.Scale * 100):N1}%", new Vector2(10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
+            DebugFont.Draw(sbatch, $"Zoom: {(Map.ActiveCamera.Scale * 100):N1}%", new Vector2(10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
+            //todo
             //draw selected item in top right corner
             //if (modes.Mode?.Selector != null)
             //{

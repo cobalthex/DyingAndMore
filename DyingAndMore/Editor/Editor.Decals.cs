@@ -30,7 +30,7 @@ namespace DyingAndMore.Editor
 
         public override void Start()
         {
-            lastWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+            lastWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
         }
 
         Takai.Game.MapSector GetDecalSector(Takai.Game.Decal decal)
@@ -41,7 +41,7 @@ namespace DyingAndMore.Editor
 
         public override void Update(GameTime time)
         {
-            var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+            var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsPress(MouseButtons.Left))
             {
@@ -112,7 +112,7 @@ namespace DyingAndMore.Editor
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
         {
-            var visibleRegion = editor.Camera.VisibleRegion;
+            var visibleRegion = editor.Map.ActiveCamera.VisibleRegion;
             var visibleSectors = editor.Map.GetVisibleSectors(visibleRegion);
 
             for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)

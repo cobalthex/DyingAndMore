@@ -6,7 +6,7 @@ namespace Takai.Runtime
     /// A helper/wrapper around the game. Also manages game state
     /// </summary>
     public static class GameManager
-    {   
+    {
         /// <summary>
         /// A reference to the game and its properties
         /// </summary>
@@ -51,7 +51,7 @@ namespace Takai.Runtime
         /// Does the game window have focus?
         /// </summary>
         public static bool HasFocus { get { return Game.IsActive; } }
-        
+
         /// <summary>
         /// Initialize state manager
         /// </summary>
@@ -86,7 +86,7 @@ namespace Takai.Runtime
                 if (s.IsEnabled)
                 {
                     s.Update(time);
-                   
+
                     if (!s.UpdateBelow)
                         break;
                 }
@@ -139,13 +139,10 @@ namespace Takai.Runtime
         {
             System.Diagnostics.Contracts.Contract.Assert(nextState != null);
 
-            GameState s;
-            while (states.Count > 0 && ((s = states[states.Count - 1]).DrawBelow))
-            {
-                s.Unload();
-                s.IsLoaded = false;
-                states.RemoveAt(states.Count - 1);
-            }
+            while (states.Count > 0 && states[states.Count - 1].DrawBelow)
+                PopState();
+            if (states.Count > 0)
+                PopState(); //remove the 'base' non-draw below state
 
             if (!nextState.DrawBelow)
                 firstDraw = states.Count;
@@ -161,7 +158,8 @@ namespace Takai.Runtime
         {
             GameState s = states[states.Count - 1];
             states.RemoveAt(states.Count - 1);
-            s.Deactivate();
+            s.Unload();
+            s.IsLoaded = false;
             return s;
         }
 
@@ -171,8 +169,9 @@ namespace Takai.Runtime
         /// <param name="state">The state to remove</param>
         internal static void RemoveState(GameState state)
         {
-            state.Deactivate();
             states.Remove(state);
+            state.Unload();
+            state.IsLoaded = false;
         }
 
         /// <summary>

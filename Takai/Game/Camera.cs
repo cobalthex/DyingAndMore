@@ -37,8 +37,6 @@ namespace Takai.Game
         /// </summary>
         public float MoveSpeed = 1000;
 
-        //todo: switch to physics based system
-
         /// <summary>
         /// The target position of the camera
         /// </summary>
@@ -90,7 +88,7 @@ namespace Takai.Game
                 var b = Vector2.Transform(new Vector2( centerTransform.X, -centerTransform.Y), transform);
                 var c = Vector2.Transform(new Vector2(-centerTransform.X,  centerTransform.Y), transform);
                 var d = Vector2.Transform(new Vector2( centerTransform.X,  centerTransform.Y), transform);
-                
+
                 Vector2 min = Vector2.Min(Vector2.Min(Vector2.Min(a, b), c), d);
                 Vector2 max = Vector2.Max(Vector2.Max(Vector2.Max(a, b), c), d);
 
@@ -165,25 +163,6 @@ namespace Takai.Game
                 LastPosition = Vector2.Lerp(LastPosition, Position, (1 / dist) * deltaS);
             */
             ActualPosition = Vector2.Lerp(ActualPosition, Position, (float)time.ElapsedGameTime.TotalSeconds * (MoveSpeed / 100));
-
-            Map.Update(time, this);
-        }
-
-        /// <summary>
-        /// Draw the map at the camera's position
-        /// </summary>
-        public void Draw()
-        {
-            Draw(Viewport);
-        }
-
-        /// <summary>
-        /// Draw the map at the camera's position
-        /// </summary>
-        /// <param name="viewport">An explicit viewport to draw to</param>
-        public void Draw(Rectangle viewport)
-        {
-            Map.Draw(this, PostEffect);
         }
 
         /// <summary>
