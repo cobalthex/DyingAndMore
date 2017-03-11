@@ -154,8 +154,11 @@ namespace Takai.Game
         /// <param name="PostEffect">An optional fullscreen post effect to render with</param>
         /// <param name="DrawSectorEntities">Draw entities in sectors. Typically used for debugging/map editing</param>
         /// <remarks>All rendering management handled internally</remarks>
-        public void Draw(Camera Camera, Effect PostEffect = null)
+        public void Draw(Camera Camera = null, Effect PostEffect = null)
         {
+            if (Camera == null)
+                Camera = ActiveCamera;
+
             profilingInfo = new MapProfilingInfo();
 
             #region setup
@@ -409,7 +412,7 @@ namespace Takai.Game
                 sbatch.Draw(blobsRenderTarget, Vector2.Zero, Color.White);
                 sbatch.End();
             }
-            
+
             //draw entities (and any other reflected objects)
             sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead);
             sbatch.Draw(reflectedRenderTarget, Vector2.Zero, Color.White);
@@ -453,7 +456,7 @@ namespace Takai.Game
                 GraphicsDevice.DepthStencilState = DepthStencilState.None;
                 var viewProjection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
                 lineEffect.Parameters["Transform"].SetValue(cameraTransform * viewProjection);
-                
+
                 var grids = new VertexPositionColor[visibleTiles.Width * 2 + visibleTiles.Height * 2];
                 var gridColor = new Color(Color.Gray, 0.3f);
                 var sectorColor = new Color(Color.Gray, 0.65f);

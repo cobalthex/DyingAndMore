@@ -30,7 +30,7 @@ namespace DyingAndMore.Editor
 
         public override void Start()
         {
-            lastWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+            lastWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
         }
 
         public override void End()
@@ -44,7 +44,7 @@ namespace DyingAndMore.Editor
 
         public override void Update(GameTime Time)
         {
-            var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+            var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (selectedEntity != null)
                 selectedEntity.OutlineColor = Color.Transparent;

@@ -129,6 +129,27 @@ namespace Takai.Game
         /// </summary>
         protected Dictionary<string, Script> scripts = new Dictionary<string, Script>();
 
+        /// <summary>
+        /// An enumerable list of all entities, entities must be added through Spawn()
+        /// </summary>
+        [Data.NonSerialized]
+        public IEnumerable<Entity> AllEntities
+        {
+            get
+            {
+                foreach (var ent in ActiveEnts)
+                    yield return ent;
+
+                foreach (var sector in Sectors)
+                {
+                    foreach (var ent in sector.entities)
+                        yield return ent;
+                }
+            }
+        }
+
+        public Camera ActiveCamera { get; set; }
+
         public Map() { }
 
         /// <summary>
@@ -225,7 +246,7 @@ namespace Takai.Game
                 var sector = GetSector(entity.Position);
                 Sectors[sector.Y, sector.X].entities.Add(entity);
             }
-            TotalEntitiesCount++;
+            ++TotalEntitiesCount;
         }
 
         /// <summary>
@@ -252,7 +273,7 @@ namespace Takai.Game
             //will be removed in next update if out of visible range
             //only inactive entities are placed in sectors
             ActiveEnts.Add(ent);
-            TotalEntitiesCount++;
+            ++TotalEntitiesCount;
 
             return ent;
         }

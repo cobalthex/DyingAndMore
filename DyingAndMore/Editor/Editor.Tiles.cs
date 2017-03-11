@@ -29,7 +29,7 @@ namespace DyingAndMore.Editor
         
         public override void Update(GameTime time)
         {
-            var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+            var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsPress(Keys.LeftControl) || InputState.IsPress(Keys.RightControl))
             {
@@ -120,7 +120,7 @@ namespace DyingAndMore.Editor
 
                     var w = (System.Math.Abs((int)diff.X) - 1) / editor.Map.TileSize + 1;
                     var h = (System.Math.Abs((int)diff.Y) - 1) / editor.Map.TileSize + 1;
-                    editor.DebugFont.Draw(sbatch, $"w:{w}, h:{w}", editor.Camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
+                    editor.DebugFont.Draw(sbatch, $"w:{w}, h:{w}", editor.Map.ActiveCamera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
                 else
                 {
@@ -131,7 +131,7 @@ namespace DyingAndMore.Editor
 
                     diff /= editor.Map.TileSize;
                     editor.DebugFont.Draw(sbatch, $"x:{System.Math.Ceiling(diff.X)} y:{System.Math.Ceiling(diff.Y)} deg:{angle}",
-                        editor.Camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
+                        editor.Map.ActiveCamera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
             }
         }

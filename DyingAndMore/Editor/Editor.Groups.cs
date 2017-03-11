@@ -53,10 +53,17 @@ namespace DyingAndMore.Editor
         {
         }
 
+        public override void Start()
+        {
+        }
+
         public override void End()
         {
             //clear all group colors
             selectedGroup = null;
+
+            foreach (var ent in editor.Map.AllEntities)
+                ent.OutlineColor = Color.Transparent;
         }
 
         public override void Update(GameTime time)

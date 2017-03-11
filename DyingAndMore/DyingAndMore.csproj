@@ -83,6 +83,7 @@
     <Compile Include="Game\Entities\Controller.cs" />
     <Compile Include="Game\Entities\Device.cs" />
     <Compile Include="Game\Entities\InputController.cs" />
+    <Compile Include="Game\Scripts\TestScript.cs" />
     <Compile Include="Game\Weapons\BlobGun.cs" />
     <Compile Include="Game\Weapons\Gun.cs" />
     <Compile Include="Game\Weapons\Weapon.cs" />

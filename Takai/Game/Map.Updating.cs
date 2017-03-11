@@ -54,8 +54,11 @@ namespace Takai.Game
         /// <param name="RealTime">(Real) game time</param>
         /// <param name="Camera">Where on the map to view</param>
         /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
-        public void Update(GameTime RealTime, Camera Camera)
+        public void Update(GameTime RealTime, Camera Camera = null)
         {
+            if (Camera == null)
+                Camera = ActiveCamera;
+
             if (TimeScale == 0)
                 return; //may need to revisit
 
