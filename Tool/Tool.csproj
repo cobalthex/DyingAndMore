@@ -204,7 +204,7 @@
     <Resource Include="Resources\Trigger.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Templates\" />
+    <Folder Include="Types\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Camera.png" />

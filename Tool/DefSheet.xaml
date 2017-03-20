@@ -5,6 +5,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:Tool"
         xmlns:Toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:Xna="clr-namespace:Microsoft.Xna.Framework;assembly=MonoGame.Framework"
+        xmlns:XnaGraphics="clr-namespace:Microsoft.Xna.Framework.Graphics;assembly=MonoGame.Framework"
         mc:Ignorable="d"
         MinWidth="300"
     >
@@ -17,5 +20,42 @@
     </Grid>-->
     <Toolkit:PropertyGrid
         SelectedObject="{Binding Path=Source, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ScrollViewer}}}"
-        PropertyValueChanged="Props_ValueChanged"/>
+        PropertyValueChanged="Props_ValueChanged" FontSize="14">
+        <Toolkit:PropertyGrid.EditorDefinitions>
+            
+            <Toolkit:EditorTemplateDefinition>
+                <Toolkit:EditorTemplateDefinition.TargetProperties>
+                    <Toolkit:TargetPropertyType Type="{x:Type Xna:Vector2}"/>
+                </Toolkit:EditorTemplateDefinition.TargetProperties>
+                <Toolkit:EditorTemplateDefinition.EditingTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Toolkit:SingleUpDown Grid.Column="0" Value="{Binding Path=X, Mode=TwoWay}"/>
+                            <Toolkit:SingleUpDown Grid.Column="1" Value="{Binding Path=Y, Mode=TwoWay}"/> <!-- maybe not working because property -->
+                        </Grid>
+                    </DataTemplate>
+                </Toolkit:EditorTemplateDefinition.EditingTemplate>
+            </Toolkit:EditorTemplateDefinition>
+
+            <Toolkit:EditorTemplateDefinition>
+                <Toolkit:EditorTemplateDefinition.TargetProperties>
+                    <Toolkit:TargetPropertyType Type="{x:Type Xna:Color}"/>
+                </Toolkit:EditorTemplateDefinition.TargetProperties>
+                <Toolkit:EditorTemplateDefinition.EditingTemplate>
+                    <DataTemplate>
+                        <Toolkit:ColorPicker 
+                            UsingAlphaChannel="True" 
+                            ShowRecentColors="True"
+                            DisplayColorAndName="True"
+                        /><!-- todo: convert xna color to wpf(?) color -->
+                    </DataTemplate>
+                </Toolkit:EditorTemplateDefinition.EditingTemplate>
+            </Toolkit:EditorTemplateDefinition>
+            
+        </Toolkit:PropertyGrid.EditorDefinitions>
+    </Toolkit:PropertyGrid>
 </ScrollViewer>

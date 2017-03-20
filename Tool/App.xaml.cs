@@ -43,20 +43,22 @@ namespace Tool
                 {
                     using (var stream = Console.OpenStandardOutput())
                     {
-                        var writer = new System.IO.StreamWriter(stream);
-                        writer.AutoFlush = true;
-                        Console.SetOut(writer);
-
-                        for (int i = 1; i < e.Args.Length; i++)
+                        using (var writer = new System.IO.StreamWriter(stream))
                         {
-                            Type ty;
-                            if (Takai.Data.Serializer.RegisteredTypes.TryGetValue(e.Args[i], out ty))
+                            Console.SetOut(writer);
+
+                            for (int i = 1; i < e.Args.Length; i++)
                             {
-                                var obj = Activator.CreateInstance(ty);
-                                Takai.Data.Serializer.TextSerialize(writer, obj);
-                                writer.WriteLine();
+                                Type ty;
+                                if (Takai.Data.Serializer.RegisteredTypes.TryGetValue(e.Args[i], out ty))
+                                {
+                                    var obj = Activator.CreateInstance(ty);
+                                    Takai.Data.Serializer.TextSerialize(writer, obj);
+                                    writer.WriteLine();
+                                }
                             }
                         }
+                        stream.Flush();
                     }
                 }
 

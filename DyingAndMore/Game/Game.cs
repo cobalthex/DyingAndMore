@@ -1,9 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
-using System.Linq;
 using Takai.Input;
-using System;
 using Takai;
 
 namespace DyingAndMore.Game
@@ -35,7 +34,14 @@ namespace DyingAndMore.Game
                        select ent;
 
             player = plyr.FirstOrDefault() as Entities.Actor;
-            map.ActiveCamera = new Takai.Game.Camera(map, player);
+            map.ActiveCamera = new Takai.Game.Camera(player);
+
+            var testScript = new Scripts.TestScript()
+            {
+                totalTime = System.TimeSpan.FromSeconds(10),
+                victim = player
+            };
+            map.AddScript(testScript);
 
             //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
         }
@@ -58,10 +64,10 @@ namespace DyingAndMore.Game
             pt1 = new Takai.Game.ParticleType()
             {
                 Graphic = new Takai.Graphics.Sprite(
-                    Takai.AssetManager.Load<Texture2D>("Textures/Particles/Star.png"),
-                    32,
-                    32,
-                    4,
+                    Takai.AssetManager.Load<Texture2D>("Textures/Particles/Trail.png"),
+                    8,
+                    8,
+                    1,
                     System.TimeSpan.FromMilliseconds(100),
                     Takai.Graphics.TweenStyle.Sequential,
                     true
@@ -87,6 +93,8 @@ namespace DyingAndMore.Game
 
         public override void Update(GameTime time)
         {
+            map.ActiveCamera.Viewport = GraphicsDevice.Viewport.Bounds;
+
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.O))
             {
                 var ofd = new System.Windows.Forms.OpenFileDialog()
@@ -175,7 +183,7 @@ namespace DyingAndMore.Game
                 count = new Takai.Game.Range<int>(3, 5),
                 lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800))
             };
-            //map.Spawn(pspawn);
+            map.Spawn(pspawn);
 
             map.Update(time);
         }
@@ -199,10 +207,11 @@ namespace DyingAndMore.Game
             fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
 
             var sDebugInfo =
-                $"TimeScale: {map.TimeScale:0.#}x\n"
+                $"TimeScale: {map.TimeScale:0.#}x\n" +
+                $"Map Debug: {map.debugOut}\n"
             ;
 
-            fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White, true);
+            fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White);
 
             sbatch.End();
         }

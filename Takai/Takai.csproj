@@ -88,7 +88,9 @@
     <Compile Include="Game\Map.Updating.cs">
       <DependentUpon>Map.cs</DependentUpon>
     </Compile>
+    <Compile Include="Game\Path.cs" />
     <Compile Include="Game\Script.cs" />
+    <Compile Include="Game\Trigger.cs" />
     <Compile Include="StateMachine.cs" />
     <Compile Include="Graphics\BitmapFont.cs" />
     <Compile Include="Graphics\Sprite.cs" />

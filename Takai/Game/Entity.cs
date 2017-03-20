@@ -232,22 +232,6 @@ namespace Takai.Game
         }
         private Group group;
 
-        /// <summary>
-        /// A script that can control this entity's behavior (Runs after all other logic)
-        /// </summary>
-        public Script Script
-        {
-            get { return script; }
-            set
-            {
-                if (script != null)
-                    script.Entity = null;
-                script = Script;
-                script.Entity = this;
-            }
-        }
-        private Script script;
-
         public Entity() { }
 
         /// <summary>
@@ -274,7 +258,6 @@ namespace Takai.Game
         public virtual void Think(System.TimeSpan DeltaTime)
         {
             State.Update(DeltaTime);
-            Script?.Step(DeltaTime);
         }
 
         /// <summary>

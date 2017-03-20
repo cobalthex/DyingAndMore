@@ -10,12 +10,6 @@ namespace Takai.Game
     public class Camera
     {
         /// <summary>
-        /// The map this camera is tracking
-        /// </summary>
-        [Data.NonDesigned]
-        public Map Map { get; set; }
-
-        /// <summary>
         /// An optional post effect to apply to this camera
         /// </summary>
         public Effect PostEffect { get; set; } = null;
@@ -127,17 +121,15 @@ namespace Takai.Game
 
         public Camera() { }
 
-        public Camera(Map map, Entity follow = null)
+        public Camera(Entity follow = null)
         {
-            Map = map;
             Follow = follow;
             if (Follow != null)
                 ActualPosition = Position = Follow.Position;
         }
 
-        public Camera(Map map, Vector2 position)
+        public Camera(Vector2 position)
         {
-            Map = map;
             Follow = null;
             ActualPosition = Position = position;
         }

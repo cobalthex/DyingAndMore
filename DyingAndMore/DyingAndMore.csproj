@@ -70,6 +70,7 @@
     <Compile Include="Editor\Editor.Blobs.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
     <Compile Include="Editor\Editor.Groups.cs" />
+    <Compile Include="Editor\Editor.Paths.cs" />
     <Compile Include="Editor\Editor.Tiles.cs" />
     <Compile Include="Editor\Selectors\EntSelector.cs" />
     <Compile Include="Editor\Selectors\BlobSelector.cs" />
