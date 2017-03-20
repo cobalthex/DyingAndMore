@@ -189,8 +189,6 @@ namespace Takai.Game
                 new Rectangle(0, 0, Sectors.GetLength(1), Sectors.GetLength(0))
             );
 
-            debugOut = $"{visibleRegion}\n{visibleTiles}";
-
             #endregion
 
             #region entities

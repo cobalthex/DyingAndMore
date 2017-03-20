@@ -59,6 +59,8 @@ namespace Takai.Game
             if (Camera == null)
                 Camera = ActiveCamera;
 
+            Camera.Update(RealTime);
+
             if (TimeScale == 0)
                 return; //may need to revisit
 

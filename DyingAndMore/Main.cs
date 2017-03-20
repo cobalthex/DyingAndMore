@@ -1,5 +1,6 @@
 //Main.cs
 
+using System.Runtime.InteropServices;
 using Takai.Runtime;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,12 +10,46 @@ namespace DyingAndMore
     #region startup (Windows/Xbox/Zune)
     static class Program
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AttachConsole(int pid = -1);
+
         /// <summary>
         /// The main entry point for the game
         /// </summary>
         [System.STAThread]
         static void Main(string[] args)
         {
+            if (args.Length > 0)
+            {
+                if (args[0].Equals("MakeDef", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    AttachConsole();
+
+                    using (var stream = new System.IO.StreamWriter(System.Console.OpenStandardOutput()))
+                    {
+                        stream.AutoFlush = true;
+                        System.Console.SetOut(stream);
+
+                        stream.WriteLine("Test");
+
+                        for (int i = 1; i < args.Length; ++i)
+                        {
+                            if (Takai.Data.Serializer.RegisteredTypes.TryGetValue(args[i], out var type))
+                            {
+                                var obj = System.Activator.CreateInstance(type);
+                                Takai.Data.Serializer.TextSerialize(stream, obj);
+                                stream.WriteLine();
+                            }
+                        }
+
+                        stream.WriteLine();
+                    }
+                    return;
+                }
+            }
+
+
             using (DyingAndMoreGame game = new DyingAndMoreGame())
             {
 #if WINDOWS

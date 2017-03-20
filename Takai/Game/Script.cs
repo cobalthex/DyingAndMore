@@ -15,13 +15,9 @@ namespace Takai.Game
         /// <summary>
         /// The map this script is running on
         /// </summary>
+        [Data.NonSerialized]
         public Map Map { get; set; }
-
-        /// <summary>
-        /// An entity that this script is optionally attached to
-        /// </summary>
-        public Entity Entity { get; set; }
-
+        
         public Script(string name)
         {
             Name = name;
@@ -30,7 +26,8 @@ namespace Takai.Game
         /// <summary>
         /// Run one step of the script
         /// </summary>
-        /// <param name="DeltaTime">How much tim ehas elapsed since the last update (in map time)</param>
-        public abstract void Step(TimeSpan DeltaTime);
+        /// <param name="deltaTime">The game's delta time</param>
+        /// <param name="context">An optional entity that is passed in to provide context for various scripts (A trigger would pass the colliding entity in here)</param>
+        public abstract void Step(TimeSpan deltaTime, Entity context = null);
     }
 }

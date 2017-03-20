@@ -76,7 +76,8 @@ namespace Takai.Game
         }
         void Deserialize(Dictionary<string, object> Props)
         {
-            LoadState((MapState)Props["State"]);
+            if (Props.TryGetValue("State", out var state))
+                LoadState((MapState)state);
             
             Tiles = new short[Height, Width];
             var tiles = Data.Serializer.CastType<List<short>>(Props["Tiles"]);

@@ -128,7 +128,7 @@ namespace DyingAndMore.Editor
                 showEntitiesWithoutSprites = true,
                 showGrid = true
             };
-            Map.ActiveCamera = new Takai.Game.Camera(Map);
+            Map.ActiveCamera = new Takai.Game.Camera();
 
             if (modes == null)
             {
@@ -144,6 +144,7 @@ namespace DyingAndMore.Editor
                 modes.AddMode(new BlobsEditorMode(this));
                 modes.AddMode(new EntitiesEditorMode(this));
                 modes.AddMode(new GroupsEditorMode(this));
+                modes.AddMode(new PathsEditorMode(this));
                 modes.ModeIndex = 0;
 
                 selectorPreview = new Takai.UI.Element()
