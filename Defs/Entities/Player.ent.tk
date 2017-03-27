@@ -40,12 +40,12 @@ Actor {
         Speed: 0;
         shotDelay: 100;
     };
-    AltWeapon: BlobGun {
-        blob: BlobType {
+    AltWeapon: FluidGun {
+        Fluid: FluidType {
             Radius: 54;
             Drag: 0.2;
-            Texture: "Textures/Blobs/blood.png";
-            Reflection: "Textures/Blobs/blood.r.png";
+            Texture: "Textures/Fluids/blood.png";
+            Reflection: "Textures/Fluids/blood.r.png";
         };
         speed: 100;
     };

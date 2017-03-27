@@ -1,7 +1,0 @@
-BlobType {
-    Texture: "Textures\\Blobs\\water.png";
-    Reflection: "Textures\\Blobs\\water.r.png";
-    Alpha: 0.5;
-    Radius: 42;
-    Drag: 0.55;
-}

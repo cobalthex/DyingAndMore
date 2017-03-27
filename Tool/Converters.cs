@@ -30,8 +30,8 @@ namespace Tool
                     case "wpn":
                         icon = "Gun";
                         break;
-                    case "blob":
-                        icon = "BlobType";
+                    case "Fluid":
+                        icon = "FluidType";
                         break;
                     default:
                         icon = "Unknown";

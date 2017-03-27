@@ -1,0 +1,6 @@
+FluidType {
+    Texture: "Data\\Textures\\Fluids\\Something.png";
+    Reflection: "Data\\Textures\\Fluids\\Something.r.png";
+    Radius: 54;
+    Drag: 0.8;
+}

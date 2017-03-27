@@ -1,6 +1,0 @@
-BlobType {
-    Texture: "Textures\\Blobs\\Bile.png";
-    Reflection: "Textures\\Blobs\\Bile.r.png";
-    Radius: 54;
-    Drag: 0.7;
-}

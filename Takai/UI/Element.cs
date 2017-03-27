@@ -41,8 +41,11 @@ namespace Takai.UI
             get { return parent; }
             set
             {
-                parent = value;
-                Reflow();
+                if (parent != value)
+                {
+                    parent = value;
+                    Reflow();
+                }
             }
         }
         private Element parent = null;
@@ -50,7 +53,7 @@ namespace Takai.UI
         /// <summary>
         /// A readonly collection of all of the children in this element
         /// </summary>
-        public ReadOnlyCollection<Element> Children { get; set; } //todo: maybe observable
+        public ReadOnlyCollection<Element> Children { get; private set; } //todo: maybe observable
         protected List<Element> children = new List<Element>();
 
         public string Text
@@ -58,8 +61,11 @@ namespace Takai.UI
             get { return text; }
             set
             {
-                text = value;
-                textSize = Font?.MeasureString(text) ?? Vector2.One;
+                if (text != value)
+                {
+                    text = value;
+                    textSize = Font?.MeasureString(text) ?? Vector2.One;
+                }
             }
         }
         private string text = "";
@@ -70,8 +76,11 @@ namespace Takai.UI
             get { return font; }
             set
             {
-                font = value;
-                textSize = font?.MeasureString(text) ?? Vector2.One;
+                if (font != value)
+                {
+                    font = value;
+                    textSize = font?.MeasureString(text) ?? Vector2.One;
+                }
             }
         }
         private Graphics.BitmapFont font;
@@ -86,8 +95,11 @@ namespace Takai.UI
             get { return horizontalAlignment; }
             set
             {
-                horizontalAlignment = value;
-                Reflow();
+                if (horizontalAlignment != value)
+                {
+                    horizontalAlignment = value;
+                    Reflow();
+                }
             }
         }
         private Alignment horizontalAlignment;
@@ -100,8 +112,11 @@ namespace Takai.UI
             get { return verticalAlignment; }
             set
             {
-                verticalAlignment = value;
-                Reflow();
+                if (verticalAlignment != value)
+                {
+                    verticalAlignment = value;
+                    Reflow();
+                }
             }
         }
         private Alignment verticalAlignment;
@@ -117,8 +132,11 @@ namespace Takai.UI
             get { return position; }
             set
             {
-                position = value;
-                Reflow();
+                if (position != value)
+                {
+                    position = value;
+                    Reflow();
+                }
             }
         }
         private Vector2 position = Vector2.Zero;
@@ -131,8 +149,11 @@ namespace Takai.UI
             get { return size; }
             set
             {
-                size = value;
-                ResizeAndReflow();
+                if (size != value)
+                {
+                    size = value;
+                    ResizeAndReflow();
+                }
             }
         }
         private Vector2 size = Vector2.One;
@@ -142,9 +163,12 @@ namespace Takai.UI
             get { return new Rectangle(Position.ToPoint(), Size.ToPoint()); }
             set
             {
-                position = value.Location.ToVector2();
-                size = value.Size.ToVector2();
-                ResizeAndReflow();
+                if (Bounds != value)
+                {
+                    position = value.Location.ToVector2();
+                    size = value.Size.ToVector2();
+                    ResizeAndReflow();
+                }
             }
         }
 
@@ -182,16 +206,32 @@ namespace Takai.UI
         /// <param name="children">Optionally add children to this element</param>
         public Element(params Element[] children)
         {
-            this.Children = new ReadOnlyCollection<Element>(this.children);
+            Children = new ReadOnlyCollection<Element>(this.children);
 
             foreach (var child in children)
                 AddChild(child);
+        }
+
+        /// <summary>
+        /// Remove this element from its parent. If parent is null, does nothing
+        /// </summary>
+        /// <returns>True if the element was removed from its parent or false if parent was null</returns>
+        public bool RemoveFromParent()
+        {
+            if (Parent != null)
+            {
+                parent.RemoveChild(this);
+                parent = null;
+                return true;
+            }
+            return false;
         }
 
         public void AddChild(Element child)
         {
             child.Parent = this;
             children.Add(child);
+            Reflow();
         }
 
         public void RemoveChild(Element child)
@@ -204,6 +244,11 @@ namespace Takai.UI
             var child = children[index];
             children.RemoveAt(index);
             return child;
+        }
+
+        public void RemoveAllChildren()
+        {
+            children.Clear();
         }
 
         protected void ResizeAndReflow()
@@ -227,7 +272,7 @@ namespace Takai.UI
                 child.Reflow();
             }
         }
-       
+
         /// <summary>
         /// Calculate the bounds of this element based on a parent container
         /// </summary>
@@ -269,7 +314,7 @@ namespace Takai.UI
         protected Rectangle CalculateAbsoluteBounds()
         {
             callCount++;
-            absoluteBounds = Parent != null 
+            absoluteBounds = Parent != null
                 ? CalculateBounds(Parent.CalculateAbsoluteBounds())
                 : new Rectangle(Position.ToPoint(), Size.ToPoint());
             return absoluteBounds;
@@ -292,6 +337,14 @@ namespace Takai.UI
             Size = bounds.Size.ToVector2() + new Vector2(padding);
         }
 
+        /// <summary>
+        /// Add specific behavior before <see cref="OnClick"/> is called. Called by Update()
+        /// </summary>
+        /// <param name="args">Click event args passed from Update. Forwarded to <see cref="OnClick"/></param>
+        protected virtual void BeforeClick(ClickEventArgs args)
+        {
+            OnClick(this, args);
+        }
 
         /// <summary>
         /// Update this element
@@ -303,7 +356,7 @@ namespace Takai.UI
             if (!Runtime.GameManager.HasFocus)
                 return false;
 
-            for (var i = Children.Count - 1; i >= 0 ; --i)
+            for (var i = Children.Count - 1; i >= 0; --i)
             {
                 if (!Children[i].Update(time))
                     return false;
@@ -320,7 +373,7 @@ namespace Takai.UI
             {
                 if (didPress && AbsoluteBounds.Contains(mouse) && OnClick != null)
                 {
-                    OnClick(this, new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() });
+                    BeforeClick(new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() });
                     didPress = false;
                     return false;
                 }
@@ -333,28 +386,34 @@ namespace Takai.UI
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            var size = new Point(
-                MathHelper.Min(AbsoluteBounds.Width, (int)textSize.X),
-                MathHelper.Min(AbsoluteBounds.Height, (int)textSize.Y)
-            );
-
             if (DrawBoundingRects)
                 Graphics.Primitives2D.DrawRect(spriteBatch, new Color(0, 0.75f, 1, 0.35f), AbsoluteBounds);
 
-            Font?.Draw(
-                spriteBatch,
-                Text,
-                new Rectangle(
-                    AbsoluteBounds.X + ((AbsoluteBounds.Width - size.X) / 2),
-                    AbsoluteBounds.Y + ((AbsoluteBounds.Height - size.Y) / 2),
-                    size.X,
-                    size.Y
-                ),
-                Color
-            );
+            var textBounds = CalculateTextBounds(textSize, AbsoluteBounds);
+            Font?.Draw(spriteBatch, Text, textBounds, Color);
 
             foreach (var child in Children)
                 child.Draw(spriteBatch);
+        }
+
+        /// <summary>
+        /// Caluclate a rectangle where the text is centered inside bounds
+        /// </summary>
+        /// <param name="textSize">The size of the text</param>
+        /// <param name="bounds">The bounds to center inside</param>
+        /// <returns>The absolute bounds of the text rect</returns>
+        protected static Rectangle CalculateTextBounds(Vector2 textSize, Rectangle bounds)
+        {
+            var size = new Point(
+                MathHelper.Min(bounds.Width, (int)textSize.X),
+                MathHelper.Min(bounds.Height, (int)textSize.Y)
+            );
+            return new Rectangle(
+                bounds.X + ((bounds.Width - size.X) / 2),
+                bounds.Y + ((bounds.Height - size.Y) / 2),
+                size.X,
+                size.Y
+            );
         }
     }
 }

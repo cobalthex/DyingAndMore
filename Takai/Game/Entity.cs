@@ -284,10 +284,10 @@ namespace Takai.Game
         public virtual void OnMapCollision(Point Tile, Vector2 Point, TimeSpan DeltaTime) { }
 
         /// <summary>
-        /// Called when there is a collision between this entity and a blob
+        /// Called when there is a collision between this entity and a Fluid
         /// </summary>
-        /// <param name="Type">The type of blob collided with</param>
+        /// <param name="Type">The type of Fluid collided with</param>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void OnBlobCollision(BlobType Type, TimeSpan DeltaTime) { }
+        public virtual void OnFluidCollision(FluidType Type, TimeSpan DeltaTime) { }
     }
 }

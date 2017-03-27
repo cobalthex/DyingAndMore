@@ -9,13 +9,13 @@ namespace Takai.Game
         protected GraphicsDevice GraphicsDevice { get; set; }
         protected SpriteBatch sbatch;
         protected RenderTarget2D preRenderTarget;
-        protected RenderTarget2D blobsRenderTarget;
+        protected RenderTarget2D fluidsRenderTarget;
         protected RenderTarget2D reflectionRenderTarget; //the reflection mask
         protected RenderTarget2D reflectedRenderTarget; //draw all things that should be reflected here
         protected DepthStencilState stencilWrite, stencilRead;
         protected AlphaTestEffect mapAlphaTest;
         protected Effect outlineEffect;
-        protected Effect blobEffect;
+        protected Effect fluidEffect;
         protected Effect reflectionEffect; //writes color and reflection information to two render targets
 
         public Texture2D TilesImage { get; set; }
@@ -32,17 +32,35 @@ namespace Takai.Game
         /// </summary>
         public class MapRenderSettings
         {
-            public bool showGrid;
-            public bool showEntitiesWithoutSprites;
-            public bool showReflectionMask;
+            //todo: maybe convert to enum/packed vector
+
+            public bool drawTiles;
+            public bool drawEntities;
+            public bool drawFluids;
+            public bool drawReflections;
+            public bool drawFluidReflectionMask;
+            public bool drawDecals;
+            public bool drawParticles;
+            public bool drawTriggers;
+            public bool drawLines;
+            public bool drawGrids;
+            public bool drawBordersAroundNonDrawingEntities;
         }
 
         [Data.NonSerialized]
         public MapRenderSettings renderSettings = new MapRenderSettings()
         {
-            showGrid = false,
-            showEntitiesWithoutSprites = false,
-            showReflectionMask = false
+            drawTiles = true,
+            drawEntities = true,
+            drawFluids = true,
+            drawReflections = true,
+            drawFluidReflectionMask = false,
+            drawDecals = true,
+            drawParticles = true,
+            drawTriggers = false,
+            drawLines = true,
+            drawGrids = false,
+            drawBordersAroundNonDrawingEntities = false
         };
 
         /// <summary>
@@ -74,8 +92,8 @@ namespace Takai.Game
         public struct MapProfilingInfo
         {
             public int visibleEnts;
-            public int visibleInactiveBlobs;
-            public int visibleActiveBlobs;
+            public int visibleInactiveFluids;
+            public int visibleActiveFluids;
             public int visibleDecals;
         }
         [Data.NonSerialized]
@@ -128,13 +146,13 @@ namespace Takai.Game
                     ReferenceAlpha = 1
                 };
                 preRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
-                blobsRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                fluidsRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
                 reflectionRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
                 reflectedRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
                 //todo: some of the render targets may be able to be combined
 
                 outlineEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Outline.mgfx");
-                blobEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Blob.mgfx");
+                fluidEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Fluid.mgfx");
                 reflectionEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Reflection.mgfx");
             }
         }
@@ -168,6 +186,7 @@ namespace Takai.Game
             var originalRt = GraphicsDevice.GetRenderTargets();
 
             var cameraTransform = Camera.Transform;
+            var cameraViewTransform = cameraTransform * Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
 
             var visibleRegion = Rectangle.Intersect(Camera.VisibleRegion, Bounds);
             var visibleTiles = Rectangle.Intersect(
@@ -191,263 +210,270 @@ namespace Takai.Game
 
             #endregion
 
-            #region entities
-
             GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
             GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, cameraTransform);
 
-            foreach (var ent in ActiveEnts)
+            if (renderSettings.drawEntities)
             {
-                bool didDraw = false;
-                foreach (var sprite in ent.Sprites)
+                sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, cameraTransform);
+
+                foreach (var ent in ActiveEnts)
                 {
-                    if (sprite?.Texture == null)
-                        continue;
-
-                    didDraw = true;
-                    profilingInfo.visibleEnts++;
-
-                    if (ent.OutlineColor.A > 0)
-                        _drawEntsOutlined.Add(ent);
-                    else
+                    bool didDraw = false;
+                    foreach (var sprite in ent.Sprites)
                     {
-                        var angle = ent.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                        sprite.Draw(sbatch, ent.Position, angle);
-                        //todo: draw all overlays
+                        if (sprite?.Texture == null)
+                            continue;
+
+                        didDraw = true;
+                        profilingInfo.visibleEnts++;
+
+                        if (ent.OutlineColor.A > 0)
+                            _drawEntsOutlined.Add(ent);
+                        else
+                        {
+                            var angle = ent.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                            sprite.Draw(sbatch, ent.Position, angle);
+                            //todo: draw all overlays
+                        }
+                    }
+
+                    if (renderSettings.drawBordersAroundNonDrawingEntities && !didDraw)
+                    {
+                        Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
+                                                     -ent.Direction.Y, ent.Direction.X, 0, 0,
+                                                      0, 0, 1, 0,
+                                                      0, 0, 0, 1);
+
+                        Rectangle rect = new Rectangle(new Vector2(-ent.Radius).ToPoint(), new Vector2(ent.Radius * 2).ToPoint());
+
+                        var tl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Top), transform);
+                        var tr = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Top), transform);
+                        var bl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Bottom), transform);
+                        var br = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Bottom), transform);
+
+                        DrawLine(tl, tr, Color.Salmon);
+                        DrawLine(tr, br, Color.Salmon);
+                        DrawLine(br, bl, Color.Salmon);
+                        DrawLine(bl, tl, Color.Salmon);
+
+                        DrawLine(tl, br, Color.Salmon);
+                        DrawLine(bl, tr, Color.Salmon);
                     }
                 }
 
-                if (renderSettings.showEntitiesWithoutSprites && !didDraw)
+                sbatch.End();
+
+                //outlined entities
+                sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, outlineEffect, cameraTransform);
+
+                foreach (var ent in _drawEntsOutlined)
                 {
-                    Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
-                                                 -ent.Direction.Y, ent.Direction.X, 0, 0,
-                                                  0,               0,               1, 0,
-                                                  0,               0,               0, 1);
+                    bool first = true;
+                    foreach (var sprite in ent.Sprites)
+                    {
+                        if (sprite?.Texture == null)
+                            continue;
 
-                    Rectangle rect = new Rectangle(new Vector2(-ent.Radius).ToPoint(), new Vector2(ent.Radius * 2).ToPoint());
+                        //outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
+                        //outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
 
-                    var tl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Top), transform);
-                    var tr = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Top), transform);
-                    var bl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Bottom), transform);
-                    var br = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Bottom), transform);
+                        var angle = ent.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                        sprite.Draw(sbatch, ent.Position, angle, first ? ent.OutlineColor : Color.Transparent);
 
-                    DrawLine(tl, tr, Color.Salmon);
-                    DrawLine(tr, br, Color.Salmon);
-                    DrawLine(br, bl, Color.Salmon);
-                    DrawLine(bl, tl, Color.Salmon);
-
-                    DrawLine(tl, br, Color.Salmon);
-                    DrawLine(bl, tr, Color.Salmon);
-                }
-            }
-
-            sbatch.End();
-
-            //outlined entities
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, outlineEffect, cameraTransform);
-
-            foreach (var ent in _drawEntsOutlined)
-            {
-                bool first = true;
-                foreach (var sprite in ent.Sprites)
-                {
-                    if (sprite?.Texture == null)
-                        continue;
-
-                    //outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
-                    //outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
-
-                    var angle = ent.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                    sprite.Draw(sbatch, ent.Position, angle, first ? ent.OutlineColor : Color.Transparent);
-
-                    first = false;
-                }
-            }
-
-            sbatch.End();
-
-            #endregion
-
-            #region Particles
-
-            foreach (var p in Particles)
-            {
-                sbatch.Begin(SpriteSortMode.BackToFront, p.Key.BlendMode, null, stencilRead, null, null, cameraTransform);
-
-                for (int i = 0; i < p.Value.Count; i++)
-                {
-                    if (p.Value[i].time == System.TimeSpan.Zero)
-                        continue;
-
-                    var sz = p.Key.Graphic.Size.ToVector2();
-                    sz *= p.Value[i].scale;
-
-                    p.Key.Graphic.Draw
-                    (
-                        sbatch,
-                        new Rectangle(p.Value[i].position.ToPoint(), sz.ToPoint()),
-                        p.Value[i].rotation,
-                        p.Value[i].color,
-                        ElapsedTime - p.Value[i].time
-                    );
+                        first = false;
+                    }
                 }
 
                 sbatch.End();
             }
 
-            #endregion
-
-            #region blobs
-
-            GraphicsDevice.SetRenderTargets(blobsRenderTarget, reflectionRenderTarget);
-            GraphicsDevice.Clear(Color.TransparentBlack);
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, reflectionEffect, cameraTransform);
-
-            //inactive blobs
-            for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
+            if (renderSettings.drawParticles)
             {
-                for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
+                foreach (var p in Particles)
                 {
-                    foreach (var blob in Sectors[y, x].blobs)
+                    sbatch.Begin(SpriteSortMode.BackToFront, p.Key.BlendMode, null, stencilRead, null, null, cameraTransform);
+
+                    for (int i = 0; i < p.Value.Count; i++)
                     {
-                        profilingInfo.visibleInactiveBlobs++;
-                        reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
-                        sbatch.Draw(blob.type.Texture, blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), new Color(1, 1, 1, blob.type.Alpha));
+                        if (p.Value[i].time == System.TimeSpan.Zero)
+                            continue;
+
+                        var sz = p.Key.Graphic.Size.ToVector2();
+                        sz *= p.Value[i].scale;
+
+                        p.Key.Graphic.Draw
+                        (
+                            sbatch,
+                            new Rectangle(p.Value[i].position.ToPoint(), sz.ToPoint()),
+                            p.Value[i].rotation,
+                            p.Value[i].color,
+                            ElapsedTime - p.Value[i].time
+                        );
                     }
+
+                    sbatch.End();
                 }
             }
-            //active blobs
-            foreach (var blob in ActiveBlobs)
+
+            GraphicsDevice.SetRenderTargets(fluidsRenderTarget, reflectionRenderTarget);
+            GraphicsDevice.Clear(Color.TransparentBlack);
+
+            if (renderSettings.drawFluids || renderSettings.drawFluidReflectionMask)
             {
-                profilingInfo.visibleActiveBlobs++;
-                reflectionEffect.Parameters["Reflection"].SetValue(blob.type.Reflection);
-                sbatch.Draw(blob.type.Texture, blob.position - new Vector2(blob.type.Texture.Width / 2, blob.type.Texture.Height / 2), new Color(1, 1, 1, blob.type.Alpha));
+                sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, reflectionEffect, cameraTransform);
+
+                //inactive fluids
+                for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
+                {
+                    for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
+                    {
+                        foreach (var fluid in Sectors[y, x].Fluids)
+                        {
+                            profilingInfo.visibleInactiveFluids++;
+                            reflectionEffect.Parameters["Reflection"].SetValue(fluid.type.Reflection);
+                            sbatch.Draw(fluid.type.Texture, fluid.position - new Vector2(fluid.type.Texture.Width / 2, fluid.type.Texture.Height / 2), new Color(1, 1, 1, fluid.type.Alpha));
+                        }
+                    }
+                }
+                //active fluids
+                foreach (var fluid in ActiveFluids)
+                {
+                    profilingInfo.visibleActiveFluids++;
+                    reflectionEffect.Parameters["Reflection"].SetValue(fluid.type.Reflection);
+                    sbatch.Draw(fluid.type.Texture, fluid.position - new Vector2(fluid.type.Texture.Width / 2, fluid.type.Texture.Height / 2), new Color(1, 1, 1, fluid.type.Alpha));
+                }
+
+                sbatch.End();
             }
-
-            sbatch.End();
-
-            #endregion
 
             //main render
             GraphicsDevice.SetRenderTargets(preRenderTarget);
 
-            #region tiles
-
-            var projection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
-            mapAlphaTest.Projection = projection;
-            mapAlphaTest.View = cameraTransform;
-            sbatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, stencilWrite, null, mapAlphaTest);
-
-            for (var y = visibleTiles.Top; y < visibleTiles.Bottom; ++y)
+            if (renderSettings.drawTiles)
             {
-                for (var x = visibleTiles.Left; x < visibleTiles.Right; ++x)
+                var projection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
+                mapAlphaTest.Projection = projection;
+                mapAlphaTest.View = cameraTransform;
+                sbatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, stencilWrite, null, mapAlphaTest);
+
+                for (var y = visibleTiles.Top; y < visibleTiles.Bottom; ++y)
                 {
-                    var tile = Tiles[y, x];
-                    if (tile < 0)
-                        continue;
-
-                    sbatch.Draw
-                    (
-                        TilesImage,
-                        new Vector2(x * TileSize, y * TileSize),
-                        new Rectangle((tile % TilesPerRow) * TileSize, (tile / TilesPerRow) * TileSize, TileSize, TileSize),
-                        Color.White
-                    );
-                }
-            }
-
-            sbatch.End();
-
-            #endregion
-
-            #region decals
-
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, cameraTransform);
-
-            for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
-            {
-                for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
-                {
-                    foreach (var decal in Sectors[y, x].decals)
+                    for (var x = visibleTiles.Left; x < visibleTiles.Right; ++x)
                     {
+                        var tile = Tiles[y, x];
+                        if (tile < 0)
+                            continue;
+
                         sbatch.Draw
                         (
-                            decal.texture,
-                            decal.position,
-                            null,
-                            Color.White,
-                            decal.angle,
-                            new Vector2(decal.texture.Width / 2, decal.texture.Height / 2),
-                            decal.scale,
-                            SpriteEffects.None,
-                            0
+                            TilesImage,
+                            new Vector2(x * TileSize, y * TileSize),
+                            new Rectangle((tile % TilesPerRow) * TileSize, (tile / TilesPerRow) * TileSize, TileSize, TileSize),
+                            Color.White
                         );
-                        profilingInfo.visibleDecals++;
                     }
                 }
+
+                sbatch.End();
             }
-            sbatch.End();
 
-            #endregion
+            if (renderSettings.drawDecals)
+            {
+                sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, stencilRead, null, null, cameraTransform);
 
-            #region blob effects
+                for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
+                {
+                    for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
+                    {
+                        foreach (var decal in Sectors[y, x].decals)
+                        {
+                            sbatch.Draw
+                            (
+                                decal.texture,
+                                decal.position,
+                                null,
+                                Color.White,
+                                decal.angle,
+                                new Vector2(decal.texture.Width / 2, decal.texture.Height / 2),
+                                decal.scale,
+                                SpriteEffects.None,
+                                0
+                            );
+                            profilingInfo.visibleDecals++;
+                        }
+                    }
+                }
+                sbatch.End();
+            }
 
-            //draw blobs onto map (with reflections)
-            if (renderSettings.showReflectionMask) //draw blobs as reflection mask
+            #region Present fluids + reflections
+
+            if (renderSettings.drawFluidReflectionMask)
             {
                 sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
                 sbatch.Draw(reflectionRenderTarget, Vector2.Zero, Color.White);
                 sbatch.End();
             }
-            else //draw blobs
+
+            if (renderSettings.drawFluids)
             {
                 //todo: transform correctly
 
-                sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead, null, blobEffect);
-                blobEffect.Parameters["Mask"].SetValue(reflectionRenderTarget);
-                blobEffect.Parameters["Reflection"].SetValue(reflectedRenderTarget);
-                sbatch.Draw(blobsRenderTarget, Vector2.Zero, Color.White);
+                sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead, null, fluidEffect);
+                fluidEffect.Parameters["Mask"].SetValue(reflectionRenderTarget);
+                fluidEffect.Parameters["Reflection"].SetValue(renderSettings.drawReflections ? reflectedRenderTarget : null);
+                sbatch.Draw(fluidsRenderTarget, Vector2.Zero, Color.White);
                 sbatch.End();
             }
+
+            #endregion
 
             //draw entities (and any other reflected objects)
             sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead);
             sbatch.Draw(reflectedRenderTarget, Vector2.Zero, Color.White);
             sbatch.End();
 
-            #endregion
-
-            #region lines
-
-            if (debugLines.Count > 0)
+            if (renderSettings.drawTriggers)
             {
-                GraphicsDevice.RasterizerState = lineRaster;
-                GraphicsDevice.BlendState = BlendState.NonPremultiplied;
-                GraphicsDevice.DepthStencilState = DepthStencilState.None;
-                var viewProjection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
-                lineEffect.Parameters["Transform"].SetValue(cameraTransform * viewProjection);
-
-                var blackLines = debugLines.ConvertAll(line => { line.Color = Color.Black; line.Position += new Vector3(1, 1, 0); return line; });
-                foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
+                sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, null, cameraTransform);
+                for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
                 {
-                    pass.Apply();
-                    GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, blackLines.ToArray(), 0, blackLines.Count / 2);
+                    for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
+                    {
+                        foreach (var trigger in Sectors[y, x].triggers)
+                            Graphics.Primitives2D.DrawFill(sbatch, new Color(Color.Aqua, 0.25f), trigger.Region);
+                    }
                 }
-
-                foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, debugLines.ToArray(), 0, debugLines.Count / 2);
-                }
-                debugLines.Clear();
+                sbatch.End();
             }
 
-            #endregion
+            if (renderSettings.drawLines)
+            {
+                if (debugLines.Count > 0)
+                {
+                    GraphicsDevice.RasterizerState = lineRaster;
+                    GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+                    GraphicsDevice.DepthStencilState = DepthStencilState.None;
+                    lineEffect.Parameters["Transform"].SetValue(cameraViewTransform);
 
-            #region grid
+                    var blackLines = debugLines.ConvertAll(line => { line.Color = Color.Black; line.Position += new Vector3(1, 1, 0); return line; });
+                    foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
+                    {
+                        pass.Apply();
+                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, blackLines.ToArray(), 0, blackLines.Count / 2);
+                    }
 
-            if (renderSettings.showGrid)
+                    foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
+                    {
+                        pass.Apply();
+                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, debugLines.ToArray(), 0, debugLines.Count / 2);
+                    }
+                    debugLines.Clear();
+                }
+            }
+
+            if (renderSettings.drawGrids)
             {
                 GraphicsDevice.RasterizerState = lineRaster;
                 GraphicsDevice.BlendState = BlendState.NonPremultiplied;
@@ -482,8 +508,6 @@ namespace Takai.Game
                     GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, grids, 0, grids.Length / 2);
                 }
             }
-
-            #endregion
 
             #region present
 

@@ -51,14 +51,14 @@ namespace Takai.Game
     }
 
     /// <summary>
-    /// A single type of blob
-    /// This struct defines the graphics for the blob and physical properties that can affect the game
+    /// A single type of Fluid
+    /// This struct defines the graphics for the Fluid and physical properties that can affect the game
     /// </summary>
     [Data.DesignerCreatable]
-    public class BlobType
+    public class FluidType
     {
         /// <summary>
-        /// The texture to render the blob with
+        /// The texture to render the Fluid with
         /// </summary>
         public Texture2D Texture { get; set; }
         /// <summary>
@@ -73,24 +73,24 @@ namespace Takai.Game
         public float Alpha { get; set; } = 1;
 
         /// <summary>
-        /// The radius of an individual blob
+        /// The radius of an individual Fluid
         /// </summary>
         public float Radius { get; set; }
         /// <summary>
-        /// Drag affects both how quickly the blob stops moving and how much resistance there is to entities moving through it
+        /// Drag affects both how quickly the Fluid stops moving and how much resistance there is to entities moving through it
         /// </summary>
         public float Drag { get; set; }
     }
 
     /// <summary>
-    /// A single blob, rendered as a metablob
-    /// Blobs can have physics per their blob type
-    /// Blobs can be spawned with a velocity which is decreased by their drag over time. Once the velocity reaches zero, the blob is considered inactive (permanently)
+    /// A single fluid, rendered as a meta-blob
+    /// Fluids can have physics per their fluid type
+    /// Fluids can be spawned with a velocity which is decreased by their drag over time. Once the velocity reaches zero, the fluid is considered inactive (permanently)
     /// </summary>
     [Data.DesignerCreatable]
-    public struct Blob
+    public struct Fluid
     {
-        public BlobType type;
+        public FluidType type;
         public Vector2 position;
         public Vector2 velocity;
     }

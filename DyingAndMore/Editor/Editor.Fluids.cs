@@ -3,16 +3,16 @@ using Takai.Input;
 
 namespace DyingAndMore.Editor
 {
-    class BlobsEditorMode : EditorMode
+    class FluidsEditorMode : EditorMode
     {
-        System.TimeSpan lastBlobTime = System.TimeSpan.Zero;
+        System.TimeSpan lastFluidTime = System.TimeSpan.Zero;
 
-        Selectors.BlobSelector selector;
+        Selectors.FluidSelector selector;
 
-        public BlobsEditorMode(Editor editor)
-            : base("Blobs", editor)
+        public FluidsEditorMode(Editor editor)
+            : base("Fluids", editor)
         {
-            selector = new Selectors.BlobSelector(editor);
+            selector = new Selectors.FluidSelector(editor);
             selector.Load();
         }
 
@@ -26,10 +26,10 @@ namespace DyingAndMore.Editor
         {
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
-            if (time.TotalGameTime > lastBlobTime + System.TimeSpan.FromMilliseconds(50))
+            if (time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
             {
                 if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Bounds.Contains(currentWorldPos))
-                    editor.Map.Spawn(selector.blobs[selector.SelectedItem], currentWorldPos, Vector2.Zero);
+                    editor.Map.Spawn(selector.Fluids[selector.SelectedItem], currentWorldPos, Vector2.Zero);
 
                 else if (InputState.IsButtonDown(MouseButtons.Right))
                 {
@@ -42,14 +42,14 @@ namespace DyingAndMore.Editor
                         for (int x = start.X; x < end.X; ++x)
                         {
                             var sect = editor.Map.Sectors[y, x];
-                            for (var i = 0; i < sect.blobs.Count; ++i)
+                            for (var i = 0; i < sect.Fluids.Count; ++i)
                             {
-                                var blob = sect.blobs[i];
+                                var Fluid = sect.Fluids[i];
 
-                                if (Vector2.DistanceSquared(blob.position, currentWorldPos) < blob.type.Radius * blob.type.Radius)
+                                if (Vector2.DistanceSquared(Fluid.position, currentWorldPos) < Fluid.type.Radius * Fluid.type.Radius)
                                 {
-                                    sect.blobs[i] = sect.blobs[sect.blobs.Count - 1];
-                                    sect.blobs.RemoveAt(sect.blobs.Count - 1);
+                                    sect.Fluids[i] = sect.Fluids[sect.Fluids.Count - 1];
+                                    sect.Fluids.RemoveAt(sect.Fluids.Count - 1);
                                     --i;
                                 }
                             }
@@ -57,7 +57,7 @@ namespace DyingAndMore.Editor
                     }
                 }
 
-                lastBlobTime = time.TotalGameTime;
+                lastFluidTime = time.TotalGameTime;
             }
         }
     }

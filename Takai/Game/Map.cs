@@ -6,21 +6,22 @@ namespace Takai.Game
 {
     /// <summary>
     /// A single sector of the map, used for spacial calculations
-    /// Sectors typically contain inactive entities that are not visible as well as dummy objects (inactive blobs, decals).
+    /// Sectors typically contain inactive entities that are not visible as well as dummy objects (inactive Fluids, decals).
     /// </summary>
     public class MapSector
     {
         public List<Entity> entities = new List<Entity>();
-        public List<Blob> blobs = new List<Blob>();
+        public List<Fluid> Fluids = new List<Fluid>();
         public List<Decal> decals = new List<Decal>();
+        public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
     }
 
     /// <summary>
-    /// An event handler for triggered events
+    /// An event handler for game events
     /// </summary>
-    /// <param name="triggerType"></param>
-    /// <param name="triggerValue"></param>
-    public delegate void TriggeredEvent(string triggerType, int triggerValue);
+    /// <param name="eventName">The name of the event that triggered this handler</param>
+    /// <param name="eventValue">And optional event value</param>
+    public delegate void GameEvent(string eventName, int eventValue = 0);
 
     /// <summary>
     /// A 2D, tile based map system that handles logic and rendering of the map
@@ -110,19 +111,19 @@ namespace Takai.Game
         [Data.NonSerialized]
         public List<Entity> ActiveEnts { get; protected set; } = new List<Entity>(128);
         /// <summary>
-        /// The list of live blobs. Once the blobs' velocity is zero, they are removed from this and not re-added
+        /// The list of live Fluids. Once the Fluids' velocity is zero, they are removed from this and not re-added
         /// </summary>
         [Data.NonSerialized]
-        public List<Blob> ActiveBlobs { get; protected set; } = new List<Blob>(128);
+        public List<Fluid> ActiveFluids { get; protected set; } = new List<Fluid>(128);
 
         [Data.NonSerialized]
         public int TotalEntitiesCount { get; private set; } = 0;
 
         /// <summary>
-        /// Event handlers for specific triggered events
-        /// Name -> Handlers
+        /// Event handlers for specific game events
+        /// Event name -> Handlers
         /// </summary>
-        protected Dictionary<string, TriggeredEvent> eventHandlers = new Dictionary<string, TriggeredEvent>();
+        protected Dictionary<string, GameEvent> eventHandlers = new Dictionary<string, GameEvent>();
 
         /// <summary>
         /// Active scripts running on this map
@@ -158,7 +159,7 @@ namespace Takai.Game
         /// <param name="name">The name of the event to add a handler to. Null or empty names are ignored</param>
         /// <param name="eventHandler">The event handler to add</param>
         /// <returns>True if the handler was added, false otherwise</returns>
-        public bool AddEventHandler(string name, TriggeredEvent eventHandler)
+        public bool AddEventHandler(string name, GameEvent eventHandler)
         {
             if (string.IsNullOrEmpty(name))
                 return false;
@@ -177,7 +178,7 @@ namespace Takai.Game
         /// <param name="name">The name of the event to remove the handler from</param>
         /// <param name="eventHandler">The event handler to remove</param>
         /// <returns>True if the handler was removed, false otherwise</returns>
-        public bool RemoveEventHandler(string name, TriggeredEvent eventHandler)
+        public bool RemoveEventHandler(string name, GameEvent eventHandler)
         {
             if (eventHandlers.ContainsKey(name))
             {
@@ -243,7 +244,7 @@ namespace Takai.Game
                 ActiveEnts.Add(entity);
             else
             {
-                var sector = GetSector(entity.Position);
+                var sector = GetOverlappingSector(entity.Position);
                 Sectors[sector.Y, sector.X].entities.Add(entity);
             }
             ++TotalEntitiesCount;
@@ -308,22 +309,22 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Spawn a single blob onto the map
+        /// Spawn a single Fluid onto the map
         /// </summary>
-        /// <param name="position">The position of the blob</param>
-        /// <param name="velocity">The blob's initial velocity</param>
-        /// <param name="type">The blob's type</param>
-        public void Spawn(BlobType type, Vector2 position, Vector2 velocity)
+        /// <param name="position">The position of the Fluid</param>
+        /// <param name="velocity">The Fluid's initial velocity</param>
+        /// <param name="type">The Fluid's type</param>
+        public void Spawn(FluidType type, Vector2 position, Vector2 velocity)
         {
-            //todo: don't spawn blobs outside the map (position + radius)
+            //todo: don't spawn Fluids outside the map (position + radius)
 
             if (velocity == Vector2.Zero)
             {
-                var sector = GetSector(position);
-                Sectors[sector.Y, sector.X].blobs.Add(new Blob { position = position, velocity = velocity, type = type });
+                var sector = GetOverlappingSector(position);
+                Sectors[sector.Y, sector.X].Fluids.Add(new Fluid { position = position, velocity = velocity, type = type });
             }
             else
-                ActiveBlobs.Add(new Blob { position = position, velocity = velocity, type = type });
+                ActiveFluids.Add(new Fluid { position = position, velocity = velocity, type = type });
         }
 
         /// <summary>
@@ -381,9 +382,8 @@ namespace Takai.Game
             if (texture == null)
                 return null;
 
-            var sector = GetSector(position);
             var decal = new Decal { texture = texture, position = position, angle = angle, scale = scale };
-            Sectors[sector.Y, sector.X].decals.Add(decal);
+            AddDecal(decal);
             return decal;
         }
 
@@ -392,8 +392,24 @@ namespace Takai.Game
             if (decal.texture == null)
                 return;
 
-            var sector = GetSector(decal.position);
+            var sector = GetOverlappingSector(decal.position);
             Sectors[sector.Y, sector.X].decals.Add(decal);
+        }
+
+        public Trigger AddTrigger(Rectangle region)
+        {
+            var trigger = new Trigger(region);
+            AddTrigger(trigger);
+            return trigger;
+        }
+        public void AddTrigger(Trigger trigger)
+        {
+            var sectors = GetOverlappingSectors(trigger.Region);
+            for (var y = sectors.Top; y < sectors.Bottom; ++y)
+            {
+                for (var x = sectors.Left; x < sectors.Right; ++x)
+                    Sectors[y, x].triggers.Add(trigger);
+            }
         }
 
         /// <summary>
@@ -405,6 +421,16 @@ namespace Takai.Game
         public void Destroy(Entity ent)
         {
             ent.Map = null;
+        }
+
+        public void Destroy(Trigger trigger)
+        {
+            var sectors = GetOverlappingSectors(trigger.Region);
+            for (var y = sectors.Top; y < sectors.Bottom; ++y)
+            {
+                for (var x = sectors.Left; x < sectors.Right; ++x)
+                    Sectors[y, x].triggers.Remove(trigger);
+            }
         }
     }
 }
