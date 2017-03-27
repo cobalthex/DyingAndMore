@@ -45,8 +45,6 @@ namespace Takai.Game
         [Takai.Data.NonSerialized] //serialized in state
         public float TimeScale { get; set; } = 1;
 
-        //todo: switch update method to add tiem to total game time
-
         /// <summary>
         /// Update the map state
         /// Updates the active set and then the contents of the active set
@@ -61,9 +59,6 @@ namespace Takai.Game
 
             Camera.Update(RealTime);
 
-            if (TimeScale == 0)
-                return; //may need to revisit
-
             var deltaTicks = (long)(RealTime.ElapsedGameTime.Ticks * (double)TimeScale);
             var deltaTime = TimeSpan.FromTicks(deltaTicks);
             var deltaSeconds = (float)deltaTime.TotalSeconds;
@@ -72,32 +67,32 @@ namespace Takai.Game
             var invTransform = Matrix.Invert(Camera.Transform);
 
             var visibleRegion = Camera.VisibleRegion;
-            var visibleSectors = GetVisibleSectors(visibleRegion);
+            var visibleSectors = GetOverlappingSectors(visibleRegion);
             visibleSectors.Inflate(1, 1);
             var mapBounds = Bounds;
 
             var tileSq = new Vector2(tileSize).LengthSquared();
 
-            #region active blobs
+            #region active Fluids
 
-            for (int i = 0; i < ActiveBlobs.Count; i++)
+            for (int i = 0; i < ActiveFluids.Count; i++)
             {
-                var blob = ActiveBlobs[i];
-                var deltaV = blob.velocity * deltaSeconds;
-                blob.position += deltaV;
-                blob.velocity -= deltaV * blob.type.Drag;
+                var Fluid = ActiveFluids[i];
+                var deltaV = Fluid.velocity * deltaSeconds;
+                Fluid.position += deltaV;
+                Fluid.velocity -= deltaV * Fluid.type.Drag;
 
                 //todo: maybe add collision detection for better fluid simulation (combine drag when colliding)
 
-                if (System.Math.Abs(blob.velocity.X) < 1 && System.Math.Abs(blob.velocity.Y) < 1)
+                if (System.Math.Abs(Fluid.velocity.X) < 1 && System.Math.Abs(Fluid.velocity.Y) < 1)
                 {
-                    Spawn(blob.type, blob.position, Vector2.Zero); //this will move the blob to the static area of the map
-                    ActiveBlobs[i] = ActiveBlobs[ActiveBlobs.Count - 1];
-                    ActiveBlobs.RemoveAt(ActiveBlobs.Count - 1);
+                    Spawn(Fluid.type, Fluid.position, Vector2.Zero); //this will move the Fluid to the static area of the map
+                    ActiveFluids[i] = ActiveFluids[ActiveFluids.Count - 1];
+                    ActiveFluids.RemoveAt(ActiveFluids.Count - 1);
                     i--;
                 }
                 else
-                    ActiveBlobs[i] = blob;
+                    ActiveFluids[i] = Fluid;
             }
 
             #endregion
@@ -177,17 +172,17 @@ namespace Takai.Game
 
                             //todo: GetOverlappingSectors
 
-                            //blob collision
+                            //Fluid collision
                             if (!ent.IgnoreTrace)
                             {
                                 var drag = 0f;
                                 var dc = 0u;
                                 var sector = Sectors[targetCell.Y / SectorSize, targetCell.X / SectorSize];
-                                foreach (var blob in sector.blobs)
+                                foreach (var Fluid in sector.Fluids)
                                 {
-                                    if (Vector2.DistanceSquared(blob.position, targetPos) <= (blob.type.Radius * blob.type.Radius) + ent.RadiusSq)
+                                    if (Vector2.DistanceSquared(Fluid.position, targetPos) <= (Fluid.type.Radius * Fluid.type.Radius) + ent.RadiusSq)
                                     {
-                                        drag += blob.type.Drag;
+                                        drag += Fluid.type.Drag;
                                         dc++;
                                     }
                                 }

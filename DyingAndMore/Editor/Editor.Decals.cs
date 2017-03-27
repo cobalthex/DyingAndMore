@@ -35,7 +35,7 @@ namespace DyingAndMore.Editor
 
         Takai.Game.MapSector GetDecalSector(Takai.Game.Decal decal)
         {
-            var sector = editor.Map.GetSector(decal.position);
+            var sector = editor.Map.GetOverlappingSector(decal.position);
             return editor.Map.Sectors[sector.Y, sector.X];
         }
 
@@ -113,7 +113,7 @@ namespace DyingAndMore.Editor
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
         {
             var visibleRegion = editor.Map.ActiveCamera.VisibleRegion;
-            var visibleSectors = editor.Map.GetVisibleSectors(visibleRegion);
+            var visibleSectors = editor.Map.GetOverlappingSectors(visibleRegion);
 
             for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
             {

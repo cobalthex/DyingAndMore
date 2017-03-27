@@ -23,11 +23,9 @@ namespace DyingAndMore.Game
         void StartMap()
         {
             map.updateSettings = Takai.Game.MapUpdateSettings.Game;
-            map.renderSettings = new Takai.Game.Map.MapRenderSettings()
-            {
-                showEntitiesWithoutSprites = false,
-                showGrid = false
-            };
+            map.renderSettings.drawBordersAroundNonDrawingEntities = false;
+            map.renderSettings.drawGrids = false;
+            map.renderSettings.drawTriggers = false;
 
             var plyr = from ent in map.FindEntitiesByType<Entities.Actor>(true)
                        where ((Entities.Actor)ent).Faction == Entities.Factions.Player

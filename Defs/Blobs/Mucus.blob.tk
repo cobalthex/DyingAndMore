@@ -1,5 +1,0 @@
-BlobType {
-    Texture: "Data\\Textures\\Blobs\\Mucus.png";
-    Radius: 54;
-    Drag: 0.9;
-}

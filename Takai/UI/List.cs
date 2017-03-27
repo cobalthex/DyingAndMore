@@ -88,7 +88,6 @@ namespace Takai.UI
                 }
             }
 
-
             Size = size;
         }
     }

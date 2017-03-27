@@ -90,7 +90,7 @@ namespace Takai.Game
             BuildTileMask(TilesImage, true);
         }
 
-        struct BlobSave
+        struct FluidSave
         {
             public int type;
             public Vector2 position;
@@ -103,8 +103,8 @@ namespace Takai.Game
         struct MapState
         {
             public List<Entity> entities;
-            public List<BlobType> blobTypes;
-            public List<BlobSave> blobs;
+            public List<FluidType> FluidTypes;
+            public List<FluidSave> Fluids;
             public List<Decal> decals;
 
             public TimeSpan elapsedTime;
@@ -113,26 +113,26 @@ namespace Takai.Game
             public MapState(Map Map)
             {
                 entities = new List<Entity>(Map.ActiveEnts);
-                blobTypes = new List<BlobType>();
-                blobs = new List<BlobSave>();
+                FluidTypes = new List<FluidType>();
+                Fluids = new List<FluidSave>();
                 decals = new List<Decal>();
                 elapsedTime = Map.ElapsedTime;
                 timeScale = Map.TimeScale;
 
                 //todo: particles?
 
-                var typeIndices = new Dictionary<BlobType, int>();
+                var typeIndices = new Dictionary<FluidType, int>();
 
-                foreach (var blob in Map.ActiveBlobs)
+                foreach (var Fluid in Map.ActiveFluids)
                 {
-                    var type = blob.type;
+                    var type = Fluid.type;
                     if (!typeIndices.TryGetValue(type, out var index))
                     {
-                        index = blobTypes.Count;
-                        blobTypes.Add(type);
+                        index = FluidTypes.Count;
+                        FluidTypes.Add(type);
                         typeIndices.Add(type, index);
                     }
-                    blobs.Add(new BlobSave { type = index, position = blob.position, velocity = blob.velocity });
+                    Fluids.Add(new FluidSave { type = index, position = Fluid.position, velocity = Fluid.velocity });
                 }
 
                 foreach (var sector in (System.Collections.IEnumerable)Map.Sectors)
@@ -142,20 +142,20 @@ namespace Takai.Game
                     entities.AddRange(s.entities);
                     decals.AddRange(s.decals);
 
-                    foreach (var blob in s.blobs)
+                    foreach (var Fluid in s.Fluids)
                     {
-                        var type = blob.type;
+                        var type = Fluid.type;
                         if (!typeIndices.TryGetValue(type, out var index))
                         {
-                            index = blobTypes.Count;
-                            blobTypes.Add(type);
+                            index = FluidTypes.Count;
+                            FluidTypes.Add(type);
                             typeIndices.Add(type, index);
                         }
-                        blobs.Add(new BlobSave
+                        Fluids.Add(new FluidSave
                         {
                             type = index,
-                            position = blob.position,
-                            velocity = blob.velocity
+                            position = Fluid.position,
+                            velocity = Fluid.velocity
                         });
                     }
                 }
@@ -189,9 +189,9 @@ namespace Takai.Game
 
             eventHandlers.Clear();
 
-            var blobTypes = new Dictionary<int, BlobType>();
-            for (var i = 0; i < State.blobTypes?.Count; i++)
-                blobTypes[i] = State.blobTypes[i];
+            var FluidTypes = new Dictionary<int, FluidType>();
+            for (var i = 0; i < State.FluidTypes?.Count; i++)
+                FluidTypes[i] = State.FluidTypes[i];
 
             ActiveEnts = State.entities ?? new List<Entity>();
             foreach (var ent in ActiveEnts)
@@ -200,15 +200,15 @@ namespace Takai.Game
                 ent.OnSpawn();
             }
 
-            ActiveBlobs = State.blobs?.Select((BlobSave Save) =>
+            ActiveFluids = State.Fluids?.Select((FluidSave Save) =>
             {
-                return new Blob
+                return new Fluid
                 {
-                    type = blobTypes[Save.type],
+                    type = FluidTypes[Save.type],
                     position = Save.position,
                     velocity = Save.velocity
                 };
-            }).ToList() ?? new List<Blob>();
+            }).ToList() ?? new List<Fluid>();
 
             BuildSectors();
 

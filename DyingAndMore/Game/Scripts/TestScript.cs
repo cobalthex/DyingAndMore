@@ -5,22 +5,21 @@ namespace DyingAndMore.Game.Scripts
 {
     class TestScript : Takai.Game.Script
     {
-        public TimeSpan elapsedTime;
         public TimeSpan totalTime;
 
         public Takai.Game.Entity victim;
+        public Takai.Game.PathRider path = new Takai.Game.PathRider();
 
         public TestScript()
             : base("Test")
         {
+            path.Path = Editor.PathsEditorMode.paths[0];
         }
 
         public override void Step(TimeSpan deltaTime, Takai.Game.Entity context = null)
         {
-            var amount = (float)(elapsedTime.TotalSeconds / totalTime.TotalSeconds);
-            victim.Position = Editor.PathsEditorMode.paths[0].Evaluate(amount);
-
-            elapsedTime += deltaTime;
+            path.Move(100 * (float)deltaTime.TotalSeconds);
+            victim.Position = path.Position;
         }
     }
 }

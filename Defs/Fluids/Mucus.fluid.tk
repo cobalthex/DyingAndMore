@@ -1,0 +1,5 @@
+FluidType {
+    Texture: "Data\\Textures\\Fluids\\Mucus.png";
+    Radius: 54;
+    Drag: 0.9;
+}

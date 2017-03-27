@@ -26,7 +26,7 @@ namespace DyingAndMore.Editor
             selector.DidClickOpen = DidClickOpen;
             Takai.Runtime.GameManager.PushState(selector);
         }
-        
+
         public override void Update(GameTime time)
         {
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);

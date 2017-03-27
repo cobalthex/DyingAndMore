@@ -42,6 +42,7 @@ namespace DyingAndMore.Editor
 
         Takai.UI.Element uiContainer;
         Takai.UI.Element selectorPreview;
+        Takai.UI.Element renderSettingsConsole;
 
         public ModeSelector modes;
 
@@ -63,6 +64,13 @@ namespace DyingAndMore.Editor
             uiContainer = new Takai.UI.Element();
 
             TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap | GestureType.FreeDrag;
+
+            renderSettingsConsole = new Takai.UI.List()
+            {
+                HorizontalAlignment = Takai.UI.Alignment.Middle,
+                VerticalAlignment = Takai.UI.Alignment.Middle,
+                Margin = 5
+            };
 
             if (Map == null)
             {
@@ -123,11 +131,30 @@ namespace DyingAndMore.Editor
         public void StartMap()
         {
             Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
-            Map.renderSettings = new Takai.Game.Map.MapRenderSettings()
+            Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
+            Map.renderSettings.drawGrids = true;
+
+            renderSettingsConsole.RemoveAllChildren();
+            foreach (var setting in Map.renderSettings.GetType().GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
             {
-                showEntitiesWithoutSprites = true,
-                showGrid = true
-            };
+                var checkbox = new Takai.UI.Checkbox()
+                {
+                    Text = setting.Name, //todo: beautify names
+                    Font = LargeFont,
+                    HorizontalAlignment = Takai.UI.Alignment.Start,
+                    VerticalAlignment = Takai.UI.Alignment.Middle,
+                    IsChecked = (bool)setting.GetValue(Map.renderSettings)
+                };
+                checkbox.OnClick += delegate (Takai.UI.Element sender, Takai.UI.ClickEventArgs args)
+                {
+                    setting.SetValue(Map.renderSettings, ((Takai.UI.Checkbox)sender).IsChecked);
+                };
+                checkbox.AutoSize();
+
+                renderSettingsConsole.AddChild(checkbox);
+            }
+            renderSettingsConsole.AutoSize();
+
             Map.ActiveCamera = new Takai.Game.Camera();
 
             if (modes == null)
@@ -141,10 +168,11 @@ namespace DyingAndMore.Editor
 
                 modes.AddMode(new TilesEditorMode(this));
                 modes.AddMode(new DecalsEditorMode(this));
-                modes.AddMode(new BlobsEditorMode(this));
+                modes.AddMode(new FluidsEditorMode(this));
                 modes.AddMode(new EntitiesEditorMode(this));
                 modes.AddMode(new GroupsEditorMode(this));
                 modes.AddMode(new PathsEditorMode(this));
+                modes.AddMode(new TriggersEditorMode(this));
                 modes.ModeIndex = 0;
 
                 selectorPreview = new Takai.UI.Element()
@@ -230,15 +258,10 @@ namespace DyingAndMore.Editor
             return false;
         }
 
-        private Rectangle lastViewport;
         public override void Update(GameTime time)
         {
             var viewport = GraphicsDevice.Viewport.Bounds;
-            if (viewport != lastViewport)
-            {
-                lastViewport = viewport;
-                uiContainer.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            }
+            uiContainer.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
             if (!uiContainer.Update(time))
                 return;
@@ -271,10 +294,13 @@ namespace DyingAndMore.Editor
             }
 
             if (InputState.IsPress(Keys.F2))
-                Map.renderSettings.showReflectionMask ^= true;
+            {
+                if (!renderSettingsConsole.RemoveFromParent())
+                    uiContainer.AddChild(renderSettingsConsole);
+            }
 
             if (InputState.IsPress(Keys.G))
-                Map.renderSettings.showGrid ^= true;
+                Map.renderSettings.drawGrids ^= true;
 
             if (InputState.IsPress(Keys.F4))
             {

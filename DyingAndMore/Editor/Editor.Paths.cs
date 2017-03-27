@@ -46,20 +46,19 @@ namespace DyingAndMore.Editor
         public PathsEditorMode(Editor editor)
             : base("Paths", editor)
         {
-            paths = new List<Takai.Game.Path>
+            if (paths == null)
             {
-                new Takai.Game.Path()
+                var path = new Takai.Game.Path();
+                path.AddPoint(new Vector2(200, 50));
+                path.AddPoint(new Vector2(300, 150));
+                path.AddPoint(new Vector2(400, 200));
+                path.AddPoint(new Vector2(500, 150));
+                path.AddPoint(new Vector2(600, 50));
+                paths = new List<Takai.Game.Path>
                 {
-                    ControlPoints = new List<Vector2>
-                    {
-                        new Vector2(200, 50),
-                        new Vector2(300, 150),
-                        new Vector2(400, 200),
-                        new Vector2(500, 150),
-                        new Vector2(600, 50),
-                    }
-                }
-            };
+                    path
+                };
+            }
         }
 
         public override void OpenConfigurator(bool DidClickOpen)
@@ -78,7 +77,7 @@ namespace DyingAndMore.Editor
         {
             if (Takai.Input.InputState.IsPress(Takai.Input.MouseButtons.Left))
             {
-                paths[0].ControlPoints.Add(editor.Map.ActiveCamera.ScreenToWorld(Takai.Input.InputState.MouseVector));
+                paths[0].AddPoint(editor.Map.ActiveCamera.ScreenToWorld(Takai.Input.InputState.MouseVector));
             }
         }
 

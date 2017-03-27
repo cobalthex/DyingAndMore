@@ -41,23 +41,23 @@ namespace Takai.Game
         /// </summary>
         /// <param name="position">The point in the map</param>
         /// <returns>The sector coordinates. Clamped to the map bounds</returns>
-        public Point GetSector(Vector2 position)
+        public Point GetOverlappingSector(Vector2 position)
         {
             return Vector2.Clamp(position / SectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
         }
 
         /// <summary>
-        /// Get the region of sectors visible in a certain viewport
+        /// Get the region of sectors overlapping this region
         /// </summary>
-        /// <param name="visibleRegion">The visible region of the map to consider</param>
-        /// <returns><The region of sectors visible/returns>
-        public Rectangle GetVisibleSectors(Rectangle visibleRegion)
+        /// <param name="region">The region to consider</param>
+        /// <returns>The region of sectors contained by this region (Clamped in the map bounds)</returns>
+        public Rectangle GetOverlappingSectors(Rectangle region)
         {
             var rect = new Rectangle(
-                MathHelper.Max(0, visibleRegion.X / SectorPixelSize),
-                MathHelper.Max(0, visibleRegion.Y / SectorPixelSize),
-                (visibleRegion.Width - 1) / SectorPixelSize + 1,
-                (visibleRegion.Height - 1) / SectorPixelSize + 1
+                MathHelper.Max(0, region.X / SectorPixelSize),
+                MathHelper.Max(0, region.Y / SectorPixelSize),
+                (region.Width - 1) / SectorPixelSize + 1,
+                (region.Height - 1) / SectorPixelSize + 1
             );
             rect.Width = MathHelper.Min(Width / SectorSize - rect.X, rect.Width);
             rect.Height = MathHelper.Min(Height / SectorSize - rect.Y, rect.Height);

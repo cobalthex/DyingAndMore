@@ -11,7 +11,23 @@ namespace Takai.Game
         /// <summary>
         /// The control points of this curve
         /// </summary>
-        public List<Vector2> ControlPoints { get; set; }
+        public List<Vector2> ControlPoints { get; private set; } = new List<Vector2>();
+        public List<float> SegmentLengths { get; private set; } = new List<float>();
+        public float TotalLength { get; private set; } = 0;
+
+        public void AddPoint(Vector2 Point)
+        {
+            ControlPoints.Add(Point);
+
+            if (ControlPoints.Count > 3)
+            {
+                var length = Vector2.Distance(ControlPoints[ControlPoints.Count - 2], Point);
+                //todo: length needs to be calculated as hermite length
+
+                SegmentLengths.Add(length);
+                TotalLength += length;
+            }
+        }
 
         /// <summary>
         /// Calculate the position on the curve given a specific T value
@@ -21,23 +37,102 @@ namespace Takai.Game
         /// <remarks>Requires at least one point</remarks>
         public Vector2 Evaluate(float percent)
         {
-            if (percent < 0)
-                return ControlPoints[0];
+            throw new System.NotImplementedException("Todo");
+        }
+    }
 
-            if (percent >= 1)
-                return ControlPoints[ControlPoints.Count - 1];
+    /// <summary>
+    /// Follow along a path
+    /// </summary>
+    /// <remarks>Caches positions along the path for better performance</remarks>
+    public class PathRider
+    {
+        /// <summary>
+        /// The path this rider is following
+        /// Setting this value will reset the rider
+        /// </summary>
+        public Path Path
+        {
+            get => path;
+            set
+            {
+                path = value;
+                offset = 0;
+                Segment = 0;
+                SegmentRelative = 0;
+            }
+        }
+        private Path path;
 
-            var startSegment = (int)(percent * ControlPoints.Count);
+        /// <summary>
+        /// Offset on the curve from the start of the curve (0 to Path.TotalLength)
+        /// </summary>
+        public float Offset
+        {
+            get => offset;
+            set
+            {
+                if (offset != value)
+                {
+                    offset = value;
+                    throw new System.NotImplementedException("Use Path.Evaluate");
+                }
+            }
+        }
+        private float offset = 0;
+        
+        protected int Segment { get; set; } = 0;
+        protected float SegmentRelative { get; set; } = 0;
 
-            var weight = (percent - ((float)startSegment / ControlPoints.Count)) * ControlPoints.Count;
+        /// <summary>
+        /// The calculated position on the curve
+        /// </summary>
+        public Vector2 Position
+        {
+            get
+            {
+                return Vector2.CatmullRom(
+                    path.ControlPoints[MathHelper.Max(0, Segment - 1)],
+                    path.ControlPoints[Segment],
+                    path.ControlPoints[MathHelper.Min(Path.ControlPoints.Count - 1, Segment + 1)],
+                    path.ControlPoints[MathHelper.Min(Path.ControlPoints.Count - 1, Segment + 2)],
+                    SegmentRelative / path.SegmentLengths[Segment]
+                );
+            }
+        }
 
-            return Vector2.CatmullRom(
-                ControlPoints[MathHelper.Max(0, startSegment - 1)],
-                ControlPoints[startSegment],
-                ControlPoints[MathHelper.Min(ControlPoints.Count - 1, startSegment + 1)],
-                ControlPoints[MathHelper.Min(ControlPoints.Count - 1, startSegment + 2)],
-                weight
-            );
+        /// <summary>
+        /// Move along the path
+        /// </summary>
+        /// <param name="relative">The relative position to move (> 0 for forward, < 0 for backwards)</param>
+        public void Move(float relative)
+        {
+            offset = MathHelper.Clamp(offset + relative, 0, path.TotalLength);
+            SegmentRelative += relative;
+            var segLength = path.SegmentLengths[Segment];
+
+            if (SegmentRelative < 0)
+            {
+                --Segment;
+                if (Segment < 0)
+                {
+                    Segment = 0;
+                    SegmentRelative = 0;
+                }
+                else
+                    SegmentRelative += path.SegmentLengths[Segment];
+            }
+            else if (SegmentRelative > segLength)
+            {
+                SegmentRelative -= segLength;
+                ++Segment;
+
+                if (Segment >= path.SegmentLengths.Count)
+                {
+                    Segment = path.SegmentLengths.Count - 1;
+                    SegmentRelative = path.SegmentLengths[Segment];
+                }
+            }
         }
     }
 }
