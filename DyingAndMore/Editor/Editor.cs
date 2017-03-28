@@ -67,7 +67,8 @@ namespace DyingAndMore.Editor
 
             renderSettingsConsole = new Takai.UI.List()
             {
-                HorizontalAlignment = Takai.UI.Alignment.Middle,
+                Position = new Vector2(20, 0),
+                HorizontalAlignment = Takai.UI.Alignment.Start,
                 VerticalAlignment = Takai.UI.Alignment.Middle,
                 Margin = 5
             };
@@ -139,7 +140,7 @@ namespace DyingAndMore.Editor
             {
                 var checkbox = new Takai.UI.Checkbox()
                 {
-                    Text = setting.Name, //todo: beautify names
+                    Text = BeautifyPropName(setting.Name),
                     Font = LargeFont,
                     HorizontalAlignment = Takai.UI.Alignment.Start,
                     VerticalAlignment = Takai.UI.Alignment.Middle,
@@ -449,6 +450,27 @@ namespace DyingAndMore.Editor
             Magnitude = MathHelper.Clamp(Magnitude * 0.333f, 5, 30);
             Map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, arrowWingTransform)), Color.Yellow);
             Map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(arrowWingTransform))), Color.Yellow);
+        }
+
+        static string BeautifyPropName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return "";
+
+            var builder = new System.Text.StringBuilder(name.Length + 4);
+            builder.Append(char.ToUpper(name[0]));
+            for (int i = 1; i < name.Length; ++i)
+            {
+                if (char.IsUpper(name[i]) && !char.IsUpper(name[i - 1]))
+                {
+                    builder.Append(' ');
+                    builder.Append(char.ToLower(name[i]));
+                }
+                else
+                    builder.Append(name[i]);
+            }
+
+            return builder.ToString();
         }
     }
 }
