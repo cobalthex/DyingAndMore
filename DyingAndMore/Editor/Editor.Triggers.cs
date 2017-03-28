@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
@@ -30,7 +29,7 @@ namespace DyingAndMore.Editor
     class TriggersEditorMode : EditorMode
     {
         bool isPosSaved = false;
-        Vector2 savedWorldPos, lastWorldPos;
+        Vector2 savedWorldPos;
 
         Takai.Game.Trigger activeTrigger = null;
 
@@ -89,8 +88,6 @@ namespace DyingAndMore.Editor
                 var diff = end - start;
                 activeTrigger.Region = new Rectangle(start, diff);
             }
-
-            lastWorldPos = currentWorldPos;
         }
 
         public override void Draw(SpriteBatch sbatch)

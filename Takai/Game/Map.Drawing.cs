@@ -186,7 +186,6 @@ namespace Takai.Game
             var originalRt = GraphicsDevice.GetRenderTargets();
 
             var cameraTransform = Camera.Transform;
-            var cameraViewTransform = cameraTransform * Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
 
             var visibleRegion = Rectangle.Intersect(Camera.VisibleRegion, Bounds);
             var visibleTiles = Rectangle.Intersect(
@@ -429,10 +428,13 @@ namespace Takai.Game
 
             #endregion
 
-            //draw entities (and any other reflected objects)
+            #region present entities (and any other reflected objects)
+
             sbatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, stencilRead);
             sbatch.Draw(reflectedRenderTarget, Vector2.Zero, Color.White);
             sbatch.End();
+
+            #endregion
 
             if (renderSettings.drawTriggers)
             {
@@ -455,7 +457,8 @@ namespace Takai.Game
                     GraphicsDevice.RasterizerState = lineRaster;
                     GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                     GraphicsDevice.DepthStencilState = DepthStencilState.None;
-                    lineEffect.Parameters["Transform"].SetValue(cameraViewTransform);
+                    var lineTransform = cameraTransform * Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
+                    lineEffect.Parameters["Transform"].SetValue(lineTransform);
 
                     var blackLines = debugLines.ConvertAll(line => { line.Color = Color.Black; line.Position += new Vector3(1, 1, 0); return line; });
                     foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
