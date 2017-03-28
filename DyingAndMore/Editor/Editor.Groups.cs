@@ -75,6 +75,8 @@ namespace DyingAndMore.Editor
                 else
                     ent.OutlineColor = Color.Purple; //todo: unify color
             }
+
+
         }
 
         public override void Draw(SpriteBatch sbatch)
