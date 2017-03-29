@@ -235,7 +235,7 @@ namespace Takai.Data
 
                         var value = ReadWord(Stream);
                         values |= Convert.ToUInt64(Enum.Parse(type, value));
-                        valuesCount++;
+                        ++valuesCount;
 
                         SkipIgnored(Stream);
                     }

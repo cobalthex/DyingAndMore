@@ -162,7 +162,7 @@ namespace DyingAndMore.Editor.Selectors
             var itemsPerRow = MathHelper.Max(1, (width - Padding) / (ItemSize.X + Padding));
 
             var first = ((ScrollPosition / iHeight) - 1) * itemsPerRow;
-            for (var i = MathHelper.Max(0, first); i < MathHelper.Min(ItemCount, first + ((viewHeight - 1) / itemsPerRow) + 1); i++)
+            for (var i = MathHelper.Max(0, first); i < MathHelper.Min(ItemCount, first + ((viewHeight - 1) / itemsPerRow) + 1); ++i)
             {
                 var bounds = new Rectangle
                 (

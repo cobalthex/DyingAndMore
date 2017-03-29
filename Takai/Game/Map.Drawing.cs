@@ -161,7 +161,9 @@ namespace Takai.Game
         //todo: curves (and volumetric curves) (things like rivers/flows)
 
         private List<Entity> _drawEntsOutlined = new List<Entity>();
+        private HashSet<Trigger> _drawTriggers = new HashSet<Trigger>();
 
+        [Data.NonSerialized]
         public string debugOut;
 
         /// <summary>
@@ -225,7 +227,7 @@ namespace Takai.Game
                             continue;
 
                         didDraw = true;
-                        profilingInfo.visibleEnts++;
+                        ++profilingInfo.visibleEnts;
 
                         if (ent.OutlineColor.A > 0)
                             _drawEntsOutlined.Add(ent);
@@ -293,7 +295,7 @@ namespace Takai.Game
                 {
                     sbatch.Begin(SpriteSortMode.BackToFront, p.Key.BlendMode, null, stencilRead, null, null, cameraTransform);
 
-                    for (int i = 0; i < p.Value.Count; i++)
+                    for (int i = 0; i < p.Value.Count; ++i)
                     {
                         if (p.Value[i].time == System.TimeSpan.Zero)
                             continue;
@@ -329,7 +331,7 @@ namespace Takai.Game
                     {
                         foreach (var fluid in Sectors[y, x].Fluids)
                         {
-                            profilingInfo.visibleInactiveFluids++;
+                            ++profilingInfo.visibleInactiveFluids;
                             reflectionEffect.Parameters["Reflection"].SetValue(fluid.type.Reflection);
                             sbatch.Draw(fluid.type.Texture, fluid.position - new Vector2(fluid.type.Texture.Width / 2, fluid.type.Texture.Height / 2), new Color(1, 1, 1, fluid.type.Alpha));
                         }
@@ -338,7 +340,7 @@ namespace Takai.Game
                 //active fluids
                 foreach (var fluid in ActiveFluids)
                 {
-                    profilingInfo.visibleActiveFluids++;
+                    ++profilingInfo.visibleActiveFluids;
                     reflectionEffect.Parameters["Reflection"].SetValue(fluid.type.Reflection);
                     sbatch.Draw(fluid.type.Texture, fluid.position - new Vector2(fluid.type.Texture.Width / 2, fluid.type.Texture.Height / 2), new Color(1, 1, 1, fluid.type.Alpha));
                 }
@@ -399,7 +401,7 @@ namespace Takai.Game
                                 SpriteEffects.None,
                                 0
                             );
-                            profilingInfo.visibleDecals++;
+                            ++profilingInfo.visibleDecals;
                         }
                     }
                 }
@@ -438,15 +440,16 @@ namespace Takai.Game
 
             if (renderSettings.drawTriggers)
             {
-                sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, null, cameraTransform);
+                _drawTriggers.Clear();
                 for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
                 {
                     for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
-                    {
-                        foreach (var trigger in Sectors[y, x].triggers)
-                            Graphics.Primitives2D.DrawFill(sbatch, new Color(Color.Aqua, 0.25f), trigger.Region);
-                    }
+                        _drawTriggers.UnionWith(Sectors[y, x].triggers);
                 }
+
+                sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, null, cameraTransform);
+                foreach (var trigger in _drawTriggers)
+                    Graphics.Primitives2D.DrawFill(sbatch, new Color(Color.LimeGreen, 0.25f), trigger.Region);
                 sbatch.End();
             }
 

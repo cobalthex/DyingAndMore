@@ -56,7 +56,7 @@ namespace Takai.Graphics
             int len = BitConverter.ToInt32(block, 0);
             font.Characters = new System.Collections.Generic.Dictionary<char, Rectangle>(len);
             font.MaxCharWidth = 0;
-            for (int i = 0; i < len; i++)
+            for (int i = 0; i < len; ++i)
             {
 #if XBOX
                 read.Read(block, 2, 2); c = BitConverter.ToChar(block, 0);
@@ -129,7 +129,7 @@ namespace Takai.Graphics
             int maxH = 0;
             Color curColor = Color;
             int esc = 0;
-            for (int i = 0; i < String.Length; i++)
+            for (int i = 0; i < String.Length; ++i)
             {
                 //escape chars
                 if (String[i] == '\n')
@@ -153,7 +153,7 @@ namespace Takai.Graphics
                     else if (String.Length > i + 3)
                     {
                         int[] col = new int[3];
-                        for (int j = 0; j < 3; j++)
+                        for (int j = 0; j < 3; ++j)
                         {
                             char cch = String[j + i + 1];
                             if (cch >= 'a' && cch <= 'w')
@@ -217,7 +217,7 @@ namespace Takai.Graphics
             int start = GetStart(String, 0);
 
             int len = Length > String.Length ? String.Length : Length == -1 ? String.Length : Length;
-            for (int i = 0; i + start < String.Length && i < len; i++)
+            for (int i = 0; i + start < String.Length && i < len; ++i)
             {
                 char ch = String[i + start];
                 if (ch == '\n')
@@ -249,7 +249,7 @@ namespace Takai.Graphics
                     else if (String.Length > i + start + 3)
                     {
                         int[] col = new int[3];
-                        for (int j = 0; j < 3; j++)
+                        for (int j = 0; j < 3; ++j)
                         {
                             char cch = String[j + i + start + 1];
                             if (cch >= 'a' && cch <= 'f')
@@ -343,7 +343,7 @@ namespace Takai.Graphics
             int start = GetStart(String, StartIndex);
 
             int len = Length > String.Length ? String.Length : Length == -1 ? String.Length : Length;
-            for (int i = 0; i + start < String.Length && i < len; i++)
+            for (int i = 0; i + start < String.Length && i < len; ++i)
             {
                 if (String[i] == '\n')
                 {
@@ -394,7 +394,7 @@ namespace Takai.Graphics
         protected int GetStart(string String, int StartIndex)
         {
             int start = StartIndex < 0 ? 0 : StartIndex;
-            for (int i = 0; i < StartIndex; i++) //calculate for escape chars
+            for (int i = 0; i < StartIndex; ++i) //calculate for escape chars
             {
                 if (String[i] == '\n')
                     start++;

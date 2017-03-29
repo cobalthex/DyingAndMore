@@ -46,6 +46,11 @@ namespace Takai.Game
         public float TimeScale { get; set; } = 1;
 
         /// <summary>
+        /// Ents that are to be destroyed during the next Update()
+        /// </summary>
+        protected List<Entity> entsToDestroy = new List<Entity>(8);
+
+        /// <summary>
         /// Update the map state
         /// Updates the active set and then the contents of the active set
         /// </summary>
@@ -75,7 +80,7 @@ namespace Takai.Game
 
             #region active Fluids
 
-            for (int i = 0; i < ActiveFluids.Count; i++)
+            for (int i = 0; i < ActiveFluids.Count; ++i)
             {
                 var Fluid = ActiveFluids[i];
                 var deltaV = Fluid.velocity * deltaSeconds;
@@ -99,10 +104,26 @@ namespace Takai.Game
 
             #region active entities
 
-            for (int i = 0; i < ActiveEnts.Count; i++)
+            //remove entities that have been destroyed
+            foreach (var ent in entsToDestroy)
             {
-                var ent = ActiveEnts[i];
+                ent.OnDestroy();
+                ent.SpawnTime = TimeSpan.Zero;
 
+                if (ent.Sector != null)
+                {
+                    ent.Sector.entities.Remove(ent);
+                    ent.Sector = null;
+                }
+                else
+                    ActiveEnts.Remove(ent);
+                ent.Map = null;
+                TotalEntitiesCount--;
+            }
+            entsToDestroy.Clear();
+
+            foreach (var ent in ActiveEnts)
+            {
                 if (!ent.AlwaysActive && !visibleSectors.Contains(ent.Position / SectorPixelSize))
                 {
                     //ents outside the map are deleted
@@ -119,11 +140,6 @@ namespace Takai.Game
                         Destroy(ent);
                         continue;
                     }
-
-                    //remove from active set (swap with last)
-                    ActiveEnts[i] = ActiveEnts[ActiveEnts.Count - 1];
-                    ActiveEnts.RemoveAt(ActiveEnts.Count - 1);
-                    i--;
                 }
                 else
                 {
@@ -183,7 +199,7 @@ namespace Takai.Game
                                     if (Vector2.DistanceSquared(Fluid.position, targetPos) <= (Fluid.type.Radius * Fluid.type.Radius) + ent.RadiusSq)
                                     {
                                         drag += Fluid.type.Drag;
-                                        dc++;
+                                        ++dc;
                                     }
                                 }
                                 if (dc > 0)
@@ -197,34 +213,13 @@ namespace Takai.Game
                         ent.Position += ent.Velocity * deltaSeconds;
                     }
                 }
-
-                //remove entity from map
-                if (ent.Map == null)
-                {
-                    ent.Map = this;
-                    ent.OnDestroy();
-                    ent.SpawnTime = TimeSpan.Zero;
-
-                    if (ent.Sector != null)
-                    {
-                        ent.Sector.entities.Remove(ent);
-                        ent.Sector = null;
-                    }
-                    else
-                        ActiveEnts.Remove(ent);
-                    ent.Map = null;
-                    TotalEntitiesCount--;
-                }
             }
 
             //add new entities to active set (will be updated next frame)
-            for (var y = System.Math.Max(visibleSectors.Top, 0); y < System.Math.Min(Height / SectorSize, visibleSectors.Bottom); y++)
+            for (var y = System.Math.Max(visibleSectors.Top, 0); y < System.Math.Min(Height / SectorSize, visibleSectors.Bottom); ++y)
             {
-                for (var x = System.Math.Max(visibleSectors.Left, 0); x < System.Math.Min(Width / SectorSize, visibleSectors.Right); x++)
-                {
-                    ActiveEnts.AddRange(Sectors[y, x].entities);
-                    Sectors[y, x].entities.Clear();
-                }
+                for (var x = System.Math.Max(visibleSectors.Left, 0); x < System.Math.Min(Width / SectorSize, visibleSectors.Right); ++x)
+                    ActiveEnts.UnionWith(Sectors[y, x].entities);
             }
 
             #endregion
@@ -233,7 +228,7 @@ namespace Takai.Game
 
             foreach (var p in Particles)
             {
-                for (var i = 0; i < p.Value.Count; i++)
+                for (var i = 0; i < p.Value.Count; ++i)
                 {
                     var x = p.Value[i];
 

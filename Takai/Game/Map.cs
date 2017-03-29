@@ -90,12 +90,10 @@ namespace Takai.Game
         public short[,] Tiles { get; set; }
         /// <summary>
         /// All of the sectors in the map
-        /// Typically inactive entities are stored here
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>
         [Data.NonSerialized]
         public MapSector[,] Sectors { get; protected set; }
-        protected Point NumSectors { get; private set; }
 
         /// <summary>
         /// The list of active particles. Not serialized
@@ -109,7 +107,7 @@ namespace Takai.Game
         /// Automatically updated as the view changes
         /// </summary>
         [Data.NonSerialized]
-        public List<Entity> ActiveEnts { get; protected set; } = new List<Entity>(128);
+        public HashSet<Entity> ActiveEnts { get; protected set; } = new HashSet<Entity>();
         /// <summary>
         /// The list of live Fluids. Once the Fluids' velocity is zero, they are removed from this and not re-added
         /// </summary>
@@ -303,20 +301,20 @@ namespace Takai.Game
             //will be removed in next update if out of visible range
             //only inactive entities are placed in sectors
             ActiveEnts.Add(ent);
-            TotalEntitiesCount++;
+            ++TotalEntitiesCount;
 
             return ent;
         }
 
         /// <summary>
-        /// Spawn a single Fluid onto the map
+        /// Spawn a single fluid onto the map
         /// </summary>
-        /// <param name="position">The position of the Fluid</param>
-        /// <param name="velocity">The Fluid's initial velocity</param>
-        /// <param name="type">The Fluid's type</param>
+        /// <param name="position">The position of the fluid</param>
+        /// <param name="velocity">The fluid's initial velocity</param>
+        /// <param name="type">The fluid's type</param>
         public void Spawn(FluidType type, Vector2 position, Vector2 velocity)
         {
-            //todo: don't spawn Fluids outside the map (position + radius)
+            //todo: don't spawn fluids outside the map (position + radius)
 
             if (velocity == Vector2.Zero)
             {
@@ -338,7 +336,7 @@ namespace Takai.Game
             if (!Particles.ContainsKey(spawn.type))
                 Particles.Add(spawn.type, new List<Particle>());
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < count; ++i)
             {
                 var lifetime = RandTime(spawn.lifetime.min, spawn.lifetime.max);
                 if (lifetime <= System.TimeSpan.Zero)
@@ -396,12 +394,22 @@ namespace Takai.Game
             Sectors[sector.Y, sector.X].decals.Add(decal);
         }
 
-        public Trigger AddTrigger(Rectangle region)
+        /// <summary>
+        /// Create a new trigger with the given region and add it to the map
+        /// </summary>
+        /// <param name="region">The region of the trigger to create</param>
+        /// <param name="name">An optional name for the trigger</param>
+        /// <returns>The trigger created</returns>
+        public Trigger AddTrigger(Rectangle region, string name = null)
         {
-            var trigger = new Trigger(region);
+            var trigger = new Trigger(region, name);
             AddTrigger(trigger);
             return trigger;
         }
+        /// <summary>
+        /// Add an existing trigger to the map
+        /// </summary>
+        /// <param name="trigger">The trigger to add</param>
         public void AddTrigger(Trigger trigger)
         {
             var sectors = GetOverlappingSectors(trigger.Region);
@@ -414,13 +422,13 @@ namespace Takai.Game
 
         /// <summary>
         /// Remove an entity from the map.
-        /// Entity.OnDestroy() is called immediately
+        /// ent.OnDestroy() is called when the ent is actually removed from the map
         /// </summary>
         /// <param name="ent">The entity to remove</param>
         /// <remarks>Will be marked for removal to be removed during the next Update cycle</remarks>
         public void Destroy(Entity ent)
         {
-            ent.Map = null;
+            entsToDestroy.Add(ent);
         }
 
         public void Destroy(Trigger trigger)

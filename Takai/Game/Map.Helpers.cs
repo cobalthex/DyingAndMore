@@ -56,11 +56,11 @@ namespace Takai.Game
             var rect = new Rectangle(
                 MathHelper.Max(0, region.X / SectorPixelSize),
                 MathHelper.Max(0, region.Y / SectorPixelSize),
-                (region.Width - 1) / SectorPixelSize + 1,
-                (region.Height - 1) / SectorPixelSize + 1
+                ((region.X % SectorPixelSize) + region.Width - 1) / SectorPixelSize + 1,
+                ((region.Y % SectorPixelSize) + region.Height - 1) / SectorPixelSize + 1
             );
-            rect.Width = MathHelper.Min(Width / SectorSize - rect.X, rect.Width);
-            rect.Height = MathHelper.Min(Height / SectorSize - rect.Y, rect.Height);
+            rect.Width = MathHelper.Min((Width - 1) / SectorSize + 1 - rect.X, rect.Width);
+            rect.Height = MathHelper.Min((Height - 1) / SectorSize + 1 - rect.Y, rect.Height);
             return rect;
         }
 
@@ -99,9 +99,9 @@ namespace Takai.Game
                 var start = Vector2.Clamp((position - vr) / SectorPixelSize, Vector2.Zero, mapSz).ToPoint();
                 var end = (Vector2.Clamp((position + vr) / SectorPixelSize, Vector2.Zero, mapSz) + Vector2.One).ToPoint();
 
-                for (int y = start.Y; y < end.Y; y++)
+                for (int y = start.Y; y < end.Y; ++y)
                 {
-                    for (int x = start.X; x < end.X; x++)
+                    for (int x = start.X; x < end.X; ++x)
                     {
                         foreach (var ent in Sectors[y, x].entities)
                         {
@@ -140,9 +140,9 @@ namespace Takai.Game
                     ((Region.Height - 1) / SectorPixelSize) + 1
                 );
 
-                for (int y = searchSectors.Top; y < searchSectors.Bottom; y++)
+                for (int y = searchSectors.Top; y < searchSectors.Bottom; ++y)
                 {
-                    for (int x = searchSectors.Left; x < searchSectors.Right; x++)
+                    for (int x = searchSectors.Left; x < searchSectors.Right; ++x)
                     {
                         foreach (var ent in Sectors[y, x].entities)
                         {
@@ -173,9 +173,9 @@ namespace Takai.Game
 
             if (SearchInactive)
             {
-                for (var y = 0; y < Sectors.GetLength(0); y++)
+                for (var y = 0; y < Sectors.GetLength(0); ++y)
                 {
-                    for (var x = 0; x < Sectors.GetLength(1); x++)
+                    for (var x = 0; x < Sectors.GetLength(1); ++x)
                     {
                         foreach (var ent in Sectors[y, x].entities)
                         {

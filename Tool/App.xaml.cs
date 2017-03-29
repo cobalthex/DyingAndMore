@@ -24,7 +24,7 @@ namespace Tool
             {
                 Stream.Write('<');
                 var gp = Type.GetGenericArguments();
-                for (var i = 0; i < gp.Length; i++)
+                for (var i = 0; i < gp.Length; ++i)
                 {
                     if (i > 0)
                         Stream.Write(", ");
@@ -47,7 +47,7 @@ namespace Tool
                         {
                             Console.SetOut(writer);
 
-                            for (int i = 1; i < e.Args.Length; i++)
+                            for (int i = 1; i < e.Args.Length; ++i)
                             {
                                 Type ty;
                                 if (Takai.Data.Serializer.RegisteredTypes.TryGetValue(e.Args[i], out ty))
