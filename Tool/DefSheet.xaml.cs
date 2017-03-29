@@ -64,7 +64,7 @@ namespace Tool
             if (Name.Length > 0)
                 builder.Append(char.ToUpper(Name[0]));
 
-            for (var i = 1; i < Name.Length; i++)
+            for (var i = 1; i < Name.Length; ++i)
             {
                 if (char.IsUpper(Name[i]))
                 {

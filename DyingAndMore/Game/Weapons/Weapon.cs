@@ -29,7 +29,7 @@ namespace DyingAndMore.Game.Weapons
 
         /// <summary>
         /// Attempt to fire the weapon
-        /// Fires in the 
+        /// Fires in the
         /// </summary>
         /// <param name="Entity">The entity to fire from</param>
         /// <remarks>Fires from the owner entity's position in their forward direction</remarks>
@@ -39,7 +39,7 @@ namespace DyingAndMore.Game.Weapons
             {
                 SingleFire(Entity);
                 lastShot = TotalTime;
-                shotsTaken++;
+                ++shotsTaken;
             }
         }
 

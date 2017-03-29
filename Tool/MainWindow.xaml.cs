@@ -104,7 +104,7 @@ namespace Tool
         public void OpenFile(string File)
         {
             //check if already open
-            for (var i = 0; i < tabs.Items.Count; i++)
+            for (var i = 0; i < tabs.Items.Count; ++i)
             {
                 if (((DefTab)tabs.Items[i]).File == File)
                 {

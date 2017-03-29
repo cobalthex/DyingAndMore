@@ -193,10 +193,10 @@ namespace DyingAndMore.Editor
 
                 var left = first.X;
                 var right = first.X;
-                for (; left > 0 && editor.Map.Tiles[first.Y, left - 1] == initialValue; left--) ;
-                for (; right < editor.Map.Width - 1 && editor.Map.Tiles[first.Y, right + 1] == initialValue; right++) ;
+                for (; left > 0 && editor.Map.Tiles[first.Y, left - 1] == initialValue; --left) ;
+                for (; right < editor.Map.Width - 1 && editor.Map.Tiles[first.Y, right + 1] == initialValue; ++right) ;
 
-                for (; left <= right; left++)
+                for (; left <= right; ++left)
                 {
                     editor.Map.Tiles[first.Y, left] = TileValue;
 

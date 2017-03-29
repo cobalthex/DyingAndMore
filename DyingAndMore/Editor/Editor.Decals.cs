@@ -141,7 +141,7 @@ namespace DyingAndMore.Editor
                 }
             }
         }
-        
+
         bool SelectDecal(Vector2 worldPosition)
         {
             //find closest decal
@@ -150,11 +150,11 @@ namespace DyingAndMore.Editor
             var end = Vector2.Clamp((worldPosition / editor.Map.SectorPixelSize) + Vector2.One, Vector2.Zero, mapSz).ToPoint();
 
             selectedDecal = null;
-            for (int y = start.Y; y < end.Y; y++)
+            for (int y = start.Y; y < end.Y; ++y)
             {
-                for (int x = start.X; x < end.X; x++)
+                for (int x = start.X; x < end.X; ++x)
                 {
-                    for (var i = 0; i < editor.Map.Sectors[y, x].decals.Count; i++)
+                    for (var i = 0; i < editor.Map.Sectors[y, x].decals.Count; ++i)
                     {
                         var decal = editor.Map.Sectors[y, x].decals[i];
 

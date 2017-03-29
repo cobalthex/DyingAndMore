@@ -23,7 +23,7 @@ namespace Takai.Game
             Texture.GetData(pixels);
 
             TilesMask = new System.Collections.BitArray(Texture.Height * Texture.Width);
-            for (var i = 0; i < pixels.Length; i++)
+            for (var i = 0; i < pixels.Length; ++i)
             {
                 if (UseAlpha)
                     TilesMask[i] = pixels[i].A > 127;
@@ -43,9 +43,9 @@ namespace Takai.Game
 
             Sectors = new MapSector[height, width];
 
-            for (var y = 0; y < height; y++)
+            for (var y = 0; y < height; ++y)
             {
-                for (var x = 0; x < width; x++)
+                for (var x = 0; x < width; ++x)
                     Sectors[y, x] = new MapSector();
             }
         }
@@ -78,7 +78,7 @@ namespace Takai.Game
         {
             if (Props.TryGetValue("State", out var state))
                 LoadState((MapState)state);
-            
+
             Tiles = new short[Height, Width];
             var tiles = Data.Serializer.CastType<List<short>>(Props["Tiles"]);
             Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, Width * Height * sizeof(short));
@@ -190,15 +190,20 @@ namespace Takai.Game
             eventHandlers.Clear();
 
             var FluidTypes = new Dictionary<int, FluidType>();
-            for (var i = 0; i < State.FluidTypes?.Count; i++)
+            for (var i = 0; i < State.FluidTypes?.Count; ++i)
                 FluidTypes[i] = State.FluidTypes[i];
 
-            ActiveEnts = State.entities ?? new List<Entity>();
-            foreach (var ent in ActiveEnts)
+            if (State.entities != null)
             {
-                ent.Map = this;
-                ent.OnSpawn();
+                foreach (var ent in State.entities)
+                {
+                    ent.Map = this;
+                    ent.OnSpawn();
+                }
+                ActiveEnts = new HashSet<Entity>(State.entities);
             }
+            else
+                ActiveEnts = new HashSet<Entity>();
 
             ActiveFluids = State.Fluids?.Select((FluidSave Save) =>
             {

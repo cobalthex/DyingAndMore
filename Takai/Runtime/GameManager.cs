@@ -99,7 +99,7 @@ namespace Takai.Runtime
         /// <param name="time">game time</param>
         public static void Draw(Microsoft.Xna.Framework.GameTime time)
         {
-            for (int i = firstDraw; i < states.Count; i++)
+            for (int i = firstDraw; i < states.Count; ++i)
             {
                 if (states[i].IsVisible)
                 {

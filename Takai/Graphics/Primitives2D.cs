@@ -24,7 +24,7 @@ namespace Takai.Graphics
             if (_pixel == null)
                 Init(SpriteBatch.GraphicsDevice);
 
-            for (int i = 0; i < Points.Length - 1; i++)
+            for (int i = 0; i < Points.Length - 1; ++i)
             {
                 float angle = (float)System.Math.Atan2(Points[i + 1].Y - Points[i].Y, Points[i + 1].X - Points[i].X);
                 float length = (Points[i + 1] - Points[i]).Length();

@@ -177,7 +177,7 @@ namespace Takai
         {
             int lng = _cLang;
 
-            for (int i = 0; i < languages.Length; i++)
+            for (int i = 0; i < languages.Length; ++i)
                 if (languages[i] == language)
                 {
                     lng = i;

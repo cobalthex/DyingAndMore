@@ -7,6 +7,14 @@ namespace Takai.Game
     /// </summary>
     public class Trigger
     {
+        /// <summary>
+        /// A name to identify this trigger
+        /// </summary>
+        public string Name { get; set; } = null;
+
+        /// <summary>
+        /// The rectangular area of this trigger
+        /// </summary>
         public Microsoft.Xna.Framework.Rectangle Region { get; set; }
 
         /// <summary>
@@ -14,9 +22,10 @@ namespace Takai.Game
         /// </summary>
         internal HashSet<Entity> ContainedEntities { get; set; } = new HashSet<Entity>();
 
-        public Trigger(Microsoft.Xna.Framework.Rectangle region)
+        public Trigger(Microsoft.Xna.Framework.Rectangle region, string name = null)
         {
             Region = region;
+            Name = name;
         }
 
         /// <summary>
