@@ -50,16 +50,16 @@ namespace Takai.Game
         [Data.NonSerialized]
         public MapRenderSettings renderSettings = new MapRenderSettings()
         {
-            drawTiles = true,
-            drawEntities = true,
-            drawFluids = true,
-            drawReflections = true,
-            drawFluidReflectionMask = false,
-            drawDecals = true,
-            drawParticles = true,
-            drawTriggers = false,
-            drawLines = true,
-            drawGrids = false,
+            drawTiles                           = true,
+            drawEntities                        = true,
+            drawFluids                          = true,
+            drawReflections                      = true,
+            drawFluidReflectionMask              = false,
+            drawDecals                          = true,
+            drawParticles                       = true,
+            drawTriggers                        = false,
+            drawLines                           = true,
+            drawGrids                           = false,
             drawBordersAroundNonDrawingEntities = false
         };
 

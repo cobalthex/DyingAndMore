@@ -10,7 +10,10 @@ namespace Takai.Game
     /// </summary>
     public class MapSector
     {
-        public List<Entity> entities = new List<Entity>();
+        //dynamic
+        public HashSet<Entity> entities = new HashSet<Entity>();
+
+        //static
         public List<Fluid> Fluids = new List<Fluid>();
         public List<Decal> decals = new List<Decal>();
         public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
@@ -136,9 +139,6 @@ namespace Takai.Game
         {
             get
             {
-                foreach (var ent in ActiveEnts)
-                    yield return ent;
-
                 foreach (var sector in Sectors)
                 {
                     foreach (var ent in sector.entities)
@@ -232,19 +232,22 @@ namespace Takai.Game
         /// <param name="addToActive">Add this entity to the active set (defaults to true)</param>
         public void Spawn(Entity entity, bool addToActive = true)
         {
-            if (entity.Map != null)
-                Destroy(entity);
+            if (entity.Map != this && entity.Map != null)
+                entity.Map.Destroy(entity);
 
             entity.Map = this;
             entity.SpawnTime = ElapsedTime;
 
             if (addToActive)
                 ActiveEnts.Add(entity);
-            else
+
+            var sectors = GetOverlappingSectors(entity.AxisAlignedBounds);
+            for (int y = sectors.Top; y < sectors.Bottom; ++y)
             {
-                var sector = GetOverlappingSector(entity.Position);
-                Sectors[sector.Y, sector.X].entities.Add(entity);
+                for (int x = sectors.Left; x < sectors.Right; ++x)
+                    Sectors[y, x].entities.Add(entity);
             }
+
             ++TotalEntitiesCount;
         }
 
@@ -268,12 +271,7 @@ namespace Takai.Game
                 Direction = direction,
                 Velocity = velocity
             };
-
-            //will be removed in next update if out of visible range
-            //only inactive entities are placed in sectors
-            ActiveEnts.Add(ent);
-            ++TotalEntitiesCount;
-
+            Spawn(ent);
             return ent;
         }
 
@@ -298,11 +296,7 @@ namespace Takai.Game
             ent.Direction = direction;
             ent.Velocity = velocity;
 
-            //will be removed in next update if out of visible range
-            //only inactive entities are placed in sectors
-            ActiveEnts.Add(ent);
-            ++TotalEntitiesCount;
-
+            Spawn(ent);
             return ent;
         }
 

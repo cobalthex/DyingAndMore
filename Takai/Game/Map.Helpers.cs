@@ -127,7 +127,7 @@ namespace Takai.Game
 
             foreach (var ent in ActiveEnts)
             {
-                if (Rectangle.Union(Region, ent.Bounds).Contains(ent.Position))
+                if (Rectangle.Union(Region, ent.AxisAlignedBounds).Contains(ent.Position))
                     ents.Add(ent);
             }
 
@@ -146,7 +146,7 @@ namespace Takai.Game
                     {
                         foreach (var ent in Sectors[y, x].entities)
                         {
-                            if (Rectangle.Union(Region, ent.Bounds).Contains(ent.Position))
+                            if (Rectangle.Union(Region, ent.AxisAlignedBounds).Contains(ent.Position))
                                 ents.Add(ent);
                         }
                     }
@@ -271,6 +271,8 @@ namespace Takai.Game
 
             MaxDistance *= MaxDistance;
             FieldOfView = 1 - MathHelper.Clamp(FieldOfView / MathHelper.Pi, 0, 1);
+
+            //todo: move to use sectors
 
             foreach (var ent in ActiveEnts)
             {
