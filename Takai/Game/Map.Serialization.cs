@@ -76,9 +76,6 @@ namespace Takai.Game
         }
         void Deserialize(Dictionary<string, object> Props)
         {
-            if (Props.TryGetValue("State", out var state))
-                LoadState((MapState)state);
-
             Tiles = new short[Height, Width];
             var tiles = Data.Serializer.CastType<List<short>>(Props["Tiles"]);
             Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, Width * Height * sizeof(short));
@@ -86,8 +83,11 @@ namespace Takai.Game
             TilesPerRow = (TilesImage != null ? (TilesImage.Width / TileSize) : 0);
             SectorPixelSize = SectorSize * TileSize;
 
-            BuildSectors();
             BuildTileMask(TilesImage, true);
+            BuildSectors();
+
+            if (Props.TryGetValue("State", out var state))
+                LoadState((MapState)state);
         }
 
         struct FluidSave
@@ -112,7 +112,7 @@ namespace Takai.Game
 
             public MapState(Map Map)
             {
-                entities = new List<Entity>(Map.ActiveEnts);
+                entities = new List<Entity>(Map.AllEntities);
                 FluidTypes = new List<FluidType>();
                 Fluids = new List<FluidSave>();
                 decals = new List<Decal>();
@@ -139,7 +139,6 @@ namespace Takai.Game
                 {
                     var s = (MapSector)sector;
 
-                    entities.AddRange(s.entities);
                     decals.AddRange(s.decals);
 
                     foreach (var Fluid in s.Fluids)
@@ -185,25 +184,19 @@ namespace Takai.Game
 
         private void LoadState(MapState State)
         {
-            //todo: map time (cache delta time)
-
             eventHandlers.Clear();
+            scripts.Clear();
+
+            ActiveEnts.Clear();
+            if (State.entities != null)
+            {
+                foreach (var ent in State.entities)
+                    Spawn(ent);
+            }
 
             var FluidTypes = new Dictionary<int, FluidType>();
             for (var i = 0; i < State.FluidTypes?.Count; ++i)
                 FluidTypes[i] = State.FluidTypes[i];
-
-            if (State.entities != null)
-            {
-                foreach (var ent in State.entities)
-                {
-                    ent.Map = this;
-                    ent.OnSpawn();
-                }
-                ActiveEnts = new HashSet<Entity>(State.entities);
-            }
-            else
-                ActiveEnts = new HashSet<Entity>();
 
             ActiveFluids = State.Fluids?.Select((FluidSave Save) =>
             {
@@ -214,8 +207,6 @@ namespace Takai.Game
                     velocity = Save.velocity
                 };
             }).ToList() ?? new List<Fluid>();
-
-            BuildSectors();
 
             if (State.decals != null)
             {

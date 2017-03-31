@@ -28,7 +28,6 @@ namespace DyingAndMore.Editor
 
     class TriggersEditorMode : EditorMode
     {
-        bool isPosSaved = false;
         bool isNewTrigger = false;
         Vector2 savedWorldPos;
 

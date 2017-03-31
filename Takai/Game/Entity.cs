@@ -66,7 +66,7 @@ namespace Takai.Game
     [Data.DesignerCreatable]
     public class Entity : ICloneable
     {
-        private static UInt64 nextId = 1; //generator for the unique (runtime) IDs
+        private static int nextId = 1; //generator for the unique (runtime) IDs
 
         /// <summary>
         /// A unique ID for each entity
@@ -74,7 +74,7 @@ namespace Takai.Game
         /// Primarily used for debugging
         /// </summary>
         [Data.NonSerialized]
-        public UInt64 Id { get; private set; } = (nextId++);
+        public int Id { get; private set; } = (nextId++);
 
         /// <summary>
         /// The name of this entity. Typically used by other entities or scripts for referencing (and therefore should be unique)
@@ -104,11 +104,6 @@ namespace Takai.Game
         /// </summary>
         [Data.NonSerialized]
         public Map Map { get; internal set; } = null;
-        /// <summary>
-        /// The section the entity is located in in the map, null if none or if in the active set
-        /// </summary>
-        [Data.NonSerialized]
-        public MapSector Sector { get; internal set; } = null;
 
         /// <summary>
         /// Determines if the entity is thinking
@@ -144,7 +139,7 @@ namespace Takai.Game
         /// the axis aligned bounding box of this entity, based on radius
         /// </summary>
         [Data.NonSerialized]
-        public Rectangle Bounds
+        public Rectangle AxisAlignedBounds
         {
             get
             {
@@ -245,7 +240,6 @@ namespace Takai.Game
 
             cloned.Id = (nextId++);
             cloned.Map = null;
-            cloned.Sector = null;
             cloned.State = (EntityStateMachine)State.Clone();
 
             return cloned;
@@ -289,5 +283,10 @@ namespace Takai.Game
         /// <param name="Type">The type of Fluid collided with</param>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void OnFluidCollision(FluidType Type, TimeSpan DeltaTime) { }
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
     }
 }

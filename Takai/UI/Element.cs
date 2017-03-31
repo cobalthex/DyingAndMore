@@ -38,7 +38,7 @@ namespace Takai.UI
         /// </summary>
         public Element Parent
         {
-            get { return parent; }
+            get => parent;
             set
             {
                 if (parent != value)
@@ -56,9 +56,12 @@ namespace Takai.UI
         public ReadOnlyCollection<Element> Children { get; private set; } //todo: maybe observable
         protected List<Element> children = new List<Element>();
 
-        public string Text
+        /// <summary>
+        /// The text of the element. Can be null or empty
+        /// </summary>
+        public virtual string Text
         {
-            get { return text; }
+            get => text;
             set
             {
                 if (text != value)
@@ -73,7 +76,7 @@ namespace Takai.UI
 
         public Graphics.BitmapFont Font
         {
-            get { return font; }
+            get => font;
             set
             {
                 if (font != value)
@@ -92,7 +95,7 @@ namespace Takai.UI
         /// </summary>
         public Alignment HorizontalAlignment
         {
-            get { return horizontalAlignment; }
+            get => horizontalAlignment;
             set
             {
                 if (horizontalAlignment != value)
@@ -109,7 +112,7 @@ namespace Takai.UI
         /// </summary>
         public Alignment VerticalAlignment
         {
-            get { return verticalAlignment; }
+            get => verticalAlignment;
             set
             {
                 if (verticalAlignment != value)
@@ -129,7 +132,7 @@ namespace Takai.UI
         /// </summary>
         public Vector2 Position
         {
-            get { return position; }
+            get => position;
             set
             {
                 if (position != value)
@@ -146,7 +149,7 @@ namespace Takai.UI
         /// </summary>
         public Vector2 Size
         {
-            get { return size; }
+            get => size;
             set
             {
                 if (size != value)
@@ -160,7 +163,7 @@ namespace Takai.UI
 
         public Rectangle Bounds
         {
-            get { return new Rectangle(Position.ToPoint(), Size.ToPoint()); }
+            get => new Rectangle(Position.ToPoint(), Size.ToPoint());
             set
             {
                 if (Bounds != value)
@@ -177,22 +180,54 @@ namespace Takai.UI
         /// </summary>
         public Rectangle AbsoluteBounds
         {
-            get { return absoluteBounds; }
+            get => absoluteBounds;
         }
         private Rectangle absoluteBounds; //cached bounds
 
-        //todo: focus
+        //Does this element currently have focus
+        public bool HasFocus
+        {
+            get => hasFocus;
+            set
+            {
+                if (value == false)
+                    hasFocus = false;
+
+                else
+                {
+                    Stack<Element> defocusing = new Stack<Element>();
+
+                    //defocus all elements in tree
+                    Element next = this;
+                    while (next.parent != null)
+                        next = next.parent;
+
+                    defocusing.Push(next);
+                    while (defocusing.Count > 0)
+                    {
+                        next = defocusing.Pop();
+                        next.hasFocus = false;
+
+                        foreach (var child in next.children)
+                            defocusing.Push(child);
+                    }
+
+                    hasFocus = true;
+                }
+            }
+        }
+        private bool hasFocus = false;
+
+        /// <summary>
+        /// Can this element be focused
+        /// </summary>
+        public virtual bool CanFocus { get => OnClick != null; }
 
         /// <summary>
         /// The click handler. If null, this item is not clickable/focusable (Does not apply to children)
         /// </summary>
         [Data.NonSerialized]
         public event ClickHandler OnClick = null;
-
-        /// <summary>
-        /// Can this element be focused
-        /// </summary>
-        public virtual bool CanFocus { get { return OnClick != null; } }
 
         /// <summary>
         /// The input must start inside the element to register a click
@@ -364,10 +399,12 @@ namespace Takai.UI
 
             var mouse = Input.InputState.MousePoint;
 
-            //todo: focus
-
             if (Input.InputState.IsPress(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
+            {
                 didPress = true;
+                if (CanFocus)
+                    HasFocus = true;
+            }
 
             else if (Input.InputState.IsClick(Input.MouseButtons.Left))
             {
@@ -386,7 +423,7 @@ namespace Takai.UI
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            if (DrawBoundingRects)
+            if (DrawBoundingRects || HasFocus)
                 Graphics.Primitives2D.DrawRect(spriteBatch, new Color(0, 0.75f, 1, 0.35f), AbsoluteBounds);
 
             var textBounds = CalculateTextBounds(textSize, AbsoluteBounds);

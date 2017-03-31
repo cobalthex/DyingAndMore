@@ -5,7 +5,7 @@ using System;
 
 namespace Takai.Game
 {
-    public struct MapUpdateSettings
+    public class MapUpdateSettings
     {
         public bool isAiEnabled;
         public bool isInputEnabled;
@@ -49,6 +49,7 @@ namespace Takai.Game
         /// Ents that are to be destroyed during the next Update()
         /// </summary>
         protected List<Entity> entsToDestroy = new List<Entity>(8);
+        protected List<Entity> entsToRemoveFromActive = new List<Entity>(16);
 
         /// <summary>
         /// Update the map state
@@ -73,10 +74,7 @@ namespace Takai.Game
 
             var visibleRegion = Camera.VisibleRegion;
             var visibleSectors = GetOverlappingSectors(visibleRegion);
-            visibleSectors.Inflate(1, 1);
             var mapBounds = Bounds;
-
-            var tileSq = new Vector2(tileSize).LengthSquared();
 
             #region active Fluids
 
@@ -94,7 +92,7 @@ namespace Takai.Game
                     Spawn(Fluid.type, Fluid.position, Vector2.Zero); //this will move the Fluid to the static area of the map
                     ActiveFluids[i] = ActiveFluids[ActiveFluids.Count - 1];
                     ActiveFluids.RemoveAt(ActiveFluids.Count - 1);
-                    i--;
+                    --i;
                 }
                 else
                     ActiveFluids[i] = Fluid;
@@ -102,44 +100,47 @@ namespace Takai.Game
 
             #endregion
 
-            #region active entities
+            #region entities
 
             //remove entities that have been destroyed
             foreach (var ent in entsToDestroy)
             {
+                if (ent.Map != this)
+                    continue;
+
                 ent.OnDestroy();
                 ent.SpawnTime = TimeSpan.Zero;
 
-                if (ent.Sector != null)
+                ActiveEnts.Remove(ent);
+                var sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
+                for (int y = sectors.Top; y < sectors.Bottom; ++y)
                 {
-                    ent.Sector.entities.Remove(ent);
-                    ent.Sector = null;
+                    for (int x = sectors.Left; x < sectors.Right; ++x)
+                        Sectors[y, x].entities.Remove(ent);
                 }
-                else
-                    ActiveEnts.Remove(ent);
+
                 ent.Map = null;
-                TotalEntitiesCount--;
+                --TotalEntitiesCount;
             }
             entsToDestroy.Clear();
 
+            ActiveEnts.ExceptWith(entsToRemoveFromActive);
+            entsToRemoveFromActive.Clear();
+
             foreach (var ent in ActiveEnts)
             {
-                if (!ent.AlwaysActive && !visibleSectors.Contains(ent.Position / SectorPixelSize))
-                {
-                    //ents outside the map are deleted
-                    if (mapBounds.Contains((ent.Position / tileSize).ToPoint()))
-                        Sectors[(int)ent.Position.Y / SectorPixelSize, (int)ent.Position.X / SectorPixelSize].entities.Add(ent);
-                    else
-                    {
-                        Destroy(ent);
-                        continue;
-                    }
+                var entBounds = ent.AxisAlignedBounds;
 
+                //ents outside the map are deleted
+                if (!Bounds.Contains(entBounds))
+                    Destroy(ent);
+
+                else if (!ent.AlwaysActive && !visibleRegion.Contains(entBounds))
+                {
                     if (ent.DestroyIfDeadAndInactive && ent.State.Is(EntStateKey.Dead))
-                    {
                         Destroy(ent);
-                        continue;
-                    }
+                    else
+                        entsToRemoveFromActive.Add(ent);
                 }
                 else
                 {
@@ -186,8 +187,6 @@ namespace Takai.Game
                                 }
                             }
 
-                            //todo: GetOverlappingSectors
-
                             //Fluid collision
                             if (!ent.IgnoreTrace)
                             {
@@ -210,15 +209,25 @@ namespace Takai.Game
                             }
                         }
 
-                        ent.Position += ent.Velocity * deltaSeconds;
+                        if (ent.Velocity != Vector2.Zero)
+                        {
+                            ent.Position += ent.Velocity * deltaSeconds;
+                            //update entity sector data, for collision
+                            var sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
+                            for (int y = sectors.Top; y < sectors.Bottom; ++y)
+                            {
+                                for (int x = sectors.Left; x < sectors.Right; ++x)
+                                    Sectors[y, x].entities.Add(ent);
+                            }
+                        }
                     }
                 }
             }
 
             //add new entities to active set (will be updated next frame)
-            for (var y = System.Math.Max(visibleSectors.Top, 0); y < System.Math.Min(Height / SectorSize, visibleSectors.Bottom); ++y)
+            for (int y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
             {
-                for (var x = System.Math.Max(visibleSectors.Left, 0); x < System.Math.Min(Width / SectorSize, visibleSectors.Right); ++x)
+                for (int x = visibleSectors.Left; x < visibleSectors.Right; ++x)
                     ActiveEnts.UnionWith(Sectors[y, x].entities);
             }
 

@@ -12,7 +12,7 @@ namespace Takai.Input
         X4,
         X5
     }
-    
+
     public enum KeyMod
     {
         None,
@@ -22,7 +22,7 @@ namespace Takai.Input
         Windows,
         Super
     }
-    
+
     //todo: touchdownPoint (where first touched?) and press/release time (maybe)
 
     public static class InputState
@@ -95,7 +95,7 @@ namespace Takai.Input
         {
             return (lastMouseState.Position - mouseState.Position).ToVector2();
         }
-        
+
         /// <summary>
         /// Has the mouse been dragged since last frame
         /// </summary>
@@ -270,6 +270,15 @@ namespace Takai.Input
                 default:
                     return false;
             }
+        }
+
+        /// <summary>
+        /// Get all currently pressed keyboard keys
+        /// </summary>
+        /// <returns>Currently pressed keys</returns>
+        public static Keys[] GetPressedKeys()
+        {
+            return keyState.GetPressedKeys();
         }
     }
 }
