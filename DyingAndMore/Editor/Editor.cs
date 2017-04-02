@@ -75,6 +75,19 @@ namespace DyingAndMore.Editor
 
             if (Map == null)
             {
+                uiContainer = (Takai.UI.Element)Takai.Data.Serializer.TextDeserialize("test.ui.tk");
+                void SetFont(Takai.UI.Element zz)
+                {
+                    zz.Font = LargeFont;
+                    foreach (var child in zz.Children)
+                        SetFont(child);
+                    if (!(zz is Takai.UI.TextBox))
+                        zz.AutoSize();
+                }
+                SetFont(uiContainer);
+                Takai.Data.Serializer.TextSerialize("out.ui.tk", uiContainer);
+                return;
+
                 var list = new Takai.UI.List()
                 {
                     HorizontalAlignment = Takai.UI.Alignment.Middle,
@@ -118,6 +131,8 @@ namespace DyingAndMore.Editor
 
                 list.AutoSize();
                 uiContainer.AddChild(list);
+
+                Takai.Data.Serializer.TextSerialize("test.ui.tk", uiContainer);
             }
             else
                 StartMap();
@@ -406,7 +421,7 @@ namespace DyingAndMore.Editor
             {
                 GraphicsDevice.Clear(new Color(24, 24, 24)); //todo: replace w/ graphic maybe
 
-                sbatch.Begin();
+                sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
                 uiContainer.Draw(sbatch);
                 sbatch.End();
                 return;

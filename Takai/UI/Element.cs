@@ -24,37 +24,17 @@ namespace Takai.UI
     /// <summary>
     /// A single UI Element
     /// </summary>
+    [Data.DerivedTypeDeserialize(typeof(Element), "DerivedDeserialize")]
     public class Element
     {
+        public static Color FocusOutlineColor = Color.RoyalBlue;
+
         public static bool DrawBoundingRects = false;
 
         /// <summary>
         /// A unique name for this element. Can be null
         /// </summary>
         public string Name { get; set; } = null;
-
-        /// <summary>
-        /// Who owns/contains this element
-        /// </summary>
-        public Element Parent
-        {
-            get => parent;
-            set
-            {
-                if (parent != value)
-                {
-                    parent = value;
-                    Reflow();
-                }
-            }
-        }
-        private Element parent = null;
-
-        /// <summary>
-        /// A readonly collection of all of the children in this element
-        /// </summary>
-        public ReadOnlyCollection<Element> Children { get; private set; } //todo: maybe observable
-        protected List<Element> children = new List<Element>();
 
         /// <summary>
         /// The text of the element. Can be null or empty
@@ -74,6 +54,7 @@ namespace Takai.UI
         private string text = "";
         protected Vector2 textSize;
 
+        [Data.NonSerialized]
         public Graphics.BitmapFont Font
         {
             get => font;
@@ -88,6 +69,10 @@ namespace Takai.UI
         }
         private Graphics.BitmapFont font;
 
+        /// <summary>
+        /// The color of this element. Usage varies between element types
+        /// Usually applies to text color
+        /// </summary>
         public Color Color { get; set; } = Color.White;
 
         /// <summary>
@@ -130,6 +115,7 @@ namespace Takai.UI
         /// Center moves down and to the right from the center
         /// End moves in the opposite direction
         /// </summary>
+        [Data.NonSerialized] //use bounds
         public Vector2 Position
         {
             get => position;
@@ -147,6 +133,7 @@ namespace Takai.UI
         /// <summary>
         /// The size of the element
         /// </summary>
+        [Data.NonSerialized] //use bounds
         public Vector2 Size
         {
             get => size;
@@ -178,13 +165,16 @@ namespace Takai.UI
         /// <summary>
         /// Bounds relative to the outermost container
         /// </summary>
+        [Data.NonSerialized]
         public Rectangle AbsoluteBounds
         {
             get => absoluteBounds;
         }
         private Rectangle absoluteBounds; //cached bounds
 
-        //Does this element currently have focus
+        /// <summary>
+        /// Does this element currently have focus?
+        /// </summary>
         public bool HasFocus
         {
             get => hasFocus;
@@ -221,7 +211,8 @@ namespace Takai.UI
         /// <summary>
         /// Can this element be focused
         /// </summary>
-        public virtual bool CanFocus { get => OnClick != null; }
+        [Data.NonSerialized]
+        public virtual bool CanFocus { get => true; }// OnClick != null; }
 
         /// <summary>
         /// The click handler. If null, this item is not clickable/focusable (Does not apply to children)
@@ -232,17 +223,55 @@ namespace Takai.UI
         /// <summary>
         /// The input must start inside the element to register a click
         /// </summary>
-        [Data.NonSerialized]
         protected bool didPress = false;
+
+        /// <summary>
+        /// Who owns/contains this element
+        /// </summary>
+        [Data.NonSerialized]
+        public Element Parent
+        {
+            get => parent;
+            set
+            {
+                if (parent != value)
+                {
+                    parent = value;
+                    Reflow();
+                }
+            }
+        }
+        private Element parent = null;
+
+        /// <summary>
+        /// A readonly collection of all of the children in this element
+        /// </summary>
+        [Data.CustomDeserialize(typeof(Element), "DeserializeChildren")]
+        public ReadOnlyCollection<Element> Children { get; private set; } //todo: maybe observable
+        protected List<Element> children = new List<Element>();
+
+        private void DeserializeChildren(object objects)
+        {
+            var elements = objects as List<object>;
+            foreach (var element in elements)
+            {
+                if (element is Element child)
+                    AddChild(child);
+            }
+        }
+
+        public Element()
+        {
+            Children = new ReadOnlyCollection<Element>(children);
+        }
 
         /// <summary>
         /// Create a new element
         /// </summary>
         /// <param name="children">Optionally add children to this element</param>
         public Element(params Element[] children)
+            : this()
         {
-            Children = new ReadOnlyCollection<Element>(this.children);
-
             foreach (var child in children)
                 AddChild(child);
         }
@@ -265,6 +294,8 @@ namespace Takai.UI
         public void AddChild(Element child)
         {
             child.Parent = this;
+            if (child.CanFocus)
+                child.HasFocus = true;
             children.Add(child);
             Reflow();
         }
@@ -342,13 +373,11 @@ namespace Takai.UI
                     break;
             }
 
-            return new Rectangle(pos.ToPoint() + container.Location, Size.ToPoint()); //if size is changed, changes may need to be made elsewhere
+            return new Rectangle(pos.ToPoint() + container.Location, Size.ToPoint());
         }
 
-        public static int callCount = 0;
         protected Rectangle CalculateAbsoluteBounds()
         {
-            callCount++;
             absoluteBounds = Parent != null
                 ? CalculateBounds(Parent.CalculateAbsoluteBounds())
                 : new Rectangle(Position.ToPoint(), Size.ToPoint());
@@ -373,13 +402,116 @@ namespace Takai.UI
         }
 
         /// <summary>
+        /// Focus the next element in the tree
+        /// </summary>
+        /// <remarks>If this is not the focused element, finds the focused element and calls this function</remarks>
+        protected void FocusNext()
+        {
+            if (!HasFocus)
+            {
+                FindFocusedElement()?.FocusNext();
+                return;
+            }
+
+            /* focus in the following order
+
+            1
+                2
+                3
+                    4
+                5
+                6
+            7
+                8
+                    9
+                        10
+                        11
+                    12
+                13
+
+            */
+
+            var next = this;
+            while (next != null)
+            {
+                foreach (var child in next.children)
+                {
+                    if (child.CanFocus)
+                    {
+                        child.HasFocus = true;
+                        return;
+                    }
+
+                    if (child.Children.Count > 0)
+                    {
+                        next = child;
+                        break;
+                    }
+                }
+
+                while (next.parent != null)
+                {
+                    var index = next.Parent.Children.IndexOf(next) + 1;
+                    if (index < next.Parent.Children.Count)
+                    {
+                        next = next.Parent.Children[index];
+                        if (next.CanFocus)
+                        {
+                            next.HasFocus = true;
+                            next = null;
+                            break;
+                        }
+                    }
+                    else
+                        next = next.parent;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Focus the previous element, using the reverse order of FocusNext
+        /// </summary>
+        protected void FocusPrevious()
+        {
+
+        }
+
+        /// <summary>
+        /// Find the element in this treethat has focus
+        /// Searches up and down
+        /// </summary>
+        /// <returns>The focused element, or null if there is none</returns>
+        public Element FindFocusedElement()
+        {
+            var parent = this;
+            while (parent.Parent != null)
+                parent = parent.Parent;
+
+            var next = new Stack<Element>();
+            next.Push(parent);
+
+            while (next.Count > 0)
+            {
+                var elem = next.Pop();
+                if (elem.HasFocus)
+                    return elem;
+
+                foreach (var child in elem.Children)
+                    next.Push(child);
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Add specific behavior before <see cref="OnClick"/> is called. Called by Update()
         /// </summary>
         /// <param name="args">Click event args passed from Update. Forwarded to <see cref="OnClick"/></param>
         protected virtual void BeforeClick(ClickEventArgs args)
         {
-            OnClick(this, args);
+            OnClick?.Invoke(this, args);
         }
+
 
         /// <summary>
         /// Update this element
@@ -397,13 +529,33 @@ namespace Takai.UI
                     return false;
             }
 
+            if (HasFocus)
+            {
+                if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Tab))
+                {
+                    if (Input.InputState.IsMod(Input.KeyMod.Shift))
+                        FocusPrevious();
+                    else
+                        FocusNext();
+                    return false;
+                }
+                if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Enter))
+                {
+                    BeforeClick(new ClickEventArgs { position = Vector2.Zero });
+                    return false;
+                }
+            }
+
             var mouse = Input.InputState.MousePoint;
 
             if (Input.InputState.IsPress(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
             {
                 didPress = true;
                 if (CanFocus)
+                {
                     HasFocus = true;
+                    return false;
+                }
             }
 
             else if (Input.InputState.IsClick(Input.MouseButtons.Left))
@@ -423,8 +575,11 @@ namespace Takai.UI
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            if (DrawBoundingRects || HasFocus)
-                Graphics.Primitives2D.DrawRect(spriteBatch, new Color(0, 0.75f, 1, 0.35f), AbsoluteBounds);
+            if (DrawBoundingRects)
+                Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Crimson, 0.35f), AbsoluteBounds);
+
+            if (HasFocus)
+                Graphics.Primitives2D.DrawRect(spriteBatch, FocusOutlineColor, AbsoluteBounds);
 
             var textBounds = CalculateTextBounds(textSize, AbsoluteBounds);
             Font?.Draw(spriteBatch, Text, textBounds, Color);
@@ -451,6 +606,17 @@ namespace Takai.UI
                 size.X,
                 size.Y
             );
+        }
+
+        protected void DerivedDeserialize(Dictionary<string, object> props)
+        {
+            if (props.TryGetValue("AutoSize", out var autoSize))
+            {
+                if (autoSize is int autoSizeValue)
+                    AutoSize(autoSizeValue);
+                else if (autoSize is bool doAutoSize)
+                    AutoSize();
+            }
         }
     }
 }
