@@ -110,58 +110,55 @@ namespace Takai.Graphics
         /// <summary>
         /// Draw a string
         /// </summary>
-        /// <param name="Spritebatch">Spritebatch to use</param>
-        /// <param name="String">The string to draw (New lines included)</param>
-        /// <param name="Position">Where to draw the string</param>
-        /// <param name="Color">The hue to draw the string with</param>
-        /// <param name="MonoSpace">Draw the font, treating all characters as equal width</param>
+        /// <param name="spriteBatch">Spritebatch to use</param>
+        /// <param name="text">The string to draw (New lines included)</param>
+        /// <param name="position">Where to draw the string</param>
+        /// <param name="color">The hue to draw the string with</param>
+        /// <param name="monospace">Draw the font, treating all characters as equal width</param>
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and www (base 33) to set the color in RGB. use `x to reset the color</remarks>
         /// <returns>Returns the size of the text drawn</returns>
-        public Vector2 Draw(SpriteBatch Spritebatch, string String, Vector2 Position, Color Color, bool MonoSpace = false)
+        public Vector2 Draw(SpriteBatch spriteBatch, string text, Vector2 position, Color color, bool monospace = false)
         {
-            if (String == null)
+            if (text == null)
                 return Vector2.Zero;
 
-            Position.X = (int)Position.X;
-            Position.Y = (int)Position.Y;
+            var pos = position.ToPoint().ToVector2(); //round down to nearest int
+            Color curColor = color;
 
-            Vector2 pos = Position;
             int maxH = 0;
-            Color curColor = Color;
-            int esc = 0;
-            for (int i = 0; i < String.Length; ++i)
+
+            for (int i = 0; i < text.Length; ++i)
             {
-                //escape chars
-                if (String[i] == '\n')
+                char ch = text[i];
+
+                //newline
+                if (ch == '\n')
                 {
-                    pos.X = Position.X;
+                    pos.X = (int)position.X;
                     pos.Y += maxH + Tracking.Y;
                     maxH = 0;
-                    esc++;
                     continue;
                 }
-                else if (String[i] == '`') //color
+                else if (ch == '`' && i + 1 < text.Length) //colors (`RGB (hex)) and `x to end
                 {
-                    if (String.Length > i + 1 && String[i + 1] == '`')
-                        i++;
-                    else if (String.Length > i + 1 && String[i + 1] == 'x')
+                    if (text[i + 1] == 'x')
                     {
-                        curColor = Color;
-                        i++;
+                        curColor = color;
+                        ++i;
                         continue;
                     }
-                    else if (String.Length > i + 3)
+                    else if (i + 3 < text.Length)
                     {
                         int[] col = new int[3];
                         for (int j = 0; j < 3; ++j)
                         {
-                            char cch = String[j + i + 1];
-                            if (cch >= 'a' && cch <= 'w')
-                                col[j] = 10 + (int)(cch - 'a');
-                            else if (cch >= 'A' && cch <= 'W')
-                                col[j] = 10 + (int)(cch - 'A');
+                            char cch = text[i + i];
+                            if (cch >= 'a' && cch <= 'f')
+                                col[j] = 10 + (cch - 'a');
+                            else if (cch >= 'A' && cch <= 'F')
+                                col[j] = 10 + (cch - 'A');
                             else if (cch >= '0' && cch <= '9')
-                                col[j] = (int)(cch - '0');
+                                col[j] = (cch - '0');
                         }
                         curColor = new Color(col[0] << 3, col[1] << 3, col[2] << 3);
                         i += 3;
@@ -169,16 +166,16 @@ namespace Takai.Graphics
                     }
                 }
 
-                if (!Characters.TryGetValue(String[i], out var rgn))
+                if (!Characters.TryGetValue(ch, out var rgn))
                     continue;
 
-                Spritebatch.Draw(Texture, pos, rgn, curColor);
+                spriteBatch.Draw(Texture, pos, rgn, curColor);
 
-                pos.X += (MonoSpace ? MaxCharWidth : rgn.Width) + Tracking.X;
-                maxH = (int)MathHelper.Max(maxH, rgn.Height);
+                pos.X += (monospace ? MaxCharWidth : rgn.Width) + Tracking.X;
+                maxH = MathHelper.Max(maxH, rgn.Height);
             }
 
-            return pos - Position;
+            return pos - position;
         }
 
         /// <summary>
@@ -198,70 +195,62 @@ namespace Takai.Graphics
         /// <summary>
         /// Draw a variable length string in a specific region with a given offset
         /// </summary>
-        /// <param name="Spritebatch">The sprite batch to use</param>
-        /// <param name="String">The string to draw</param>
-        /// <param name="StartIndex">The zero-based starting position in the string</param>
-        /// <param name="Length">The length of the sub string, use -1 for the entire string (special chars not included)</param>
-        /// <param name="Bounds">The bounds of the </param>
-        /// <param name="Offset">The pixel offset of the text</param>
-        /// <param name="Color">The color of the text</param>
-        /// <param name="MonoSpace">Draw the font, treating all characters as equal width</param>
-        /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and fff (base 16) to set the color in RGB. use `x to reset the color</remarks>
-        public void Draw(SpriteBatch Spritebatch, string String, int StartIndex, int Length, Rectangle Bounds, Point Offset, Color Color, bool MonoSpace = false)
+        /// <param name="spriteBatch">The sprite batch to use</param>
+        /// <param name="text">The string to draw</param>
+        /// <param name="startIndex">The zero-based starting position in the string</param>
+        /// <param name="length">The length of the sub string, use -1 for the entire string (non-printing characters not included)</param>
+        /// <param name="bounds">The clipping region for drawing the text to</param>
+        /// <param name="offset">The pixel offset to render the text inside the clipping region</param>
+        /// <param name="color">The color of the text</param>
+        /// <param name="monospace">Draw the font, treating all characters as equal width</param>
+        /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and fff to change the color. use `x to reset the color</remarks>
+        public void Draw(SpriteBatch spriteBatch, string text, int startIndex, int length, Rectangle bounds, Point offset, Color color, bool monospace = false)
         {
-            Vector2 pos = Vector2.Zero;
-            Point off = Offset;
-            Color curColor = Color;
+            Point pos = bounds.Location + offset;
+            Color curColor = color;
 
             int maxH = 0;
-            int start = GetStart(String, 0);
+            int start = startIndex;
 
-            int len = Length > String.Length ? String.Length : Length == -1 ? String.Length : Length;
-            for (int i = 0; i + start < String.Length && i < len; ++i)
+            length = (length == -1 ? text.Length : MathHelper.Min(text.Length, length));
+            for (int i = start; i < length; ++i)
             {
-                char ch = String[i + start];
+                char ch = text[i];
+
+                //newline
                 if (ch == '\n')
                 {
-                    pos.X = Bounds.X;
+                    pos.X = bounds.X + offset.X;
                     pos.Y += maxH + Tracking.Y;
-                    off.X = Offset.X;
-                    off.Y -= maxH;
-                    if (off.Y < 0)
-                        off.Y = 0;
                     maxH = 0;
-                    len++;
+                    ++length;
                     continue;
                 }
-                else if (ch == '`') //colors
+                else if (ch == '`' && i + 1 < length) //colors (`RGB (hex)) and `x to end
                 {
-                    if (String.Length > i + start + 1 && String[i + start + 1] == '`')
+                    if (text[i + 1] == 'x')
                     {
-                        i++;
-                        len++;
-                    }
-                    else if (String.Length > i + start + 1 && String[i + start + 1] == 'x')
-                    {
-                        curColor = Color;
-                        i++;
-                        len += 2;
+                        curColor = color;
+                        length += 2;
+                        ++i;
                         continue;
                     }
-                    else if (String.Length > i + start + 3)
+                    else if (i + 3 < text.Length)
                     {
                         int[] col = new int[3];
                         for (int j = 0; j < 3; ++j)
                         {
-                            char cch = String[j + i + start + 1];
+                            char cch = text[j + i + start + 1];
                             if (cch >= 'a' && cch <= 'f')
-                                col[j] = 10 + (int)(cch - 'a');
+                                col[j] = 10 + (cch - 'a');
                             else if (cch >= 'A' && cch <= 'F')
-                                col[j] = 10 + (int)(cch - 'A');
+                                col[j] = 10 + (cch - 'A');
                             else if (cch >= '0' && cch <= '9')
-                                col[j] = (int)(cch - '0');
+                                col[j] = (cch - '0');
                         }
                         curColor = new Color(col[0] << 3, col[1] << 3, col[2] << 3);
                         i += 3;
-                        len += 4;
+                        length += 4;
                         continue;
                     }
                 }
@@ -269,46 +258,12 @@ namespace Takai.Graphics
                 if (!Characters.TryGetValue(ch, out var rgn))
                     continue;
 
-                int ofx = off.X, ofy = off.Y;
-                if (ofx < 0)
-                    rgn.X -= ofx;
-                else
-                {
-                    pos.X += ofx;
-                    off.X = 0;
-                }
-                if (ofy < 0)
-                    rgn.Y -= ofy;
-                else
-                {
-                    pos.Y += ofy;
-                    off.Y = 0;
-                }
+                var clip = Rectangle.Intersect(new Rectangle(pos, rgn.Size), bounds);
+                if (clip.Width > 0 && clip.Height > 0)
+                    spriteBatch.Draw(Texture, clip, rgn, curColor);
 
-                rgn.Width = (Bounds.Width - ofx) > rgn.Width ? rgn.Width : Bounds.Width - ofx;
-                rgn.Height = (Bounds.Height - ofy) > rgn.Height ? rgn.Height : Bounds.Height - ofy;
-
-                int x = (int)pos.X, y = (int)pos.Y;
-
-                if (rgn.Width < 1 || rgn.Height < 1 || x >= Bounds.Width || y >= Bounds.Height)
-                    continue;
-
-                int xdif = Bounds.Width - x, ydif = Bounds.Height - y;
-                //x region check
-                if (x + rgn.Width > Bounds.Width)
-                    rgn.Width = xdif;
-                else
-                    rgn.Width = (rgn.Width > Bounds.Width ? Bounds.Width : rgn.Width);
-                //y region check
-                if (y + rgn.Height > Bounds.Height)
-                    rgn.Height = ydif;
-                else
-                    rgn.Height = (rgn.Height > Bounds.Height ? Bounds.Height : rgn.Height);
-
-                Spritebatch.Draw(Texture, new Vector2(Bounds.X + pos.X, Bounds.Y + pos.Y), rgn, curColor);
-
-                pos.X += (MonoSpace ? MaxCharWidth : rgn.Width) + Tracking.X;
-                maxH = (int)MathHelper.Max(maxH, rgn.Height);
+                pos.X += (monospace ? MaxCharWidth : rgn.Width) + Tracking.X;
+                maxH = MathHelper.Max(maxH, rgn.Height);
             }
         }
 
@@ -330,91 +285,54 @@ namespace Takai.Graphics
         /// <summary>
         /// Measure a substring for its size in pixels
         /// </summary>
-        /// <param name="String">The string to measure</param>
-        /// <param name="StartIndex">The zero-based start index in the string</param>
-        /// <param name="Length">The length of the sub string, use -1 for the entire string</param>
+        /// <param name="text">The string to measure</param>
+        /// <param name="startIndex">The zero-based start index in the string</param>
+        /// <param name="length">The length of the sub string, use -1 for the entire string</param>
         /// <returns>The length of the string in pixels</returns>
         /// <remarks>Characters not in the font are ignored, escape characters are ignored aswell</remarks>
-        public Vector2 MeasureString(string String, int StartIndex, int Length)
+        public Vector2 MeasureString(string text, int startIndex, int length)
         {
             Vector2 pos = Vector2.Zero;
             int nW = 0, nH = 0;
 
-            int start = GetStart(String, StartIndex);
+            int start = startIndex;
 
-            int len = Length > String.Length ? String.Length : Length == -1 ? String.Length : Length;
-            for (int i = 0; i + start < String.Length && i < len; ++i)
+            length = (length == -1 ? text.Length : MathHelper.Min(text.Length, length));
+            for (int i = start; i < length; ++i)
             {
-                if (String[i] == '\n')
+                if (text[i] == '\n')
                 {
-                    nW = 0;
                     pos.Y += nH + Tracking.Y;
+                    nW = 0;
                     nH = 0;
                     continue;
                 }
-                else if (String[i] == '`') //colors
+                else if (text[i] == '`' && i + 1 < length) //colors (`RGB (hex)) and `x to end
                 {
-                    if (String.Length > i + start + 1 && String[i + start + 1] == '`')
+                    if (text[i + 1] == 'x')
                     {
-                        i++;
-                        len += 1;
-                    }
-                    else if (String.Length > i + start + 1 && String[i + start + 1] == '`')
-                    {
-                        i++;
-                        len += 2;
+                        length += 2;
+                        ++i;
                         continue;
                     }
-                    else if (String.Length > i + start + 3)
+                    else if (i + 3 < text.Length)
                     {
-                        i += 1;
-                        len += 4;
+                        i += 3;
+                        length += 4;
                         continue;
                     }
                 }
 
-                if (Characters.TryGetValue(String[i], out var rgn))
+                if (Characters.TryGetValue(text[i], out var rgn))
                 {
                     nW += rgn.Width;
-                    nH = (int)MathHelper.Max(nH, rgn.Height);
+                    nH = MathHelper.Max(nH, rgn.Height);
                 }
 
                 pos.X = (int)MathHelper.Max(pos.X, nW);
             }
             pos.Y += nH + Tracking.Y;
             return pos;
-        }
-
-        /// <summary>
-        /// Get the start position, ignoring special chars
-        /// </summary>
-        /// <param name="String">The string to check</param>
-        /// <param name="StartIndex">The suppposed start</param>
-        /// <returns>The actual start position</returns>
-        protected int GetStart(string String, int StartIndex)
-        {
-            int start = StartIndex < 0 ? 0 : StartIndex;
-            for (int i = 0; i < StartIndex; ++i) //calculate for escape chars
-            {
-                if (String[i] == '\n')
-                    start++;
-                else if (String[i] == '`')
-                {
-                    if (String.Length > i + 1 && String[i + 1] == '`')
-                        start += 1;
-                    else if (String.Length > i + 1 && String[i + 1] == 'x')
-                    {
-                        start += 2;
-                        i++;
-                    }
-                    else if (String.Length > i + 3)
-                    {
-                        start += 4;
-                        i += 3;
-                    }
-                }
-            }
-            return start;
         }
 
         #endregion

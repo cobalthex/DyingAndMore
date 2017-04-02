@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -13,6 +12,7 @@ namespace Takai.Data
 {
     /// <summary>
     /// This member/object should be serizlied with the specified method
+    /// If the method is an instance method, called in the context of the parent object (when available)
     /// </summary>
     [AttributeUsage(AttributeTargets.All)]
     [System.Runtime.InteropServices.ComVisible(true)]
@@ -20,9 +20,9 @@ namespace Takai.Data
     {
         internal MethodInfo deserialize;
 
-        public CustomDeserializeAttribute(Type Type, string MethodName)
+        public CustomDeserializeAttribute(Type type, string methodName)
         {
-            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+            var method = type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
             deserialize = method;
         }
     }
@@ -41,12 +41,12 @@ namespace Takai.Data
         /// <summary>
         /// Create a derived type serializer
         /// </summary>
-        /// <param name="Type">The object to look in for the serialize method</param>
-        /// <param name="MethodName">The name of the method to search for (Must be non-static, can be public or non public)</param>
+        /// <param name="type">The object to look in for the serialize method</param>
+        /// <param name="methodName">The name of the method to search for (Must be non-static, can be public or non public)</param>
         /// <remarks>format: Dictionary&lt;string, object&gt;(object Source)</remarks>
-        public DerivedTypeDeserializeAttribute(Type Type, string MethodName)
+        public DerivedTypeDeserializeAttribute(Type type, string methodName)
         {
-            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            var method = type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             deserialize = method;
         }
     }
@@ -57,21 +57,21 @@ namespace Takai.Data
         private static readonly MethodInfo ToListMethod = typeof(Enumerable).GetMethod("ToList");
         private static readonly MethodInfo ToArrayMethod = typeof(Enumerable).GetMethod("ToArray");
 
-        public static long GetStreamOffset(StreamReader Stream)
+        public static long GetStreamOffset(StreamReader reader)
         {
-            int charPos = (int)Stream.GetType().InvokeMember("charPos",
+            int charPos = (int)reader.GetType().InvokeMember("charPos",
                             BindingFlags.DeclaredOnly |
                             BindingFlags.Public | BindingFlags.NonPublic |
                             BindingFlags.Instance | BindingFlags.GetField,
-                            null, Stream, null);
+                            null, reader, null);
 
-            int charLen = (int)Stream.GetType().InvokeMember("charLen",
+            int charLen = (int)reader.GetType().InvokeMember("charLen",
                             BindingFlags.DeclaredOnly |
                             BindingFlags.Public | BindingFlags.NonPublic |
                             BindingFlags.Instance | BindingFlags.GetField,
-                            null, Stream, null);
+                            null, reader, null);
 
-            return Stream.BaseStream.Position - charLen + charPos;
+            return reader.BaseStream.Position - charLen + charPos;
         }
 
         private static string ExceptString(string BaseExceptionMessage, StreamReader Stream)
@@ -80,98 +80,104 @@ namespace Takai.Data
             catch { return BaseExceptionMessage; }
         }
 
+        public static object TextDeserialize(string file)
+        {
+            using (var reader = new StreamReader(file))
+                return TextDeserialize(reader);
+        }
+
         /// <summary>
         /// Deserialize a stream into an object (only reads the first object)
         /// </summary>
-        /// <param name="Stream">The stream to read from</param>
+        /// <param name="reader">The stream to read from</param>
         /// <returns>The object created</returns>
-        public static object TextDeserialize(StreamReader Stream)
+        public static object TextDeserialize(StreamReader reader)
         {
-            SkipIgnored(Stream);
+            SkipIgnored(reader);
 
-            if (Stream.EndOfStream)
+            if (reader.EndOfStream)
                 return null;
 
-            var ch = Stream.Peek();
+            var ch = reader.Peek();
 
             //read dictionary
             if (ch == '{')
             {
-                Stream.Read(); //skip {
-                SkipIgnored(Stream);
+                reader.Read(); //skip {
+                SkipIgnored(reader);
 
                 var dict = new Dictionary<string, object>(CaseSensitiveMembers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
 
-                while ((ch = Stream.Peek()) != -1 && ch != '}')
+                while ((ch = reader.Peek()) != -1 && ch != '}')
                 {
                     var key = new StringBuilder();
-                    while ((ch = Stream.Peek()) != ':')
+                    while ((ch = reader.Peek()) != ':')
                     {
                         if (ch == -1)
-                            throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected '}' to close object", Stream));
+                            throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected '}' to close object", reader));
 
                         if (ch == ';' && key.Length == 0)
                         {
-                            Stream.Read();
+                            reader.Read();
                             break;
                         }
 
-                        key.Append((char)Stream.Read());
+                        key.Append((char)reader.Read());
                     }
 
-                    if (Stream.Read() == -1)
-                        throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read object", Stream));
+                    if (reader.Read() == -1)
+                        throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read object", reader));
 
-                    var value = TextDeserialize(Stream);
+                    var value = TextDeserialize(reader);
                     dict[key.ToString().TrimEnd()] = value;
 
-                    SkipIgnored(Stream);
+                    SkipIgnored(reader);
 
-                    if ((ch = Stream.Peek()) == -1)
-                        throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected '}' to close object", Stream));
+                    if ((ch = reader.Peek()) == -1)
+                        throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected '}' to close object", reader));
 
                     if (ch == ';')
                     {
-                        Stream.Read(); //skip ;
-                        SkipIgnored(Stream);
+                        reader.Read(); //skip ;
+                        SkipIgnored(reader);
                     }
                     else if (ch != '}')
-                        throw new InvalidDataException(ExceptString("Unexpected token. Expected ';' or '}' while trying to read object", Stream));
+                        throw new InvalidDataException(ExceptString("Unexpected token. Expected ';' or '}' while trying to read object", reader));
                 }
 
-                Stream.Read();
+                reader.Read();
                 return dict;
             }
 
             //read list
             if (ch == '[')
             {
-                Stream.Read(); //skip [
-                SkipIgnored(Stream);
+                reader.Read(); //skip [
+                SkipIgnored(reader);
 
                 var values = new List<object>();
-                while (!Stream.EndOfStream && Stream.Peek() != ']')
+                while (!reader.EndOfStream && reader.Peek() != ']')
                 {
-                    if ((ch = Stream.Peek()) == ';')
+                    if ((ch = reader.Peek()) == ';')
                     {
-                        Stream.Read(); //skip ;
-                        SkipIgnored(Stream);
+                        reader.Read(); //skip ;
+                        SkipIgnored(reader);
 
-                        if (Stream.Peek() == ';')
-                            throw new InvalidDataException(ExceptString("Unexpected ';' in list (missing value)", Stream));
+                        if (reader.Peek() == ';')
+                            throw new InvalidDataException(ExceptString("Unexpected ';' in list (missing value)", reader));
 
                         continue;
                     }
 
                     if (ch == -1)
-                        throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read list", Stream));
+                        throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read list", reader));
 
-                    values.Add(TextDeserialize(Stream));
-                    SkipIgnored(Stream);
+                    values.Add(TextDeserialize(reader));
+                    SkipIgnored(reader);
                 }
 
-                if (Stream.Read() == -1) //skip ]
-                    throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected ']' to close list", Stream));
+                if (reader.Read() == -1) //skip ]
+                    throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected ']' to close list", reader));
 
                 return values;
             }
@@ -180,16 +186,17 @@ namespace Takai.Data
                 throw new NotImplementedException("File references are not currently implemented");
 
             if (ch == '"' || ch == '\'')
-                return ReadString(Stream);
+                return ReadString(reader);
 
             string word;
-            if (ch == '-' || ch == '+' || ch == '.')
-                word = (char)Stream.Read() + ReadWord(Stream);
-            else
-                word = ReadWord(Stream);
 
-            if (word.Length > 0 && ("-+.".Contains(word[0]) || char.IsDigit(word[0])) && Stream.Peek() == '.') //maybe handle ,
-                word += (char)Stream.Read() + ReadWord(Stream);
+            if (ch == '-' || ch == '+' || ch == '.')
+                word = (char)reader.Read() + ReadWord(reader);
+            else
+                word = ReadWord(reader);
+
+            if (word.Length > 0 && ("-+.".Contains(word[0]) || char.IsDigit(word[0])) && reader.Peek() == '.') //maybe handle ,
+                word += (char)reader.Read() + ReadWord(reader);
 
             if (word.ToLower() == "null")
                 return null;
@@ -205,60 +212,60 @@ namespace Takai.Data
 
             if (RegisteredTypes.TryGetValue(word, out var type))
             {
-                SkipIgnored(Stream);
+                SkipIgnored(reader);
 
                 if (type.IsEnum)
                 {
-                    if (Stream.Read() != '[')
-                        throw new InvalidDataException(ExceptString($"Expected a '[' when reading enum value EnumType[Key1; Key2]) while attempting to read '{word}'", Stream));
+                    if (reader.Read() != '[')
+                        throw new InvalidDataException(ExceptString($"Expected a '[' when reading enum value EnumType[Key1; Key2]) while attempting to read '{word}'", reader));
 
-                    SkipIgnored(Stream);
+                    SkipIgnored(reader);
 
                     var valuesCount = 0;
                     UInt64 values = 0;
 
-                    while (!Stream.EndOfStream && Stream.Peek() != ']')
+                    while (!reader.EndOfStream && reader.Peek() != ']')
                     {
-                        if ((ch = Stream.Peek()) == ';')
+                        if ((ch = reader.Peek()) == ';')
                         {
-                            Stream.Read(); //skip ;
-                            SkipIgnored(Stream);
+                            reader.Read(); //skip ;
+                            SkipIgnored(reader);
 
-                            if (Stream.Peek() == ';')
-                                throw new InvalidDataException(ExceptString("Unexpected ';' in enum (missing value)", Stream));
+                            if (reader.Peek() == ';')
+                                throw new InvalidDataException(ExceptString("Unexpected ';' in enum (missing value)", reader));
 
                             continue;
                         }
 
                         if (ch == -1)
-                            throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read enum", Stream));
+                            throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read enum", reader));
 
-                        var value = ReadWord(Stream);
+                        var value = ReadWord(reader);
                         values |= Convert.ToUInt64(Enum.Parse(type, value));
                         ++valuesCount;
 
-                        SkipIgnored(Stream);
+                        SkipIgnored(reader);
                     }
 
-                    if (Stream.Read() == -1) //skip ]
-                        throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected ']' to close enum", Stream));
+                    if (reader.Read() == -1) //skip ]
+                        throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected ']' to close enum", reader));
 
                     if (valuesCount == 0)
-                        throw new ArgumentOutOfRangeException(ExceptString("Expected at least one enum value", Stream));
+                        throw new ArgumentOutOfRangeException(ExceptString("Expected at least one enum value", reader));
 
                     if (valuesCount > 1 && !Attribute.IsDefined(type, typeof(FlagsAttribute), true))
-                        throw new ArgumentOutOfRangeException(ExceptString($"{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", Stream));
+                        throw new ArgumentOutOfRangeException(ExceptString($"{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", reader));
 
                     return Enum.ToObject(type, values);
                 }
 
                 //read object
-                if (Stream.Peek() != '{')
-                    throw new InvalidDataException(ExceptString($"Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", Stream));
+                if (reader.Peek() != '{')
+                    throw new InvalidDataException(ExceptString($"Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", reader));
 
-                var dict = TextDeserialize(Stream) as Dictionary<string, object>;
+                var dict = TextDeserialize(reader) as Dictionary<string, object>;
                 if (dict == null)
-                    throw new InvalidDataException(ExceptString($"Expected an object definition when reading type '{word}' (Type {{ }})", Stream));
+                    throw new InvalidDataException(ExceptString($"Expected an object definition when reading type '{word}' (Type {{ }})", reader));
 
                 try
                 {
@@ -266,12 +273,12 @@ namespace Takai.Data
                 }
                 catch (Exception expt)
                 {
-                    expt.Data.Add("Offset", GetStreamOffset(Stream));
+                    expt.Data.Add("Offset", GetStreamOffset(reader));
                     throw expt;
                 }
             }
 
-            throw new NotSupportedException(ExceptString($"Unknown identifier: '{word}'", Stream));
+            throw new NotSupportedException(ExceptString($"Unknown identifier: '{word}'", reader));
         }
 
         public static object ParseDictionary(Type DestType, Dictionary<string, object> Dict)
@@ -294,7 +301,7 @@ namespace Takai.Data
                         {
                             var customDeserial = field.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
                             if (customDeserial != null)
-                                return customDeserial.Invoke(null, new[] { pair.Value });
+                                return customDeserial.Invoke(customDeserial.IsStatic ? null : obj, new[] { pair.Value });
 
                             var cast = pair.Value == null ? null : CastType(field.FieldType, pair.Value);
                             field.SetValue(obj, cast);
@@ -309,10 +316,17 @@ namespace Takai.Data
                             {
                                 var customDeserial = prop.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
                                 if (customDeserial != null)
-                                    return customDeserial.Invoke(null, new[] { pair.Value });
-
-                                var cast = pair.Value == null ? null : CastType(prop.PropertyType, pair.Value);
-                                prop.SetValue(obj, cast);
+                                {
+                                    if (customDeserial.IsStatic)
+                                        prop.SetValue(obj, customDeserial.Invoke(null, new[] { pair.Value }));
+                                    else
+                                        customDeserial.Invoke(obj, new[] { pair.Value });
+                                }
+                                else
+                                {
+                                    var cast = pair.Value == null ? null : CastType(prop.PropertyType, pair.Value);
+                                    prop.SetValue(obj, cast);
+                                }
                             }
                         }
                         else
@@ -408,7 +422,7 @@ namespace Takai.Data
 
             var customDeserial = DestType.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
             if (customDeserial != null)
-                return customDeserial.Invoke(null, new[] { Source });
+                return customDeserial.Invoke(null, new[] { Source }); //will throw if customDeserial is not static
 
             if (DestType.IsAssignableFrom(sourceType))
                 return Source;
