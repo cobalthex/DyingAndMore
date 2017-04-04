@@ -212,7 +212,7 @@ namespace Takai.UI
         /// Can this element be focused
         /// </summary>
         [Data.NonSerialized]
-        public virtual bool CanFocus { get => true; }// OnClick != null; }
+        public virtual bool CanFocus { get => OnClick != null; }
 
         /// <summary>
         /// The click handler. If null, this item is not clickable/focusable (Does not apply to children)
@@ -413,7 +413,7 @@ namespace Takai.UI
                 return;
             }
 
-            /* focus in the following order
+            /* focus in the following order (13 will wrap around back to 1)
 
             1
                 2
@@ -434,6 +434,7 @@ namespace Takai.UI
             var next = this;
             while (next != null)
             {
+                var current = next;
                 foreach (var child in next.children)
                 {
                     if (child.CanFocus)
@@ -449,6 +450,9 @@ namespace Takai.UI
                     }
                 }
 
+                if (current != next)
+                    continue;
+
                 while (next.parent != null)
                 {
                     var index = next.Parent.Children.IndexOf(next) + 1;
@@ -458,8 +462,7 @@ namespace Takai.UI
                         if (next.CanFocus)
                         {
                             next.HasFocus = true;
-                            next = null;
-                            break;
+                            return;
                         }
                     }
                     else
@@ -617,6 +620,11 @@ namespace Takai.UI
                 else if (autoSize is bool doAutoSize)
                     AutoSize();
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()}: \"{Name ?? "(No name)"}\"";
         }
     }
 }
