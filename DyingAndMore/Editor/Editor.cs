@@ -61,12 +61,13 @@ namespace DyingAndMore.Editor
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
-            uiContainer = new Takai.UI.Element();
+            uiContainer = new Takai.UI.Element() { Name = "container" };
 
             TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap | GestureType.FreeDrag;
 
             renderSettingsConsole = new Takai.UI.List()
             {
+                Name = "RenderSettings",
                 Position = new Vector2(20, 0),
                 HorizontalAlignment = Takai.UI.Alignment.Start,
                 VerticalAlignment = Takai.UI.Alignment.Middle,
@@ -75,21 +76,22 @@ namespace DyingAndMore.Editor
 
             if (Map == null)
             {
-                uiContainer = (Takai.UI.Element)Takai.Data.Serializer.TextDeserialize("test.ui.tk");
-                void SetFont(Takai.UI.Element zz)
-                {
-                    zz.Font = LargeFont;
-                    foreach (var child in zz.Children)
-                        SetFont(child);
-                    if (!(zz is Takai.UI.TextBox))
-                        zz.AutoSize();
-                }
-                SetFont(uiContainer);
-                Takai.Data.Serializer.TextSerialize("out.ui.tk", uiContainer);
-                return;
+                //uiContainer = (Takai.UI.Element)Takai.Data.Serializer.TextDeserialize("test.ui.tk");
+                //void SetFont(Takai.UI.Element zz)
+                //{
+                //    zz.Font = LargeFont;
+                //    foreach (var child in zz.Children)
+                //        SetFont(child);
+                //    if (!(zz is Takai.UI.TextBox))
+                //        zz.AutoSize();
+                //}
+                //SetFont(uiContainer);
+                //Takai.Data.Serializer.TextSerialize("out.ui.tk", uiContainer);
+                //return;
 
                 var list = new Takai.UI.List()
                 {
+                    Name = "Menu",
                     HorizontalAlignment = Takai.UI.Alignment.Middle,
                     VerticalAlignment = Takai.UI.Alignment.Middle,
                     Size = GraphicsDevice.Viewport.Bounds.Size.ToVector2()
@@ -98,6 +100,7 @@ namespace DyingAndMore.Editor
                 Takai.UI.Element elem;
                 list.AddChild(elem = new Takai.UI.Element()
                 {
+                    Name = "Title",
                     Text = "No map loaded",
                     Font = LargeFont,
                     HorizontalAlignment = Takai.UI.Alignment.Middle
@@ -106,6 +109,7 @@ namespace DyingAndMore.Editor
 
                 list.AddChild(elem = new Takai.UI.Element()
                 {
+                    Name = "New",
                     Text = "Press Ctrl+N to create a new map",
                     Font = SmallFont,
                     HorizontalAlignment = Takai.UI.Alignment.Middle
@@ -114,6 +118,7 @@ namespace DyingAndMore.Editor
 
                 list.AddChild(elem = new Takai.UI.Element()
                 {
+                    Name = "Open",
                     Text = "or Ctrl+O to open a map",
                     Font = SmallFont,
                     HorizontalAlignment = Takai.UI.Alignment.Middle
@@ -123,6 +128,7 @@ namespace DyingAndMore.Editor
 
                 list.AddChild(elem = new Takai.UI.TextBox()
                 {
+                    Name = "Textbox",
                     Text = "Test",
                     Size = new Vector2(200, 30),
                     Font = SmallFont,
@@ -419,7 +425,13 @@ namespace DyingAndMore.Editor
         {
             if (Map == null)
             {
-                GraphicsDevice.Clear(new Color(24, 24, 24)); //todo: replace w/ graphic maybe
+                var t = time.TotalGameTime.TotalSeconds;
+                //GraphicsDevice.Clear(new Color(24, 24, 24)); //todo: replace w/ graphic maybe
+                GraphicsDevice.Clear(new Color(
+                   (float)System.Math.Sin(0.3f * t + 0) * 0.25f + 0.75f,
+                   (float)System.Math.Sin(0.2f * t + 2) * 0.25f + 0.75f,
+                   (float)System.Math.Sin(0.1f * t + 4) * 0.25f + 0.75f
+                ));
 
                 sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
                 uiContainer.Draw(sbatch);
