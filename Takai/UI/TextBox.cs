@@ -44,6 +44,28 @@ namespace Takai.UI
             }
         }
 
+        public TextBox()
+        {
+            ignoreSpaceKey = true;
+        }
+
+        protected override void BeforePress(ClickEventArgs args)
+        {
+            var x = args.position.X + ScrollPos;
+            var width = 0;
+            for (int i = 0; i < Text.Length; ++i)
+            {
+                var cw = (int)Font.MeasureString(Text, i, 1).X;
+                if (width + (cw / 2) > x)
+                {
+                    Caret = i;
+                    return;
+                }
+                width += cw;
+            }
+            Caret = Text.Length;
+        }
+
         public override bool Update(GameTime time)
         {
             if (HasFocus)
@@ -66,7 +88,7 @@ namespace Takai.UI
                     else if (AllowSpaces && key == Keys.Space)
                         InsertAtCaret(' ');
 
-                    else if (key >= Keys.A && key < Keys.Z)
+                    else if (key >= Keys.A && key <= Keys.Z)
                     {
                         if (InputState.IsMod(KeyMod.Shift))
                             InsertAtCaret((char)((key - Keys.A) + 'A'));
@@ -74,10 +96,10 @@ namespace Takai.UI
                             InsertAtCaret((char)((key - Keys.A) + 'a'));
                     }
 
-                    else if (key >= Keys.D0 && key < Keys.D9)
+                    else if (key >= Keys.D0 && key <= Keys.D9)
                         InsertAtCaret((char)((key - Keys.D0) + '0'));
 
-                    else if (key >= Keys.NumPad0 && key < Keys.NumPad9)
+                    else if (key >= Keys.NumPad0 && key <= Keys.NumPad9)
                         InsertAtCaret((char)((key - Keys.NumPad0) + '0'));
                 }
             }
