@@ -6,6 +6,10 @@ Features to add in the future
 0. Rewrite asset manager to provide mark and sweep ability and to simply design.
 	- Provide ability to pass in folder to search to have for eg. map relative files
 
+0. DefManager that can load/cache defs
+
+0. Unique/aggregate definitions - All Entities of type Foo reference Foo
+
 0. Invisibility
 
 0. Ambient sounds and sound scenery
@@ -22,8 +26,4 @@ Features to add in the future
 
 0. Trails that use triangle strips
 
-0. Triggers
-	0. Activation values (triggers set values or vise versa) - affect door/etc positions
-	0. activation groups (all doors part of group open when activated)
-
-0. Radial menus for editor. Creates own state in state manager (hides on mouse/touch release) - automatically displays n items
+0. Radial menus for editor

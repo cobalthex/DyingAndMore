@@ -8,14 +8,24 @@ using System;
 namespace Takai.Graphics
 {
     [Data.DesignerCreatable]
+    [Data.CustomDeserialize(typeof(BitmapFont), "DeserializeFont")]
     public class BitmapFont : System.IDisposable
     {
-        #region Data
-
         /// <summary>
         /// All of the available characters in the font
         /// </summary>
-        public System.Collections.Generic.Dictionary<char, Rectangle> Characters { get; protected set; }
+        public System.Collections.Generic.Dictionary<char, Rectangle> Characters
+        {
+            get => characters;
+            protected set
+            {
+                characters = value;
+                MaxCharWidth = 0;
+                foreach (var @char in characters)
+                    MaxCharWidth = MathHelper.Max(MaxCharWidth, @char.Value.Width);
+            }
+        }
+        private System.Collections.Generic.Dictionary<char, Rectangle> characters;
 
         /// <summary>
         /// The source texture holding all of the character images
@@ -32,9 +42,13 @@ namespace Takai.Graphics
         [Data.NonSerialized]
         public int MaxCharWidth { get; protected set; }
 
-        #endregion
+        private static object DeserializeFont(object transform)
+        {
+            if (transform is string file)
+                return AssetManager.Load<BitmapFont>(file);
 
-        #region Loading
+            return Data.Serializer.DefaultAction;
+        }
 
         /// <summary>
         /// Load a bitmap font from a stream
@@ -54,7 +68,7 @@ namespace Takai.Graphics
             int x, y, w, h; char c;
             read.Read(block, 0, 4);
             int len = BitConverter.ToInt32(block, 0);
-            font.Characters = new System.Collections.Generic.Dictionary<char, Rectangle>(len);
+            font.characters = new System.Collections.Generic.Dictionary<char, Rectangle>(len);
             font.MaxCharWidth = 0;
             for (int i = 0; i < len; ++i)
             {
@@ -68,7 +82,7 @@ namespace Takai.Graphics
                 read.Read(block, 0, 4); w = BitConverter.ToInt32(block, 0);
                 read.Read(block, 0, 4); h = BitConverter.ToInt32(block, 0);
                 font.MaxCharWidth = MathHelper.Max(font.MaxCharWidth, w);
-                font.Characters.Add(c, new Rectangle(x, y, w, h));
+                font.characters.Add(c, new Rectangle(x, y, w, h));
             }
             block = new byte[8];
             read.Read(block, 0, 8);
@@ -102,10 +116,6 @@ namespace Takai.Graphics
             Characters.Clear();
             GC.SuppressFinalize(this);
         }
-
-        #endregion
-
-        #region Drawing
 
         /// <summary>
         /// Draw a string
@@ -213,7 +223,7 @@ namespace Takai.Graphics
             int start = startIndex;
 
             length = (length == -1 ? text.Length : MathHelper.Min(text.Length, length));
-            for (int i = start; i < length; ++i)
+            for (int i = start; i < start + length; ++i)
             {
                 char ch = text[i];
 
@@ -267,10 +277,6 @@ namespace Takai.Graphics
             }
         }
 
-        #endregion
-
-        #region Helpers
-
         /// <summary>
         /// Measure a string for its size in pixels
         /// </summary>
@@ -298,7 +304,7 @@ namespace Takai.Graphics
             int start = startIndex;
 
             length = (length == -1 ? text.Length : MathHelper.Min(text.Length, length));
-            for (int i = start; i < length; ++i)
+            for (int i = start; i < start + length; ++i)
             {
                 if (text[i] == '\n')
                 {
@@ -334,7 +340,5 @@ namespace Takai.Graphics
             pos.Y += nH + Tracking.Y;
             return pos;
         }
-
-        #endregion
     }
 }

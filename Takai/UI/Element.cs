@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
@@ -54,7 +55,10 @@ namespace Takai.UI
         private string text = "";
         protected Vector2 textSize;
 
-        [Data.NonSerialized]
+        /// <summary>
+        /// The font to draw the text of this element with.
+        /// Optional if text is null
+        /// </summary>
         public Graphics.BitmapFont Font
         {
             get => font;
@@ -219,6 +223,19 @@ namespace Takai.UI
         /// </summary>
         [Data.NonSerialized]
         public event ClickHandler OnClick = null;
+
+        /// <summary>
+        /// Disable the default behavior of the tab key
+        /// </summary>
+        protected bool ignoreTabKey = false;
+        /// <summary>
+        /// Disable the default behavior of the space key
+        /// </summary>
+        protected bool ignoreSpaceKey = false;
+        /// <summary>
+        /// Disable the default behavior of the enter key
+        /// </summary>
+        protected bool ignoreEnterKey = false;
 
         /// <summary>
         /// The input must start inside the element to register a click
@@ -468,15 +485,56 @@ namespace Takai.UI
                     else
                         next = next.parent;
                 }
+
+                if (next.CanFocus)
+                {
+                    next.HasFocus = true;
+                    break;
+                }
             }
         }
 
         /// <summary>
-        /// Focus the previous element, using the reverse order of FocusNext
+        /// Focus the previous element, using the reverse order of FocusNext()
         /// </summary>
         protected void FocusPrevious()
         {
+            if (!HasFocus)
+            {
+                FindFocusedElement()?.FocusPrevious();
+                return;
+            }
 
+            var prev = this;
+
+            while (true)
+            {
+                if (prev.parent == null)
+                {
+                    while (prev.children.Count > 0)
+                        prev = prev.children[prev.children.Count - 1];
+                }
+                else
+                {
+                    var index = prev.Parent.Children.IndexOf(prev) - 1;
+                    if (index >= 0)
+                    {
+                        prev = prev.Parent.Children[index];
+
+                        while (prev.children.Count > 0)
+                            prev = prev.children[prev.children.Count - 1];
+                    }
+                    else
+                        prev = prev.parent;
+                }
+
+
+                if (prev.CanFocus)
+                {
+                    prev.HasFocus = true;
+                    break;
+                }
+            }
         }
 
         /// <summary>
@@ -507,14 +565,42 @@ namespace Takai.UI
         }
 
         /// <summary>
+        /// Find an element by its name
+        /// </summary>
+        /// <param name="name">The name of the element to search for</param>
+        /// <returns>The first element found or null if no element found with the specified name</returns>
+        public Element FindElementByName(string name, bool caseSensitive = true)
+        {
+            var parent = this;
+            while (parent.Parent != null)
+                parent = parent.Parent;
+
+            var next = new Stack<Element>();
+            next.Push(parent);
+
+            while (next.Count > 0)
+            {
+                var elem = next.Pop();
+                if (elem.Name.Equals(name, caseSensitive ? System.StringComparison.Ordinal : System.StringComparison.OrdinalIgnoreCase))
+                    return elem;
+
+                foreach (var child in elem.Children)
+                    next.Push(child);
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Add specific behavior before <see cref="OnClick"/> is called. Called by Update()
         /// </summary>
         /// <param name="args">Click event args passed from Update. Forwarded to <see cref="OnClick"/></param>
         protected virtual void BeforeClick(ClickEventArgs args)
         {
             OnClick?.Invoke(this, args);
+            //todo: evaluate removing this and only using event handlers
         }
-
+        protected virtual void BeforePress(ClickEventArgs args) { }
 
         /// <summary>
         /// Update this element
@@ -534,7 +620,7 @@ namespace Takai.UI
 
             if (HasFocus)
             {
-                if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Tab))
+                if (!ignoreTabKey && Input.InputState.IsPress(Keys.Tab))
                 {
                     if (Input.InputState.IsMod(Input.KeyMod.Shift))
                         FocusPrevious();
@@ -542,7 +628,8 @@ namespace Takai.UI
                         FocusNext();
                     return false;
                 }
-                if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Enter))
+                if ((!ignoreEnterKey && Input.InputState.IsPress(Keys.Enter)) ||
+                    (!ignoreSpaceKey && Input.InputState.IsPress(Keys.Space)))
                 {
                     BeforeClick(new ClickEventArgs { position = Vector2.Zero });
                     return false;
@@ -553,6 +640,8 @@ namespace Takai.UI
 
             if (Input.InputState.IsPress(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
             {
+                BeforePress(new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() });
+
                 didPress = true;
                 if (CanFocus)
                 {

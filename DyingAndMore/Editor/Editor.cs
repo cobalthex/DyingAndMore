@@ -56,14 +56,21 @@ namespace DyingAndMore.Editor
             SmallFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UISmall.bfnt");
             LargeFont = Takai.AssetManager.Load<BitmapFont>("Fonts/UILarge.bfnt");
 
-            using (var file = new System.IO.StreamWriter("UISmall.fnt.tk"))
-                Takai.Data.Serializer.TextSerialize(file, DebugFont);
-
             sbatch = new SpriteBatch(GraphicsDevice);
 
-            uiContainer = new Takai.UI.Element() { Name = "container" };
-
             TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap | GestureType.FreeDrag;
+
+            if (Map == null)
+            {
+                uiContainer = (Takai.UI.Element)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NoMap.ui.tk");
+                var openBtn = uiContainer.FindElementByName("Open");
+                openBtn.OnClick += delegate { OpenMap(); };
+            }
+            else
+            {
+                uiContainer = new Takai.UI.Element() { Name = "container" };
+                StartMap();
+            }
 
             renderSettingsConsole = new Takai.UI.List()
             {
@@ -74,74 +81,6 @@ namespace DyingAndMore.Editor
                 Margin = 5
             };
 
-            if (Map == null)
-            {
-                //uiContainer = (Takai.UI.Element)Takai.Data.Serializer.TextDeserialize("test.ui.tk");
-                //void SetFont(Takai.UI.Element zz)
-                //{
-                //    zz.Font = LargeFont;
-                //    foreach (var child in zz.Children)
-                //        SetFont(child);
-                //    if (!(zz is Takai.UI.TextBox))
-                //        zz.AutoSize();
-                //}
-                //SetFont(uiContainer);
-                //Takai.Data.Serializer.TextSerialize("out.ui.tk", uiContainer);
-                //return;
-
-                var list = new Takai.UI.List()
-                {
-                    Name = "Menu",
-                    HorizontalAlignment = Takai.UI.Alignment.Middle,
-                    VerticalAlignment = Takai.UI.Alignment.Middle,
-                    Size = GraphicsDevice.Viewport.Bounds.Size.ToVector2()
-                };
-
-                Takai.UI.Element elem;
-                list.AddChild(elem = new Takai.UI.Element()
-                {
-                    Name = "Title",
-                    Text = "No map loaded",
-                    Font = LargeFont,
-                    HorizontalAlignment = Takai.UI.Alignment.Middle
-                });
-                elem.AutoSize(20);
-
-                list.AddChild(elem = new Takai.UI.Element()
-                {
-                    Name = "New",
-                    Text = "Press Ctrl+N to create a new map",
-                    Font = SmallFont,
-                    HorizontalAlignment = Takai.UI.Alignment.Middle
-                });
-                elem.AutoSize(10);
-
-                list.AddChild(elem = new Takai.UI.Element()
-                {
-                    Name = "Open",
-                    Text = "or Ctrl+O to open a map",
-                    Font = SmallFont,
-                    HorizontalAlignment = Takai.UI.Alignment.Middle
-                });
-                elem.AutoSize(10);
-                elem.OnClick += delegate { OpenMap(); };
-
-                list.AddChild(elem = new Takai.UI.TextBox()
-                {
-                    Name = "Textbox",
-                    Text = "Test",
-                    Size = new Vector2(200, 30),
-                    Font = SmallFont,
-                    HorizontalAlignment = Takai.UI.Alignment.Middle
-                });
-
-                list.AutoSize();
-                uiContainer.AddChild(list);
-
-                Takai.Data.Serializer.TextSerialize("test.ui.tk", uiContainer);
-            }
-            else
-                StartMap();
         }
 
         public override void Unload()
@@ -395,7 +334,7 @@ namespace DyingAndMore.Editor
 
             if (InputState.HasScrolled())
             {
-                var delta = InputState.ScrollDelta() / 1024f;
+                var delta = (Map.ActiveCamera.Scale * InputState.ScrollDelta()) / 1024f;
                 if (InputState.IsButtonDown(Keys.LeftShift))
                 {
                     Map.ActiveCamera.Rotation += delta;
@@ -408,10 +347,9 @@ namespace DyingAndMore.Editor
                     else
                         Map.ActiveCamera.Scale = MathHelper.Clamp(Map.ActiveCamera.Scale, 0.1f, 2f);
                 }
-                //todo: translate to mouse cursor
             }
 
-            Map.ActiveCamera.Scale = MathHelper.Clamp(Map.ActiveCamera.Scale, 0.1f, 10f); //todo: make global and move to some game settings
+            Map.ActiveCamera.Scale = MathHelper.Clamp(Map.ActiveCamera.Scale, 0.1f, 10f); //todo: make ranges global and move to some game settings
             Map.ActiveCamera.Update(time);
             Map.Update(time);
         }
@@ -428,9 +366,9 @@ namespace DyingAndMore.Editor
                 var t = time.TotalGameTime.TotalSeconds;
                 //GraphicsDevice.Clear(new Color(24, 24, 24)); //todo: replace w/ graphic maybe
                 GraphicsDevice.Clear(new Color(
-                   (float)System.Math.Sin(0.3f * t + 0) * 0.25f + 0.75f,
-                   (float)System.Math.Sin(0.2f * t + 2) * 0.25f + 0.75f,
-                   (float)System.Math.Sin(0.1f * t + 4) * 0.25f + 0.75f
+                   (float)System.Math.Sin(0.3f * t + 0) * 0.25f + 0.25f,
+                   (float)System.Math.Sin(0.4f * t + 4) * 0.05f + 0.25f,
+                   (float)System.Math.Sin(0.3f * t + 4) * 0.1f  + 0.25f
                 ));
 
                 sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
