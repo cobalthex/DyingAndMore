@@ -202,7 +202,7 @@ namespace Takai.Data
 
         private static void SerializeMember(StreamWriter Stream, MemberInfo Member, object Value, int IndentLevel)
         {
-            if (Member.GetCustomAttribute<Data.NonSerializedAttribute>() != null)
+            if (Member.GetCustomAttribute<Data.Serializer.IgnoredAttribute>() != null)
                 return;
 
             Indent(Stream, IndentLevel + 1);

@@ -119,7 +119,7 @@ namespace Takai.UI
         /// Center moves down and to the right from the center
         /// End moves in the opposite direction
         /// </summary>
-        [Data.NonSerialized] //use bounds
+        [Data.Serializer.ReadOnly]
         public Vector2 Position
         {
             get => position;
@@ -137,7 +137,7 @@ namespace Takai.UI
         /// <summary>
         /// The size of the element
         /// </summary>
-        [Data.NonSerialized] //use bounds
+        [Data.Serializer.ReadOnly]
         public Vector2 Size
         {
             get => size;
@@ -169,7 +169,7 @@ namespace Takai.UI
         /// <summary>
         /// Bounds relative to the outermost container
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public Rectangle AbsoluteBounds
         {
             get => absoluteBounds;
@@ -215,13 +215,13 @@ namespace Takai.UI
         /// <summary>
         /// Can this element be focused
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public virtual bool CanFocus { get => OnClick != null; }
 
         /// <summary>
         /// The click handler. If null, this item is not clickable/focusable (Does not apply to children)
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public event ClickHandler OnClick = null;
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace Takai.UI
         /// <summary>
         /// Who owns/contains this element
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public Element Parent
         {
             get => parent;
@@ -702,7 +702,9 @@ namespace Takai.UI
 
         protected void DerivedDeserialize(Dictionary<string, object> props)
         {
-            if (props.TryGetValue("AutoSize", out var autoSize))
+            if (props.TryGetValue("AutoSize", out var autoSize) ||
+                !(props.ContainsKey("Bounds") ||
+                  props.ContainsKey("Size")))
             {
                 if (autoSize is int autoSizeValue)
                     AutoSize(autoSizeValue);

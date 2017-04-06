@@ -313,7 +313,7 @@ namespace Takai.Data
                     var field = DestType.GetField(pair.Key, DefaultBindingFlags);
                     if (field != null)
                     {
-                        if (!Attribute.IsDefined(field, typeof(NonSerializedAttribute)))
+                        if (!Attribute.IsDefined(field, typeof(IgnoredAttribute)))
                         {
                             var customDeserial = field.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
                             if (customDeserial != null)
@@ -340,7 +340,7 @@ namespace Takai.Data
                         var prop = DestType.GetProperty(pair.Key, DefaultBindingFlags);
                         if (prop != null)
                         {
-                            if (!Attribute.IsDefined(prop, typeof(NonSerializedAttribute)))
+                            if (!Attribute.IsDefined(prop, typeof(IgnoredAttribute)))
                             {
                                 var customDeserial = prop.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
                                 if (customDeserial != null)

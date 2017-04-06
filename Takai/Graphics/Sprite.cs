@@ -53,7 +53,7 @@ namespace Takai.Graphics
         /// <summary>
         /// The current frame
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public int CurrentFrame
         {
             get
@@ -66,7 +66,7 @@ namespace Takai.Graphics
         /// <summary>
         /// THe next frame
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public int NextFrame
         {
             get
@@ -79,7 +79,7 @@ namespace Takai.Graphics
         /// <summary>
         /// The fractional amount between the current and next frame
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public float FrameDelta
         {
             get
@@ -92,7 +92,7 @@ namespace Takai.Graphics
         /// <summary>
         /// The file that this graphic was loaded from
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public string File { get; set; }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Takai.Graphics
         /// <summary>
         /// Width and height represented as a point
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public Point Size { get { return new Point(Width, Height); } }
 
         protected int framesPerRow;

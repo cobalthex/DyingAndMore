@@ -60,17 +60,16 @@ namespace DyingAndMore.Editor
 
             TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap | GestureType.FreeDrag;
 
+            uiContainer = new Takai.UI.Element();
+
             if (Map == null)
             {
-                uiContainer = (Takai.UI.Element)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NoMap.ui.tk");
+                uiContainer.AddChild((Takai.UI.Element)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NoMap.ui.tk"));
                 var openBtn = uiContainer.FindElementByName("Open");
                 openBtn.OnClick += delegate { OpenMap(); };
             }
             else
-            {
-                uiContainer = new Takai.UI.Element() { Name = "container" };
                 StartMap();
-            }
 
             renderSettingsConsole = new Takai.UI.List()
             {

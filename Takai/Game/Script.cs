@@ -15,7 +15,7 @@ namespace Takai.Game
         /// <summary>
         /// The map this script is running on
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public Map Map { get; set; }
         
         public Script(string name)

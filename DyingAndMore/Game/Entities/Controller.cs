@@ -5,7 +5,7 @@
     /// </summary>
     abstract class Controller
     {
-        [Takai.Data.NonSerialized]
+        [Takai.Data.Serializer.Ignored]
         public Actor actor;
 
         /// <summary>

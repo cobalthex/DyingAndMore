@@ -1,0 +1,24 @@
+List {
+    Margin: 0;
+    Direction: Direction [ Vertical ];
+    HorizontalAlignment: Alignment [ Middle ];
+    VerticalAlignment: Alignment [ Middle ];
+    AutoSize: True;
+    Children: [
+        Element {
+            Text: "Create a New Map";
+            Font: "Fonts/UILarge.bfnt";
+            Color: [255 255 255 255];
+            HorizontalAlignment: Alignment [ Middle ];
+        }
+
+        Element {
+            Text: "Name";
+            HorizontalAlignment: Alignment [ Start ];
+        }
+        TextBox {
+            Name: "name",
+
+        }
+    ];
+}

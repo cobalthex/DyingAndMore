@@ -73,7 +73,7 @@ namespace Takai.Game
         /// Generated at runtime
         /// Primarily used for debugging
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public int Id { get; private set; } = (nextId++);
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Takai.Game
         /// <summary>
         /// The map the entity is in, null if none
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public Map Map { get; internal set; } = null;
 
         /// <summary>
@@ -131,14 +131,14 @@ namespace Takai.Game
                 RadiusSq = value * value;
             }
         }
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public float RadiusSq { get; private set; }
         private float radius = 1;
 
         /// <summary>
         /// the axis aligned bounding box of this entity, based on radius
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public Rectangle AxisAlignedBounds
         {
             get
@@ -210,7 +210,7 @@ namespace Takai.Game
         /// <summary>
         /// The group an entity belongs to
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public Group Group
         {
             get { return group; }

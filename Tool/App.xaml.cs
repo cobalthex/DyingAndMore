@@ -85,7 +85,7 @@ namespace Tool
 
                                 foreach (var mv in ty.Value.GetProperties())
                                 {
-                                    if (mv.PropertyType.GetCustomAttributes(typeof(Takai.Data.NonSerializedAttribute), true).Length > 0 ||
+                                    if (mv.PropertyType.GetCustomAttributes(typeof(Takai.Data.Serializer.IgnoredAttribute), true).Length > 0 ||
                                         typeof(Delegate).IsAssignableFrom(mv.PropertyType))
                                         continue;
 
@@ -102,7 +102,7 @@ namespace Tool
 
                                 foreach (var mv in ty.Value.GetFields())
                                 {
-                                    if (mv.FieldType.GetCustomAttributes(typeof(Takai.Data.NonSerializedAttribute), true).Length > 0 ||
+                                    if (mv.FieldType.GetCustomAttributes(typeof(Takai.Data.Serializer.IgnoredAttribute), true).Length > 0 ||
                                         typeof(Delegate).IsAssignableFrom(mv.FieldType))
                                         continue;
 
