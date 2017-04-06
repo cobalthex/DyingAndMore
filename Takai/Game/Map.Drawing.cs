@@ -47,7 +47,7 @@ namespace Takai.Game
             public bool drawBordersAroundNonDrawingEntities;
         }
 
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public MapRenderSettings renderSettings = new MapRenderSettings()
         {
             drawTiles                           = true,
@@ -96,7 +96,7 @@ namespace Takai.Game
             public int visibleActiveFluids;
             public int visibleDecals;
         }
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public MapProfilingInfo ProfilingInfo { get { return profilingInfo; } }
         protected MapProfilingInfo profilingInfo;
 
@@ -163,7 +163,7 @@ namespace Takai.Game
         private List<Entity> _drawEntsOutlined = new List<Entity>();
         private HashSet<Trigger> _drawTriggers = new HashSet<Trigger>();
 
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public string debugOut;
 
         /// <summary>

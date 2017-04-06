@@ -1,69 +1,29 @@
-Element {
-    Name: "container";
-    Color: [255 255 255 255];
-    HorizontalAlignment: Alignment [ Start ];
-    VerticalAlignment: Alignment [ Start ];
-    Bounds: [0 0 1 1];
-    HasFocus: False;
+List {
+    Margin: 0;
+    Direction: Direction [ Vertical ];
+    HorizontalAlignment: Alignment [ Middle ];
+    VerticalAlignment: Alignment [ Middle ];
+    AutoSize: True;
     Children: [
-        List {
-            Margin: 0;
-            Direction: Direction [ Vertical ];
-            Name: "Menu";
+        Element {
+            Text: "No map loaded";
+            Font: "Fonts/UILarge.bfnt";
             Color: [255 255 255 255];
             HorizontalAlignment: Alignment [ Middle ];
-            VerticalAlignment: Alignment [ Middle ];
-            Bounds: [0 0 374 150];
-            HasFocus: False;
-            Children: [
-                Element {
-                    Name: "Title";
-                    Text: "No map loaded";
-                    Font: "Fonts/UILarge.bfnt";
-                    Color: [255 255 255 255];
-                    HorizontalAlignment: Alignment [ Middle ];
-                    VerticalAlignment: Alignment [ Start ];
-                    Bounds: [0 0 186 52];
-                    HasFocus: False;
-                    Children: [];
-                }
-                Element {
-                    Name: "New";
-                    Text: "Press Ctrl+N to create a new map";
-                    Font: @"Defs/Fonts/UISmall.fnt.tk";
-                    Color: [255 255 255 255];
-                    HorizontalAlignment: Alignment [ Middle ];
-                    VerticalAlignment: Alignment [ Start ];
-                    Bounds: [0 52 374 34];
-                    HasFocus: False;
-                    Children: [];
-                }
-                Element {
-                    Name: "Open";
-                    Text: "or Ctrl+O to open a map";
-                    Font: @"Defs/Fonts/UISmall.fnt.tk";
-                    Color: [255 255 255 255];
-                    HorizontalAlignment: Alignment [ Middle ];
-                    VerticalAlignment: Alignment [ Start ];
-                    Bounds: [0 86 266 34];
-                    HasFocus: False;
-                    Children: [];
-                }
-                TextBox {
-                    ScrollPos: 0;
-                    Caret: 4;
-                    Name: "Textbox";
-                    Text: "Test";
-                    Name: "Textbox";
-                    Font: @"Defs/Fonts/UISmall.fnt.tk";
-                    Color: [255 255 255 255];
-                    HorizontalAlignment: Alignment [ Middle ];
-                    VerticalAlignment: Alignment [ Start ];
-                    Bounds: [0 120 200 30];
-                    HasFocus: True;
-                    Children: [];
-                }
-            ];
+        }
+        Element {
+            Name: "New";
+            Text: "Press Ctrl+N to create a new map";
+            Font: @"Defs/Fonts/UISmall.fnt.tk";
+            Color: [255 255 255 255];
+            HorizontalAlignment: Alignment [ Middle ];
+        }
+        Element {
+            Name: "Open";
+            Text: "or Ctrl+O to open a map";
+            Font: @"Defs/Fonts/UISmall.fnt.tk";
+            Color: [255 255 255 255];
+            HorizontalAlignment: Alignment [ Middle ];
         }
     ];
 }

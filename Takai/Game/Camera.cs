@@ -23,7 +23,7 @@ namespace Takai.Game
         /// The current position of the camera, used for smooth movement
         /// Moves towards <see cref="Position"/>
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public Vector2 ActualPosition { get; protected set; } = Vector2.Zero;
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Takai.Game
         /// <summary>
         /// The visible (AABB) region of the map that this camera encompasses
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public Rectangle VisibleRegion
         {
             get
@@ -105,7 +105,7 @@ namespace Takai.Game
         /// Calculated from Position, offset, Zoom, and Angle
         /// </summary>
         /// <remarks>Setting transform will set position, scale and angle; and offset to zero</remarks>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public Matrix Transform
         {
             get

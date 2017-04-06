@@ -17,6 +17,8 @@ namespace Takai.UI
         /// </summary>
         bool AllowSpecialCharacters { get; set; } = true;
 
+        //todo: convert to AllowedCharacters
+
         /// <summary>
         /// The maximum number of characters allowed in this textbox
         /// </summary>
@@ -25,11 +27,13 @@ namespace Takai.UI
         /// <summary>
         /// The textbox scrolled position
         /// </summary>
+        [Data.Serializer.Ignored]
         public int ScrollPos { get; set; } = 0;
 
         /// <summary>
         /// The position of the caret. Text is inserted at the caret
         /// </summary>
+        [Data.Serializer.Ignored]
         public int Caret { get; set; } = 0;
 
         public override bool CanFocus => true;
@@ -66,10 +70,21 @@ namespace Takai.UI
             Caret = Text.Length;
         }
 
+        public override void AutoSize(float padding = 0)
+        {
+            Size = new Vector2(
+                200,
+                (Font?.MaxCharHeight ?? 10) + padding
+            );
+        }
+
         public override bool Update(GameTime time)
         {
-            if (HasFocus)
+            if (HasFocus && !(InputState.IsMod(KeyMod.Alt) ||
+                              InputState.IsMod(KeyMod.Control) ||
+                              InputState.IsMod(KeyMod.Windows)))
             {
+
                 var keys = InputState.GetPressedKeys();
                 foreach (var key in keys)
                 {
@@ -80,6 +95,7 @@ namespace Takai.UI
                     {
                         base.Text = Text.Remove(Caret - 1, 1);
                         --Caret;
+                        UpdateScrollPos();
                     }
 
                     else if (key == Keys.Delete && Caret < Text.Length)
@@ -107,6 +123,16 @@ namespace Takai.UI
             return base.Update(time);
         }
 
+        void UpdateScrollPos()
+        {
+            var textWidth = Font.MeasureString(Text, 0, Caret).X;
+
+            if (textWidth < ScrollPos)
+                ScrollPos -= (int)Size.X;
+
+            ScrollPos = (int)MathHelper.Clamp(textWidth, textSize.X - Size.X, 0);
+        }
+
         void InsertAtCaret(char ch)
         {
             if (Text.Length >= MaxLength)
@@ -115,10 +141,7 @@ namespace Takai.UI
             base.Text = Text.Insert(Caret, ch.ToString());
             ++Caret;
 
-            var textWidth = Font.MeasureString(Text, 0, Caret).X;
-            ScrollPos = (int)MathHelper.Clamp(textWidth, textSize.X - Size.X, 0);
-
-            //todo: handle delete (paging)
+            UpdateScrollPos();
         }
 
         public override void Draw(SpriteBatch spriteBatch)

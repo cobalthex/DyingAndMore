@@ -31,18 +31,18 @@ namespace Takai.Game
 
     public partial class Map
     {
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public MapUpdateSettings updateSettings = new MapUpdateSettings();
 
         /// <summary>
         /// How long since this map started (updated every Update()). Affected by <see cref="TimeScale"/>
         /// </summary>
-        [Takai.Data.NonSerialized] //serialized in state
+        [Takai.Data.Serializer.Ignored] //serialized in state
         public TimeSpan ElapsedTime { get; set; } = TimeSpan.Zero;
         /// <summary>
         /// How fast the game is moving (default = 1)
         /// </summary>
-        [Takai.Data.NonSerialized] //serialized in state
+        [Takai.Data.Serializer.Ignored] //serialized in state
         public float TimeScale { get; set; } = 1;
 
         /// <summary>

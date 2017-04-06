@@ -21,8 +21,12 @@ namespace Takai.Graphics
             {
                 characters = value;
                 MaxCharWidth = 0;
+                MaxCharHeight = 0;
                 foreach (var @char in characters)
-                    MaxCharWidth = MathHelper.Max(MaxCharWidth, @char.Value.Width);
+                {
+                    MaxCharWidth  = MathHelper.Max(MaxCharWidth, @char.Value.Width);
+                    MaxCharHeight = MathHelper.Max(MaxCharHeight, @char.Value.Height);
+                }
             }
         }
         private System.Collections.Generic.Dictionary<char, Rectangle> characters;
@@ -37,10 +41,16 @@ namespace Takai.Graphics
         public Point Tracking { get; set; }
 
         /// <summary>
-        /// The maximum width of all characters (for monospacing)
+        /// The maximum width of all characters
         /// </summary>
-        [Data.NonSerialized]
+        [Data.Serializer.Ignored]
         public int MaxCharWidth { get; protected set; }
+
+        /// <summary>
+        /// The maximum height of all characters
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public int MaxCharHeight { get; protected set; }
 
         private static object DeserializeFont(object transform)
         {
@@ -70,6 +80,7 @@ namespace Takai.Graphics
             int len = BitConverter.ToInt32(block, 0);
             font.characters = new System.Collections.Generic.Dictionary<char, Rectangle>(len);
             font.MaxCharWidth = 0;
+            font.MaxCharHeight = 0;
             for (int i = 0; i < len; ++i)
             {
 #if XBOX
@@ -81,7 +92,10 @@ namespace Takai.Graphics
                 read.Read(block, 0, 4); y = BitConverter.ToInt32(block, 0);
                 read.Read(block, 0, 4); w = BitConverter.ToInt32(block, 0);
                 read.Read(block, 0, 4); h = BitConverter.ToInt32(block, 0);
+
                 font.MaxCharWidth = MathHelper.Max(font.MaxCharWidth, w);
+                font.MaxCharHeight = MathHelper.Max(font.MaxCharHeight, h);
+
                 font.characters.Add(c, new Rectangle(x, y, w, h));
             }
             block = new byte[8];
@@ -182,7 +196,7 @@ namespace Takai.Graphics
                 spriteBatch.Draw(Texture, pos, rgn, curColor);
 
                 pos.X += (monospace ? MaxCharWidth : rgn.Width) + Tracking.X;
-                maxH = MathHelper.Max(maxH, rgn.Height);
+                maxH = MathHelper.Max(maxH, rgn.Height); //todo: maybe use MaxCharHeight
             }
 
             return pos - position;

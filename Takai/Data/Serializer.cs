@@ -6,10 +6,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Data
 {
-    [AttributeUsage(AttributeTargets.All, Inherited = true)]
-    [System.Runtime.InteropServices.ComVisible(true)]
-    public class NonSerializedAttribute : Attribute { }
-
     /// <summary>
     /// Allows for custom serializers of specific types
     /// </summary>
@@ -31,6 +27,21 @@ namespace Takai.Data
     /// </summary>
     public static partial class Serializer
     {
+        /// <summary>
+        /// This value should be ignored by the serializer and deserializer
+        /// </summary>
+        [AttributeUsage(AttributeTargets.All, Inherited = true)]
+        [System.Runtime.InteropServices.ComVisible(true)]
+        public class IgnoredAttribute : Attribute { }
+
+        /// <summary>
+        /// This value should not be serialized, but can still be deserialized
+        /// </summary>
+        [AttributeUsage(AttributeTargets.All, Inherited = true)]
+        [System.Runtime.InteropServices.ComVisible(true)]
+        public class ReadOnlyAttribute : Attribute { }
+
+
         public const bool WriteFullTypeNames = false;
         public const bool CaseSensitiveMembers = false;
 
