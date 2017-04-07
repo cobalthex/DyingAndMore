@@ -27,6 +27,7 @@ namespace Takai.Graphics
     /// A graphic animation. Typically synchronized with a map's timer
     /// </summary>
     [Data.DesignerCreatable]
+    [Data.DerivedTypeDeserialize(typeof(Sprite), "DerivedDeserialize")]
     public class Sprite : ICloneable
     {
         /// <summary>
@@ -111,7 +112,6 @@ namespace Takai.Graphics
                     ClipRect = texture.Bounds;
             }
         }
-
         private Texture2D texture;
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace Takai.Graphics
                     framesPerRow = (ClipRect.Width / value);
             }
         }
-        private int width;
+        private int width = 1;
 
         /// <summary>
         /// The height of the graphic (the height of one frame)
@@ -137,15 +137,23 @@ namespace Takai.Graphics
             get { return height; }
             set { height = value; }
         }
-        private int height;
+        private int height = 1;
 
         /// <summary>
         /// Width and height represented as a point
         /// </summary>
-        [Data.Serializer.Ignored]
-        public Point Size { get { return new Point(Width, Height); } }
+        [Data.Serializer.ReadOnly]
+        public Point Size
+        {
+            get => new Point(Width, Height);
+            set
+            {
+                Width = value.X;
+                Height = value.Y;
+            }
+        }
 
-        protected int framesPerRow;
+        protected int framesPerRow = 1;
 
         /// <summary>
         /// The region of the texture to use
@@ -161,7 +169,7 @@ namespace Takai.Graphics
                     framesPerRow = (value.Width / width);
             }
         }
-        private Rectangle clipRect;
+        private Rectangle clipRect = Rectangle.Empty;
 
         /// <summary>
         /// The origin of rotation for drawing
@@ -175,68 +183,69 @@ namespace Takai.Graphics
 
         public Sprite() { }
 
-        public Sprite(Texture2D Texture)
+        public Sprite(Texture2D texture)
             : base()
         {
-            this.Texture = Texture;
-            if (Texture != null)
+            Texture = texture;
+            if (texture != null)
             {
-                File = Texture.Name;
-                Width = Texture.Width;
-                Height = Texture.Height;
-                ClipRect = Texture.Bounds;
+                File = texture.Name;
+                Width = texture.Width;
+                Height = texture.Height;
+                ClipRect = texture.Bounds;
             }
         }
 
-        public Sprite(Texture2D Texture, Rectangle ClipRect)
+        public Sprite(Texture2D texture, Rectangle clipRect)
             : base()
         {
-            this.Texture = Texture;
-            this.Width = ClipRect.Width;
-            this.Height = ClipRect.Height;
-            this.ClipRect = ClipRect;
+            Texture = texture;
+            Width = clipRect.Width;
+            Height = clipRect.Height;
+            ClipRect = clipRect;
         }
 
         public Sprite
         (
-            Texture2D Texture,
-            int Width,
-            int Height,
-            int FrameCount,
-            TimeSpan FrameLength,
-            TweenStyle TweenStyle,
-            bool ShouldLoop)
+            Texture2D texture,
+            int width,
+            int height,
+            int frameCount,
+            TimeSpan frameLength,
+            TweenStyle tweenStyle,
+            bool shouldLoop)
         {
-            this.Texture = Texture;
-            this.Width = Width;
-            this.Height = Height;
-            if (Texture != null)
-                this.ClipRect = Texture.Bounds;
-            this.FrameCount = FrameCount;
-            this.FrameLength = FrameLength;
-            this.Tween = TweenStyle;
-            this.IsLooping = ShouldLoop;
+            Texture = texture;
+            Width = width;
+            Height = height;
+            if (texture != null)
+                ClipRect = texture.Bounds;
+            FrameCount = frameCount;
+            FrameLength = frameLength;
+            Tween = tweenStyle;
+            IsLooping = shouldLoop;
         }
 
         public Sprite
         (
-            Texture2D Texture,
-            int Width,
-            int Height,
-            Rectangle ClipRect,
-            int FrameCount,
-            TimeSpan FrameLength,
-            TweenStyle TweenStyle,
-            bool ShouldLoop)
+            Texture2D texture,
+            int width,
+            int height,
+            Rectangle clipRect,
+            int frameCount,
+            TimeSpan frameLength,
+            TweenStyle tweenStyle,
+            bool shouldLoop)
         {
-            this.Texture = Texture;
-            this.Width = Width;
-            this.Height = Height;
-            this.ClipRect = ClipRect;
-            this.FrameCount = FrameCount;
-            this.FrameLength = FrameLength;
-            this.Tween = TweenStyle;
-            this.IsLooping = ShouldLoop;
+            Texture = texture;
+            Width = width;
+            Height = height;
+            if (texture != null)
+                ClipRect = clipRect;
+            FrameCount = frameCount;
+            FrameLength = frameLength;
+            Tween = tweenStyle;
+            IsLooping = shouldLoop;
         }
 
         public virtual object Clone()
@@ -276,31 +285,31 @@ namespace Takai.Graphics
         /// <summary>
         /// Get the clip rect for a single frame of the image
         /// </summary>
-        /// <param name="Frame">Which frame of the animation to use (No bounds checking)</param>
+        /// <param name="frame">Which frame of the animation to use (No bounds checking)</param>
         /// <returns>The clipping rectangle of the requested frame</returns>
-        public Rectangle GetFrameRect(int Frame)
+        public Rectangle GetFrameRect(int frame)
         {
-            var src = new Rectangle(ClipRect.X + (Frame % framesPerRow) * Width, ClipRect.Y + (Frame / framesPerRow) * Height, Width, Height);
+            var src = new Rectangle(ClipRect.X + (frame % framesPerRow) * Width, ClipRect.Y + (frame / framesPerRow) * Height, Width, Height);
             return Rectangle.Intersect(src, ClipRect);
         }
 
-        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle)
         {
-            Draw(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle, Color.White, ElapsedTime);
+            Draw(spriteBatch, new Rectangle((int)position.X, (int)position.Y, width, height), angle, Color.White, ElapsedTime);
         }
-        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle)
+        public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle)
         {
-            Draw(SpriteBatch, Bounds, Angle, Color.White, ElapsedTime);
-        }
-
-        public void Draw(SpriteBatch SpriteBatch, Vector2 Position, float Angle, Color Color, float Scale = 1)
-        {
-            Draw(SpriteBatch, new Rectangle((int)Position.X, (int)Position.Y, width, height), Angle, Color, ElapsedTime);
+            Draw(spriteBatch, bounds, angle, Color.White, ElapsedTime);
         }
 
-        public void Draw(SpriteBatch SpriteBatch, Rectangle Bounds, float Angle, Color Color, TimeSpan  ElapsedTime)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle, Color color, float scale = 1)
         {
-            var elapsed = (float)(ElapsedTime.TotalSeconds / FrameLength.TotalSeconds);
+            Draw(spriteBatch, new Rectangle((int)position.X, (int)position.Y, width, height), angle, color, ElapsedTime);
+        }
+
+        public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle, Color color, TimeSpan elapsedTime)
+        {
+            var elapsed = (float)(elapsedTime.TotalSeconds / FrameLength.TotalSeconds);
             var cf = IsLooping ? ((int)elapsed % FrameCount) : MathHelper.Clamp((int)elapsed, 0, FrameCount - 1);
             var nf = IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount - 1);
             var fd = elapsed % 1;
@@ -310,20 +319,20 @@ namespace Takai.Graphics
             switch (Tween)
             {
                 case TweenStyle.None:
-                    DrawTexture(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color);
+                    DrawTexture(spriteBatch, bounds, GetFrameRect(cf), angle, color);
                     break;
 
                 case TweenStyle.Overlap:
                     //todo: verify works
                     var nd = MathHelper.Clamp(fd * 2, 0, 1);
                     fd = MathHelper.Clamp((fd * 2) - 1, 0, 1);
-                    DrawTexture(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
-                    DrawTexture(SpriteBatch, Bounds, GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, nd));
+                    DrawTexture(spriteBatch, bounds, GetFrameRect(cf), angle, Color.Lerp(color, Color.Transparent, fd));
+                    DrawTexture(spriteBatch, bounds, GetFrameRect(nf), angle, Color.Lerp(Color.Transparent, color, nd));
                     break;
 
                 case TweenStyle.Sequential:
-                    DrawTexture(SpriteBatch, Bounds, GetFrameRect(cf), Angle, Color.Lerp(Color, Color.Transparent, fd));
-                    DrawTexture(SpriteBatch, Bounds, GetFrameRect(nf), Angle, Color.Lerp(Color.Transparent, Color, fd));
+                    DrawTexture(spriteBatch, bounds, GetFrameRect(cf), angle, Color.Lerp(color, Color.Transparent, fd));
+                    DrawTexture(spriteBatch, bounds, GetFrameRect(nf), angle, Color.Lerp(Color.Transparent, color, fd));
                     break;
             }
         }
@@ -331,46 +340,56 @@ namespace Takai.Graphics
         /// <summary>
         /// Draw the actual texture of the graphic. Used by Draw()
         /// </summary>
-        /// <param name="SpriteBatch">The spritebatch to use</param>
-        /// <param name="Bounds">Where to draw the frame</param>
-        /// <param name="SourceRect">What part of the graphic to draw</param>
-        /// <param name="Angle">The angle to rotate the drawing by (in radians)</param>
-        /// <param name="Color">The color to tint the image</param>
+        /// <param name="spriteBatch">The spritebatch to use</param>
+        /// <param name="bounds">Where to draw the frame</param>
+        /// <param name="sourceRect">What part of the graphic to draw</param>
+        /// <param name="angle">The angle to rotate the drawing by (in radians)</param>
+        /// <param name="color">The color to tint the image</param>
         /// <remarks>Does not check if texture is null</remarks>
-        public void DrawTexture(SpriteBatch SpriteBatch, Rectangle Bounds, Rectangle SourceRect, float Angle, Color Color)
+        public void DrawTexture(SpriteBatch spriteBatch, Rectangle bounds, Rectangle sourceRect, float angle, Color color)
         {
-            SpriteBatch.Draw(Texture, Bounds, SourceRect, Color, Angle, Origin, SpriteEffects.None, 0);
+            spriteBatch.Draw(Texture, bounds, sourceRect, color, angle, Origin, SpriteEffects.None, 0);
         }
 
         /// <summary>
         /// Calculate the dest rectangle to fit an image into a rectangle:
         /// Shrink if too large and center if too small to fit into the <see cref="Region"/>
         /// </summary>
-        /// <param name="Width">The width of the image</param>
-        /// <param name="Height">The height of the image</param>
-        /// <param name="Region">The region to fit to</param>
+        /// <param name="width">The width of the image</param>
+        /// <param name="height">The height of the image</param>
+        /// <param name="region">The region to fit to</param>
         /// <returns>The fit rectangle</returns>
-        public static Rectangle GetFitRect(int Width, int Height, Rectangle Region)
+        public static Rectangle GetFitRect(int width, int height, Rectangle region)
         {
-            Width = MathHelper.Min(Width, Region.Width);
-            Height = MathHelper.Min(Height, Region.Height);
-            return new Rectangle(Region.X + MathHelper.Max(0, (Region.Width - Width) / 2), Region.Y + MathHelper.Max(0, (Region.Height - Height) / 2), Width, Height);
+            width = MathHelper.Min(width, region.Width);
+            height = MathHelper.Min(height, region.Height);
+            return new Rectangle(region.X + MathHelper.Max(0, (region.Width - width) / 2), region.Y + MathHelper.Max(0, (region.Height - height) / 2), width, height);
         }
         /// <summary>
         /// Calculate the dest rectangle to contain an image into a rectangle:
         /// Shrink if too large and center if too small to fit into the <see cref="Region"/>
         /// while maintaining the same aspect ratio
         /// </summary>
-        /// <param name="Width">The width of the image</param>
-        /// <param name="Height">The height of the image</param>
-        /// <param name="Region">The region to contain to</param>
+        /// <param name="width">The width of the image</param>
+        /// <param name="height">The height of the image</param>
+        /// <param name="region">The region to contain to</param>
         /// <returns>The contain rectangle</returns>
-        public static Rectangle GetContainRect(int Width, int Height, Rectangle Region)
+        public static Rectangle GetContainRect(int width, int height, Rectangle region)
         {
             //todo
-            Width = MathHelper.Min(Width, Region.Width);
-            Height = MathHelper.Min(Height, Region.Height);
-            return new Rectangle(Region.X + MathHelper.Max(0, (Region.Width - Width) / 2), Region.Y + MathHelper.Max(0, (Region.Height - Height) / 2), Width, Height);
+            width = MathHelper.Min(width, region.Width);
+            height = MathHelper.Min(height, region.Height);
+            return new Rectangle(region.X + MathHelper.Max(0, (region.Width - width) / 2), region.Y + MathHelper.Max(0, (region.Height - height) / 2), width, height);
+        }
+
+        protected void DerivedDeserialize(System.Collections.Generic.Dictionary<string, object> props)
+        {
+            bool hasSize = props.ContainsKey("Size");
+
+            if (!hasSize && !props.ContainsKey("Width"))
+                Width = Texture?.Width ?? 1;
+            if (!hasSize && !props.ContainsKey("Height"))
+                Height = Texture?.Height ?? 1;
         }
     }
 }

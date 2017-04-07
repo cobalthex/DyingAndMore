@@ -354,7 +354,7 @@ namespace Takai.Data
                                     else
                                     {
                                         customDeserial.Invoke(obj, new[] { pair.Value });
-                                        return obj;
+                                        continue;
                                     }
                                 }
 
@@ -437,7 +437,7 @@ namespace Takai.Data
 
         /// <summary>
         /// Convert <see cref="Source"/> to type <see cref="DestType"/>
-        /// Utilizes CustomSerializers
+        /// Utilizes CustomDeserializer
         /// </summary>
         /// <param name="DestType">The type to cast to</param>
         /// <param name="Source">The source object</param>

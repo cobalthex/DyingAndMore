@@ -8,7 +8,7 @@ namespace DyingAndMore.Editor
     {
         SpriteBatch sbatch;
 
-        Takai.UI.Element uiContainer;
+        Takai.UI.Static uiContainer;
 
         public TriggersConfigurator()
             : base(true, false) { }

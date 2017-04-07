@@ -8,7 +8,6 @@ Actor {
                     texture: "Textures/Entities/Player.png";
                     width: 48;
                     height: 48;
-                    ClipRect: [0 0 96 96];
                     origin: [24 24];
                     FrameCount: 2;
                     FrameLength: 100;

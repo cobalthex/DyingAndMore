@@ -3,22 +3,29 @@ List {
     Direction: Direction [ Vertical ];
     HorizontalAlignment: Alignment [ Middle ];
     VerticalAlignment: Alignment [ Middle ];
-    AutoSize: True;
     Children: [
-        Element {
+        Static {
             Text: "Create a New Map";
             Font: "Fonts/UILarge.bfnt";
             Color: [255 255 255 255];
             HorizontalAlignment: Alignment [ Middle ];
         }
 
-        Element {
+        Static {
             Text: "Name";
+            Font: @"Defs/Fonts/UISmall.fnt.tk";
             HorizontalAlignment: Alignment [ Start ];
         }
-        TextBox {
-            Name: "name",
+        TextInput {
+            Name: "name";
+            Size: [200 30];
+            Font: @"Defs/Fonts/UISmall.fnt.tk";
+        }
 
+        Graphic {
+            Sprite: {
+                Texture: "Textures/Dejitaru.png";
+            };
         }
     ];
 }

@@ -5,19 +5,12 @@ using Takai.Input;
 
 namespace Takai.UI
 {
-    public class TextBox : Element
+    public class TextInput : Static
     {
         /// <summary>
-        /// Allow spaces in the textbox
+        /// The char to draw characters in the password field with
         /// </summary>
-        bool AllowSpaces { get; set; } = true;
-
-        /// <summary>
-        /// Allow special characters ($~!@#, etc), by default only A-Z a-z 0-9 _ are allowed, in the textbox
-        /// </summary>
-        bool AllowSpecialCharacters { get; set; } = true;
-
-        //todo: convert to AllowedCharacters
+        public static char PasswordChar = '*';
 
         /// <summary>
         /// The maximum number of characters allowed in this textbox
@@ -28,7 +21,7 @@ namespace Takai.UI
         /// The textbox scrolled position
         /// </summary>
         [Data.Serializer.Ignored]
-        public int ScrollPos { get; set; } = 0;
+        public int ScrollPosition { get; set; } = 0;
 
         /// <summary>
         /// The position of the caret. Text is inserted at the caret
@@ -44,18 +37,49 @@ namespace Takai.UI
             set
             {
                 base.Text = value;
+                UpdateVisibleText();
                 Caret = value.Length;
+                lastInputTick = System.Environment.TickCount;
             }
         }
+        /// <summary>
+        /// The actual text of this element, base.Text is affected by pass
+        /// </summary>
+        protected string visibleText = "";
 
-        public TextBox()
+        /// <summary>
+        /// Hide visual input
+        /// </summary>
+        public bool IsPassword { get; set; } = false;
+
+        /// <summary>
+        /// Allow spaces in the textbox
+        /// </summary>
+        public bool AllowSpaces { get; set; } = true;
+
+        /// <summary>
+        /// Allow special characters ($~!@#, etc)
+        /// </summary>
+        public bool AllowSpecialCharacters { get; set; } = true;
+
+        /// <summary>
+        /// Allow numbers (0-9)
+        /// </summary>
+        public bool AllowNumbers { get; set; } = true;
+
+        /// <summary>
+        /// When the last character was inputted (in system ticks)
+        /// </summary>
+        protected int lastInputTick;
+
+        public TextInput()
         {
             ignoreSpaceKey = true;
         }
 
         protected override void BeforePress(ClickEventArgs args)
         {
-            var x = args.position.X + ScrollPos;
+            var x = args.position.X + ScrollPosition;
             var width = 0;
             for (int i = 0; i < Text.Length; ++i)
             {
@@ -94,12 +118,16 @@ namespace Takai.UI
                     if (key == Keys.Back && Caret > 0)
                     {
                         base.Text = Text.Remove(Caret - 1, 1);
+                        UpdateVisibleText();
                         --Caret;
-                        UpdateScrollPos();
+                        UpdateScrollPosition();
                     }
 
                     else if (key == Keys.Delete && Caret < Text.Length)
+                    {
                         base.Text = Text.Remove(Caret, 1);
+                        UpdateVisibleText();
+                    }
 
                     else if (AllowSpaces && key == Keys.Space)
                         InsertAtCaret(' ');
@@ -112,10 +140,10 @@ namespace Takai.UI
                             InsertAtCaret((char)((key - Keys.A) + 'a'));
                     }
 
-                    else if (key >= Keys.D0 && key <= Keys.D9)
+                    else if (AllowNumbers && key >= Keys.D0 && key <= Keys.D9)
                         InsertAtCaret((char)((key - Keys.D0) + '0'));
 
-                    else if (key >= Keys.NumPad0 && key <= Keys.NumPad9)
+                    else if (AllowNumbers && key >= Keys.NumPad0 && key <= Keys.NumPad9)
                         InsertAtCaret((char)((key - Keys.NumPad0) + '0'));
                 }
             }
@@ -123,14 +151,20 @@ namespace Takai.UI
             return base.Update(time);
         }
 
-        void UpdateScrollPos()
+
+        protected void UpdateVisibleText()
+        {
+            visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
+        }
+
+        void UpdateScrollPosition()
         {
             var textWidth = Font.MeasureString(Text, 0, Caret).X;
 
-            if (textWidth < ScrollPos)
-                ScrollPos -= (int)Size.X;
+            if (textWidth < ScrollPosition)
+                ScrollPosition -= (int)Size.X;
 
-            ScrollPos = (int)MathHelper.Clamp(textWidth, textSize.X - Size.X, 0);
+            ScrollPosition = (int)MathHelper.Clamp(textWidth, textSize.X - Size.X, 0);
         }
 
         void InsertAtCaret(char ch)
@@ -139,9 +173,10 @@ namespace Takai.UI
                 return;
 
             base.Text = Text.Insert(Caret, ch.ToString());
+            UpdateVisibleText();
             ++Caret;
 
-            UpdateScrollPos();
+            UpdateScrollPosition();
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -158,7 +193,7 @@ namespace Takai.UI
 
             Font?.Draw(
                 spriteBatch,
-                Text,
+                visibleText,
                 0, -1,
                 new Rectangle(
                     AbsoluteBounds.X + 2,
@@ -166,13 +201,14 @@ namespace Takai.UI
                     size.X,
                     size.Y
                 ),
-                new Point(-ScrollPos, 0),
+                new Point(-ScrollPosition, 0),
                 Color
             );
 
-            if (HasFocus && System.Environment.TickCount % 1000 < 500)
+            var tickCount = System.Environment.TickCount;
+            if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 1000 < 500))
             {
-                var x = Font.MeasureString(Text, 0, Caret).X - ScrollPos + AbsoluteBounds.X + 3;
+                var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + AbsoluteBounds.X + 3;
                 Graphics.Primitives2D.DrawLine(
                     spriteBatch,
                     Color,

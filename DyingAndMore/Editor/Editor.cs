@@ -40,9 +40,9 @@ namespace DyingAndMore.Editor
         public static readonly Color ActiveColor = Color.GreenYellow;
         public static readonly Color InactiveColor = new Color(Color.Purple, 0.5f);
 
-        Takai.UI.Element uiContainer;
-        Takai.UI.Element selectorPreview;
-        Takai.UI.Element renderSettingsConsole;
+        Takai.UI.Static uiContainer;
+        Takai.UI.Static selectorPreview;
+        Takai.UI.Static renderSettingsConsole;
 
         public ModeSelector modes;
 
@@ -60,13 +60,13 @@ namespace DyingAndMore.Editor
 
             TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.Tap | GestureType.DoubleTap | GestureType.FreeDrag;
 
-            uiContainer = new Takai.UI.Element();
+            uiContainer = new Takai.UI.Static();
 
             if (Map == null)
             {
-                uiContainer.AddChild((Takai.UI.Element)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NoMap.ui.tk"));
+                uiContainer.AddChild((Takai.UI.Static)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NewMap.ui.tk"));
                 var openBtn = uiContainer.FindElementByName("Open");
-                openBtn.OnClick += delegate { OpenMap(); };
+                //openBtn.OnClick += delegate { OpenMap(); };
             }
             else
                 StartMap();
@@ -97,7 +97,7 @@ namespace DyingAndMore.Editor
             renderSettingsConsole.RemoveAllChildren();
             foreach (var setting in Map.renderSettings.GetType().GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
             {
-                var checkbox = new Takai.UI.Checkbox()
+                var checkbox = new Takai.UI.CheckBox()
                 {
                     Text = BeautifyPropName(setting.Name),
                     Font = LargeFont,
@@ -105,9 +105,9 @@ namespace DyingAndMore.Editor
                     VerticalAlignment = Takai.UI.Alignment.Middle,
                     IsChecked = (bool)setting.GetValue(Map.renderSettings)
                 };
-                checkbox.OnClick += delegate (Takai.UI.Element sender, Takai.UI.ClickEventArgs args)
+                checkbox.OnClick += delegate (Takai.UI.Static sender, Takai.UI.ClickEventArgs args)
                 {
-                    setting.SetValue(Map.renderSettings, ((Takai.UI.Checkbox)sender).IsChecked);
+                    setting.SetValue(Map.renderSettings, ((Takai.UI.CheckBox)sender).IsChecked);
                 };
                 checkbox.AutoSize();
 
@@ -135,7 +135,7 @@ namespace DyingAndMore.Editor
                 modes.AddMode(new TriggersEditorMode(this));
                 modes.ModeIndex = 0;
 
-                selectorPreview = new Takai.UI.Element()
+                selectorPreview = new Takai.UI.Static()
                 {
                     HorizontalAlignment = Takai.UI.Alignment.End,
                     VerticalAlignment = Takai.UI.Alignment.Start,
@@ -147,7 +147,7 @@ namespace DyingAndMore.Editor
                     modes.Mode?.OpenConfigurator(true);
                 };
 
-                uiContainer = new Takai.UI.Element(modes, selectorPreview)
+                uiContainer = new Takai.UI.Static(modes, selectorPreview)
                 {
                     Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height)
                 };

@@ -7,7 +7,7 @@ namespace DyingAndMore.Editor
     {
         SpriteBatch sbatch;
 
-        Takai.UI.Element uiContainer;
+        Takai.UI.Static uiContainer;
 
         public GroupsConfigurator()
             : base(true, false) { }
@@ -15,8 +15,8 @@ namespace DyingAndMore.Editor
         public override void Load()
         {
             sbatch = new SpriteBatch(GraphicsDevice);
-            uiContainer = new Takai.UI.Element();
-            uiContainer.AddChild(new Takai.UI.TextBox()
+            uiContainer = new Takai.UI.Static();
+            uiContainer.AddChild(new Takai.UI.TextInput()
             {
                 Text = "Test",
                 Position = new Vector2(10, 10)
