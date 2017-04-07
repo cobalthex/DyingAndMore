@@ -67,7 +67,7 @@ namespace DyingAndMore.Editor
         {
             modes.Add(mode);
 
-            var child = new Takai.UI.Element()
+            var child = new Takai.UI.Static()
             {
                 Text = mode.Name,
                 Font = ActiveFont,
@@ -76,7 +76,7 @@ namespace DyingAndMore.Editor
             child.AutoSize(padding: 20);
             child.Font = InactiveFont;
 
-            child.OnClick += delegate (Takai.UI.Element sender, Takai.UI.ClickEventArgs args)
+            child.OnClick += delegate (Takai.UI.Static sender, Takai.UI.ClickEventArgs args)
             {
                 Mode = mode;
             };

@@ -205,15 +205,15 @@ namespace Takai.Graphics
         /// <summary>
         /// Draw a string in a specific region
         /// </summary>
-        /// <param name="Spritebatch">The sprite batch to use</param>
-        /// <param name="String">The string to draw</param>
-        /// <param name="Bounds">The clipping bounds and location</param>
-        /// <param name="Color">The default font color</param>
-        /// <param name="MonoSpace">Draw the font, treating all characters as equal width</param>
+        /// <param name="spriteBatch">The sprite batch to use</param>
+        /// <param name="text">The string to draw</param>
+        /// <param name="bounds">The clipping bounds and location</param>
+        /// <param name="color">The default font color</param>
+        /// <param name="monoSpace">Draw the font, treating all characters as equal width</param>
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and www (base 33) to set the color in RGB. use `x to reset the color</remarks>
-        public void Draw(SpriteBatch Spritebatch, string String, Rectangle Bounds, Color Color, bool MonoSpace = false)
+        public void Draw(SpriteBatch spriteBatch, string text, Rectangle bounds, Color color, bool monoSpace = false)
         {
-            Draw(Spritebatch, String, 0, -1, Bounds, Point.Zero, Color, MonoSpace);
+            Draw(spriteBatch, text, 0, -1, bounds, Point.Zero, color, monoSpace);
         }
 
         /// <summary>
@@ -226,9 +226,9 @@ namespace Takai.Graphics
         /// <param name="bounds">The clipping region for drawing the text to</param>
         /// <param name="offset">The pixel offset to render the text inside the clipping region</param>
         /// <param name="color">The color of the text</param>
-        /// <param name="monospace">Draw the font, treating all characters as equal width</param>
+        /// <param name="monoSpace">Draw the font, treating all characters as equal width</param>
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and fff to change the color. use `x to reset the color</remarks>
-        public void Draw(SpriteBatch spriteBatch, string text, int startIndex, int length, Rectangle bounds, Point offset, Color color, bool monospace = false)
+        public void Draw(SpriteBatch spriteBatch, string text, int startIndex, int length, Rectangle bounds, Point offset, Color color, bool monoSpace = false)
         {
             Point pos = bounds.Location + offset;
             Color curColor = color;
@@ -286,7 +286,7 @@ namespace Takai.Graphics
                 if (clip.Width > 0 && clip.Height > 0)
                     spriteBatch.Draw(Texture, clip, rgn, curColor);
 
-                pos.X += (monospace ? MaxCharWidth : rgn.Width) + Tracking.X;
+                pos.X += (monoSpace ? MaxCharWidth : rgn.Width) + Tracking.X;
                 maxH = MathHelper.Max(maxH, rgn.Height);
             }
         }

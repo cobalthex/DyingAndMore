@@ -3,13 +3,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
-    public class Checkbox : Element
+    public class CheckBox : Static
     {
         static int dividerWidth = 15;
 
         public bool IsChecked { get; set; } = false;
 
-        public Checkbox(bool isChecked = false)
+        public CheckBox(bool isChecked = false)
         {
             IsChecked = isChecked;
         }

@@ -20,13 +20,13 @@ namespace Takai.UI
         /// </summary>
         public Vector2 position;
     }
-    public delegate void ClickHandler(Element Sender, ClickEventArgs Args);
+    public delegate void ClickHandler(Static Sender, ClickEventArgs Args);
 
     /// <summary>
-    /// A single UI Element
+    /// The basic UI element
     /// </summary>
-    [Data.DerivedTypeDeserialize(typeof(Element), "DerivedDeserialize")]
-    public class Element
+    [Data.DerivedTypeDeserialize(typeof(Static), "DerivedDeserialize")]
+    public class Static
     {
         public static Color FocusOutlineColor = Color.RoyalBlue;
 
@@ -189,10 +189,10 @@ namespace Takai.UI
 
                 else
                 {
-                    Stack<Element> defocusing = new Stack<Element>();
+                    Stack<Static> defocusing = new Stack<Static>();
 
                     //defocus all elements in tree
-                    Element next = this;
+                    Static next = this;
                     while (next.parent != null)
                         next = next.parent;
 
@@ -246,7 +246,7 @@ namespace Takai.UI
         /// Who owns/contains this element
         /// </summary>
         [Data.Serializer.Ignored]
-        public Element Parent
+        public Static Parent
         {
             get => parent;
             set
@@ -258,35 +258,35 @@ namespace Takai.UI
                 }
             }
         }
-        private Element parent = null;
+        private Static parent = null;
 
         /// <summary>
         /// A readonly collection of all of the children in this element
         /// </summary>
-        [Data.CustomDeserialize(typeof(Element), "DeserializeChildren")]
-        public ReadOnlyCollection<Element> Children { get; private set; } //todo: maybe observable
-        protected List<Element> children = new List<Element>();
+        [Data.CustomDeserialize(typeof(Static), "DeserializeChildren")]
+        public ReadOnlyCollection<Static> Children { get; private set; } //todo: maybe observable
+        protected List<Static> children = new List<Static>();
 
         private void DeserializeChildren(object objects)
         {
             var elements = objects as List<object>;
             foreach (var element in elements)
             {
-                if (element is Element child)
+                if (element is Static child)
                     AddChild(child);
             }
         }
 
-        public Element()
+        public Static()
         {
-            Children = new ReadOnlyCollection<Element>(children);
+            Children = new ReadOnlyCollection<Static>(children);
         }
 
         /// <summary>
         /// Create a new element
         /// </summary>
         /// <param name="children">Optionally add children to this element</param>
-        public Element(params Element[] children)
+        public Static(params Static[] children)
             : this()
         {
             foreach (var child in children)
@@ -308,7 +308,7 @@ namespace Takai.UI
             return false;
         }
 
-        public void AddChild(Element child)
+        public void AddChild(Static child)
         {
             child.Parent = this;
             if (child.CanFocus)
@@ -317,12 +317,12 @@ namespace Takai.UI
             Reflow();
         }
 
-        public void RemoveChild(Element child)
+        public void RemoveChild(Static child)
         {
             children.Remove(child);
         }
 
-        public Element RemoveChildAt(int index)
+        public Static RemoveChildAt(int index)
         {
             var child = children[index];
             children.RemoveAt(index);
@@ -542,13 +542,13 @@ namespace Takai.UI
         /// Searches up and down
         /// </summary>
         /// <returns>The focused element, or null if there is none</returns>
-        public Element FindFocusedElement()
+        public Static FindFocusedElement()
         {
             var parent = this;
             while (parent.Parent != null)
                 parent = parent.Parent;
 
-            var next = new Stack<Element>();
+            var next = new Stack<Static>();
             next.Push(parent);
 
             while (next.Count > 0)
@@ -569,19 +569,20 @@ namespace Takai.UI
         /// </summary>
         /// <param name="name">The name of the element to search for</param>
         /// <returns>The first element found or null if no element found with the specified name</returns>
-        public Element FindElementByName(string name, bool caseSensitive = true)
+        public Static FindElementByName(string name, bool caseSensitive = true)
         {
             var parent = this;
             while (parent.Parent != null)
                 parent = parent.Parent;
 
-            var next = new Stack<Element>();
+            var next = new Stack<Static>();
             next.Push(parent);
 
             while (next.Count > 0)
             {
                 var elem = next.Pop();
-                if (elem.Name.Equals(name, caseSensitive ? System.StringComparison.Ordinal : System.StringComparison.OrdinalIgnoreCase))
+                if (elem.Name == null ||
+                    elem.Name.Equals(name, caseSensitive ? System.StringComparison.Ordinal : System.StringComparison.OrdinalIgnoreCase))
                     return elem;
 
                 foreach (var child in elem.Children)
@@ -702,15 +703,16 @@ namespace Takai.UI
 
         protected void DerivedDeserialize(Dictionary<string, object> props)
         {
-            if (props.TryGetValue("AutoSize", out var autoSize) ||
-                !(props.ContainsKey("Bounds") ||
-                  props.ContainsKey("Size")))
+            if (props.TryGetValue("AutoSize", out var autoSize))
             {
                 if (autoSize is int autoSizeValue)
                     AutoSize(autoSizeValue);
                 else if (autoSize is bool doAutoSize)
                     AutoSize();
             }
+            else if (!(props.ContainsKey("Bounds") ||
+                       props.ContainsKey("Size")))
+                AutoSize();
         }
 
         public override string ToString()

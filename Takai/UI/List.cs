@@ -9,7 +9,7 @@ namespace Takai.UI
         Vertical
     }
 
-    public class List : Element
+    public class List : Static
     {
         /// <summary>
         /// Spacing between items
