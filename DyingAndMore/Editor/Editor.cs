@@ -64,9 +64,19 @@ namespace DyingAndMore.Editor
 
             if (Map == null)
             {
-                uiContainer.AddChild((Takai.UI.Static)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NewMap.ui.tk"));
+                uiContainer.AddChild((Takai.UI.Static)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NoMap.ui.tk"));
+                var newBtn = uiContainer.FindElementByName("New");
+                if (newBtn != null)
+                {
+                    newBtn.OnClick += delegate
+                    {
+                        uiContainer.ReplaceChildren((Takai.UI.Static)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NewMap.ui.tk"));
+                    };
+                }
+
                 var openBtn = uiContainer.FindElementByName("Open");
-                //openBtn.OnClick += delegate { OpenMap(); };
+                if (openBtn != null)
+                    openBtn.OnClick += delegate { OpenMap(); };
             }
             else
                 StartMap();
@@ -147,10 +157,7 @@ namespace DyingAndMore.Editor
                     modes.Mode?.OpenConfigurator(true);
                 };
 
-                uiContainer = new Takai.UI.Static(modes, selectorPreview)
-                {
-                    Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height)
-                };
+                uiContainer.ReplaceChildren(modes, selectorPreview);
             }
 
             //start zoomed out to see the whole map

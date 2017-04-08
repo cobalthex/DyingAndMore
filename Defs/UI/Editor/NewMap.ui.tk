@@ -1,6 +1,5 @@
 List {
-    Margin: 0;
-    Direction: Direction [ Vertical ];
+    Margin: 10;
     HorizontalAlignment: Alignment [ Middle ];
     VerticalAlignment: Alignment [ Middle ];
     Children: [
@@ -18,14 +17,67 @@ List {
         }
         TextInput {
             Name: "name";
-            Size: [200 30];
+            Width: 300;
+            MaxLength: 32;
             Font: @"Defs/Fonts/UISmall.fnt.tk";
         }
 
-        Graphic {
-            Sprite: {
-                Texture: "Textures/Dejitaru.png";
-            };
+        List {
+            Direction: Direction [ Horizontal ];
+            Margin: 10;
+            Children: [
+                List {
+                    Children: [
+                        Static {
+                            Text: "Width";
+                            Font: @"Defs/Fonts/UISmall.fnt.tk";
+                            HorizontalAlignment: Alignment [ Start ];
+                        }
+                        TextInput { #NumericInput
+                            Name: "width";
+                            Minimum: 1;
+                            Width: 145;
+                            Font: @"Defs/Fonts/UISmall.fnt.tk";
+                        }
+                    ]
+                }
+
+                List {
+                    Children: [
+                        Static {
+                            Text: "Height";
+                            Font: @"Defs/Fonts/UISmall.fnt.tk";
+                            HorizontalAlignment: Alignment [ Start ];
+                        }
+                        TextInput { #NumericInput
+                            Name: "height";
+                            Minimum: 1;
+                            Width: 140;
+                            Font: @"Defs/Fonts/UISmall.fnt.tk";
+                        }
+                    ]
+                }
+            ]
+        }
+
+        Static {
+            Text: "Tileset";
+            Font: @"Defs/Fonts/UISmall.fnt.tk";
+            HorizontalAlignment: Alignment [ Start ];
+        }
+        TextInput { #NumericInput
+            Name: "tileset";
+            Filter: "tiles.tk"; #todo: use win32 filter format
+            Width: 300;
+            Font: @"Defs/Fonts/UISmall.fnt.tk";
+        }
+
+        Static {
+            Name: "create";
+            Text: "Create";
+            Font: "Fonts/UILarge.bfnt";
+            Width: 200;
+            HorizontalAlignment: Alignment [ Middle ];
         }
     ];
 }

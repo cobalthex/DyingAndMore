@@ -15,7 +15,7 @@ namespace Takai.UI
         /// <summary>
         /// The maximum number of characters allowed in this textbox
         /// </summary>
-        uint MaxLength { get; set; } = 0x10000;
+        public uint MaxLength { get; set; } = 0x10000;
 
         /// <summary>
         /// The textbox scrolled position

@@ -44,7 +44,7 @@ namespace Takai.UI
             Font?.Draw(
                 spriteBatch,
                 Text,
-                CalculateTextBounds(textSize, new Rectangle(
+                CenterInRect(textSize, new Rectangle(
                     AbsoluteBounds.X + checkboxSize + dividerWidth,
                     AbsoluteBounds.Y,
                     AbsoluteBounds.Width - checkboxSize,
