@@ -279,7 +279,7 @@ namespace Takai.UI
 
         public Static()
         {
-            Children = new ReadOnlyCollection<Static>(children);
+            Children = children.AsReadOnly();
         }
 
         /// <summary>
@@ -311,9 +311,9 @@ namespace Takai.UI
         public void AddChild(Static child)
         {
             child.Parent = this;
+            children.Add(child);
             if (child.CanFocus)
                 child.HasFocus = true;
-            children.Add(child);
             Reflow();
         }
 
@@ -333,6 +333,20 @@ namespace Takai.UI
         {
             children.Clear();
         }
+
+        public void ReplaceChildren(params Static[] newChildren)
+        {
+            RemoveAllChildren();
+            children.AddRange(newChildren);
+            Reflow();
+        }
+        public void ReplaceChildren(List<Static> newChildren)
+        {
+            RemoveAllChildren();
+            children.AddRange(newChildren);
+            Reflow();
+        }
+
 
         protected void ResizeAndReflow()
         {
@@ -581,7 +595,7 @@ namespace Takai.UI
             while (next.Count > 0)
             {
                 var elem = next.Pop();
-                if (elem.Name == null ||
+                if (elem.Name != null &&
                     elem.Name.Equals(name, caseSensitive ? System.StringComparison.Ordinal : System.StringComparison.OrdinalIgnoreCase))
                     return elem;
 
@@ -674,30 +688,33 @@ namespace Takai.UI
             if (HasFocus)
                 Graphics.Primitives2D.DrawRect(spriteBatch, FocusOutlineColor, AbsoluteBounds);
 
-            var textBounds = CalculateTextBounds(textSize, AbsoluteBounds);
-            Font?.Draw(spriteBatch, Text, textBounds, Color);
+            if (Font != null)
+            {
+                var textBounds = CenterInRect(textSize, AbsoluteBounds);
+                Font.Draw(spriteBatch, Text, textBounds, Color);
+            }
 
             foreach (var child in Children)
                 child.Draw(spriteBatch);
         }
 
         /// <summary>
-        /// Caluclate a rectangle where the text is centered inside bounds
+        /// Caluclate a rectangle where the region is centered inside bounds
         /// </summary>
-        /// <param name="textSize">The size of the text</param>
+        /// <param name="size">The size of the region</param>
         /// <param name="bounds">The bounds to center inside</param>
-        /// <returns>The absolute bounds of the text rect</returns>
-        protected static Rectangle CalculateTextBounds(Vector2 textSize, Rectangle bounds)
+        /// <returns>The absolute bounds of the region rect</returns>
+        protected static Rectangle CenterInRect(Vector2 size, Rectangle bounds)
         {
-            var size = new Point(
-                MathHelper.Min(bounds.Width, (int)textSize.X),
-                MathHelper.Min(bounds.Height, (int)textSize.Y)
+            var minSize = new Point(
+                MathHelper.Min(bounds.Width, (int)size.X),
+                MathHelper.Min(bounds.Height, (int)size.Y)
             );
             return new Rectangle(
-                bounds.X + ((bounds.Width - size.X) / 2),
-                bounds.Y + ((bounds.Height - size.Y) / 2),
-                size.X,
-                size.Y
+                bounds.X + ((bounds.Width - minSize.X) / 2),
+                bounds.Y + ((bounds.Height - minSize.Y) / 2),
+                minSize.X,
+                minSize.Y
             );
         }
 
@@ -713,6 +730,12 @@ namespace Takai.UI
             else if (!(props.ContainsKey("Bounds") ||
                        props.ContainsKey("Size")))
                 AutoSize();
+
+            if (props.TryGetValue("Width", out var width))
+                Size = new Vector2(Data.Serializer.CastType<float>(width), Size.Y);
+
+            if (props.TryGetValue("Height", out var height))
+                Size = new Vector2(size.X, Data.Serializer.CastType<float>(height));
         }
 
         public override string ToString()

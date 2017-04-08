@@ -1,9 +1,8 @@
 List {
-    Margin: 0;
+    Margin: 10;
     Direction: Direction [ Vertical ];
     HorizontalAlignment: Alignment [ Middle ];
     VerticalAlignment: Alignment [ Middle ];
-    AutoSize: True;
     Children: [
         Static {
             Text: "No map loaded";
