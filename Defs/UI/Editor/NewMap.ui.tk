@@ -27,15 +27,17 @@ List {
             Margin: 10;
             Children: [
                 List {
+                    Margin: 10;
                     Children: [
                         Static {
                             Text: "Width";
                             Font: @"Defs/Fonts/UISmall.fnt.tk";
                             HorizontalAlignment: Alignment [ Start ];
                         }
-                        TextInput { #NumericInput
+                        NumericInput {
                             Name: "width";
                             Minimum: 1;
+                            Maximum: 256;
                             Width: 145;
                             Font: @"Defs/Fonts/UISmall.fnt.tk";
                         }
@@ -43,16 +45,18 @@ List {
                 }
 
                 List {
+                    Margin: 10;
                     Children: [
                         Static {
                             Text: "Height";
                             Font: @"Defs/Fonts/UISmall.fnt.tk";
                             HorizontalAlignment: Alignment [ Start ];
                         }
-                        TextInput { #NumericInput
+                        NumericInput {
                             Name: "height";
                             Minimum: 1;
-                            Width: 140;
+                            Maximum: 256;
+                            Width: 145;
                             Font: @"Defs/Fonts/UISmall.fnt.tk";
                         }
                     ]
@@ -65,7 +69,7 @@ List {
             Font: @"Defs/Fonts/UISmall.fnt.tk";
             HorizontalAlignment: Alignment [ Start ];
         }
-        TextInput { #NumericInput
+        TextInput { #FileInput
             Name: "tileset";
             Filter: "tiles.tk"; #todo: use win32 filter format
             Width: 300;

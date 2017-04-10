@@ -65,18 +65,46 @@ namespace DyingAndMore.Editor
             if (Map == null)
             {
                 uiContainer.AddChild((Takai.UI.Static)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NoMap.ui.tk"));
-                var newBtn = uiContainer.FindElementByName("New");
+
+                var newBtn = uiContainer.FindElementByName("new");
                 if (newBtn != null)
                 {
                     newBtn.OnClick += delegate
                     {
-                        uiContainer.ReplaceChildren((Takai.UI.Static)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NewMap.ui.tk"));
+                        uiContainer.ReplaceAllChildren((Takai.UI.Static)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NewMap.ui.tk"));
+                        uiContainer.FocusFirstAvailable();
+
+                        var createBtn = uiContainer.FindElementByName("create");
+                        createBtn.OnClick += delegate
+                        {
+                            var width = ((Takai.UI.NumericInput)uiContainer.FindElementByName("width")).Value;
+                            var height = ((Takai.UI.NumericInput)uiContainer.FindElementByName("height")).Value;
+
+                            var map = new Takai.Game.Map(GraphicsDevice)
+                            {
+                                Width = width,
+                                Height = height,
+                                TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles.png"),
+                                TileSize = 48,
+                                Name = uiContainer.FindElementByName("name")?.Text
+                            };
+                            map.Tiles = new short[height, width];
+                            for (var y = 0; y < height; ++y)
+                                for (var x = 0; x < width; ++x)
+                                    map.Tiles[y, x] = -1;
+                            map.BuildSectors();
+                            map.BuildTileMask(map.TilesImage);
+                            Map = map;
+                            StartMap();
+                        };
                     };
                 }
 
-                var openBtn = uiContainer.FindElementByName("Open");
+                var openBtn = uiContainer.FindElementByName("open");
                 if (openBtn != null)
                     openBtn.OnClick += delegate { OpenMap(); };
+
+                uiContainer.FocusFirstAvailable();
             }
             else
                 StartMap();
@@ -157,7 +185,7 @@ namespace DyingAndMore.Editor
                     modes.Mode?.OpenConfigurator(true);
                 };
 
-                uiContainer.ReplaceChildren(modes, selectorPreview);
+                uiContainer.ReplaceAllChildren(modes, selectorPreview);
             }
 
             //start zoomed out to see the whole map

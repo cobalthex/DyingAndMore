@@ -5,6 +5,9 @@ using Takai.Input;
 
 namespace Takai.UI
 {
+    public class InputEventArgs : System.EventArgs { }
+    public delegate void InputHandler(TextInput Sender, InputEventArgs Args);
+
     public class TextInput : Static
     {
         /// <summary>
@@ -27,7 +30,16 @@ namespace Takai.UI
         /// The position of the caret. Text is inserted at the caret
         /// </summary>
         [Data.Serializer.Ignored]
-        public int Caret { get; set; } = 0;
+        public int Caret
+        {
+            get => caret;
+            set
+            {
+                caret = MathHelper.Clamp(value, 0, Text.Length);
+                UpdateScrollPosition();
+            }
+        }
+        private int caret = 0;
 
         public override bool CanFocus => true;
 
@@ -66,6 +78,14 @@ namespace Takai.UI
         /// Allow numbers (0-9)
         /// </summary>
         public bool AllowNumbers { get; set; } = true;
+
+        /// <summary>
+        /// Allow A-Z
+        /// </summary>
+        public bool AllowLetters { get; set; } = true;
+
+        [Data.Serializer.Ignored]
+        public event InputHandler OnInput = null;
 
         /// <summary>
         /// When the last character was inputted (in system ticks)
@@ -115,12 +135,22 @@ namespace Takai.UI
                     if (!InputState.IsPress(key))
                         continue;
 
-                    if (key == Keys.Back && Caret > 0)
+                    if (key == Keys.Left && Caret > 0)
+                        --Caret;
+                    else if (key == Keys.Right && Caret < Text.Length)
+                        ++Caret;
+
+                    else if (key == Keys.Home)
+                        Caret = 0;
+
+                    else if (key == Keys.End)
+                        Caret = Text.Length;
+
+                    else if (key == Keys.Back && Caret > 0)
                     {
                         base.Text = Text.Remove(Caret - 1, 1);
                         UpdateVisibleText();
                         --Caret;
-                        UpdateScrollPosition();
                     }
 
                     else if (key == Keys.Delete && Caret < Text.Length)
@@ -132,7 +162,7 @@ namespace Takai.UI
                     else if (AllowSpaces && key == Keys.Space)
                         InsertAtCaret(' ');
 
-                    else if (key >= Keys.A && key <= Keys.Z)
+                    else if (AllowLetters && key >= Keys.A && key <= Keys.Z)
                     {
                         if (InputState.IsMod(KeyMod.Shift))
                             InsertAtCaret((char)((key - Keys.A) + 'A'));
@@ -145,6 +175,17 @@ namespace Takai.UI
 
                     else if (AllowNumbers && key >= Keys.NumPad0 && key <= Keys.NumPad9)
                         InsertAtCaret((char)((key - Keys.NumPad0) + '0'));
+
+                    else if ((AllowNumbers || AllowSpecialCharacters) &&
+                             key == Keys.OemPlus)
+                        InsertAtCaret('+');
+
+                    else if ((AllowNumbers || AllowSpecialCharacters) &&
+                             key == Keys.OemMinus)
+                        InsertAtCaret('-');
+
+                    //else if (AllowSpecialCharacters)
+                    //    ;
                 }
             }
 
@@ -155,11 +196,12 @@ namespace Takai.UI
         protected void UpdateVisibleText()
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
+            OnInput?.Invoke(this, new InputEventArgs());
         }
 
         void UpdateScrollPosition()
         {
-            var textWidth = Font.MeasureString(Text, 0, Caret).X;
+            var textWidth = Font?.MeasureString(Text, 0, Caret).X ?? 0;
 
             if (textWidth < ScrollPosition)
                 ScrollPosition -= (int)Size.X;
@@ -175,8 +217,6 @@ namespace Takai.UI
             base.Text = Text.Insert(Caret, ch.ToString());
             UpdateVisibleText();
             ++Caret;
-
-            UpdateScrollPosition();
         }
 
         public override void Draw(SpriteBatch spriteBatch)
