@@ -17,10 +17,14 @@ namespace Takai.UI
     {
         /// <summary>
         /// The relative position of the click inside the element
+        /// If activated via keyboard, this is Zero
         /// </summary>
         public Vector2 position;
     }
-    public delegate void ClickHandler(Static Sender, ClickEventArgs Args);
+    public delegate void ClickHandler(Static sender, ClickEventArgs args);
+
+    public class ResizeEventArgs : System.EventArgs { }
+    public delegate void ResizeHandler(Static sender, ResizeEventArgs args);
 
     /// <summary>
     /// The basic UI element
@@ -59,7 +63,7 @@ namespace Takai.UI
         /// The font to draw the text of this element with.
         /// Optional if text is null
         /// </summary>
-        public Graphics.BitmapFont Font
+        public virtual Graphics.BitmapFont Font
         {
             get => font;
             set
@@ -77,7 +81,7 @@ namespace Takai.UI
         /// The color of this element. Usage varies between element types
         /// Usually applies to text color
         /// </summary>
-        public Color Color { get; set; } = Color.White;
+        public virtual Color Color { get; set; } = Color.White;
 
         /// <summary>
         /// How this element is positioned in its container horizontally
@@ -184,10 +188,7 @@ namespace Takai.UI
             get => hasFocus;
             set
             {
-                if (value == false)
-                    hasFocus = false;
-
-                else
+                if (value == true)
                 {
                     Stack<Static> defocusing = new Stack<Static>();
 
@@ -205,9 +206,9 @@ namespace Takai.UI
                         foreach (var child in next.children)
                             defocusing.Push(child);
                     }
-
-                    hasFocus = true;
                 }
+
+                hasFocus = value;
             }
         }
         private bool hasFocus = false;
@@ -219,10 +220,17 @@ namespace Takai.UI
         public virtual bool CanFocus { get => OnClick != null; }
 
         /// <summary>
-        /// The click handler. If null, this item is not clickable/focusable (Does not apply to children)
+        /// Called whenever the element is clicked.
+        /// By default, focus is allowed if there are more than zero handlers
         /// </summary>
         [Data.Serializer.Ignored]
         public event ClickHandler OnClick = null;
+
+        /// <summary>
+        /// Called whenever the size of this element is updated
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public event ResizeHandler OnResize = null;
 
         /// <summary>
         /// Disable the default behavior of the tab key
@@ -312,8 +320,42 @@ namespace Takai.UI
         {
             child.Parent = this;
             children.Add(child);
-            if (child.CanFocus)
+            if (child.HasFocus) //re-apply throughout tree
                 child.HasFocus = true;
+            Reflow();
+        }
+
+        public void AddChildren(params Static[] children)
+        {
+            this.children.AddRange(children);
+
+            Static lastFocus = null;
+            foreach (var child in children)
+            {
+                child.parent = this;
+                if (child.HasFocus)
+                    lastFocus = child;
+            }
+            if (lastFocus != null)
+                lastFocus.HasFocus = true;
+
+            Reflow();
+        }
+
+        public void AddChildren(IEnumerable<Static> children)
+        {
+            this.children.AddRange(children);
+
+            Static lastFocus = null;
+            foreach (var child in children)
+            {
+                child.parent = this;
+                if (child.HasFocus)
+                    lastFocus = child;
+            }
+            if (lastFocus != null)
+                lastFocus.HasFocus = true;
+
             Reflow();
         }
 
@@ -334,27 +376,211 @@ namespace Takai.UI
             children.Clear();
         }
 
-        public void ReplaceChildren(params Static[] newChildren)
+        public void ReplaceAllChildren(params Static[] newChildren)
         {
             RemoveAllChildren();
-            children.AddRange(newChildren);
-            Reflow();
+            AddChildren(newChildren);
         }
-        public void ReplaceChildren(List<Static> newChildren)
+        public void ReplaceAllChildren(IEnumerable<Static> newChildren)
         {
             RemoveAllChildren();
-            children.AddRange(newChildren);
-            Reflow();
+            AddChildren(newChildren);
         }
 
-
-        protected void ResizeAndReflow()
+        /// <summary>
+        /// Focus the next element in the tree
+        /// </summary>
+        /// <remarks>If this is not the focused element, finds the focused element and calls this function</remarks>
+        protected void FocusNext()
         {
-            CalculateAbsoluteBounds();
+            if (!HasFocus)
+            {
+                FindFocusedElement()?.FocusNext();
+                return;
+            }
 
-            //OnResized()
+            /* focus in the following order (13 will wrap around back to 1)
 
-            Reflow();
+            1
+                2
+                3
+                    4
+                5
+                6
+            7
+                8
+                    9
+                        10
+                        11
+                    12
+                13
+
+            */
+
+            var next = this;
+            while (next != null)
+            {
+                var current = next;
+                foreach (var child in next.children)
+                {
+                    if (child.CanFocus)
+                    {
+                        child.HasFocus = true;
+                        return;
+                    }
+
+                    if (child.Children.Count > 0)
+                    {
+                        next = child;
+                        break;
+                    }
+                }
+
+                if (current != next)
+                    continue;
+
+                while (next.parent != null)
+                {
+                    var index = next.Parent.Children.IndexOf(next) + 1;
+                    if (index < next.Parent.Children.Count)
+                    {
+                        next = next.Parent.Children[index];
+                        break;
+                    }
+                    else
+                        next = next.parent;
+                }
+
+                if (next.CanFocus)
+                {
+                    next.HasFocus = true;
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Focus the previous element, using the reverse order of FocusNext()
+        /// </summary>
+        protected void FocusPrevious()
+        {
+            if (!HasFocus)
+            {
+                FindFocusedElement()?.FocusPrevious();
+                return;
+            }
+
+            var prev = this;
+
+            while (true)
+            {
+                if (prev.parent == null)
+                {
+                    while (prev.children.Count > 0)
+                        prev = prev.children[prev.children.Count - 1];
+                }
+                else
+                {
+                    var index = prev.Parent.Children.IndexOf(prev) - 1;
+                    if (index >= 0)
+                    {
+                        prev = prev.Parent.Children[index];
+
+                        while (prev.children.Count > 0)
+                            prev = prev.children[prev.children.Count - 1];
+                    }
+                    else
+                        prev = prev.parent;
+                }
+
+
+                if (prev.CanFocus)
+                {
+                    prev.HasFocus = true;
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Find the first element that can focus and focus it, starting at this element
+        /// Only traverses down
+        /// </summary>
+        /// <returns>The focused element, null if none</returns>
+        public Static FocusFirstAvailable()
+        {
+            var next = new Queue<Static>();
+            next.Enqueue(this);
+
+            while (next.Count > 0)
+            {
+                var elem = next.Dequeue();
+                if (elem.CanFocus)
+                {
+                    elem.HasFocus = true;
+                    return elem;
+                }
+
+                foreach (var child in elem.Children)
+                    next.Enqueue(child);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Find the element in this treethat has focus
+        /// Searches up and down
+        /// </summary>
+        /// <returns>The focused element, or null if there is none</returns>
+        public Static FindFocusedElement()
+        {
+            var parent = this;
+            while (parent.Parent != null)
+                parent = parent.Parent;
+
+            var next = new Stack<Static>();
+            next.Push(parent);
+
+            while (next.Count > 0)
+            {
+                var elem = next.Pop();
+                if (elem.HasFocus)
+                    return elem;
+
+                foreach (var child in elem.Children)
+                    next.Push(child);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Find an element by its name
+        /// </summary>
+        /// <param name="name">The name of the element to search for</param>
+        /// <returns>The first element found or null if no element found with the specified name</returns>
+        public Static FindElementByName(string name, bool caseSensitive = true)
+        {
+            var parent = this;
+            while (parent.Parent != null)
+                parent = parent.Parent;
+
+            var next = new Stack<Static>();
+            next.Push(parent);
+
+            while (next.Count > 0)
+            {
+                var elem = next.Pop();
+                if (elem.Name != null &&
+                    elem.Name.Equals(name, caseSensitive ? System.StringComparison.Ordinal : System.StringComparison.OrdinalIgnoreCase))
+                    return elem;
+
+                foreach (var child in elem.Children)
+                    next.Push(child);
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -368,6 +594,15 @@ namespace Takai.UI
                 child.absoluteBounds = child.CalculateBounds(absoluteBounds);
                 child.Reflow();
             }
+        }
+
+        protected void ResizeAndReflow()
+        {
+            CalculateAbsoluteBounds();
+
+            OnResize?.Invoke(this, new ResizeEventArgs());
+
+            Reflow();
         }
 
         /// <summary>
@@ -430,180 +665,6 @@ namespace Takai.UI
                 bounds = Rectangle.Union(bounds, child.Bounds);
             }
             Size = bounds.Size.ToVector2() + new Vector2(padding);
-        }
-
-        /// <summary>
-        /// Focus the next element in the tree
-        /// </summary>
-        /// <remarks>If this is not the focused element, finds the focused element and calls this function</remarks>
-        protected void FocusNext()
-        {
-            if (!HasFocus)
-            {
-                FindFocusedElement()?.FocusNext();
-                return;
-            }
-
-            /* focus in the following order (13 will wrap around back to 1)
-
-            1
-                2
-                3
-                    4
-                5
-                6
-            7
-                8
-                    9
-                        10
-                        11
-                    12
-                13
-
-            */
-
-            var next = this;
-            while (next != null)
-            {
-                var current = next;
-                foreach (var child in next.children)
-                {
-                    if (child.CanFocus)
-                    {
-                        child.HasFocus = true;
-                        return;
-                    }
-
-                    if (child.Children.Count > 0)
-                    {
-                        next = child;
-                        break;
-                    }
-                }
-
-                if (current != next)
-                    continue;
-
-                while (next.parent != null)
-                {
-                    var index = next.Parent.Children.IndexOf(next) + 1;
-                    if (index < next.Parent.Children.Count)
-                    {
-                        next = next.Parent.Children[index];
-                        if (next.CanFocus)
-                        {
-                            next.HasFocus = true;
-                            return;
-                        }
-                    }
-                    else
-                        next = next.parent;
-                }
-
-                if (next.CanFocus)
-                {
-                    next.HasFocus = true;
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Focus the previous element, using the reverse order of FocusNext()
-        /// </summary>
-        protected void FocusPrevious()
-        {
-            if (!HasFocus)
-            {
-                FindFocusedElement()?.FocusPrevious();
-                return;
-            }
-
-            var prev = this;
-
-            while (true)
-            {
-                if (prev.parent == null)
-                {
-                    while (prev.children.Count > 0)
-                        prev = prev.children[prev.children.Count - 1];
-                }
-                else
-                {
-                    var index = prev.Parent.Children.IndexOf(prev) - 1;
-                    if (index >= 0)
-                    {
-                        prev = prev.Parent.Children[index];
-
-                        while (prev.children.Count > 0)
-                            prev = prev.children[prev.children.Count - 1];
-                    }
-                    else
-                        prev = prev.parent;
-                }
-
-
-                if (prev.CanFocus)
-                {
-                    prev.HasFocus = true;
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Find the element in this treethat has focus
-        /// Searches up and down
-        /// </summary>
-        /// <returns>The focused element, or null if there is none</returns>
-        public Static FindFocusedElement()
-        {
-            var parent = this;
-            while (parent.Parent != null)
-                parent = parent.Parent;
-
-            var next = new Stack<Static>();
-            next.Push(parent);
-
-            while (next.Count > 0)
-            {
-                var elem = next.Pop();
-                if (elem.HasFocus)
-                    return elem;
-
-                foreach (var child in elem.Children)
-                    next.Push(child);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Find an element by its name
-        /// </summary>
-        /// <param name="name">The name of the element to search for</param>
-        /// <returns>The first element found or null if no element found with the specified name</returns>
-        public Static FindElementByName(string name, bool caseSensitive = true)
-        {
-            var parent = this;
-            while (parent.Parent != null)
-                parent = parent.Parent;
-
-            var next = new Stack<Static>();
-            next.Push(parent);
-
-            while (next.Count > 0)
-            {
-                var elem = next.Pop();
-                if (elem.Name != null &&
-                    elem.Name.Equals(name, caseSensitive ? System.StringComparison.Ordinal : System.StringComparison.OrdinalIgnoreCase))
-                    return elem;
-
-                foreach (var child in elem.Children)
-                    next.Push(child);
-            }
-
-            return null;
         }
 
         /// <summary>
@@ -740,7 +801,7 @@ namespace Takai.UI
 
         public override string ToString()
         {
-            return $"{base.ToString()}: \"{Name ?? "(No name)"}\"";
+            return $"{base.ToString()}: \"{Name ?? "(No name)"}\"{(HasFocus ? " *" : "")}";
         }
     }
 }

@@ -11,14 +11,14 @@ List {
             HorizontalAlignment: Alignment [ Middle ];
         }
         Static {
-            Name: "New";
+            Name: "new";
             Text: "Press Ctrl+N to create a new map";
             Font: @"Defs/Fonts/UISmall.fnt.tk";
             Color: [255 255 255 255];
             HorizontalAlignment: Alignment [ Middle ];
         }
         Static {
-            Name: "Open";
+            Name: "open";
             Text: "or Ctrl+O to open a map";
             Font: @"Defs/Fonts/UISmall.fnt.tk";
             Color: [255 255 255 255];

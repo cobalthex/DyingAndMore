@@ -103,6 +103,7 @@
     <Compile Include="UI\CheckBox.cs" />
     <Compile Include="UI\Graphic.cs" />
     <Compile Include="UI\List.cs" />
+    <Compile Include="UI\NumericInput.cs" />
     <Compile Include="UI\Static.cs" />
     <Compile Include="UI\TextInput.cs" />
   </ItemGroup>
