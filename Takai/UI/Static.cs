@@ -23,8 +23,7 @@ namespace Takai.UI
     }
     public delegate void ClickHandler(Static sender, ClickEventArgs args);
 
-    public class ResizeEventArgs : System.EventArgs { }
-    public delegate void ResizeHandler(Static sender, ResizeEventArgs args);
+    public delegate void ResizeHandler(Static sender, System.EventArgs args);
 
     /// <summary>
     /// The basic UI element

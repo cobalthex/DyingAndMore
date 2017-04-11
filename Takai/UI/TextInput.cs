@@ -5,8 +5,7 @@ using Takai.Input;
 
 namespace Takai.UI
 {
-    public class InputEventArgs : System.EventArgs { }
-    public delegate void InputHandler(TextInput Sender, InputEventArgs Args);
+    public delegate void InputHandler(TextInput sender, System.EventArgs args);
 
     public class TextInput : Static
     {
