@@ -84,7 +84,7 @@ namespace DyingAndMore.Editor
                             {
                                 Width = width,
                                 Height = height,
-                                TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles.png"),
+                                TilesImage = Takai.AssetManager.Load<Texture2D>(uiContainer.FindElementByName("tileset")?.Text),
                                 TileSize = 48,
                                 Name = uiContainer.FindElementByName("name")?.Text
                             };

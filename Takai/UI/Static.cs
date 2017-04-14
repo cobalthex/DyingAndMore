@@ -33,8 +33,6 @@ namespace Takai.UI
     {
         public static Color FocusOutlineColor = Color.RoyalBlue;
 
-        public static bool DrawBoundingRects = false;
-
         /// <summary>
         /// A unique name for this element. Can be null
         /// </summary>
@@ -81,6 +79,11 @@ namespace Takai.UI
         /// Usually applies to text color
         /// </summary>
         public virtual Color Color { get; set; } = Color.White;
+
+        /// <summary>
+        /// The color to draw the outline with, by default, transparent
+        /// </summary>
+        public virtual Color OutlineColor { get; set; } = Color.Transparent;
 
         /// <summary>
         /// How this element is positioned in its container horizontally
@@ -599,7 +602,7 @@ namespace Takai.UI
         {
             CalculateAbsoluteBounds();
 
-            OnResize?.Invoke(this, new ResizeEventArgs());
+            OnResize?.Invoke(this, new System.EventArgs());
 
             Reflow();
         }
@@ -742,11 +745,7 @@ namespace Takai.UI
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            if (DrawBoundingRects)
-                Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Crimson, 0.35f), AbsoluteBounds);
-
-            if (HasFocus)
-                Graphics.Primitives2D.DrawRect(spriteBatch, FocusOutlineColor, AbsoluteBounds);
+            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusOutlineColor : OutlineColor, AbsoluteBounds);
 
             if (Font != null)
             {

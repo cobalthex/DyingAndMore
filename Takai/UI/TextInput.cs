@@ -15,6 +15,15 @@ namespace Takai.UI
         public static char PasswordChar = '*';
 
         /// <summary>
+        /// How long to wait before repeating key presses
+        /// </summary>
+        public static System.TimeSpan InitialKeyRepeatDelay = System.TimeSpan.FromMilliseconds(500);
+        /// <summary>
+        /// How long to wait between each key repetition
+        /// </summary>
+        public static int KeyRepeatDelayInMSec = 50;
+
+        /// <summary>
         /// The maximum number of characters allowed in this textbox
         /// </summary>
         public uint MaxLength { get; set; } = 0x10000;
@@ -36,6 +45,7 @@ namespace Takai.UI
             {
                 caret = MathHelper.Clamp(value, 0, Text.Length);
                 UpdateScrollPosition();
+                lastInputTick = System.Environment.TickCount;
             }
         }
         private int caret = 0;
@@ -50,7 +60,6 @@ namespace Takai.UI
                 base.Text = value;
                 UpdateVisibleText();
                 Caret = value.Length;
-                lastInputTick = System.Environment.TickCount;
             }
         }
         /// <summary>
@@ -91,9 +100,20 @@ namespace Takai.UI
         /// </summary>
         protected int lastInputTick;
 
+        /// <summary>
+        /// The last key that was repeated, Keys.None if none.
+        /// Used for repetitive input
+        /// </summary>
+        protected Keys lastRepeatKey;
+        /// <summary>
+        /// When the last key-repeat was hit
+        /// </summary>
+        protected System.TimeSpan keyRepeatTime;
+
         public TextInput()
         {
             ignoreSpaceKey = true;
+            OutlineColor = Color;
         }
 
         protected override void BeforePress(ClickEventArgs args)
@@ -121,23 +141,94 @@ namespace Takai.UI
             );
         }
 
+        protected int FindNextWordStart()
+        {
+            int pos = Caret;
+            for (; pos < Text.Length; ++pos)
+            {
+                if (!char.IsWhiteSpace(Text[pos]))
+                    break;
+            }
+            for (; pos < Text.Length; ++pos)
+            {
+                if (!(char.IsSymbol(Text[pos]) || char.IsPunctuation(Text[pos])))
+                    break;
+            }
+            for (; pos < Text.Length; ++pos)
+            {
+                if (!char.IsLetterOrDigit(Text[pos]))
+                    break;
+            }
+            return pos;
+        }
+        protected int FindPreviousWordStart()
+        {
+            int pos = Caret;
+            for (; pos > 0; --pos)
+            {
+                if (!char.IsWhiteSpace(Text[pos - 1]))
+                    break;
+            }
+            for (; pos > 0; --pos)
+            {
+                if (!(char.IsSymbol(Text[pos - 1]) || char.IsPunctuation(Text[pos - 1])))
+                    break;
+            }
+            for (; pos > 0; --pos)
+            {
+                if (!char.IsLetterOrDigit(Text[pos - 1]))
+                    break;
+            }
+            return pos;
+        }
+
         public override bool Update(GameTime time)
         {
             if (HasFocus && !(InputState.IsMod(KeyMod.Alt) ||
-                              InputState.IsMod(KeyMod.Control) ||
                               InputState.IsMod(KeyMod.Windows)))
             {
+                bool isCtrl  = InputState.IsMod(KeyMod.Control);
+                bool isShift = InputState.IsMod(KeyMod.Shift);
 
                 var keys = InputState.GetPressedKeys();
+
+                //key repetition
+                if (keys.Length > 0)
+                {
+                    var newKey = keys[keys.Length - 1];
+                    if (newKey != lastRepeatKey)
+                    {
+                        lastRepeatKey = newKey;
+                        keyRepeatTime = time.TotalGameTime;
+                    }
+                }
+                else
+                    lastRepeatKey = Keys.None;
+
+                //todo: multiple key presses messing up delay timing of repeat
+
                 foreach (var key in keys)
                 {
-                    if (!InputState.IsPress(key))
+                    if (!InputState.IsPress(key) && //ignore held keys
+                        ((lastRepeatKey != Keys.None && key != lastRepeatKey) || //and ignore other keys if there is a repeat
+                            (time.TotalGameTime < keyRepeatTime + InitialKeyRepeatDelay || //or the repeat hasn't started yet
+                             System.Environment.TickCount < lastInputTick + KeyRepeatDelayInMSec))) //or the repeat is delayed
                         continue;
 
                     if (key == Keys.Left && Caret > 0)
-                        --Caret;
+                    {
+                        if (isCtrl)
+                            Caret = FindPreviousWordStart();
+                        else
+                            --Caret;
+                    }
                     else if (key == Keys.Right && Caret < Text.Length)
-                        ++Caret;
+                    {
+                        if (isCtrl)
+                            Caret = FindNextWordStart();
+                        else
+                            ++Caret;
+                    }
 
                     else if (key == Keys.Home)
                         Caret = 0;
@@ -147,44 +238,66 @@ namespace Takai.UI
 
                     else if (key == Keys.Back && Caret > 0)
                     {
-                        base.Text = Text.Remove(Caret - 1, 1);
+                        if (isCtrl)
+                        {
+                            var pos = FindPreviousWordStart();
+                            base.Text = Text.Remove(pos, caret - pos);
+                            Caret = pos;
+                        }
+                        else
+                        {
+                            base.Text = Text.Remove(Caret - 1, 1);
+                            --Caret;
+                        }
                         UpdateVisibleText();
-                        --Caret;
                     }
 
                     else if (key == Keys.Delete && Caret < Text.Length)
                     {
-                        base.Text = Text.Remove(Caret, 1);
+                        if (isCtrl)
+                        {
+                            var pos = FindNextWordStart();
+                            base.Text = Text.Remove(pos, caret - pos);
+                        }
+                        else
+                            base.Text = Text.Remove(Caret, 1);
                         UpdateVisibleText();
                     }
 
                     else if (AllowSpaces && key == Keys.Space)
-                        InsertAtCaret(' ');
+                        InsertAtCaret(' '); //autocomplete when ctrl?
 
-                    else if (AllowLetters && key >= Keys.A && key <= Keys.Z)
+                    else if (!isCtrl && AllowLetters && key >= Keys.A && key <= Keys.Z)
                     {
-                        if (InputState.IsMod(KeyMod.Shift))
+                        if (isShift)
                             InsertAtCaret((char)((key - Keys.A) + 'A'));
                         else
                             InsertAtCaret((char)((key - Keys.A) + 'a'));
                     }
 
-                    else if (AllowNumbers && key >= Keys.D0 && key <= Keys.D9)
+                    else if (!isCtrl && AllowNumbers && key >= Keys.D0 && key <= Keys.D9)
                         InsertAtCaret((char)((key - Keys.D0) + '0'));
 
-                    else if (AllowNumbers && key >= Keys.NumPad0 && key <= Keys.NumPad9)
+                    else if (!isCtrl && AllowNumbers && key >= Keys.NumPad0 && key <= Keys.NumPad9)
                         InsertAtCaret((char)((key - Keys.NumPad0) + '0'));
 
-                    else if ((AllowNumbers || AllowSpecialCharacters) &&
+                    else if (!isCtrl && (AllowNumbers || AllowSpecialCharacters) &&
                              key == Keys.OemPlus)
                         InsertAtCaret('+');
 
-                    else if ((AllowNumbers || AllowSpecialCharacters) &&
+                    else if (!isCtrl && (AllowNumbers || AllowSpecialCharacters) &&
                              key == Keys.OemMinus)
                         InsertAtCaret('-');
 
-                    //else if (AllowSpecialCharacters)
-                    //    ;
+                    else if (AllowSpecialCharacters)
+                    {
+                        if (key == Keys.OemQuestion)
+                            InsertAtCaret(isShift ? '?' : '/');
+                        else if (key == Keys.OemComma)
+                            InsertAtCaret(isShift ? '<' : ',');
+                        else if (key == Keys.OemPeriod)
+                            InsertAtCaret(isShift ? '>' : '.');
+                    }
                 }
             }
 
@@ -195,7 +308,7 @@ namespace Takai.UI
         protected void UpdateVisibleText()
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
-            OnInput?.Invoke(this, new InputEventArgs());
+            OnInput?.Invoke(this, new System.EventArgs ());
         }
 
         void UpdateScrollPosition()
@@ -220,40 +333,40 @@ namespace Takai.UI
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (Font == null)
-                return;
+            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusOutlineColor : OutlineColor, AbsoluteBounds);
 
-            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusOutlineColor : Color, AbsoluteBounds);
-
-            var size = new Point(
-                MathHelper.Min(AbsoluteBounds.Width - 4, (int)textSize.X),
-                MathHelper.Min(AbsoluteBounds.Height, (int)textSize.Y)
-            );
-
-            Font?.Draw(
-                spriteBatch,
-                visibleText,
-                0, -1,
-                new Rectangle(
-                    AbsoluteBounds.X + 2,
-                    AbsoluteBounds.Y + ((AbsoluteBounds.Height - size.Y) / 2),
-                    size.X,
-                    size.Y
-                ),
-                new Point(-ScrollPosition, 0),
-                Color
-            );
-
-            var tickCount = System.Environment.TickCount;
-            if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 1000 < 500))
+            if (Font != null)
             {
-                var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + AbsoluteBounds.X + 3;
-                Graphics.Primitives2D.DrawLine(
-                    spriteBatch,
-                    Color,
-                    new Vector2(x, AbsoluteBounds.Top + 4),
-                    new Vector2(x, AbsoluteBounds.Bottom - 4)
+                var size = new Point(
+                    MathHelper.Min(AbsoluteBounds.Width - 4, (int)textSize.X),
+                    MathHelper.Min(AbsoluteBounds.Height, (int)textSize.Y)
                 );
+
+                Font?.Draw(
+                    spriteBatch,
+                    visibleText,
+                    0, -1,
+                    new Rectangle(
+                        AbsoluteBounds.X + 2,
+                        AbsoluteBounds.Y + ((AbsoluteBounds.Height - size.Y) / 2),
+                        size.X,
+                        size.Y
+                    ),
+                    new Point(-ScrollPosition, 0),
+                    Color
+                );
+
+                var tickCount = System.Environment.TickCount;
+                if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
+                {
+                    var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + AbsoluteBounds.X + 3;
+                    Graphics.Primitives2D.DrawLine(
+                        spriteBatch,
+                        Color,
+                        new Vector2(x, AbsoluteBounds.Top + 4),
+                        new Vector2(x, AbsoluteBounds.Bottom - 4)
+                    );
+                }
             }
 
             foreach (var child in Children)

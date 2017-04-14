@@ -101,6 +101,7 @@
     <Compile Include="Runtime\GameManager.cs" />
     <Compile Include="Runtime\GameState.cs" />
     <Compile Include="UI\CheckBox.cs" />
+    <Compile Include="UI\FileInput.cs" />
     <Compile Include="UI\Graphic.cs" />
     <Compile Include="UI\List.cs" />
     <Compile Include="UI\NumericInput.cs" />
