@@ -117,7 +117,6 @@ namespace DyingAndMore.Editor
                 VerticalAlignment = Takai.UI.Alignment.Middle,
                 Margin = 5
             };
-
         }
 
         public override void Unload()
@@ -137,10 +136,9 @@ namespace DyingAndMore.Editor
             {
                 var checkbox = new Takai.UI.CheckBox()
                 {
+                    Name = setting.Name,
                     Text = BeautifyPropName(setting.Name),
                     Font = LargeFont,
-                    HorizontalAlignment = Takai.UI.Alignment.Start,
-                    VerticalAlignment = Takai.UI.Alignment.Middle,
                     IsChecked = (bool)setting.GetValue(Map.renderSettings)
                 };
                 checkbox.OnClick += delegate (Takai.UI.Static sender, Takai.UI.ClickEventArgs args)
@@ -291,7 +289,14 @@ namespace DyingAndMore.Editor
             if (InputState.IsPress(Keys.F2))
             {
                 if (!renderSettingsConsole.RemoveFromParent())
+                {
+                    //refresh individual render settings
+                    var settings = typeof(Takai.Game.Map.MapRenderSettings);
+                    foreach (var child in renderSettingsConsole.Children)
+                        ((Takai.UI.CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
+
                     uiContainer.AddChild(renderSettingsConsole);
+                }
             }
 
             if (InputState.IsPress(Keys.G))
