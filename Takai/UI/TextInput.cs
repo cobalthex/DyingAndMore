@@ -182,7 +182,7 @@ namespace Takai.UI
             return pos;
         }
 
-        public override bool Update(GameTime time)
+        protected override bool UpdateSelf(GameTime time)
         {
             if (HasFocus && !(InputState.IsMod(KeyMod.Alt) ||
                               InputState.IsMod(KeyMod.Windows)))
@@ -301,7 +301,7 @@ namespace Takai.UI
                 }
             }
 
-            return base.Update(time);
+            return base.UpdateSelf(time); //todo: check for changes and return false if any
         }
 
 
@@ -331,10 +331,8 @@ namespace Takai.UI
             ++Caret;
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusOutlineColor : OutlineColor, AbsoluteBounds);
-
             if (Font != null)
             {
                 var size = new Point(
@@ -368,9 +366,6 @@ namespace Takai.UI
                     );
                 }
             }
-
-            foreach (var child in Children)
-                child.Draw(spriteBatch);
         }
     }
 }

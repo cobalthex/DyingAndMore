@@ -473,7 +473,6 @@ namespace Takai.UI
             }
 
             var prev = this;
-
             while (true)
             {
                 if (prev.parent == null)
@@ -690,12 +689,46 @@ namespace Takai.UI
             if (!Runtime.GameManager.HasFocus)
                 return false;
 
-            for (var i = Children.Count - 1; i >= 0; --i)
+            /* update in the following order: H G F E D C B A
+            A
+                B
+                    C
+                    D
+                E
+                    F
+                        G
+                    H
+            */
+
+            var update = this;
+            while (update.children.Count > 0)
+                update = update.children[update.children.Count - 1];
+
+            while (true)
             {
-                if (!Children[i].Update(time))
+                if (!update.UpdateSelf(time))
                     return false;
+
+                if (update.parent == null)
+                    break;
+
+                var index = update.Parent.Children.IndexOf(update) - 1;
+                if (index >= 0)
+                {
+                    update = update.Parent.Children[index];
+
+                    while (update.children.Count > 0)
+                        update = update.children[update.children.Count - 1];
+                }
+                else
+                    update = update.parent;
             }
 
+            return true;
+        }
+
+        protected virtual bool UpdateSelf(GameTime time)
+        {
             if (HasFocus)
             {
                 if (!ignoreTabKey && Input.InputState.IsPress(Keys.Tab))
@@ -743,18 +776,38 @@ namespace Takai.UI
             return true;
         }
 
+        /// <summary>
+        /// Draw this element, its decorators, and any children
+        /// </summary>
+        /// <param name="spriteBatch">The spritebatch to use</param>
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusOutlineColor : OutlineColor, AbsoluteBounds);
+            var draws = new Queue<Static>(Children.Count + 1);
+            draws.Enqueue(this);
 
+            while (draws.Count > 0)
+            {
+                var draw = draws.Dequeue();
+
+                Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusOutlineColor : draw.OutlineColor, draw.AbsoluteBounds);
+                draw.DrawSelf(spriteBatch);
+
+                foreach (var child in draw.Children)
+                    draws.Enqueue(child);
+            }
+        }
+
+        /// <summary>
+        /// Draw only this item (no children)
+        /// </summary>
+        /// <param name="spriteBatch">The spritebatch to use</param>
+        protected virtual void DrawSelf(SpriteBatch spriteBatch)
+        {
             if (Font != null)
             {
                 var textBounds = CenterInRect(textSize, AbsoluteBounds);
                 Font.Draw(spriteBatch, Text, textBounds, Color);
             }
-
-            foreach (var child in Children)
-                child.Draw(spriteBatch);
         }
 
         /// <summary>
@@ -799,7 +852,7 @@ namespace Takai.UI
 
         public override string ToString()
         {
-            return $"{base.ToString()}: \"{Name ?? "(No name)"}\"{(HasFocus ? " *" : "")}";
+            return $"{base.ToString()} \"{Name ?? "(No name)"}\"{(HasFocus ? " *" : "")}";
         }
     }
 }

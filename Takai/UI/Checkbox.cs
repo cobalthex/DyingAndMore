@@ -5,6 +5,11 @@ namespace Takai.UI
 {
     public class CheckBox : Static
     {
+        /// <summary>
+        /// The color of the checkbox check
+        /// </summary>
+        public Color CheckColor { get; set; } = Color.White;
+
         static int dividerWidth = 15;
 
         public bool IsChecked { get; set; } = false;
@@ -27,18 +32,18 @@ namespace Takai.UI
             base.BeforeClick(args);
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             var checkboxSize = MathHelper.Min(AbsoluteBounds.Width, AbsoluteBounds.Height);
             var checkboxBounds = new Rectangle(AbsoluteBounds.X, AbsoluteBounds.Y, checkboxSize, checkboxSize);
-            Graphics.Primitives2D.DrawRect(spriteBatch, Color, checkboxBounds);
+            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusOutlineColor : CheckColor, checkboxBounds);
             checkboxBounds.Inflate(-1, -1);
-            Graphics.Primitives2D.DrawRect(spriteBatch, Color, checkboxBounds);
+            Graphics.Primitives2D.DrawRect(spriteBatch, CheckColor, checkboxBounds);
 
             if (IsChecked)
             {
                 checkboxBounds.Inflate(-4, -4);
-                Graphics.Primitives2D.DrawFill(spriteBatch, Color, checkboxBounds);
+                Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, checkboxBounds);
             }
 
             Font?.Draw(
@@ -47,7 +52,7 @@ namespace Takai.UI
                 CenterInRect(textSize, new Rectangle(
                     AbsoluteBounds.X + checkboxSize + dividerWidth,
                     AbsoluteBounds.Y,
-                    AbsoluteBounds.Width - checkboxSize,
+                    AbsoluteBounds.Width - checkboxSize - dividerWidth,
                     AbsoluteBounds.Height)),
                 Color
             );

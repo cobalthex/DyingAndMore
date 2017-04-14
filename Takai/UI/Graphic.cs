@@ -12,12 +12,10 @@ namespace Takai.UI
             Size = Sprite.Size.ToVector2() + new Vector2(padding);
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             //todo: custom positioning/sizing
             Sprite.Draw(spriteBatch, AbsoluteBounds, 0);
-
-            base.Draw(spriteBatch);
         }
     }
 }

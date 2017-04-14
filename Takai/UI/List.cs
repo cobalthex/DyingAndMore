@@ -28,6 +28,7 @@ namespace Takai.UI
             //pre-position items into a list
             for (int i = 0; i < Children.Count; ++i)
             {
+                var child = children[i];
                 //todo: account for auto size padding (first item offset)
 
                 if (i > 0)
@@ -49,7 +50,8 @@ namespace Takai.UI
                 children[i].Position = position;
             }
 
-            //adjust absolute positions
+            //todo: decide how to handle alignment on main axis, vertical list with child:vertical-middle will put child in middle of list container
+
             base.Reflow();
         }
 
