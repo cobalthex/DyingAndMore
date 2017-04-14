@@ -63,19 +63,20 @@ List {
                 }
             ]
         }
-
+        
         Static {
             Text: "Tileset";
             Font: @"Defs/Fonts/UISmall.fnt.tk";
             HorizontalAlignment: Alignment [ Start ];
         }
-        TextInput { #FileInput
+
+        FileInput {
             Name: "tileset";
-            Filter: "tiles.tk"; #todo: use win32 filter format
+            Filter: "PNG Image (*.png)|*.png";
             Width: 300;
             Font: @"Defs/Fonts/UISmall.fnt.tk";
         }
-
+        
         Static {
             Name: "create";
             Text: "Create";

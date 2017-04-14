@@ -100,7 +100,8 @@ namespace Takai.UI
                 AllowNumbers = true,
                 AllowSpaces = false,
                 AllowSpecialCharacters = false,
-                MaxLength = 20
+                MaxLength = 20,
+                OutlineColor = Color.Transparent
             };
             textInput.OnInput += delegate
             {
@@ -143,6 +144,8 @@ namespace Takai.UI
                 textInput.Size = new Vector2(Size.X - height * 2, height);
                 upButton.Size = downButton.Size = new Vector2(height);
             };
+
+            OutlineColor = Color;
         }
 
         public override void AutoSize(float padding = 0)
