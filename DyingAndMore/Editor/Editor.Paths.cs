@@ -48,15 +48,9 @@ namespace DyingAndMore.Editor
         {
             if (paths == null)
             {
-                var path = new Takai.Game.Path();
-                path.AddPoint(new Vector2(200, 50));
-                path.AddPoint(new Vector2(300, 150));
-                path.AddPoint(new Vector2(400, 200));
-                path.AddPoint(new Vector2(500, 150));
-                path.AddPoint(new Vector2(600, 50));
                 paths = new List<Takai.Game.Path>
                 {
-                    path
+                    new Takai.Game.Path()
                 };
             }
         }
@@ -83,14 +77,45 @@ namespace DyingAndMore.Editor
 
         void DrawPath(Takai.Game.Path path)
         {
-            if (path.ControlPoints.Count > 0)
-                editor.Map.DrawRect(new Rectangle((int)path.ControlPoints[0].X - 2, (int)path.ControlPoints[0].Y - 2, 4, 4), Color.White);
+            if (path.ControlPoints.Count < 1)
+                return;
 
-            for (int i = 0; i < path.ControlPoints.Count - 1; ++i)
+            //if (path.ControlPoints.Count > 0)
+            //{
+            //    editor.Map.DrawRect(new Rectangle((int)path.ControlPoints[0].X - 2, (int)path.ControlPoints[0].Y - 2, 4, 4), pathColor);
+
+            //    editor.Map.DrawLine(path.ControlPoints[0], path.ControlPoints[1], pathColor);
+            //    editor.Map.DrawLine(path.ControlPoints[path.ControlPoints.Count - 2], path.ControlPoints[path.ControlPoints.Count - 1], pathColor);
+            //}
+
+            Vector2 GetPoint(float val, int segment)
             {
-                var next = path.ControlPoints[i + 1];
-                editor.Map.DrawLine(path.ControlPoints[i], next, Color.White);
-                editor.Map.DrawRect(new Rectangle((int)next.X - 2, (int)next.Y - 2, 4, 4), Color.White);
+                int c = path.ControlPoints.Count - 1;
+                return Vector2.CatmullRom(
+                    path.ControlPoints[MathHelper.Clamp(segment - 1, 0, c)],
+                    path.ControlPoints[MathHelper.Clamp(segment,     0, c)],
+                    path.ControlPoints[MathHelper.Clamp(segment + 1, 0, c)],
+                    path.ControlPoints[MathHelper.Clamp(segment + 2, 0, c)],
+                    val
+                );
+            }
+
+            Vector2 last = GetPoint(0, 0);
+            for (int i = 0; i < path.SegmentLengths.Count; ++i)
+            {
+                for (int s = 0; s <= path.SegmentLengths[i]; s += 5)
+                {
+                    var next = GetPoint(MathHelper.Max(s, 0) / path.SegmentLengths[i], i + 1);
+                    editor.Map.DrawLine(last, next, Color.GreenYellow);
+                    last = next;
+                }
+            }
+
+            //draw directional arrows at control points
+            foreach (var p in path.ControlPoints)
+            {
+                editor.Map.DrawLine(p - new Vector2(3), p + new Vector2(3), Color.Cyan);
+                editor.Map.DrawLine(p + new Vector2(-3, 3), p + new Vector2(3, -3), Color.Cyan);
             }
         }
 

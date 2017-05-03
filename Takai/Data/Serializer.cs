@@ -169,17 +169,30 @@ namespace Takai.Data
         /// Load types from an assembly
         /// </summary>
         /// <param name="Assembly">The assembly to load from</param>
-        public static void LoadTypesFrom(Assembly Ass)
+        public static void LoadTypesFrom(Assembly assembly)
         {
-            if (Ass == null)
+            if (assembly == null)
                 return;
 
-            Type[] types = Ass.GetTypes();
+            Type[] types = assembly.GetTypes();
             foreach (var type in types)
             {
                 if (!type.IsGenericType && !Attribute.IsDefined(type, typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false))
-                    RegisteredTypes[WriteFullTypeNames ? type.FullName : type.Name] = type;
+                    RegisterType(type);
             }
+
+            RegisterType(typeof(Curve));
+            RegisterType(typeof(CurveKey));
+            RegisterType(typeof(Color));
+            RegisterType(typeof(Vector2));
+            RegisterType(typeof(Vector3));
+            RegisterType(typeof(Vector4));
+            RegisterType(typeof(Rectangle));
+        }
+
+        public static void RegisterType(Type type)
+        {
+            RegisteredTypes[WriteFullTypeNames ? type.FullName : type.Name] = type;
         }
     }
 }

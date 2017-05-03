@@ -463,7 +463,12 @@ namespace Takai.Game
                     var lineTransform = cameraTransform * Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
                     lineEffect.Parameters["Transform"].SetValue(lineTransform);
 
-                    var blackLines = debugLines.ConvertAll(line => { line.Color = Color.Black; line.Position += new Vector3(1, 1, 0); return line; });
+                    var blackLines = debugLines.ConvertAll(line =>
+                    {
+                        line.Color = new Color(0, 0, 0, line.Color.A);
+                        line.Position += new Vector3(1, 1, 0);
+                        return line;
+                    });
                     foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
                     {
                         pass.Apply();

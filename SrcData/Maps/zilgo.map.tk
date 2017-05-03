@@ -1,0 +1,2318 @@
+Map {
+    Name: "zilgo";
+    TileSize: 48;
+    Width: 16;
+    Height: 16;
+    ActiveCamera: Camera {
+        PostEffect: Null;
+        Viewport: [0 0 1280 800];
+        Position: [424.5842 332.7966];
+        Scale: 0.8828125;
+        Rotation: 0;
+        Shake: 0;
+        Follow: Null;
+        MoveSpeed: 1000;
+    };
+    TilesImage: "Textures/Tiles.png";
+    Tiles: [8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 11];
+    State: MapState {
+        entities: [
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [136.8674 171.947];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 20145;
+            }
+            Actor {
+                CurrentHealth: 100;
+                MaxHealth: 100;
+                FieldOfView: 2.356194;
+                MaxSpeed: 400;
+                MoveForce: 600;
+                Faction: Factions [ Player ];
+                Controller: InputController {
+                    player: PlayerIndex.One;
+                };
+                PrimaryWeapon: Gun {
+                    Projectile: Projectile {
+                        Range: 0;
+                        Velocity: [0 0];
+                        Direction: [1 0];
+                        Name: Null;
+                        Position: [0 0];
+                        IsAlive: True;
+                        AlwaysActive: True;
+                        Radius: 8;
+                        IsPhysical: True;
+                        IgnoreTrace: True;
+                        State: EntityStateMachine {
+                            States: {
+                                Idle: EntState {
+                                    Sprite: Sprite {
+                                        ElapsedTime: 0;
+                                        FrameCount: 1;
+                                        FrameLength: 0.0001;
+                                        IsLooping: True;
+                                        Texture: "Data\\Textures/Projectiles/Sharp.png";
+                                        Width: 16;
+                                        Height: 8;
+                                        Size: [16 8];
+                                        ClipRect: [0 0 16 8];
+                                        Origin: [12 4];
+                                        Tween: TweenStyle.None;
+                                    };
+                                    IsLooping: True;
+                                    IsOverlay: False;
+                                };
+                            };
+                            BaseState: EntStateKey.Idle;
+                            OverlaidStates: [];
+                        };
+                        Sprites: [
+                            Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Projectiles/Sharp.png";
+                                Width: 16;
+                                Height: 8;
+                                Size: [16 8];
+                                ClipRect: [0 0 16 8];
+                                Origin: [12 4];
+                                Tween: TweenStyle.None;
+                            }
+                        ];
+                        DestroyIfDeadAndInactive: False;
+                        AlwaysDrawUpright: False;
+                        OutlineColor: [0 0 0 0];
+                        SpawnTime: 0;
+                        explosion: ParticleType {
+                            Graphic: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Particles/Spark.png";
+                                Width: 8;
+                                Height: 8;
+                                Size: [8 8];
+                                ClipRect: [0 0 8 8];
+                                Origin: [4 4];
+                                Tween: TweenStyle.None;
+                            };
+                            BlendMode: "Additive";
+                            Color: ValueCurve`1 {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType.Constant;
+                                    PreLoop: CurveLoopType.Constant;
+                                };
+                                start: [255 255 255 255];
+                                end: [0 0 0 0];
+                            };
+                            Speed: ValueCurve`1 {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType.Constant;
+                                    PreLoop: CurveLoopType.Constant;
+                                };
+                                start: 100;
+                                end: 50;
+                            };
+                            Scale: ValueCurve`1 {
+                                curve: Curve {
+                                    IsConstant: True;
+                                    Keys: [];
+                                    PostLoop: CurveLoopType.Constant;
+                                    PreLoop: CurveLoopType.Constant;
+                                };
+                                start: 1;
+                                end: 1;
+                            };
+                            Angle: ValueCurve`1 {
+                                curve: Null;
+                                start: 0;
+                                end: 0;
+                            };
+                        };
+                        trail: ParticleType {
+                            Graphic: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Particles/trail.png";
+                                Width: 8;
+                                Height: 8;
+                                Size: [8 8];
+                                ClipRect: [0 0 8 8];
+                                Origin: [4 4];
+                                Tween: TweenStyle.None;
+                            };
+                            BlendMode: Null;
+                            Color: ValueCurve`1 {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType.Constant;
+                                    PreLoop: CurveLoopType.Constant;
+                                };
+                                start: [255 165 0 255];
+                                end: [0 0 0 0];
+                            };
+                            Speed: ValueCurve`1 {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType.Constant;
+                                    PreLoop: CurveLoopType.Constant;
+                                };
+                                start: 100;
+                                end: 0;
+                            };
+                            Scale: ValueCurve`1 {
+                                curve: Curve {
+                                    IsConstant: True;
+                                    Keys: [];
+                                    PostLoop: CurveLoopType.Constant;
+                                    PreLoop: CurveLoopType.Constant;
+                                };
+                                start: 1;
+                                end: 1;
+                            };
+                            Angle: ValueCurve`1 {
+                                curve: Null;
+                                start: 0;
+                                end: 0;
+                            };
+                        };
+                        trailGlow: ParticleType {
+                            Graphic: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Particles/trailglow.png";
+                                Width: 8;
+                                Height: 8;
+                                Size: [8 8];
+                                ClipRect: [0 0 8 8];
+                                Origin: [4 4];
+                                Tween: TweenStyle.None;
+                            };
+                            BlendMode: "Additive";
+                            Color: ValueCurve`1 {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType.Constant;
+                                    PreLoop: CurveLoopType.Constant;
+                                };
+                                start: [255 255 255 255];
+                                end: [0 0 0 0];
+                            };
+                            Speed: ValueCurve`1 {
+                                curve: Curve {
+                                    IsConstant: False;
+                                    Keys: [
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 0.25;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 0.5;
+                                        }
+                                        CurveKey {
+                                            Continuity: CurveContinuity.Smooth;
+                                            Position: 1;
+                                            TangentIn: 0;
+                                            TangentOut: 0;
+                                            Value: 1;
+                                        }
+                                    ];
+                                    PostLoop: CurveLoopType.Constant;
+                                    PreLoop: CurveLoopType.Constant;
+                                };
+                                start: 20;
+                                end: 5;
+                            };
+                            Scale: ValueCurve`1 {
+                                curve: Curve {
+                                    IsConstant: True;
+                                    Keys: [];
+                                    PostLoop: CurveLoopType.Constant;
+                                    PreLoop: CurveLoopType.Constant;
+                                };
+                                start: 1;
+                                end: 1;
+                            };
+                            Angle: ValueCurve`1 {
+                                curve: Null;
+                                start: 0;
+                                end: 0;
+                            };
+                        };
+                        damage: 20;
+                    };
+                    Speed: 0;
+                    AddVelocity: False;
+                    shotDelay: 100;
+                    maxShots: 0;
+                };
+                AltWeapon: FluidGun {
+                    Fluid: FluidType {
+                        Texture: "Data\\Textures/Fluids/blood.png";
+                        Reflection: "Data\\Textures/Fluids/blood.r.png";
+                        Alpha: 1;
+                        Radius: 54;
+                        Drag: 0.2;
+                    };
+                    speed: 100;
+                    shotDelay: 100;
+                    maxShots: 0;
+                };
+                Name: Null;
+                Position: [71.16827 63.20365];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 24;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 2;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/Player.png";
+                                Width: 48;
+                                Height: 48;
+                                Size: [48 48];
+                                ClipRect: [0 0 96 144];
+                                Origin: [24 24];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 2;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/Player.png";
+                        Width: 48;
+                        Height: 48;
+                        Size: [48 48];
+                        ClipRect: [0 0 96 144];
+                        Origin: [24 24];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: False;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 23120;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [207.0975 178.7435];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 17153;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [256.9382 178.7435];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 17408;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [297.7169 156.0886];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 17680;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [349.8232 190.0709];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 21029;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [256.9382 108.5134];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 22219;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [401.9294 158.3541];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 21505;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [136.8674 210.4603];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 19822;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [299.9825 380.3718];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 16524;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [252.4072 301.0797];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 16881;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [207.0975 178.7435];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 17153;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [322.6373 214.9912];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 17952;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [202.5665 230.8497];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 19465;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [349.8232 190.0709];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 21029;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [410.9913 373.5753];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 16218;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [232.0179 466.4603];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 15725;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [299.9825 380.3718];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 16524;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [406.4603 450.6019];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 15963;
+            }
+            Actor {
+                CurrentHealth: 20;
+                MaxHealth: 20;
+                FieldOfView: 2.356194;
+                MaxSpeed: 300;
+                MoveForce: 500;
+                Faction: Factions [ Enemy Common Common ];
+                Controller: AIController {
+                };
+                PrimaryWeapon: Null;
+                AltWeapon: Null;
+                Name: Null;
+                Position: [410.9913 373.5753];
+                Direction: [1 0];
+                Velocity: [0 0];
+                IsAlive: True;
+                AlwaysActive: False;
+                Radius: 16;
+                IsPhysical: True;
+                IgnoreTrace: False;
+                State: EntityStateMachine {
+                    States: {
+                        Idle: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 8;
+                                FrameLength: 100;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 32;
+                                Height: 32;
+                                Size: [32 32];
+                                ClipRect: [0 0 256 32];
+                                Origin: [16 16];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: True;
+                            IsOverlay: False;
+                        };
+                        Dying: EntState {
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/InfectedCell.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 32 256 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.Overlap;
+                            };
+                            IsLooping: False;
+                            IsOverlay: False;
+                        };
+                    };
+                    BaseState: EntStateKey.Idle;
+                    OverlaidStates: [];
+                };
+                Sprites: [
+                    Sprite {
+                        ElapsedTime: 0;
+                        FrameCount: 8;
+                        FrameLength: 100;
+                        IsLooping: True;
+                        Texture: "Data\\Textures/Entities/InfectedCell.png";
+                        Width: 32;
+                        Height: 32;
+                        Size: [32 32];
+                        ClipRect: [0 0 256 32];
+                        Origin: [16 16];
+                        Tween: TweenStyle.Overlap;
+                    }
+                ];
+                DestroyIfDeadAndInactive: False;
+                AlwaysDrawUpright: True;
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 16218;
+            }
+        ];
+        FluidTypes: [
+            FluidType {
+                Texture: "Data\\Textures\\Fluids\\Blood.png";
+                Reflection: "Data\\Textures\\Fluids\\Blood.r.png";
+                Alpha: 1;
+                Radius: 54;
+                Drag: 0.2;
+            }
+        ];
+        Fluids: [
+            FluidSave {
+                type: 0;
+                position: [179.9116 190.0709];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [125.5399 153.8231];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [125.5399 142.4957];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [327.1682 174.2125];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [340.7612 169.6815];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [336.2302 171.947];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [352.0887 47.34524];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [288.655 49.61073];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [241.0798 113.0444];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [229.7523 144.7612];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [236.5488 135.6992];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [268.2656 115.3099];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [268.2656 151.5576];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [266.0002 183.2744];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [270.5311 181.0089];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [555.9824 126.6373];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [492.5488 103.9824];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [438.1771 117.5753];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [435.9117 119.8408];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [433.6461 119.8408];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [408.7258 158.3541];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [399.6638 137.9647];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [184.4426 212.7258];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [168.5842 208.1948];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [127.8055 244.4426];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [125.5399 239.9116];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [111.947 210.4603];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [102.8851 242.1771];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [322.6373 203.6638];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [340.7612 203.6638];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [370.2125 199.1328];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [365.6815 228.5842];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [354.3541 260.301];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [232.0179 248.9735];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [229.7523 248.9735];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [234.2833 226.3187];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [195.7701 242.1771];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [293.1859 382.6373];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [306.7789 371.3098];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [374.7435 341.8585];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [395.1328 242.1771];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [467.6284 230.8497];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [467.6284 255.77];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [460.832 267.0974];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [490.2833 226.3187];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [388.3364 192.3364];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [392.8674 375.8408];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [585.4337 194.6019];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [594.4957 212.7258];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [578.6373 248.9735];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [576.3718 226.3187];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [286.3895 391.6992];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [397.3983 407.5576];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [406.4603 407.5576];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [454.0356 396.2302];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [476.6904 421.1506];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [485.7523 448.3364];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [490.2833 450.6019];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [546.9205 409.8231];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [553.7169 407.5576];
+                velocity: [0 0];
+            }
+            FluidSave {
+                type: 0;
+                position: [553.7169 407.5576];
+                velocity: [0 0];
+            }
+        ];
+        decals: [
+            Decal {
+                texture: "Data\\Textures\\Decals\\Pimple.png";
+                position: [256.9381 196.8672];
+                angle: 0;
+                scale: 1;
+            }
+            Decal {
+                texture: "Data\\Textures\\Decals\\crack.png";
+                position: [574.1062 149.292];
+                angle: 0;
+                scale: 1;
+            }
+            Decal {
+                texture: "Data\\Textures\\Decals\\Pimple.png";
+                position: [77.96466 294.2832];
+                angle: 0;
+                scale: 1;
+            }
+            Decal {
+                texture: "Data\\Textures\\Decals\\crack.png";
+                position: [370.2124 248.9734];
+                angle: -0.3365584;
+                scale: 1;
+            }
+            Decal {
+                texture: "Data\\Textures\\Decals\\crack.png";
+                position: [241.0797 486.8495];
+                angle: 0;
+                scale: 1;
+            }
+            Decal {
+                texture: "Data\\Textures\\Decals\\crack.png";
+                position: [583.1682 498.177];
+                angle: 0;
+                scale: 1;
+            }
+        ];
+        elapsedTime: 46070;
+        timeScale: 1;
+    };
+}

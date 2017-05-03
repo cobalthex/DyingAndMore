@@ -16,6 +16,8 @@ namespace Takai.UI
         {
             //todo: custom positioning/sizing
             Sprite.Draw(spriteBatch, AbsoluteBounds, 0);
+
+            base.DrawSelf(spriteBatch);
         }
     }
 }
