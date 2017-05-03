@@ -1,19 +1,27 @@
+Static {
+    Name: "back";
+    Text: "« Back";
+    Font: @"Defs/Fonts/UISmall.fnt.tk";
+    Color: Color.White;
+    Position: Vector2 {x:20 y:20};
+}
+
 List {
     Margin: 10;
-    HorizontalAlignment: Alignment [ Middle ];
-    VerticalAlignment: Alignment [ Middle ];
-    Children: [
+    HorizontalAlignment: Alignment.Middle;
+    VerticalAlignment: Alignment.Middle;
+    Children: [;
         Static {
             Text: "Create a New Map";
             Font: "Fonts/UILarge.bfnt";
-            Color: [255 255 255 255];
-            HorizontalAlignment: Alignment [ Middle ];
+            Color: Color.White;
+            HorizontalAlignment: Alignment.Middle;
         }
 
         Static {
             Text: "Name";
             Font: @"Defs/Fonts/UISmall.fnt.tk";
-            HorizontalAlignment: Alignment [ Start ];
+            HorizontalAlignment: Alignment.Start;
         }
         TextInput {
             Name: "name";
@@ -25,14 +33,14 @@ List {
         List {
             Direction: Direction [ Horizontal ];
             Margin: 10;
-            Children: [
+            Children: [;
                 List {
                     Margin: 10;
-                    Children: [
+                    Children: [;
                         Static {
                             Text: "Width";
                             Font: @"Defs/Fonts/UISmall.fnt.tk";
-                            HorizontalAlignment: Alignment [ Start ];
+                            HorizontalAlignment: Alignment.Start;
                         }
                         NumericInput {
                             Name: "width";
@@ -46,11 +54,11 @@ List {
 
                 List {
                     Margin: 10;
-                    Children: [
+                    Children: [;
                         Static {
                             Text: "Height";
                             Font: @"Defs/Fonts/UISmall.fnt.tk";
-                            HorizontalAlignment: Alignment [ Start ];
+                            HorizontalAlignment: Alignment.Start;
                         }
                         NumericInput {
                             Name: "height";
@@ -67,7 +75,7 @@ List {
         Static {
             Text: "Tileset";
             Font: @"Defs/Fonts/UISmall.fnt.tk";
-            HorizontalAlignment: Alignment [ Start ];
+            HorizontalAlignment: Alignment.Start;
         }
 
         FileInput {
@@ -76,13 +84,13 @@ List {
             Width: 300;
             Font: @"Defs/Fonts/UISmall.fnt.tk";
         }
-        
+
         Static {
             Name: "create";
             Text: "Create";
             Font: "Fonts/UILarge.bfnt";
             Width: 200;
-            HorizontalAlignment: Alignment [ Middle ];
+            HorizontalAlignment: Alignment.Middle;
         }
-    ];
+    ]
 }

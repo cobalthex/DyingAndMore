@@ -87,10 +87,30 @@ namespace Takai.Data
             catch { return BaseExceptionMessage; }
         }
 
+        public static List<object> TextDeserializeAll(string file)
+        {
+            using (var reader = new StreamReader(file))
+                return TextDeserializeAll(reader);
+        }
+
         public static object TextDeserialize(string file)
         {
             using (var reader = new StreamReader(file))
                 return TextDeserialize(reader);
+        }
+
+        /// <summary>
+        /// Read all objects from the file
+        /// </summary>
+        /// <param name="reader">The stream to read from</param>
+        /// <returns>The objects created</returns>
+        public static List<object> TextDeserializeAll(StreamReader reader)
+        {
+            var objects = new List<object>();
+            while (!reader.EndOfStream)
+                objects.Add(TextDeserialize(reader));
+
+            return objects;
         }
 
         /// <summary>
@@ -148,8 +168,8 @@ namespace Takai.Data
                         reader.Read(); //skip ;
                         SkipIgnored(reader);
                     }
-                    else if (peek != '}')
-                        throw new InvalidDataException(ExceptString("Unexpected token. Expected ';' or '}' while trying to read object", reader));
+                    //else if (peek != '}')
+                    //    throw new InvalidDataException(ExceptString("Unexpected token. Expected ';' or '}' while trying to read object", reader));
                 }
 
                 reader.Read();
@@ -226,53 +246,79 @@ namespace Takai.Data
             {
                 SkipIgnored(reader);
 
+                peek = reader.Peek();
+
                 if (type.IsEnum)
                 {
-                    if (reader.Read() != '[')
-                        throw new InvalidDataException(ExceptString($"Expected a '[' when reading enum value EnumType[Key1; Key2]) while attempting to read '{word}'", reader));
-
-                    SkipIgnored(reader);
-
-                    var valuesCount = 0;
-                    UInt64 values = 0;
-
-                    while (!reader.EndOfStream && reader.Peek() != ']')
+                    peek = reader.Read();
+                    if (peek == '[')
                     {
-                        if ((peek = reader.Peek()) == ';')
+                        SkipIgnored(reader);
+
+                        var valuesCount = 0;
+                        UInt64 values = 0;
+
+                        while (!reader.EndOfStream && reader.Peek() != ']')
                         {
-                            reader.Read(); //skip ;
+                            if ((peek = reader.Peek()) == ';')
+                            {
+                                reader.Read(); //skip ;
+                                SkipIgnored(reader);
+
+                                if (reader.Peek() == ';')
+                                    throw new InvalidDataException(ExceptString("Unexpected ';' in enum (missing value)", reader));
+
+                                continue;
+                            }
+
+                            if (peek == -1)
+                                throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read enum", reader));
+
+                            var value = ReadWord(reader);
+                            values |= Convert.ToUInt64(Enum.Parse(type, value));
+                            ++valuesCount;
+
                             SkipIgnored(reader);
-
-                            if (reader.Peek() == ';')
-                                throw new InvalidDataException(ExceptString("Unexpected ';' in enum (missing value)", reader));
-
-                            continue;
                         }
 
-                        if (peek == -1)
-                            throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read enum", reader));
+                        if (reader.Read() == -1) //skip ]
+                            throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected ']' to close enum", reader));
 
-                        var value = ReadWord(reader);
-                        values |= Convert.ToUInt64(Enum.Parse(type, value));
-                        ++valuesCount;
+                        if (valuesCount == 0)
+                            throw new ArgumentOutOfRangeException(ExceptString("Expected at least one enum value", reader));
 
-                        SkipIgnored(reader);
+                        if (valuesCount > 1 && !Attribute.IsDefined(type, typeof(FlagsAttribute), true))
+                            throw new ArgumentOutOfRangeException(ExceptString($"{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", reader));
+
+                        return Enum.ToObject(type, values);
                     }
+                    if (peek == '.')
+                        return Enum.Parse(type, ReadWord(reader));
 
-                    if (reader.Read() == -1) //skip ]
-                        throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected ']' to close enum", reader));
+                    if (reader.Read() != '[')
+                        throw new InvalidDataException(ExceptString($"Expected a '[' when reading enum value (EnumType[Key1; Key2]) or '.' (EnumType.Key) while attempting to read '{word}'", reader));
+                }
 
-                    if (valuesCount == 0)
-                        throw new ArgumentOutOfRangeException(ExceptString("Expected at least one enum value", reader));
+                //static/single enum value
+                if (peek == '.')
+                {
+                    reader.Read();
+                    SkipIgnored(reader);
+                    var staticVal = ReadWord(reader);
 
-                    if (valuesCount > 1 && !Attribute.IsDefined(type, typeof(FlagsAttribute), true))
-                        throw new ArgumentOutOfRangeException(ExceptString($"{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", reader));
+                    var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static);
+                    if (field != null)
+                        return field.GetValue(null);
 
-                    return Enum.ToObject(type, values);
+                    var prop = type.GetProperty(staticVal, BindingFlags.Public | BindingFlags.Static);
+                    if (prop != null)
+                        return prop.GetValue(null);
+
+                    throw new InvalidDataException(ExceptString($"Expected static value when reading {staticVal} from type '{word}'", reader));
                 }
 
                 //read object
-                if (reader.Peek() != '{')
+                if (peek != '{')
                     throw new InvalidDataException(ExceptString($"Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", reader));
 
                 var dict = TextDeserialize(reader) as Dictionary<string, object>;
@@ -450,6 +496,9 @@ namespace Takai.Data
 
             var sourceType = Source.GetType();
 
+            if (DestType.IsAssignableFrom(sourceType))
+                return Source;
+
             if (Serializers.TryGetValue(DestType, out var deserial) && deserial.Deserialize != null)
                 return deserial.Deserialize(Source);
 
@@ -460,9 +509,6 @@ namespace Takai.Data
                 if (deserialed != DefaultAction)
                     return deserialed;
             }
-
-            if (DestType.IsAssignableFrom(sourceType))
-                return Source;
 
             if (!Strict)
             {

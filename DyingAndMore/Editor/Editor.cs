@@ -62,6 +62,15 @@ namespace DyingAndMore.Editor
 
             uiContainer = new Takai.UI.Static();
 
+            renderSettingsConsole = new Takai.UI.List()
+            {
+                Name = "RenderSettings",
+                Position = new Vector2(20, 0),
+                HorizontalAlignment = Takai.UI.Alignment.Start,
+                VerticalAlignment = Takai.UI.Alignment.Middle,
+                Margin = 5
+            };
+
             if (Map == null)
             {
                 uiContainer.AddChild((Takai.UI.Static)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NoMap.ui.tk"));
@@ -71,7 +80,14 @@ namespace DyingAndMore.Editor
                 {
                     newBtn.OnClick += delegate
                     {
-                        uiContainer.ReplaceAllChildren((Takai.UI.Static)Takai.Data.Serializer.TextDeserialize("Defs/UI/Editor/NewMap.ui.tk"));
+                        var children = Takai.Data.Serializer.TextDeserializeAll("Defs/UI/Editor/NewMap.ui.tk");
+                        uiContainer.RemoveAllChildren();
+                        foreach (var child in children)
+                        {
+                            var uiChild = (Takai.UI.Static)child;
+                            uiContainer.AddChild(uiChild);
+                        }
+
                         uiContainer.FocusFirstAvailable();
 
                         var createBtn = uiContainer.FindElementByName("create");
@@ -108,15 +124,6 @@ namespace DyingAndMore.Editor
             }
             else
                 StartMap();
-
-            renderSettingsConsole = new Takai.UI.List()
-            {
-                Name = "RenderSettings",
-                Position = new Vector2(20, 0),
-                HorizontalAlignment = Takai.UI.Alignment.Start,
-                VerticalAlignment = Takai.UI.Alignment.Middle,
-                Margin = 5
-            };
         }
 
         public override void Unload()

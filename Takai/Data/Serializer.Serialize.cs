@@ -60,6 +60,7 @@ namespace Takai.Data
     {
         public static void TextSerialize(string file, object serializing)
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(file));
             using (var writer = new StreamWriter(file))
                 TextSerialize(writer, serializing);
         }
@@ -88,20 +89,21 @@ namespace Takai.Data
             {
                 writer.Write(WriteFullTypeNames ? ty.FullName : ty.Name);
 
-                writer.Write(" [");
                 if (Attribute.IsDefined(ty, typeof(FlagsAttribute)) && Convert.ToUInt64(serializing) != 0)
                 {
+                    writer.Write(" [");
                     var e = serializing as Enum;
-                    var enumValues = Enum.GetValues(ty);
-                    foreach (Enum flag in enumValues)
+                    var enumValues = Enum.GetNames(ty);
+                    foreach (var flag in enumValues)
                     {
-                        if (Convert.ToUInt64(flag) != 0 && e.HasFlag(flag))
+                        var value = (Enum)Enum.Parse(ty, flag);
+                        if (Convert.ToUInt64(value) != 0 && e.HasFlag(value))
                             writer.Write(" {0}", flag.ToString());
                     }
+                    writer.Write(" ]");
                 }
                 else
-                    writer.Write(" {0}", serializing.ToString());
-                writer.Write(" ]");
+                    writer.Write(".{0}", serializing.ToString());
             }
 
             else if (ty == typeof(string) || ty == typeof(char[]))

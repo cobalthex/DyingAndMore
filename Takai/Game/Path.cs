@@ -19,10 +19,26 @@ namespace Takai.Game
         {
             ControlPoints.Add(Point);
 
-            if (ControlPoints.Count > 3)
+            if (ControlPoints.Count > 2)
             {
-                var length = Vector2.Distance(ControlPoints[ControlPoints.Count - 2], Point);
-                //todo: length needs to be calculated as hermite length
+                var coarseLength = Vector2.Distance(ControlPoints[ControlPoints.Count - 2], Point);
+                coarseLength = MathHelper.Min(5, coarseLength / 10);
+                var length = 0f;
+
+                Vector2 GetPoint(float val)
+                {
+                    int c = ControlPoints.Count - 1;
+                    return Vector2.CatmullRom(
+                        ControlPoints[MathHelper.Clamp(ControlPoints.Count - 4, 0, c)],
+                        ControlPoints[MathHelper.Clamp(ControlPoints.Count - 3, 0, c)],
+                        ControlPoints[MathHelper.Clamp(ControlPoints.Count - 2, 0, c)],
+                        ControlPoints[MathHelper.Clamp(ControlPoints.Count - 1, 0, c)],
+                        val
+                    );
+                }
+
+                for (int i = 1; i < coarseLength; ++i)
+                    length += Vector2.Distance(GetPoint((i - 1) / coarseLength), GetPoint(i / coarseLength));
 
                 SegmentLengths.Add(length);
                 TotalLength += length;
@@ -80,7 +96,7 @@ namespace Takai.Game
             }
         }
         private float offset = 0;
-        
+
         protected int Segment { get; set; } = 0;
         protected float SegmentRelative { get; set; } = 0;
 

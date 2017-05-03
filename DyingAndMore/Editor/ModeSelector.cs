@@ -85,7 +85,7 @@ namespace DyingAndMore.Editor
             AutoSize();
         }
 
-        public override bool Update(GameTime time)
+        protected override bool UpdateSelf(GameTime time)
         {
             Mode?.Update(time);
 
@@ -99,13 +99,12 @@ namespace DyingAndMore.Editor
                 }
             }
 
-            return base.Update(time);
+            return true;
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             Mode?.Draw(spriteBatch);
-            base.Draw(spriteBatch);
         }
     }
 }
