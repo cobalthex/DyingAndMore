@@ -4,10 +4,7 @@ using Takai.Graphics;
 
 namespace Takai.UI
 {
-    /// <summary>
-    /// An integer input selector
-    /// </summary>
-    public class NumericInput : Static
+    public abstract class NumericBase : Static
     {
         /// <summary>
         /// The current value of this input
@@ -27,8 +24,21 @@ namespace Takai.UI
                 Text = value.ToString();
             }
         }
-        private int value;
+        protected int value;
 
+        /// <summary>
+        /// The normalized value (from 0 to 1) of this range
+        /// </summary>
+        public float NormalizedValue
+        {
+            get => (Value - Minimum) / (float)(Maximum - Minimum);
+            set => Value = (int)(value * (Maximum - Minimum)) + Minimum;
+        }
+
+        /// <summary>
+        /// The minimum allowed value
+        /// Setting this may affect Value
+        /// </summary>
         public int Minimum
         {
             get => minimum;
@@ -38,6 +48,11 @@ namespace Takai.UI
                 Value = MathHelper.Max(Value, minimum);
             }
         }
+
+        /// <summary>
+        /// The maximum allowed value
+        /// Setting this may affect Value
+        /// </summary>
         public int Maximum
         {
             get => maximum;
@@ -47,14 +62,20 @@ namespace Takai.UI
                 Value = MathHelper.Min(Value, maximum);
             }
         }
-        int minimum = int.MinValue;
-        int maximum = int.MaxValue;
+        protected int minimum = int.MinValue;
+        protected int maximum = int.MaxValue;
 
         /// <summary>
         /// How much to increase or decrease the value by each step
         /// </summary>
         public int Increment { get; set; } = 1;
+    }
 
+    /// <summary>
+    /// An integer input selector
+    /// </summary>
+    public class NumericInput : NumericBase
+    {
         /// <summary>
         /// Attempt to set the text of this input. Must be a valid number to be set
         /// </summary>

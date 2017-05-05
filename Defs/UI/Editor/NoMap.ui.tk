@@ -24,5 +24,12 @@ List {
             Color: Color.White;
             HorizontalAlignment: Alignment.Middle;
         }
+        TrackBar {
+            Size: [200 30];
+            Value: 10;
+            Minimum: -100;
+            Maximum: 100;
+            HorizontalAlignment: Alignment.Middle;
+        }
     ];
 }

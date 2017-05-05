@@ -65,7 +65,7 @@ namespace DyingAndMore.Editor
             }
 
             else if (InputState.IsButtonDown(MouseButtons.Left) &&
-                    (isNewTrigger || (currentWorldPos - savedWorldPos).LengthSquared() >= 5 * 5))
+                    (isNewTrigger || InputState.HasMouseDragged(MouseButtons.Left)))
             {
                 if (!isNewTrigger)
                 {
