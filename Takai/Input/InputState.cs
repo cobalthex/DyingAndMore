@@ -29,6 +29,12 @@ namespace Takai.Input
     {
         private static KeyboardState keyState, lastKeyState;
         private static MouseState mouseState, lastMouseState;
+        private static Vector2[] mouseDownPositions;
+
+        static InputState()
+        {
+            mouseDownPositions = new Vector2[System.Enum.GetNames(typeof(MouseButtons)).Length];
+        }
 
         /// <summary>
         /// Get a vector2 of the current mouse position
@@ -67,6 +73,12 @@ namespace Takai.Input
 
             LastPolarMouseVector = PolarMouseVector;
             PolarMouseVector = MouseVector - new Vector2(Viewport.Width / 2, Viewport.Height / 2);
+
+            for (int i = 0; i < mouseDownPositions.Length; ++i)
+            {
+                if (IsPress((MouseButtons)i))
+                    mouseDownPositions[i] = MouseVector;
+            }
         }
 
         /// <summary>
@@ -97,13 +109,14 @@ namespace Takai.Input
         }
 
         /// <summary>
-        /// Has the mouse been dragged since last frame
+        /// Has the mouse been dragged since the mouse was pressed
         /// </summary>
         /// <param name="Epsilon">The minimum length required to be considered dragging</param>
         /// <returns>True if the mouse is held down and is being moved</returns>
         public static bool HasMouseDragged(MouseButtons Button, int Epsilon = 10)
         {
-            return (IsButtonHeld(Button) && MouseDelta().LengthSquared() > (Epsilon * Epsilon));
+            return (IsButtonHeld(Button) &&
+                   (MouseVector - mouseDownPositions[(int)Button]).LengthSquared() >= (Epsilon * Epsilon));
         }
 
         static ButtonState GetButtonState(MouseButtons Button, ref MouseState State)

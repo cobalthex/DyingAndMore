@@ -107,6 +107,7 @@
     <Compile Include="UI\NumericInput.cs" />
     <Compile Include="UI\Static.cs" />
     <Compile Include="UI\TextInput.cs" />
+    <Compile Include="UI\TrackBar.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

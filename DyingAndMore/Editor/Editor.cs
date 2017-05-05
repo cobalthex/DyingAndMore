@@ -43,6 +43,7 @@ namespace DyingAndMore.Editor
         Takai.UI.Static uiContainer;
         Takai.UI.Static selectorPreview;
         Takai.UI.Static renderSettingsConsole;
+        public Takai.UI.TrackBar testTrack;
 
         public ModeSelector modes;
 
@@ -191,6 +192,15 @@ namespace DyingAndMore.Editor
                 };
 
                 uiContainer.ReplaceAllChildren(modes, selectorPreview);
+                uiContainer.AddChild(testTrack = new Takai.UI.TrackBar()
+                {
+                    Position = new Vector2(0, 100),
+                    Size = new Vector2(300, 30),
+                    HorizontalAlignment = Takai.UI.Alignment.Middle,
+                    Minimum = 0,
+                    Maximum = 1000,
+                    Value = 500
+                });
             }
 
             //start zoomed out to see the whole map
