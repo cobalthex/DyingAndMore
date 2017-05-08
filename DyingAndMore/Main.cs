@@ -71,6 +71,9 @@ namespace DyingAndMore
         bool useCustomCursor = false;
         bool takingScreenshot = false;
 
+        SpriteBatch sbatch;
+        Takai.UI.Static ui;
+
         /// <summary>
         /// Create the game
         /// </summary>
@@ -114,14 +117,17 @@ namespace DyingAndMore
             Takai.AssetManager.Initialize(GraphicsDevice, "Data\\");
 
             GameManager.Initialize(this);
+            sbatch = new SpriteBatch(GraphicsDevice);
 
             var map = new Takai.Game.Map(GraphicsDevice)
             {
                 updateSettings = Takai.Game.MapUpdateSettings.Editor
             };
 
-            var state = new Editor.Editor();
-            GameManager.PushState(state);
+            //var state = new Editor.Editor();
+            //GameManager.PushState(state);
+
+            ui = new Editor.Editor2();
 
             base.Initialize();
         }
@@ -137,7 +143,9 @@ namespace DyingAndMore
                 takingScreenshot = true;
 
             Takai.Input.InputState.Update(GraphicsDevice.Viewport.Bounds);
-            GameManager.Update(gameTime);
+            //GameManager.Update(gameTime);
+            ui.Update(gameTime);
+            ui.Bounds = GraphicsDevice.Viewport.Bounds;
         }
 
         protected override void Draw(GameTime gameTime)
@@ -159,7 +167,12 @@ namespace DyingAndMore
                 rt.Dispose();
             }
             else
-                GameManager.Draw(gameTime);
+            {
+                sbatch.Begin();
+                //GameManager.Draw(gameTime);
+                ui.Draw(sbatch);
+                sbatch.End();
+            }
         }
     }
 }

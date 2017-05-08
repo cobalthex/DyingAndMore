@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 namespace Takai.Game
 {
     /// <summary>
-    /// A 2D path calculated using hermite splines
+    /// A 2D path calculated using splines
     /// </summary>
     public class Path
     {

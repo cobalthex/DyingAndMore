@@ -63,14 +63,26 @@ namespace Takai.Game
                 map = (Map)Data.Serializer.TextDeserialize(reader);
 
             map.InitializeGraphics(Runtime.GameManager.Game.GraphicsDevice);
+            GC.Collect();
             return map;
         }
 
         Dictionary<string, object> Serialize()
         {
+            var decals = new List<Decal>();
+            var triggers = new HashSet<Trigger>();
+
+            foreach (var sector in Sectors)
+            {
+                decals.AddRange(sector.decals);
+                triggers.UnionWith(sector.triggers);
+            }
+
             return new Dictionary<string, object>
             {
                 ["Tiles"] = Tiles,
+                ["Decals"] = decals,
+                ["Triggers"] = triggers,
                 ["State"] = new MapState(this)
             };
         }
@@ -85,6 +97,18 @@ namespace Takai.Game
 
             BuildTileMask(TilesImage, true);
             BuildSectors();
+
+            if (Props.TryGetValue("Triggers", out var triggers))
+            {
+                foreach (var trigger in Data.Serializer.CastType<List<Trigger>>(triggers))
+                    AddTrigger(trigger);
+            }
+
+            if (Props.TryGetValue("Decals", out var decals))
+            {
+                foreach (var decal in Data.Serializer.CastType<List<Decal>>(decals))
+                    AddDecal(decal);
+            }
 
             if (Props.TryGetValue("State", out var state))
                 LoadState((MapState)state);
@@ -105,7 +129,6 @@ namespace Takai.Game
             public List<Entity> entities;
             public List<FluidType> FluidTypes;
             public List<FluidSave> Fluids;
-            public List<Decal> decals;
 
             public TimeSpan elapsedTime;
             public float timeScale;
@@ -115,7 +138,6 @@ namespace Takai.Game
                 entities = new List<Entity>(Map.AllEntities);
                 FluidTypes = new List<FluidType>();
                 Fluids = new List<FluidSave>();
-                decals = new List<Decal>();
                 elapsedTime = Map.ElapsedTime;
                 timeScale = Map.TimeScale;
 
@@ -138,8 +160,6 @@ namespace Takai.Game
                 foreach (var sector in (System.Collections.IEnumerable)Map.Sectors)
                 {
                     var s = (MapSector)sector;
-
-                    decals.AddRange(s.decals);
 
                     foreach (var Fluid in s.Fluids)
                     {
@@ -175,6 +195,7 @@ namespace Takai.Game
             {
                 var temp = Data.Serializer.TextDeserialize(reader);
                 if (!(temp is MapState))
+
                     return;
                 load = (MapState)temp;
             }
@@ -207,12 +228,6 @@ namespace Takai.Game
                     velocity = Save.velocity
                 };
             }).ToList() ?? new List<Fluid>();
-
-            if (State.decals != null)
-            {
-                foreach (var decal in State.decals)
-                    AddDecal(decal);
-            }
 
             TimeScale = State.timeScale == 0 ? 1 : State.timeScale;
             ElapsedTime = State.elapsedTime;

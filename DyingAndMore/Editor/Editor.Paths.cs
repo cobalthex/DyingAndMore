@@ -113,7 +113,7 @@ namespace DyingAndMore.Editor
             //    }
             //}
 
-            int nSegPoints = 30; //todo (based on segment length)
+            int nSegPoints = 15; //todo (based on segment length)
 
             double Interpolate(double p0, double p1, double p2, double p3, double[] time, double t)
             {

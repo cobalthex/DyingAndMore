@@ -138,7 +138,7 @@ namespace Takai.Game
         /// Update the camera (and map)
         /// </summary>
         /// <param name="time">Game time</param>
-        public void Update(GameTime time)
+        public virtual void Update(GameTime time)
         {
             if (Follow != null)
                 Position = Follow.Position;
