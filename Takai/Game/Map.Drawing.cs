@@ -492,11 +492,11 @@ namespace Takai.Game
                 var viewProjection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
                 lineEffect.Parameters["Transform"].SetValue(cameraTransform * viewProjection);
 
-                var grids = new VertexPositionColor[visibleTiles.Width * 2 + visibleTiles.Height * 2];
+                var grids = new VertexPositionColor[visibleTiles.Width * 2 + visibleTiles.Height * 2 + 4];
                 var gridColor = new Color(Color.Gray, 0.3f);
                 var sectorColor = new Color(Color.Gray, 0.65f);
                 var cameraOffset = -new Vector2(visibleRegion.X % TileSize, visibleRegion.Y % TileSize);
-                for (int i = 0; i < visibleTiles.Width; ++i)
+                for (int i = 0; i <= visibleTiles.Width; ++i)
                 {
                     var n = i * 2;
                     grids[n].Position = new Vector3(cameraOffset.X + visibleRegion.X + i * TileSize, visibleRegion.Top, 0);
@@ -504,9 +504,9 @@ namespace Takai.Game
                     grids[n + 1] = grids[n];
                     grids[n + 1].Position.Y += visibleRegion.Height;
                 }
-                for (int i = 0; i < visibleTiles.Height; ++i)
+                for (int i = 0; i <= visibleTiles.Height; ++i)
                 {
-                    var n = visibleTiles.Width * 2 + i * 2;
+                    var n = visibleTiles.Width * 2 + i * 2 + 2;
                     grids[n].Position = new Vector3(visibleRegion.Left, cameraOffset.Y + visibleRegion.Y + i * TileSize, 0);
                     grids[n].Color = (int)grids[n].Position.Y % SectorPixelSize < TileSize ? sectorColor : gridColor;
                     grids[n + 1] = grids[n];

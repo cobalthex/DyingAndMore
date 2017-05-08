@@ -22,6 +22,11 @@ namespace Takai.Game
         /// </summary>
         internal HashSet<Entity> ContainedEntities { get; set; } = new HashSet<Entity>();
 
+        public Trigger()
+        {
+            Region = new Microsoft.Xna.Framework.Rectangle(0, 0, 1, 1);
+        }
+
         public Trigger(Microsoft.Xna.Framework.Rectangle region, string name = null)
         {
             Region = region;

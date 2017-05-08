@@ -104,6 +104,7 @@
     <Compile Include="UI\FileInput.cs" />
     <Compile Include="UI\Graphic.cs" />
     <Compile Include="UI\List.cs" />
+    <Compile Include="UI\MapView.cs" />
     <Compile Include="UI\NumericInput.cs" />
     <Compile Include="UI\Static.cs" />
     <Compile Include="UI\TextInput.cs" />
