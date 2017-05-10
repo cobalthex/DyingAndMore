@@ -761,7 +761,7 @@ namespace Takai.UI
                 }
             }
 
-            else if (Input.InputState.IsClick(Input.MouseButtons.Left))
+            else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
             {
                 if (didPress && AbsoluteBounds.Contains(mouse) && OnClick != null)
                 {

@@ -3,13 +3,16 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Data;
 using Takai.Input;
+using Takai.UI;
 
 namespace DyingAndMore.Editor
 {
     class Editor2 : Takai.UI.MapView
     {
         ModeSelector selector;
-        Takai.UI.List renderSettingsConsole;
+        List renderSettingsConsole;
+        Static modeContainer;
+        Static fpsDisplay;
 
         public Editor2()
         {
@@ -29,6 +32,22 @@ namespace DyingAndMore.Editor
                 HorizontalAlignment = Takai.UI.Alignment.Middle,
                 VerticalAlignment = Takai.UI.Alignment.Start,
                 Position = new Vector2(0, 40)
+            });
+
+            AddChild(fpsDisplay = new Static()
+            {
+                Position = new Vector2(20),
+                VerticalAlignment = Alignment.End,
+                HorizontalAlignment = Alignment.End,
+                Font = smallFont
+            });
+
+            AddChild(new Selectors.ScrollBar()
+            {
+                ContentPosition = 10,
+                ContentSize = 200,
+                Position = new Vector2(100),
+                Size = new Vector2(20, 100)
             });
 
             #region render settings console
@@ -69,6 +88,8 @@ namespace DyingAndMore.Editor
             if (InputState.IsPress(Keys.F2))
                 ToggleRenderSettingsConsole();
 
+            fpsDisplay.Text = "FPS: " + (1000 / time.ElapsedGameTime.TotalMilliseconds).ToString("N2");
+            fpsDisplay.AutoSize();
             return base.UpdateSelf(time);
         }
 
