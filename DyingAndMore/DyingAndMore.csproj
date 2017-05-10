@@ -80,6 +80,7 @@
     <Compile Include="Editor\Editor.cs" />
     <Compile Include="Editor\Selectors\DecalSelector.cs" />
     <Compile Include="Editor\ModeSelector.cs" />
+    <Compile Include="Editor\Selectors\Selector2.cs" />
     <Compile Include="Editor\Selectors\TileSelector.cs" />
     <Compile Include="Editor\Selectors\Selector.cs" />
     <Compile Include="Game\Entities\AIController.cs" />
