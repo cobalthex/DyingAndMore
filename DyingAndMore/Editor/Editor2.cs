@@ -41,13 +41,38 @@ namespace DyingAndMore.Editor
                 HorizontalAlignment = Alignment.End,
                 Font = smallFont
             });
-
-            AddChild(new Selectors.ScrollBar()
+            AddChild(new TrackBar()
+            {
+                Minimum = 0,
+                Maximum = 100,
+                Size = new Vector2(200, 30),
+                Position = new Vector2(0, 100),
+                HorizontalAlignment = Alignment.Middle
+            });
+            AddChild(new ScrollBar()
+            {
+                ContentPosition = 10,
+                ContentSize = 2000,
+                Position = new Vector2(100),
+                Size = new Vector2(20, 100),
+                VerticalAlignment = Alignment.Stretch
+            });
+            AddChild(new ScrollBar()
             {
                 ContentPosition = 10,
                 ContentSize = 200,
-                Position = new Vector2(100),
-                Size = new Vector2(20, 100)
+                Position = new Vector2(130, 100),
+                Size = new Vector2(100, 20),
+                Direction = Direction.Horizontal
+            });
+
+            AddChild(new Selectors.Selector2()
+            {
+                Size = new Vector2(300, 1),
+                VerticalAlignment = Alignment.Stretch,
+                HorizontalAlignment = Alignment.End,
+                ItemCount = 200,
+                ItemSize = new Point(64)
             });
 
             #region render settings console
@@ -87,17 +112,12 @@ namespace DyingAndMore.Editor
         {
             if (InputState.IsPress(Keys.F2))
                 ToggleRenderSettingsConsole();
+            else if (InputState.IsPress(Keys.Q) && InputState.IsMod(KeyMod.Control))
+                Takai.Runtime.GameManager.Exit();
 
             fpsDisplay.Text = "FPS: " + (1000 / time.ElapsedGameTime.TotalMilliseconds).ToString("N2");
             fpsDisplay.AutoSize();
             return base.UpdateSelf(time);
-        }
-
-        protected override void DrawSelf(SpriteBatch spriteBatch)
-        {
-            base.DrawSelf(spriteBatch);
-
-
         }
 
         static string BeautifyPropName(string name)

@@ -11,8 +11,7 @@ namespace Takai.UI
             if (!base.UpdateSelf(time))
                 return false;
 
-            if (AbsoluteBounds.Contains(Input.InputState.MousePoint) &&
-                Input.InputState.IsButtonHeld(Input.MouseButtons.Left))
+            if (didPress)
             {
                 var relPos = Input.InputState.MousePoint - AbsoluteBounds.Location;
                 Value = (int)((relPos.X / Size.X) * (Maximum - Minimum)) + Minimum;

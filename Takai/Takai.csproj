@@ -106,6 +106,7 @@
     <Compile Include="UI\List.cs" />
     <Compile Include="UI\MapView.cs" />
     <Compile Include="UI\NumericInput.cs" />
+    <Compile Include="UI\ScrollBar.cs" />
     <Compile Include="UI\Static.cs" />
     <Compile Include="UI\TextInput.cs" />
     <Compile Include="UI\TrackBar.cs" />

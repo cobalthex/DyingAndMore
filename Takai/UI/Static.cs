@@ -10,7 +10,8 @@ namespace Takai.UI
     {
         Start,
         Middle,
-        End
+        End,
+        Stretch //Special case, overrides position and size
     }
 
     public class ClickEventArgs : System.EventArgs
@@ -125,6 +126,7 @@ namespace Takai.UI
         /// Center moves down and to the right from the center
         /// End moves in the opposite direction
         /// </summary>
+        /// <remarks>Overriden if Alignment.Stretch is used</remarks>
         [Data.Serializer.ReadOnly]
         public Vector2 Position
         {
@@ -143,6 +145,7 @@ namespace Takai.UI
         /// <summary>
         /// The size of the element
         /// </summary>
+        /// <remarks>Overriden if Alignment.Stretch is used</remarks>
         [Data.Serializer.ReadOnly]
         public Vector2 Size
         {
@@ -590,6 +593,22 @@ namespace Takai.UI
         /// </summary>
         public virtual void Reflow()
         {
+            if (HorizontalAlignment == Alignment.Stretch ||
+                VerticalAlignment == Alignment.Stretch)
+            {
+                if (HorizontalAlignment == Alignment.Stretch)
+                {
+                    position.X = 0;
+                    size.X = (parent?.size.X ?? 1);
+                }
+                if (VerticalAlignment == Alignment.Stretch)
+                {
+                    position.Y = 0;
+                    size.Y = (parent?.size.Y ?? 1);
+                }
+                CalculateAbsoluteBounds();
+            }
+
             foreach (var child in Children)
             {
                 child.absoluteBounds = child.CalculateBounds(absoluteBounds);
@@ -599,11 +618,13 @@ namespace Takai.UI
 
         protected void ResizeAndReflow()
         {
-            CalculateAbsoluteBounds();
-
-            OnResize?.Invoke(this, new System.EventArgs());
+            if (horizontalAlignment != Alignment.Stretch &&
+                verticalAlignment != Alignment.Stretch)
+                CalculateAbsoluteBounds();
 
             Reflow();
+
+            OnResize?.Invoke(this, new System.EventArgs());
         }
 
         /// <summary>
@@ -646,7 +667,7 @@ namespace Takai.UI
         protected Rectangle CalculateAbsoluteBounds()
         {
             absoluteBounds = Parent != null
-                ? CalculateBounds(Parent.CalculateAbsoluteBounds())
+                ? CalculateBounds(Parent.AbsoluteBounds)
                 : new Rectangle(Position.ToPoint(), Size.ToPoint());
             return absoluteBounds;
 
@@ -659,6 +680,7 @@ namespace Takai.UI
         /// </summary>
         public virtual void AutoSize(float padding = 0)
         {
+            //todo: maybe make padding an actual property
             var bounds = new Rectangle(Position.ToPoint(), textSize.ToPoint());
             foreach (var child in Children)
             {

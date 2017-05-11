@@ -105,7 +105,7 @@ namespace Takai.Input
         /// <returns>The change in position</returns>
         public static Vector2 MouseDelta()
         {
-            return (lastMouseState.Position - mouseState.Position).ToVector2();
+            return (mouseState.Position - lastMouseState.Position).ToVector2();
         }
 
         /// <summary>
