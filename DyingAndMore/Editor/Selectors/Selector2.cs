@@ -5,134 +5,50 @@ using Takai.UI;
 
 namespace DyingAndMore.Editor.Selectors
 {
-    class ScrollBar : Static
+    class Selector2 : Static
     {
-        static int Margin = 4; //todo: apply correctly
+        protected ScrollBar scrollBar;
 
-        /// <summary>
-        /// The size of the content. This determines how big the scroll thumb is
-        /// </summary>
-        public int ContentSize { get; set; } = 1;
+        public Point ItemSize { get; set; }
+        public int ItemCount { get; set; }
+        public int Padding { get; set; } = 5;
 
-        /// <summary>
-        /// Where the content is scrolled to
-        /// </summary>
-        public int ContentPosition
+        protected int ItemsPerRow
         {
-            get => contentPosition;
-            set
+            get => (int)((Padding + Size.X - scrollBar.Size.X) / (ItemSize.X + Padding));
+        }
+
+        public Selector2()
+        {
+            AddChild(scrollBar = new ScrollBar()
             {
-                if (Direction == Direction.Vertical)
-                    contentPosition = MathHelper.Clamp(value, 0, ContentSize - (int)Size.Y);
-                else if (Direction == Direction.Horizontal)
-                    contentPosition = MathHelper.Clamp(value, 0, ContentSize - (int)Size.X);
-                else
-                    contentPosition = value;
-            }
-        }
-        private int contentPosition = 0;
-
-        /// <summary>
-        /// Which direction the scrollbar moves
-        /// </summary>
-        public Direction Direction { get; set; } = Direction.Vertical;
-
-        protected bool didPressThumb = false;
-        protected Point thumbPressOffset;
-
-        public ScrollBar()
-        {
-            OutlineColor = Color;
-        }
-
-        protected override bool UpdateSelf(GameTime time)
-        {
-            var mouse = InputState.MousePoint - AbsoluteBounds.Location;
-
-            if (InputState.IsButtonUp(MouseButtons.Left))
-                didPressThumb = false;
-
-            if (didPressThumb)
-            {
-                if (Direction == Direction.Vertical)
-                    ContentPosition = (int)((mouse.Y - thumbPressOffset.Y) * (ContentSize / Size.Y));
-                else if (Direction == Direction.Horizontal)
-                    ContentPosition = (int)((mouse.X - thumbPressOffset.X) * (ContentSize / Size.X));
-                return false;
-            }
-
-            return base.UpdateSelf(time);
-        }
-
-        protected override void BeforePress(ClickEventArgs args)
-        {
-            var thumb = GetThumbBounds();
-            if (thumb.Contains(args.position))
-            {
-                didPressThumb = true;
-                thumbPressOffset = args.position.ToPoint() - thumb.Location;
-            }
-        }
-
-        protected override void BeforeClick(ClickEventArgs args)
-        {
-            didPressThumb = false;
-            base.BeforeClick(args);
-        }
-
-        protected int GetThumbSize()
-        {
-            switch (Direction)
-            {
-                case Direction.Vertical:
-                    return (int)((Size.Y / ContentSize) * Size.Y);
-                case Direction.Horizontal:
-                    return (int)((Size.X / ContentSize) * Size.X);
-                default:
-                    return 1;
-            }
-        }
-
-        protected int GetThumbOffset()
-        {
-            int size = GetThumbSize();
-
-            switch (Direction)
-            {
-                case Direction.Vertical:
-                    return MathHelper.Clamp((int)((ContentPosition / (float)ContentSize) * Size.Y), 10, (int)Size.Y - size);
-                case Direction.Horizontal:
-                    return MathHelper.Clamp((int)((ContentPosition / (float)ContentSize) * Size.X), 10, (int)Size.X - size);
-                default:
-                    return 1;
-            }
-        }
-
-        protected Rectangle GetThumbBounds()
-        {
-            return new Rectangle(
-                4,
-                4 + GetThumbOffset(),
-                (int)Size.X - 8,
-                GetThumbSize() - 8
-            );
+                Size = new Vector2(20, 1),
+                VerticalAlignment = Alignment.Stretch,
+                HorizontalAlignment = Alignment.End,
+                Direction = Direction.Vertical
+            });
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var bounds = AbsoluteBounds;
-            Takai.Graphics.Primitives2D.DrawRect(spriteBatch, OutlineColor, bounds);
-            bounds.Inflate(-1, -1);
-            Takai.Graphics.Primitives2D.DrawRect(spriteBatch, OutlineColor, bounds);
+            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, Color.LightGray , AbsoluteBounds);
 
-            var thumb = GetThumbBounds();
-            thumb.Offset(AbsoluteBounds.Location);
-            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, OutlineColor, thumb);
+            for (int i = 0; i < ItemCount; ++i)
+            {
+                var rect = new Rectangle(
+                    Padding + (i % ItemsPerRow) * (ItemSize.X + Padding),
+                    Padding + (i / ItemsPerRow) * (ItemSize.Y + Padding),
+                    ItemSize.X,
+                    ItemSize.Y
+                );
+                rect.Offset(AbsoluteBounds.Location);
+
+                Takai.Graphics.Primitives2D.DrawFill(
+                    spriteBatch,
+                    new Color((i * 24) % 255, (i * 32) % 255, (i * 16) % 255),
+                    rect
+                );
+            }
         }
-    }
-
-    class Selector2 : Takai.UI.Static
-    {
-
     }
 }

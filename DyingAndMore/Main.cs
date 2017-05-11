@@ -89,6 +89,8 @@ namespace DyingAndMore
             gdm.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
             gdm.PreferMultiSampling = true;
             IsMouseVisible = true;
+
+            this.IsFixedTimeStep = false;
         }
 
         void gdm_DeviceCreated(object sender, System.EventArgs e)
@@ -143,7 +145,7 @@ namespace DyingAndMore
                 takingScreenshot = true;
 
             Takai.Input.InputState.Update(GraphicsDevice.Viewport.Bounds);
-            //GameManager.Update(gameTime);
+            GameManager.Update(gameTime);
             ui.Update(gameTime);
             ui.Bounds = GraphicsDevice.Viewport.Bounds;
         }
