@@ -7,11 +7,42 @@ namespace DyingAndMore.Editor.Selectors
 {
     class Selector2 : Static
     {
+        //todo: internal canvas
+
         protected ScrollBar scrollBar;
 
-        public Point ItemSize { get; set; }
-        public int ItemCount { get; set; }
-        public int Padding { get; set; } = 5;
+        public Point ItemSize
+        {
+            get => itemSize;
+            set
+            {
+                itemSize = value;
+                OnResize(System.EventArgs.Empty);
+            }
+        }
+        private Point itemSize;
+
+        public int ItemCount
+        {
+            get => itemCount;
+            set
+            {
+                itemCount = value;
+                OnResize(System.EventArgs.Empty);
+            }
+        }
+        private int itemCount;
+
+        public int Padding
+        {
+            get => padding;
+            set
+            {
+                padding = value;
+                OnResize(System.EventArgs.Empty);
+            }
+        }
+        private int padding = 5;
 
         protected int ItemsPerRow
         {
@@ -29,15 +60,35 @@ namespace DyingAndMore.Editor.Selectors
             });
         }
 
+        protected override void OnResize(System.EventArgs e)
+        {
+            scrollBar.ContentSize = (ItemCount / ItemsPerRow) * (ItemSize.Y + Padding);
+        }
+
+        protected override bool UpdateSelf(GameTime time)
+        {
+            if (!base.UpdateSelf(time))
+                return false;
+
+            if (AbsoluteBounds.Contains(InputState.MousePoint) && InputState.HasScrolled())
+            {
+                scrollBar.ContentPosition -= InputState.ScrollDelta();
+                return false;
+            }
+
+            return true;
+        }
+
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, Color.LightGray , AbsoluteBounds);
+            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, Color.LightGray, AbsoluteBounds);
 
-            for (int i = 0; i < ItemCount; ++i)
+            int start = scrollBar.ContentPosition / (ItemSize.Y + Padding) * ItemsPerRow;
+            for (int i = start; i < MathHelper.Min(start + (int)(Size.Y / (ItemSize.Y + Padding) + 2) * ItemsPerRow, ItemCount); ++i)
             {
                 var rect = new Rectangle(
                     Padding + (i % ItemsPerRow) * (ItemSize.X + Padding),
-                    Padding + (i / ItemsPerRow) * (ItemSize.Y + Padding),
+                    Padding + (i / ItemsPerRow) * (ItemSize.Y + Padding) - scrollBar.ContentPosition,
                     ItemSize.X,
                     ItemSize.Y
                 );

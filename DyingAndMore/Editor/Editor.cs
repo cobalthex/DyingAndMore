@@ -79,7 +79,7 @@ namespace DyingAndMore.Editor
                 var newBtn = uiContainer.FindElementByName("new");
                 if (newBtn != null)
                 {
-                    newBtn.OnClick += delegate
+                    newBtn.Click += delegate
                     {
                         var children = Takai.Data.Serializer.TextDeserializeAll("Defs/UI/Editor/NewMap.ui.tk");
                         uiContainer.RemoveAllChildren();
@@ -92,7 +92,7 @@ namespace DyingAndMore.Editor
                         uiContainer.FocusFirstAvailable();
 
                         var createBtn = uiContainer.FindElementByName("create");
-                        createBtn.OnClick += delegate
+                        createBtn.Click += delegate
                         {
                             var width = ((Takai.UI.NumericInput)uiContainer.FindElementByName("width")).Value;
                             var height = ((Takai.UI.NumericInput)uiContainer.FindElementByName("height")).Value;
@@ -119,7 +119,7 @@ namespace DyingAndMore.Editor
 
                 var openBtn = uiContainer.FindElementByName("open");
                 if (openBtn != null)
-                    openBtn.OnClick += delegate { OpenMap(); };
+                    openBtn.Click += delegate { OpenMap(); };
 
                 uiContainer.FocusFirstAvailable();
             }
@@ -149,7 +149,7 @@ namespace DyingAndMore.Editor
                     Font = LargeFont,
                     IsChecked = (bool)setting.GetValue(Map.renderSettings)
                 };
-                checkbox.OnClick += delegate (Takai.UI.Static sender, Takai.UI.ClickEventArgs args)
+                checkbox.Click += delegate (object sender, Takai.UI.ClickEventArgs args)
                 {
                     setting.SetValue(Map.renderSettings, ((Takai.UI.CheckBox)sender).IsChecked);
                 };
@@ -186,7 +186,7 @@ namespace DyingAndMore.Editor
                     Position = new Vector2(10),
                     Size = new Vector2(Map.TileSize)
                 };
-                selectorPreview.OnClick += delegate
+                selectorPreview.Click += delegate
                 {
                     modes.Mode?.OpenConfigurator(true);
                 };
