@@ -26,10 +26,10 @@ namespace Takai.UI
             Size += new Vector2(checkboxSize + dividerWidth, 0);
         }
 
-        protected override void BeforeClick(ClickEventArgs args)
+        protected override void OnClick(ClickEventArgs args)
         {
             IsChecked ^= true;
-            base.BeforeClick(args);
+            base.OnClick(args);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

@@ -5,8 +5,6 @@ using Takai.Input;
 
 namespace Takai.UI
 {
-    public delegate void InputHandler(TextInput sender, System.EventArgs args);
-
     public class TextInput : Static
     {
         /// <summary>
@@ -93,7 +91,8 @@ namespace Takai.UI
         public bool AllowLetters { get; set; } = true;
 
         [Data.Serializer.Ignored]
-        public event InputHandler OnInput = null;
+        public event System.EventHandler TextChanged = null;
+        protected virtual void OnTextChanged(System.EventArgs e) { }
 
         /// <summary>
         /// When the last character was inputted (in system ticks)
@@ -116,7 +115,7 @@ namespace Takai.UI
             OutlineColor = Color;
         }
 
-        protected override void BeforePress(ClickEventArgs args)
+        protected override void OnPress(ClickEventArgs args)
         {
             var x = args.position.X + ScrollPosition;
             var width = 0;
@@ -308,7 +307,8 @@ namespace Takai.UI
         protected void UpdateVisibleText()
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
-            OnInput?.Invoke(this, new System.EventArgs ());
+            OnTextChanged(System.EventArgs.Empty);
+            TextChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
         void UpdateScrollPosition()

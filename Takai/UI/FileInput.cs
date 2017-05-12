@@ -68,13 +68,13 @@ namespace Takai.UI
             {
                 OutlineColor = Color.Transparent
             };
-            textInput.OnInput += delegate { ValidateFile(); };
+            textInput.TextChanged += delegate { ValidateFile(); };
 
             pickerButton = new Static()
             {
                 Text = "..."
             };
-            pickerButton.OnClick += delegate
+            pickerButton.Click += delegate
             {
                 FileDialog dialog = null;
                 if (Mode == DialogMode.Open)
@@ -101,7 +101,7 @@ namespace Takai.UI
 
             AddChildren(textInput, pickerButton);
 
-            OnResize += delegate
+            Resize += delegate
             {
                 var height = Size.Y;
                 textInput.Size = new Vector2(Size.X - height, height);

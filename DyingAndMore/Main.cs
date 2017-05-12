@@ -90,7 +90,7 @@ namespace DyingAndMore
             gdm.PreferMultiSampling = true;
             IsMouseVisible = true;
 
-            this.IsFixedTimeStep = false;
+            IsFixedTimeStep = false;
         }
 
         void gdm_DeviceCreated(object sender, System.EventArgs e)

@@ -124,7 +124,7 @@ namespace Takai.UI
                 MaxLength = 20,
                 OutlineColor = Color.Transparent
             };
-            textInput.OnInput += delegate
+            textInput.TextChanged += delegate
             {
                 if (int.TryParse(textInput.Text, out int val))
                 {
@@ -141,7 +141,7 @@ namespace Takai.UI
             {
                 Text = "+",
             };
-            upButton.OnClick += delegate
+            upButton.Click += delegate
             {
                 if (value < Maximum)
                     Value += Increment;
@@ -151,7 +151,7 @@ namespace Takai.UI
             {
                 Text = "-",
             };
-            downButton.OnClick += delegate
+            downButton.Click += delegate
             {
                 if (value > Minimum)
                     Value -= Increment;
@@ -159,7 +159,7 @@ namespace Takai.UI
 
             AddChildren(textInput, upButton, downButton);
 
-            OnResize += delegate
+            Resize += delegate
             {
                 var height = Size.Y;
                 textInput.Size = new Vector2(Size.X - height * 2, height);

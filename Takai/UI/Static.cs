@@ -22,9 +22,6 @@ namespace Takai.UI
         /// </summary>
         public Vector2 position;
     }
-    public delegate void ClickHandler(Static sender, ClickEventArgs args);
-
-    public delegate void ResizeHandler(Static sender, System.EventArgs args);
 
     /// <summary>
     /// The basic UI element
@@ -222,20 +219,29 @@ namespace Takai.UI
         /// Can this element be focused
         /// </summary>
         [Data.Serializer.Ignored]
-        public virtual bool CanFocus { get => OnClick != null; }
+        public virtual bool CanFocus { get => Click != null; }
 
         /// <summary>
-        /// Called whenever the element is clicked.
-        /// By default, focus is allowed if there are more than zero handlers
+        /// Called whenever the element is pressed.
         /// </summary>
         [Data.Serializer.Ignored]
-        public event ClickHandler OnClick = null;
+        public event System.EventHandler<ClickEventArgs> Press = null;
+        protected virtual void OnPress(ClickEventArgs e) { }
+
+        /// <summary>
+        /// Called whenever the element is clicked (mouse just released).
+        /// By default, whether or not there is a click handler determines if this is focusable
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public event System.EventHandler<ClickEventArgs> Click = null;
+        protected virtual void OnClick(ClickEventArgs e) { }
 
         /// <summary>
         /// Called whenever the size of this element is updated
         /// </summary>
         [Data.Serializer.Ignored]
-        public event ResizeHandler OnResize = null;
+        public event System.EventHandler Resize = null;
+        protected virtual void OnResize(System.EventArgs e) { }
 
         /// <summary>
         /// Disable the default behavior of the tab key
@@ -624,7 +630,8 @@ namespace Takai.UI
 
             Reflow();
 
-            OnResize?.Invoke(this, new System.EventArgs());
+            OnResize(System.EventArgs.Empty);
+            Resize?.Invoke(this, System.EventArgs.Empty);
         }
 
         /// <summary>
@@ -691,17 +698,6 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Add specific behavior before <see cref="OnClick"/> is called. Called by Update()
-        /// </summary>
-        /// <param name="args">Click event args passed from Update. Forwarded to <see cref="OnClick"/></param>
-        protected virtual void BeforeClick(ClickEventArgs args)
-        {
-            OnClick?.Invoke(this, args);
-            //todo: evaluate removing this and only using event handlers
-        }
-        protected virtual void BeforePress(ClickEventArgs args) { }
-
-        /// <summary>
         /// Update this element
         /// </summary>
         /// <param name="time">Game time</param>
@@ -764,7 +760,9 @@ namespace Takai.UI
                 if ((!ignoreEnterKey && Input.InputState.IsPress(Keys.Enter)) ||
                     (!ignoreSpaceKey && Input.InputState.IsPress(Keys.Space)))
                 {
-                    BeforeClick(new ClickEventArgs { position = Vector2.Zero });
+                    var e = new ClickEventArgs { position = Vector2.Zero };
+                    OnClick(e);
+                    Click?.Invoke(this, e);
                     return false;
                 }
             }
@@ -773,7 +771,9 @@ namespace Takai.UI
 
             if (Input.InputState.IsPress(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
             {
-                BeforePress(new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() });
+                var e = new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() };
+                OnPress(e);
+                Press?.Invoke(this, e);
 
                 didPress = true;
                 if (CanFocus)
@@ -785,9 +785,11 @@ namespace Takai.UI
 
             else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
             {
-                if (didPress && AbsoluteBounds.Contains(mouse) && OnClick != null)
+                if (didPress && AbsoluteBounds.Contains(mouse) && Click != null)
                 {
-                    BeforeClick(new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() });
+                    var e = new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() };
+                    OnClick(e);
+                    Click?.Invoke(this, e);
                     didPress = false;
                     return false;
                 }

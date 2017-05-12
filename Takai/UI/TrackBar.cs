@@ -17,6 +17,13 @@ namespace Takai.UI
                 Value = (int)((relPos.X / Size.X) * (Maximum - Minimum)) + Minimum;
                 return false;
             }
+
+            if (AbsoluteBounds.Contains(Input.InputState.MousePoint) && Input.InputState.HasScrolled())
+            {
+                Value += Increment * System.Math.Sign(Input.InputState.ScrollDelta());
+                return false;
+            }
+
             return true;
         }
 

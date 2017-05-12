@@ -95,9 +95,9 @@ namespace DyingAndMore.Editor
                     Font = largeFont,
                     IsChecked = (bool)setting.GetValue(Map.renderSettings)
                 };
-                checkbox.OnClick += delegate (Takai.UI.Static sender, Takai.UI.ClickEventArgs args)
+                checkbox.Click += delegate (object sender, ClickEventArgs args)
                 {
-                    setting.SetValue(Map.renderSettings, ((Takai.UI.CheckBox)sender).IsChecked);
+                    setting.SetValue(Map.renderSettings, ((CheckBox)sender).IsChecked);
                 };
                 checkbox.AutoSize();
 

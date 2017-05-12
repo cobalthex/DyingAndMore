@@ -3,6 +3,16 @@ using Takai.Input;
 
 namespace Takai.UI
 {
+    public class ScrollEventArgs : System.EventArgs
+    {
+        public int Delta { get; set; }
+
+        public ScrollEventArgs(int delta)
+        {
+            Delta = delta;
+        }
+    }
+
     public class ScrollBar : Static
     {
         static int ThumbMargin = 4; //todo: apply correctly
@@ -10,7 +20,16 @@ namespace Takai.UI
         /// <summary>
         /// The size of the content. This determines how big the scroll thumb is
         /// </summary>
-        public int ContentSize { get; set; } = 1;
+        public int ContentSize
+        {
+            get => contentSize;
+            set
+            {
+                contentSize = MathHelper.Max(value, 0);
+                ContentPosition = contentPosition;
+            }
+        }
+        private int contentSize = 1;
 
         /// <summary>
         /// Where the content is scrolled to
@@ -20,12 +39,17 @@ namespace Takai.UI
             get => contentPosition;
             set
             {
+                int lastValue = contentPosition;
                 if (Direction == Direction.Vertical)
                     contentPosition = MathHelper.Clamp(value, 0, ContentSize - (int)Size.Y);
                 else if (Direction == Direction.Horizontal)
                     contentPosition = MathHelper.Clamp(value, 0, ContentSize - (int)Size.X);
                 else
                     contentPosition = value;
+
+                var e = new ScrollEventArgs(contentPosition - lastValue);
+                OnScroll(e);
+                Scroll?.Invoke(this, e);
             }
         }
         private int contentPosition = 0;
@@ -38,6 +62,10 @@ namespace Takai.UI
         protected bool didPressThumb = false;
 
         public override bool CanFocus => true;
+
+        [Data.Serializer.Ignored]
+        public event System.EventHandler<ScrollEventArgs> Scroll;
+        protected virtual void OnScroll(ScrollEventArgs e) { }
 
         public ScrollBar()
         {
@@ -67,15 +95,25 @@ namespace Takai.UI
                 }
                 else
                     didPressThumb = false;
+
+                if (AbsoluteBounds.Contains(InputState.MousePoint) && InputState.HasScrolled())
+                {
+                    ContentPosition -= InputState.ScrollDelta();
+                    return false;
+                }
+
+                //todo up/down + pgup/pgdn
             }
             return true;
         }
 
-        protected override void BeforePress(ClickEventArgs args)
+        protected override void OnPress(ClickEventArgs args)
         {
             var thumb = GetThumbBounds();
             if (!thumb.Contains(args.position))
             {
+                //todo: maybe scroll to mouse over time
+
                 //center thumb around mouse
                 if (Direction == Direction.Vertical)
                     ContentPosition = (int)((args.position.Y - ThumbMargin - GetThumbSize() / 2) * ((float)ContentSize / GetContainerSize()));
