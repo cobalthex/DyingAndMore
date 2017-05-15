@@ -4,46 +4,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DyingAndMore.Editor
 {
-    class PathsConfigurator : Takai.Runtime.GameState
-    {
-        SpriteBatch sbatch;
-
-        Takai.UI.Static uiContainer;
-
-        public PathsConfigurator()
-            : base(true, false) { }
-
-        public override void Load()
-        {
-            sbatch = new SpriteBatch(GraphicsDevice);
-            uiContainer = new Takai.UI.Static();
-            uiContainer.AddChild(new Takai.UI.TextInput()
-            {
-                Text = "Test",
-                Position = new Vector2(10, 10)
-            });
-        }
-
-        public override void Update(GameTime time)
-        {
-            uiContainer.Update(time);
-        }
-
-        public override void Draw(GameTime time)
-        {
-            sbatch.Begin();
-            uiContainer.Draw(sbatch);
-            sbatch.End();
-        }
-    }
-
     class PathsEditorMode : EditorMode
     {
-        PathsConfigurator configurator;
-
         public static List<Takai.Game.Path> paths;
 
-        public PathsEditorMode(DyingAndMore.Editor editor)
+        public PathsEditorMode(Editor editor)
             : base("Paths", editor)
         {
             if (paths == null)
@@ -55,10 +20,6 @@ namespace DyingAndMore.Editor
             }
         }
 
-        public override void OpenConfigurator(bool DidClickOpen)
-        {
-        }
-
         public override void Start()
         {
         }
@@ -67,12 +28,15 @@ namespace DyingAndMore.Editor
         {
         }
 
-        public override void Update(GameTime time)
+        protected override bool UpdateSelf(GameTime time)
         {
             if (Takai.Input.InputState.IsPress(Takai.Input.MouseButtons.Left))
             {
                 paths[0].AddPoint(editor.Map.ActiveCamera.ScreenToWorld(Takai.Input.InputState.MouseVector));
+                return false;
             }
+
+            return true;
         }
 
 
@@ -147,7 +111,7 @@ namespace DyingAndMore.Editor
                 var result = new List<Vector2>();
                 //i + 1
 
-                float alpha = editor.testTrack.NormalizedValue; //controls parameterization (α)
+                float alpha = 0.5f; //curve parameterization (α)
 
                 var times = new double[4];
                 for (int i = 0; i < p.Count - 3; ++i)
@@ -205,7 +169,7 @@ namespace DyingAndMore.Editor
             }
         }
 
-        public override void Draw(SpriteBatch sbatch)
+        protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             foreach (var path in paths)
                 DrawPath(path);
