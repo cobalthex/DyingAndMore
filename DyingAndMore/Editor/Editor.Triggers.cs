@@ -4,28 +4,6 @@ using Takai.Input;
 
 namespace DyingAndMore.Editor
 {
-    class TriggersConfigurator : Takai.Runtime.GameState
-    {
-        SpriteBatch sbatch;
-
-        Takai.UI.Static uiContainer;
-
-        public TriggersConfigurator()
-            : base(true, false) { }
-
-        public override void Load()
-        {
-        }
-
-        public override void Update(GameTime time)
-        {
-        }
-
-        public override void Draw(GameTime time)
-        {
-        }
-    }
-
     class TriggersEditorMode : EditorMode
     {
         bool isNewTrigger = false;
@@ -33,15 +11,11 @@ namespace DyingAndMore.Editor
 
         Takai.Game.Trigger activeTrigger = null;
 
-        TriggersConfigurator configurator;
-
-        public TriggersEditorMode(DyingAndMore.Editor editor)
+        public TriggersEditorMode(Editor editor)
             : base("Triggers", editor)
         {
-        }
-
-        public override void OpenConfigurator(bool DidClickOpen)
-        {
+            VerticalAlignment = Takai.UI.Alignment.Stretch;
+            HorizontalAlignment = Takai.UI.Alignment.Stretch;
         }
 
         public override void Start()
@@ -54,8 +28,11 @@ namespace DyingAndMore.Editor
             editor.Map.renderSettings.drawTriggers = false;
         }
 
-        public override void Update(GameTime time)
+        protected override bool UpdateSelf(GameTime time)
         {
+            if (!base.UpdateSelf(time))
+                return false;
+
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsPress(MouseButtons.Left))
@@ -126,6 +103,8 @@ namespace DyingAndMore.Editor
                 isNewTrigger = false;
                 savedWorldPos = currentWorldPos;
             }
+
+            return true;
         }
 
         void SelectTrigger(Vector2 Position)
@@ -146,7 +125,7 @@ namespace DyingAndMore.Editor
             activeTrigger = null;
         }
 
-        public override void Draw(SpriteBatch sbatch)
+        protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             if (activeTrigger != null)
                 editor.Map.DrawRect(activeTrigger.Region, Color.GreenYellow);

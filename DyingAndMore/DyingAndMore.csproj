@@ -69,9 +69,9 @@
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
-    <None Include="Editor\Editor.Triggers.cs" />
-    <None Include="Editor\Editor.Groups.cs" />
-    <None Include="Editor\Editor.Paths.cs" />
+    <Compile Include="Editor\Editor.Triggers.cs" />
+    <Compile Include="Editor\Editor.Groups.cs" />
+    <Compile Include="Editor\Editor.Paths.cs" />
     <Compile Include="Editor\Editor.Tiles.cs" />
     <Compile Include="Editor\Editor.cs" />
     <Compile Include="Editor\EditorCamera.cs" />

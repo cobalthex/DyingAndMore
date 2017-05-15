@@ -60,6 +60,9 @@ namespace DyingAndMore.Editor
             modes.AddMode(new DecalsEditorMode(this) { Font = smallFont });
             modes.AddMode(new FluidsEditorMode(this) { Font = smallFont });
             modes.AddMode(new EntitiesEditorMode(this) { Font = smallFont });
+            modes.AddMode(new GroupsEditorMode(this) { Font = smallFont });
+            modes.AddMode(new PathsEditorMode(this) { Font = smallFont });
+            modes.AddMode(new TriggersEditorMode(this) { Font = smallFont });
 
             #region render settings console
 

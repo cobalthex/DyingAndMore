@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
 namespace DyingAndMore.Editor
@@ -145,7 +146,7 @@ namespace DyingAndMore.Editor
             return true;
         }
 
-        protected override void DrawSelf(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
+        protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             var visibleRegion = editor.Map.ActiveCamera.VisibleRegion;
             var visibleSectors = editor.Map.GetOverlappingSectors(visibleRegion);
