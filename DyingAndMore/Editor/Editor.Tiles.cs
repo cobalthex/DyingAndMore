@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
-using Takai.Graphics;
 
 namespace DyingAndMore.Editor
 {
@@ -13,22 +12,61 @@ namespace DyingAndMore.Editor
         Vector2 savedWorldPos, lastWorldPos;
 
         Selectors.TileSelector selector;
+        Takai.UI.Graphic preview;
 
         public TilesEditorMode(Editor editor)
             : base("Tiles", editor)
         {
-            selector = new Selectors.TileSelector(editor);
-            selector.Load();
+            VerticalAlignment = Takai.UI.Alignment.Stretch;
+            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+
+            selector = new Selectors.TileSelector(editor)
+            {
+                Size = new Vector2(320, 1),
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                HorizontalAlignment = Takai.UI.Alignment.End
+            };
+            selector.SelectionChanged += delegate
+            {
+                preview.Sprite.ClipRect = new Rectangle(
+                    (selector.SelectedItem % editor.Map.TilesPerRow) * editor.Map.TileSize,
+                    (selector.SelectedItem / editor.Map.TilesPerRow) * editor.Map.TileSize,
+                    editor.Map.TileSize,
+                    editor.Map.TileSize
+                );
+            };
+
+            AddChild(preview = new Takai.UI.Graphic()
+            {
+                Sprite = new Takai.Graphics.Sprite()
+                {
+                    Width = editor.Map.TileSize,
+                    Height = editor.Map.TileSize,
+                    Texture = editor.Map.TilesImage
+                },
+                Position = new Vector2(20),
+                Size = new Vector2(editor.Map.TileSize),
+                HorizontalAlignment = Takai.UI.Alignment.End,
+                VerticalAlignment = Takai.UI.Alignment.Start,
+                OutlineColor = Color.White
+            });
+            preview.Click += delegate
+            {
+                AddChild(selector);
+            };
         }
 
-        public override void OpenConfigurator(bool DidClickOpen)
+        protected override bool UpdateSelf(GameTime time)
         {
-            selector.DidClickOpen = DidClickOpen;
-            Takai.Runtime.GameManager.PushState(selector);
-        }
+            if (InputState.IsPress(Keys.Tab))
+            {
+                AddChild(selector);
+                return false;
+            }
 
-        public override void Update(GameTime time)
-        {
+            if (!base.UpdateSelf(time))
+                return false;
+
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsPress(Keys.LeftControl) || InputState.IsPress(Keys.RightControl))
@@ -86,14 +124,16 @@ namespace DyingAndMore.Editor
                 }
                 else if (InputState.IsMod(KeyMod.Shift))
                     TileFill(currentWorldPos, tile);
-                else if (InputState.IsButtonHeld(tile == -1 ? MouseButtons.Right : MouseButtons.Left)) //todo: improve
+                else if (InputState.IsButtonHeld(tile == -1 ? MouseButtons.Right : MouseButtons.Left)) //todo: may be issues with line drawing
                     TileLine(lastWorldPos, currentWorldPos, tile);
             }
 
             lastWorldPos = currentWorldPos;
+
+            return true;
         }
 
-        public override void Draw(SpriteBatch sbatch)
+        protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             //draw rect around tile under cursor
             if (editor.Map.IsInside(lastWorldPos))
@@ -106,7 +146,7 @@ namespace DyingAndMore.Editor
                         (int)(lastWorldPos.Y / editor.Map.TileSize) * editor.Map.TileSize,
                         editor.Map.TileSize, editor.Map.TileSize
                     ),
-                    Editor.ActiveColor
+                    Color.Orange
                 );
             }
 
@@ -120,7 +160,7 @@ namespace DyingAndMore.Editor
 
                     var w = (System.Math.Abs((int)diff.X) - 1) / editor.Map.TileSize + 1;
                     var h = (System.Math.Abs((int)diff.Y) - 1) / editor.Map.TileSize + 1;
-                    editor.DebugFont.Draw(sbatch, $"w:{w}, h:{w}", editor.Map.ActiveCamera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
+                    Font.Draw(spriteBatch, $"w:{w}, h:{w}", editor.Map.ActiveCamera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
                 else
                 {
@@ -130,7 +170,7 @@ namespace DyingAndMore.Editor
                     editor.Map.DrawLine(savedWorldPos, lastWorldPos, Color.GreenYellow);
 
                     diff /= editor.Map.TileSize;
-                    editor.DebugFont.Draw(sbatch, $"x:{System.Math.Ceiling(diff.X)} y:{System.Math.Ceiling(diff.Y)} deg:{angle}",
+                    Font.Draw(spriteBatch, $"x:{System.Math.Ceiling(diff.X)} y:{System.Math.Ceiling(diff.Y)} deg:{angle}",
                         editor.Map.ActiveCamera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
             }

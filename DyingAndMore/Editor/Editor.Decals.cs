@@ -12,20 +12,44 @@ namespace DyingAndMore.Editor
         Vector2 lastWorldPos;
 
         Selectors.DecalSelector selector;
+        Takai.UI.Graphic preview;
 
         //todo: start,end to update selected
 
         public DecalsEditorMode(Editor editor)
             : base("Decals", editor)
         {
-            selector = new Selectors.DecalSelector(editor);
-            selector.Load();
-        }
+            VerticalAlignment = Takai.UI.Alignment.Stretch;
+            HorizontalAlignment = Takai.UI.Alignment.Stretch;
 
-        public override void OpenConfigurator(bool DidClickOpen)
-        {
-            selector.DidClickOpen = DidClickOpen;
-            Takai.Runtime.GameManager.PushState(selector);
+            selector = new Selectors.DecalSelector(editor)
+            {
+                Size = new Vector2(320, 1),
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                HorizontalAlignment = Takai.UI.Alignment.End
+            };
+            selector.SelectionChanged += delegate
+            {
+                var selectedDecal = selector.textures[selector.SelectedItem];
+                preview.Sprite.Texture = selectedDecal;
+                preview.Sprite.ClipRect = selectedDecal.Bounds;
+                preview.Sprite.Size = selectedDecal.Bounds.Size;
+                preview.Size = Vector2.Clamp(preview.Sprite.Size.ToVector2(),
+                    new Vector2(32), new Vector2(96));
+            };
+
+            AddChild(preview = new Takai.UI.Graphic()
+            {
+                Sprite = new Takai.Graphics.Sprite(),
+                Position = new Vector2(20),
+                HorizontalAlignment = Takai.UI.Alignment.End,
+                VerticalAlignment = Takai.UI.Alignment.Start,
+                OutlineColor = Color.White
+            });
+            preview.Click += delegate
+            {
+                AddChild(selector);
+            };
         }
 
         public override void Start()
@@ -39,8 +63,17 @@ namespace DyingAndMore.Editor
             return editor.Map.Sectors[sector.Y, sector.X];
         }
 
-        public override void Update(GameTime time)
+        protected override bool UpdateSelf(GameTime time)
         {
+            if (InputState.IsPress(Keys.Tab))
+            {
+                AddChild(selector);
+                return false;
+            }
+
+            if (!base.UpdateSelf(time))
+                return false;
+
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsPress(MouseButtons.Left))
@@ -108,9 +141,11 @@ namespace DyingAndMore.Editor
             }
 
             lastWorldPos = currentWorldPos;
+
+            return true;
         }
 
-        public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
+        protected override void DrawSelf(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
         {
             var visibleRegion = editor.Map.ActiveCamera.VisibleRegion;
             var visibleSectors = editor.Map.GetOverlappingSectors(visibleRegion);
@@ -132,7 +167,7 @@ namespace DyingAndMore.Editor
                         var bl = Vector2.Transform(new Vector2(-w2, h2), transform);
                         var br = Vector2.Transform(new Vector2(w2, h2), transform);
 
-                        var color = decal == selectedDecal ? Editor.ActiveColor : Editor.InactiveColor;
+                        var color = decal == selectedDecal ? Color.GreenYellow : Color.Purple; //todo
                         editor.Map.DrawLine(tl, tr, color);
                         editor.Map.DrawLine(tr, br, color);
                         editor.Map.DrawLine(br, bl, color);

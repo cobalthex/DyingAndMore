@@ -29,6 +29,12 @@ namespace Takai.UI
     [Data.DerivedTypeDeserialize(typeof(Static), "DerivedDeserialize")]
     public class Static
     {
+        /// <summary>
+        /// A font to use for drawing debug info.
+        /// If null, debug info is not drawn
+        /// </summary>
+        public static Graphics.BitmapFont DebugFont = null;
+
         public static Color FocusOutlineColor = Color.RoyalBlue;
 
         /// <summary>
@@ -158,6 +164,9 @@ namespace Takai.UI
         }
         private Vector2 size = Vector2.One;
 
+        /// <summary>
+        /// The bounds of this static, calculated from <see cref="Position"/> and <see cref="Size"/>
+        /// </summary>
         public Rectangle Bounds
         {
             get => new Rectangle(Position.ToPoint(), Size.ToPoint());
@@ -370,6 +379,10 @@ namespace Takai.UI
             Reflow();
         }
 
+        /// <summary>
+        /// Remove an element from this element. Does not search children
+        /// </summary>
+        /// <param name="child"></param>
         public void RemoveChild(Static child)
         {
             children.Remove(child);
@@ -599,18 +612,19 @@ namespace Takai.UI
         /// </summary>
         public virtual void Reflow()
         {
-            if (HorizontalAlignment == Alignment.Stretch ||
-                VerticalAlignment == Alignment.Stretch)
+            if (parent != null &&
+                (HorizontalAlignment == Alignment.Stretch ||
+                VerticalAlignment == Alignment.Stretch))
             {
                 if (HorizontalAlignment == Alignment.Stretch)
                 {
                     position.X = 0;
-                    size.X = (parent?.size.X ?? 1);
+                    size.X = parent.size.X;
                 }
                 if (VerticalAlignment == Alignment.Stretch)
                 {
                     position.Y = 0;
-                    size.Y = (parent?.size.Y ?? 1);
+                    size.Y = parent.size.Y;
                 }
                 CalculateAbsoluteBounds();
             }
@@ -698,7 +712,7 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Update this element
+        /// Update this element and all of its children
         /// </summary>
         /// <param name="time">Game time</param>
         /// <returns>Returns true if this element was clicked/triggered. This will prevent parent items from being triggered as well</returns>
@@ -727,7 +741,8 @@ namespace Takai.UI
                 if (!update.UpdateSelf(time))
                     return false;
 
-                if (update.parent == null)
+                //stop at this element
+                if (update.parent == null || update == this)
                     break;
 
                 var index = update.Parent.Children.IndexOf(update) - 1;
@@ -813,8 +828,18 @@ namespace Takai.UI
             {
                 var draw = draws.Dequeue();
 
-                Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusOutlineColor : draw.OutlineColor, draw.AbsoluteBounds);
                 draw.DrawSelf(spriteBatch);
+                Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusOutlineColor : draw.OutlineColor, draw.AbsoluteBounds);
+
+                if (DebugFont != null && draw.absoluteBounds.Contains(Input.InputState.MousePoint))
+                {
+                    var rect = draw.AbsoluteBounds;
+                    rect.Inflate(1, 1);
+                    Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, rect);
+
+                    string info = $"Name: {(Name ?? "(No name)")}\nBounds: {rect}";
+                    DebugFont.Draw(spriteBatch, info, (rect.Location + rect.Size).ToVector2(), Color.Gold);
+                }
 
                 foreach (var child in draw.Children)
                     draws.Enqueue(child);

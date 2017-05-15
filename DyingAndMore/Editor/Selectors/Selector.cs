@@ -1,228 +1,144 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
+using Takai.UI;
 
 namespace DyingAndMore.Editor.Selectors
 {
-    abstract class Selector : Takai.Runtime.GameState
+    abstract class Selector : Static
     {
-        public Editor editor;
+        protected Editor editor;
 
-        protected int width = 320;
-        protected const int splitterWidth = 8;
-        protected const int scrollbarWidth = 17; //1px for divider, 2px on all sides between thumb
-        protected Vector2 Start { get { return new Vector2(GraphicsDevice.Viewport.Width - width - GetScrollbarWidth(), 0); } }
+        protected ScrollBar scrollBar;
 
-        protected SpriteBatch sbatch;
-
-        protected bool isResizing = false;
-        private int resizeXOffset = 0;
-        private bool isHoveringSplitter = false;
-        private bool isHoveringScroll = false;
-
-        public bool DidClickOpen { get; set; } = false;
-
-        public int Padding { get; set; } = 2; //todo: make x,y
-
-        /// <summary>
-        /// The position of the scrollbar (in pixels, clamped to TotalHeight - ViewHeight)
-        /// </summary>
-        public int ScrollPosition { get; set; } = 0;
-
-        /// <summary>
-        /// The size of each item
-        /// </summary>
-        public Point ItemSize { get; set; } = new Point(1);
-
-        /// <summary>
-        /// The number of items
-        /// </summary>
-        public int ItemCount { get; set; } = 0;
-
-        public int SelectedItem { get; set; } = 0;
-
-        public Selector(Editor Editor)
-            : base(true, false)
+        public Point ItemSize
         {
-            editor = Editor;
-            GraphicsDevice = editor.GraphicsDevice;
-        }
-
-        public override void Load()
-        {
-            sbatch = new SpriteBatch(GraphicsDevice);
-        }
-
-        protected int GetTotalHeight()
-        {
-            var cols = (width - scrollbarWidth - Padding) / (ItemSize.X + Padding);
-            if (cols > 0)
+            get => itemSize;
+            set
             {
-                var rows = (ItemCount - 1) / cols + 1;
-                return Padding + (rows * (ItemSize.Y + Padding));
+                itemSize = value;
+                OnResize(System.EventArgs.Empty);
             }
-            return 0;
         }
+        private Point itemSize = new Point(1);
 
-        /// <summary>
-        /// Get the scrollbar width (handles visibility)
-        /// </summary>
-        /// <returns>scrollbarWidth if visible, 0 if hidden</returns>
-        protected int GetScrollbarWidth()
+        public int ItemCount
         {
-            if (width < 1)
-                return 0;
-
-            if (GetTotalHeight() > GraphicsDevice.Viewport.Height)
-                return scrollbarWidth;
-
-            return 0;
-        }
-
-        public override void Update(GameTime time)
-        {
-            //todo: test gestures
-
-            if ((!DidClickOpen && InputState.IsClick(Keys.Tab)) ||
-                (DidClickOpen && InputState.IsPress(Keys.Tab)))
-                RemoveSelf();
-
-            var mouse = InputState.MousePoint;
-
-            var scrollWidth = GetScrollbarWidth();
-            var itemsPerRow = MathHelper.Max(1, (width - Padding) / (ItemSize.X + Padding));
-            var splitterX = GraphicsDevice.Viewport.Width - width - scrollWidth - splitterWidth;
-            isHoveringSplitter = (mouse.X >= splitterX && mouse.X <= splitterX + splitterWidth);
-
-            bool isTapping = false, isDragging = false;
-            while (TouchPanel.IsGestureAvailable)
+            get => itemCount;
+            set
             {
-                var gesture = TouchPanel.ReadGesture();
-                switch (gesture.GestureType)
-                {
-                    case GestureType.Tap:
-                        isTapping = true;
-                        break;
-
-                    case GestureType.FreeDrag:
-                        if (gesture.Delta.Y != 0 && gesture.Position.X > splitterX)
-                            ScrollPosition -= (int)gesture.Delta.Y;
-                        break;
-                }
+                itemCount = value;
+                OnResize(System.EventArgs.Empty);
             }
+        }
+        private int itemCount = 0;
 
-            if (InputState.IsPress(MouseButtons.Left))
+        public int Padding
+        {
+            get => padding;
+            set
             {
-                if (DidClickOpen && mouse.X < splitterX)
-                    RemoveSelf();
-
-                else if (isHoveringSplitter)
-                {
-                    isResizing = true;
-                    resizeXOffset = mouse.X - splitterX;
-                }
-                else
-                {
-                    //todo: test if scrollbar
-
-                    var mx = mouse.X - splitterX - splitterWidth - Padding;
-                    var newSelect = (((mouse.Y + ScrollPosition - Padding) / (ItemSize.Y + Padding)) * itemsPerRow) + (mx / (ItemSize.X + Padding));
-                    if (newSelect >= 0 && newSelect < ItemCount)
-                    {
-                        SelectedItem = newSelect;
-
-                        if (DidClickOpen)
-                            RemoveSelf();
-                    }
-                }
+                padding = value;
+                OnResize(System.EventArgs.Empty);
             }
-            else if (InputState.IsClick(MouseButtons.Left))
-                isResizing = false;
+        }
+        private int padding = 2;
 
-            else if (isResizing)
-                width = GraphicsDevice.Viewport.Width - scrollWidth - splitterWidth - mouse.X + resizeXOffset;
+        protected int ItemsPerRow { get; private set; } = 1;
 
-            if (InputState.HasScrolled())
-                ScrollPosition -= (InputState.ScrollDelta() / 2);
+        public int SelectedItem
+        {
+            get => selectedItem;
+            set
+            {
+                selectedItem = value;
+                SelectionChanged?.Invoke(this, System.EventArgs.Empty);
+            }
+        }
+        private int selectedItem = 0;
 
-            width = MathHelper.Clamp(width, 0, GraphicsDevice.Viewport.Width - scrollWidth - splitterWidth);
-            ScrollPosition = MathHelper.Clamp(ScrollPosition, 0, GetTotalHeight() - GraphicsDevice.Viewport.Height);
+        public event System.EventHandler SelectionChanged;
+
+        public override bool CanFocus => true;
+
+        public Selector(Editor editor)
+        {
+            this.editor = editor;
+
+            AddChild(scrollBar = new ScrollBar()
+            {
+                Size = new Vector2(20, 1),
+                VerticalAlignment = Alignment.Stretch,
+                HorizontalAlignment = Alignment.End,
+                Direction = Direction.Vertical
+            });
         }
 
-        public override void Draw(GameTime Time)
+        protected override void OnResize(System.EventArgs e)
         {
-            DrawBackground();
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            ItemsPerRow = Size.X > scrollBar.Size.X
+                        ? (int)((Padding + Size.X - scrollBar.Size.X) / (ItemSize.X + Padding))
+                        : 1;
+            scrollBar.ContentSize = (ItemCount / ItemsPerRow) * (ItemSize.Y + Padding) + Padding;
+        }
 
-            //items
-            var viewHeight = GraphicsDevice.Viewport.Height;
-            var iHeight = ItemSize.Y + Padding;
-            var itemsPerRow = MathHelper.Max(1, (width - Padding) / (ItemSize.X + Padding));
+        protected override void OnPress(ClickEventArgs e)
+        {
+            //todo: handle scroll
+            var row = (int)((e.position.Y + scrollBar.ContentPosition - (Padding / 2)) / (ItemSize.Y + Padding)) * ItemsPerRow;
+            var col = (int)((e.position.X - (padding / 2)) / (itemSize.X + padding));
 
-            var first = ((ScrollPosition / iHeight) - 1) * itemsPerRow;
-            for (var i = MathHelper.Max(0, first); i < MathHelper.Min(ItemCount, first + ((viewHeight - 1) / itemsPerRow) + 1); ++i)
+            SelectedItem = MathHelper.Clamp(row + col, 0, ItemCount - 1);
+        }
+
+        protected override bool UpdateSelf(GameTime time)
+        {
+            if (!base.UpdateSelf(time))
+                return false;
+
+            if (InputState.IsClick(Microsoft.Xna.Framework.Input.Keys.Tab))
+                RemoveFromParent();
+
+            else if (AbsoluteBounds.Contains(InputState.MousePoint) && InputState.HasScrolled())
+                scrollBar.ContentPosition -= InputState.ScrollDelta();
+
+            else if (InputState.IsPress(MouseButtons.Left))
+                RemoveFromParent(); //clicked outside (OnPress handles interior clicking
+
+            return false;
+        }
+
+        protected override void DrawSelf(SpriteBatch spriteBatch)
+        {
+            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, new Color(1, 1, 1, 0.75f), AbsoluteBounds);
+
+            int start = scrollBar.ContentPosition / (ItemSize.Y + Padding) * ItemsPerRow;
+            for (int i = start; i < MathHelper.Min(start + (int)(Size.Y / (ItemSize.Y + Padding) + 2) * ItemsPerRow, ItemCount); ++i)
             {
-                var bounds = new Rectangle
-                (
-                    Padding + (int)Start.X + (i % itemsPerRow) * (ItemSize.X + Padding),
-                    Padding + (int)Start.Y + (i / itemsPerRow) * (ItemSize.Y + Padding) - ScrollPosition,
+                var rect = new Rectangle(
+                    Padding + (i % ItemsPerRow) * (ItemSize.X + Padding),
+                    Padding + (i / ItemsPerRow) * (ItemSize.Y + Padding) - scrollBar.ContentPosition,
                     ItemSize.X,
                     ItemSize.Y
                 );
-                DrawItem(Time, i, bounds);
+                rect.Offset(AbsoluteBounds.Location);
 
+                //Takai.Graphics.Primitives2D.DrawFill(
+                //    spriteBatch,
+                //    new Color((i * 24) % 255, (i * 32) % 255, (i * 16) % 255),
+                //    rect
+                //);
+                DrawItem(spriteBatch, i, rect);
                 if (i == SelectedItem)
                 {
-                    Takai.Graphics.Primitives2D.DrawRect(sbatch, new Color(1, 1, 1, 0.5f), bounds);
-                    bounds.Inflate(1, 1);
-                    Takai.Graphics.Primitives2D.DrawRect(sbatch, Color.Black, bounds);
+                    rect.Inflate(1, 1);
+                    Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.White, rect);
+                    rect.Inflate(1, 1);
+                    Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Black, rect);
                 }
             }
-
-            sbatch.End();
         }
 
-        void DrawBackground()
-        {
-            var viewHeight = GraphicsDevice.Viewport.Height;
-
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-
-            var scrollWidth = GetScrollbarWidth();
-
-            Takai.Graphics.Primitives2D.DrawFill(sbatch, new Color(1, 1, 1, 0.85f), new Rectangle((int)Start.X, (int)Start.Y, width + scrollWidth, viewHeight));
-
-            //splitter
-            Takai.Graphics.Primitives2D.DrawFill
-            (
-                sbatch,
-                isHoveringSplitter ? (InputState.IsButtonDown(MouseButtons.Left) ? Color.DarkGray : Color.LightGray) : Color.Gray,
-                new Rectangle((int)Start.X - splitterWidth, (int)Start.Y, splitterWidth, viewHeight)
-            );
-
-            var relHeight = (viewHeight / (float)GetTotalHeight());
-            var relScrollPos = (int)(relHeight * ScrollPosition);
-
-            //scrollbar
-            if (scrollWidth > 0)
-            {
-                var x = (int)Start.X + width;
-                Takai.Graphics.Primitives2D.DrawLine(sbatch, Color.DarkGray, new Vector2(x, 0), new Vector2(x, viewHeight));
-
-                var thumbHeight = (viewHeight - 4) * relHeight;
-                Takai.Graphics.Primitives2D.DrawFill
-                (
-                    sbatch,
-                    isHoveringScroll ? (InputState.IsButtonDown(MouseButtons.Left) ? Color.DarkGray : Color.LightGray) : Color.Gray,
-                    new Rectangle(x + 2, relScrollPos + 2, scrollWidth - 4, (int)thumbHeight)
-                );
-            }
-
-            sbatch.End();
-        }
-
-        public abstract void DrawItem(GameTime Time, int ItemIndex, Rectangle Bounds, SpriteBatch Sbatch = null);
+        public abstract void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds);
     }
 }

@@ -8,12 +8,9 @@ namespace DyingAndMore.Editor.Selectors
     {
         public List<Takai.Game.Entity> ents;
 
-        public EntSelector(Editor Editor) : base(Editor) { }
-
-        public override void Load()
+        public EntSelector(Editor Editor)
+            : base(Editor)
         {
-            base.Load();
-
             ItemSize = new Point(64);
             Padding = 5;
 
@@ -28,38 +25,35 @@ namespace DyingAndMore.Editor.Selectors
                             ents.Add(ent);
                     }
                 }
-                catch (DeviceLostException) { }
+                catch (System.Exception) { } //ignore failed loads
             }
 
             ItemCount = ents.Count;
         }
 
-        public override void DrawItem(GameTime Time, int ItemIndex, Rectangle Bounds, SpriteBatch Sbatch = null)
+        public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds)
         {
-            if (ItemIndex >= 0 && ItemIndex < ents.Count)
+            var ent = ents[itemIndex];
+
+            bool didDraw = false;
+            foreach (var sprite in ent.Sprites)
             {
-                var ent = ents[ItemIndex];
+                if (sprite?.Texture == null)
+                    continue;
 
-                bool didDraw = false;
-                foreach (var sprite in ent.Sprites)
-                {
-                    if (sprite?.Texture == null)
-                        continue;
+                bounds.X += bounds.Width / 2;
+                bounds.Y += bounds.Height / 2;
+                sprite.Draw(spriteBatch, bounds, 0, Color.White, editor.Map.ElapsedTime); //todo: correct time
 
-                    Bounds.X += Bounds.Width / 2;
-                    Bounds.Y += Bounds.Height / 2;
-                    sprite.Draw(Sbatch ?? sbatch, Bounds, 0, Color.White, Time.TotalGameTime);
-
-                    didDraw = true;
-                }
+                didDraw = true;
+            }
 
 #if DEBUG //Draw [X] in place of ent graphic
-                if (!didDraw)
-                {
-                    //todo: draw x as placeholder
-                }
-#endif
+            if (!didDraw)
+            {
+                //todo: draw x as placeholder
             }
+#endif
         }
     }
 }

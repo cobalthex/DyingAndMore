@@ -7,39 +7,33 @@ namespace DyingAndMore.Editor.Selectors
 {
     class FluidSelector : Selector
     {
-        public List<Takai.Game.FluidType> Fluids;
+        public List<Takai.Game.FluidType> fluids;
 
-        public FluidSelector(Editor Editor) : base(Editor) { }
-
-        public override void Load()
+        public FluidSelector(Editor editor)
+            : base(editor)
         {
-            base.Load();
-
-            base.ItemSize = new Point(64, 64);
-
-            Fluids = new List<Takai.Game.FluidType>();
+            fluids = new List<Takai.Game.FluidType>();
             foreach (var file in System.IO.Directory.EnumerateFiles("Defs\\Fluids", "*", System.IO.SearchOption.AllDirectories))
             {
                 try
                 {
                     using (var stream = new System.IO.StreamReader(file))
                     {
-                        var Fluid = Takai.Data.Serializer.TextDeserialize(stream) as Takai.Game.FluidType;
-                        if (Fluid != null)
-                            Fluids.Add(Fluid);
+                        if (Takai.Data.Serializer.TextDeserialize(stream) is Takai.Game.FluidType fluid)
+                            fluids.Add(fluid);
                     }
                 }
                 catch { } //add diagnostic output
             }
-            ItemCount = Fluids.Count;
+
+            ItemCount = fluids.Count;
             ItemSize = new Point(64);
-            Padding = 5;
         }
 
-        public override void DrawItem(GameTime Time, int ItemIndex, Rectangle Bounds, SpriteBatch Sbatch = null)
+        public override void DrawItem(SpriteBatch spriteBatch, int ItemIndex, Rectangle Bounds)
         {
-            if (ItemIndex >= 0 && ItemIndex < Fluids.Count && Fluids[ItemIndex].Texture != null)
-                (Sbatch ?? sbatch).Draw(Fluids[ItemIndex].Texture, Bounds, Color.White);
+            if (fluids[ItemIndex].Texture != null)
+                spriteBatch.Draw(fluids[ItemIndex].Texture, Bounds, Color.White);
         }
     }
 }

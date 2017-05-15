@@ -3,12 +3,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Takai.Input;
+using Takai.UI;
 
 namespace DyingAndMore.Editor
 {
-    class ModeSelector : Takai.UI.List
+    class ModeSelector : Static
     {
         private List<EditorMode> modes = new List<EditorMode>();
+        protected List tabs;
 
         public EditorMode Mode
         {
@@ -27,21 +29,25 @@ namespace DyingAndMore.Editor
 
                 mode = value;
 
-                for (int i = 0; i < Children.Count; ++i)
+                for (int i = 0; i < tabs.Children.Count; ++i)
                 {
                     if (i == mode)
                     {
-                        Children[i].Font = ActiveFont;
-                        Children[i].Color = ActiveColor;
+                        tabs.Children[i].Font = ActiveFont;
+                        tabs.Children[i].Color = ActiveColor;
                         modes[i].Start();
+                        AddChild(modes[i]);
                     }
                     else
                     {
-                        Children[i].Font = InactiveFont;
-                        Children[i].Color = InactiveColor;
+                        tabs.Children[i].Font = InactiveFont;
+                        tabs.Children[i].Color = InactiveColor;
 
                         if (i == lastMode)
+                        {
+                            RemoveChild(modes[lastMode]);
                             modes[lastMode].End();
+                        }
                     }
                 }
             }
@@ -57,38 +63,41 @@ namespace DyingAndMore.Editor
         public ModeSelector(Takai.Graphics.BitmapFont activeFont,
                             Takai.Graphics.BitmapFont inactiveFont)
         {
-            Direction = Takai.UI.Direction.Horizontal;
-
             ActiveFont = activeFont;
             InactiveFont = inactiveFont;
+
+            AddChild(tabs = new List()
+            {
+                Position = new Vector2(0, 40),
+                VerticalAlignment = Alignment.Start,
+                HorizontalAlignment = Alignment.Middle,
+                Direction = Direction.Horizontal
+            });
         }
 
         public void AddMode(EditorMode mode)
         {
             modes.Add(mode);
 
-            var child = new Takai.UI.Static()
+            var tab = new Static()
             {
                 Text = mode.Name,
                 Font = ActiveFont,
                 Color = InactiveColor
             };
-            child.AutoSize(padding: 20);
-            child.Font = InactiveFont;
+            tab.AutoSize(padding: 20);
+            tab.Font = InactiveFont;
 
-            child.Click += delegate
+            tab.Click += delegate
             {
                 Mode = mode;
             };
-            AddChild(child);
-
-            AutoSize();
+            tabs.AddChild(tab);
+            tabs.AutoSize();
         }
 
         protected override bool UpdateSelf(GameTime time)
         {
-            Mode?.Update(time);
-
             for (int i = 0; i < MathHelper.Min(10, modes.Count); ++i)
             {
                 //set editor mode
@@ -100,11 +109,6 @@ namespace DyingAndMore.Editor
             }
 
             return true;
-        }
-
-        protected override void DrawSelf(SpriteBatch spriteBatch)
-        {
-            Mode?.Draw(spriteBatch);
         }
     }
 }

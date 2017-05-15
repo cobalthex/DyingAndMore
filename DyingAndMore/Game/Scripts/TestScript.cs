@@ -13,7 +13,7 @@ namespace DyingAndMore.Game.Scripts
         public TestScript()
             : base("Test")
         {
-            path.Path = Editor.PathsEditorMode.paths[0];
+
         }
 
         public override void Step(TimeSpan deltaTime, Takai.Game.Entity context = null)

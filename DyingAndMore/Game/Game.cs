@@ -113,10 +113,10 @@ namespace DyingAndMore.Game
 
             if (InputState.IsClick(Keys.F1))
             {
-                Takai.Runtime.GameManager.NextState(new Editor.Editor()
-                {
-                    Map = map
-                });
+                //Takai.Runtime.GameManager.NextState(new Editor.Editor()
+                //{
+                //    Map = map
+                //});
                 return;
             }
 
