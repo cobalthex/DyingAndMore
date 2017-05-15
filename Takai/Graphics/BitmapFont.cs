@@ -247,7 +247,6 @@ namespace Takai.Graphics
                     pos.X = bounds.X + offset.X;
                     pos.Y += maxH + Tracking.Y;
                     maxH = 0;
-                    ++length;
                     continue;
                 }
                 else if (ch == '`' && i + 1 < length) //colors (`RGB (hex)) and `x to end

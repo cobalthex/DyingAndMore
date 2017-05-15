@@ -15,7 +15,8 @@ namespace Takai.UI
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             //todo: custom positioning/sizing
-            Sprite.Draw(spriteBatch, AbsoluteBounds, 0);
+            if (Sprite?.Texture != null)
+                Sprite.Draw(spriteBatch, AbsoluteBounds, 0);
 
             base.DrawSelf(spriteBatch);
         }

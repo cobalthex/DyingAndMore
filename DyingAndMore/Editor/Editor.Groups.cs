@@ -44,7 +44,7 @@ namespace DyingAndMore.Editor
 
         GroupsConfigurator configurator;
 
-        public GroupsEditorMode(Editor editor)
+        public GroupsEditorMode(DyingAndMore.Editor editor)
             : base("Groups", editor)
         {
         }

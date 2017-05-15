@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Takai.Input;
 
 namespace DyingAndMore.Editor
@@ -8,28 +9,62 @@ namespace DyingAndMore.Editor
         System.TimeSpan lastFluidTime = System.TimeSpan.Zero;
 
         Selectors.FluidSelector selector;
+        Takai.UI.Graphic preview;
 
         public FluidsEditorMode(Editor editor)
             : base("Fluids", editor)
         {
-            selector = new Selectors.FluidSelector(editor);
-            selector.Load();
+            VerticalAlignment = Takai.UI.Alignment.Stretch;
+            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+
+            selector = new Selectors.FluidSelector(editor)
+            {
+                Size = new Vector2(320, 1),
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                HorizontalAlignment = Takai.UI.Alignment.End
+            };
+            selector.SelectionChanged += delegate
+            {
+                var selectedFluid = selector.fluids[selector.SelectedItem]; //todo: can go into selector
+                preview.Sprite.Texture = selectedFluid.Texture;
+                preview.Sprite.ClipRect = selectedFluid.Texture.Bounds;
+                preview.Sprite.Size = selectedFluid.Texture.Bounds.Size;
+            };
+
+            AddChild(preview = new Takai.UI.Graphic()
+            {
+                Sprite = new Takai.Graphics.Sprite(),
+                Position = new Vector2(20),
+                Size = new Vector2(64),
+                HorizontalAlignment = Takai.UI.Alignment.End,
+                VerticalAlignment = Takai.UI.Alignment.Start,
+                OutlineColor = Color.White
+            });
+            preview.Click += delegate
+            {
+                AddChild(selector);
+            };
         }
 
-        public override void OpenConfigurator(bool DidClickOpen)
+        protected override bool UpdateSelf(GameTime time)
         {
-            selector.DidClickOpen = DidClickOpen;
-            Takai.Runtime.GameManager.PushState(selector);
-        }
+            if (InputState.IsPress(Keys.Tab))
+            {
+                AddChild(selector);
+                return false;
+            }
 
-        public override void Update(GameTime time)
-        {
+            if (!base.UpdateSelf(time))
+                return false;
+
+            var selectedFluid = selector.fluids[selector.SelectedItem];
+
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
             {
                 if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Bounds.Contains(currentWorldPos))
-                    editor.Map.Spawn(selector.Fluids[selector.SelectedItem], currentWorldPos, Vector2.Zero);
+                    editor.Map.Spawn(selectedFluid, currentWorldPos, Vector2.Zero);
 
                 else if (InputState.IsButtonDown(MouseButtons.Right))
                 {
@@ -59,6 +94,8 @@ namespace DyingAndMore.Editor
 
                 lastFluidTime = time.TotalGameTime;
             }
+
+            return true;
         }
     }
 }

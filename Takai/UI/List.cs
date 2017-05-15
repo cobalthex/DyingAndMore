@@ -34,20 +34,19 @@ namespace Takai.UI
                 if (i > 0)
                     t += Margin;
 
-                Vector2 position = new Vector2();
-
+                Vector2 position = child.Position;
                 if (Direction == Direction.Horizontal)
                 {
-                    position = new Vector2(t, 0);
-                    t += Children[i].Size.X;
+                    position = new Vector2(t, position.Y);
+                    t += child.Size.X;
                 }
                 else if (Direction == Direction.Vertical)
                 {
-                    position = new Vector2(0, t);
-                    t += Children[i].Size.Y;
+                    position = new Vector2(position.X, t);
+                    t += child.Size.Y;
                 }
 
-                children[i].Position = position;
+                child.Position = position;
             }
 
             //todo: decide how to handle alignment on main axis, vertical list with child:vertical-middle will put child in middle of list container

@@ -129,7 +129,9 @@ namespace DyingAndMore
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            ui = new Editor.Editor2();
+            ui = new Editor.Editor();
+
+            //Takai.UI.Static.DebugFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/RCT2.bfnt");
 
             base.Initialize();
         }
@@ -170,7 +172,7 @@ namespace DyingAndMore
             }
             else
             {
-                sbatch.Begin();
+                sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                 //GameManager.Draw(gameTime);
                 ui.Draw(sbatch);
                 sbatch.End();

@@ -3,30 +3,82 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
-using Takai.Graphics;
 
 namespace DyingAndMore.Editor
 {
     class EntitiesEditorMode : EditorMode
     {
-        Takai.Game.Entity selectedEntity = null;
+        public Takai.Game.Entity SelectedEntity
+        {
+            get => selectedEntity;
+            set
+            {
+                selectedEntity = value;
+                if (value == null)
+                    entInfo.Text = "";
+                else
+                {
+                    entInfo.Font = Font;
+                    entInfo.Text
+                        = $"Name: {(string.IsNullOrWhiteSpace(selectedEntity.Name) ? "(No Name)" : SelectedEntity.Name)}\n"
+                        + $"ID: {selectedEntity.Id}\n"
+                        + $"Position: {selectedEntity.Position}\n"
+                        + $"Type: {selectedEntity.GetType().Name}\n"
+                        + $"State: {selectedEntity.State}\n";
+                    //controller, faction
+                }
+                entInfo.AutoSize();
+            }
+        }
+        Takai.Game.Entity selectedEntity;
 
         Vector2 lastWorldPos;
 
         Selectors.EntSelector selector;
+        Takai.UI.Graphic preview;
+
+        Takai.UI.Static entInfo;
 
         public EntitiesEditorMode(Editor editor)
             : base("Entities", editor)
         {
-            selector = new Selectors.EntSelector(editor);
-            selector.Load();
+            VerticalAlignment = Takai.UI.Alignment.Stretch;
+            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+
+            selector = new Selectors.EntSelector(editor)
+            {
+                Size = new Vector2(320, 1),
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                HorizontalAlignment = Takai.UI.Alignment.End
+            };
+            selector.SelectionChanged += delegate
+            {
+
+
+                //todo: ent preview
+            };
+
+            AddChild(preview = new Takai.UI.Graphic()
+            {
+                Position = new Vector2(20),
+                HorizontalAlignment = Takai.UI.Alignment.End,
+                VerticalAlignment = Takai.UI.Alignment.Start,
+                OutlineColor = Color.White
+            });
+            preview.Click += delegate
+            {
+                AddChild(selector);
+            };
+
+            AddChild(entInfo = new Takai.UI.Static()
+            {
+                Position = new Vector2(20),
+                HorizontalAlignment = Takai.UI.Alignment.Start,
+                VerticalAlignment = Takai.UI.Alignment.End,
+                Font = Font
+            });
         }
 
-        public override void OpenConfigurator(bool DidClickOpen)
-        {
-            selector.DidClickOpen = DidClickOpen;
-            Takai.Runtime.GameManager.PushState(selector);
-        }
 
         public override void Start()
         {
@@ -35,19 +87,30 @@ namespace DyingAndMore.Editor
 
         public override void End()
         {
-            if (selectedEntity != null)
+            if (SelectedEntity != null)
             {
-                selectedEntity.OutlineColor = Color.Transparent;
-                selectedEntity = null;
+                SelectedEntity.OutlineColor = Color.Transparent;
+                SelectedEntity = null;
             }
         }
 
-        public override void Update(GameTime Time)
+        protected override bool UpdateSelf(GameTime time)
         {
+            //todo: add return false to cases and move things to use events
+
+            if (InputState.IsPress(Keys.Tab))
+            {
+                AddChild(selector);
+                return false;
+            }
+
+            if (!base.UpdateSelf(time))
+                return false;
+
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
-            if (selectedEntity != null)
-                selectedEntity.OutlineColor = Color.Transparent;
+            if (SelectedEntity != null)
+                SelectedEntity.OutlineColor = Color.Transparent;
 
             if (InputState.IsPress(MouseButtons.Left)/* || isTapping*/)
             {
@@ -70,7 +133,8 @@ namespace DyingAndMore.Editor
                             editor.Map.Spawn(ent);
                         }
                     }
-                    return;
+
+                    return false;
                 }
 
                 var searchRadius = /*isTapping*/ false ? 10 : 1;
@@ -78,87 +142,56 @@ namespace DyingAndMore.Editor
                 if (selected.Count < 1)
                 {
                     if (editor.Map.Bounds.Contains(currentWorldPos))
-                        selectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedItem], currentWorldPos, Vector2.UnitX, Vector2.Zero);
+                        SelectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedItem], currentWorldPos, Vector2.UnitX, Vector2.Zero);
                     else
-                        selectedEntity = null;
+                        SelectedEntity = null;
                 }
                 else
-                    selectedEntity = selected[0];
+                    SelectedEntity = selected[0];
             }
             else if (InputState.IsPress(MouseButtons.Right))
             {
                 var selected = editor.Map.FindEntities(currentWorldPos, 1, true);
-                selectedEntity = selected.Count > 0 ? selected[0] : null;
+                SelectedEntity = selected.Count > 0 ? selected[0] : null;
             }
             else if (InputState.IsClick(MouseButtons.Right)/* || isDoubleTapping*/)
             {
                 var searchRadius = /*isTapping*/ false ? 10 : 1;
                 var selected = editor.Map.FindEntities(currentWorldPos, searchRadius, true);
-                if (selected.Count > 0 && selected[0] == selectedEntity)
+                if (selected.Count > 0 && selected[0] == SelectedEntity)
                 {
-                    editor.Map.Destroy(selectedEntity);
-                    selectedEntity = null;
+                    editor.Map.Destroy(SelectedEntity);
+                    SelectedEntity = null;
                 }
             }
 
-            else if (selectedEntity != null)
+            else if (SelectedEntity != null)
             {
-                selectedEntity.OutlineColor = Color.YellowGreen;
+                SelectedEntity.OutlineColor = Color.YellowGreen;
 
                 if (InputState.IsButtonDown(MouseButtons.Left))
                 {
                     var delta = currentWorldPos - lastWorldPos;
-                    selectedEntity.Position += delta;
+                    SelectedEntity.Position += delta;
                 }
 
                 if (InputState.IsButtonDown(Keys.R))
                 {
-                    var diff = currentWorldPos - selectedEntity.Position;
+                    var diff = currentWorldPos - SelectedEntity.Position;
                     diff.Normalize();
-                    selectedEntity.Direction = diff;
+                    SelectedEntity.Direction = diff;
                 }
 
                 if (InputState.IsPress(Keys.Delete))
                 {
-                    editor.Map.Destroy(selectedEntity);
-                    selectedEntity = null;
+                    editor.Map.Destroy(SelectedEntity);
+                    SelectedEntity = null;
                 }
             }
 
             lastWorldPos = currentWorldPos;
-        }
 
-        public override void Draw(SpriteBatch sbatch)
-        {
-            if (selectedEntity != null)
-                DrawEntInfo(sbatch, selectedEntity);
-
-            foreach (var ent in editor.Map.ActiveEnts)
-                editor.DrawArrow(ent.Position, ent.Direction, ent.Radius * 1.5f);
-
-            //draw basic info about entity screen
-            editor.SmallFont.Draw(sbatch, $"Visible Entities: {editor.Map.ActiveEnts.Count}\nTotal Entities:   {editor.Map.TotalEntitiesCount}", new Vector2(20, 80), Color.LightSeaGreen);
-        }
-
-
-        static readonly string[] entInfoKeys = { "Name", "ID", "Type", "Position", "State" };
-        protected void DrawEntInfo(SpriteBatch sbatch, Takai.Game.Entity ent)
-        {
-            var props = new[] { ent.Name, ent.Id.ToString(), ent.GetType().Name, ent.Position.ToString(), ent.State.ToString() };
-            var font = editor.DebugFont;
-
-            var lineHeight = font.Characters[' '].Height;
-            var totalHeight = (entInfoKeys.Length * lineHeight) + 10;
-
-            var maxWidth = 0;
-            for (var i = 0; i < entInfoKeys.Length; ++i)
-            {
-                var sz = font.Draw(sbatch, entInfoKeys[i] + ": ", new Vector2(10, editor.GraphicsDevice.Viewport.Height - totalHeight + (lineHeight * i)), Color.White);
-                maxWidth = MathHelper.Max(maxWidth, (int)sz.X);
-            }
-
-            for (var i = 0; i < props.Length; ++i)
-                font.Draw(sbatch, props[i] ?? "Null", new Vector2(10 + maxWidth, editor.GraphicsDevice.Viewport.Height - totalHeight + (lineHeight * i)), props[i] == null ? Color.Gray : Color.White);
+            return true;
         }
     }
 }

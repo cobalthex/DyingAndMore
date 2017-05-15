@@ -108,7 +108,7 @@ namespace Takai.Graphics
             set
             {
                 texture = value;
-                if (texture != null && clipRect == Rectangle.Empty)
+                if (texture != null && ClipRect == Rectangle.Empty)
                     ClipRect = texture.Bounds;
             }
         }
@@ -123,8 +123,7 @@ namespace Takai.Graphics
             set
             {
                 width = value;
-                if (value != 0)
-                    framesPerRow = (ClipRect.Width / value);
+                framesPerRow = MathHelper.Max(1, ClipRect.Width / width);
             }
         }
         private int width = 1;
@@ -165,8 +164,7 @@ namespace Takai.Graphics
             set
             {
                 clipRect = value;
-                if (width != 0)
-                    framesPerRow = (value.Width / width);
+                framesPerRow = MathHelper.Max(1, value.Width / width);
             }
         }
         private Rectangle clipRect = Rectangle.Empty;

@@ -43,7 +43,7 @@ namespace DyingAndMore.Editor
 
         public static List<Takai.Game.Path> paths;
 
-        public PathsEditorMode(Editor editor)
+        public PathsEditorMode(DyingAndMore.Editor editor)
             : base("Paths", editor)
         {
             if (paths == null)

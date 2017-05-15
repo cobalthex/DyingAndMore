@@ -60,7 +60,9 @@ namespace Takai.Data
     {
         public static void TextSerialize(string file, object serializing)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(file));
+            var dir = Path.GetDirectoryName(file);
+            if (!string.IsNullOrEmpty(dir))
+                Directory.CreateDirectory(dir);
             using (var writer = new StreamWriter(file))
                 TextSerialize(writer, serializing);
         }

@@ -10,7 +10,7 @@ namespace DyingAndMore.Editor
         {
             if (InputState.IsButtonDown(MouseButtons.Middle))
             {
-                MoveTo(Position + Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(Transform)));
+                MoveTo(Position - Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(Transform)));
             }
             else
             {

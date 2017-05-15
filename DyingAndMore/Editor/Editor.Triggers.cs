@@ -35,7 +35,7 @@ namespace DyingAndMore.Editor
 
         TriggersConfigurator configurator;
 
-        public TriggersEditorMode(Editor editor)
+        public TriggersEditorMode(DyingAndMore.Editor editor)
             : base("Triggers", editor)
         {
         }
