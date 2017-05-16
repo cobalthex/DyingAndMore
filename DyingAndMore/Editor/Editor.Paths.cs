@@ -8,16 +8,29 @@ namespace DyingAndMore.Editor
     {
         public static List<Takai.Game.Path> paths;
 
+        Takai.UI.TrackBar trackBar;
+
         public PathsEditorMode(Editor editor)
             : base("Paths", editor)
         {
-            if (paths == null)
+            VerticalAlignment = Takai.UI.Alignment.Stretch;
+            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+
+            AddChild(trackBar = new Takai.UI.TrackBar()
             {
-                paths = new List<Takai.Game.Path>
-                {
-                    new Takai.Game.Path()
-                };
-            }
+                Position = new Vector2(0, 100),
+                Size = new Vector2(200, 30),
+                HorizontalAlignment = Takai.UI.Alignment.Middle,
+                Minimum = 0,
+                Maximum = 1000,
+                Value = 500,
+                Increment = 50,
+            });
+
+            paths = new List<Takai.Game.Path>
+            {
+                new Takai.Game.Path()
+            };
         }
 
         public override void Start()
@@ -36,7 +49,7 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
-            return true;
+            return base.UpdateSelf(time);
         }
 
 
@@ -111,7 +124,7 @@ namespace DyingAndMore.Editor
                 var result = new List<Vector2>();
                 //i + 1
 
-                float alpha = 0.5f; //curve parameterization (α)
+                float alpha = trackBar.NormalizedValue; //curve parameterization (α)
 
                 var times = new double[4];
                 for (int i = 0; i < p.Count - 3; ++i)

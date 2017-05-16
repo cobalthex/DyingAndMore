@@ -9,7 +9,7 @@ namespace DyingAndMore.Editor
     class TilesEditorMode : EditorMode
     {
         bool isPosSaved = false;
-        Vector2 savedWorldPos, lastWorldPos;
+        Vector2 savedWorldPos, lastWorldPos, currentWorldPos;
 
         Selectors.TileSelector selector;
         Takai.UI.Graphic preview;
@@ -64,10 +64,8 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
-            if (!base.UpdateSelf(time))
-                return false;
-
-            var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            lastWorldPos = currentWorldPos;
+            currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsPress(Keys.LeftControl) || InputState.IsPress(Keys.RightControl))
             {
@@ -122,15 +120,17 @@ namespace DyingAndMore.Editor
 
                     savedWorldPos = currentWorldPos;
                 }
+
+                //todo: fix when coming out of selector
                 else if (InputState.IsMod(KeyMod.Shift))
                     TileFill(currentWorldPos, tile);
-                else if (InputState.IsButtonHeld(tile == -1 ? MouseButtons.Right : MouseButtons.Left)) //todo: may be issues with line drawing
+                else
                     TileLine(lastWorldPos, currentWorldPos, tile);
+
+                return false;
             }
 
-            lastWorldPos = currentWorldPos;
-
-            return true;
+            return base.UpdateSelf(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

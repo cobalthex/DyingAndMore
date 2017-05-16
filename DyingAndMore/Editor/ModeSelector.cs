@@ -36,7 +36,7 @@ namespace DyingAndMore.Editor
                         tabs.Children[i].Font = ActiveFont;
                         tabs.Children[i].Color = ActiveColor;
                         modes[i].Start();
-                        AddChild(modes[i]);
+                        InsertChild(modes[i]);
                     }
                     else
                     {
@@ -108,7 +108,7 @@ namespace DyingAndMore.Editor
                 }
             }
 
-            return true;
+            return base.UpdateSelf(time);
         }
     }
 }

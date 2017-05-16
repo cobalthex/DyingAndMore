@@ -442,17 +442,6 @@ namespace DyingAndMore.Editor
             sbatch.End();
         }
 
-        static readonly Matrix arrowWingTransform = Matrix.CreateRotationZ(120);
-        public void DrawArrow(Vector2 Position, Vector2 Direction, float Magnitude)
-        {
-            var tip = Position + (Direction * Magnitude);
-            Map.DrawLine(Position, tip, Color.Yellow);
-
-            Magnitude = MathHelper.Clamp(Magnitude * 0.333f, 5, 30);
-            Map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, arrowWingTransform)), Color.Yellow);
-            Map.DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(arrowWingTransform))), Color.Yellow);
-        }
-
         static string BeautifyPropName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
