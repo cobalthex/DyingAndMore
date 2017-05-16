@@ -9,14 +9,25 @@ namespace Takai.UI
 
         public override void AutoSize(float padding = 0)
         {
-            Size = Sprite.Size.ToVector2() + new Vector2(padding);
+            Size = (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2()) + new Vector2(padding);
+        }
+
+        protected override bool UpdateSelf(GameTime time)
+        {
+            if (Sprite != null)
+                Sprite.ElapsedTime += time.ElapsedGameTime;
+            return base.UpdateSelf(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             //todo: custom positioning/sizing
             if (Sprite?.Texture != null)
-                Sprite.Draw(spriteBatch, AbsoluteBounds, 0);
+            {
+                var rect = AbsoluteBounds;
+                rect.Offset(Sprite.Origin);
+                Sprite.Draw(spriteBatch, rect, 0);
+            }
 
             base.DrawSelf(spriteBatch);
         }

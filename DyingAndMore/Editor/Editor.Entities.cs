@@ -32,7 +32,7 @@ namespace DyingAndMore.Editor
         }
         Takai.Game.Entity selectedEntity;
 
-        Vector2 lastWorldPos;
+        Vector2 lastWorldPos, currentWorldPos;
 
         Selectors.EntSelector selector;
         Takai.UI.Graphic preview;
@@ -53,9 +53,17 @@ namespace DyingAndMore.Editor
             };
             selector.SelectionChanged += delegate
             {
-
-
-                //todo: ent preview
+                var sprite = selector.ents[selector.SelectedItem].Sprites.GetEnumerator();
+                if (sprite.MoveNext())
+                {
+                    preview.Sprite = sprite.Current;
+                    preview.AutoSize();
+                }
+                else
+                {
+                    preview.Sprite = null;
+                    preview.Size = new Vector2(1);
+                }
             };
 
             AddChild(preview = new Takai.UI.Graphic()
@@ -96,18 +104,14 @@ namespace DyingAndMore.Editor
 
         protected override bool UpdateSelf(GameTime time)
         {
-            //todo: add return false to cases and move things to use events
-
             if (InputState.IsPress(Keys.Tab))
             {
                 AddChild(selector);
                 return false;
             }
 
-            if (!base.UpdateSelf(time))
-                return false;
-
-            var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            lastWorldPos = currentWorldPos;
+            currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (SelectedEntity != null)
                 SelectedEntity.OutlineColor = Color.Transparent;
@@ -148,11 +152,15 @@ namespace DyingAndMore.Editor
                 }
                 else
                     SelectedEntity = selected[0];
+
+                return false;
             }
             else if (InputState.IsPress(MouseButtons.Right))
             {
                 var selected = editor.Map.FindEntities(currentWorldPos, 1, true);
                 SelectedEntity = selected.Count > 0 ? selected[0] : null;
+
+                return false;
             }
             else if (InputState.IsClick(MouseButtons.Right)/* || isDoubleTapping*/)
             {
@@ -162,6 +170,8 @@ namespace DyingAndMore.Editor
                 {
                     editor.Map.Destroy(SelectedEntity);
                     SelectedEntity = null;
+
+                    return false;
                 }
             }
 
@@ -173,6 +183,8 @@ namespace DyingAndMore.Editor
                 {
                     var delta = currentWorldPos - lastWorldPos;
                     SelectedEntity.Position += delta;
+
+                    return false;
                 }
 
                 if (InputState.IsButtonDown(Keys.R))
@@ -180,18 +192,29 @@ namespace DyingAndMore.Editor
                     var diff = currentWorldPos - SelectedEntity.Position;
                     diff.Normalize();
                     SelectedEntity.Direction = diff;
+
+                    return false;
                 }
 
                 if (InputState.IsPress(Keys.Delete))
                 {
                     editor.Map.Destroy(SelectedEntity);
                     SelectedEntity = null;
+
+                    return false;
                 }
             }
 
-            lastWorldPos = currentWorldPos;
+            return base.UpdateSelf(time);
+        }
 
-            return true;
+        protected override void DrawSelf(SpriteBatch spriteBatch)
+        {
+            base.DrawSelf(spriteBatch);
+            foreach (var ent in editor.Map.ActiveEnts)
+            {
+                editor.Map.DrawArrow(ent.Position, ent.Direction, ent.Radius * 1.5f, Color.Gold);
+            }
         }
     }
 }

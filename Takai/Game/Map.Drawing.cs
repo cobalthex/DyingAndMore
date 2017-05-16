@@ -89,6 +89,23 @@ namespace Takai.Game
             DrawLine(new Vector2(rect.Left, rect.Bottom), new Vector2(rect.Right, rect.Bottom), color);
         }
 
+        static readonly Matrix arrowWingTransform = Matrix.CreateRotationZ(120);
+        /// <summary>
+        /// Draw an arrow facing away from a point
+        /// </summary>
+        /// <param name="Position">The origin of the tail of the arrow</param>
+        /// <param name="Direction">The direction the arrow is facing</param>
+        /// <param name="Magnitude">How big the arrow should be</param>
+        public void DrawArrow(Vector2 Position, Vector2 Direction, float Magnitude, Color color)
+        {
+            var tip = Position + (Direction * Magnitude);
+            DrawLine(Position, tip, Color.Yellow);
+
+            Magnitude = MathHelper.Clamp(Magnitude * 0.333f, 5, 30);
+            DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, arrowWingTransform)), color);
+            DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(arrowWingTransform))), color);
+        }
+
         public struct MapProfilingInfo
         {
             public int visibleEnts;

@@ -266,7 +266,7 @@ namespace Takai.UI
         protected bool ignoreEnterKey = false;
 
         /// <summary>
-        /// The input must start inside the element to register a click
+        /// Was the current (left) mouse press inside this element
         /// </summary>
         protected bool didPress = false;
 
@@ -277,7 +277,7 @@ namespace Takai.UI
         public Static Parent
         {
             get => parent;
-            set
+            protected set
             {
                 if (parent != value)
                 {
@@ -338,8 +338,23 @@ namespace Takai.UI
 
         public void AddChild(Static child)
         {
-            child.Parent = this;
+            if (child.Parent == this)
+                return;
+
+            child.parent = this;
             children.Add(child);
+            if (child.HasFocus) //re-apply throughout tree
+                child.HasFocus = true;
+            Reflow();
+        }
+
+        public void InsertChild(Static child, int index = 0)
+        {
+            if (child.Parent == this)
+                return;
+
+            child.parent = this;
+            children.Insert(index, child);
             if (child.HasFocus) //re-apply throughout tree
                 child.HasFocus = true;
             Reflow();
@@ -347,15 +362,18 @@ namespace Takai.UI
 
         public void AddChildren(params Static[] children)
         {
-            this.children.AddRange(children);
-
             Static lastFocus = null;
             foreach (var child in children)
             {
+                if (child.Parent == this)
+                    continue;
+
                 child.parent = this;
+                this.children.Add(child);
                 if (child.HasFocus)
                     lastFocus = child;
             }
+
             if (lastFocus != null)
                 lastFocus.HasFocus = true;
 
@@ -364,15 +382,18 @@ namespace Takai.UI
 
         public void AddChildren(IEnumerable<Static> children)
         {
-            this.children.AddRange(children);
-
             Static lastFocus = null;
             foreach (var child in children)
             {
+                if (child.Parent == this)
+                    continue;
+
                 child.parent = this;
+                this.children.Add(child);
                 if (child.HasFocus)
                     lastFocus = child;
             }
+
             if (lastFocus != null)
                 lastFocus.HasFocus = true;
 
@@ -386,17 +407,21 @@ namespace Takai.UI
         public void RemoveChild(Static child)
         {
             children.Remove(child);
+            child.parent = null;
         }
 
         public Static RemoveChildAt(int index)
         {
             var child = children[index];
             children.RemoveAt(index);
+            child.parent = null;
             return child;
         }
 
         public void RemoveAllChildren()
         {
+            foreach (var child in children)
+                child.parent = null;
             children.Clear();
         }
 
@@ -786,17 +811,20 @@ namespace Takai.UI
 
             if (Input.InputState.IsPress(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
             {
+                didPress = true;
                 var e = new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() };
                 OnPress(e);
                 Press?.Invoke(this, e);
 
-                didPress = true;
                 if (CanFocus)
                 {
                     HasFocus = true;
                     return false;
                 }
             }
+
+            else if (didPress && Input.InputState.IsButtonDown(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
+                return false;
 
             else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
             {
@@ -808,7 +836,6 @@ namespace Takai.UI
                     didPress = false;
                     return false;
                 }
-
                 didPress = false;
             }
 

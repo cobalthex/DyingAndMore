@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
+using Takai.UI;
 
 namespace DyingAndMore.Editor
 {
@@ -10,7 +11,7 @@ namespace DyingAndMore.Editor
         Takai.Game.Decal selectedDecal = null;
         float startRotation, startScale;
 
-        Vector2 lastWorldPos;
+        Vector2 currentWorldPos, lastWorldPos;
 
         Selectors.DecalSelector selector;
         Takai.UI.Graphic preview;
@@ -72,10 +73,8 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
-            if (!base.UpdateSelf(time))
-                return false;
-
-            var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            lastWorldPos = currentWorldPos;
+            currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsPress(MouseButtons.Left))
             {
@@ -84,11 +83,13 @@ namespace DyingAndMore.Editor
                     //add new decal under cursor
                     selectedDecal = editor.Map.AddDecal(selector.textures[selector.SelectedItem], currentWorldPos);
                     var pos = (currentWorldPos / editor.Map.SectorPixelSize).ToPoint();
+                    return false;
                 }
             }
             else if (InputState.IsPress(MouseButtons.Right))
             {
                 SelectDecal(currentWorldPos);
+                return false;
             }
             else if (InputState.IsClick(MouseButtons.Right))
             {
@@ -100,6 +101,7 @@ namespace DyingAndMore.Editor
                     GetDecalSector(selectedDecal).decals.Remove(selectedDecal);
                     selectedDecal = null;
                 }
+                return false;
             }
 
             else if (selectedDecal != null)
@@ -108,6 +110,7 @@ namespace DyingAndMore.Editor
                 {
                     var delta = currentWorldPos - lastWorldPos;
                     selectedDecal.position += delta;
+                    return false;
                 }
 
                 if (InputState.IsButtonDown(Keys.R))
@@ -119,6 +122,7 @@ namespace DyingAndMore.Editor
                         startRotation = theta - selectedDecal.angle;
 
                     selectedDecal.angle = theta - startRotation;
+                    return false;
                 }
 
                 if (InputState.IsButtonDown(Keys.E))
@@ -130,20 +134,20 @@ namespace DyingAndMore.Editor
 
                     selectedDecal.scale = MathHelper.Clamp(selectedDecal.scale + (dist - startScale) / 25, 0.25f, 10f);
                     startScale = dist;
+                    return false;
                 }
 
                 if (InputState.IsPress(Keys.Delete))
                 {
                     GetDecalSector(selectedDecal).decals.Remove(selectedDecal);
                     selectedDecal = null;
+                    return false;
                 }
 
                 //todo: clone
             }
 
-            lastWorldPos = currentWorldPos;
-
-            return true;
+            return base.UpdateSelf(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -180,6 +184,8 @@ namespace DyingAndMore.Editor
 
         bool SelectDecal(Vector2 worldPosition)
         {
+            //todo: improve
+
             //find closest decal
             var mapSz = new Vector2(editor.Map.Width, editor.Map.Height);
             var start = Vector2.Clamp((worldPosition / editor.Map.SectorPixelSize) - Vector2.One, Vector2.Zero, mapSz).ToPoint();

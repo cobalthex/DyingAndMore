@@ -54,19 +54,21 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
-            if (!base.UpdateSelf(time))
-                return false;
-
             var selectedFluid = selector.fluids[selector.SelectedItem];
 
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
             {
-                if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Bounds.Contains(currentWorldPos))
-                    editor.Map.Spawn(selectedFluid, currentWorldPos, Vector2.Zero);
+                lastFluidTime = time.TotalGameTime;
 
-                else if (InputState.IsButtonDown(MouseButtons.Right))
+                if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Bounds.Contains(currentWorldPos))
+                {
+                    editor.Map.Spawn(selectedFluid, currentWorldPos, Vector2.Zero);
+                    return false;
+                }
+
+                if (InputState.IsButtonDown(MouseButtons.Right))
                 {
                     var mapSz = new Vector2(editor.Map.Width, editor.Map.Height);
                     var start = Vector2.Clamp((currentWorldPos / editor.Map.SectorPixelSize) - Vector2.One, Vector2.Zero, mapSz).ToPoint();
@@ -90,12 +92,12 @@ namespace DyingAndMore.Editor
                             }
                         }
                     }
-                }
 
-                lastFluidTime = time.TotalGameTime;
+                    return false;
+                }
             }
 
-            return true;
+            return base.UpdateSelf(time);
         }
     }
 }

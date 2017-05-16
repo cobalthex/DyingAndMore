@@ -12,6 +12,9 @@ namespace DyingAndMore.Editor
         public GroupsEditorMode(Editor editor)
             : base("Groups", editor)
         {
+            VerticalAlignment = Takai.UI.Alignment.Stretch;
+            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+
         }
 
         public override void Start()
@@ -37,7 +40,7 @@ namespace DyingAndMore.Editor
                     ent.OutlineColor = Color.Purple; //todo: unify color
             }
 
-            return true;
+            return base.UpdateSelf(time);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.UI;
@@ -93,18 +94,19 @@ namespace DyingAndMore.Editor.Selectors
 
         protected override bool UpdateSelf(GameTime time)
         {
-            if (!base.UpdateSelf(time))
-                return false;
-
             if (InputState.IsClick(Microsoft.Xna.Framework.Input.Keys.Tab))
                 RemoveFromParent();
 
-            else if (AbsoluteBounds.Contains(InputState.MousePoint) && InputState.HasScrolled())
-                scrollBar.ContentPosition -= InputState.ScrollDelta();
+            else if (AbsoluteBounds.Contains(InputState.MousePoint))
+            {
+                if (InputState.HasScrolled())
+                    scrollBar.ContentPosition -= InputState.ScrollDelta();
+            }
 
             else if (InputState.IsPress(MouseButtons.Left))
-                RemoveFromParent(); //clicked outside (OnPress handles interior clicking
+                RemoveFromParent();
 
+            base.UpdateSelf(time);
             return false;
         }
 
