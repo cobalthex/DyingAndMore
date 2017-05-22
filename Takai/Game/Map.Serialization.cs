@@ -62,7 +62,7 @@ namespace Takai.Game
             using (var reader = new StreamReader(Stream))
                 map = (Map)Data.Serializer.TextDeserialize(reader);
 
-            map.InitializeGraphics(Runtime.GameManager.Game.GraphicsDevice);
+            map.InitializeGraphics();
             GC.Collect();
             return map;
         }

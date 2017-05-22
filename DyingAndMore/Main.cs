@@ -1,7 +1,6 @@
 //Main.cs
 
 using System.Runtime.InteropServices;
-using Takai.Runtime;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -97,9 +96,6 @@ namespace DyingAndMore
         {
             Takai.Data.Serializer.LoadTypesFrom(System.Reflection.Assembly.GetEntryAssembly());
 
-            if (GameManager.IsInitialized)
-                return;
-
             #region Mouse Cursor
 #if WINDOWS
             if (useCustomCursor)
@@ -116,15 +112,16 @@ namespace DyingAndMore
 
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
+            Takai.Runtime.Game = this;
             Takai.AssetManager.Initialize(GraphicsDevice, "Data\\");
 
-            GameManager.Initialize(this);
             sbatch = new SpriteBatch(GraphicsDevice);
 
-            var map = new Takai.Game.Map(GraphicsDevice)
+            var map = new Takai.Game.Map()
             {
                 updateSettings = Takai.Game.MapUpdateSettings.Editor
             };
+            map.InitializeGraphics();
 
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
@@ -138,16 +135,21 @@ namespace DyingAndMore
 
         protected override void OnExiting(object sender, System.EventArgs args)
         {
-            GameManager.Exit();
         }
 
         protected override void Update(GameTime gameTime)
         {
+            if (Takai.Runtime.IsExiting)
+            {
+                Exit();
+                return;
+            }
+
             if (Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.F12))
                 takingScreenshot = true;
 
             Takai.Input.InputState.Update(GraphicsDevice.Viewport.Bounds);
-            GameManager.Update(gameTime);
+
             ui.Update(gameTime);
             ui.Bounds = GraphicsDevice.Viewport.Bounds;
         }
@@ -162,7 +164,6 @@ namespace DyingAndMore
                     GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
                 GraphicsDevice.SetRenderTarget(rt);
-                GameManager.Draw(gameTime);
                 GraphicsDevice.SetRenderTarget(null);
 
                 var fs = new System.IO.FileStream(System.DateTime.Now.ToString("dd_MMM_HH-mm-ss-fff") + ".png", System.IO.FileMode.Create);

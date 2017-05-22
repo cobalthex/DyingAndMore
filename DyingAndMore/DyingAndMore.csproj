@@ -93,7 +93,7 @@
     <Compile Include="Game\Weapons\Weapon.cs" />
     <Compile Include="Game\Entities\Actor.cs" />
     <Compile Include="Game\Entities\Projectile.cs" />
-    <Compile Include="Game\Game.cs" />
+    <None Include="Game\Game.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

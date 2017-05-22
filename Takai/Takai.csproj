@@ -91,6 +91,7 @@
     <Compile Include="Game\Path.cs" />
     <Compile Include="Game\Script.cs" />
     <Compile Include="Game\Trigger.cs" />
+    <Compile Include="Runtime.cs" />
     <Compile Include="StateMachine.cs" />
     <Compile Include="Graphics\BitmapFont.cs" />
     <Compile Include="Graphics\Sprite.cs" />
@@ -98,8 +99,6 @@
     <Compile Include="Input\InputState.cs" />
     <Compile Include="Locale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Runtime\GameManager.cs" />
-    <Compile Include="Runtime\GameState.cs" />
     <Compile Include="UI\CheckBox.cs" />
     <Compile Include="UI\FileInput.cs" />
     <Compile Include="UI\Graphic.cs" />

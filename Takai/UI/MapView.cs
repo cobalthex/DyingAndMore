@@ -3,6 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
+    /// <summary>
+    /// A view of the map. Updating only occurs in Update()
+    /// </summary>
     public class MapView : Static
     {
         public Game.Map Map { get; set; } = null;
@@ -12,7 +15,7 @@ namespace Takai.UI
             Size = new Vector2(800, 600) + new Vector2(padding);
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        public override bool Update(GameTime time)
         {
             if (Map != null)
             {
@@ -20,7 +23,7 @@ namespace Takai.UI
                     Map.ActiveCamera.Viewport = AbsoluteBounds;
                 Map.Update(time);
             }
-            return base.UpdateSelf(time);
+            return base.Update(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
