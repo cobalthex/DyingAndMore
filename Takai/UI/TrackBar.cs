@@ -8,8 +8,8 @@ namespace Takai.UI
     {
         protected override bool UpdateSelf(GameTime time)
         {
-            if (!base.UpdateSelf(time))
-                return false;
+            //if (!base.UpdateSelf(time))
+            //    return false;
 
             if (didPress)
             {
@@ -24,7 +24,7 @@ namespace Takai.UI
                 return false;
             }
 
-            return true;
+            return base.UpdateSelf(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

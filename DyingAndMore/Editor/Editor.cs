@@ -32,7 +32,7 @@ namespace DyingAndMore.Editor
         public Editor()
         {
             Map = Serializer.CastType<Takai.Game.Map>(Serializer.TextDeserialize("Data/Maps/maze2.map.tk"));
-            Map.InitializeGraphics(Takai.Runtime.GameManager.GraphicsDevice);
+            Map.InitializeGraphics();
             Map.ActiveCamera = new EditorCamera();
 
             Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
@@ -99,10 +99,19 @@ namespace DyingAndMore.Editor
             #endregion
 
             //start zoomed out to see the whole map
-            //var mapSize = new Vector2(Map.Width, Map.Height) * Map.TileSize;
-            //var xyScale = new Vector2(GraphicsDevice.Viewport.Width - 20, GraphicsDevice.Viewport.Height - 20) / mapSize;
-            //Camera.Scale = MathHelper.Clamp(MathHelper.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
-            //Camera.Position = mapSize / 2;
+            var mapSize = new Vector2(Map.Width, Map.Height) * Map.TileSize;
+            var xyScale = new Vector2(Takai.Runtime.GraphicsDevice.Viewport.Width - 20,
+                                      Takai.Runtime.GraphicsDevice.Viewport.Height - 20) / mapSize;
+            Map.ActiveCamera.Scale = MathHelper.Clamp(MathHelper.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
+            Map.ActiveCamera.MoveTo(mapSize / 2);
+        }
+
+        public override bool Update(GameTime time)
+        {
+            fpsDisplay.Text = "FPS: " + (1000 / time.ElapsedGameTime.TotalMilliseconds).ToString("N2");
+            fpsDisplay.AutoSize();
+
+            return base.Update(time);
         }
 
         protected override bool UpdateSelf(GameTime time)
@@ -110,10 +119,8 @@ namespace DyingAndMore.Editor
             if (InputState.IsPress(Keys.F2))
                 ToggleRenderSettingsConsole();
             else if (InputState.IsPress(Keys.Q) && InputState.IsMod(KeyMod.Control))
-                Takai.Runtime.GameManager.Exit();
+                Takai.Runtime.IsExiting = true;
 
-            fpsDisplay.Text = "FPS: " + (1000 / time.ElapsedGameTime.TotalMilliseconds).ToString("N2");
-            fpsDisplay.AutoSize();
             return base.UpdateSelf(time);
         }
 

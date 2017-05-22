@@ -37,7 +37,7 @@ namespace DyingAndMore.Editor
                 if (selectedGroup != null && selectedGroup.Entities.Contains(ent))
                     ent.OutlineColor = Color.GreenYellow; //todo: unify color
                 else
-                    ent.OutlineColor = Color.Purple; //todo: unify color
+                    ent.OutlineColor = Color.MediumPurple; //todo: unify color
             }
 
             return base.UpdateSelf(time);

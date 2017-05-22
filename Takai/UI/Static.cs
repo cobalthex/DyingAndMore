@@ -743,7 +743,7 @@ namespace Takai.UI
         /// <returns>Returns true if this element was clicked/triggered. This will prevent parent items from being triggered as well</returns>
         public virtual bool Update(GameTime time)
         {
-            if (!Runtime.GameManager.HasFocus)
+            if (!Runtime.HasFocus)
                 return false;
 
             /* update in the following order: H G F E D C B A
@@ -763,8 +763,10 @@ namespace Takai.UI
 
             while (true)
             {
+                update.PreUpdate(time);
                 if (!update.UpdateSelf(time))
                     return false;
+                update.PostUpdate(time);
 
                 //stop at this element
                 if (update.parent == null || update == this)
@@ -785,8 +787,21 @@ namespace Takai.UI
             return true;
         }
 
+        private void PreUpdate(GameTime time)
+        {
+            if (Input.InputState.IsPress(Input.MouseButtons.Left) &&
+                AbsoluteBounds.Contains(Input.InputState.MousePoint))
+                didPress = true;
+        }
+        private void PostUpdate(GameTime time)
+        {
+            if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
+                didPress = false;
+        }
+
         protected virtual bool UpdateSelf(GameTime time)
         {
+            //todo: maybe move to pre-update (and have pre-update override updateSelf)
             if (HasFocus)
             {
                 if (!ignoreTabKey && Input.InputState.IsPress(Keys.Tab))
@@ -811,7 +826,6 @@ namespace Takai.UI
 
             if (Input.InputState.IsPress(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
             {
-                didPress = true;
                 var e = new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() };
                 OnPress(e);
                 Press?.Invoke(this, e);
@@ -823,7 +837,9 @@ namespace Takai.UI
                 }
             }
 
-            else if (didPress && Input.InputState.IsButtonDown(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
+            //input capture
+            //todo: maybe add setting
+            else if (didPress && Input.InputState.IsButtonDown(Input.MouseButtons.Left))
                 return false;
 
             else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
@@ -833,10 +849,8 @@ namespace Takai.UI
                     var e = new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() };
                     OnClick(e);
                     Click?.Invoke(this, e);
-                    didPress = false;
                     return false;
                 }
-                didPress = false;
             }
 
             return true;

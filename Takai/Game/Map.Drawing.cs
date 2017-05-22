@@ -6,7 +6,6 @@ namespace Takai.Game
 {
     public partial class Map
     {
-        protected GraphicsDevice GraphicsDevice { get; set; }
         protected SpriteBatch sbatch;
         protected RenderTarget2D preRenderTarget;
         protected RenderTarget2D fluidsRenderTarget;
@@ -117,21 +116,15 @@ namespace Takai.Game
         public MapProfilingInfo ProfilingInfo { get { return profilingInfo; } }
         protected MapProfilingInfo profilingInfo;
 
-        public Map(GraphicsDevice gDevice)
-        {
-            InitializeGraphics(gDevice);
-        }
-
         /// <summary>
         /// Create a new map
         /// </summary>
-        /// <param name="gDevice">The graphics device to use for rendering the map</param>
-        public void InitializeGraphics(GraphicsDevice gDevice)
+        /// <param name="graphicsDevice">The graphics device to use for rendering the map</param>
+        public void InitializeGraphics()
         {
-            GraphicsDevice = gDevice;
-            if (gDevice != null)
+            if (Runtime.GraphicsDevice != null)
             {
-                sbatch = new SpriteBatch(gDevice);
+                sbatch = new SpriteBatch(Runtime.GraphicsDevice);
                 lineEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Line.mgfx");
                 lineRaster = new RasterizerState()
                 {
@@ -155,17 +148,17 @@ namespace Takai.Game
                     DepthBufferEnable = false,
                 };
 
-                var width = gDevice.PresentationParameters.BackBufferWidth;
-                var height = gDevice.PresentationParameters.BackBufferHeight;
+                var width = Runtime.GraphicsDevice.PresentationParameters.BackBufferWidth;
+                var height = Runtime.GraphicsDevice.PresentationParameters.BackBufferHeight;
 
-                mapAlphaTest = new AlphaTestEffect(gDevice)
+                mapAlphaTest = new AlphaTestEffect(Runtime.GraphicsDevice)
                 {
                     ReferenceAlpha = 1
                 };
-                preRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
-                fluidsRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-                reflectionRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-                reflectedRenderTarget = new RenderTarget2D(gDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                preRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                fluidsRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                reflectionRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
                 //todo: some of the render targets may be able to be combined
 
                 outlineEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Outline.mgfx");
@@ -202,7 +195,7 @@ namespace Takai.Game
 
             _drawEntsOutlined.Clear();
 
-            var originalRt = GraphicsDevice.GetRenderTargets();
+            var originalRt = Runtime.GraphicsDevice.GetRenderTargets();
 
             var cameraTransform = Camera.Transform;
 
@@ -228,8 +221,8 @@ namespace Takai.Game
 
             #endregion
 
-            GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
-            GraphicsDevice.Clear(Color.TransparentBlack);
+            Runtime.GraphicsDevice.SetRenderTarget(reflectedRenderTarget);
+            Runtime.GraphicsDevice.Clear(Color.TransparentBlack);
 
             if (renderSettings.drawEntities)
             {
@@ -334,8 +327,8 @@ namespace Takai.Game
                 }
             }
 
-            GraphicsDevice.SetRenderTargets(fluidsRenderTarget, reflectionRenderTarget);
-            GraphicsDevice.Clear(Color.TransparentBlack);
+            Runtime.GraphicsDevice.SetRenderTargets(fluidsRenderTarget, reflectionRenderTarget);
+            Runtime.GraphicsDevice.Clear(Color.TransparentBlack);
 
             if (renderSettings.drawFluids || renderSettings.drawFluidReflectionMask)
             {
@@ -366,7 +359,7 @@ namespace Takai.Game
             }
 
             //main render
-            GraphicsDevice.SetRenderTargets(preRenderTarget);
+            Runtime.GraphicsDevice.SetRenderTargets(preRenderTarget);
 
             if (renderSettings.drawTiles)
             {
@@ -474,9 +467,9 @@ namespace Takai.Game
             {
                 if (debugLines.Count > 0)
                 {
-                    GraphicsDevice.RasterizerState = lineRaster;
-                    GraphicsDevice.BlendState = BlendState.NonPremultiplied;
-                    GraphicsDevice.DepthStencilState = DepthStencilState.None;
+                    Runtime.GraphicsDevice.RasterizerState = lineRaster;
+                    Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+                    Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
                     var lineTransform = cameraTransform * Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
                     lineEffect.Parameters["Transform"].SetValue(lineTransform);
 
@@ -489,13 +482,13 @@ namespace Takai.Game
                     foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
                     {
                         pass.Apply();
-                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, blackLines.ToArray(), 0, blackLines.Count / 2);
+                        Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, blackLines.ToArray(), 0, blackLines.Count / 2);
                     }
 
                     foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
                     {
                         pass.Apply();
-                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, debugLines.ToArray(), 0, debugLines.Count / 2);
+                        Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, debugLines.ToArray(), 0, debugLines.Count / 2);
                     }
                     debugLines.Clear();
                 }
@@ -503,9 +496,9 @@ namespace Takai.Game
 
             if (renderSettings.drawGrids)
             {
-                GraphicsDevice.RasterizerState = lineRaster;
-                GraphicsDevice.BlendState = BlendState.NonPremultiplied;
-                GraphicsDevice.DepthStencilState = DepthStencilState.None;
+                Runtime.GraphicsDevice.RasterizerState = lineRaster;
+                Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+                Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
                 var viewProjection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
                 lineEffect.Parameters["Transform"].SetValue(cameraTransform * viewProjection);
 
@@ -533,13 +526,13 @@ namespace Takai.Game
                 foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, grids, 0, grids.Length / 2);
+                    Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, grids, 0, grids.Length / 2);
                 }
             }
 
             #region present
 
-            GraphicsDevice.SetRenderTargets(originalRt);
+            Runtime.GraphicsDevice.SetRenderTargets(originalRt);
 
             sbatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, PostEffect);
             sbatch.Draw(preRenderTarget, Vector2.Zero, Color.White);
