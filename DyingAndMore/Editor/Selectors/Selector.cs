@@ -92,7 +92,7 @@ namespace DyingAndMore.Editor.Selectors
             SelectedItem = MathHelper.Clamp(row + col, 0, ItemCount - 1);
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
             if (InputState.IsClick(Microsoft.Xna.Framework.Input.Keys.Tab))
                 RemoveFromParent();
@@ -106,7 +106,7 @@ namespace DyingAndMore.Editor.Selectors
             else if (InputState.IsPress(MouseButtons.Left))
                 RemoveFromParent();
 
-            base.UpdateSelf(time);
+            base.HandleInput(time);
             return false;
         }
 

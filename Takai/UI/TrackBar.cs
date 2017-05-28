@@ -6,12 +6,9 @@ namespace Takai.UI
     //scroll base?
     public class TrackBar : NumericBase
     {
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
-            //if (!base.UpdateSelf(time))
-            //    return false;
-
-            if (didPress)
+            if (DidPressInside())
             {
                 var relPos = Input.InputState.MousePoint - AbsoluteBounds.Location;
                 Value = (int)((relPos.X / Size.X) * (Maximum - Minimum)) + Minimum;
@@ -24,7 +21,7 @@ namespace Takai.UI
                 return false;
             }
 
-            return base.UpdateSelf(time);
+            return base.HandleInput(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

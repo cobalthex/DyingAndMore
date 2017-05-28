@@ -15,7 +15,7 @@ namespace Takai.UI
             Size = new Vector2(800, 600) + new Vector2(padding);
         }
 
-        public override bool Update(GameTime time)
+        protected override void UpdateSelf(GameTime time)
         {
             if (Map != null)
             {
@@ -23,7 +23,7 @@ namespace Takai.UI
                     Map.ActiveCamera.Viewport = AbsoluteBounds;
                 Map.Update(time);
             }
-            return base.Update(time);
+            base.UpdateSelf(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

@@ -106,22 +106,28 @@ namespace DyingAndMore.Editor
             Map.ActiveCamera.MoveTo(mapSize / 2);
         }
 
-        public override bool Update(GameTime time)
+        protected override void UpdateSelf(GameTime time)
         {
             fpsDisplay.Text = "FPS: " + (1000 / time.ElapsedGameTime.TotalMilliseconds).ToString("N2");
             fpsDisplay.AutoSize();
 
-            return base.Update(time);
+            base.UpdateSelf(time);
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
             if (InputState.IsPress(Keys.F2))
+            {
                 ToggleRenderSettingsConsole();
+                return false;
+            }
             else if (InputState.IsPress(Keys.Q) && InputState.IsMod(KeyMod.Control))
+            {
                 Takai.Runtime.IsExiting = true;
+                return false;
+            }
 
-            return base.UpdateSelf(time);
+            return base.HandleInput(time);
         }
 
         static string BeautifyPropName(string name)

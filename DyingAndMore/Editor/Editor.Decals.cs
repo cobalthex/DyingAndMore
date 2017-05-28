@@ -65,7 +65,7 @@ namespace DyingAndMore.Editor
             return editor.Map.Sectors[sector.Y, sector.X];
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
             if (InputState.IsPress(Keys.Tab))
             {
@@ -113,6 +113,7 @@ namespace DyingAndMore.Editor
                     return false;
                 }
 
+                bool didAct = false;
                 if (InputState.IsButtonDown(Keys.R))
                 {
                     var diff = currentWorldPos - selectedDecal.position;
@@ -122,7 +123,7 @@ namespace DyingAndMore.Editor
                         startRotation = theta - selectedDecal.angle;
 
                     selectedDecal.angle = theta - startRotation;
-                    return false;
+                    didAct = true;
                 }
 
                 if (InputState.IsButtonDown(Keys.E))
@@ -134,8 +135,10 @@ namespace DyingAndMore.Editor
 
                     selectedDecal.scale = MathHelper.Clamp(selectedDecal.scale + (dist - startScale) / 25, 0.25f, 10f);
                     startScale = dist;
-                    return false;
+                    didAct = true;
                 }
+                if (didAct)
+                    return false;
 
                 if (InputState.IsPress(Keys.Delete))
                 {
@@ -147,7 +150,7 @@ namespace DyingAndMore.Editor
                 //todo: clone
             }
 
-            return base.UpdateSelf(time);
+            return base.HandleInput(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

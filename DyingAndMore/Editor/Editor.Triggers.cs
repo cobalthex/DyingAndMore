@@ -28,9 +28,9 @@ namespace DyingAndMore.Editor
             editor.Map.renderSettings.drawTriggers = false;
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
-            if (!base.UpdateSelf(time))
+            if (!base.HandleInput(time))
                 return false;
 
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);

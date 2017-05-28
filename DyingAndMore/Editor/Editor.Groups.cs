@@ -30,7 +30,7 @@ namespace DyingAndMore.Editor
                 ent.OutlineColor = Color.Transparent;
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
             foreach (var ent in editor.Map.ActiveEnts)
             {
@@ -40,7 +40,7 @@ namespace DyingAndMore.Editor
                     ent.OutlineColor = Color.MediumPurple; //todo: unify color
             }
 
-            return base.UpdateSelf(time);
+            return base.HandleInput(time);
         }
     }
 }

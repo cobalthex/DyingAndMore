@@ -46,7 +46,7 @@ namespace DyingAndMore.Editor
             };
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
             if (InputState.IsPress(Keys.Tab))
             {
@@ -97,7 +97,7 @@ namespace DyingAndMore.Editor
                 }
             }
 
-            return base.UpdateSelf(time);
+            return base.HandleInput(time);
         }
     }
 }

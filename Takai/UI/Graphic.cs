@@ -12,11 +12,11 @@ namespace Takai.UI
             Size = (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2()) + new Vector2(padding);
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
             if (Sprite != null)
                 Sprite.ElapsedTime += time.ElapsedGameTime;
-            return base.UpdateSelf(time);
+            return base.HandleInput(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
