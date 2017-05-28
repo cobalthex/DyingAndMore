@@ -72,14 +72,11 @@ namespace Takai.UI
             OutlineColor = Color;
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
-            if (!base.UpdateSelf(time))
-                return false;
-
             if (Size.Y < ContentSize)
             {
-                if (didPress)
+                if (DidPressInside())
                 {
                     var mouse = InputState.MousePoint - AbsoluteBounds.Location;
                     var deltaMouse = InputState.MouseDelta();
@@ -104,7 +101,7 @@ namespace Takai.UI
 
                 //todo up/down + pgup/pgdn
             }
-            return true;
+            return base.HandleInput(time);
         }
 
         protected override void OnPress(ClickEventArgs args)

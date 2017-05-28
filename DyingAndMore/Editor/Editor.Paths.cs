@@ -41,7 +41,7 @@ namespace DyingAndMore.Editor
         {
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
             if (Takai.Input.InputState.IsPress(Takai.Input.MouseButtons.Left))
             {
@@ -49,7 +49,7 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
-            return base.UpdateSelf(time);
+            return base.HandleInput(time);
         }
 
 

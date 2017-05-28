@@ -96,7 +96,7 @@ namespace DyingAndMore.Editor
             tabs.AutoSize();
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
             for (int i = 0; i < MathHelper.Min(10, modes.Count); ++i)
             {
@@ -108,7 +108,7 @@ namespace DyingAndMore.Editor
                 }
             }
 
-            return base.UpdateSelf(time);
+            return base.HandleInput(time);
         }
     }
 }

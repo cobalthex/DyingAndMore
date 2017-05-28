@@ -181,7 +181,7 @@ namespace Takai.UI
             return pos;
         }
 
-        protected override bool UpdateSelf(GameTime time)
+        protected override bool HandleInput(GameTime time)
         {
             if (HasFocus && !(InputState.IsMod(KeyMod.Alt) ||
                               InputState.IsMod(KeyMod.Windows)))
@@ -300,7 +300,7 @@ namespace Takai.UI
                 }
             }
 
-            return base.UpdateSelf(time); //todo: check for changes and return false if any
+            return base.HandleInput(time); //todo: check for changes and return false if any
         }
 
 

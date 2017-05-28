@@ -268,7 +268,14 @@ namespace Takai.UI
         /// <summary>
         /// Was the current (left) mouse press inside this element
         /// </summary>
-        protected bool didPress = false;
+        private bool didPress = false;
+
+        /// <summary>
+        /// Was the mouse pressed inside this static (and is the mouse still down)
+        /// </summary>
+        /// <returns>True if the mouse is currently down and was pressed inside this static</returns>
+        protected bool DidPressInside() =>
+            didPress && Input.InputState.IsButtonDown(Input.MouseButtons.Left);
 
         /// <summary>
         /// Who owns/contains this element
@@ -740,11 +747,10 @@ namespace Takai.UI
         /// Update this element and all of its children
         /// </summary>
         /// <param name="time">Game time</param>
-        /// <returns>Returns true if this element was clicked/triggered. This will prevent parent items from being triggered as well</returns>
-        public virtual bool Update(GameTime time)
+        public virtual void Update(GameTime time)
         {
             if (!Runtime.HasFocus)
-                return false;
+                return;
 
             /* update in the following order: H G F E D C B A
             A
@@ -761,12 +767,13 @@ namespace Takai.UI
             while (update.children.Count > 0)
                 update = update.children[update.children.Count - 1];
 
+            bool handleInput = true;
             while (true)
             {
-                update.PreUpdate(time);
-                if (!update.UpdateSelf(time))
-                    return false;
-                update.PostUpdate(time);
+                if (handleInput)
+                    handleInput = update.HandleInput(time);
+
+                update.UpdateSelf(time);
 
                 //stop at this element
                 if (update.parent == null || update == this)
@@ -783,23 +790,20 @@ namespace Takai.UI
                 else
                     update = update.parent;
             }
-
-            return true;
         }
 
-        private void PreUpdate(GameTime time)
-        {
-            if (Input.InputState.IsPress(Input.MouseButtons.Left) &&
-                AbsoluteBounds.Contains(Input.InputState.MousePoint))
-                didPress = true;
-        }
-        private void PostUpdate(GameTime time)
-        {
-            if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
-                didPress = false;
-        }
+        /// <summary>
+        /// Update this UI's state here. Input should be handled in <see cref="HandleInput"/>
+        /// </summary>
+        /// <param name="time">game time</param>
+        protected virtual void UpdateSelf(GameTime time) { }
 
-        protected virtual bool UpdateSelf(GameTime time)
+        /// <summary>
+        /// React to user input here. Updating should be performed in <see cref="UpdateSelf"/>
+        /// </summary>
+        /// <param name="time">game time</param>
+        /// <returns>False if the input has been handled by this UI</returns>
+        protected virtual bool HandleInput(GameTime time)
         {
             //todo: maybe move to pre-update (and have pre-update override updateSelf)
             if (HasFocus)
@@ -827,6 +831,7 @@ namespace Takai.UI
             if (Input.InputState.IsPress(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
             {
                 var e = new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() };
+                didPress = true;
                 OnPress(e);
                 Press?.Invoke(this, e);
 
@@ -839,7 +844,7 @@ namespace Takai.UI
 
             //input capture
             //todo: maybe add setting
-            else if (didPress && Input.InputState.IsButtonDown(Input.MouseButtons.Left))
+            else if (DidPressInside())
                 return false;
 
             else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
@@ -849,8 +854,10 @@ namespace Takai.UI
                     var e = new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() };
                     OnClick(e);
                     Click?.Invoke(this, e);
+                    didPress = false;
                     return false;
                 }
+                didPress = false;
             }
 
             return true;
