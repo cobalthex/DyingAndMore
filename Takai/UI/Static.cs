@@ -329,6 +329,40 @@ namespace Takai.UI
         }
 
         /// <summary>
+        /// Create a clone of this static and all of its children
+        /// Does not add to parent
+        /// </summary>
+        /// <returns>The cloned static</returns>
+        public Static Clone()
+        {
+            var clone = CloneSelf();
+            clone.parent = null;
+            Stack<Static> clones = new Stack<Static>(new []{ clone });
+            while (clones.Count > 0)
+            {
+                var top = clones.Pop();
+                for (int i = 0; i < top.children.Count; ++i)
+                {
+                    var child = top.children[i].CloneSelf();
+                    child.parent = top;
+                    top.children[i] = child;
+                    if (child.children.Count > 0)
+                        clones.Push(child);
+                }
+            }
+            return clone;
+        }
+
+        /// <summary>
+        /// Clone this item, should not modify parent or children
+        /// </summary>
+        /// <returns>The cloned item</returns>
+        protected Static CloneSelf()
+        {
+            return (Static)MemberwiseClone();
+        }
+
+        /// <summary>
         /// Remove this element from its parent. If parent is null, does nothing
         /// </summary>
         /// <returns>True if the element was removed from its parent or false if parent was null</returns>
@@ -451,7 +485,7 @@ namespace Takai.UI
         {
             if (!HasFocus)
             {
-                FindFocusedElement()?.FocusNext();
+                FindFocused()?.FocusNext();
                 return;
             }
 
@@ -522,7 +556,7 @@ namespace Takai.UI
         {
             if (!HasFocus)
             {
-                FindFocusedElement()?.FocusPrevious();
+                FindFocused()?.FocusPrevious();
                 return;
             }
 
@@ -584,11 +618,11 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Find the element in this treethat has focus
+        /// Find the element in this tree that has focus
         /// Searches up and down
         /// </summary>
         /// <returns>The focused element, or null if there is none</returns>
-        public Static FindFocusedElement()
+        public Static FindFocused()
         {
             var parent = this;
             while (parent.Parent != null)
@@ -611,11 +645,11 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Find an element by its name
+        /// Find a child element by its name
         /// </summary>
-        /// <param name="name">The name of the element to search for</param>
-        /// <returns>The first element found or null if no element found with the specified name</returns>
-        public Static FindElementByName(string name, bool caseSensitive = true)
+        /// <param name="name">The name of the UI to search for</param>
+        /// <returns>The first child found or null if none found with the specified name</returns>
+        public Static FindChildByName(string name, bool caseSensitive = true)
         {
             var parent = this;
             while (parent.Parent != null)
