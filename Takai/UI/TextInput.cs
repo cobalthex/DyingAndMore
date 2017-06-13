@@ -55,9 +55,9 @@ namespace Takai.UI
             get => base.Text;
             set
             {
-                base.Text = value;
+                base.Text = value ?? "";
                 UpdateVisibleText();
-                Caret = value.Length;
+                Caret = base.Text.Length;
             }
         }
         /// <summary>
@@ -340,19 +340,8 @@ namespace Takai.UI
                     MathHelper.Min(AbsoluteBounds.Height, (int)textSize.Y)
                 );
 
-                Font?.Draw(
-                    spriteBatch,
-                    visibleText,
-                    0, -1,
-                    new Rectangle(
-                        AbsoluteBounds.X + 2,
-                        AbsoluteBounds.Y + ((AbsoluteBounds.Height - size.Y) / 2),
-                        size.X,
-                        size.Y
-                    ),
-                    new Point(-ScrollPosition, 0),
-                    Color
-                );
+                DrawText(spriteBatch,
+                    new Point(-ScrollPosition, (int)(Size.Y - textSize.Y) / 2));
 
                 var tickCount = System.Environment.TickCount;
                 if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))

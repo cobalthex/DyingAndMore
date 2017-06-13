@@ -1,5 +1,5 @@
-﻿
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.UI;
@@ -52,7 +52,7 @@ namespace DyingAndMore.Editor.Selectors
             get => selectedItem;
             set
             {
-                selectedItem = value;
+                selectedItem = MathHelper.Clamp(value, 0, ItemCount - 1); ;
                 SelectionChanged?.Invoke(this, System.EventArgs.Empty);
             }
         }
@@ -89,13 +89,22 @@ namespace DyingAndMore.Editor.Selectors
             var row = (int)((e.position.Y + scrollBar.ContentPosition - (Padding / 2)) / (ItemSize.Y + Padding)) * ItemsPerRow;
             var col = (int)((e.position.X - (padding / 2)) / (itemSize.X + padding));
 
-            SelectedItem = MathHelper.Clamp(row + col, 0, ItemCount - 1);
+            SelectedItem = row + col;
         }
 
         protected override bool HandleInput(GameTime time)
         {
-            if (InputState.IsClick(Microsoft.Xna.Framework.Input.Keys.Tab))
+            if (InputState.IsClick(Keys.Tab))
                 RemoveFromParent();
+
+            else if (InputState.IsPress(Keys.Left))
+                --SelectedItem;
+            else if (InputState.IsPress(Keys.Right))
+                ++SelectedItem;
+            else if (InputState.IsPress(Keys.Up))
+                SelectedItem -= ItemsPerRow;
+            else if (InputState.IsPress(Keys.Down))
+                SelectedItem += ItemsPerRow;
 
             else if (AbsoluteBounds.Contains(InputState.MousePoint))
             {

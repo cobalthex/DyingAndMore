@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Input;
 using Takai.Graphics;
 
+using NumericBaseType = System.Int64;
+
 namespace Takai.UI
 {
     public abstract class NumericBase : Static
@@ -10,21 +12,23 @@ namespace Takai.UI
         /// The current value of this input
         /// Calculated on the fly. Returns Minimum if failed to parse
         /// </summary>
-        public int Value
+        public NumericBaseType Value
         {
             get
             {
-                if (int.TryParse(Text, out int val))
-                    return MathHelper.Clamp(val, Minimum, Maximum);
+                if (NumericBaseType.TryParse(Text, out var val))
+                    return (val < Minimum ? Minimum : (Value > Maximum ? Maximum : val));
                 return Minimum;
             }
             set
             {
-                this.value = MathHelper.Clamp(value, Minimum, Maximum);
+                this.value = (value < Minimum ? Minimum : (Value > Maximum ? Maximum : value));
+                OnValueChanged(System.EventArgs.Empty);
+                ValueChanged?.Invoke(this, System.EventArgs.Empty);
                 Text = value.ToString();
             }
         }
-        protected int value;
+        protected NumericBaseType value;
 
         /// <summary>
         /// The normalized value (from 0 to 1) of this range
@@ -32,20 +36,20 @@ namespace Takai.UI
         public float NormalizedValue
         {
             get => (Value - Minimum) / (float)(Maximum - Minimum);
-            set => Value = (int)(value * (Maximum - Minimum)) + Minimum;
+            set => Value = (NumericBaseType)(value * (Maximum - Minimum)) + Minimum;
         }
 
         /// <summary>
         /// The minimum allowed value
         /// Setting this may affect Value
         /// </summary>
-        public int Minimum
+        public NumericBaseType Minimum
         {
             get => minimum;
             set
             {
                 minimum = value;
-                Value = MathHelper.Max(Value, minimum);
+                Value = (Value > minimum ? value : minimum);
             }
         }
 
@@ -53,22 +57,29 @@ namespace Takai.UI
         /// The maximum allowed value
         /// Setting this may affect Value
         /// </summary>
-        public int Maximum
+        public NumericBaseType Maximum
         {
             get => maximum;
             set
             {
                 maximum = value;
-                Value = MathHelper.Min(Value, maximum);
+                Value = (Value < maximum ? value : maximum);
             }
         }
-        protected int minimum = int.MinValue;
-        protected int maximum = int.MaxValue;
+        protected NumericBaseType minimum = NumericBaseType.MinValue;
+        protected NumericBaseType maximum = NumericBaseType.MaxValue;
 
         /// <summary>
         /// How much to increase or decrease the value by each step
         /// </summary>
-        public int Increment { get; set; } = 1;
+        public NumericBaseType Increment { get; set; } = 1;
+
+        /// <summary>
+        /// called whenever this numeric's value has changed
+        /// </summary>
+        public event System.EventHandler ValueChanged;
+
+        protected virtual void OnValueChanged(System.EventArgs e) { }
     }
 
     /// <summary>
@@ -84,7 +95,7 @@ namespace Takai.UI
             get => textInput.Text;
             set
             {
-                if (int.TryParse(value, out this.value))
+                if (NumericBaseType.TryParse(value, out this.value))
                     textInput.Text = value;
             }
         }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
+using Takai.UI;
 
 namespace DyingAndMore.Editor
 {
@@ -10,24 +11,27 @@ namespace DyingAndMore.Editor
 
         Takai.Game.Group selectedGroup = null;
 
-        Takai.UI.Static selector;
+        Static selector;
 
         public GroupsEditorMode(Editor editor)
             : base("Groups", editor)
         {
-            VerticalAlignment = Takai.UI.Alignment.Stretch;
-            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+            VerticalAlignment = Alignment.Stretch;
+            HorizontalAlignment = Alignment.Stretch;
 
-            selector = new Takai.UI.List()
+            selector = new Selectors.EntSelector(editor)
             {
-                HorizontalAlignment = Takai.UI.Alignment.Middle,
-                VerticalAlignment = Takai.UI.Alignment.Middle
+                HorizontalAlignment = Alignment.Middle,
+                VerticalAlignment = Alignment.Middle,
+                Size = new Vector2(400, 300)
             };
 
         }
 
         public override void Start()
         {
+            selectedGroup = new Takai.Game.Group()
+                ;
         }
 
         public override void End()
@@ -50,12 +54,23 @@ namespace DyingAndMore.Editor
             foreach (var ent in editor.Map.ActiveEnts)
             {
                 if (selectedGroup != null && selectedGroup.Entities.Contains(ent))
-                    ent.OutlineColor = Color.GreenYellow; //todo: unify color
+                    ent.OutlineColor = Color.GreenYellow; //todo: standardize color
                 else
-                    ent.OutlineColor = Color.MediumPurple; //todo: unify color
+                    ent.OutlineColor = Color.MediumPurple; //todo: standardize color
             }
 
             return base.HandleInput(time);
+        }
+
+        protected override void OnPress(ClickEventArgs e)
+        {
+            var mousePos = editor.Map.ActiveCamera.ScreenToWorld(e.position);
+            var ents = editor.Map.FindEntities(mousePos, 10);
+
+            foreach (var ent in ents)
+                ent.Group = selectedGroup;
+
+            base.OnPress(e);
         }
     }
 }

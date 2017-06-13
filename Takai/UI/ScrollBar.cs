@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
 namespace Takai.UI
@@ -30,6 +32,11 @@ namespace Takai.UI
             }
         }
         private int contentSize = 1;
+
+        /// <summary>
+        /// Is the scrollbar thumb visible
+        /// </summary>
+        public bool IsThumbVisible => Size.Y < ContentSize;
 
         /// <summary>
         /// Where the content is scrolled to
@@ -74,7 +81,7 @@ namespace Takai.UI
 
         protected override bool HandleInput(GameTime time)
         {
-            if (Size.Y < ContentSize)
+            if (IsThumbVisible)
             {
                 if (DidPressInside())
                 {
@@ -169,19 +176,94 @@ namespace Takai.UI
             }
         }
 
-        protected override void DrawSelf(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
+        protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             var bounds = AbsoluteBounds;
             Takai.Graphics.Primitives2D.DrawRect(spriteBatch, OutlineColor, bounds);
             bounds.Inflate(-1, -1);
             Takai.Graphics.Primitives2D.DrawRect(spriteBatch, OutlineColor, bounds);
 
-            if (Size.Y < ContentSize)
+            if (IsThumbVisible)
             {
                 var thumb = GetThumbBounds();
                 thumb.Offset(AbsoluteBounds.Location);
                 Takai.Graphics.Primitives2D.DrawFill(spriteBatch, OutlineColor, thumb);
             }
+        }
+    }
+
+    public class ScrollBox : Static
+    {
+        protected ScrollBar verticalScrollbar = new ScrollBar()
+        {
+            HorizontalAlignment = Alignment.End,
+            Size = new Vector2(20, 1)
+        };
+        protected ScrollBar horizontalScrollbar = new ScrollBar()
+        {
+            VerticalAlignment = Alignment.End,
+            Size = new Vector2(1, 20)
+        };
+
+        public ScrollBox()
+        {
+            AddChildren(horizontalScrollbar, verticalScrollbar);
+
+            horizontalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
+            {
+                foreach (var child in Children)
+                {
+                    if (child != horizontalScrollbar &&
+                        child != verticalScrollbar)
+                        child.Position -= new Vector2(0, e.Delta);
+                }
+                Reflow();
+            };
+            verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
+            {
+                foreach (var child in Children)
+                {
+                    if (child != horizontalScrollbar &&
+                        child != verticalScrollbar)
+                        child.Position -= new Vector2(0, e.Delta);
+                }
+                Reflow();
+            };
+        }
+
+        public override void Reflow()
+        {
+            //todo: maybe create event for OnAdd/RemoveChild
+            horizontalScrollbar.Size = new Vector2(
+                Size.X - verticalScrollbar.Size.X,
+                horizontalScrollbar.Size.Y);
+
+            verticalScrollbar.Size = new Vector2(
+                verticalScrollbar.Size.X,
+                Size.Y - horizontalScrollbar.Size.Y);
+
+            base.Reflow();
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            var bounds = Rectangle.Empty;
+            foreach (var child in Children)
+                bounds = Rectangle.Union(bounds, child.Bounds);
+
+            horizontalScrollbar.ContentSize = bounds.Width;
+            verticalScrollbar.ContentSize = bounds.Height;
+        }
+
+        protected override bool HandleInput(GameTime time)
+        {
+            if (InputState.HasScrolled() && AbsoluteBounds.Contains(InputState.MousePoint))
+            {
+                verticalScrollbar.ContentPosition -= InputState.ScrollDelta();
+                return false;
+            }
+
+            return base.HandleInput(time);
         }
     }
 }

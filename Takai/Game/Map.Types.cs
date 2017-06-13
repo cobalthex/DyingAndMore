@@ -10,6 +10,8 @@ namespace Takai.Game
     /// <typeparam name="T">The type of range</typeparam>
     public struct Range<T>
     {
+        private static System.Random randomGen = new System.Random();
+
         public T min;
         public T max;
 
@@ -23,10 +25,10 @@ namespace Takai.Game
             max = Max;
         }
 
-        public static implicit operator Range<T>(T Value)
+        public static implicit operator Range<T>(T value)
         {
             return new Range<T>
-                (Value);
+                (value);
         }
     }
 
