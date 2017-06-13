@@ -185,11 +185,20 @@ namespace Takai.UI
         /// Bounds relative to the outermost container
         /// </summary>
         [Data.Serializer.Ignored]
-        public Rectangle AbsoluteBounds
+        public Rectangle VirtualBounds
         {
-            get => absoluteBounds;
+            get;
+            private set;
         }
-        private Rectangle absoluteBounds; //cached bounds
+        /// <summary>
+        /// <see cref="VirtualBounds"/> clipped to the parent
+        /// </summary>
+        [Data.Serializer.Ignored]
+        protected Rectangle AbsoluteBounds //clipped to parent
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Does this element currently have focus?
@@ -692,12 +701,12 @@ namespace Takai.UI
                     position.Y = 0;
                     size.Y = parent.size.Y;
                 }
-                CalculateAbsoluteBounds();
+                CalculateBounds();
             }
 
             foreach (var child in Children)
             {
-                child.absoluteBounds = child.CalculateBounds(absoluteBounds);
+                child.CalculateBounds();
                 child.Reflow();
             }
         }
@@ -706,7 +715,7 @@ namespace Takai.UI
         {
             if (horizontalAlignment != Alignment.Stretch &&
                 verticalAlignment != Alignment.Stretch)
-                CalculateAbsoluteBounds();
+                CalculateBounds();
 
             Reflow();
 
@@ -751,12 +760,14 @@ namespace Takai.UI
             return new Rectangle(pos.ToPoint() + container.Location, Size.ToPoint());
         }
 
-        protected Rectangle CalculateAbsoluteBounds()
+        protected void CalculateBounds()
         {
-            absoluteBounds = Parent != null
-                ? CalculateBounds(Parent.AbsoluteBounds)
+            VirtualBounds = Parent != null
+                ? CalculateBounds(Parent.VirtualBounds)
                 : new Rectangle(Position.ToPoint(), Size.ToPoint());
-            return absoluteBounds;
+            AbsoluteBounds = Parent != null
+                ? Rectangle.Intersect(Parent.AbsoluteBounds, VirtualBounds)
+                : VirtualBounds;
 
         }
 
@@ -913,7 +924,7 @@ namespace Takai.UI
                 draw.DrawSelf(spriteBatch);
                 Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusOutlineColor : draw.OutlineColor, draw.AbsoluteBounds);
 
-                if (DebugFont != null && draw.absoluteBounds.Contains(Input.InputState.MousePoint))
+                if (DebugFont != null && draw.AbsoluteBounds.Contains(Input.InputState.MousePoint))
                 {
                     var rect = draw.AbsoluteBounds;
                     rect.Inflate(1, 1);
@@ -936,29 +947,19 @@ namespace Takai.UI
         {
             if (Font != null)
             {
-                var textBounds = CenterInRect(textSize, AbsoluteBounds);
-                Font.Draw(spriteBatch, Text, textBounds, Color);
+                var textPos = ((size - textSize) / 2).ToPoint();
+                DrawText(spriteBatch, textPos);
             }
         }
 
         /// <summary>
-        /// Caluclate a rectangle where the region is centered inside bounds
+        /// Draw this element's text. Position specifies the base location
         /// </summary>
-        /// <param name="size">The size of the region</param>
-        /// <param name="bounds">The bounds to center inside</param>
-        /// <returns>The absolute bounds of the region rect</returns>
-        protected static Rectangle CenterInRect(Vector2 size, Rectangle bounds)
+        /// <param name="position"></param>
+        protected void DrawText(SpriteBatch spriteBatch, Point position)
         {
-            var minSize = new Point(
-                MathHelper.Min(bounds.Width, (int)size.X),
-                MathHelper.Min(bounds.Height, (int)size.Y)
-            );
-            return new Rectangle(
-                bounds.X + ((bounds.Width - minSize.X) / 2),
-                bounds.Y + ((bounds.Height - minSize.Y) / 2),
-                minSize.X,
-                minSize.Y
-            );
+            position += VirtualBounds.Location - AbsoluteBounds.Location;
+            Font.Draw(spriteBatch, Text, 0, Text.Length, AbsoluteBounds, position, Color);
         }
 
         protected void DerivedDeserialize(Dictionary<string, object> props)
@@ -984,6 +985,155 @@ namespace Takai.UI
         public override string ToString()
         {
             return $"{base.ToString()} \"{Name ?? "(No name)"}\"{(HasFocus ? " *" : "")}";
+        }
+
+        /// <summary>
+        /// Convert a member name to a more english-friendly name
+        /// This includes adding spaces and correct capitalization
+        /// </summary>
+        /// <param name="name">the member name to convert</param>
+        /// <returns>The beautified name</returns>
+        public static string BeautifyMemberName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return "";
+
+            var builder = new System.Text.StringBuilder(name.Length + 4);
+            builder.Append(char.ToUpper(name[0]));
+            for (int i = 1; i < name.Length; ++i)
+            {
+                if (char.IsUpper(name[i]) && !char.IsUpper(name[i - 1]))
+                {
+                    builder.Append(' ');
+                    builder.Append(char.ToLower(name[i]));
+                }
+                else
+                    builder.Append(name[i]);
+            }
+
+            return builder.ToString();
+        }
+
+        public static Static GeneratePropSheet(object obj, Graphics.BitmapFont font,
+                                        Color color)
+        {
+            var root = new List();
+
+            var members = obj.GetType().GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+
+            foreach (var member in members)
+            {
+                System.Type type;
+                object curValue;
+                System.Action<object, object> setValue;
+
+                if (member is System.Reflection.FieldInfo fInfo)
+                {
+                    type = fInfo.FieldType;
+                    curValue = fInfo.GetValue(obj);
+                    setValue = fInfo.SetValue;
+                }
+                else if (member is System.Reflection.PropertyInfo pInfo)
+                {
+                    type = pInfo.PropertyType;
+                    curValue = pInfo.GetValue(obj);
+                    setValue = pInfo.SetValue;
+                }
+                else
+                    continue;
+
+                Static label = new Static()
+                {
+                    Text = BeautifyMemberName(member.Name),
+                    Font = font,
+                    Color = color
+                };
+                label.AutoSize();
+                root.AddChild(label);
+
+                if (type == typeof(int))
+                {
+                    var input = new NumericInput()
+                    {
+                        Minimum = int.MinValue,
+                        Maximum = int.MaxValue,
+                        Value = (int)curValue,
+
+                        HorizontalAlignment = Alignment.Stretch,
+                        Font = font,
+                        Color = color
+                    };
+                    input.ValueChanged += delegate
+                    {
+                        //todo: not working
+                        setValue(obj, input.Value);
+                    };
+                    input.AutoSize();
+                    root.AddChild(input);
+                }
+                if (type == typeof(uint))
+                {
+                    var input = new NumericInput()
+                    {
+                        Minimum = uint.MinValue,
+                        Maximum = uint.MaxValue,
+                        Value = (long)curValue,
+
+                        HorizontalAlignment = Alignment.Stretch,
+                        Font = font,
+                        Color = color
+                    };
+                    input.ValueChanged += delegate
+                    {
+                        //todo: not working
+                        setValue(obj, input.Value);
+                    };
+                    input.AutoSize();
+                    root.AddChild(input);
+                }
+                else if (type == typeof(string))
+                {
+                    //todo: file input where applicable
+                    var input = new TextInput()
+                    {
+                        Text = (string)curValue,
+                        HorizontalAlignment = Alignment.Stretch,
+                        Font = font,
+                        Color = color
+                    };
+                    input.TextChanged += delegate
+                    {
+                        setValue(obj, input.Text);
+                    };
+                    input.AutoSize();
+                    root.AddChild(input);
+                }
+                else if (type == typeof(bool))
+                {
+                    //todo: file input where applicable
+                    var check = new CheckBox()
+                    {
+                        Text = "--- todo ---",
+                        HorizontalAlignment = Alignment.Stretch,
+                        Font = font,
+                        Color = color
+                    };
+                    check.Click += delegate
+                    {
+                        setValue(obj, check.IsChecked);
+                    };
+                    check.AutoSize();
+                    root.AddChild(check);
+                }
+                else
+                {
+                    label.Text += "\n---";
+                    label.AutoSize();
+                }
+            }
+
+            root.AutoSize();
+            return root;
         }
     }
 }

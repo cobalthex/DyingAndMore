@@ -1,0 +1,29 @@
+Spawner {
+    MaxHealth: 100;
+    State: {
+        BaseState: EntStateKey [Idle];
+        States: {
+            Idle: {
+                Sprite: {
+                    texture: "Textures/Entities/Spawner.png";
+                    width: 48;
+                    height: 48;
+                    origin: [24 24];
+                };
+            };
+        };
+    };
+    IsAlive: True;
+    AlwaysActive: False;
+    Radius: 24;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: False;
+
+    Faction: Factions [Enemy];
+    SearchRadius: 200;
+
+    Template: [
+        [@"Defs/Entities/InfectedCell.ent.tk" [3 5]]
+    ]
+}

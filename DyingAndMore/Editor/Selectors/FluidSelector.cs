@@ -17,13 +17,17 @@ namespace DyingAndMore.Editor.Selectors
             {
                 try
                 {
-                    using (var stream = new System.IO.StreamReader(file))
+                    var deserialized = Takai.Data.Serializer.TextDeserializeAll(file);
+                    foreach (var obj in deserialized)
                     {
-                        if (Takai.Data.Serializer.TextDeserialize(stream) is Takai.Game.FluidType fluid)
+                        if (obj is Takai.Game.FluidType fluid)
                             fluids.Add(fluid);
                     }
                 }
-                catch { } //add diagnostic output
+                catch (System.Exception)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Could not load Fluid definitions from {file}");
+                }
             }
 
             ItemCount = fluids.Count;

@@ -19,13 +19,17 @@ namespace DyingAndMore.Editor.Selectors
             {
                 try
                 {
-                    using (var stream = new System.IO.StreamReader(file))
+                    var deserialized = Takai.Data.Serializer.TextDeserializeAll(file);
+                    foreach (var obj in deserialized)
                     {
-                        if (Takai.Data.Serializer.TextDeserialize(stream) is Takai.Game.Entity ent)
+                        if (obj is Takai.Game.Entity ent)
                             ents.Add(ent);
                     }
                 }
-                catch (System.Exception) { } //ignore failed loads
+                catch (System.Exception)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Could not load Entity definitions from {file}");
+                }
             }
 
             ItemCount = ents.Count;

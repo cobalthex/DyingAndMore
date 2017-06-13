@@ -126,12 +126,26 @@ namespace DyingAndMore
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            ui = new Editor.Editor();
+            var smallFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>(
+                "Fonts/UISmall.bfnt");
+
+            testAutoObj = new Takai.Graphics.Sprite();
+            var testAutoUi = Takai.UI.Static.GeneratePropSheet(
+                testAutoObj, smallFont, Color.White);
+            var box = new Takai.UI.ScrollBox() { Position = new Vector2(50) };
+            box.AddChild(testAutoUi);
+            box.Size = new Vector2(300, 400);
+            box.OutlineColor = Color.LightBlue;
+            ui = new Takai.UI.Static(box);
+            ui.Font = smallFont;
+
+            //ui = new Editor.Editor();
 
             //Takai.UI.Static.DebugFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/RCT2.bfnt");
 
             base.Initialize();
         }
+        object testAutoObj;
 
         protected override void OnExiting(object sender, System.EventArgs args)
         {
@@ -139,11 +153,21 @@ namespace DyingAndMore
 
         protected override void Update(GameTime gameTime)
         {
+            if (Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Q)
+            && Takai.Input.InputState.IsMod(Takai.Input.KeyMod.Control))
+                Takai.Runtime.IsExiting = true;
+
             if (Takai.Runtime.IsExiting)
             {
                 Exit();
                 return;
             }
+
+            if (Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Down))
+                offset.Y -= 2;
+
+            if (Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Up))
+                offset.Y += 2;
 
             if (Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.F12))
                 takingScreenshot = true;
@@ -154,8 +178,11 @@ namespace DyingAndMore
             ui.Bounds = GraphicsDevice.Viewport.Bounds;
         }
 
+        Point offset = new Point(0, 0);
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.Clear(Color.Black);
+
             if (takingScreenshot)
             {
                 takingScreenshot = false;
@@ -174,8 +201,20 @@ namespace DyingAndMore
             else
             {
                 sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-                //GameManager.Draw(gameTime);
                 ui.Draw(sbatch);
+
+                //var rect = new Rectangle(100, 100, 100, 50);
+
+                //Takai.Graphics.Primitives2D.DrawRect(sbatch, Color.Orange, rect);
+                //ui.Font.Draw(sbatch, "abc\ndef\nghi", 0, -1, rect, offset, Color.White);
+
+                //rect.X += rect.Width + 20;
+                //Takai.Graphics.Primitives2D.DrawRect(sbatch, Color.Gray, rect);
+                //rect.Height += 1000;
+                //ui.Font.Draw(sbatch, "abc\ndef\nghi", (rect.Location + offset).ToVector2(), Color.Gray);
+
+                //ui.Font.Draw(sbatch, offset.ToString(), new Vector2(20), Color.Aqua);
+
                 sbatch.End();
             }
         }

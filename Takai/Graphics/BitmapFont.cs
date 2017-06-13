@@ -230,10 +230,10 @@ namespace Takai.Graphics
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and fff to change the color. use `x to reset the color</remarks>
         public void Draw(SpriteBatch spriteBatch, string text, int startIndex, int length, Rectangle bounds, Point offset, Color color, bool monoSpace = false)
         {
-            Point pos = bounds.Location + offset;
+            Point pos = offset;
             Color curColor = color;
 
-            int maxH = 0;
+            int lineHeight = 0;
             int start = startIndex;
 
             length = (length == -1 ? text.Length : MathHelper.Min(text.Length, length));
@@ -244,9 +244,9 @@ namespace Takai.Graphics
                 //newline
                 if (ch == '\n')
                 {
-                    pos.X = bounds.X + offset.X;
-                    pos.Y += maxH + Tracking.Y;
-                    maxH = 0;
+                    pos.X = offset.X;
+                    pos.Y += lineHeight + Tracking.Y;
+                    lineHeight = 0;
                     continue;
                 }
                 else if (ch == '`' && i + 1 < length) //colors (`RGB (hex)) and `x to end
@@ -281,12 +281,23 @@ namespace Takai.Graphics
                 if (!Characters.TryGetValue(ch, out var rgn))
                     continue;
 
-                var clip = Rectangle.Intersect(new Rectangle(pos, rgn.Size), bounds);
-                if (clip.Width > 0 && clip.Height > 0)
-                    spriteBatch.Draw(Texture, clip, rgn, curColor);
+                //todo: revisit this pain in the ass (see Main.cs for demo)
+                var clip = Rectangle.Intersect(
+                    rgn,
+                    new Rectangle(rgn.Location - pos, bounds.Size + offset)
+                );
 
+                if (clip.Width > 0 && clip.Height > 0)
+                {
+                    spriteBatch.Draw(
+                        Texture,
+                        new Rectangle(pos + bounds.Location - offset, clip.Size),
+                        clip,
+                        curColor
+                    );
+                }
                 pos.X += (monoSpace ? MaxCharWidth : rgn.Width) + Tracking.X;
-                maxH = MathHelper.Max(maxH, rgn.Height);
+                lineHeight = MathHelper.Max(lineHeight, clip.Height);
             }
         }
 
@@ -295,7 +306,7 @@ namespace Takai.Graphics
         /// </summary>
         /// <param name="String">the string to measure</param>
         /// <returns>The size in pixels of the string</returns>
-        /// <remarks>Characters not in the font are ignored</remarks>
+        /// <remarks>Characters not 6in the font are ignored</remarks>
         public Vector2 MeasureString(string String)
         {
             return MeasureString(String, 0, -1);

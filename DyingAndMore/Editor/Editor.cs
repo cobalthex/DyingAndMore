@@ -82,7 +82,7 @@ namespace DyingAndMore.Editor
                 var checkbox = new Takai.UI.CheckBox()
                 {
                     Name = setting.Name,
-                    Text = BeautifyPropName(setting.Name),
+                    Text = Static.BeautifyMemberName(setting.Name),
                     Font = largeFont,
                     IsChecked = (bool)setting.GetValue(Map.renderSettings)
                 };
@@ -121,34 +121,8 @@ namespace DyingAndMore.Editor
                 ToggleRenderSettingsConsole();
                 return false;
             }
-            else if (InputState.IsPress(Keys.Q) && InputState.IsMod(KeyMod.Control))
-            {
-                Takai.Runtime.IsExiting = true;
-                return false;
-            }
 
             return base.HandleInput(time);
-        }
-
-        static string BeautifyPropName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                return "";
-
-            var builder = new System.Text.StringBuilder(name.Length + 4);
-            builder.Append(char.ToUpper(name[0]));
-            for (int i = 1; i < name.Length; ++i)
-            {
-                if (char.IsUpper(name[i]) && !char.IsUpper(name[i - 1]))
-                {
-                    builder.Append(' ');
-                    builder.Append(char.ToLower(name[i]));
-                }
-                else
-                    builder.Append(name[i]);
-            }
-
-            return builder.ToString();
         }
 
         void ToggleRenderSettingsConsole()

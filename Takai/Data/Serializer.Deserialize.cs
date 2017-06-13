@@ -545,43 +545,45 @@ namespace Takai.Data
                 return ToArrayMethod.MakeGenericMethod(elType).Invoke(null, new[] { casted });
             }
 
+            var sourceList = Source as List<object>;
             if (DestType.IsGenericType)
             {
                 var genericType = DestType.GetGenericTypeDefinition();
                 var genericArgs = DestType.GetGenericArguments();
 
-                if (genericType == typeof(List<>))
+                //todo: support any number of items in tuple
+                if (genericType == typeof(Tuple<,>))
                 {
-                    var list = Source as List<object>;
-                    if (list == null)
-                        throw new InvalidCastException($"Type:{DestType.Name} is a list but '{Source}' is of type:{sourceType.Name}");
+                    if (sourceList == null)
+                        throw new InvalidCastException($"Type:{DestType.Name} is a Tuple but '{Source}' is of type:{sourceType.Name}");
 
-                    list = list.ConvertAll(i => CastType(genericArgs[0], i, Strict));
-                    var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { list });
-                    return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
+                    for (int i = 0; i < sourceList.Count; ++i)
+                        sourceList[i] = CastType(genericArgs[i], sourceList[i], Strict);
+                    return Activator.CreateInstance(DestType, sourceList.ToArray());
                 }
 
-                if (genericType == typeof(HashSet<>))
+                //if (typeof(IEnumerable<>).IsAssignableFrom(genericType) && genericArgs.Count() == 1)
+                if (genericType == typeof(List<>) || genericType == typeof(HashSet<>) ||
+                    genericType == typeof(Queue<>) || genericType == typeof(Stack<>))
                 {
-                    var list = Source as List<object>;
-                    if (list == null)
-                        throw new InvalidCastException($"Type:{DestType.Name} is a HashSet but '{Source}' is of type:{sourceType.Name}");
+                    if (sourceList == null)
+                        throw new InvalidCastException($"Type:{DestType.Name} is a {genericType.Name} but '{Source}' is of type:{sourceType.Name}");
 
-                    var set = Activator.CreateInstance(DestType);
-                    var add = DestType.GetMethod("Add");
-                    foreach (var item in list)
-                        add.Invoke(set, new[] { CastType(genericArgs[0], item, Strict) });
-
-                    return set;
+                    sourceList = sourceList.ConvertAll(i => CastType(genericArgs[0], i, Strict));
+                    //return Activator.CreateInstance(DestType, new[] { list.AsEnumerable<object>() });
+                    var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
+                    return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
                 }
 
                 if (genericType == typeof(Dictionary<,>))
                 {
+                    //todo: revisit, may be able to convert srcDict more easily
+
                     var srcDict = Source as Dictionary<string, object>;
                     if (srcDict == null)
                         throw new InvalidCastException($"Type:{DestType.Name} is a dictionary but '{Source}' is of type:{sourceType.Name}");
 
-                    var dict = Activator.CreateInstance(DestType);
+                    var dict = Activator.CreateInstance(DestType, srcDict.Count);
                     var add = DestType.GetMethod("Add");
 
                     foreach (var pair in srcDict)
@@ -589,6 +591,35 @@ namespace Takai.Data
 
                     return dict;
                 }
+            }
+
+            //struct initialization using shorthand array syntax
+            if (DestType.IsValueType && sourceList != null)
+            {
+                var obj = Activator.CreateInstance(DestType);
+                var members = DestType.GetMembers(BindingFlags.Instance | BindingFlags.Public);
+                var memberEnumerator = members.GetEnumerator();
+                for (int i = 0; i < sourceList.Count; ++i)
+                {
+                    if (!memberEnumerator.MoveNext())
+                        throw new ArgumentOutOfRangeException($"too many members when converting to {DestType.Name}");
+                    //parse dictionary (test if field or property and set accordingly)
+                    switch (((MemberInfo)memberEnumerator.Current).MemberType)
+                    {
+                        case MemberTypes.Field:
+                            var field = (FieldInfo)memberEnumerator.Current;
+                            field.SetValue(obj, CastType(field.FieldType, sourceList[i], Strict));
+                            break;
+                        case MemberTypes.Property:
+                            var prop = (PropertyInfo)memberEnumerator.Current;
+                            prop.SetValue(obj, CastType(prop.PropertyType, sourceList[i], Strict));
+                            break;
+                        default:
+                            --i; //does not seem to be built in way to filter out non-var members
+                            break;
+                    }
+                }
+                return obj;
             }
 
             if (sourceType == typeof(Dictionary<string, object>))

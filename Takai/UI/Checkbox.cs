@@ -46,16 +46,17 @@ namespace Takai.UI
                 Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, checkboxBounds);
             }
 
-            Font?.Draw(
-                spriteBatch,
-                Text,
-                CenterInRect(textSize, new Rectangle(
-                    AbsoluteBounds.X + checkboxSize + dividerWidth,
-                    AbsoluteBounds.Y,
-                    AbsoluteBounds.Width - checkboxSize - dividerWidth,
-                    AbsoluteBounds.Height)),
-                Color
-            );
+            //todo
+            //Font?.Draw(
+            //    spriteBatch,
+            //    Text,
+            //    CenterInRect(textSize, new Rectangle(
+            //        AbsoluteBounds.X + checkboxSize + dividerWidth,
+            //        AbsoluteBounds.Y,
+            //        AbsoluteBounds.Width - checkboxSize - dividerWidth,
+            //        AbsoluteBounds.Height)),
+            //    Color
+            //);
         }
     }
 }
