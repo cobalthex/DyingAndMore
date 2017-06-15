@@ -24,7 +24,7 @@ namespace Takai.UI
             //todo: custom positioning/sizing
             if (Sprite?.Texture != null)
             {
-                var rect = AbsoluteBounds;
+                var rect = VisibleBounds;
                 rect.Offset(Sprite.Origin);
                 Sprite.Draw(spriteBatch, rect, 0);
             }

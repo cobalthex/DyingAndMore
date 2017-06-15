@@ -182,8 +182,9 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Bounds relative to the outermost container
+        /// Bounds relative to the outermost container (can be outside the parent)
         /// </summary>
+        /// <seealso cref="VisibleBounds"/>
         [Data.Serializer.Ignored]
         public Rectangle VirtualBounds
         {
@@ -194,7 +195,7 @@ namespace Takai.UI
         /// <see cref="VirtualBounds"/> clipped to the parent
         /// </summary>
         [Data.Serializer.Ignored]
-        protected Rectangle AbsoluteBounds //clipped to parent
+        protected Rectangle VisibleBounds
         {
             get;
             private set;
@@ -765,8 +766,8 @@ namespace Takai.UI
             VirtualBounds = Parent != null
                 ? CalculateBounds(Parent.VirtualBounds)
                 : new Rectangle(Position.ToPoint(), Size.ToPoint());
-            AbsoluteBounds = Parent != null
-                ? Rectangle.Intersect(Parent.AbsoluteBounds, VirtualBounds)
+            VisibleBounds = Parent != null
+                ? Rectangle.Intersect(Parent.VisibleBounds, VirtualBounds)
                 : VirtualBounds;
 
         }
@@ -873,9 +874,9 @@ namespace Takai.UI
 
             var mouse = Input.InputState.MousePoint;
 
-            if (Input.InputState.IsPress(Input.MouseButtons.Left) && AbsoluteBounds.Contains(mouse))
+            if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mouse))
             {
-                var e = new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() };
+                var e = new ClickEventArgs { position = (mouse - VisibleBounds.Location).ToVector2() };
                 didPress = true;
                 OnPress(e);
                 Press?.Invoke(this, e);
@@ -894,9 +895,9 @@ namespace Takai.UI
 
             else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
             {
-                if (didPress && AbsoluteBounds.Contains(mouse) && Click != null)
+                if (didPress && VisibleBounds.Contains(mouse) && Click != null)
                 {
-                    var e = new ClickEventArgs { position = (mouse - AbsoluteBounds.Location).ToVector2() };
+                    var e = new ClickEventArgs { position = (mouse - VisibleBounds.Location).ToVector2() };
                     OnClick(e);
                     Click?.Invoke(this, e);
                     didPress = false;
@@ -922,11 +923,11 @@ namespace Takai.UI
                 var draw = draws.Dequeue();
 
                 draw.DrawSelf(spriteBatch);
-                Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusOutlineColor : draw.OutlineColor, draw.AbsoluteBounds);
+                Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusOutlineColor : draw.OutlineColor, draw.VisibleBounds);
 
-                if (DebugFont != null && draw.AbsoluteBounds.Contains(Input.InputState.MousePoint))
+                if (DebugFont != null && draw.VisibleBounds.Contains(Input.InputState.MousePoint))
                 {
-                    var rect = draw.AbsoluteBounds;
+                    var rect = draw.VisibleBounds;
                     rect.Inflate(1, 1);
                     Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, rect);
 
@@ -958,8 +959,8 @@ namespace Takai.UI
         /// <param name="position"></param>
         protected void DrawText(SpriteBatch spriteBatch, Point position)
         {
-            position += VirtualBounds.Location - AbsoluteBounds.Location;
-            Font.Draw(spriteBatch, Text, 0, Text.Length, AbsoluteBounds, position, Color);
+            position += VirtualBounds.Location - VisibleBounds.Location;
+            Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleBounds, position, Color);
         }
 
         protected void DerivedDeserialize(Dictionary<string, object> props)
@@ -1019,6 +1020,8 @@ namespace Takai.UI
         {
             var root = new List();
 
+            //todo: item spacing (can't use list margin without nesting)
+
             var members = obj.GetType().GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 
             foreach (var member in members)
@@ -1042,16 +1045,37 @@ namespace Takai.UI
                 else
                     continue;
 
-                Static label = new Static()
+                Static label = null;
+                if (type != typeof(bool))
                 {
-                    Text = BeautifyMemberName(member.Name),
-                    Font = font,
-                    Color = color
-                };
-                label.AutoSize();
-                root.AddChild(label);
+                    label = new Static()
+                    {
+                        Text = BeautifyMemberName(member.Name),
+                        Font = font,
+                        Color = color
+                    };
+                    label.AutoSize();
+                    root.AddChild(label);
+                }
 
-                if (type == typeof(int))
+                if (type == typeof(bool))
+                {
+                    //todo: file input where applicable
+                    var check = new CheckBox()
+                    {
+                        Text = BeautifyMemberName(member.Name),
+                        HorizontalAlignment = Alignment.Stretch,
+                        Font = font,
+                        Color = color
+                    };
+                    check.Click += delegate
+                    {
+                        setValue(obj, check.IsChecked);
+                    };
+                    check.AutoSize();
+                    root.AddChild(check);
+                }
+                else if (type == typeof(int))
                 {
                     var input = new NumericInput()
                     {
@@ -1066,17 +1090,37 @@ namespace Takai.UI
                     input.ValueChanged += delegate
                     {
                         //todo: not working
-                        setValue(obj, input.Value);
+                        setValue(obj, (int)input.Value);
                     };
                     input.AutoSize();
                     root.AddChild(input);
                 }
-                if (type == typeof(uint))
+                else if (type == typeof(uint))
                 {
                     var input = new NumericInput()
                     {
                         Minimum = uint.MinValue,
                         Maximum = uint.MaxValue,
+                        Value = (long)curValue,
+
+                        HorizontalAlignment = Alignment.Stretch,
+                        Font = font,
+                        Color = color
+                    };
+                    input.ValueChanged += delegate
+                    {
+                        //todo: not working
+                        setValue(obj, (uint)input.Value);
+                    };
+                    input.AutoSize();
+                    root.AddChild(input);
+                }
+                else if (type == typeof(long))
+                {
+                    var input = new NumericInput()
+                    {
+                        Minimum = long.MinValue,
+                        Maximum = long.MaxValue,
                         Value = (long)curValue,
 
                         HorizontalAlignment = Alignment.Stretch,
@@ -1093,7 +1137,7 @@ namespace Takai.UI
                 }
                 else if (type == typeof(string))
                 {
-                    //todo: file input where applicable
+                    //todo: file input where applicable (maybe switch vars to use FileInfo class)
                     var input = new TextInput()
                     {
                         Text = (string)curValue,
@@ -1108,26 +1152,9 @@ namespace Takai.UI
                     input.AutoSize();
                     root.AddChild(input);
                 }
-                else if (type == typeof(bool))
-                {
-                    //todo: file input where applicable
-                    var check = new CheckBox()
-                    {
-                        Text = "--- todo ---",
-                        HorizontalAlignment = Alignment.Stretch,
-                        Font = font,
-                        Color = color
-                    };
-                    check.Click += delegate
-                    {
-                        setValue(obj, check.IsChecked);
-                    };
-                    check.AutoSize();
-                    root.AddChild(check);
-                }
                 else
                 {
-                    label.Text += "\n---";
+                    label.Text += $"\n`aaa--- ({type.Name}) ---`x";
                     label.AutoSize();
                 }
             }

@@ -106,7 +106,7 @@ namespace DyingAndMore.Editor.Selectors
             else if (InputState.IsPress(Keys.Down))
                 SelectedItem += ItemsPerRow;
 
-            else if (AbsoluteBounds.Contains(InputState.MousePoint))
+            else if (VisibleBounds.Contains(InputState.MousePoint))
             {
                 if (InputState.HasScrolled())
                     scrollBar.ContentPosition -= InputState.ScrollDelta();
@@ -121,7 +121,7 @@ namespace DyingAndMore.Editor.Selectors
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, new Color(1, 1, 1, 0.75f), AbsoluteBounds);
+            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, new Color(1, 1, 1, 0.75f), VisibleBounds);
 
             int start = scrollBar.ContentPosition / (ItemSize.Y + Padding) * ItemsPerRow;
             for (int i = start; i < MathHelper.Min(start + (int)(Size.Y / (ItemSize.Y + Padding) + 2) * ItemsPerRow, ItemCount); ++i)
@@ -132,7 +132,7 @@ namespace DyingAndMore.Editor.Selectors
                     ItemSize.X,
                     ItemSize.Y
                 );
-                rect.Offset(AbsoluteBounds.Location);
+                rect.Offset(VisibleBounds.Location);
 
                 //Takai.Graphics.Primitives2D.DrawFill(
                 //    spriteBatch,

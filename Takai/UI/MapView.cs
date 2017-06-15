@@ -20,7 +20,7 @@ namespace Takai.UI
             if (Map != null)
             {
                 if (Map.ActiveCamera != null)
-                    Map.ActiveCamera.Viewport = AbsoluteBounds;
+                    Map.ActiveCamera.Viewport = VisibleBounds;
                 Map.Update(time);
             }
             base.UpdateSelf(time);
