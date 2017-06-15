@@ -236,8 +236,10 @@ namespace Takai.Graphics
             int lineHeight = 0;
             int start = startIndex;
 
-            length = (length == -1 ? text.Length : MathHelper.Min(text.Length, length));
-            for (int i = start; i < start + length; ++i)
+            if (length == -1)
+                length = text.Length;
+
+            for (int i = start; i < MathHelper.Min(text.Length, start + length); ++i)
             {
                 char ch = text[i];
 
@@ -291,7 +293,7 @@ namespace Takai.Graphics
                 {
                     spriteBatch.Draw(
                         Texture,
-                        new Rectangle(pos + bounds.Location - offset, clip.Size),
+                        new Rectangle(pos + bounds.Location , clip.Size),
                         clip,
                         curColor
                     );
@@ -327,8 +329,10 @@ namespace Takai.Graphics
 
             int start = startIndex;
 
-            length = (length == -1 ? text.Length : MathHelper.Min(text.Length, length));
-            for (int i = start; i < start + length; ++i)
+            if (length == -1)
+                length = text.Length;
+
+            for (int i = start; i < MathHelper.Min(text.Length, start + length); ++i)
             {
                 if (text[i] == '\n')
                 {
@@ -341,8 +345,8 @@ namespace Takai.Graphics
                 {
                     if (text[i + 1] == 'x')
                     {
-                        length += 2;
                         ++i;
+                        length += 2;
                         continue;
                     }
                     else if (i + 3 < text.Length)

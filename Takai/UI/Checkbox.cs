@@ -22,7 +22,7 @@ namespace Takai.UI
         public override void AutoSize(float padding = 0)
         {
             base.AutoSize(padding);
-            var checkboxSize = MathHelper.Min(AbsoluteBounds.Width, AbsoluteBounds.Height);
+            var checkboxSize = MathHelper.Min(VirtualBounds.Width, VirtualBounds.Height);
             Size += new Vector2(checkboxSize + dividerWidth, 0);
         }
 
@@ -34,8 +34,8 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var checkboxSize = MathHelper.Min(AbsoluteBounds.Width, AbsoluteBounds.Height);
-            var checkboxBounds = new Rectangle(AbsoluteBounds.X, AbsoluteBounds.Y, checkboxSize, checkboxSize);
+            var checkboxSize = MathHelper.Min(VirtualBounds.Width, VirtualBounds.Height);
+            var checkboxBounds = new Rectangle(VirtualBounds.X, VirtualBounds.Y, checkboxSize, checkboxSize);
             Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusOutlineColor : CheckColor, checkboxBounds);
             checkboxBounds.Inflate(-1, -1);
             Graphics.Primitives2D.DrawRect(spriteBatch, CheckColor, checkboxBounds);
@@ -46,17 +46,7 @@ namespace Takai.UI
                 Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, checkboxBounds);
             }
 
-            //todo
-            //Font?.Draw(
-            //    spriteBatch,
-            //    Text,
-            //    CenterInRect(textSize, new Rectangle(
-            //        AbsoluteBounds.X + checkboxSize + dividerWidth,
-            //        AbsoluteBounds.Y,
-            //        AbsoluteBounds.Width - checkboxSize - dividerWidth,
-            //        AbsoluteBounds.Height)),
-            //    Color
-            //);
+            DrawText(spriteBatch, new Point(checkboxSize + dividerWidth, 0));
         }
     }
 }

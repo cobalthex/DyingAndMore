@@ -10,12 +10,12 @@ namespace Takai.UI
         {
             if (DidPressInside())
             {
-                var relPos = Input.InputState.MousePoint - AbsoluteBounds.Location;
+                var relPos = Input.InputState.MousePoint - VisibleBounds.Location;
                 Value = (int)((relPos.X / Size.X) * (Maximum - Minimum)) + Minimum;
                 return false;
             }
 
-            if (AbsoluteBounds.Contains(Input.InputState.MousePoint) && Input.InputState.HasScrolled())
+            if (VisibleBounds.Contains(Input.InputState.MousePoint) && Input.InputState.HasScrolled())
             {
                 Value += Increment * System.Math.Sign(Input.InputState.ScrollDelta());
                 return false;
@@ -26,7 +26,7 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var pos = AbsoluteBounds.Location.ToVector2();
+            var pos = VisibleBounds.Location.ToVector2();
 
             var y = (Size.Y - 1) / 2;
 

@@ -85,7 +85,7 @@ namespace Takai.UI
             {
                 if (DidPressInside())
                 {
-                    var mouse = InputState.MousePoint - AbsoluteBounds.Location;
+                    var mouse = InputState.MousePoint - VisibleBounds.Location;
                     var deltaMouse = InputState.MouseDelta();
 
                     if (didPressThumb)
@@ -100,7 +100,7 @@ namespace Takai.UI
                 else
                     didPressThumb = false;
 
-                if (AbsoluteBounds.Contains(InputState.MousePoint) && InputState.HasScrolled())
+                if (VisibleBounds.Contains(InputState.MousePoint) && InputState.HasScrolled())
                 {
                     ContentPosition -= InputState.ScrollDelta();
                     return false;
@@ -178,7 +178,7 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var bounds = AbsoluteBounds;
+            var bounds = VisibleBounds;
             Takai.Graphics.Primitives2D.DrawRect(spriteBatch, OutlineColor, bounds);
             bounds.Inflate(-1, -1);
             Takai.Graphics.Primitives2D.DrawRect(spriteBatch, OutlineColor, bounds);
@@ -186,7 +186,7 @@ namespace Takai.UI
             if (IsThumbVisible)
             {
                 var thumb = GetThumbBounds();
-                thumb.Offset(AbsoluteBounds.Location);
+                thumb.Offset(VisibleBounds.Location);
                 Takai.Graphics.Primitives2D.DrawFill(spriteBatch, OutlineColor, thumb);
             }
         }
@@ -257,7 +257,7 @@ namespace Takai.UI
 
         protected override bool HandleInput(GameTime time)
         {
-            if (InputState.HasScrolled() && AbsoluteBounds.Contains(InputState.MousePoint))
+            if (InputState.HasScrolled() && VisibleBounds.Contains(InputState.MousePoint))
             {
                 verticalScrollbar.ContentPosition -= InputState.ScrollDelta();
                 return false;

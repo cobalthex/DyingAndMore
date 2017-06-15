@@ -17,18 +17,21 @@ namespace Takai.UI
             get
             {
                 if (NumericBaseType.TryParse(Text, out var val))
-                    return (val < Minimum ? Minimum : (Value > Maximum ? Maximum : val));
+                    return (val < Minimum ? Minimum : (val > Maximum ? Maximum : val));
                 return Minimum;
             }
             set
             {
-                this.value = (value < Minimum ? Minimum : (Value > Maximum ? Maximum : value));
+                this.value = (value < Minimum ? Minimum : (value > Maximum ? Maximum : value));
+
+                if (this.value == value)
+                    return;
+
                 OnValueChanged(System.EventArgs.Empty);
                 ValueChanged?.Invoke(this, System.EventArgs.Empty);
-                Text = value.ToString();
             }
         }
-        protected NumericBaseType value;
+        private NumericBaseType value;
 
         /// <summary>
         /// The normalized value (from 0 to 1) of this range
@@ -49,7 +52,7 @@ namespace Takai.UI
             set
             {
                 minimum = value;
-                Value = (Value > minimum ? value : minimum);
+                Value = (value > minimum ? value : minimum);
             }
         }
 
@@ -63,7 +66,7 @@ namespace Takai.UI
             set
             {
                 maximum = value;
-                Value = (Value < maximum ? value : maximum);
+                Value = (value > maximum ? maximum : value);
             }
         }
         protected NumericBaseType minimum = NumericBaseType.MinValue;
@@ -95,8 +98,11 @@ namespace Takai.UI
             get => textInput.Text;
             set
             {
-                if (NumericBaseType.TryParse(value, out this.value))
+                if (NumericBaseType.TryParse(value, out var val))
+                {
+                    Value = val;
                     textInput.Text = value;
+                }
             }
         }
 
@@ -137,14 +143,11 @@ namespace Takai.UI
             };
             textInput.TextChanged += delegate
             {
-                if (int.TryParse(textInput.Text, out int val))
+                if (NumericBaseType.TryParse(textInput.Text, out var val))
                 {
-                    var clamped = MathHelper.Clamp(val, Minimum, Maximum);
-                    if (val != clamped)
-                    {
-                        textInput.Text = clamped.ToString();
-                        value = val;
-                    }
+                    Value = val;
+                    if (Value != val)
+                        textInput.Text = Value.ToString();
                 }
             };
 
@@ -154,8 +157,7 @@ namespace Takai.UI
             };
             upButton.Click += delegate
             {
-                if (value < Maximum)
-                    Value += Increment;
+                Value += Increment;
             };
 
             downButton = new Static()
@@ -164,8 +166,7 @@ namespace Takai.UI
             };
             downButton.Click += delegate
             {
-                if (value > Minimum)
-                    Value -= Increment;
+                Value -= Increment;
             };
 
             AddChildren(textInput, upButton, downButton);
