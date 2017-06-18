@@ -55,9 +55,12 @@ namespace Takai.UI
             get => base.Text;
             set
             {
-                base.Text = value ?? "";
-                UpdateVisibleText();
-                Caret = base.Text.Length;
+                if (value != base.Text)
+                {
+                    base.Text = value ?? "";
+                    UpdateVisibleText();
+                    Caret = base.Text.Length;
+                }
             }
         }
         /// <summary>
@@ -112,7 +115,7 @@ namespace Takai.UI
         public TextInput()
         {
             ignoreSpaceKey = true;
-            OutlineColor = Color;
+            BorderColor = Color;
         }
 
         protected override void OnPress(ClickEventArgs args)
@@ -127,7 +130,7 @@ namespace Takai.UI
                     Caret = i;
                     return;
                 }
-                width += cw;
+                width += cw + Font.Tracking.X;
             }
             Caret = Text.Length;
         }
@@ -317,8 +320,8 @@ namespace Takai.UI
 
             if (textWidth < ScrollPosition)
                 ScrollPosition -= (int)Size.X;
-
-            ScrollPosition = (int)MathHelper.Clamp(textWidth, textSize.X - Size.X, 0);
+            //todo
+            ScrollPosition = (int)MathHelper.Clamp(textWidth, 0, textSize.X - Size.X);
         }
 
         void InsertAtCaret(char ch)

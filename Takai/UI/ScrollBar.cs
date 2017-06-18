@@ -17,7 +17,7 @@ namespace Takai.UI
 
     public class ScrollBar : Static
     {
-        static int ThumbMargin = 4; //todo: apply correctly
+        static int ThumbMargin = 3; //todo: apply correctly
 
         /// <summary>
         /// The size of the content. This determines how big the scroll thumb is
@@ -46,17 +46,19 @@ namespace Takai.UI
             get => contentPosition;
             set
             {
-                int lastValue = contentPosition;
+                var newPosition = value;
                 if (Direction == Direction.Vertical)
-                    contentPosition = MathHelper.Clamp(value, 0, ContentSize - (int)Size.Y);
+                    newPosition = MathHelper.Clamp(value, 0, ContentSize - (int)Size.Y);
                 else if (Direction == Direction.Horizontal)
-                    contentPosition = MathHelper.Clamp(value, 0, ContentSize - (int)Size.X);
-                else
-                    contentPosition = value;
+                    newPosition = MathHelper.Clamp(value, 0, ContentSize - (int)Size.X);
 
-                var e = new ScrollEventArgs(contentPosition - lastValue);
-                OnScroll(e);
-                Scroll?.Invoke(this, e);
+                if (newPosition != contentPosition)
+                {
+                    var e = new ScrollEventArgs(newPosition - contentPosition);
+                    contentPosition = newPosition;
+                    OnScroll(e);
+                    Scroll?.Invoke(this, e);
+                }
             }
         }
         private int contentPosition = 0;
@@ -70,13 +72,12 @@ namespace Takai.UI
 
         public override bool CanFocus => true;
 
-        [Data.Serializer.Ignored]
         public event System.EventHandler<ScrollEventArgs> Scroll;
         protected virtual void OnScroll(ScrollEventArgs e) { }
 
         public ScrollBar()
         {
-            OutlineColor = Color;
+            BorderColor = Color;
         }
 
         protected override bool HandleInput(GameTime time)
@@ -179,15 +180,13 @@ namespace Takai.UI
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             var bounds = VisibleBounds;
-            Takai.Graphics.Primitives2D.DrawRect(spriteBatch, OutlineColor, bounds);
-            bounds.Inflate(-1, -1);
-            Takai.Graphics.Primitives2D.DrawRect(spriteBatch, OutlineColor, bounds);
+            Takai.Graphics.Primitives2D.DrawRect(spriteBatch, BorderColor, bounds);
 
             if (IsThumbVisible)
             {
                 var thumb = GetThumbBounds();
                 thumb.Offset(VisibleBounds.Location);
-                Takai.Graphics.Primitives2D.DrawFill(spriteBatch, OutlineColor, thumb);
+                Takai.Graphics.Primitives2D.DrawFill(spriteBatch, BorderColor, thumb);
             }
         }
     }
@@ -197,31 +196,33 @@ namespace Takai.UI
         protected ScrollBar verticalScrollbar = new ScrollBar()
         {
             HorizontalAlignment = Alignment.End,
-            Size = new Vector2(20, 1)
+            Size = new Vector2(20, 1),
         };
         protected ScrollBar horizontalScrollbar = new ScrollBar()
         {
+            Direction = Direction.Horizontal,
             VerticalAlignment = Alignment.End,
-            Size = new Vector2(1, 20)
+            Size = new Vector2(1, 20),
         };
+        protected Static contentArea = new Static();
 
         public ScrollBox()
         {
-            AddChildren(horizontalScrollbar, verticalScrollbar);
+            AddChildren(horizontalScrollbar, verticalScrollbar, contentArea);
 
             horizontalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
             {
-                foreach (var child in Children)
+                foreach (var child in contentArea.Children)
                 {
                     if (child != horizontalScrollbar &&
                         child != verticalScrollbar)
-                        child.Position -= new Vector2(0, e.Delta);
+                        child.Position -= new Vector2(e.Delta, 0);
                 }
                 Reflow();
             };
             verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
             {
-                foreach (var child in Children)
+                foreach (var child in contentArea.Children)
                 {
                     if (child != horizontalScrollbar &&
                         child != verticalScrollbar)
@@ -231,35 +232,51 @@ namespace Takai.UI
             };
         }
 
+        //todo: virtualize
+        public new void AddChild(Static child)
+        {
+            contentArea.AddChild(child);
+        }
+
         public override void Reflow()
         {
-            //todo: maybe create event for OnAdd/RemoveChild
-            horizontalScrollbar.Size = new Vector2(
-                Size.X - verticalScrollbar.Size.X,
-                horizontalScrollbar.Size.Y);
+            //todo:
+            // maybe use contentContainer and contentArea
+            // autosize contentArea and move inside contentContainer
+            // does not disrupt positions of elements inside area
 
-            verticalScrollbar.Size = new Vector2(
-                verticalScrollbar.Size.X,
-                Size.Y - horizontalScrollbar.Size.Y);
+            var bounds = Rectangle.Empty;
+            foreach (var child in contentArea.Children)
+                bounds = Rectangle.Union(bounds, child.Bounds);
 
+            horizontalScrollbar.ContentSize = bounds.Width;
+            verticalScrollbar.ContentSize = bounds.Height;
             base.Reflow();
         }
 
         protected override void OnResize(EventArgs e)
         {
-            var bounds = Rectangle.Empty;
-            foreach (var child in Children)
-                bounds = Rectangle.Union(bounds, child.Bounds);
+            horizontalScrollbar.Size = new Vector2(
+                Size.X - verticalScrollbar.Size.X,
+                horizontalScrollbar.Size.Y
+            );
 
-            horizontalScrollbar.ContentSize = bounds.Width;
-            verticalScrollbar.ContentSize = bounds.Height;
+            verticalScrollbar.Size = new Vector2(
+                verticalScrollbar.Size.X,
+                Size.Y - horizontalScrollbar.Size.Y
+            );
+
+            contentArea.Size = Size - new Vector2(verticalScrollbar.Size.X, horizontalScrollbar.Size.Y);
         }
 
         protected override bool HandleInput(GameTime time)
         {
             if (InputState.HasScrolled() && VisibleBounds.Contains(InputState.MousePoint))
             {
-                verticalScrollbar.ContentPosition -= InputState.ScrollDelta();
+                if (InputState.IsMod(KeyMod.Shift))
+                    horizontalScrollbar.ContentPosition -= InputState.ScrollDelta();
+                else
+                    verticalScrollbar.ContentPosition -= InputState.ScrollDelta();
                 return false;
             }
 

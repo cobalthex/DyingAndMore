@@ -21,6 +21,9 @@ namespace Takai.UI
         /// </summary>
         public Direction Direction { get; set; } = Direction.Vertical;
 
+        public List(params Static[] children)
+            : base(children) { }
+
         public override void Reflow()
         {
             float t = 0;

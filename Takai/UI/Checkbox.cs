@@ -35,15 +35,16 @@ namespace Takai.UI
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             var checkboxSize = MathHelper.Min(VirtualBounds.Width, VirtualBounds.Height);
-            var checkboxBounds = new Rectangle(VirtualBounds.X, VirtualBounds.Y, checkboxSize, checkboxSize);
+            var checkBounds = new Rectangle(VirtualBounds.X, VirtualBounds.Y, checkboxSize, checkboxSize);
+            var checkboxBounds = Rectangle.Intersect(checkBounds, VisibleBounds);
             Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusOutlineColor : CheckColor, checkboxBounds);
             checkboxBounds.Inflate(-1, -1);
             Graphics.Primitives2D.DrawRect(spriteBatch, CheckColor, checkboxBounds);
 
             if (IsChecked)
             {
-                checkboxBounds.Inflate(-4, -4);
-                Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, checkboxBounds);
+                checkBounds.Inflate(-4, -4);
+                Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, Rectangle.Intersect(checkBounds, VisibleBounds));
             }
 
             DrawText(spriteBatch, new Point(checkboxSize + dividerWidth, 0));

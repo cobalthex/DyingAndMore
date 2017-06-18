@@ -129,15 +129,25 @@ namespace DyingAndMore
             var smallFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>(
                 "Fonts/UISmall.bfnt");
 
-            testAutoObj = new Takai.Graphics.Sprite();
+            testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
+
             var testAutoUi = Takai.UI.Static.GeneratePropSheet(
                 testAutoObj, smallFont, Color.White);
-            var box = new Takai.UI.ScrollBox() { Position = new Vector2(50) };
+
+            var box = new Takai.UI.ScrollBox() { Position = new Vector2(100) };
             box.AddChild(testAutoUi);
             box.Size = new Vector2(300, 400);
-            box.OutlineColor = Color.LightBlue;
-            ui = new Takai.UI.Static(box);
-            ui.Font = smallFont;
+            box.BorderColor = Color.LightBlue;
+            ui = new Takai.UI.Static(box)
+            {
+                Font = smallFont,
+            };
+            //ui.AddChild(new Takai.UI.Graphic()
+            //{
+            //    Sprite = (Takai.Graphics.Sprite)testAutoObj,
+            //    Position = new Vector2(400, 100),
+            //    Size = new Vector2(32)
+            //});
 
             //ui = new Editor.Editor();
 
@@ -187,16 +197,17 @@ namespace DyingAndMore
             {
                 takingScreenshot = false;
 
-                RenderTarget2D rt = new RenderTarget2D(GraphicsDevice,
-                    GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+                using (var rt = new RenderTarget2D(GraphicsDevice,
+                    GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height))
+                {
+                    GraphicsDevice.SetRenderTarget(rt);
+                    GraphicsDevice.SetRenderTarget(null);
 
-                GraphicsDevice.SetRenderTarget(rt);
-                GraphicsDevice.SetRenderTarget(null);
-
-                var fs = new System.IO.FileStream(System.DateTime.Now.ToString("dd_MMM_HH-mm-ss-fff") + ".png", System.IO.FileMode.Create);
-                rt.SaveAsPng(fs, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-                fs.Close();
-                rt.Dispose();
+                    using (var fs = new System.IO.FileStream(System.DateTime.Now.ToString("dd_MMM_HH-mm-ss-fff") + ".png", System.IO.FileMode.Create))
+                    {
+                        rt.SaveAsPng(fs, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+                    }
+                }
             }
             else
             {
