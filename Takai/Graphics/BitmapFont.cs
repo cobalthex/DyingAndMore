@@ -221,20 +221,19 @@ namespace Takai.Graphics
         /// </summary>
         /// <param name="spriteBatch">The sprite batch to use</param>
         /// <param name="text">The string to draw</param>
-        /// <param name="startIndex">The zero-based starting position in the string</param>
+        /// <param name="start">The zero-based starting position in the string</param>
         /// <param name="length">The length of the sub string, use -1 for the entire string (non-printing characters not included)</param>
         /// <param name="bounds">The clipping region for drawing the text to</param>
         /// <param name="offset">The pixel offset to render the text inside the clipping region</param>
         /// <param name="color">The color of the text</param>
         /// <param name="monoSpace">Draw the font, treating all characters as equal width</param>
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and fff to change the color. use `x to reset the color</remarks>
-        public void Draw(SpriteBatch spriteBatch, string text, int startIndex, int length, Rectangle bounds, Point offset, Color color, bool monoSpace = false)
+        public void Draw(SpriteBatch spriteBatch, string text, int start, int length, Rectangle bounds, Point offset, Color color, bool monoSpace = false)
         {
             Point pos = offset;
             Color curColor = color;
 
             int lineHeight = 0;
-            int start = startIndex;
 
             if (length == -1)
                 length = text.Length;
@@ -263,7 +262,7 @@ namespace Takai.Graphics
                     else if (i + 3 < text.Length)
                     {
                         int[] col = new int[3];
-                        for (int j = 0; j < 3; ++j)
+                        ; for (int j = 0; j < 3; ++j)
                         {
                             char cch = text[j + i + start + 1];
                             if (cch >= 'a' && cch <= 'f')
@@ -280,26 +279,31 @@ namespace Takai.Graphics
                     }
                 }
 
+                else if (pos.Y > bounds.Height)
+                    return;
+                else if (pos.X >= bounds.Width)
+                    continue;
+
                 if (!Characters.TryGetValue(ch, out var rgn))
                     continue;
 
-                //todo: revisit this pain in the ass (see Main.cs for demo)
-                var clip = Rectangle.Intersect(
-                    rgn,
-                    new Rectangle(rgn.Location - pos, bounds.Size + offset)
-                );
+                //outline each character's bounds
+                //Primitives2D.DrawRect(spriteBatch, Color.Coral, new Rectangle(bounds.Location + pos, rgn.Size));
+
+                var clip = Rectangle.Intersect(rgn, new Rectangle(rgn.Location - pos, bounds.Size));
 
                 if (clip.Width > 0 && clip.Height > 0)
                 {
                     spriteBatch.Draw(
                         Texture,
-                        new Rectangle(pos + bounds.Location , clip.Size),
+                        new Rectangle(bounds.Location + pos + (clip.Location - rgn.Location), clip.Size),
                         clip,
                         curColor
                     );
                 }
+
                 pos.X += (monoSpace ? MaxCharWidth : rgn.Width) + Tracking.X;
-                lineHeight = MathHelper.Max(lineHeight, clip.Height);
+                lineHeight = MathHelper.Max(lineHeight, rgn.Height);
             }
         }
 
@@ -324,8 +328,8 @@ namespace Takai.Graphics
         /// <remarks>Characters not in the font are ignored, escape characters are ignored aswell</remarks>
         public Vector2 MeasureString(string text, int startIndex, int length)
         {
-            Vector2 pos = Vector2.Zero;
-            int nW = 0, nH = 0;
+            Vector2 total = Vector2.Zero;
+            Vector2 row = Vector2.Zero;
 
             int start = startIndex;
 
@@ -336,9 +340,9 @@ namespace Takai.Graphics
             {
                 if (text[i] == '\n')
                 {
-                    pos.Y += nH + Tracking.Y;
-                    nW = 0;
-                    nH = 0;
+                    total.X = MathHelper.Max(total.X, row.X);
+                    total.Y += row.Y + Tracking.Y;
+                    row = Vector2.Zero;
                     continue;
                 }
                 else if (text[i] == '`' && i + 1 < length) //colors (`RGB (hex)) and `x to end
@@ -359,14 +363,14 @@ namespace Takai.Graphics
 
                 if (Characters.TryGetValue(text[i], out var rgn))
                 {
-                    nW += rgn.Width;
-                    nH = MathHelper.Max(nH, rgn.Height);
+                    row.X += rgn.Width;
+                    row.Y  = MathHelper.Max(row.Y, rgn.Height);
                 }
-
-                pos.X = (int)MathHelper.Max(pos.X, nW);
             }
-            pos.Y += nH + Tracking.Y;
-            return pos;
+
+            total.X = MathHelper.Max(total.X, row.X);
+            total.Y += row.Y;
+            return total;
         }
     }
 }

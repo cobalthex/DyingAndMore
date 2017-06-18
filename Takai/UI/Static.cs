@@ -87,7 +87,7 @@ namespace Takai.UI
         /// <summary>
         /// The color to draw the outline with, by default, transparent
         /// </summary>
-        public virtual Color OutlineColor { get; set; } = Color.Transparent;
+        public virtual Color BorderColor { get; set; } = Color.Transparent;
 
         /// <summary>
         /// How this element is positioned in its container horizontally
@@ -167,6 +167,8 @@ namespace Takai.UI
         /// <summary>
         /// The bounds of this static, calculated from <see cref="Position"/> and <see cref="Size"/>
         /// </summary>
+        /// <seealso cref="VirtualBounds"/>
+        /// <seealso cref="VisibleBounds"/>
         public Rectangle Bounds
         {
             get => new Rectangle(Position.ToPoint(), Size.ToPoint());
@@ -714,7 +716,7 @@ namespace Takai.UI
 
         protected void ResizeAndReflow()
         {
-            if (horizontalAlignment != Alignment.Stretch &&
+            if (horizontalAlignment != Alignment.Stretch ||
                 verticalAlignment != Alignment.Stretch)
                 CalculateBounds();
 
@@ -923,7 +925,7 @@ namespace Takai.UI
                 var draw = draws.Dequeue();
 
                 draw.DrawSelf(spriteBatch);
-                Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusOutlineColor : draw.OutlineColor, draw.VisibleBounds);
+                Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusOutlineColor : draw.BorderColor, draw.VisibleBounds);
 
                 if (DebugFont != null && draw.VisibleBounds.Contains(Input.InputState.MousePoint))
                 {
@@ -956,7 +958,7 @@ namespace Takai.UI
         /// <summary>
         /// Draw this element's text. Position specifies the base location
         /// </summary>
-        /// <param name="position"></param>
+        /// <param name="position">The position of the text relative to this element</param>
         protected void DrawText(SpriteBatch spriteBatch, Point position)
         {
             position += VirtualBounds.Location - VisibleBounds.Location;
@@ -1038,6 +1040,9 @@ namespace Takai.UI
                 }
                 else if (member is System.Reflection.PropertyInfo pInfo)
                 {
+                    if (!pInfo.CanWrite)
+                        continue;
+
                     type = pInfo.PropertyType;
                     curValue = pInfo.GetValue(obj);
                     setValue = pInfo.SetValue;
@@ -1046,6 +1051,7 @@ namespace Takai.UI
                     continue;
 
                 Static label = null;
+
                 if (type != typeof(bool))
                 {
                     label = new Static()
@@ -1060,11 +1066,9 @@ namespace Takai.UI
 
                 if (type == typeof(bool))
                 {
-                    //todo: file input where applicable
                     var check = new CheckBox()
                     {
                         Text = BeautifyMemberName(member.Name),
-                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
@@ -1083,13 +1087,11 @@ namespace Takai.UI
                         Maximum = int.MaxValue,
                         Value = (int)curValue,
 
-                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
                     input.ValueChanged += delegate
                     {
-                        //todo: not working
                         setValue(obj, (int)input.Value);
                     };
                     input.AutoSize();
@@ -1103,13 +1105,11 @@ namespace Takai.UI
                         Maximum = uint.MaxValue,
                         Value = (long)curValue,
 
-                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
                     input.ValueChanged += delegate
                     {
-                        //todo: not working
                         setValue(obj, (uint)input.Value);
                     };
                     input.AutoSize();
@@ -1123,13 +1123,11 @@ namespace Takai.UI
                         Maximum = long.MaxValue,
                         Value = (long)curValue,
 
-                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
                     input.ValueChanged += delegate
                     {
-                        //todo: not working
                         setValue(obj, input.Value);
                     };
                     input.AutoSize();
@@ -1141,7 +1139,6 @@ namespace Takai.UI
                     var input = new TextInput()
                     {
                         Text = (string)curValue,
-                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
@@ -1152,9 +1149,81 @@ namespace Takai.UI
                     input.AutoSize();
                     root.AddChild(input);
                 }
+                else if (type == typeof(System.IO.FileInfo))
+                {
+                    var input = new FileInput()
+                    {
+                        Text = ((System.IO.FileInfo)curValue)?.Name,
+                        Font = font,
+                        Color = color
+                    };
+                    input.FileSelected += delegate
+                    {
+                        setValue(obj, new System.IO.FileInfo(input.Text));
+                    };
+                    input.AutoSize();
+                    root.AddChild(input);
+                }
+                else if (type == typeof(Texture2D))
+                {
+                    var input = new FileInput()
+                    {
+                        Text = ((Texture2D)curValue)?.Name,
+                        Font = font,
+                        Color = color
+                    };
+                    input.FileSelected += delegate
+                    {
+                        setValue(obj, Takai.AssetManager.Load<Texture2D>(input.Text));
+                    };
+                    input.AutoSize();
+                    root.AddChild(input);
+                }
+                else if (type == typeof(System.TimeSpan))
+                {
+                    var input = new NumericInput()
+                    {
+                        Minimum = long.MinValue,
+                        Maximum = long.MaxValue,
+                        Value = (long)((System.TimeSpan)curValue).TotalMilliseconds,
+
+                        Font = font,
+                        Color = color,
+                    };
+                    input.ValueChanged += delegate
+                    {
+                        setValue(obj, System.TimeSpan.FromMilliseconds(input.Value));
+                    };
+
+                    var mSecLabel = new Static()
+                    {
+                        Text = "msec",
+                        Font = font,
+                        Color = color
+                    };
+                    mSecLabel.AutoSize();
+
+                    var container = new List()
+                    {
+                        Direction = Direction.Horizontal,
+                        Margin = 10
+                    };
+                    container.AddChildren(
+                        input,
+                        mSecLabel
+                    );
+                    container.AutoSize();
+                    root.AddChild(container);
+                }
+                else if (type == typeof(Point))
+                {
+                    var list = (List)GeneratePropSheet(curValue, font, color);
+                    list.Direction = Direction.Horizontal;
+                    root.AddChild(list);
+                }
                 else
                 {
-                    label.Text += $"\n`aaa--- ({type.Name}) ---`x";
+                    label.Text += $"\n`aab--- ({type.Name}) ---\nthird line`x";
                     label.AutoSize();
                 }
             }

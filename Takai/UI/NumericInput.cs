@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Takai.Graphics;
 
@@ -14,21 +15,17 @@ namespace Takai.UI
         /// </summary>
         public NumericBaseType Value
         {
-            get
-            {
-                if (NumericBaseType.TryParse(Text, out var val))
-                    return (val < Minimum ? Minimum : (val > Maximum ? Maximum : val));
-                return Minimum;
-            }
+            get => value;
             set
             {
-                this.value = (value < Minimum ? Minimum : (value > Maximum ? Maximum : value));
+                var newVal = (value < Minimum ? Minimum : (value > Maximum ? Maximum : value));
 
-                if (this.value == value)
-                    return;
-
-                OnValueChanged(System.EventArgs.Empty);
-                ValueChanged?.Invoke(this, System.EventArgs.Empty);
+                if (this.value != newVal)
+                {
+                    this.value = newVal;
+                    OnValueChanged(System.EventArgs.Empty);
+                    ValueChanged?.Invoke(this, System.EventArgs.Empty);
+                }
             }
         }
         private NumericBaseType value;
@@ -90,38 +87,20 @@ namespace Takai.UI
     /// </summary>
     public class NumericInput : NumericBase
     {
-        /// <summary>
-        /// Attempt to set the text of this input. Must be a valid number to be set
-        /// </summary>
-        public override string Text
-        {
-            get => textInput.Text;
-            set
-            {
-                if (NumericBaseType.TryParse(value, out var val))
-                {
-                    Value = val;
-                    textInput.Text = value;
-                }
-            }
-        }
-
         public override BitmapFont Font
         {
-            get => base.Font;
+            get => textInput.Font;
             set
             {
-                base.Font = value;
                 textInput.Font = upButton.Font = downButton.Font = value;
             }
         }
 
         public override Color Color
         {
-            get => base.Color;
+            get => textInput.Color;
             set
             {
-                base.Color = value;
                 textInput.Color = upButton.Color = downButton.Color = value;
             }
         }
@@ -131,6 +110,13 @@ namespace Takai.UI
 
         public NumericInput()
         {
+            Resize += delegate
+            {
+                var height = Size.Y;
+                textInput.Size = new Vector2(Size.X - height * 2, height);
+                upButton.Size = downButton.Size = new Vector2(height);
+            };
+
             textInput = new TextInput()
             {
                 Text = "0",
@@ -139,7 +125,7 @@ namespace Takai.UI
                 AllowSpaces = false,
                 AllowSpecialCharacters = false,
                 MaxLength = 20,
-                OutlineColor = Color.Transparent
+                BorderColor = Color.Transparent,
             };
             textInput.TextChanged += delegate
             {
@@ -151,6 +137,8 @@ namespace Takai.UI
                 }
             };
 
+            BorderColor = Color;
+
             upButton = new Static()
             {
                 Text = "+",
@@ -158,6 +146,7 @@ namespace Takai.UI
             upButton.Click += delegate
             {
                 Value += Increment;
+                textInput.Text = Value.ToString();
             };
 
             downButton = new Static()
@@ -167,18 +156,16 @@ namespace Takai.UI
             downButton.Click += delegate
             {
                 Value -= Increment;
+                textInput.Text = Value.ToString();
             };
 
             AddChildren(textInput, upButton, downButton);
+        }
 
-            Resize += delegate
-            {
-                var height = Size.Y;
-                textInput.Size = new Vector2(Size.X - height * 2, height);
-                upButton.Size = downButton.Size = new Vector2(height);
-            };
-
-            OutlineColor = Color;
+        protected override void OnValueChanged(EventArgs e)
+        {
+            textInput.Text = Value.ToString();
+            base.OnValueChanged(e);
         }
 
         public override void AutoSize(float padding = 0)
@@ -188,6 +175,17 @@ namespace Takai.UI
             upButton.Size = downButton.Size = new Vector2(btnSize);
 
             Size = textInput.Size + new Vector2(btnSize * 2, 0);
+            base.AutoSize(padding);
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            var btnSize = Size.Y;
+            textInput.Size = new Vector2(Size.X - btnSize * 2, Size.Y);
+            upButton.Size = downButton.Size = new Vector2(btnSize);
+            upButton.Position = new Vector2(Size.X - btnSize * 2, 0);
+            downButton.Position = new Vector2(Size.X - btnSize, 0);
+            base.OnResize(e);
         }
 
         public override void Reflow()

@@ -48,7 +48,7 @@ namespace DyingAndMore.Editor
                 Size = new Vector2(editor.Map.TileSize),
                 HorizontalAlignment = Takai.UI.Alignment.End,
                 VerticalAlignment = Takai.UI.Alignment.Start,
-                OutlineColor = Color.White
+                BorderColor = Color.White
             });
             preview.Click += delegate
             {

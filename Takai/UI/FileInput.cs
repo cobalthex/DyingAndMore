@@ -1,5 +1,6 @@
 ﻿using System.Windows.Forms;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
@@ -9,8 +10,10 @@ namespace Takai.UI
         Save
     }
 
-    public class FileInput : Static
+    public class FileInput : List
     {
+        //todo: directory support
+
         public static Color InvalidFileOutlineColor = Color.Tomato;
 
         public override string Text
@@ -38,20 +41,18 @@ namespace Takai.UI
 
         public override Graphics.BitmapFont Font
         {
-            get => base.Font;
+            get => textInput.Font;
             set
             {
-                base.Font = value;
                 textInput.Font = pickerButton.Font = value;
             }
         }
 
         public override Color Color
         {
-            get => base.Color;
+            get => textInput.Color;
             set
             {
-                base.Color = value;
                 textInput.Color = pickerButton.Color = value;
             }
         }
@@ -62,11 +63,19 @@ namespace Takai.UI
         private Color lastOutlineColor;
         private bool fileWasInvalid = false;
 
+        /// <summary>
+        /// Called whenever a valid file name is entered
+        /// </summary>
+        public System.EventHandler FileSelected;
+        protected virtual void OnFileSelected(System.EventArgs e) { }
+
         public FileInput()
         {
+            Direction = Direction.Horizontal;
+
             textInput = new TextInput()
             {
-                OutlineColor = Color.Transparent
+                BorderColor = Color.Transparent
             };
             textInput.TextChanged += delegate { ValidateFile(); };
 
@@ -76,6 +85,14 @@ namespace Takai.UI
             };
             pickerButton.Click += delegate
             {
+#if WINDOWS && DEBUG
+                if (Takai.Input.InputState.IsMod(Input.KeyMod.Alt))
+                {
+                    System.Diagnostics.Process.Start(System.IO.Path.GetDirectoryName(Text));
+                    return;
+                }
+#endif
+
                 FileDialog dialog = null;
                 if (Mode == DialogMode.Open)
                     dialog = new OpenFileDialog();
@@ -101,41 +118,47 @@ namespace Takai.UI
 
             AddChildren(textInput, pickerButton);
 
-            Resize += delegate
-            {
-                var height = Size.Y;
-                textInput.Size = new Vector2(Size.X - height, height);
-                pickerButton.Size = new Vector2(height);
-            };
-
-            OutlineColor = Color;
+            BorderColor = Color;
         }
 
         public override void AutoSize(float padding = 0)
         {
             textInput.AutoSize(padding);
             var btnSize = textInput.Size.Y;
-            pickerButton.Size = new Vector2(btnSize + 10, btnSize);
+            pickerButton.Size = new Vector2(btnSize);
 
-            Size = textInput.Size + new Vector2(btnSize + 10, 0);
+            Size = textInput.Size + new Vector2(btnSize, 0);
+            base.AutoSize(padding);
         }
 
-        public override void Reflow()
+        protected override void OnResize(System.EventArgs e)
         {
-            pickerButton.Position = textInput.Position + new Vector2(textInput.Size.X, 0);
-            base.Reflow();
+            var btnSize = Size.Y;
+            textInput.Size = new Vector2(Size.X - btnSize, Size.Y);
+            pickerButton.Size = new Vector2(btnSize);
+            pickerButton.Position = new Vector2(Size.X - btnSize, 0);
+            base.OnResize(e);
         }
 
         protected void ValidateFile()
         {
-            if (VerifyFileExists && Text.Length > 0 && !System.IO.File.Exists(Text))
+            bool isFileValid = !VerifyFileExists;
+            if (VerifyFileExists && Text.Length > 0 && !(isFileValid = System.IO.File.Exists(Text)))
             {
-                lastOutlineColor = OutlineColor;
-                OutlineColor = InvalidFileOutlineColor;
+                lastOutlineColor = BorderColor;
+                BorderColor = InvalidFileOutlineColor;
                 fileWasInvalid = true;
             }
             else if (fileWasInvalid)
-                OutlineColor = lastOutlineColor;
+                BorderColor = lastOutlineColor;
+
+            if (isFileValid)
+            {
+                OnFileSelected(System.EventArgs.Empty);
+                FileSelected?.Invoke(this, System.EventArgs.Empty);
+            }
         }
+
+        protected override void DrawSelf(SpriteBatch spriteBatch) { }
     }
 }
