@@ -36,7 +36,9 @@ namespace Takai.UI
         /// <summary>
         /// Is the scrollbar thumb visible
         /// </summary>
-        public bool IsThumbVisible => Size.Y < ContentSize;
+        [Data.Serializer.Ignored]
+        public bool IsThumbVisible =>
+            (Direction == Direction.Horizontal ? Size.X : Size.Y) < ContentSize;
 
         /// <summary>
         /// Where the content is scrolled to

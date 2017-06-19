@@ -1,21 +1,21 @@
 Spawner {
-    MaxHealth: 100;
+    MaxHealth: 1000;
     State: {
         BaseState: EntStateKey [Idle];
         States: {
             Idle: {
                 Sprite: {
                     texture: "Textures/Entities/Spawner.png";
-                    width: 48;
-                    height: 48;
-                    origin: [24 24];
+                    width: 32;
+                    height: 32;
+                    origin: [16 16];
                 };
             };
         };
     };
     IsAlive: True;
     AlwaysActive: False;
-    Radius: 24;
+    Radius: 16;
     IsPhysical: True;
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
