@@ -705,6 +705,9 @@ namespace Takai.UI
                     size.Y = parent.size.Y;
                 }
                 CalculateBounds();
+
+                OnResize(System.EventArgs.Empty);
+                Resize?.Invoke(this, System.EventArgs.Empty);
             }
 
             foreach (var child in Children)
@@ -1069,6 +1072,7 @@ namespace Takai.UI
                     var check = new CheckBox()
                     {
                         Text = BeautifyMemberName(member.Name),
+                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
@@ -1087,6 +1091,7 @@ namespace Takai.UI
                         Maximum = int.MaxValue,
                         Value = (int)curValue,
 
+                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
@@ -1105,6 +1110,7 @@ namespace Takai.UI
                         Maximum = uint.MaxValue,
                         Value = (long)curValue,
 
+                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
@@ -1123,6 +1129,7 @@ namespace Takai.UI
                         Maximum = long.MaxValue,
                         Value = (long)curValue,
 
+                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
@@ -1139,6 +1146,7 @@ namespace Takai.UI
                     var input = new TextInput()
                     {
                         Text = (string)curValue,
+                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
@@ -1154,6 +1162,7 @@ namespace Takai.UI
                     var input = new FileInput()
                     {
                         Text = ((System.IO.FileInfo)curValue)?.Name,
+                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
@@ -1169,6 +1178,7 @@ namespace Takai.UI
                     var input = new FileInput()
                     {
                         Text = ((Texture2D)curValue)?.Name,
+                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
@@ -1194,6 +1204,7 @@ namespace Takai.UI
                     {
                         setValue(obj, System.TimeSpan.FromMilliseconds(input.Value));
                     };
+                    input.AutoSize();
 
                     var mSecLabel = new Static()
                     {
@@ -1215,12 +1226,6 @@ namespace Takai.UI
                     container.AutoSize();
                     root.AddChild(container);
                 }
-                else if (type == typeof(Point))
-                {
-                    var list = (List)GeneratePropSheet(curValue, font, color);
-                    list.Direction = Direction.Horizontal;
-                    root.AddChild(list);
-                }
                 else
                 {
                     label.Text += $"\n`aab--- ({type.Name}) ---\nthird line`x";
@@ -1229,6 +1234,7 @@ namespace Takai.UI
             }
 
             root.AutoSize();
+            root.HorizontalAlignment = Alignment.Stretch;
             return root;
         }
     }

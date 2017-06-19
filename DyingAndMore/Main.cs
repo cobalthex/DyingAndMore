@@ -138,28 +138,22 @@ namespace DyingAndMore
             box.AddChild(testAutoUi);
             box.Size = new Vector2(300, 400);
             box.BorderColor = Color.LightBlue;
-            ui = new Takai.UI.Static(box)
+            //ui = new Takai.UI.Static(box);
+            ui = new Editor.Editor();
+            ui.AddChild(box);
+            ui.AddChild(new Takai.UI.Graphic()
             {
-                Font = smallFont,
-            };
-            //ui.AddChild(new Takai.UI.Graphic()
-            //{
-            //    Sprite = (Takai.Graphics.Sprite)testAutoObj,
-            //    Position = new Vector2(400, 100),
-            //    Size = new Vector2(32)
-            //});
+                Sprite = (Takai.Graphics.Sprite)testAutoObj,
+                Position = new Vector2(500, 100),
+                Size = new Vector2(32)
+            });
 
-            //ui = new Editor.Editor();
 
             //Takai.UI.Static.DebugFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/RCT2.bfnt");
 
             base.Initialize();
         }
         object testAutoObj;
-
-        protected override void OnExiting(object sender, System.EventArgs args)
-        {
-        }
 
         protected override void Update(GameTime gameTime)
         {
