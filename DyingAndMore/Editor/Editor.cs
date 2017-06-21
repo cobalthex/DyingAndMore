@@ -31,6 +31,9 @@ namespace DyingAndMore.Editor
 
         public Editor()
         {
+            HorizontalAlignment = Alignment.Stretch;
+            VerticalAlignment = Alignment.Stretch;
+
             Map = Serializer.CastType<Takai.Game.Map>(Serializer.TextDeserialize("Data/Maps/maze2.map.tk"));
             Map.InitializeGraphics();
             Map.ActiveCamera = new EditorCamera();
@@ -116,6 +119,14 @@ namespace DyingAndMore.Editor
 
         protected override bool HandleInput(GameTime time)
         {
+            if (InputState.IsPress(Keys.F1))
+            {
+                Parent.ReplaceAllChildren(new Game.Game()
+                {
+                    Map = Map
+                });
+                return false;
+            }
             if (InputState.IsPress(Keys.F2))
             {
                 ToggleRenderSettingsConsole();

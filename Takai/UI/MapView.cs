@@ -8,7 +8,26 @@ namespace Takai.UI
     /// </summary>
     public class MapView : Static
     {
-        public Game.Map Map { get; set; } = null;
+        public Game.Map Map
+        {
+            get => map;
+            set
+            {
+                if (map != value)
+                {
+                    map = value;
+                    MapChanged?.Invoke(this, System.EventArgs.Empty);
+                    OnMapChanged(System.EventArgs.Empty);
+                }
+            }
+        }
+        private Game.Map map;
+
+        /// <summary>
+        /// Called whenever the map changes
+        /// </summary>
+        public System.EventHandler MapChanged;
+        protected virtual void OnMapChanged(System.EventArgs e) { }
 
         public override void AutoSize(float padding = 0)
         {

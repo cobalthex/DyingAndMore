@@ -18,8 +18,8 @@ namespace DyingAndMore.Game.Scripts
 
         public override void Step(TimeSpan deltaTime, Takai.Game.Entity context = null)
         {
-            path.Move(100 * (float)deltaTime.TotalSeconds);
-            victim.Position = path.Position;
+            //path.Move(100 * (float)deltaTime.TotalSeconds);
+            //victim.Position = path.Position;
         }
     }
 }
