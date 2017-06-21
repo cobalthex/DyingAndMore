@@ -1197,6 +1197,7 @@ namespace Takai.UI
                         Maximum = long.MaxValue,
                         Value = (long)((System.TimeSpan)curValue).TotalMilliseconds,
 
+                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color,
                     };
@@ -1217,6 +1218,7 @@ namespace Takai.UI
                     var container = new List()
                     {
                         Direction = Direction.Horizontal,
+                        HorizontalAlignment = Alignment.Stretch,
                         Margin = 10
                     };
                     container.AddChildren(

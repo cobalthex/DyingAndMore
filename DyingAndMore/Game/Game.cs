@@ -7,57 +7,15 @@ using Takai;
 
 namespace DyingAndMore.Game
 {
-    class Game : Takai.Runtime.GameState
+    class Game : Takai.UI.MapView
     {
-        public Takai.Game.Map map;
-
         Entities.Actor player = null;
         Entities.Controller lastController = null;
 
-        Takai.Graphics.BitmapFont fnt;
-
-        SpriteBatch sbatch;
-
-        public Game() : base(false, false) { }
-
-        void StartMap()
+        public Game()
         {
-            map.updateSettings = Takai.Game.MapUpdateSettings.Game;
-            map.renderSettings.drawBordersAroundNonDrawingEntities = false;
-            map.renderSettings.drawGrids = false;
-            map.renderSettings.drawTriggers = false;
-
-            var plyr = from ent in map.FindEntitiesByType<Entities.Actor>(true)
-                       where ((Entities.Actor)ent).Faction == Entities.Factions.Player
-                       select ent;
-
-            player = plyr.FirstOrDefault() as Entities.Actor;
-            map.ActiveCamera = new Takai.Game.Camera(player);
-
-            var testScript = new Scripts.TestScript()
-            {
-                totalTime = System.TimeSpan.FromSeconds(10),
-                victim = player
-            };
-            map.AddScript(testScript);
-
-            //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
-        }
-
-        public override void Load()
-        {
-            fnt = AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
-
-            if (map == null)
-            {
-                map = new Takai.Game.Map(GraphicsDevice);
-                using (var s = new System.IO.FileStream("data/maps/test.map.tk", System.IO.FileMode.Open))
-                    map = Takai.Game.Map.Load(s);
-            }
-
-            sbatch = new SpriteBatch(GraphicsDevice);
-
-            StartMap();
+            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+            VerticalAlignment = Takai.UI.Alignment.Stretch;
 
             pt1 = new Takai.Game.ParticleType()
             {
@@ -89,60 +47,106 @@ namespace DyingAndMore.Game
         }
         Takai.Game.ParticleType pt1, pt2;
 
-        public override void Update(GameTime time)
+        protected override void OnMapChanged(System.EventArgs e)
         {
-            map.ActiveCamera.Viewport = GraphicsDevice.Viewport.Bounds;
+            Map.updateSettings = Takai.Game.MapUpdateSettings.Game;
+            Map.renderSettings.drawBordersAroundNonDrawingEntities = false;
+            Map.renderSettings.drawGrids = false;
+            Map.renderSettings.drawTriggers = false;
 
+            var plyr = from ent in Map.FindEntitiesByType<Entities.Actor>(true)
+                       where ((Entities.Actor)ent).Faction == Entities.Factions.Player
+                       select ent;
+
+            player = plyr.FirstOrDefault() as Entities.Actor;
+            Map.ActiveCamera = new Takai.Game.Camera(player);
+
+            var testScript = new Scripts.TestScript()
+            {
+                totalTime = System.TimeSpan.FromSeconds(10),
+                victim = player
+            };
+            Map.AddScript(testScript);
+
+            //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
+        }
+
+        protected override void UpdateSelf(GameTime time)
+        {
+            var scrollDelta = InputState.ScrollDelta();
+            if (InputState.IsMod(KeyMod.Control) && scrollDelta != 0)
+            {
+                Map.TimeScale += System.Math.Sign(scrollDelta) * 0.1f;
+            }
+
+            Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+
+            Takai.Game.ParticleSpawn pspawn = new Takai.Game.ParticleSpawn()
+            {
+                type = pt1,
+                angle = new Takai.Game.Range<float>(0, MathHelper.TwoPi),
+                position = new Takai.Game.Range<Vector2>(worldMousePos),
+                count = new Takai.Game.Range<int>(3, 5),
+                lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800))
+            };
+            Map.Spawn(pspawn);
+
+            base.UpdateSelf(time);
+        }
+
+        protected override bool HandleInput(GameTime time)
+        {
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.O))
             {
                 var ofd = new System.Windows.Forms.OpenFileDialog()
                 {
                     SupportMultiDottedExtensions = true,
-                    Filter = "Map (*.map.tk)|*.map.tk|All Files (*.*)|*.*",
-                    InitialDirectory = System.IO.Path.GetDirectoryName(map.File),
-                    FileName = System.IO.Path.GetFileName(map.File)
+                    Filter = "Map (*.Map.tk)|*.Map.tk|All Files (*.*)|*.*",
+                    InitialDirectory = System.IO.Path.GetDirectoryName(Map.File),
+                    FileName = System.IO.Path.GetFileName(Map.File)
                 };
                 if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     using (var stream = ofd.OpenFile())
-                        map = Takai.Game.Map.Load(stream);
-                    StartMap();
+                        Map = Takai.Game.Map.Load(stream);
                 }
-                return;
+                return false;
             }
 
             if (InputState.IsClick(Keys.F1))
             {
                 //Takai.Runtime.GameManager.NextState(new Editor.Editor()
                 //{
-                //    Map = map
+                //    Map = Map
                 //});
-                return;
+                return false;
             }
 
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
-                Takai.Runtime.GameManager.Exit();
-                return;
+                Takai.Runtime.IsExiting = true;
+                return false;
             }
 
             if (InputState.IsPress(Keys.F5))
             {
                 using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Create))
-                    map.SaveState(stream);
+                    Map.SaveState(stream);
+                return false;
             }
             if (InputState.IsPress(Keys.F9))
             {
                 using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Open))
-                    map.LoadState(stream);
-                StartMap();
+                    Map.LoadState(stream);
+                OnMapChanged(System.EventArgs.Empty);
+                return false;
             }
 
             //possess actors
 #if DEBUG
             if (InputState.IsMod(KeyMod.Alt) && InputState.IsPress(MouseButtons.Left))
             {
-                var targets = map.FindEntities(map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 5, false);
+                var targets = Map.FindEntities(Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 5, false);
 
                 foreach (var ent in targets)
                 {
@@ -158,60 +162,27 @@ namespace DyingAndMore.Game
                         player = actor;
                         lastController = player.Controller;
                         player.Controller = inputCtrl ?? new Entities.InputController();
-                        map.ActiveCamera.Follow = player;
+                        Map.ActiveCamera.Follow = player;
                         break;
                     }
                 }
+                return false;
             }
 #endif
 
-            var scrollDelta = InputState.ScrollDelta();
-            if (InputState.IsMod(KeyMod.Control) && scrollDelta != 0)
-            {
-                map.TimeScale += System.Math.Sign(scrollDelta) * 0.1f;
-            }
-
-            Vector2 worldMousePos = map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
-
-            Takai.Game.ParticleSpawn pspawn = new Takai.Game.ParticleSpawn()
-            {
-                type = pt1,
-                angle = new Takai.Game.Range<float>(0, MathHelper.TwoPi),
-                position = new Takai.Game.Range<Vector2>(worldMousePos),
-                count = new Takai.Game.Range<int>(3, 5),
-                lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800))
-            };
-            map.Spawn(pspawn);
-
-            map.Update(time);
+            return base.HandleInput(time);
         }
 
-        public override void Draw(GameTime time)
+        protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            Vector2 worldMousePos = map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            base.DrawSelf(spriteBatch);
+
+            Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
             if (player != null)
             {
-                var line = map.TraceLine(player.Position, player.Direction, out var hit, 1000);
-                //map.DrawLine(player.Position, player.Position + player.Direction * hit.distance, Color.White);
+                var line = Map.TraceLine(player.Position, player.Direction, out var hit, 1000);
+                //Map.DrawLine(player.Position, player.Position + player.Direction * hit.distance, Color.White);
             }
-
-            map.Draw();
-
-            sbatch.Begin(SpriteSortMode.Deferred);
-
-            //fps
-            var sFps = (1 / time.ElapsedGameTime.TotalSeconds).ToString("N2");
-            var sSz = fnt.MeasureString(sFps);
-            fnt.Draw(sbatch, sFps, new Vector2(GraphicsDevice.Viewport.Width - sSz.X - 10, GraphicsDevice.Viewport.Height - sSz.Y - 10), Color.LightSteelBlue);
-
-            var sDebugInfo =
-                $"TimeScale: {map.TimeScale:0.#}x\n" +
-                $"Map Debug: {map.debugOut}\n"
-            ;
-
-            fnt.Draw(sbatch, sDebugInfo, new Vector2(10), Color.White);
-
-            sbatch.End();
         }
     }
 }
