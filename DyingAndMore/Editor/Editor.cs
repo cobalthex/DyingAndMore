@@ -29,18 +29,12 @@ namespace DyingAndMore.Editor
         List renderSettingsConsole;
         Static fpsDisplay;
 
-        public Editor()
+        public Editor(Takai.Game.Map map)
         {
+            Map = map ?? throw new System.ArgumentNullException("There must be a map to edit");
+
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
-
-            Map = Serializer.CastType<Takai.Game.Map>(Serializer.TextDeserialize("Data/Maps/maze2.map.tk"));
-            Map.InitializeGraphics();
-            Map.ActiveCamera = new EditorCamera();
-
-            Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
-            Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
-            Map.renderSettings.drawGrids = true;
 
             var smallFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UISmall.bfnt");
             var largeFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UILarge.bfnt");
@@ -101,6 +95,16 @@ namespace DyingAndMore.Editor
 
             #endregion
 
+        }
+
+        protected override void OnMapChanged(System.EventArgs e)
+        {
+            Map.ActiveCamera = new EditorCamera();
+
+            Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
+            Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
+            Map.renderSettings.drawGrids = true;
+
             //start zoomed out to see the whole map
             var mapSize = new Vector2(Map.Width, Map.Height) * Map.TileSize;
             var xyScale = new Vector2(Takai.Runtime.GraphicsDevice.Viewport.Width - 20,
@@ -121,12 +125,10 @@ namespace DyingAndMore.Editor
         {
             if (InputState.IsPress(Keys.F1))
             {
-                Parent.ReplaceAllChildren(new Game.Game()
-                {
-                    Map = Map
-                });
+                Parent.ReplaceAllChildren(new Game.Game(Map));
                 return false;
             }
+
             if (InputState.IsPress(Keys.F2))
             {
                 ToggleRenderSettingsConsole();
