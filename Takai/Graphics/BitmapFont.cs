@@ -248,6 +248,7 @@ namespace Takai.Graphics
                     pos.X = offset.X;
                     pos.Y += lineHeight + Tracking.Y;
                     lineHeight = 0;
+                    return;
                     continue;
                 }
                 else if (ch == '`' && i + 1 < length) //colors (`RGB (hex)) and `x to end

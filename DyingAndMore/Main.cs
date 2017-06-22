@@ -132,7 +132,11 @@ namespace DyingAndMore
             box.AddChild(testAutoUi);
             box.Size = new Vector2(300, 400);
             box.BorderColor = Color.LightBlue;
-            ui = new Takai.UI.Static(new Editor.Editor());
+
+            var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(
+                Takai.Data.Serializer.TextDeserialize("Data/Maps/maze2.map.tk"));
+            map.InitializeGraphics();
+            ui = new Takai.UI.Static(new Editor.Editor(map));
             //ui.AddChild(box);
             //ui.AddChild(new Takai.UI.Graphic()
             //{

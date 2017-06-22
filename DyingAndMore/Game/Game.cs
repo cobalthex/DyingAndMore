@@ -12,8 +12,10 @@ namespace DyingAndMore.Game
         Entities.Actor player = null;
         Entities.Controller lastController = null;
 
-        public Game()
+        public Game(Takai.Game.Map map)
         {
+            Map = map ?? throw new System.ArgumentNullException("There must be a map to play");
+
             HorizontalAlignment = Takai.UI.Alignment.Stretch;
             VerticalAlignment = Takai.UI.Alignment.Stretch;
 
@@ -96,6 +98,12 @@ namespace DyingAndMore.Game
 
         protected override bool HandleInput(GameTime time)
         {
+            if (InputState.IsPress(Keys.F1))
+            {
+                Parent.ReplaceAllChildren(new Editor.Editor(Map));
+                return false;
+            }
+
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.O))
             {
                 var ofd = new System.Windows.Forms.OpenFileDialog()
