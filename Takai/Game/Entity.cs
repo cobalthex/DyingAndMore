@@ -37,7 +37,7 @@ namespace Takai.Game
 
         public bool HasFinished()
         {
-            return Sprite.HasFinished();
+            return Sprite.ElapsedTime > Sprite.TotalLength;
         }
 
         public void Start()
@@ -77,10 +77,15 @@ namespace Takai.Game
         public int Id { get; private set; } = (nextId++);
 
         /// <summary>
+        /// The type of this entity
+        /// </summary>
+        public string Class { get; set; }
+
+        /// <summary>
         /// The name of this entity. Typically used by other entities or scripts for referencing (and therefore should be unique)
         /// </summary>
         [Data.NonDesigned]
-        public string Name { get; set; } = null;
+        public string Name { get; set; }
 
         /// <summary>
         /// The current position of the entity
@@ -287,6 +292,11 @@ namespace Takai.Game
         public override int GetHashCode()
         {
             return Id;
+        }
+
+        public override string ToString()
+        {
+            return Class ?? base.ToString();
         }
     }
 }

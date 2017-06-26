@@ -1,4 +1,5 @@
 Spawner {
+    Class: "Spawner";
     MaxHealth: 1000;
     State: {
         BaseState: EntStateKey [Idle];
@@ -6,9 +7,34 @@ Spawner {
             Idle: {
                 Sprite: {
                     texture: "Textures/Entities/Spawner.png";
-                    width: 32;
-                    height: 32;
-                    origin: [16 16];
+                    Width: 64;
+                    Height: 64;
+                    origin: [32 32];
+                    ClipRect: [0 0 64 64];
+                };
+            };
+            Active: {
+                Sprite: {
+                    texture: "Textures/Entities/Spawner.png";
+                    width: 64;
+                    height: 64;
+                    origin: [32 32];
+                    ClipRect: [0 32 320 64];
+                    FrameCount: 5;
+                    FrameLength: 200;
+                    IsLooping: False;
+                };
+            };
+            Inactive: {
+                Sprite: {
+                    texture: "Textures/Entities/Spawner.png";
+                    width: 64;
+                    height: 64;
+                    origin: [32 32];
+                    ClipRect: [0 64 192 64];
+                    FrameCount: 3;
+                    FrameLength: 200;
+                    IsLooping: False;
                 };
             };
         };

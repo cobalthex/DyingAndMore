@@ -1,4 +1,5 @@
 Actor {
+    Class: "Player";
     MaxHealth: 100;
     State: {
         BaseState: EntStateKey [Idle];

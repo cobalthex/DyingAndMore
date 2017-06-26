@@ -47,6 +47,11 @@ namespace Takai.Graphics
         public TimeSpan FrameLength { get; set; } = TimeSpan.FromTicks(1);
 
         /// <summary>
+        /// The total length of this animation (FrameCount * FrameLength)
+        /// </summary>
+        public TimeSpan TotalLength => TimeSpan.FromTicks(FrameLength.Ticks * FrameCount);
+
+        /// <summary>
         /// Is the graphic looping?
         /// </summary>
         public bool IsLooping { get; set; } = false;
@@ -254,12 +259,11 @@ namespace Takai.Graphics
         /// <summary>
         /// Is the animation finished playing?
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the animation isn't looping and has completed</returns>
         public bool HasFinished()
         {
             return !IsLooping && ElapsedTime >= TimeSpan.FromTicks(FrameLength.Ticks * FrameCount);
         }
-
 
         /// <summary>
         /// (Re)start the animation

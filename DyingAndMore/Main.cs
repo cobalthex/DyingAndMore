@@ -120,13 +120,13 @@ namespace DyingAndMore
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            var smallFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>(
+            Takai.UI.Static.DefaultFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>(
                 "Fonts/UISmall.bfnt");
 
             testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
 
             var testAutoUi = Takai.UI.Static.GeneratePropSheet(
-                testAutoObj, smallFont, Color.White);
+                testAutoObj, Takai.UI.Static.DefaultFont, Color.White);
 
             var box = new Takai.UI.ScrollBox() { Position = new Vector2(100) };
             box.AddChild(testAutoUi);
@@ -134,7 +134,7 @@ namespace DyingAndMore
             box.BorderColor = Color.LightBlue;
 
             var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(
-                Takai.Data.Serializer.TextDeserialize("Data/Maps/maze2.map.tk"));
+                Takai.Data.Serializer.TextDeserialize("Data/Maps/playground.map.tk"));
             map.InitializeGraphics();
             ui = new Takai.UI.Static(new Editor.Editor(map));
             //ui.AddChild(box);
@@ -146,11 +146,21 @@ namespace DyingAndMore
             //});
 
 
-            //Takai.UI.Static.DebugFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/RCT2.bfnt");
+            var dropdown = new Takai.UI.DropdownSelect<string>();
+            dropdown.Items.Add("test 1");
+            dropdown.Items.Add("test 2");
+            dropdown.Items.Add("test 3");
+            dropdown.Items.Add("test 4");
+
+            dropdown.Size = new Vector2(100, 30);
+            dropdown.Position = new Vector2(200);
+            dropdown.SelectedIndex = 0;
+            ui.AddChild(dropdown);
 
             base.Initialize();
         }
         object testAutoObj;
+        int counter = 0;
 
         protected override void Update(GameTime gameTime)
         {

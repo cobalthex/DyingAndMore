@@ -35,7 +35,16 @@ namespace Takai.UI
         /// </summary>
         public static Graphics.BitmapFont DebugFont = null;
 
-        public static Color FocusOutlineColor = Color.RoyalBlue;
+        /// <summary>
+        /// The default font used for elements
+        /// </summary>
+        public static Graphics.BitmapFont DefaultFont = null;
+        /// <summary>
+        /// The default color used for element text
+        /// </summary>
+        public static Color DefaultColor = Color.White;
+
+        public static Color FocusedBorderColor = Color.RoyalBlue;
 
         /// <summary>
         /// A unique name for this element. Can be null
@@ -76,13 +85,13 @@ namespace Takai.UI
                 }
             }
         }
-        private Graphics.BitmapFont font;
+        private Graphics.BitmapFont font = DefaultFont;
 
         /// <summary>
         /// The color of this element. Usage varies between element types
         /// Usually applies to text color
         /// </summary>
-        public virtual Color Color { get; set; } = Color.White;
+        public virtual Color Color { get; set; } = DefaultColor;
 
         /// <summary>
         /// The color to draw the outline with, by default, transparent
@@ -397,6 +406,20 @@ namespace Takai.UI
             child.parent = this;
             children.Add(child);
             if (child.HasFocus) //re-apply throughout tree
+                child.HasFocus = true;
+            Reflow();
+        }
+
+        /// <summary>
+        /// Replace the child at a specific index
+        /// </summary>
+        /// <param name="child">the child to replace with</param>
+        /// <param name="index">the index of the child to replace. Throws if out of range</param>
+        public void ReplaceChild(Static child, int index)
+        {
+            child.parent = this;
+            children[index] = child;
+            if (child.HasFocus)
                 child.HasFocus = true;
             Reflow();
         }
@@ -900,7 +923,7 @@ namespace Takai.UI
 
             else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
             {
-                if (didPress && VisibleBounds.Contains(mouse) && Click != null)
+                if (didPress && VisibleBounds.Contains(mouse))
                 {
                     var e = new ClickEventArgs { position = (mouse - VisibleBounds.Location).ToVector2() };
                     OnClick(e);
@@ -928,7 +951,7 @@ namespace Takai.UI
                 var draw = draws.Dequeue();
 
                 draw.DrawSelf(spriteBatch);
-                Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusOutlineColor : draw.BorderColor, draw.VisibleBounds);
+                Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusedBorderColor : draw.BorderColor, draw.VisibleBounds);
 
                 if (DebugFont != null && draw.VisibleBounds.Contains(Input.InputState.MousePoint))
                 {

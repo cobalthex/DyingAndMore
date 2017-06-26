@@ -125,6 +125,8 @@ namespace DyingAndMore.Editor
         {
             if (InputState.IsPress(Keys.F1))
             {
+                modes.Mode?.End();
+
                 Parent.ReplaceAllChildren(new Game.Game(Map));
                 return false;
             }
@@ -132,6 +134,29 @@ namespace DyingAndMore.Editor
             if (InputState.IsPress(Keys.F2))
             {
                 ToggleRenderSettingsConsole();
+                return false;
+            }
+
+            if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.S))
+            {
+                using (var sfd = new System.Windows.Forms.SaveFileDialog()
+                {
+                    Filter = "Dying and More! Maps (*.map.tk)|*.map.tk",
+                    RestoreDirectory = true
+                })
+                {
+                    if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        try
+                        {
+                            Takai.Data.Serializer.TextSerialize(sfd.FileName, Map);
+                        }
+                        catch
+                        {
+                            //todo
+                        }
+                    }
+                }
                 return false;
             }
 
