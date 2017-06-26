@@ -1,4 +1,5 @@
 Actor {
+    Class: "Infected Cell";
     MaxHealth: 20;
     State: EntityStateMachine {
         BaseState: EntStateKey [Idle];

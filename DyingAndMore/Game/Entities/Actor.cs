@@ -115,12 +115,12 @@ namespace DyingAndMore.Game.Entities
             lastVelocity = Velocity;
 
             if (CurrentHealth <= 0 && !(State.Is(EntStateKey.Dying) || State.Is(EntStateKey.Dead)))
-                State.Transition(0, EntStateKey.Dying);
+                State.Transition(EntStateKey.Dying);
 
-            if (State.BaseState == EntStateKey.Dying && State.States[EntStateKey.Dying].HasFinished())
+            if (State.Is(EntStateKey.Dying) && State.States[EntStateKey.Dying].HasFinished())
             {
                 State.OverlaidStates.Clear();
-                State.Transition(0, EntStateKey.Dead);
+                State.Transition(EntStateKey.Dead);
             }
 
             base.Think(DeltaTime);

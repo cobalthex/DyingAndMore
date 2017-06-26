@@ -3,26 +3,25 @@ List {
     Direction: Direction.Vertical;
     HorizontalAlignment: Alignment.Middle;
     verticalAlignment: Alignment.Middle;
-    Children: [
-        Static {
-            Text: "No map loaded";
-            Font: "Fonts/UILarge.bfnt";
-            Color: Color.White;
-            HorizontalAlignment: Alignment.Middle;
-        }
-        Static {
-            Name: "new";
-            Text: "Press Ctrl+N to create a new map";
-            Font: @"Defs/Fonts/UISmall.fnt.tk";
-            Color: Color.White;
-            HorizontalAlignment: Alignment.Middle;
-        }
-        Static {
-            Name: "open";
-            Text: "or Ctrl+O to open a map";
-            Font: @"Defs/Fonts/UISmall.fnt.tk";
-            Color: Color.White;
-            HorizontalAlignment: Alignment.Middle;
-        }
-    ];
+
+    Static {
+        Text: "No map loaded";
+        Font: "Fonts/UILarge.bfnt";
+        Color: Color.White;
+        HorizontalAlignment: Alignment.Middle;
+    }
+    Static {
+        Name: "new";
+        Text: "Press Ctrl+N to create a new map";
+        Font: @"Defs/Fonts/UISmall.fnt.tk";
+        Color: Color.White;
+        HorizontalAlignment: Alignment.Middle;
+    }
+    Static {
+        Name: "open";
+        Text: "or Ctrl+O to open a map";
+        Font: @"Defs/Fonts/UISmall.fnt.tk";
+        Color: Color.White;
+        HorizontalAlignment: Alignment.Middle;
+    }
 }

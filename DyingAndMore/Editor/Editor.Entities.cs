@@ -20,12 +20,19 @@ namespace DyingAndMore.Editor
                 {
                     entInfo.Font = Font;
                     entInfo.Text
-                        = $"Name: {(string.IsNullOrWhiteSpace(selectedEntity.Name) ? "(No Name)" : SelectedEntity.Name)}\n"
+                        = $"`8df{BeautifyMemberName(selectedEntity.GetType().Name)}`x\n"
+                        + $"Name: {(string.IsNullOrWhiteSpace(selectedEntity.Name) ? "(No Name)" : SelectedEntity.Name)}\n"
                         + $"ID: {selectedEntity.Id}\n"
                         + $"Position: {selectedEntity.Position}\n"
-                        + $"Type: {selectedEntity.GetType().Name}\n"
                         + $"State: {selectedEntity.State}\n";
-                    //controller, faction
+
+                    if (selectedEntity is Game.Entities.Actor actor)
+                    {
+                        entInfo.Text
+                            += $"Health: {actor.CurrentHealth}/{actor.MaxHealth}\n"
+                            +  $"Faction(s): {actor.Faction}\n"
+                            +  $"Controller: {actor.Controller?.GetType().Name}\n";
+                    }
                 }
                 entInfo.AutoSize();
             }

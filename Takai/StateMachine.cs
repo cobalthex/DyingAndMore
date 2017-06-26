@@ -102,6 +102,25 @@ namespace Takai
         }
 
         /// <summary>
+        /// Transition immediately to a state
+        /// </summary>
+        /// <param name="NextState">The new state</param>
+        /// <returns>False if the state does not exist</returns>
+        public virtual bool Transition(TKey NextState)
+        {
+            if (!EqComparer.Equals(NextState, default(TKey)) && States.TryGetValue(NextState, out var next))
+            {
+                next.Start();
+                if (next.IsOverlay)
+                    OverlaidStates.Add(NextState);
+                else
+                    BaseState = NextState;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Transition from one state to another
         /// </summary>
         /// <param name="CurrentState">The current state to transition from. If Default(TKey) then NextState is added immediately</param>
@@ -129,53 +148,32 @@ namespace Takai
         List<TKey> added = new List<TKey>();
         List<TKey> removed = new List<TKey>();
 
-        void UpdateState(TKey StateKey, TimeSpan DeltaTime)
+        void UpdateState(TKey stateKey, TimeSpan deltaTime)
         {
-            var state = States[StateKey];
-            state.Update(DeltaTime);
+            var state = States[stateKey];
+            state.Update(deltaTime);
 
             if (state.HasFinished())
             {
-                if (Transitions.TryGetValue(StateKey, out var transition))
+                if (Transitions.TryGetValue(stateKey, out var transition))
                 {
                     if (EqComparer.Equals(transition, default(TKey)))
                         BaseState = default(TKey);
                     else
                         BaseState = transition;
-
-                    Transitions.Remove(StateKey);
+                    Transitions.Remove(stateKey);
                 }
-                else if (state.IsLooping)
-                    state.Start();
-                else
-                    BaseState = default(TKey);
             }
         }
 
         /// <summary>
         /// Update all of the animations
         /// </summary>
-        /// <param name="DeltaTime">How much time has passed since the last update</param>
-        public virtual void Update(TimeSpan DeltaTime)
+        /// <param name="deltaTime">How much time has passed since the last update</param>
+        public virtual void Update(TimeSpan deltaTime)
         {
             //update active state
-            var activeVal = States[BaseState];
-            activeVal.Update(DeltaTime);
-            if (activeVal.HasFinished())
-            {
-                if (Transitions.TryGetValue(BaseState, out var transition))
-                {
-                    if (transition != null)
-                        added.Add(transition);
-                    else
-
-                    Transitions.Remove(BaseState);
-                }
-                else if (activeVal.IsLooping)
-                    activeVal.Start();
-                else
-                    BaseState = default(TKey);
-            }
+            UpdateState(BaseState, deltaTime);
 
             //update overlays
             added.Clear();
@@ -183,23 +181,7 @@ namespace Takai
 
             foreach (var key in OverlaidStates)
             {
-                var overlayVal = States[key];
-                overlayVal.Update(DeltaTime);
-
-                if (overlayVal.HasFinished())
-                {
-                    if (Transitions.TryGetValue(key, out var transition))
-                    {
-                        removed.Add(key);
-                        if (transition != null)
-                            added.Add(transition);
-                        Transitions.Remove(key);
-                    }
-                    else if (overlayVal.IsLooping)
-                        overlayVal.Start();
-                    else
-                        removed.Add(key);
-                }
+                UpdateState(key, deltaTime);
             }
 
             foreach (var key in added)

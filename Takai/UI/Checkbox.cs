@@ -37,7 +37,7 @@ namespace Takai.UI
             var checkboxSize = MathHelper.Min(VirtualBounds.Width, VirtualBounds.Height);
             var checkBounds = new Rectangle(VirtualBounds.X, VirtualBounds.Y, checkboxSize, checkboxSize);
             var checkboxBounds = Rectangle.Intersect(checkBounds, VisibleBounds);
-            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusOutlineColor : CheckColor, checkboxBounds);
+            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, checkboxBounds);
             checkboxBounds.Inflate(-1, -1);
             Graphics.Primitives2D.DrawRect(spriteBatch, CheckColor, checkboxBounds);
 

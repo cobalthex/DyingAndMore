@@ -230,16 +230,13 @@ namespace Takai.Game
         /// </summary>
         /// <param name="entity">The entity to add</param>
         /// <param name="addToActive">Add this entity to the active set (defaults to true)</param>
-        public void Spawn(Entity entity, bool addToActive = true)
+        public void Spawn(Entity entity)
         {
             if (entity.Map != this && entity.Map != null)
                 entity.Map.Destroy(entity);
 
             entity.Map = this;
             entity.SpawnTime = ElapsedTime;
-
-            if (addToActive)
-                ActiveEnts.Add(entity);
 
             var sectors = GetOverlappingSectors(entity.AxisAlignedBounds);
             for (int y = sectors.Top; y < sectors.Bottom; ++y)

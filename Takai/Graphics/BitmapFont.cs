@@ -248,7 +248,6 @@ namespace Takai.Graphics
                     pos.X = offset.X;
                     pos.Y += lineHeight + Tracking.Y;
                     lineHeight = 0;
-                    return;
                     continue;
                 }
                 else if (ch == '`' && i + 1 < length) //colors (`RGB (hex)) and `x to end
@@ -263,17 +262,17 @@ namespace Takai.Graphics
                     else if (i + 3 < text.Length)
                     {
                         int[] col = new int[3];
-                        ; for (int j = 0; j < 3; ++j)
+                        for (int j = 0; j < 3; ++j)
                         {
-                            char cch = text[j + i + start + 1];
-                            if (cch >= 'a' && cch <= 'f')
+                            char cch = text[i + j + 1];
+                            if (cch >= '0' && cch <= '9')
+                                col[j] = (cch - '0');
+                            else if (cch >= 'a' && cch <= 'f')
                                 col[j] = 10 + (cch - 'a');
                             else if (cch >= 'A' && cch <= 'F')
                                 col[j] = 10 + (cch - 'A');
-                            else if (cch >= '0' && cch <= '9')
-                                col[j] = (cch - '0');
                         }
-                        curColor = new Color(col[0] << 3, col[1] << 3, col[2] << 3);
+                        curColor = new Color(col[0] << 4, col[1] << 4, col[2] << 4);
                         i += 3;
                         length += 4;
                         continue;

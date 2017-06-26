@@ -148,7 +148,10 @@ namespace Takai.Game
                         continue;
 
                     if (ent.State.BaseState == EntStateKey.Invalid)
+                    {
                         Destroy(ent);
+                        continue;
+                    }
 
                     if (updateSettings.isAiEnabled)
                         ent.Think(deltaTime);
