@@ -1,8 +1,6 @@
 Map {
     Name: "zilgo";
     TileSize: 48;
-    Width: 16;
-    Height: 16;
     ActiveCamera: Camera {
         PostEffect: Null;
         Viewport: [0 0 1280 800];

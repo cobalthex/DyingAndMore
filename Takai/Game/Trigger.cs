@@ -20,7 +20,7 @@ namespace Takai.Game
         /// <summary>
         /// Entities currently inside this trigger region
         /// </summary>
-        internal HashSet<Entity> ContainedEntities { get; set; } = new HashSet<Entity>();
+        internal HashSet<EntityClass> ContainedEntities { get; set; } = new HashSet<EntityClass>();
 
         public Trigger()
         {
@@ -38,7 +38,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="entity">The entity to check</param>
         /// <returns>True if the entity is colliding with this trigger region</returns>
-        public bool Contains(Entity entity)
+        public bool Contains(EntityClass entity)
         {
             return ContainedEntities.Contains(entity);
         }

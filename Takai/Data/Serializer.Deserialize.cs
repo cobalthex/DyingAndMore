@@ -93,12 +93,6 @@ namespace Takai.Data
                 return TextDeserializeAll(reader);
         }
 
-        public static object TextDeserialize(string file)
-        {
-            using (var reader = new StreamReader(file))
-                return TextDeserialize(reader);
-        }
-
         /// <summary>
         /// Read all objects from the file
         /// </summary>
@@ -111,6 +105,23 @@ namespace Takai.Data
                 objects.Add(TextDeserialize(reader));
 
             return objects;
+        }
+
+        public static T TextDeserialize<T>(string file, bool strict = true)
+        {
+            using (var reader = new StreamReader(file))
+                return CastType<T>(TextDeserialize(reader), strict);
+        }
+
+        public static object TextDeserialize(string file)
+        {
+            using (var reader = new StreamReader(file))
+                return TextDeserialize(reader);
+        }
+
+        public static T TextDeserialize<T>(StreamReader reader, bool strict = true)
+        {
+            return CastType<T>(TextDeserialize(reader), strict);
         }
 
         /// <summary>
@@ -213,7 +224,7 @@ namespace Takai.Data
             {
                 reader.Read();
                 var file = ReadString(reader);
-                var reference = TextDeserialize(file); //todo: make generic based on file type
+                var reference = TextDeserialize(file);
                 return reference;
             }
 

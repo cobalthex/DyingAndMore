@@ -17,7 +17,7 @@ namespace Takai.Game
         /// </summary>
         [Data.Serializer.Ignored]
         public Map Map { get; set; }
-        
+
         public Script(string name)
         {
             Name = name;
@@ -28,6 +28,6 @@ namespace Takai.Game
         /// </summary>
         /// <param name="deltaTime">The game's delta time</param>
         /// <param name="context">An optional entity that is passed in to provide context for various scripts (A trigger would pass the colliding entity in here)</param>
-        public abstract void Step(TimeSpan deltaTime, Entity context = null);
+        public abstract void Step(TimeSpan deltaTime, EntityInstance context = null);
     }
 }

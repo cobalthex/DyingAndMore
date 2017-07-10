@@ -13,7 +13,7 @@
     <AssemblyName>DyingAndMore</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -66,34 +66,24 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
     <Compile Include="Editor\Editor.Triggers.cs" />
-    <Compile Include="Editor\Editor.Groups.cs" />
     <Compile Include="Editor\Editor.Paths.cs" />
     <Compile Include="Editor\Editor.Tiles.cs" />
     <Compile Include="Editor\Editor.cs" />
     <Compile Include="Editor\EditorCamera.cs" />
-    <Compile Include="Editor\Selectors\EntSelector.cs" />
     <Compile Include="Editor\Selectors\FluidSelector.cs" />
-    <None Include="Editor\Editor.old.cs" />
     <Compile Include="Editor\Selectors\DecalSelector.cs" />
     <Compile Include="Editor\ModeSelector.cs" />
     <Compile Include="Editor\Selectors\Selector.cs" />
     <Compile Include="Editor\Selectors\TileSelector.cs" />
     <Compile Include="Game\Entities\AIController.cs" />
-    <Compile Include="Game\Entities\Control.cs" />
     <Compile Include="Game\Entities\Controller.cs" />
-    <Compile Include="Game\Entities\Device.cs" />
     <Compile Include="Game\Entities\InputController.cs" />
-    <Compile Include="Game\Entities\Spawner.cs" />
     <Compile Include="Game\Scripts\TestScript.cs" />
-    <Compile Include="Game\Weapons\BlobGun.cs" />
-    <Compile Include="Game\Weapons\Gun.cs" />
     <Compile Include="Game\Weapons\Weapon.cs" />
     <Compile Include="Game\Entities\Actor.cs" />
-    <Compile Include="Game\Entities\Projectile.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -131,6 +121,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <Compile Include="Editor\Editor.Entities.cs" />
+    <Compile Include="Editor\Selectors\EntSelector.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -7,19 +7,22 @@ namespace Takai.Game
     /// <summary>
     /// All of the possible entity states
     /// </summary>
-    public enum EntStateKey
+    public enum EntStateId
     {
         Invalid,
         Dead,
         Idle,
-        Dying,
         Inactive,
         Active,
     }
 
     public class EntState : IState
     {
-        public Takai.Graphics.Sprite Sprite { get; set; }
+        public Graphics.Sprite Sprite { get; set; }
+
+        //todo: cache
+        public float Radius =>
+            Sprite != null ? MathHelper.Max(Sprite.Width, Sprite.Height) / 2 : 1;
 
         public bool IsLooping
         {
@@ -58,99 +61,22 @@ namespace Takai.Game
         }
     }
 
-    public class EntityStateMachine : StateMachine<EntStateKey, EntState> { }
-
     /// <summary>
-    /// The basic entity. All actors and objects inherit from this
+    /// Describes a single type of entity. Actors, etc. inherit from this
     /// </summary>
     [Data.DesignerCreatable]
-    public class Entity : ICloneable
+    public abstract class EntityClass
     {
-        private static int nextId = 1; //generator for the unique (runtime) IDs
-
-        /// <summary>
-        /// A unique ID for each entity
-        /// Generated at runtime
-        /// Primarily used for debugging
-        /// </summary>
-        [Data.Serializer.Ignored]
-        public int Id { get; private set; } = (nextId++);
-
-        /// <summary>
-        /// The type of this entity
-        /// </summary>
-        public string Class { get; set; }
-
         /// <summary>
         /// The name of this entity. Typically used by other entities or scripts for referencing (and therefore should be unique)
         /// </summary>
-        [Data.NonDesigned]
         public string Name { get; set; }
-
-        /// <summary>
-        /// The current position of the entity
-        /// </summary>
-        [Data.NonDesigned]
-        public virtual Vector2 Position { get; set; }
-        /// <summary>
-        /// The (normalized) direction the entity is facing
-        /// </summary>
-        /// <remarks>This vector should always be normalized</remarks>
-        [Data.NonDesigned]
-        public virtual Vector2 Direction { get; set; } = Vector2.UnitX;
-        /// <summary>
-        /// The direction the entity is moving
-        /// </summary>
-        [Data.NonDesigned]
-        public virtual Vector2 Velocity { get; set; } = Vector2.Zero;
-
-        /// <summary>
-        /// The map the entity is in, null if none
-        /// </summary>
-        [Data.Serializer.Ignored]
-        public Map Map { get; internal set; } = null;
-
-        /// <summary>
-        /// Determines if the entity is thinking
-        /// </summary>
-        public bool IsAlive { get; set; } = true;
 
         /// <summary>
         /// Determines if this entity is always part of the active set and therefore always updated
         /// </summary>
         /// <remarks>This is typically used for things like projectiles</remarks>
         public bool AlwaysActive { get; set; } = false;
-
-        /// <summary>
-        /// The radius of this entity. Used mainly for broad-phase collision
-        /// </summary>
-        public float Radius
-        {
-            get
-            {
-                return radius;
-            }
-            set
-            {
-                radius = value;
-                RadiusSq = value * value;
-            }
-        }
-        [Data.Serializer.Ignored]
-        public float RadiusSq { get; private set; }
-        private float radius = 1;
-
-        /// <summary>
-        /// the axis aligned bounding box of this entity, based on radius
-        /// </summary>
-        [Data.Serializer.Ignored]
-        public Rectangle AxisAlignedBounds
-        {
-            get
-            {
-                return new Rectangle((int)Position.X, (int)Position.Y, (int)Radius, (int)Radius);
-            }
-        }
 
         /// <summary>
         /// On collision, should this entity try to 'uncollide' with the entity
@@ -164,17 +90,107 @@ namespace Takai.Game
         public bool IgnoreTrace { get; set; } = false;
 
         /// <summary>
-        /// Defines the entity's available and active state and handles transitions. Primarily for tracking actions
+        /// All of this entity's available states
+        public Dictionary<EntStateId, EntState> States { get; set; }
+
+        /// <summary>
+        /// Destroy the sprite if it is dead and the animation is finished
         /// </summary>
-        /// <remarks>
-        /// If State.Dead:
-        ///     Entity will be removed if IsLooping is false (or if DestroyOffScreenIsDead applies)
-        /// </remarks>
-        public EntityStateMachine State { get; set; } = new EntityStateMachine();
+        public bool DestroyIfDead { get; set; }
+
+        /// <summary>
+        /// Destroy this entity if it goes off screen (becomes inactive) and is dead
+        /// </summary>
+        public bool DestroyIfDeadAndInactive { get; set; }
+
+        /// <summary>
+        /// Should the sprite always be drawn with the original sprite orientation?
+        /// </summary>
+        public bool AlwaysDrawUpright { get; set; } = false;
+
+        public EntityClass() { }
+
+        public abstract EntityInstance Create();
+
+        public override string ToString()
+        {
+            return (Name ?? base.ToString());
+        }
+    }
+
+    /// <summary>
+    /// A single instance of an entity in a map. Mostly logic handled through <see cref="EntityClass"/>
+    /// </summary>
+    public abstract class EntityInstance
+    {
+        private static int nextId = 1; //generator for the unique (runtime) IDs
+
+        /// <summary>
+        /// A unique ID for each entity
+        /// Generated at runtime
+        /// Primarily used for debugging
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public int Id { get; private set; } = (nextId++);
+
+        public float Radius => State.States.TryGetValue(State.BaseState, out var state) ? state.Radius : 1; //todo: aggregate all sprites + cache
+        public float RadiusSq => Radius * Radius; //todo: cache
+
+        /// <summary>
+        /// The class that this instance inherits from
+        /// </summary>
+        public virtual EntityClass Class
+        {
+            get => _class;
+            set
+            {
+                _class = value;
+                State.States = value.States;
+            }
+        }
+        private EntityClass _class;
+
+        /// <summary>
+        /// A name for this instance, should be unique
+        /// </summary>
+        public string Name { get; set; } = null;
+
+        /// <summary>
+        /// The current position of the entity
+        /// </summary>
+        public Vector2 Position { get; set; }
+        /// <summary>
+        /// The (normalized) direction the entity is facing
+        /// </summary>
+        /// <remarks>This vector should always be normalized</remarks>
+        public Vector2 Direction { get; set; } = Vector2.UnitX;
+
+        /// <summary>
+        /// the axis aligned bounding box of this entity, based on radius
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public Rectangle AxisAlignedBounds
+        {
+            get
+            {
+                return new Rectangle(
+                    (int)Position.X - (int)Radius,
+                    (int)Position.Y - (int)Radius,
+                    (int)Radius * 2,
+                    (int)Radius * 2
+                );
+            }
+        }
+
+        public StateMachine<EntStateId, EntState> State { get; set; } = new StateMachine<EntStateId, EntState>()
+        {
+            BaseState = EntStateId.Idle
+        };
 
         /// <summary>
         /// Enumerate through active sprites for this entity
         /// </summary>
+        [Data.Serializer.Ignored]
         public IEnumerable<Graphics.Sprite> Sprites
         {
             get
@@ -191,25 +207,19 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Destroy this entity if it goes off screen (becomes inactive) and is dead
-        /// </summary>
-        public bool DestroyIfDeadAndInactive { get; set; }
-
-        /// <summary>
-        /// Should the sprite always be drawn with the original sprite orientation?
-        /// </summary>
-        public bool AlwaysDrawUpright { get; set; } = false;
-
-        /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
-        [Data.NonDesigned]
         public Color OutlineColor { get; set; } = Color.Transparent;
+
+        /// <summary>
+        /// The map the entity is in
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public Map Map { get; internal set; } = null;
 
         /// <summary>
         /// When this entity was last spawned (in map time). Zero if destroyed or not spawned
         /// </summary>
-        [Data.NonDesigned]
         public TimeSpan SpawnTime { get; set; } = TimeSpan.Zero;
 
         /// <summary>
@@ -218,36 +228,36 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public Group Group
         {
-            get { return group; }
+            get { return _group; }
             set
             {
-                if (group != null)
-                    group.Entities.Remove(this);
+                _group = value;
+                //if (group != null)
+                //    group.Entities.Remove(this);
 
-                group = value;
+                //group = value;
 
-                if (group != null)
-                    group.Entities.Add(this);
+                //if (group != null)
+                //    group.Entities.Add(this);
+
+                throw new NotImplementedException();
             }
         }
-        private Group group;
+        private Group _group;
 
-        public Entity() { }
-
-        /// <summary>
-        /// Clone this entity
-        /// </summary>
-        /// <returns>A cloned entity</returns>
-        /// <remarks>Map information is not cloned</remarks>
-        public virtual object Clone()
+        public override bool Equals(object obj)
         {
-            var cloned = (Entity)MemberwiseClone();
+            return obj is EntityInstance ent && ent.Id == Id;
+        }
 
-            cloned.Id = (nextId++);
-            cloned.Map = null;
-            cloned.State = (EntityStateMachine)State.Clone();
+        public override int GetHashCode()
+        {
+            return Id;
+        }
 
-            return cloned;
+        public override string ToString()
+        {
+            return (Class?.Name ?? base.ToString()) + $"({Id})";
         }
 
         /// <summary>
@@ -256,24 +266,24 @@ namespace Takai.Game
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void Think(System.TimeSpan DeltaTime)
         {
-            State.Update(DeltaTime);
+            //State.Update(DeltaTime);
         }
 
         /// <summary>
-        /// Called when the entity is spawned. Also called on deserialization
+        /// Called when this instance is spawned. Also called on deserialization
         /// </summary>
         public virtual void OnSpawn() { }
         /// <summary>
-        /// Called when the entity is marked for deletion
+        /// Called when this instance is marked for deletion
         /// </summary>
         public virtual void OnDestroy() { }
 
         /// <summary>
-        /// Called when there is a collision between this entity and another entity
+        /// Called when there is a collision between this instance and another
         /// </summary>
-        /// <param name="Collider">The entity collided with</param>
+        /// <param name="Collider">The instance collided with</param>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void OnEntityCollision(Entity Collider, Vector2 Point, TimeSpan DeltaTime) { }
+        public virtual void OnEntityCollision(EntityInstance Collider, Vector2 Point, TimeSpan DeltaTime) { }
 
         /// <summary>
         /// Called when there is a collision between this entity and the map
@@ -288,15 +298,7 @@ namespace Takai.Game
         /// <param name="Type">The type of Fluid collided with</param>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void OnFluidCollision(FluidType Type, TimeSpan DeltaTime) { }
-
-        public override int GetHashCode()
-        {
-            return Id;
-        }
-
-        public override string ToString()
-        {
-            return Class ?? base.ToString();
-        }
     }
 }
+
+//todo: come up with shorter names (EntityClass + Entity?)

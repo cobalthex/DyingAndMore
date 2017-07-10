@@ -126,7 +126,7 @@ namespace Takai.Game
         /// </summary>
         struct MapState
         {
-            public List<Entity> entities;
+            public List<EntityInstance> entities;
             public List<FluidType> FluidTypes;
             public List<FluidSave> Fluids;
 
@@ -135,7 +135,7 @@ namespace Takai.Game
 
             public MapState(Map Map)
             {
-                entities = new List<Entity>(Map.AllEntities);
+                entities = new List<EntityInstance>(Map.AllEntities);
                 FluidTypes = new List<FluidType>();
                 Fluids = new List<FluidSave>();
                 elapsedTime = Map.ElapsedTime;

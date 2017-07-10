@@ -11,7 +11,7 @@ namespace Takai.Game
     public class MapSector
     {
         //dynamic
-        public HashSet<Entity> entities = new HashSet<Entity>();
+        public HashSet<EntityInstance> entities = new HashSet<EntityInstance>();
 
         //static
         public List<Fluid> Fluids = new List<Fluid>();
@@ -66,11 +66,13 @@ namespace Takai.Game
         /// <summary>
         /// The horizontal size of the map in tiles
         /// </summary>
-        public int Width { get; set; }
+        [Data.Serializer.Ignored]
+        public int Width => Tiles.GetLength(1);
         /// <summary>
         /// The vertical size of the map in tiles
         /// </summary>
-        public int Height { get; set; }
+        [Data.Serializer.Ignored]
+        public int Height => Tiles.GetLength(0);
 
         public const int SectorSize = 4; //The number of tiles in a map sector
         [Data.Serializer.Ignored]
@@ -110,7 +112,7 @@ namespace Takai.Game
         /// Automatically updated as the view changes
         /// </summary>
         [Data.Serializer.Ignored]
-        public HashSet<Entity> ActiveEnts { get; protected set; } = new HashSet<Entity>();
+        public HashSet<EntityInstance> ActiveEnts { get; protected set; } = new HashSet<EntityInstance>();
         /// <summary>
         /// The list of live Fluids. Once the Fluids' velocity is zero, they are removed from this and not re-added
         /// </summary>
@@ -135,10 +137,12 @@ namespace Takai.Game
         /// An enumerable list of all entities, entities must be added through Spawn()
         /// </summary>
         [Data.Serializer.Ignored]
-        public IEnumerable<Entity> AllEntities
+        public IEnumerable<EntityInstance> AllEntities
         {
             get
             {
+                throw new System.Exception("see todo");
+                //todo: this is not unique
                 foreach (var sector in Sectors)
                 {
                     foreach (var ent in sector.entities)
@@ -150,6 +154,32 @@ namespace Takai.Game
         public Camera ActiveCamera { get; set; }
 
         public Map() { }
+
+        /// <summary>
+        /// Resize the map
+        /// Any entities/blobs/decals/etc that are in a area of the map that is removed may be deleted
+        /// </summary>
+        /// <param name="newWidth">the new width of the map</param>
+        /// <param name="newHeight">the new height of the map</param>
+        public void Resize(int newWidth, int newHeight)
+        {
+            System.Diagnostics.Contracts.Contract.Requires(newWidth > 0);
+            System.Diagnostics.Contracts.Contract.Requires(newHeight > 0);
+
+            //todo: make width/height/tiles private
+
+            Tiles = Tiles.Resize(newHeight, newWidth);
+            Sectors = Sectors.Resize((newHeight - 1) / SectorSize + 1, (newWidth - 1) / SectorSize + 1);
+
+            for (int y = 0; y < Sectors.GetLength(0); ++y)
+            {
+                for (int x = 0; x < Sectors.GetLength(1); ++x)
+                {
+                    if (Sectors[y, x] == null)
+                        Sectors[y, x] = new MapSector();
+                }
+            }
+        }
 
         /// <summary>
         /// Add an event handler
@@ -226,75 +256,36 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Adds an existing entity to the map
+        /// Adds an existing instance to the map
         /// </summary>
-        /// <param name="entity">The entity to add</param>
-        /// <param name="addToActive">Add this entity to the active set (defaults to true)</param>
-        public void Spawn(Entity entity)
+        /// <param name="instance">The instance to add</param>
+        public void Spawn(EntityInstance instance)
         {
-            if (entity.Map != this && entity.Map != null)
-                entity.Map.Destroy(entity);
+            if (instance.Map != this && instance.Map != null)
+                instance.Map.Destroy(instance);
 
-            entity.Map = this;
-            entity.SpawnTime = ElapsedTime;
+            instance.Map = this;
+            instance.SpawnTime = ElapsedTime;
 
-            var sectors = GetOverlappingSectors(entity.AxisAlignedBounds);
+            var sectors = GetOverlappingSectors(instance.AxisAlignedBounds);
             for (int y = sectors.Top; y < sectors.Bottom; ++y)
             {
                 for (int x = sectors.Left; x < sectors.Right; ++x)
-                    Sectors[y, x].entities.Add(entity);
+                    Sectors[y, x].entities.Add(instance);
             }
 
             ++TotalEntitiesCount;
         }
 
-        /// <summary>
-        /// Spawn an entity in the map
-        /// </summary>
-        /// <typeparam name="TEntity">The type of entity to spawn</typeparam>
-        /// <param name="position">Where to spawn the entity</param>
-        /// <param name="direction">The direction the entity should face</param>
-        /// <param name="velocity">The entity's initial velocity</param>
-        /// <param name="LoadEntity">Should the entity be loaded, defaults to true</param>
-        /// <returns>The entity spawned</returns>
-        public TEntity Spawn<TEntity>(Vector2 position, Vector2 direction, Vector2 velocity) where TEntity : Entity, new()
+        public EntityInstance Spawn(EntityClass @class, Vector2 position, Vector2 direction)
         {
-            var ent = new TEntity()
-            {
-                Map = this,
-                SpawnTime = ElapsedTime,
+            var instance = @class.Create();
 
-                Position = position,
-                Direction = direction,
-                Velocity = velocity
-            };
-            Spawn(ent);
-            return ent;
-        }
+            instance.Position = position;
+            instance.Direction = direction;
 
-        /// <summary>
-        /// Spawn an entity, cloning another
-        /// </summary>
-        /// <param name="template">The entity to clone</param>
-        /// <param name="position">Where to spawn the entity</param>
-        /// <param name="direction">The direction the entity should face</param>
-        /// <param name="velocity">The entity's initial velocity</param>
-        /// <param name="LoadEntity">Should the entity be loaded, defaults to true</param>
-        /// <returns>The new entity spawned</returns>
-        public TEntity Spawn<TEntity>(TEntity template, Vector2 position, Vector2 direction, Vector2 velocity) where TEntity : Entity, new()
-        {
-            var ent = (TEntity)template.Clone();
-
-            ent.Map = this;
-            ent.SpawnTime = ElapsedTime;
-            ent.OnSpawn();
-
-            ent.Position = position;
-            ent.Direction = direction;
-            ent.Velocity = velocity;
-
-            Spawn(ent);
-            return ent;
+            Spawn(instance);
+            return instance;
         }
 
         /// <summary>
@@ -415,9 +406,9 @@ namespace Takai.Game
         /// Remove an entity from the map.
         /// ent.OnDestroy() is called when the ent is actually removed from the map
         /// </summary>
-        /// <param name="ent">The entity to remove</param>
+        /// <param name="ent">The instance to remove</param>
         /// <remarks>Will be marked for removal to be removed during the next Update cycle</remarks>
-        public void Destroy(Entity ent)
+        public void Destroy(EntityInstance ent)
         {
             entsToDestroy.Add(ent);
         }

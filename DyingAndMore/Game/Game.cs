@@ -9,8 +9,22 @@ namespace DyingAndMore.Game
 {
     class Game : Takai.UI.MapView
     {
-        Entities.Actor player = null;
+        Entities.ActorInstance player = null;
         Entities.Controller lastController = null;
+
+        Takai.UI.Static renderSettingsConsole;
+        void ToggleRenderSettingsConsole()
+        {
+            if (!renderSettingsConsole.RemoveFromParent())
+            {
+                //refresh individual render settings
+                var settings = typeof(Takai.Game.Map.RenderSettings);
+                foreach (var child in renderSettingsConsole.Children)
+                    ((Takai.UI.CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
+
+                AddChild(renderSettingsConsole);
+            }
+        }
 
         public Game(Takai.Game.Map map)
         {
@@ -22,10 +36,10 @@ namespace DyingAndMore.Game
             pt1 = new Takai.Game.ParticleType()
             {
                 Graphic = new Takai.Graphics.Sprite(
-                    Takai.AssetManager.Load<Texture2D>("Textures/Particles/Trail.png"),
-                    8,
-                    8,
-                    1,
+                    Takai.AssetManager.Load<Texture2D>("Textures/Particles/Blood.png"),
+                    10,
+                    10,
+                    6,
                     System.TimeSpan.FromMilliseconds(100),
                     Takai.Graphics.TweenStyle.Sequential,
                     true
@@ -38,29 +52,31 @@ namespace DyingAndMore.Game
             curve.Keys.Add(new CurveKey(1, 1));
 
             pt1.BlendMode = BlendState.AlphaBlend;
-            pt1.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Red);
+            pt1.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Aquamarine);
             pt1.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 2);
             pt1.Speed = new Takai.Game.ValueCurve<float>(curve, 100, 0);
 
-            if (player?.PrimaryWeapon is Weapons.Gun wpn)
-            {
-                wpn.Speed = 0;
-            }
+            map.renderSettings |= Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
+
+            //renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
+            renderSettingsConsole = new Takai.UI.Static();
+            renderSettingsConsole.Position = new Vector2(100, 0);
+            renderSettingsConsole.VerticalAlignment = Takai.UI.Alignment.Middle;
         }
         Takai.Game.ParticleType pt1, pt2;
 
         protected override void OnMapChanged(System.EventArgs e)
         {
             Map.updateSettings = Takai.Game.MapUpdateSettings.Game;
-            Map.renderSettings.drawBordersAroundNonDrawingEntities = false;
-            Map.renderSettings.drawGrids = false;
-            Map.renderSettings.drawTriggers = false;
+            Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
+            Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawGrids;
+            Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawTriggers;
 
-            var plyr = from ent in Map.FindEntitiesByType<Entities.Actor>(true)
-                       where ((Entities.Actor)ent).Faction == Entities.Factions.Player
-                       select ent;
+            //var plyr = from ent in Map.FindEntitiesByClass(true)
+            //           where ((Entities.Actor)ent).Faction == Entities.Factions.Player
+            //           select ent;
+            //player = plyr.FirstOrDefault() as Entities.Actor;
 
-            player = plyr.FirstOrDefault() as Entities.Actor;
             Map.ActiveCamera = new Takai.Game.Camera(player);
 
             var testScript = new Scripts.TestScript()
@@ -101,6 +117,12 @@ namespace DyingAndMore.Game
             if (InputState.IsPress(Keys.F1))
             {
                 Parent.ReplaceAllChildren(new Editor.Editor(Map));
+                return false;
+            }
+
+            if (InputState.IsPress(Keys.F2))
+            {
+                ToggleRenderSettingsConsole();
                 return false;
             }
 
@@ -158,21 +180,21 @@ namespace DyingAndMore.Game
 
                 foreach (var ent in targets)
                 {
-                    if (ent is Entities.Actor actor)
-                    {
-                        Entities.Controller inputCtrl = null;
-                        if (player != null)
-                        {
-                            inputCtrl = player.Controller;
-                            player.Controller = lastController;
-                        }
+                    //if (ent is Entities.ActorInstance actor)
+                    //{
+                    //    Entities.Controller inputCtrl = null;
+                    //    if (player != null)
+                    //    {
+                    //        inputCtrl = player.Controller;
+                    //        player.Controller = lastController;
+                    //    }
 
-                        player = actor;
-                        lastController = player.Controller;
-                        player.Controller = inputCtrl ?? new Entities.InputController();
-                        Map.ActiveCamera.Follow = player;
-                        break;
-                    }
+                    //    player = actor;
+                    //    lastController = player.Controller;
+                    //    player.Controller = inputCtrl ?? new Entities.InputController();
+                    //    Map.ActiveCamera.Follow = player;
+                    //    break;
+                    //}
                 }
                 return false;
             }

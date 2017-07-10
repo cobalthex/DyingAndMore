@@ -21,11 +21,6 @@ namespace DyingAndMore.Game.Entities
 
             actor.Move(d);
 
-            if (actor.PrimaryWeapon != null && Takai.Input.InputState.IsButtonDown(Takai.Input.MouseButtons.Left))
-                actor.PrimaryWeapon.Fire(actor.Map.ElapsedTime, actor);
-            if (actor.AltWeapon != null && Takai.Input.InputState.IsButtonDown(Takai.Input.MouseButtons.Right))
-                actor.AltWeapon.Fire(actor.Map.ElapsedTime, actor);
-
             var dir = Takai.Input.InputState.PolarMouseVector;
             dir.Normalize();
             actor.Direction = dir;

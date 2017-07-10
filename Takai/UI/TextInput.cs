@@ -344,7 +344,7 @@ namespace Takai.UI
                 );
 
                 DrawText(spriteBatch,
-                    new Point(-ScrollPosition, (int)(Size.Y - textSize.Y) / 2));
+                    new Point(-ScrollPosition + 2, (int)(Size.Y - textSize.Y) / 2));
 
                 var tickCount = System.Environment.TickCount;
                 if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))

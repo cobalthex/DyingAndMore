@@ -10,7 +10,7 @@ List {
     Margin: 10;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
-    Children: [;
+    Children: [
         Static {
             Text: "Create a New Map";
             Font: "Fonts/UILarge.bfnt";

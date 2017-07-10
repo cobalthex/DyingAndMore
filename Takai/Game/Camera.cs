@@ -92,13 +92,12 @@ namespace Takai.Game
         }
 
         //todo: camera viewport, transformed
-        //todo: use map get visible sectors in render calculation
 
         /// <summary>
         /// An entity to follow
         /// </summary>
         [Data.NonDesigned]
-        public Entity Follow { get; set; } = null;
+        public EntityInstance Follow { get; set; } = null;
 
         /// <summary>
         /// A transformation matrix passed to the map renderer
@@ -121,7 +120,7 @@ namespace Takai.Game
 
         public Camera() { }
 
-        public Camera(Entity follow = null)
+        public Camera(EntityInstance follow = null)
         {
             Follow = follow;
             if (Follow != null)

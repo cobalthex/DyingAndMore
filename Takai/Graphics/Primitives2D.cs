@@ -7,70 +7,82 @@ namespace Takai.Graphics
     {
         private static Texture2D _pixel;
 
-        private static void Init(GraphicsDevice GDev)
+        private static void Init(GraphicsDevice device)
         {
-            _pixel = new Texture2D(GDev, 1, 1);
+            _pixel = new Texture2D(device, 1, 1);
             _pixel.SetData<Color>(new[] { Color.White });
         }
 
         /// <summary>
         /// Draw one or more lines (one pixel width)
         /// </summary>
-        /// <param name="SpriteBatch">The sprite batch to use</param>
-        /// <param name="Color">The color of the line</param>
-        /// <param name="Points">The verticies of the line, if there are less than 2 points, no line is drawn</param>
-        public static void DrawLine(SpriteBatch SpriteBatch, Color Color, params Vector2[] Points)
+        /// <param name="spriteBatch">The sprite batch to use</param>
+        /// <param name="color">The color of the line</param>
+        /// <param name="points">The verticies of the line, if there are less than 2 points, no line is drawn</param>
+        public static void DrawLine(SpriteBatch spriteBatch, Color color, params Vector2[] points)
         {
             if (_pixel == null)
-                Init(SpriteBatch.GraphicsDevice);
+                Init(spriteBatch.GraphicsDevice);
 
-            for (int i = 0; i < Points.Length - 1; ++i)
+            for (int i = 0; i < points.Length - 1; ++i)
             {
-                float angle = (float)System.Math.Atan2(Points[i + 1].Y - Points[i].Y, Points[i + 1].X - Points[i].X);
-                float length = (Points[i + 1] - Points[i]).Length();
+                float angle = (float)System.Math.Atan2(points[i + 1].Y - points[i].Y, points[i + 1].X - points[i].X);
+                float length = (points[i + 1] - points[i]).Length();
 
-                SpriteBatch.Draw(_pixel, Points[i], null, Color, angle, Vector2.Zero, new Vector2(length, 1), SpriteEffects.None, 0);
+                spriteBatch.Draw(_pixel, points[i], null, color, angle, Vector2.Zero, new Vector2(length, 1), SpriteEffects.None, 0);
             }
         }
 
         /// <summary>
         /// Draw a single pixel dot
         /// </summary>
-        /// <param name="SpriteBatch">The Spritebatch to use</param>
-        /// <param name="Color">The color of the dot</param>
-        /// <param name="Point">The point to draw the dot at</param>
-        public static void DrawDot(SpriteBatch SpriteBatch, Color Color, Vector2 Point)
+        /// <param name="spriteBatch">The Spritebatch to use</param>
+        /// <param name="color">The color of the dot</param>
+        /// <param name="point">The point to draw the dot at</param>
+        public static void DrawDot(SpriteBatch spriteBatch, Color color, Vector2 point)
         {
             if (_pixel == null)
-                Init(SpriteBatch.GraphicsDevice);
+                Init(spriteBatch.GraphicsDevice);
 
-            SpriteBatch.Draw(_pixel, Point, Color);
+            spriteBatch.Draw(_pixel, point, color);
         }
 
         /// <summary>
         /// Draw a rectangle
         /// </summary>
-        /// <param name="SpriteBatch">The sprite batch to use</param>
-        /// <param name="Color">The color of the lines</param>
-        /// <param name="Rectangle">The rectangle to draw</param>
-        public static void DrawRect(SpriteBatch SpriteBatch, Color Color, Rectangle Rectangle)
+        /// <param name="spriteBatch">The sprite batch to use</param>
+        /// <param name="color">The color of the lines</param>
+        /// <param name="rectangle">The rectangle to draw</param>
+        public static void DrawRect(SpriteBatch spriteBatch, Color color, Rectangle rectangle)
         {
-            DrawLine(SpriteBatch, Color, new Vector2(Rectangle.X, Rectangle.Y), new Vector2(Rectangle.X + Rectangle.Width, Rectangle.Y),
-                new Vector2(Rectangle.X + Rectangle.Width, Rectangle.Y + Rectangle.Height), new Vector2(Rectangle.X, Rectangle.Y + Rectangle.Height), new Vector2(Rectangle.X, Rectangle.Y));
+            DrawLine(spriteBatch, color, new Vector2(rectangle.X, rectangle.Y), new Vector2(rectangle.X + rectangle.Width, rectangle.Y),
+                new Vector2(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height), new Vector2(rectangle.X, rectangle.Y + rectangle.Height), new Vector2(rectangle.X, rectangle.Y));
         }
 
         /// <summary>
         /// Draw a filled rectangle
         /// </summary>
-        /// <param name="SpriteBatch">The sprite batch to use</param>
-        /// <param name="Color">The color of the region</param>
-        /// <param name="Rectangle">The rectangle of the filled region</param>
-        public static void DrawFill(SpriteBatch SpriteBatch, Color Color, Rectangle Rectangle)
+        /// <param name="spriteBatch">The sprite batch to use</param>
+        /// <param name="color">The color of the region</param>
+        /// <param name="rectangle">The rectangle of the filled region</param>
+        public static void DrawFill(SpriteBatch spriteBatch, Color color, Rectangle rectangle)
         {
             if (_pixel == null)
-                Init(SpriteBatch.GraphicsDevice);
+                Init(spriteBatch.GraphicsDevice);
 
-            SpriteBatch.Draw(_pixel, Rectangle, Color);
+            spriteBatch.Draw(_pixel, rectangle, color);
+        }
+
+        public static void DrawX(SpriteBatch spriteBatch, Color color, Rectangle bounds)
+        {
+            var a = bounds.Location.ToVector2();
+            var b = (bounds.Location + bounds.Size).ToVector2();
+            DrawLine(spriteBatch, color, a, b);
+
+            var x = a.X;
+            a.X = b.X;
+            b.X = x;
+            DrawLine(spriteBatch, color, a, b);
         }
     }
 }

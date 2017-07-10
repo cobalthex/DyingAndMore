@@ -26,8 +26,9 @@ namespace DyingAndMore.Editor
     class Editor : MapView
     {
         ModeSelector modes;
-        List renderSettingsConsole;
+        Static renderSettingsConsole;
         Static fpsDisplay;
+        Static resizeDialog;
 
         public Editor(Takai.Game.Map map)
         {
@@ -53,48 +54,22 @@ namespace DyingAndMore.Editor
                 Font = smallFont
             });
 
-            modes.AddMode(new TilesEditorMode(this)     { Font = smallFont });
-            modes.AddMode(new DecalsEditorMode(this)    { Font = smallFont });
-            modes.AddMode(new FluidsEditorMode(this)    { Font = smallFont });
-            modes.AddMode(new EntitiesEditorMode(this)  { Font = smallFont });
-            modes.AddMode(new GroupsEditorMode(this)    { Font = smallFont });
-            modes.AddMode(new PathsEditorMode(this)     { Font = smallFont });
-            modes.AddMode(new TriggersEditorMode(this)  { Font = smallFont });
+            modes.AddMode(new TilesEditorMode(this));
+            modes.AddMode(new DecalsEditorMode(this));
+            modes.AddMode(new FluidsEditorMode(this));
+            modes.AddMode(new EntitiesEditorMode(this));
+            //modes.AddMode(new GroupsEditorMode(this));
+            modes.AddMode(new PathsEditorMode(this));
+            modes.AddMode(new TriggersEditorMode(this));
 
             modes.ModeIndex = 0;
 
-            #region render settings console
+            //renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
+            renderSettingsConsole = new Static();
+            renderSettingsConsole.Position = new Vector2(100, 0);
+            renderSettingsConsole.VerticalAlignment = Alignment.Middle;
 
-            renderSettingsConsole = new Takai.UI.List()
-            {
-                Name = "RenderSettings",
-                Position = new Vector2(20, 0),
-                HorizontalAlignment = Takai.UI.Alignment.Start,
-                VerticalAlignment = Takai.UI.Alignment.Middle,
-                Margin = 5
-            };
-
-            foreach (var setting in Map.renderSettings.GetType().GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
-            {
-                var checkbox = new Takai.UI.CheckBox()
-                {
-                    Name = setting.Name,
-                    Text = Static.BeautifyMemberName(setting.Name),
-                    Font = largeFont,
-                    IsChecked = (bool)setting.GetValue(Map.renderSettings)
-                };
-                checkbox.Click += delegate (object sender, ClickEventArgs args)
-                {
-                    setting.SetValue(Map.renderSettings, ((CheckBox)sender).IsChecked);
-                };
-                checkbox.AutoSize();
-
-                renderSettingsConsole.AddChild(checkbox);
-            }
-            renderSettingsConsole.AutoSize();
-
-            #endregion
-
+            resizeDialog = Serializer.TextDeserialize<Static>("Defs/UI/Editor/ResizeMap.ui.tk");
         }
 
         protected override void OnMapChanged(System.EventArgs e)
@@ -102,8 +77,9 @@ namespace DyingAndMore.Editor
             Map.ActiveCamera = new EditorCamera();
 
             Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
-            Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
-            Map.renderSettings.drawGrids = true;
+            Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
+            Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawGrids;
+            Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawSectorsOnGrid;
 
             //start zoomed out to see the whole map
             var mapSize = new Vector2(Map.Width, Map.Height) * Map.TileSize;
@@ -137,27 +113,61 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
-            if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.S))
+            if (InputState.IsPress(Keys.F5))
             {
-                using (var sfd = new System.Windows.Forms.SaveFileDialog()
+                //todo: reload all defs
+                return false;
+            }
+
+            if (InputState.IsMod(KeyMod.Control))
+            {
+                if (InputState.IsPress(Keys.S))
                 {
-                    Filter = "Dying and More! Maps (*.map.tk)|*.map.tk",
-                    RestoreDirectory = true
-                })
-                {
-                    if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    using (var sfd = new System.Windows.Forms.SaveFileDialog()
                     {
-                        try
+                        Filter = "Dying and More! Maps (*.map.tk)|*.map.tk",
+                        RestoreDirectory = true
+                    })
+                    {
+                        if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         {
-                            Takai.Data.Serializer.TextSerialize(sfd.FileName, Map);
-                        }
-                        catch
-                        {
-                            //todo
+                            try
+                            {
+                                Serializer.TextSerialize(sfd.FileName, Map);
+                            }
+                            catch
+                            {
+                                //todo
+                            }
                         }
                     }
+                    return false;
                 }
-                return false;
+
+                if (InputState.IsPress(Keys.R))
+                {
+                    var widthInput = (NumericInput)resizeDialog.FindChildByName("width", false);
+                    var heightInput  = (NumericInput)resizeDialog.FindChildByName("height", false);
+
+                    widthInput.Value = Map.Width;
+                    heightInput.Value = Map.Height;
+
+                    var resizeBtn = resizeDialog.FindChildByName("resize", false);
+                    var cancelBtn = resizeDialog.FindChildByName("cancel", false);
+
+                    resizeBtn.Click += delegate
+                    {
+                        Map.Resize((int)widthInput.Value, (int)heightInput.Value);
+                        resizeDialog.RemoveFromParent();
+                    };
+
+                    cancelBtn.Click += delegate
+                    {
+                        resizeDialog.RemoveFromParent();
+                    };
+
+                    AddChild(resizeDialog);
+                }
             }
 
             return base.HandleInput(time);
@@ -168,9 +178,9 @@ namespace DyingAndMore.Editor
             if (!renderSettingsConsole.RemoveFromParent())
             {
                 //refresh individual render settings
-                var settings = typeof(Takai.Game.Map.MapRenderSettings);
+                var settings = typeof(Takai.Game.Map.RenderSettings);
                 foreach (var child in renderSettingsConsole.Children)
-                    ((Takai.UI.CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
+                    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
 
                 AddChild(renderSettingsConsole);
             }

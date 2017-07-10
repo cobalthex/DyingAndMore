@@ -123,44 +123,31 @@ namespace DyingAndMore
             Takai.UI.Static.DefaultFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>(
                 "Fonts/UISmall.bfnt");
 
-            testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
+            //testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
 
-            var testAutoUi = Takai.UI.Static.GeneratePropSheet(
-                testAutoObj, Takai.UI.Static.DefaultFont, Color.White);
+            //var testAutoUi = Takai.UI.Static.GeneratePropSheet(
+            //    testAutoObj, Takai.UI.Static.DefaultFont, Color.White);
 
-            var box = new Takai.UI.ScrollBox() { Position = new Vector2(100) };
-            box.AddChild(testAutoUi);
-            box.Size = new Vector2(300, 400);
-            box.BorderColor = Color.LightBlue;
+            //var box = new Takai.UI.ScrollBox() { Position = new Vector2(100) };
+            //box.AddChild(testAutoUi);
+            //box.Size = new Vector2(300, 400);
+            //box.BorderColor = Color.LightBlue;
 
-            var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(
-                Takai.Data.Serializer.TextDeserialize("Data/Maps/playground.map.tk"));
+            //var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(
+            //    Takai.Data.Serializer.TextDeserialize("Data/Maps/playground.map.tk"));
+            var map = new Takai.Game.Map()
+            {
+                Tiles = new short[8, 8],
+                TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/tiles.png"),
+                TileSize = 48,
+            };
+            map.BuildTileMask(map.TilesImage, true);
+            map.BuildSectors();
             map.InitializeGraphics();
             ui = new Takai.UI.Static(new Editor.Editor(map));
-            //ui.AddChild(box);
-            //ui.AddChild(new Takai.UI.Graphic()
-            //{
-            //    Sprite = (Takai.Graphics.Sprite)testAutoObj,
-            //    Position = new Vector2(500, 100),
-            //    Size = new Vector2(32)
-            //});
-
-
-            var dropdown = new Takai.UI.DropdownSelect<string>();
-            dropdown.Items.Add("test 1");
-            dropdown.Items.Add("test 2");
-            dropdown.Items.Add("test 3");
-            dropdown.Items.Add("test 4");
-
-            dropdown.Size = new Vector2(100, 30);
-            dropdown.Position = new Vector2(200);
-            dropdown.SelectedIndex = 0;
-            ui.AddChild(dropdown);
 
             base.Initialize();
         }
-        object testAutoObj;
-        int counter = 0;
 
         protected override void Update(GameTime gameTime)
         {

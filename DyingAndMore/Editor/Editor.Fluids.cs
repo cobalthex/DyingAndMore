@@ -70,13 +70,11 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsButtonDown(MouseButtons.Right))
                 {
-                    var mapSz = new Vector2(editor.Map.Width, editor.Map.Height);
-                    var start = Vector2.Clamp((currentWorldPos / editor.Map.SectorPixelSize) - Vector2.One, Vector2.Zero, mapSz).ToPoint();
-                    var end = Vector2.Clamp((currentWorldPos / editor.Map.SectorPixelSize) + Vector2.One, Vector2.Zero, mapSz).ToPoint();
-
-                    for (int y = start.Y; y < end.Y; ++y)
+                    var sectors = editor.Map.GetOverlappingSectors(new Rectangle((currentWorldPos - Vector2.One).ToPoint(), new Point(2)));
+                    //get overlapping sectors
+                    for (int y = sectors.Top; y < sectors.Bottom; ++y)
                     {
-                        for (int x = start.X; x < end.X; ++x)
+                        for (int x = sectors.Left; x < sectors.Right; ++x)
                         {
                             var sect = editor.Map.Sectors[y, x];
                             for (var i = 0; i < sect.Fluids.Count; ++i)
