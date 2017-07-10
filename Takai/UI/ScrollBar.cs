@@ -72,7 +72,7 @@ namespace Takai.UI
 
         protected bool didPressThumb = false;
 
-        public override bool CanFocus => true;
+        public override bool CanFocus => IsThumbVisible;
 
         public event System.EventHandler<ScrollEventArgs> Scroll;
         protected virtual void OnScroll(ScrollEventArgs e) { }

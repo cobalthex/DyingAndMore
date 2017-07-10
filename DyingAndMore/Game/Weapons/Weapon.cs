@@ -31,13 +31,13 @@ namespace DyingAndMore.Game.Weapons
         /// Attempt to fire the weapon
         /// Fires in the
         /// </summary>
-        /// <param name="Entity">The entity to fire from</param>
+        /// <param name="entity">The entity to fire from</param>
         /// <remarks>Fires from the owner entity's position in their forward direction</remarks>
-        public virtual void Fire(TimeSpan TotalTime, Takai.Game.Entity Entity)
+        public virtual void Fire(TimeSpan TotalTime, Takai.Game.EntityInstance entity)
         {
             if (CanFire(TotalTime))
             {
-                SingleFire(Entity);
+                SingleFire(entity);
                 lastShot = TotalTime;
                 ++shotsTaken;
             }
@@ -48,9 +48,9 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         /// <param name="Time">The current time</param>
         /// <returns>True if able to fire</returns>
-        public virtual bool CanFire(TimeSpan TotalTime)
+        public virtual bool CanFire(TimeSpan elapsedTime)
         {
-            return (maxShots == 0 || shotsTaken < maxShots) && TotalTime > lastShot + shotDelay;
+            return (maxShots == 0 || shotsTaken < maxShots) && elapsedTime > lastShot + shotDelay;
         }
 
         /// <summary>
@@ -58,6 +58,6 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         /// <param name="Entity">The entity to fire from</param>
         /// <remarks>Unaffected by firing conditions</remarks>
-        protected abstract void SingleFire(Takai.Game.Entity Entity);
+        protected abstract void SingleFire(Takai.Game.EntityInstance entity);
     }
 }

@@ -21,19 +21,19 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         public bool AddVelocity { get; set; } = false;
 
-        protected override void SingleFire(Takai.Game.Entity Entity)
+        protected override void SingleFire(Takai.Game.EntityInstance entity)
         {
-            var origin = Entity.Position + (Entity.Direction * (Entity.Radius + Projectile.Radius + 1));
+            var origin = entity.Position + (entity.Direction * (entity.Radius + Projectile.Radius + 1));
 
             //todo: merge projectiles with this
 
             //trace fire
             if (Speed == 0)
             {
-                bool didHit = Entity.Map.TraceLine(origin, Entity.Direction, out var hit, Projectile.Range);
+                bool didHit = entity.Map.TraceLine(origin, entity.Direction, out var hit, Projectile.Range);
                 if (didHit)
                 {
-                    var hitPos = origin + (Entity.Direction * hit.distance);
+                    var hitPos = origin + (entity.Direction * hit.distance);
 
                     var particles = new Takai.Game.ParticleSpawn()
                     {
@@ -42,13 +42,13 @@ namespace DyingAndMore.Game.Weapons
                         lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromSeconds(1), System.TimeSpan.FromSeconds(2)),
                         position = hitPos
                     };
-                    var normal = hit.entity != null ? Vector2.Normalize(hitPos - hit.entity.Position) : (Vector2.Zero - Entity.Direction);
+                    var normal = hit.entity != null ? Vector2.Normalize(hitPos - hit.entity.Position) : (Vector2.Zero - entity.Direction);
                     //normal = Vector2.Reflect(Direction, normal);
                     var angle = (float)System.Math.Atan2(normal.Y, normal.X);
                     particles.angle = new Takai.Game.Range<float>(angle - 0.75f, angle + 0.75f);
 
-                    Entity.Map.Spawn(particles);
-                    Entity.Map.DrawLine(Entity.Position, hitPos, Color.NavajoWhite);
+                    entity.Map.Spawn(particles);
+                    entity.Map.DrawLine(entity.Position, hitPos, Color.NavajoWhite);
 
                     var actor = hit.entity as Entities.Actor;
                     if (actor != null)
@@ -58,12 +58,12 @@ namespace DyingAndMore.Game.Weapons
                 }
                 else
                 {
-                    Entity.Map.DrawLine(Entity.Position, Entity.Position + Entity.Direction * (Projectile.Range == 0 ? 100000 : Projectile.Range), Color.NavajoWhite);
+                    entity.Map.DrawLine(entity.Position, entity.Position + entity.Direction * (Projectile.Range == 0 ? 100000 : Projectile.Range), Color.NavajoWhite);
                     //explosion at the end
                 }
             }
             else
-                Entity.Map.Spawn(Projectile, origin, Entity.Direction, (AddVelocity ? Entity.Velocity : Vector2.Zero) + (Entity.Direction * Speed));
+                entity.Map.Spawn(Projectile, origin, entity.Direction, (AddVelocity ? entity.Velocity : Vector2.Zero) + (entity.Direction * Speed));
         }
     }
 }

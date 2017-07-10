@@ -6,7 +6,7 @@
     abstract class Controller
     {
         [Takai.Data.Serializer.Ignored]
-        public Actor actor;
+        public ActorInstance actor;
 
         /// <summary>
         /// One frame of time to control the actor

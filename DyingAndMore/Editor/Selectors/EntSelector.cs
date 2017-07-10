@@ -6,7 +6,7 @@ namespace DyingAndMore.Editor.Selectors
 {
     class EntSelector : Selector
     {
-        public List<Takai.Game.Entity> ents;
+        public List<Takai.Game.EntityClass> ents = new List<Takai.Game.EntityClass>();
 
         public EntSelector(Editor Editor)
             : base(Editor)
@@ -14,7 +14,6 @@ namespace DyingAndMore.Editor.Selectors
             ItemSize = new Point(64);
             Padding = 5;
 
-            ents = new List<Takai.Game.Entity>();
             foreach (var file in System.IO.Directory.EnumerateFiles("Defs\\Entities", "*", System.IO.SearchOption.AllDirectories))
             {
                 try
@@ -22,13 +21,13 @@ namespace DyingAndMore.Editor.Selectors
                     var deserialized = Takai.Data.Serializer.TextDeserializeAll(file);
                     foreach (var obj in deserialized)
                     {
-                        if (obj is Takai.Game.Entity ent)
+                        if (obj is Takai.Game.EntityClass ent)
                             ents.Add(ent);
                     }
                 }
-                catch (System.Exception)
+                catch (System.Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Could not load Entity definitions from {file}");
+                    System.Diagnostics.Debug.WriteLine($"Could not load Entity definitions from {file}:\n  {e}");
                 }
             }
 
@@ -39,25 +38,20 @@ namespace DyingAndMore.Editor.Selectors
         {
             var ent = ents[itemIndex];
 
-            bool didDraw = false;
-            foreach (var sprite in ent.Sprites)
+            if (ent.States.TryGetValue(Takai.Game.EntStateId.Idle, out var state) && state.Sprite?.Texture != null)
             {
-                if (sprite?.Texture == null)
-                    continue;
-
                 bounds.X += bounds.Width / 2;
                 bounds.Y += bounds.Height / 2;
-                sprite.Draw(spriteBatch, bounds, 0, Color.White, editor.Map.ElapsedTime); //todo: correct time
-
-                didDraw = true;
+                state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, editor.Map.ElapsedTime);
             }
-
-#if DEBUG //Draw [X] in place of ent graphic
-            if (!didDraw)
+            else
             {
                 //todo: draw x as placeholder
+                bounds.Inflate(-4, -4);
+                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Tomato, bounds);
+                bounds.Offset(0, 2);
+                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Black, bounds);
             }
-#endif
         }
     }
 }

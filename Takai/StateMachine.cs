@@ -46,7 +46,7 @@ namespace Takai
         /// <summary>
         /// All of the available states
         /// </summary>
-        public Dictionary<TKey, TState> States { get; set; } = new Dictionary<TKey, TState>();
+        public Dictionary<TKey, TState> States { get; set; }
 
         /// <summary>
         /// The currently active 'base' state. Only one base state can be active at a time
@@ -58,20 +58,17 @@ namespace Takai
         /// </summary>
         public HashSet<TKey> OverlaidStates { get; set; } = new HashSet<TKey>(); //todo: make private w/ public enumerator
 
-        /// <summary>
-        /// Active transitions between states
-        /// </summary>
-        /// <remarks>Transitions are removed after they finish</remarks>
-        protected Dictionary<TKey, TKey> Transitions { get; set; } = new Dictionary<TKey, TKey>();
+        private Dictionary<TKey, TKey> transitions = new Dictionary<TKey, TKey>();
 
         protected static readonly EqualityComparer<TKey> EqComparer = EqualityComparer<TKey>.Default;
 
         public virtual object Clone()
         {
+            //todo
             var cloned = (StateMachine<TKey, TState>)MemberwiseClone();
             cloned.OverlaidStates = new HashSet<TKey>(OverlaidStates);
-            cloned.Transitions = new Dictionary<TKey, TKey>(Transitions);
             cloned.States = new Dictionary<TKey, TState>(States.Count);
+            cloned.transitions = new Dictionary<TKey, TKey>(transitions);
             foreach (var kvp in States)
                 cloned.States.Add(kvp.Key, (TState)kvp.Value.Clone());
             return cloned;
@@ -88,7 +85,7 @@ namespace Takai
         {
             States[Key] = State;
             if (AddToActive)
-                Transition(default(TKey), Key);
+                Transition(Key);
         }
 
         /// <summary>
@@ -123,26 +120,11 @@ namespace Takai
         /// <summary>
         /// Transition from one state to another
         /// </summary>
-        /// <param name="CurrentState">The current state to transition from. If Default(TKey) then NextState is added immediately</param>
-        /// <param name="NextState">The next state to transition to. If Default(TKey) then CurrentState will be removed when it is finished playing</param>
-        /// <returns>False if the states did not exist in the state machine</returns>
-        public virtual bool Transition(TKey CurrentState, TKey NextState)
+        /// <param name="currentState">The state to transition from when it is finished</param>
+        /// <param name="nextState">The state to transition to after currentState is finished/></param>
+        public virtual void Transition(TKey currentState, TKey nextState)
         {
-            if (!EqComparer.Equals(CurrentState, default(TKey)))
-            {
-                Transitions[CurrentState] = NextState;
-                return true;
-            }
-            if (!EqComparer.Equals(NextState, default(TKey)) && States.TryGetValue(NextState, out var next))
-            {
-                next.Start();
-                if (next.IsOverlay)
-                    OverlaidStates.Add(NextState);
-                else
-                    BaseState = NextState;
-                return true;
-            }
-            return false;
+            transitions[currentState] = nextState;
         }
 
         List<TKey> added = new List<TKey>();
@@ -150,18 +132,30 @@ namespace Takai
 
         void UpdateState(TKey stateKey, TimeSpan deltaTime)
         {
-            var state = States[stateKey];
+            if (!States.TryGetValue(stateKey, out var state))
+                return;
+
             state.Update(deltaTime);
 
             if (state.HasFinished())
             {
-                if (Transitions.TryGetValue(stateKey, out var transition))
+                if (transitions.TryGetValue(stateKey, out var transition))
                 {
-                    if (EqComparer.Equals(transition, default(TKey)))
-                        BaseState = default(TKey);
+                    if (States.TryGetValue(transition, out var next))
+                    {
+                        if (next.IsOverlay)
+                        {
+                            OverlaidStates.Remove(stateKey);
+                            OverlaidStates.Add(transition);
+                        }
+                        else
+                            BaseState = transition;
+
+                        next.Start();
+                    }
                     else
                         BaseState = transition;
-                    Transitions.Remove(stateKey);
+                    transitions.Remove(stateKey);
                 }
             }
         }
@@ -180,9 +174,7 @@ namespace Takai
             removed.Clear();
 
             foreach (var key in OverlaidStates)
-            {
                 UpdateState(key, deltaTime);
-            }
 
             foreach (var key in added)
             {

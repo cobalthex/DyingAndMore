@@ -128,6 +128,7 @@ namespace Takai.UI
             list.SelectionChanged += delegate
             {
                 Text = SelectedItem?.ToString();
+                isDropdownOpen = false;
             };
         }
 
@@ -138,9 +139,14 @@ namespace Takai.UI
             isDropdownOpen = true;
 
             list.AutoSize();
-            dropdown.Position = VisibleBounds.Location.ToVector2() + new Vector2(0, Size.Y);
             dropdown.Size = new Vector2(Size.X, MathHelper.Min(list.Size.Y, 200));
-            dropdown.Reflow();
+
+            var end = new Vector2(VisibleBounds.Right, VisibleBounds.Bottom) + dropdown.Size;
+            if (end.X > Runtime.GraphicsDevice.Viewport.Width ||
+                end.Y > Runtime.GraphicsDevice.Viewport.Height)
+                dropdown.Position = VisibleBounds.Location.ToVector2() - new Vector2(0, dropdown.Size.Y);
+            else
+                dropdown.Position = VisibleBounds.Location.ToVector2() + new Vector2(0, Size.Y); //todo: smarter placement
         }
 
         protected override void OnClick(ClickEventArgs e)
@@ -158,9 +164,20 @@ namespace Takai.UI
             base.UpdateSelf(time);
         }
 
+        protected override bool HandleInput(GameTime time)
+        {
+            if (isDropdownOpen)
+            {
+                if (Input.InputState.IsPress(Input.MouseButtons.Left) && !dropdown.VirtualBounds.Contains(Input.InputState.MousePoint))
+                    isDropdownOpen = false;
+                return false;
+            }
+            return base.HandleInput(time);
+        }
+
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            DrawText(spriteBatch, new Point(2, (int)(Size.Y - textSize.Y - 4) / 2));
+            DrawText(spriteBatch, new Point(2, 2 + (int)(Size.Y - textSize.Y - 4) / 2));
             if (isDropdownOpen)
                 dropdown.Draw(spriteBatch);
         }

@@ -1,52 +1,28 @@
-Actor {
-    Class: "Player";
-    MaxHealth: 100;
-    State: {
-        BaseState: EntStateKey [Idle];
-        States: {
-            Idle: {
-                Sprite: {
-                    texture: "Textures/Entities/Player.png";
-                    width: 48;
-                    height: 48;
-                    origin: [24 24];
-                    FrameCount: 2;
-                    FrameLength: 100;
-                    IsLooping: True;
-                    Tween: TweenStyle [Overlap];
-                };
+ActorClass {
+    Name: "Player";
+    MaxHealth: 500;
+    DefaultFaction: Factions [Player];
+
+    States: {
+        Idle: {
+            Sprite: {
+                texture: "Textures/Entities/Player.png";
+                width: 48;
+                height: 48;
+                origin: [24 24];
+                FrameCount: 2;
+                FrameLength: 100;
+                IsLooping: True;
+                Tween: TweenStyle [Overlap];
             };
         };
     };
+
     FieldOfView: 2.356194;
-    MaxSpeed: 400;
+    MaxSpeed: [400 400];
     MoveForce: 600;
-    Faction: Factions [Player];
-    Controller: InputController { player: PlayerIndex [One] };
-    IsAlive: True;
     AlwaysActive: False;
-    Radius: 24;
     IsPhysical: True;
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
-    PrimaryWeapon: Gun {
-        Projectile: Projectile {
-            Sprite: {
-                texture: 'Textures/Projectiles/sharp.png';
-                width: 16;
-                height: 8;
-            }
-        };
-        Speed: 0;
-        shotDelay: 100;
-    };
-    AltWeapon: FluidGun {
-        Fluid: FluidType {
-            Radius: 54;
-            Drag: 0.2;
-            Texture: "Textures/Fluids/blood.png";
-            Reflection: "Textures/Fluids/blood.r.png";
-        };
-        speed: 100;
-    };
 }

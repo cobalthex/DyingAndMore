@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Takai.Game;
 using Takai.Graphics;
@@ -25,35 +26,47 @@ namespace DyingAndMore.Game.Entities
         //max = 1 << 63
     }
 
-    class Actor : Entity
+    class ActorClass : EntityClass
     {
-        private int maxHealth = 0;
-        private Vector2 lastVelocity = Vector2.Zero;
-
-        /// <summary>
-        /// The current health of the actor
-        /// </summary>
-        [Takai.Data.NonDesigned]
-        public int CurrentHealth { get; set; }
-
         /// <summary>
         /// The default maximum allowed health of the entity (overhealing allowed)
         /// </summary>
         /// <remarks>Whenever this value is modified, the difference is added to current health</remarks>
-        public int MaxHealth
-        {
-            get { return maxHealth; }
-            set
-            {
-                CurrentHealth += (value - maxHealth);
-                maxHealth = value;
-            }
-        }
+        public int MaxHealth { get; set; }
 
         public float FieldOfView { get; set; } = MathHelper.PiOver4 * 3;
 
-        public float MaxSpeed { get; set; }
         public float MoveForce { get; set; }
+
+        //inherited
+        public Range<float> MaxSpeed { get; set; }
+        public Weapons.Weapon DefaultWeapon { get; set; } = null;
+        public Factions DefaultFaction { get; set; } = Factions.None;
+
+        public override EntityInstance Create()
+        {
+            return new ActorInstance(this);
+        }
+    }
+
+    class ActorInstance : EntityInstance
+    {
+        public override EntityClass Class
+        {
+            get => base.Class;
+            set
+            {
+                System.Diagnostics.Contracts.Contract.Assert(value is ActorClass);
+                base.Class = value;
+                _actorClass = value as ActorClass;
+
+                MaxSpeed      = RandomRange.Next(_actorClass.MaxSpeed);
+                CurrentHealth = _actorClass.MaxHealth;
+                Weapon        = _actorClass.DefaultWeapon;
+                Faction       = _actorClass.DefaultFaction;
+            }
+        }
+        private ActorClass _actorClass;
 
         /// <summary>
         /// The current faction. Typically used by the AI to determine enemies
@@ -80,21 +93,30 @@ namespace DyingAndMore.Game.Entities
         }
         private Controller controller;
 
-        public Weapons.Weapon PrimaryWeapon { get; set; } = null;
-        public Weapons.Weapon AltWeapon { get; set; } = null;
+        /// <summary>
+        /// The current health of the actor
+        /// </summary>
+        public int CurrentHealth { get; set; }
 
-        public Actor()
+        /// <summary>
+        /// The direction the entity is moving
+        /// </summary>
+        public Vector2 Velocity { get; set; } = Vector2.Zero;
+
+        private Vector2 lastVelocity = Vector2.Zero;
+
+        #region Inherited
+
+        public float MaxSpeed { get; set; }
+
+        public Weapons.Weapon Weapon { get; set; } = null;
+
+        #endregion
+
+        public ActorInstance() { }
+        public ActorInstance(ActorClass @class)
         {
-        }
-
-        public override object Clone()
-        {
-            var cloned = (Actor)base.Clone();
-
-            if (cloned.controller != null)
-                cloned.controller.actor = cloned;
-
-            return cloned;
+            Class = @class;
         }
 
         public override void Think(System.TimeSpan DeltaTime)
@@ -114,21 +136,15 @@ namespace DyingAndMore.Game.Entities
             Velocity = vel;
             lastVelocity = Velocity;
 
-            if (CurrentHealth <= 0 && !(State.Is(EntStateKey.Dying) || State.Is(EntStateKey.Dead)))
-                State.Transition(EntStateKey.Dying);
-
-            if (State.Is(EntStateKey.Dying) && State.States[EntStateKey.Dying].HasFinished())
-            {
-                State.OverlaidStates.Clear();
-                State.Transition(EntStateKey.Dead);
-            }
+            if (CurrentHealth <= 0 && !State.Is(EntStateId.Dead))
+                State.Transition(EntStateId.Dead);
 
             base.Think(DeltaTime);
         }
 
-        public override void OnEntityCollision(Entity Collider, Vector2 Point, System.TimeSpan DeltaTime)
+        public override void OnEntityCollision(EntityInstance Collider, Vector2 Point, System.TimeSpan DeltaTime)
         {
-            if (Collider is Actor actor)
+            if (Collider is ActorInstance actor)
             {
             }
         }
@@ -147,7 +163,7 @@ namespace DyingAndMore.Game.Entities
 
             var dot = Vector2.Dot(Direction, diff);
 
-            return (dot > (1 - (FieldOfView / MathHelper.Pi)));
+            return (dot > (1 - (_actorClass.FieldOfView / MathHelper.Pi)));
         }
 
         /// <summary>
@@ -155,18 +171,18 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         /// <param name="Ent">The entity to check</param>
         /// <returns>True if this entity is behind Ent</returns>
-        public bool IsBehind(Actor Ent)
+        public bool IsBehind(ActorInstance Ent)
         {
             var diff = Ent.Position - Position;
             diff.Normalize();
 
             var dot = Vector2.Dot(diff, Ent.Direction);
-            return (dot > (Ent.FieldOfView / MathHelper.Pi) - 1);
+            return (dot > (_actorClass.FieldOfView / MathHelper.Pi) - 1);
         }
 
         public void Move(Vector2 Direction)
         {
-            var vel = Velocity + (Direction * MoveForce);
+            var vel = Velocity + (Direction * _actorClass.MoveForce);
             var lSq = vel.LengthSquared();
             if (lSq > MaxSpeed * MaxSpeed)
                 vel = (vel / (float)System.Math.Sqrt(lSq)) * MaxSpeed;

@@ -4,7 +4,7 @@ using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
 {
-    class Projectile : Entity
+    class Projectile : EntityClass
     {
         public ParticleType explosion;
         public ParticleType trail, trailGlow;
@@ -47,9 +47,9 @@ namespace DyingAndMore.Game.Entities
             {
                 Origin = new Vector2(12, 4)
             };
-            State.AddState(EntStateKey.Idle, new EntState { Sprite = sprite, IsLooping = true }, true);
+            State.AddState(EntStateId.Idle, new EntState { Sprite = sprite, IsLooping = true }, true);
             Radius = sprite.Width / 2;
-            
+
             var curve = new Curve();
             curve.Keys.Add(new CurveKey(0, 0));
             curve.Keys.Add(new CurveKey(0.25f, 0.5f));
@@ -130,7 +130,7 @@ namespace DyingAndMore.Game.Entities
             Map.Destroy(this);
         }
 
-        public override void OnEntityCollision(Entity Collider, Vector2 Point, System.TimeSpan DeltaTime)
+        public override void OnEntityCollision(EntityClass Collider, Vector2 Point, System.TimeSpan DeltaTime)
         {
             ParticleSpawn spawn = new ParticleSpawn()
             {

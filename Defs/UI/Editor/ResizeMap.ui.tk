@@ -1,0 +1,77 @@
+List {
+	Name:"asdf";
+	Direction: Direction.Vertical;
+    HorizontalAlignment: Alignment.Middle;
+    VerticalAlignment: Alignment.Middle;
+	Margin: 10;
+	AutoSize: 20;
+
+	IsModal: True;
+	BackgroundColor: [255 255 255 192];
+
+    Children: [
+    	Static {
+    		Text: "Resize Map"
+    	}
+
+    	List {
+			Direction: Direction.Horizontal;
+			Margin: 10;
+
+			Children: [
+				List {
+					Direction: Direction.Vertical;
+
+					Children: [
+						Static {
+							Text: "Width";
+						}
+
+						NumericInput {
+							Name: "width";
+							Minimum: 1;
+							Maximum: 65536;
+							Value: 20;
+							Width: 100;
+						}
+					]
+				}
+
+				List {
+					Direction: Direction.Vertical;
+
+					Children: [
+						Static {
+							Text: "Height";
+						}
+
+						NumericInput {
+							Name: "height";
+							Minimum: 1;
+							Maximum: 65536;
+							Value: 20;
+							Width: 100;
+						}
+					]
+				}
+			]
+    	}
+
+    	List {
+			Direction: Direction.Horizontal;
+			HorizontalAlignment: Alignment.Middle;
+			Margin: 10;
+
+			Children: [
+				Static {
+					name: "resize";
+					Text: "Resize";
+				}
+				Static {
+					name: "cancel";
+					Text: "Cancel";
+				}
+			]
+		}
+    ]
+}

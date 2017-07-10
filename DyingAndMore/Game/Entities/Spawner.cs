@@ -6,19 +6,20 @@ using Takai.Game;
 namespace DyingAndMore.Game.Entities
 {
     class Squad { }
-    class Spawner : Actor
+
+    class Spawner : EntityClass
     {
         protected static System.Random randGen = new System.Random();
 
         /// <summary>
         /// The entities to spawn from this spawner and a range of each to spawn
         /// </summary>
-        public List<Tuple<Entity, Range<int>>> Template { get; set; }
+        public List<Tuple<EntityClass, Range<int>>> Template { get; set; }
 
         /// <summary>
         /// The actual list of entities to spawn
         /// </summary>
-        public Queue<Entity> SpawnQueue { get; protected set; }
+        public Queue<EntityClass> SpawnQueue { get; protected set; }
 
         /// <summary>
         /// how close an enemy (different faction) has to be before spawning
@@ -41,9 +42,9 @@ namespace DyingAndMore.Game.Entities
         /// Generate a list of entities based on the templates provided in <see cref="Entities"/>. Does not create clones
         /// </summary>
         /// <returns>The list of (references to original) entities</returns>
-        public List<Entity> GenerateSpawnList()
+        public List<EntityClass> GenerateSpawnList()
         {
-            var spawns = new List<Entity>();
+            var spawns = new List<EntityClass>();
 
             foreach (var ent in Template)
             {
@@ -68,31 +69,31 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnSpawn()
         {
-            SpawnQueue = new Queue<Entity>(GenerateSpawnList());
+            SpawnQueue = new Queue<EntityClass>(GenerateSpawnList());
         }
 
         public override void Think(TimeSpan DeltaTime)
         {
-            if (SpawnQueue.Count < 1)
-                State.Transition(EntStateKey.Inactive);
-            else if (State.Is(EntStateKey.Idle) && Map.ElapsedTime - lastSpawn > SpawnDelay.min) //todo
+            if (State.Is(EntStateId.Idle) && Map.ElapsedTime > lastSpawn + SpawnDelay.max) //todo
             {
                 var radii = Map.FindEntities(Position, SearchRadius);
                 foreach (var ent in radii)
                 {
                     if (ent is Actor actor && (actor.Faction & Faction) == Factions.None)
                     {
-                        State.Transition(EntStateKey.Idle, EntStateKey.Active);
-                        lastSpawn = Map.ElapsedTime;
+                        State.Transition(EntStateId.Idle, EntStateId.Active);
                         break;
                     }
                 }
             }
 
-            if (State.Is(EntStateKey.Active) && State.States[EntStateKey.Active].HasFinished())
+            if (State.Is(EntStateId.Active) && State.States[EntStateId.Active].HasFinished())
             {
                 SpawnNext();
-                lastSpawn = Map.ElapsedTime;
+                State.Transition(EntStateId.Active, EntStateId.Idle);
+
+                if (SpawnQueue.Count < 1)
+                    State.Transition(EntStateId.Idle, EntStateId.Inactive);
             }
 
             base.Think(DeltaTime);
@@ -102,13 +103,14 @@ namespace DyingAndMore.Game.Entities
         /// Spawn a clone of the next entity in the list. Does nothing if there are none remaining or if this spawner is dead
         /// </summary>
         /// <returns>The entity spawned</returns>
-        public Entity SpawnNext()
+        public EntityClass SpawnNext()
         {
             if (Map == null || SpawnQueue.Count < 1)
                 return null;
 
+            lastSpawn = Map.ElapsedTime;
             var next = SpawnQueue.Dequeue();
-            return Map.Spawn(next, Position + Direction * (Radius + next.Radius + 5), Direction, Direction * 3);
+            return Map.Spawn(next, Position + Direction * (Radius + next.Radius + 5), Direction, Direction * 100);
         }
     }
 }

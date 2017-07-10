@@ -1,46 +1,45 @@
-Actor {
-    Class: "Infected Cell";
+ActorClass {
+    Name: "Infected Cell";
     MaxHealth: 20;
-    State: EntityStateMachine {
-        BaseState: EntStateKey [Idle];
-        States: {
-            Idle: EntState {
-                Sprite: Sprite {
-                    texture: "Textures/Entities/InfectedCell.png";
-                    width: 32;
-                    height: 32;
-                    ClipRect: [0 0 256 32];
-                    origin: [16 16];
-                    FrameCount: 8;
-                    FrameLength: 100;
-                    IsLooping: true;
-                    Tween: TweenStyle [Overlap];
-                };
+    DefaultFaction: Factions [Enemy Common];
+
+	States: {
+        Idle: {
+            Sprite: { 
+            	texture: "Textures/Entities/InfectedCell.png";
+                width: 32;
+                height: 32;
+                origin: [16 16];
+                FrameCount: 8;
+                FrameLength: 100;
+                IsLooping: True;
+                Tween: TweenStyle [Overlap];
             };
-            Dying: EntState {
-                Sprite: Sprite {
-                    texture: "Textures/Entities/InfectedCell.png";
-                    width: 64;
-                    height: 64;
-                    ClipRect: [0 32 256 64];
-                    origin: [32 32];
-                    FrameCount: 4;
-                    FrameLength: 100;
-                    IsLooping: false;
-                    Tween: TweenStyle [Overlap];
-                };
+            Sound: { };
+            Radius: 16;
+        };
+        Dead: {
+            Sprite: { 
+            	texture: "Textures/Entities/InfectedCell.png";
+                width: 64;
+                height: 64;
+                origin: [32 32];
+                FrameCount: 4;
+                FrameLength: 100;
+                IsLooping: True;
+                Tween: TweenStyle [Overlap];
             };
+            Sound: { };
+            Radius: 32; #* should be calculated per frame ? *#
         };
     };
+
     FieldOfView: 2.356194;
-    MaxSpeed: 300;
+    MaxSpeed: [200 400];
     MoveForce: 500;
-    Faction: Factions [Enemy Common];
-    Controller: AIController { };
-    IsAlive: true;
     AlwaysActive: false;
-    Radius: 16;
     IsPhysical: true;
     IgnoreTrace: false;
     AlwaysDrawUpright: true;
+    DestroyIfDead: true;
 }

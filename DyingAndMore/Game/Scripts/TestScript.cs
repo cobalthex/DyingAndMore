@@ -7,7 +7,7 @@ namespace DyingAndMore.Game.Scripts
     {
         public TimeSpan totalTime;
 
-        public Takai.Game.Entity victim;
+        public Takai.Game.EntityInstance victim;
         public Takai.Game.PathRider path = new Takai.Game.PathRider();
 
         public TestScript()
@@ -16,7 +16,7 @@ namespace DyingAndMore.Game.Scripts
 
         }
 
-        public override void Step(TimeSpan deltaTime, Takai.Game.Entity context = null)
+        public override void Step(TimeSpan deltaTime, Takai.Game.EntityInstance context = null)
         {
             //path.Move(100 * (float)deltaTime.TotalSeconds);
             //victim.Position = path.Position;

@@ -10,7 +10,7 @@ namespace Takai.Game
     public struct TraceHit
     {
         public float distance;
-        public Entity entity;
+        public EntityInstance entity;
     }
 
     public partial class Map
@@ -80,12 +80,12 @@ namespace Takai.Game
         /// <param name="position">The origin search point</param>
         /// <param name="searchRadius">The maximum search radius</param>
         /// <param name="searchInSectors">Also search entities in sectors</param>
-        public List<Entity> FindEntities(Vector2 position, float searchRadius, bool searchInSectors = false)
+        public List<EntityInstance> FindEntities(Vector2 position, float searchRadius, bool searchInSectors = false)
         {
             var radiusSq = searchRadius * searchRadius;
             var vr = new Vector2(searchRadius);
 
-            List<Entity> ents = new List<Entity>();
+            List<EntityInstance> ents = new List<EntityInstance>();
 
             foreach (var ent in ActiveEnts)
             {
@@ -93,7 +93,7 @@ namespace Takai.Game
                     ents.Add(ent);
             }
 
-            if (searchInSectors)
+            if (searchInSectors && Bounds.Contains(position))
             {
                 var mapSz = new Vector2(Width, Height);
                 var start = Vector2.Clamp((position - vr) / SectorPixelSize, Vector2.Zero, mapSz).ToPoint();
@@ -121,9 +121,9 @@ namespace Takai.Game
         /// <param name="Region">The rectangle to search</param>
         /// <param name="SearchInSectors">Also search entities in sectors</param>
         /// <returns></returns>
-        public List<Entity> FindEntities(Rectangle Region, bool SearchInSectors = false)
+        public List<EntityInstance> FindEntities(Rectangle Region, bool SearchInSectors = false)
         {
-            List<Entity> ents = new List<Entity>();
+            List<EntityInstance> ents = new List<EntityInstance>();
 
             foreach (var ent in ActiveEnts)
             {
@@ -159,34 +159,12 @@ namespace Takai.Game
         /// <summary>
         /// Find all of the entities
         /// </summary>
-        /// <typeparam name="TEntity">The type of entity to find</typeparam>
+        /// <param name="class">The class type to search</param>
+        /// <param name="SearchInactive">Search in the inactive entities as well</param>
         /// <returns>A list of entities found</returns>
-        public List<Entity> FindEntitiesByType<TEntity>(bool SearchInactive = false) where TEntity : Entity
+        public List<EntityInstance> FindEntitiesByClass(EntityClass @class, bool SearchInactive = false)
         {
-            List<Entity> ents = new List<Entity>();
-
-            foreach (var ent in ActiveEnts)
-            {
-                if (ent is TEntity)
-                    ents.Add(ent);
-            }
-
-            if (SearchInactive)
-            {
-                for (var y = 0; y < Sectors.GetLength(0); ++y)
-                {
-                    for (var x = 0; x < Sectors.GetLength(1); ++x)
-                    {
-                        foreach (var ent in Sectors[y, x].entities)
-                        {
-                            if (ent is TEntity)
-                                ents.Add(ent);
-                        }
-                    }
-                }
-            }
-
-            return ents;
+            throw new System.NotImplementedException("better filtering");
         }
 
         /// <summary>
@@ -195,7 +173,7 @@ namespace Takai.Game
         /// <param name="Name"></param>
         /// <returns>The first entity found or null if none</returns>
         /// <remarks>Searches active ents and then ents in sectors from 0 to end</remarks>
-        public Entity FindEntityByName(string Name)
+        public EntityInstance FindEntityByName(string Name)
         {
             foreach (var ent in ActiveEnts)
             {
@@ -265,9 +243,9 @@ namespace Takai.Game
         /// <param name="MaxDistance">The maximum distance to search</param>
         /// <returns>The set of potential visible ents, sorted by distance (Dictionary of &lt;distance sq, entity&gt;)</returns>
         /// <remarks>Entities at Start or ignore traces are not added</remarks>
-        public SortedDictionary<float, Entity> PotentialVisibleSet(Vector2 Start, Vector2 Direction, float FieldOfView = MathHelper.Pi, float MaxDistance = 0)
+        public SortedDictionary<float, EntityInstance> PotentialVisibleSet(Vector2 Start, Vector2 Direction, float FieldOfView = MathHelper.Pi, float MaxDistance = 0)
         {
-            var ents = new SortedDictionary<float, Entity>();
+            var ents = new SortedDictionary<float, EntityInstance>();
 
             MaxDistance *= MaxDistance;
             FieldOfView = 1 - MathHelper.Clamp(FieldOfView / MathHelper.Pi, 0, 1);
@@ -276,7 +254,7 @@ namespace Takai.Game
 
             foreach (var ent in ActiveEnts)
             {
-                if (ent.IgnoreTrace || ent.Position == Start)
+                if (ent.Class.IgnoreTrace || ent.Position == Start)
                     continue;
 
                 var diff = ent.Position - Start;
@@ -307,7 +285,7 @@ namespace Takai.Game
         /// </param>
         /// <returns>True if there was a collision</returns>
         /// <remarks>Does not perform any map testing (use CanSee)</remarks>
-        public bool TraceLine(Vector2 Start, Vector2 Direction, out TraceHit Hit, float MaxDistance = 0, SortedDictionary<float, Entity> EntsToSearch = null)
+        public bool TraceLine(Vector2 Start, Vector2 Direction, out TraceHit Hit, float MaxDistance = 0, SortedDictionary<float, EntityInstance> EntsToSearch = null)
         {
             var lastT = 0f;
             var mapRect = new Rectangle(0, 0, Width, Height);

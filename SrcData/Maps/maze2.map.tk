@@ -1,8 +1,6 @@
 Map {
     Name: "Maze";
     TileSize: 48;
-    Width: 72;
-    Height: 45;
     ActiveCamera: Camera {
         PostEffect: Null;
         Viewport: [0 0 1280 800];

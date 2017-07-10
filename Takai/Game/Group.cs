@@ -15,6 +15,6 @@ namespace Takai.Game
         /// <summary>
         /// All of the entities in this group
         /// </summary>
-        public HashSet<Entity> Entities { get; set; } = new HashSet<Entity>();
+        public HashSet<EntityClass> Entities { get; set; } = new HashSet<EntityClass>();
     }
 }

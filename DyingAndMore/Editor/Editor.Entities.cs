@@ -3,33 +3,35 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
+using Takai.UI;
 
 namespace DyingAndMore.Editor
 {
     class EntitiesEditorMode : EditorMode
     {
-        public Takai.Game.Entity SelectedEntity
+        public Takai.Game.EntityInstance SelectedEntity
         {
-            get => selectedEntity;
+            get => _selectedEntity;
             set
             {
-                selectedEntity = value;
+                _selectedEntity = value;
                 if (value == null)
                     entInfo.Text = "";
                 else
                 {
                     entInfo.Font = Font;
                     entInfo.Text
-                        = $"`8df{BeautifyMemberName(selectedEntity.GetType().Name)}`x\n"
-                        + $"Name: {(string.IsNullOrWhiteSpace(selectedEntity.Name) ? "(No Name)" : SelectedEntity.Name)}\n"
-                        + $"ID: {selectedEntity.Id}\n"
-                        + $"Position: {selectedEntity.Position}\n"
-                        + $"State: {selectedEntity.State}\n";
+                        = $"`8df{BeautifyMemberName(_selectedEntity.Class.Name)}`x\n"
+                        + $"Name: {(string.IsNullOrWhiteSpace(_selectedEntity.Name) ? "(No Name)" : SelectedEntity.Name)}\n"
+                        + $"ID: {_selectedEntity.Id}\n"
+                        + $"Position: {_selectedEntity.Position}\n"
+                        + $"State: {_selectedEntity.State}\n";
 
-                    if (selectedEntity is Game.Entities.Actor actor)
+                    if (_selectedEntity is Game.Entities.ActorInstance actor &&
+                        actor.Class is Game.Entities.ActorClass @class)
                     {
                         entInfo.Text
-                            += $"Health: {actor.CurrentHealth}/{actor.MaxHealth}\n"
+                            += $"Health: {actor.CurrentHealth}/{@class.MaxHealth}\n"
                             +  $"Faction(s): {actor.Faction}\n"
                             +  $"Controller: {actor.Controller?.GetType().Name}\n";
                     }
@@ -37,14 +39,14 @@ namespace DyingAndMore.Editor
                 entInfo.AutoSize();
             }
         }
-        Takai.Game.Entity selectedEntity;
+        Takai.Game.EntityInstance _selectedEntity;
 
         Vector2 lastWorldPos, currentWorldPos;
 
         Selectors.EntSelector selector;
-        Takai.UI.Graphic preview;
+        Graphic preview;
 
-        Takai.UI.Static entInfo;
+        Static entInfo;
 
         public EntitiesEditorMode(Editor editor)
             : base("Entities", editor)
@@ -60,36 +62,38 @@ namespace DyingAndMore.Editor
             };
             selector.SelectionChanged += delegate
             {
-                var sprite = selector.ents[selector.SelectedItem].Sprites.GetEnumerator();
-                if (sprite.MoveNext())
-                {
-                    preview.Sprite = sprite.Current;
-                    preview.AutoSize();
-                }
-                else
+                //var sprite = selector.ents[selector.SelectedItem].Sprites.GetEnumerator();
+                //if (sprite.MoveNext())
+                //{
+                //    preview.Sprite = sprite.Current;
+                //    preview.AutoSize();
+                //}
+                //else
                 {
                     preview.Sprite = null;
-                    preview.Size = new Vector2(1);
+                    preview.Size = new Vector2(32);
                 }
             };
 
-            AddChild(preview = new Takai.UI.Graphic()
+            AddChild(preview = new Graphic()
             {
                 Position = new Vector2(20),
-                HorizontalAlignment = Takai.UI.Alignment.End,
-                VerticalAlignment = Takai.UI.Alignment.Start,
-                BorderColor = Color.White
+                HorizontalAlignment = Alignment.End,
+                VerticalAlignment = Alignment.Start,
+                BorderColor = Color.White,
+                DrawXIfMissingSprite = true,
             });
             preview.Click += delegate
             {
                 AddChild(selector);
             };
+            selector.SelectedItem = 0;
 
             AddChild(entInfo = new Takai.UI.Static()
             {
                 Position = new Vector2(20),
-                HorizontalAlignment = Takai.UI.Alignment.Start,
-                VerticalAlignment = Takai.UI.Alignment.End,
+                HorizontalAlignment = Alignment.Start,
+                VerticalAlignment = Alignment.End,
                 Font = Font
             });
         }
@@ -107,6 +111,11 @@ namespace DyingAndMore.Editor
                 SelectedEntity.OutlineColor = Color.Transparent;
                 SelectedEntity = null;
             }
+        }
+
+        protected override void OnPress(ClickEventArgs e)
+        {
+            base.OnPress(e);
         }
 
         protected override bool HandleInput(GameTime time)
@@ -134,14 +143,13 @@ namespace DyingAndMore.Editor
                     };
                     if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
-                        Takai.Game.Entity ent;
+                        Takai.Game.EntityClass ent;
                         using (var reader = new System.IO.StreamReader(ofd.OpenFile()))
-                            ent = Takai.Data.Serializer.TextDeserialize(reader) as Takai.Game.Entity;
+                            ent = Takai.Data.Serializer.TextDeserialize(reader) as Takai.Game.EntityClass;
 
                         if (ent != null)
                         {
-                            ent.Position = currentWorldPos;
-                            editor.Map.Spawn(ent);
+                            editor.Map.Spawn(ent, currentWorldPos, Vector2.UnitX);
                         }
                     }
 
@@ -152,8 +160,8 @@ namespace DyingAndMore.Editor
                 var selected = editor.Map.FindEntities(currentWorldPos, searchRadius, true);
                 if (selected.Count < 1)
                 {
-                    if (editor.Map.Bounds.Contains(currentWorldPos))
-                        SelectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedItem], currentWorldPos, Vector2.UnitX, Vector2.Zero);
+                    if (editor.Map.Bounds.Contains(currentWorldPos) && selector.ents.Count > 0)
+                        SelectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedItem], currentWorldPos, Vector2.UnitX);
                     else
                         SelectedEntity = null;
                 }
@@ -189,13 +197,14 @@ namespace DyingAndMore.Editor
                 if (InputState.IsButtonDown(MouseButtons.Left))
                 {
                     var delta = currentWorldPos - lastWorldPos;
-                    SelectedEntity.Position += delta;
+                    MoveEnt(SelectedEntity, _selectedEntity.Position + delta);
 
                     return false;
                 }
 
                 if (InputState.IsButtonDown(Keys.R))
                 {
+                    //todo: sector modification?
                     var diff = currentWorldPos - SelectedEntity.Position;
                     diff.Normalize();
                     SelectedEntity.Direction = diff;
@@ -221,6 +230,27 @@ namespace DyingAndMore.Editor
             foreach (var ent in editor.Map.ActiveEnts)
             {
                 editor.Map.DrawArrow(ent.Position, ent.Direction, ent.Radius * 1.5f, Color.Gold);
+            }
+        }
+
+        void MoveEnt(Takai.Game.EntityInstance ent, Vector2 newPosition)
+        {
+            var sectors = editor.Map.GetOverlappingSectors(ent.AxisAlignedBounds);
+
+            //todo: standarize somewhere?
+
+            for (int y = sectors.Top; y < sectors.Bottom; ++y)
+            {
+                for (int x = sectors.Left; x < sectors.Right; ++x)
+                    editor.Map.Sectors[y, x].entities.Remove(ent);
+            }
+            ent.Position = newPosition;
+
+            sectors = editor.Map.GetOverlappingSectors(ent.AxisAlignedBounds);
+            for (int y = sectors.Top; y < sectors.Bottom; ++y)
+            {
+                for (int x = sectors.Left; x < sectors.Right; ++x)
+                    editor.Map.Sectors[y, x].entities.Add(ent);
             }
         }
     }

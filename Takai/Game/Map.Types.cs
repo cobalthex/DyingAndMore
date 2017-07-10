@@ -10,8 +10,6 @@ namespace Takai.Game
     /// <typeparam name="T">The type of range</typeparam>
     public struct Range<T>
     {
-        private static System.Random randomGen = new System.Random();
-
         public T min;
         public T max;
 
@@ -29,6 +27,21 @@ namespace Takai.Game
         {
             return new Range<T>
                 (value);
+        }
+    }
+
+    public static class RandomRange
+    {
+        private static System.Random randomGen = new System.Random();
+
+        public static int Next(Range<int> range)
+        {
+            return randomGen.Next(range.min, range.max);
+        }
+
+        public static float Next(Range<float> range)
+        {
+            return (float)randomGen.NextDouble() * (range.max - range.min) + range.min;
         }
     }
 

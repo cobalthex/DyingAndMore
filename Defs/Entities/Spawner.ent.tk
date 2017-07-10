@@ -1,52 +1,64 @@
-Spawner {
-    Class: "Spawner";
+ActorClass {
+    Name: "Spawner";
     MaxHealth: 1000;
-    State: {
-        BaseState: EntStateKey [Idle];
-        States: {
-            Idle: {
-                Sprite: {
-                    texture: "Textures/Entities/Spawner.png";
-                    Width: 64;
-                    Height: 64;
-                    origin: [32 32];
-                    ClipRect: [0 0 64 64];
-                };
+    DefaultFaction: Factions [Enemy];
+
+    States: {
+        Idle: {
+            Sprite: {
+                texture: "Textures/Entities/Spawner.png";
+                Width: 64;
+                Height: 64;
+                origin: [32 32];
+                ClipRect: [0 0 64 64];
             };
-            Active: {
-                Sprite: {
-                    texture: "Textures/Entities/Spawner.png";
-                    width: 64;
-                    height: 64;
-                    origin: [32 32];
-                    ClipRect: [0 32 320 64];
-                    FrameCount: 5;
-                    FrameLength: 200;
-                    IsLooping: False;
-                };
+        };
+        Active: {
+            Sprite: {
+                texture: "Textures/Entities/Spawner.png";
+                width: 64;
+                height: 64;
+                origin: [32 32];
+                ClipRect: [0 64 320 64];
+                FrameCount: 5;
+                FrameLength: 100;
+                Tween: TweenStyle.Overlap;
+                IsLooping: False;
             };
-            Inactive: {
-                Sprite: {
-                    texture: "Textures/Entities/Spawner.png";
-                    width: 64;
-                    height: 64;
-                    origin: [32 32];
-                    ClipRect: [0 64 192 64];
-                    FrameCount: 3;
-                    FrameLength: 200;
-                    IsLooping: False;
-                };
+        };
+        Inactive: {
+            Sprite: {
+                texture: "Textures/Entities/Spawner.png";
+                width: 64;
+                height: 64;
+                origin: [32 32];
+                ClipRect: [0 128 192 64];
+                FrameCount: 3;
+                FrameLength: 100;
+                Tween: TweenStyle.Overlap;
+                IsLooping: False;
+            };
+        };
+        Dead: {
+            Sprite: {
+                texture: "Textures/Entities/Spawner.png";
+                width: 64;
+                height: 64;
+                origin: [32 32];
+                ClipRect: [0 192 192 64];
+                FrameCount: 3;
+                FrameLength: 100;
+                Tween: TweenStyle.Overlap;
+                IsLooping: False;
             };
         };
     };
-    IsAlive: True;
+
     AlwaysActive: False;
-    Radius: 16;
     IsPhysical: True;
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
 
-    Faction: Factions [Enemy];
     SearchRadius: 200;
 
     Template: [

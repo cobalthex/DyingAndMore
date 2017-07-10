@@ -56,17 +56,17 @@ namespace Takai.UI
         /// </summary>
         public virtual string Text
         {
-            get => text;
+            get => _text;
             set
             {
-                if (text != value)
+                if (_text != value)
                 {
-                    text = value;
-                    textSize = Font?.MeasureString(text) ?? Vector2.One;
+                    _text = value;
+                    textSize = Font?.MeasureString(_text) ?? Vector2.One;
                 }
             }
         }
-        private string text = "";
+        private string _text = "";
         protected Vector2 textSize;
 
         /// <summary>
@@ -75,17 +75,17 @@ namespace Takai.UI
         /// </summary>
         public virtual Graphics.BitmapFont Font
         {
-            get => font;
+            get => _font;
             set
             {
-                if (font != value)
+                if (_font != value)
                 {
-                    font = value;
-                    textSize = font?.MeasureString(text) ?? Vector2.One;
+                    _font = value;
+                    textSize = _font?.MeasureString(_text) ?? Vector2.One;
                 }
             }
         }
-        private Graphics.BitmapFont font = DefaultFont;
+        private Graphics.BitmapFont _font = DefaultFont;
 
         /// <summary>
         /// The color of this element. Usage varies between element types
@@ -99,38 +99,43 @@ namespace Takai.UI
         public virtual Color BorderColor { get; set; } = Color.Transparent;
 
         /// <summary>
+        /// An optional fill color for this element, by default, transparent
+        /// </summary>
+        public virtual Color BackgroundColor { get; set; } = Color.Transparent;
+
+        /// <summary>
         /// How this element is positioned in its container horizontally
         /// </summary>
         public Alignment HorizontalAlignment
         {
-            get => horizontalAlignment;
+            get => _horizontalAlignment;
             set
             {
-                if (horizontalAlignment != value)
+                if (_horizontalAlignment != value)
                 {
-                    horizontalAlignment = value;
+                    _horizontalAlignment = value;
                     Reflow();
                 }
             }
         }
-        private Alignment horizontalAlignment;
+        private Alignment _horizontalAlignment;
 
         /// <summary>
         /// How this element is positioned in its container vertically
         /// </summary>
         public Alignment VerticalAlignment
         {
-            get => verticalAlignment;
+            get => _verticalAlignment;
             set
             {
-                if (verticalAlignment != value)
+                if (_verticalAlignment != value)
                 {
-                    verticalAlignment = value;
+                    _verticalAlignment = value;
                     Reflow();
                 }
             }
         }
-        private Alignment verticalAlignment;
+        private Alignment _verticalAlignment;
 
         /// <summary>
         /// The position relative to the orientation.
@@ -142,17 +147,17 @@ namespace Takai.UI
         [Data.Serializer.ReadOnly]
         public Vector2 Position
         {
-            get => position;
+            get => _position;
             set
             {
-                if (position != value)
+                if (_position != value)
                 {
-                    position = value;
+                    _position = value;
                     Reflow();
                 }
             }
         }
-        private Vector2 position = Vector2.Zero;
+        private Vector2 _position = Vector2.Zero;
 
         /// <summary>
         /// The size of the element
@@ -161,17 +166,17 @@ namespace Takai.UI
         [Data.Serializer.ReadOnly]
         public Vector2 Size
         {
-            get => size;
+            get => _size;
             set
             {
-                if (size != value)
+                if (_size != value)
                 {
-                    size = value;
+                    _size = value;
                     ResizeAndReflow();
                 }
             }
         }
-        private Vector2 size = Vector2.One;
+        private Vector2 _size = Vector2.One;
 
         /// <summary>
         /// The bounds of this static, calculated from <see cref="Position"/> and <see cref="Size"/>
@@ -185,8 +190,8 @@ namespace Takai.UI
             {
                 if (Bounds != value)
                 {
-                    position = value.Location.ToVector2();
-                    size = value.Size.ToVector2();
+                    _position = value.Location.ToVector2();
+                    _size = value.Size.ToVector2();
                     ResizeAndReflow();
                 }
             }
@@ -217,7 +222,7 @@ namespace Takai.UI
         /// </summary>
         public bool HasFocus
         {
-            get => hasFocus;
+            get => _hasFocus;
             set
             {
                 if (value == true)
@@ -226,24 +231,29 @@ namespace Takai.UI
 
                     //defocus all elements in tree
                     Static next = this;
-                    while (next.parent != null)
-                        next = next.parent;
+                    while (next._parent != null)
+                        next = next._parent;
 
                     defocusing.Push(next);
                     while (defocusing.Count > 0)
                     {
                         next = defocusing.Pop();
-                        next.hasFocus = false;
+                        next._hasFocus = false;
 
                         foreach (var child in next.children)
                             defocusing.Push(child);
                     }
                 }
 
-                hasFocus = value;
+                _hasFocus = value;
             }
         }
-        private bool hasFocus = false;
+        private bool _hasFocus = false;
+
+        /// <summary>
+        /// Disallows input to elements below this one in the tree
+        /// </summary>
+        public bool IsModal { get; set; } = false;
 
         /// <summary>
         /// Can this element be focused
@@ -304,17 +314,17 @@ namespace Takai.UI
         [Data.Serializer.Ignored]
         public Static Parent
         {
-            get => parent;
+            get => _parent;
             protected set
             {
-                if (parent != value)
+                if (_parent != value)
                 {
-                    parent = value;
+                    _parent = value;
                     Reflow();
                 }
             }
         }
-        private Static parent = null;
+        private Static _parent = null;
 
         /// <summary>
         /// A readonly collection of all of the children in this element
@@ -357,7 +367,7 @@ namespace Takai.UI
         public Static Clone()
         {
             var clone = CloneSelf();
-            clone.parent = null;
+            clone._parent = null;
             Stack<Static> clones = new Stack<Static>(new []{ clone });
             while (clones.Count > 0)
             {
@@ -365,7 +375,7 @@ namespace Takai.UI
                 for (int i = 0; i < top.children.Count; ++i)
                 {
                     var child = top.children[i].CloneSelf();
-                    child.parent = top;
+                    child._parent = top;
                     top.children[i] = child;
                     if (child.children.Count > 0)
                         clones.Push(child);
@@ -391,8 +401,8 @@ namespace Takai.UI
         {
             if (Parent != null)
             {
-                parent.RemoveChild(this);
-                parent = null;
+                _parent.RemoveChild(this);
+                _parent = null;
                 return true;
             }
             return false;
@@ -403,7 +413,7 @@ namespace Takai.UI
             if (child.Parent == this)
                 return;
 
-            child.parent = this;
+            child._parent = this;
             children.Add(child);
             if (child.HasFocus) //re-apply throughout tree
                 child.HasFocus = true;
@@ -417,7 +427,7 @@ namespace Takai.UI
         /// <param name="index">the index of the child to replace. Throws if out of range</param>
         public void ReplaceChild(Static child, int index)
         {
-            child.parent = this;
+            child._parent = this;
             children[index] = child;
             if (child.HasFocus)
                 child.HasFocus = true;
@@ -429,7 +439,7 @@ namespace Takai.UI
             if (child.Parent == this)
                 return;
 
-            child.parent = this;
+            child._parent = this;
             children.Insert(index, child);
             if (child.HasFocus) //re-apply throughout tree
                 child.HasFocus = true;
@@ -444,7 +454,7 @@ namespace Takai.UI
                 if (child.Parent == this)
                     continue;
 
-                child.parent = this;
+                child._parent = this;
                 this.children.Add(child);
                 if (child.HasFocus)
                     lastFocus = child;
@@ -464,7 +474,7 @@ namespace Takai.UI
                 if (child.Parent == this)
                     continue;
 
-                child.parent = this;
+                child._parent = this;
                 this.children.Add(child);
                 if (child.HasFocus)
                     lastFocus = child;
@@ -483,21 +493,21 @@ namespace Takai.UI
         public void RemoveChild(Static child)
         {
             children.Remove(child);
-            child.parent = null;
+            child._parent = null;
         }
 
         public Static RemoveChildAt(int index)
         {
             var child = children[index];
             children.RemoveAt(index);
-            child.parent = null;
+            child._parent = null;
             return child;
         }
 
         public void RemoveAllChildren()
         {
             foreach (var child in children)
-                child.parent = null;
+                child._parent = null;
             children.Clear();
         }
 
@@ -564,7 +574,7 @@ namespace Takai.UI
                 if (current != next)
                     continue;
 
-                while (next.parent != null)
+                while (next._parent != null)
                 {
                     var index = next.Parent.Children.IndexOf(next) + 1;
                     if (index < next.Parent.Children.Count)
@@ -573,7 +583,7 @@ namespace Takai.UI
                         break;
                     }
                     else
-                        next = next.parent;
+                        next = next._parent;
                 }
 
                 if (next.CanFocus)
@@ -598,7 +608,7 @@ namespace Takai.UI
             var prev = this;
             while (true)
             {
-                if (prev.parent == null)
+                if (prev._parent == null)
                 {
                     while (prev.children.Count > 0)
                         prev = prev.children[prev.children.Count - 1];
@@ -614,7 +624,7 @@ namespace Takai.UI
                             prev = prev.children[prev.children.Count - 1];
                     }
                     else
-                        prev = prev.parent;
+                        prev = prev._parent;
                 }
 
 
@@ -653,8 +663,7 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Find the element in this tree that has focus
-        /// Searches up and down
+        /// Find the element in this tree that has focus (recursively)
         /// </summary>
         /// <returns>The focused element, or null if there is none</returns>
         public Static FindFocused()
@@ -680,7 +689,7 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Find a child element by its name
+        /// Find a child element by its name (recursively)
         /// </summary>
         /// <param name="name">The name of the UI to search for</param>
         /// <returns>The first child found or null if none found with the specified name</returns>
@@ -713,39 +722,34 @@ namespace Takai.UI
         /// </summary>
         public virtual void Reflow()
         {
-            if (parent != null &&
+            if (_parent != null &&
                 (HorizontalAlignment == Alignment.Stretch ||
                 VerticalAlignment == Alignment.Stretch))
             {
                 if (HorizontalAlignment == Alignment.Stretch)
                 {
-                    position.X = 0;
-                    size.X = parent.size.X;
+                    _position.X = 0;
+                    _size.X = _parent._size.X;
                 }
                 if (VerticalAlignment == Alignment.Stretch)
                 {
-                    position.Y = 0;
-                    size.Y = parent.size.Y;
+                    _position.Y = 0;
+                    _size.Y = _parent._size.Y;
                 }
                 CalculateBounds();
 
                 OnResize(System.EventArgs.Empty);
                 Resize?.Invoke(this, System.EventArgs.Empty);
             }
+            else
+                CalculateBounds();
 
             foreach (var child in Children)
-            {
-                child.CalculateBounds();
                 child.Reflow();
-            }
         }
 
         protected void ResizeAndReflow()
         {
-            if (horizontalAlignment != Alignment.Stretch ||
-                verticalAlignment != Alignment.Stretch)
-                CalculateBounds();
-
             Reflow();
 
             OnResize(System.EventArgs.Empty);
@@ -811,7 +815,10 @@ namespace Takai.UI
             var bounds = new Rectangle(Position.ToPoint(), textSize.ToPoint());
             foreach (var child in Children)
             {
-                child.Position += new Vector2(padding);
+                if (child.HorizontalAlignment != Alignment.Middle)
+                    child.Position += new Vector2(padding, 0);
+                if (child.VerticalAlignment != Alignment.Middle)
+                    child.Position += new Vector2(0, padding);
                 bounds = Rectangle.Union(bounds, child.Bounds);
             }
             Size = bounds.Size.ToVector2() + new Vector2(padding);
@@ -837,32 +844,32 @@ namespace Takai.UI
                     H
             */
 
-            var update = this;
-            while (update.children.Count > 0)
-                update = update.children[update.children.Count - 1];
+            var toUpdate = this;
+            while (toUpdate.children.Count > 0)
+                toUpdate = toUpdate.children[toUpdate.children.Count - 1];
 
             bool handleInput = true;
             while (true)
             {
                 if (handleInput)
-                    handleInput = update.HandleInput(time);
+                    handleInput = toUpdate.HandleInput(time) && !toUpdate.IsModal;
 
-                update.UpdateSelf(time);
+                toUpdate.UpdateSelf(time);
 
                 //stop at this element
-                if (update.parent == null || update == this)
+                if (toUpdate._parent == null || toUpdate == this)
                     break;
 
-                var index = update.Parent.Children.IndexOf(update) - 1;
+                var index = toUpdate.Parent.Children.IndexOf(toUpdate) - 1;
                 if (index >= 0)
                 {
-                    update = update.Parent.Children[index];
+                    toUpdate = toUpdate.Parent.Children[index];
 
-                    while (update.children.Count > 0)
-                        update = update.children[update.children.Count - 1];
+                    while (toUpdate.children.Count > 0)
+                        toUpdate = toUpdate.children[toUpdate.children.Count - 1];
                 }
                 else
-                    update = update.parent;
+                    toUpdate = toUpdate._parent;
             }
         }
 
@@ -948,14 +955,16 @@ namespace Takai.UI
 
             while (draws.Count > 0)
             {
-                var draw = draws.Dequeue();
+                var toDraw = draws.Dequeue();
 
-                draw.DrawSelf(spriteBatch);
-                Graphics.Primitives2D.DrawRect(spriteBatch, draw.HasFocus ? FocusedBorderColor : draw.BorderColor, draw.VisibleBounds);
+                Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
+                toDraw.DrawSelf(spriteBatch);
+                //Graphics.Primitives2D.DrawRect(spriteBatch, Color.Tomato, toDraw.VirtualBounds);
+                Graphics.Primitives2D.DrawRect(spriteBatch, toDraw.HasFocus ? FocusedBorderColor : toDraw.BorderColor, toDraw.VisibleBounds);
 
-                if (DebugFont != null && draw.VisibleBounds.Contains(Input.InputState.MousePoint))
+                if (DebugFont != null && toDraw.VisibleBounds.Contains(Input.InputState.MousePoint))
                 {
-                    var rect = draw.VisibleBounds;
+                    var rect = toDraw.VisibleBounds;
                     rect.Inflate(1, 1);
                     Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, rect);
 
@@ -963,7 +972,7 @@ namespace Takai.UI
                     DebugFont.Draw(spriteBatch, info, (rect.Location + rect.Size).ToVector2(), Color.Gold);
                 }
 
-                foreach (var child in draw.Children)
+                foreach (var child in toDraw.Children)
                     draws.Enqueue(child);
             }
         }
@@ -976,7 +985,7 @@ namespace Takai.UI
         {
             if (Font != null)
             {
-                var textPos = ((size - textSize) / 2).ToPoint();
+                var textPos = ((_size - textSize) / 2).ToPoint();
                 DrawText(spriteBatch, textPos);
             }
         }
@@ -995,7 +1004,7 @@ namespace Takai.UI
         {
             if (props.TryGetValue("AutoSize", out var autoSize))
             {
-                if (autoSize is int autoSizeValue)
+                if (autoSize is System.Int64 autoSizeValue)
                     AutoSize(autoSizeValue);
                 else if (autoSize is bool doAutoSize)
                     AutoSize();
@@ -1008,7 +1017,7 @@ namespace Takai.UI
                 Size = new Vector2(Data.Serializer.CastType<float>(width), Size.Y);
 
             if (props.TryGetValue("Height", out var height))
-                Size = new Vector2(size.X, Data.Serializer.CastType<float>(height));
+                Size = new Vector2(_size.X, Data.Serializer.CastType<float>(height));
         }
 
         public override string ToString()
@@ -1043,15 +1052,16 @@ namespace Takai.UI
             return builder.ToString();
         }
 
-        public static Static GeneratePropSheet(object obj, Graphics.BitmapFont font,
-                                        Color color)
+        public static Static GeneratePropSheet(object obj, Graphics.BitmapFont font, Color color)
         {
-            var root = new List();
+            var root = new List() { Margin = 2 };
+            var maxWidth = 0f;
 
             //todo: item spacing (can't use list margin without nesting)
 
             var members = obj.GetType().GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 
+            //todo: move these into type handlers
             foreach (var member in members)
             {
                 System.Type type;
@@ -1088,14 +1098,16 @@ namespace Takai.UI
                     };
                     label.AutoSize();
                     root.AddChild(label);
+
+                    maxWidth = MathHelper.Max(maxWidth, label._size.X);
                 }
 
                 if (type == typeof(bool))
                 {
                     var check = new CheckBox()
                     {
+                        Name = member.Name,
                         Text = BeautifyMemberName(member.Name),
-                        HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
                     };
@@ -1105,6 +1117,11 @@ namespace Takai.UI
                     };
                     check.AutoSize();
                     root.AddChild(check);
+                    maxWidth = MathHelper.Max(maxWidth, check._size.X);
+                }
+                else if (type.IsEnum)
+                {
+                    //todo
                 }
                 else if (type == typeof(int))
                 {
@@ -1114,6 +1131,7 @@ namespace Takai.UI
                         Maximum = int.MaxValue,
                         Value = (int)curValue,
 
+                        Name = member.Name,
                         HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
@@ -1133,6 +1151,7 @@ namespace Takai.UI
                         Maximum = uint.MaxValue,
                         Value = (long)curValue,
 
+                        Name = member.Name,
                         HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
@@ -1152,6 +1171,7 @@ namespace Takai.UI
                         Maximum = long.MaxValue,
                         Value = (long)curValue,
 
+                        Name = member.Name,
                         HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color
@@ -1168,6 +1188,7 @@ namespace Takai.UI
                     //todo: file input where applicable (maybe switch vars to use FileInfo class)
                     var input = new TextInput()
                     {
+                        Name = member.Name,
                         Text = (string)curValue,
                         HorizontalAlignment = Alignment.Stretch,
                         Font = font,
@@ -1184,6 +1205,7 @@ namespace Takai.UI
                 {
                     var input = new FileInput()
                     {
+                        Name = member.Name,
                         Text = ((System.IO.FileInfo)curValue)?.Name,
                         HorizontalAlignment = Alignment.Stretch,
                         Font = font,
@@ -1200,6 +1222,7 @@ namespace Takai.UI
                 {
                     var input = new FileInput()
                     {
+                        Name = member.Name,
                         Text = ((Texture2D)curValue)?.Name,
                         HorizontalAlignment = Alignment.Stretch,
                         Font = font,
@@ -1220,6 +1243,7 @@ namespace Takai.UI
                         Maximum = long.MaxValue,
                         Value = (long)((System.TimeSpan)curValue).TotalMilliseconds,
 
+                        Name = member.Name,
                         HorizontalAlignment = Alignment.Stretch,
                         Font = font,
                         Color = color,
@@ -1258,8 +1282,8 @@ namespace Takai.UI
                 }
             }
 
+            root._size = new Vector2(maxWidth, 1);
             root.AutoSize();
-            root.HorizontalAlignment = Alignment.Stretch;
             return root;
         }
     }

@@ -48,8 +48,8 @@ namespace Takai.Game
         /// <summary>
         /// Ents that are to be destroyed during the next Update()
         /// </summary>
-        protected List<Entity> entsToDestroy = new List<Entity>(8);
-        protected List<Entity> entsToRemoveFromActive = new List<Entity>(16);
+        protected List<EntityInstance> entsToDestroy = new List<EntityInstance>(8);
+        protected List<EntityInstance> entsToRemoveFromActive = new List<EntityInstance>(16);
 
         /// <summary>
         /// Update the map state
@@ -105,8 +105,8 @@ namespace Takai.Game
             //remove entities that have been destroyed
             foreach (var ent in entsToDestroy)
             {
-                if (ent.Map != this)
-                    continue;
+                //if (ent.Map != this)
+                //    continue;
 
                 ent.OnDestroy();
                 ent.SpawnTime = TimeSpan.Zero;
@@ -123,35 +123,31 @@ namespace Takai.Game
                 --TotalEntitiesCount;
             }
             entsToDestroy.Clear();
-
-            ActiveEnts.ExceptWith(entsToRemoveFromActive);
-            entsToRemoveFromActive.Clear();
-
+            /*
             foreach (var ent in ActiveEnts)
             {
                 var entBounds = ent.AxisAlignedBounds;
 
-                //ents outside the map are deleted
-                if (!Bounds.Contains(entBounds))
-                    Destroy(ent);
+                bool isDead = ent.State.Is(EntStateId.Dead);
 
-                else if (!ent.AlwaysActive && !visibleRegion.Contains(entBounds))
+                if (!Bounds.Intersects(entBounds) || //outside of the map
+                    ent.State.BaseState == EntStateId.Invalid || //no state
+                    (isDead &&
+                     (!ent.Sprites.GetEnumerator().MoveNext() || //no sprite
+                     (ent.Class.DestroyIfDead && ent.State.States[EntStateId.Dead].HasFinished())))) //animation is over and remove after death
+                        Destroy(ent);
+
+                else if (!ent.AlwaysActive && !visibleRegion.Intersects(entBounds))
                 {
-                    if (ent.DestroyIfDeadAndInactive && ent.State.Is(EntStateKey.Dead))
+                    if (isDead)
                         Destroy(ent);
                     else
                         entsToRemoveFromActive.Add(ent);
                 }
                 else
                 {
-                    if (!ent.IsAlive)
+                    if (!ent.IsActive)
                         continue;
-
-                    if (ent.State.BaseState == EntStateKey.Invalid)
-                    {
-                        Destroy(ent);
-                        continue;
-                    }
 
                     if (updateSettings.isAiEnabled)
                         ent.Think(deltaTime);
@@ -214,9 +210,17 @@ namespace Takai.Game
 
                         if (ent.Velocity != Vector2.Zero)
                         {
-                            ent.Position += ent.Velocity * deltaSeconds;
-                            //update entity sector data, for collision
                             var sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
+
+                            //todo: optimize removal/additions to only remove if not currently inside
+                            for (int y = sectors.Top; y < sectors.Bottom; ++y)
+                            {
+                                for (int x = sectors.Left; x < sectors.Right; ++x)
+                                    Sectors[y, x].entities.Remove(ent);
+                            }
+                            ent.Position += ent.Velocity * deltaSeconds;
+
+                            sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
                             for (int y = sectors.Top; y < sectors.Bottom; ++y)
                             {
                                 for (int x = sectors.Left; x < sectors.Right; ++x)
@@ -226,6 +230,9 @@ namespace Takai.Game
                     }
                 }
             }
+            */
+            ActiveEnts.ExceptWith(entsToRemoveFromActive);
+            entsToRemoveFromActive.Clear();
 
             //add new entities to active set (will be updated next frame)
             for (int y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
