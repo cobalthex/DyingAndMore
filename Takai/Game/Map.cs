@@ -141,7 +141,6 @@ namespace Takai.Game
         {
             get
             {
-                throw new System.Exception("see todo");
                 //todo: this is not unique
                 foreach (var sector in Sectors)
                 {
@@ -277,12 +276,13 @@ namespace Takai.Game
             ++TotalEntitiesCount;
         }
 
-        public EntityInstance Spawn(EntityClass @class, Vector2 position, Vector2 direction)
+        public EntityInstance Spawn(EntityClass @class, Vector2 position, Vector2 direction, Vector2 velocity)
         {
             var instance = @class.Create();
 
             instance.Position = position;
             instance.Direction = direction;
+            instance.Velocity = velocity;
 
             Spawn(instance);
             return instance;

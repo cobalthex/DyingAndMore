@@ -40,8 +40,9 @@ namespace DyingAndMore.Game.Entities
 
         //inherited
         public Range<float> MaxSpeed { get; set; }
-        public Weapons.Weapon DefaultWeapon { get; set; } = null;
+        public Weapons.WeaponClass DefaultWeapon { get; set; } = null;
         public Factions DefaultFaction { get; set; } = Factions.None;
+        public Controller DefaultController { get; set; } = null;
 
         public override EntityInstance Create()
         {
@@ -58,15 +59,10 @@ namespace DyingAndMore.Game.Entities
             {
                 System.Diagnostics.Contracts.Contract.Assert(value is ActorClass);
                 base.Class = value;
-                _actorClass = value as ActorClass;
-
-                MaxSpeed      = RandomRange.Next(_actorClass.MaxSpeed);
-                CurrentHealth = _actorClass.MaxHealth;
-                Weapon        = _actorClass.DefaultWeapon;
-                Faction       = _actorClass.DefaultFaction;
+                _Class = value as ActorClass;
             }
         }
-        private ActorClass _actorClass;
+        private ActorClass _Class;
 
         /// <summary>
         /// The current faction. Typically used by the AI to determine enemies
@@ -98,25 +94,25 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public int CurrentHealth { get; set; }
 
-        /// <summary>
-        /// The direction the entity is moving
-        /// </summary>
-        public Vector2 Velocity { get; set; } = Vector2.Zero;
-
-        private Vector2 lastVelocity = Vector2.Zero;
+        private Vector2 lastVelocity;
 
         #region Inherited
 
         public float MaxSpeed { get; set; }
 
-        public Weapons.Weapon Weapon { get; set; } = null;
+        public Weapons.WeaponInstance Weapon { get; set; } = null;
 
         #endregion
 
         public ActorInstance() { }
         public ActorInstance(ActorClass @class)
+            : base(@class)
         {
-            Class = @class;
+            MaxSpeed = RandomRange.Next(_Class.MaxSpeed);
+            CurrentHealth = _Class.MaxHealth;
+            Weapon = _Class.DefaultWeapon?.Create();
+            Faction = _Class.DefaultFaction;
+            Controller = _Class.DefaultController;
         }
 
         public override void Think(System.TimeSpan DeltaTime)
@@ -149,21 +145,40 @@ namespace DyingAndMore.Game.Entities
             }
         }
 
+        public void FireWeapon()
+        {
+            Weapon?.Fire(this);
+        }
+
+        public void Accelerate(Vector2 direction)
+        {
+            var vel = Velocity + (direction * _Class.MoveForce);
+            var lSq = vel.LengthSquared();
+            if (lSq > MaxSpeed * MaxSpeed)
+                vel = (vel / (float)System.Math.Sqrt(lSq)) * MaxSpeed;
+            Velocity = vel;
+        }
+
+        public void MoveTo(Vector2 newPosition, Vector2 newDirection)
+        {
+            throw new System.NotImplementedException();//todo
+        }
+
         #region Helpers
 
         /// <summary>
-        /// Is this entity facing a point
+        /// Can this actor see a point given its field of view?
         /// </summary>
         /// <param name="Point">The point to check</param>
         /// <returns>True if this entity is facing Point</returns>
-        public bool IsFacing(Vector2 Point)
+        public bool CanSee(Vector2 Point)
         {
             var diff = Point - Position;
             diff.Normalize();
 
             var dot = Vector2.Dot(Direction, diff);
 
-            return (dot > (1 - (_actorClass.FieldOfView / MathHelper.Pi)));
+            return (dot > (1 - (_Class.FieldOfView / MathHelper.Pi)));
         }
 
         /// <summary>
@@ -177,16 +192,7 @@ namespace DyingAndMore.Game.Entities
             diff.Normalize();
 
             var dot = Vector2.Dot(diff, Ent.Direction);
-            return (dot > (_actorClass.FieldOfView / MathHelper.Pi) - 1);
-        }
-
-        public void Move(Vector2 Direction)
-        {
-            var vel = Velocity + (Direction * _actorClass.MoveForce);
-            var lSq = vel.LengthSquared();
-            if (lSq > MaxSpeed * MaxSpeed)
-                vel = (vel / (float)System.Math.Sqrt(lSq)) * MaxSpeed;
-            Velocity = vel;
+            return (dot > (_Class.FieldOfView / MathHelper.Pi) - 1);
         }
 
         #endregion

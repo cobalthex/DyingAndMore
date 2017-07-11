@@ -74,7 +74,7 @@ namespace Tool
                         
                         foreach (var ty in Takai.Data.Serializer.RegisteredTypes)
                         {
-                            if (ty.Value.GetCustomAttributes(typeof(Takai.Data.DesignerCreatableAttribute), true).Length < 1)
+                            if (ty.Value.GetCustomAttributes(typeof(Takai.Data.DesignerModdableAttribute), true).Length < 1)
                                 continue;
 
                             PrintType(ty.Value, writer);

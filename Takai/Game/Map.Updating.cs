@@ -123,7 +123,7 @@ namespace Takai.Game
                 --TotalEntitiesCount;
             }
             entsToDestroy.Clear();
-            /*
+
             foreach (var ent in ActiveEnts)
             {
                 var entBounds = ent.AxisAlignedBounds;
@@ -137,7 +137,7 @@ namespace Takai.Game
                      (ent.Class.DestroyIfDead && ent.State.States[EntStateId.Dead].HasFinished())))) //animation is over and remove after death
                         Destroy(ent);
 
-                else if (!ent.AlwaysActive && !visibleRegion.Intersects(entBounds))
+                else if (!ent.Class.AlwaysActive && !visibleRegion.Intersects(entBounds))
                 {
                     if (isDead)
                         Destroy(ent);
@@ -146,9 +146,6 @@ namespace Takai.Game
                 }
                 else
                 {
-                    if (!ent.IsActive)
-                        continue;
-
                     if (updateSettings.isAiEnabled)
                         ent.Think(deltaTime);
 
@@ -174,20 +171,20 @@ namespace Takai.Game
                                     ent.OnEntityCollision(hit.entity, startPos + (direction * hit.distance), deltaTime);
                                     hit.entity.OnEntityCollision(ent, startPos + (direction * hit.distance), deltaTime);
 
-                                    if (ent.IsPhysical)
+                                    if (ent.Class.IsPhysical)
                                         ent.Velocity = Vector2.Zero;
                                 }
                                 else
                                 {
                                     ent.OnMapCollision(targetCell, startPos + (direction * hit.distance), deltaTime); //todo: update w/ correct tile
 
-                                    if (ent.IsPhysical)
+                                    if (ent.Class.IsPhysical)
                                         ent.Velocity = Vector2.Zero;
                                 }
                             }
 
                             //Fluid collision
-                            if (!ent.IgnoreTrace)
+                            if (!ent.Class.IgnoreTrace)
                             {
                                 var drag = 0f;
                                 var dc = 0u;
@@ -230,7 +227,7 @@ namespace Takai.Game
                     }
                 }
             }
-            */
+
             ActiveEnts.ExceptWith(entsToRemoveFromActive);
             entsToRemoveFromActive.Clear();
 

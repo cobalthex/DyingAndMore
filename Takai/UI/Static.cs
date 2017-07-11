@@ -408,14 +408,12 @@ namespace Takai.UI
             return false;
         }
 
-        public void AddChild(Static child)
+        public virtual void AddChild(Static child)
         {
-            if (child.Parent == this)
-                return;
-
+            //todo: come up with a common interface for modifying children
             child._parent = this;
             children.Add(child);
-            if (child.HasFocus) //re-apply throughout tree
+            if (child.HasFocus)
                 child.HasFocus = true;
             Reflow();
         }
@@ -425,8 +423,11 @@ namespace Takai.UI
         /// </summary>
         /// <param name="child">the child to replace with</param>
         /// <param name="index">the index of the child to replace. Throws if out of range</param>
-        public void ReplaceChild(Static child, int index)
+        public virtual void ReplaceChild(Static child, int index)
         {
+            if (children[index] != null)
+                children[index].Parent = null;
+
             child._parent = this;
             children[index] = child;
             if (child.HasFocus)
@@ -434,7 +435,7 @@ namespace Takai.UI
             Reflow();
         }
 
-        public void InsertChild(Static child, int index = 0)
+        public virtual void InsertChild(Static child, int index = 0)
         {
             if (child.Parent == this)
                 return;
@@ -448,6 +449,7 @@ namespace Takai.UI
 
         public void AddChildren(params Static[] children)
         {
+            //todo: see below
             Static lastFocus = null;
             foreach (var child in children)
             {
@@ -466,8 +468,10 @@ namespace Takai.UI
             Reflow();
         }
 
-        public void AddChildren(IEnumerable<Static> children)
+        public virtual void AddChildren(IEnumerable<Static> children)
         {
+            //todo: add disable reflow and then switch this to use InsertChild
+
             Static lastFocus = null;
             foreach (var child in children)
             {
@@ -492,11 +496,10 @@ namespace Takai.UI
         /// <param name="child"></param>
         public void RemoveChild(Static child)
         {
-            children.Remove(child);
-            child._parent = null;
+            RemoveChildAt(children.IndexOf(child));
         }
 
-        public Static RemoveChildAt(int index)
+        public virtual Static RemoveChildAt(int index)
         {
             var child = children[index];
             children.RemoveAt(index);
@@ -693,7 +696,7 @@ namespace Takai.UI
         /// </summary>
         /// <param name="name">The name of the UI to search for</param>
         /// <returns>The first child found or null if none found with the specified name</returns>
-        public Static FindChildByName(string name, bool caseSensitive = true)
+        public Static FindChildByName(string name, bool caseSensitive = false)
         {
             var parent = this;
             while (parent.Parent != null)
@@ -1014,10 +1017,10 @@ namespace Takai.UI
                 AutoSize();
 
             if (props.TryGetValue("Width", out var width))
-                Size = new Vector2(Data.Serializer.CastType<float>(width), Size.Y);
+                Size = new Vector2(Data.Serializer.Cast<float>(width), Size.Y);
 
             if (props.TryGetValue("Height", out var height))
-                Size = new Vector2(_size.X, Data.Serializer.CastType<float>(height));
+                Size = new Vector2(_size.X, Data.Serializer.Cast<float>(height));
         }
 
         public override string ToString()

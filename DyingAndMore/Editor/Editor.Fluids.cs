@@ -44,6 +44,8 @@ namespace DyingAndMore.Editor
             {
                 AddChild(selector);
             };
+
+            selector.SelectedItem = 0;
         }
 
         protected override bool HandleInput(GameTime time)

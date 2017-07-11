@@ -25,4 +25,11 @@ ActorClass {
     IsPhysical: True;
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
+
+    DefaultWeapon: SpawnerClass {
+        Spawns: [
+            [@"Defs/Entities/InfectedCell.ent.tk" [30 50]]
+            [@"Defs/Entities/Astrovirus.ent.tk" [30 50]]
+        ]
+    }
 }

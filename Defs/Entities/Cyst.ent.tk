@@ -1,7 +1,11 @@
 ActorClass {
-    Name: "Spawner";
+    Name: "Cyst";
     MaxHealth: 1000;
     DefaultFaction: Factions [Enemy];
+    DefaultController: ArtilleryController {
+        CanRotate: true;
+    };
+    FieldOfView: 6.28318530718;
 
     States: {
         Idle: {
@@ -59,9 +63,9 @@ ActorClass {
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
 
-    SearchRadius: 200;
-
-    Template: [
-        [@"Defs/Entities/InfectedCell.ent.tk" [3 5]]
-    ]
+    Weapon: SpawnerClass {
+        Spawns: [
+            [@"Defs/Entities/InfectedCell.ent.tk" [3 5]]
+        ]
+    }
 }

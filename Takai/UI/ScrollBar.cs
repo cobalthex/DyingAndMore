@@ -235,7 +235,7 @@ namespace Takai.UI
         }
 
         //todo: virtualize
-        public new void AddChild(Static child)
+        public override void AddChild(Static child)
         {
             contentArea.AddChild(child);
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
@@ -32,7 +33,7 @@ namespace Takai.Game
 
     public static class RandomRange
     {
-        private static System.Random randomGen = new System.Random();
+        private static Random randomGen = new Random();
 
         public static int Next(Range<int> range)
         {
@@ -42,6 +43,18 @@ namespace Takai.Game
         public static float Next(Range<float> range)
         {
             return (float)randomGen.NextDouble() * (range.max - range.min) + range.min;
+        }
+
+        public static TimeSpan Next(Range<TimeSpan> range)
+        {
+            if (range.min == range.max)
+                return range.min;
+
+            byte[] buf = new byte[8];
+            randomGen.NextBytes(buf);
+            long longRand = BitConverter.ToInt64(buf, 0);
+
+            return TimeSpan.FromTicks(Math.Abs(longRand % (range.max.Ticks - range.min.Ticks)) + range.min.Ticks);
         }
     }
 
@@ -69,7 +82,7 @@ namespace Takai.Game
     /// A single type of Fluid
     /// This struct defines the graphics for the Fluid and physical properties that can affect the game
     /// </summary>
-    [Data.DesignerCreatable]
+    [Data.DesignerModdable]
     public class FluidType
     {
         /// <summary>
@@ -102,7 +115,7 @@ namespace Takai.Game
     /// Fluids can have physics per their fluid type
     /// Fluids can be spawned with a velocity which is decreased by their drag over time. Once the velocity reaches zero, the fluid is considered inactive (permanently)
     /// </summary>
-    [Data.DesignerCreatable]
+    [Data.DesignerModdable]
     public struct Fluid
     {
         public FluidType type;
@@ -110,7 +123,7 @@ namespace Takai.Game
         public Vector2 velocity;
     }
 
-    [Data.DesignerCreatable]
+    [Data.DesignerModdable]
     public class Decal
     {
         public Texture2D texture;
@@ -122,7 +135,7 @@ namespace Takai.Game
     /// <summary>
     /// A single type of particle
     /// </summary>
-    [Data.DesignerCreatable]
+    [Data.DesignerModdable]
     public class ParticleType
     {
         /// <summary>
@@ -159,9 +172,9 @@ namespace Takai.Game
     /// </summary>
     public struct Particle
     {
-        public System.TimeSpan time; //spawn time
-        public System.TimeSpan lifetime;
-        public System.TimeSpan delay;
+        public TimeSpan time; //spawn time
+        public TimeSpan lifetime;
+        public TimeSpan delay;
 
         public Vector2 position;
         public Vector2 direction;
@@ -191,11 +204,11 @@ namespace Takai.Game
         /// <summary>
         /// How long each particle should live for
         /// </summary>
-        public Range<System.TimeSpan> lifetime;
+        public Range<TimeSpan> lifetime;
         /// <summary>
         /// How long to wait before drawing the particle
         /// </summary>
-        public Range<System.TimeSpan> delay;
+        public Range<TimeSpan> delay;
         /// <summary>
         /// Where to spawn the particles from
         /// </summary>

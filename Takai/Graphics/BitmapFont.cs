@@ -7,7 +7,7 @@ using System;
 
 namespace Takai.Graphics
 {
-    [Data.DesignerCreatable]
+    [Data.DesignerModdable]
     [Data.CustomDeserialize(typeof(BitmapFont), "DeserializeFont")]
     public class BitmapFont : System.IDisposable
     {

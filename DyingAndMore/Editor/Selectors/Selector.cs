@@ -14,49 +14,49 @@ namespace DyingAndMore.Editor.Selectors
 
         public Point ItemSize
         {
-            get => itemSize;
+            get => _itemSize;
             set
             {
-                itemSize = value;
+                _itemSize = value;
                 OnResize(System.EventArgs.Empty);
             }
         }
-        private Point itemSize = new Point(1);
+        private Point _itemSize = new Point(1);
 
         public int ItemCount
         {
-            get => itemCount;
+            get => _itemCount;
             set
             {
-                itemCount = value;
+                _itemCount = value;
                 OnResize(System.EventArgs.Empty);
             }
         }
-        private int itemCount = 0;
+        private int _itemCount = 0;
 
         public int Padding
         {
-            get => padding;
+            get => _padding;
             set
             {
-                padding = value;
+                _padding = value;
                 OnResize(System.EventArgs.Empty);
             }
         }
-        private int padding = 2;
+        private int _padding = 2;
 
         protected int ItemsPerRow { get; private set; } = 1;
 
         public int SelectedItem
         {
-            get => selectedItem;
+            get => _selectedItem;
             set
             {
-                selectedItem = MathHelper.Clamp(value, 0, ItemCount - 1); ;
+                _selectedItem = MathHelper.Clamp(value, 0, ItemCount - 1); ;
                 SelectionChanged?.Invoke(this, System.EventArgs.Empty);
             }
         }
-        private int selectedItem = 0;
+        private int _selectedItem = 0;
 
         public event System.EventHandler SelectionChanged;
 
@@ -87,7 +87,7 @@ namespace DyingAndMore.Editor.Selectors
         {
             //todo: handle scroll
             var row = (int)((e.position.Y + scrollBar.ContentPosition - (Padding / 2)) / (ItemSize.Y + Padding)) * ItemsPerRow;
-            var col = (int)((e.position.X - (padding / 2)) / (itemSize.X + padding));
+            var col = (int)((e.position.X - (_padding / 2)) / (_itemSize.X + _padding));
 
             SelectedItem = row + col;
         }
