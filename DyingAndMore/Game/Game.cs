@@ -3,16 +3,18 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
-using Takai;
+using Takai.UI;
 
 namespace DyingAndMore.Game
 {
-    class Game : Takai.UI.MapView
+    class Game : MapView
     {
         Entities.ActorInstance player = null;
         Entities.Controller lastController = null;
 
-        Takai.UI.Static renderSettingsConsole;
+        Static fpsDisplay;
+
+        Static renderSettingsConsole;
         void ToggleRenderSettingsConsole()
         {
             if (!renderSettingsConsole.RemoveFromParent())
@@ -20,7 +22,7 @@ namespace DyingAndMore.Game
                 //refresh individual render settings
                 var settings = typeof(Takai.Game.Map.RenderSettings);
                 foreach (var child in renderSettingsConsole.Children)
-                    ((Takai.UI.CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
+                    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
 
                 AddChild(renderSettingsConsole);
             }
@@ -30,8 +32,8 @@ namespace DyingAndMore.Game
         {
             Map = map ?? throw new System.ArgumentNullException("There must be a map to play");
 
-            HorizontalAlignment = Takai.UI.Alignment.Stretch;
-            VerticalAlignment = Takai.UI.Alignment.Stretch;
+            HorizontalAlignment = Alignment.Stretch;
+            VerticalAlignment = Alignment.Stretch;
 
             pt1 = new Takai.Game.ParticleType()
             {
@@ -59,9 +61,17 @@ namespace DyingAndMore.Game
             map.renderSettings |= Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
 
             //renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
-            renderSettingsConsole = new Takai.UI.Static();
+            renderSettingsConsole = new Static();
             renderSettingsConsole.Position = new Vector2(100, 0);
-            renderSettingsConsole.VerticalAlignment = Takai.UI.Alignment.Middle;
+            renderSettingsConsole.VerticalAlignment = Alignment.Middle;
+
+            AddChild(fpsDisplay = new Static()
+            {
+                Position = new Vector2(20),
+                VerticalAlignment = Alignment.End,
+                HorizontalAlignment = Alignment.End,
+            });
+
         }
         Takai.Game.ParticleType pt1, pt2;
 
@@ -72,10 +82,9 @@ namespace DyingAndMore.Game
             Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawGrids;
             Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawTriggers;
 
-            //var plyr = from ent in Map.FindEntitiesByClass(true)
-            //           where ((Entities.Actor)ent).Faction == Entities.Factions.Player
-            //           select ent;
-            //player = plyr.FirstOrDefault() as Entities.Actor;
+            player = Map.FindEntityByName("Player") as Entities.ActorInstance;
+            if (player != null)
+                player.Controller = new Entities.InputController();
 
             Map.ActiveCamera = new Takai.Game.Camera(player);
 
@@ -91,6 +100,9 @@ namespace DyingAndMore.Game
 
         protected override void UpdateSelf(GameTime time)
         {
+            fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
+            fpsDisplay.AutoSize();
+
             var scrollDelta = InputState.ScrollDelta();
             if (InputState.IsMod(KeyMod.Control) && scrollDelta != 0)
             {
@@ -143,15 +155,6 @@ namespace DyingAndMore.Game
                 return false;
             }
 
-            if (InputState.IsClick(Keys.F1))
-            {
-                //Takai.Runtime.GameManager.NextState(new Editor.Editor()
-                //{
-                //    Map = Map
-                //});
-                return false;
-            }
-
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
                 Takai.Runtime.IsExiting = true;
@@ -180,21 +183,21 @@ namespace DyingAndMore.Game
 
                 foreach (var ent in targets)
                 {
-                    //if (ent is Entities.ActorInstance actor)
-                    //{
-                    //    Entities.Controller inputCtrl = null;
-                    //    if (player != null)
-                    //    {
-                    //        inputCtrl = player.Controller;
-                    //        player.Controller = lastController;
-                    //    }
+                    if (ent is Entities.ActorInstance actor)
+                    {
+                        Entities.Controller inputCtrl = null;
+                        if (player != null)
+                        {
+                            inputCtrl = player.Controller;
+                            player.Controller = lastController;
+                        }
 
-                    //    player = actor;
-                    //    lastController = player.Controller;
-                    //    player.Controller = inputCtrl ?? new Entities.InputController();
-                    //    Map.ActiveCamera.Follow = player;
-                    //    break;
-                    //}
+                        player = actor;
+                        lastController = player.Controller;
+                        player.Controller = inputCtrl ?? new Entities.InputController();
+                        Map.ActiveCamera.Follow = player;
+                        break;
+                    }
                 }
                 return false;
             }
@@ -206,6 +209,8 @@ namespace DyingAndMore.Game
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             base.DrawSelf(spriteBatch);
+
+            DefaultFont.Draw(spriteBatch, $"Total entities:{Map.TotalEntitiesCount}", new Vector2(20), Color.Orange);
 
             Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
             if (player != null)

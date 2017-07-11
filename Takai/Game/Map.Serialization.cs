@@ -89,7 +89,7 @@ namespace Takai.Game
         void Deserialize(Dictionary<string, object> Props)
         {
             Tiles = new short[Height, Width];
-            var tiles = Data.Serializer.CastType<List<short>>(Props["Tiles"]);
+            var tiles = Data.Serializer.Cast<List<short>>(Props["Tiles"]);
             Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, Width * Height * sizeof(short));
 
             TilesPerRow = (TilesImage != null ? (TilesImage.Width / TileSize) : 0);
@@ -100,13 +100,13 @@ namespace Takai.Game
 
             if (Props.TryGetValue("Triggers", out var triggers))
             {
-                foreach (var trigger in Data.Serializer.CastType<List<Trigger>>(triggers))
+                foreach (var trigger in Data.Serializer.Cast<List<Trigger>>(triggers))
                     AddTrigger(trigger);
             }
 
             if (Props.TryGetValue("Decals", out var decals))
             {
-                foreach (var decal in Data.Serializer.CastType<List<Decal>>(decals))
+                foreach (var decal in Data.Serializer.Cast<List<Decal>>(decals))
                     AddDecal(decal);
             }
 

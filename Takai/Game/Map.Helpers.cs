@@ -165,27 +165,21 @@ namespace Takai.Game
         public List<EntityInstance> FindEntitiesByClass(EntityClass @class, bool SearchInactive = false)
         {
             throw new System.NotImplementedException("better filtering");
+            //todo: find all by class name
         }
 
         /// <summary>
         /// Find an  entity by its name
         /// </summary>
-        /// <param name="Name"></param>
+        /// <param name="name"></param>
         /// <returns>The first entity found or null if none</returns>
         /// <remarks>Searches active ents and then ents in sectors from 0 to end</remarks>
-        public EntityInstance FindEntityByName(string Name)
+        public EntityInstance FindEntityByName(string name)
         {
-            foreach (var ent in ActiveEnts)
+            foreach (var ent in AllEntities)
             {
-                if (ent.Name == Name)
+                if (ent.Name == name)
                     return ent;
-            }
-
-            foreach (var s in (System.Collections.IEnumerable)Sectors)
-            {
-                foreach (var ent in ((MapSector)s).entities)
-                    if (ent.Name == Name)
-                        return ent;
             }
 
             return null;

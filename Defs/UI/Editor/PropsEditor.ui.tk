@@ -1,0 +1,29 @@
+Static {
+    IsModal: true;
+    HorizontalAlignment: Alignment.Middle;
+    VerticalAlignment: Alignment.Middle;
+    AutoSize: 20;
+    BackgroundColor: [255 255 255 192];
+
+    Children: [
+        ScrollBox {
+            Name: "Props";
+            Size: [300 360];
+            Direction: Direction.Vertical;
+        }
+
+        Static {
+            Name: "Apply";
+            Text: "Apply";
+            Position: [0 370];
+            Size: [140 30];
+        }
+
+        Static {
+            Name: "Cancel";
+            Text: "Cancel";
+            Position: [160 370];
+            Size: [140 30];
+        }
+    ];
+}

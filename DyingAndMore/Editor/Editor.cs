@@ -23,6 +23,12 @@ namespace DyingAndMore.Editor
         public virtual void End() { }
     }
 
+    struct EditorConfiguration
+    {
+        public float snapAngle; //degrees
+        public bool showGridByDefault;
+    }
+
     class Editor : MapView
     {
         ModeSelector modes;
@@ -30,8 +36,12 @@ namespace DyingAndMore.Editor
         Static fpsDisplay;
         Static resizeDialog;
 
+        public EditorConfiguration config;
+
         public Editor(Takai.Game.Map map)
         {
+            config = Serializer.TextDeserialize<EditorConfiguration>("Config/Editor.conf.tk");
+
             Map = map ?? throw new System.ArgumentNullException("There must be a map to edit");
 
             HorizontalAlignment = Alignment.Stretch;
@@ -78,8 +88,9 @@ namespace DyingAndMore.Editor
 
             Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
             Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
-            Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawGrids;
             Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawSectorsOnGrid;
+            if (config.showGridByDefault)
+                Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawGrids;
 
             //start zoomed out to see the whole map
             var mapSize = new Vector2(Map.Width, Map.Height) * Map.TileSize;
@@ -91,7 +102,7 @@ namespace DyingAndMore.Editor
 
         protected override void UpdateSelf(GameTime time)
         {
-            fpsDisplay.Text = "FPS: " + (1000 / time.ElapsedGameTime.TotalMilliseconds).ToString("N2");
+            fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
             base.UpdateSelf(time);
@@ -146,8 +157,8 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsPress(Keys.R))
                 {
-                    var widthInput = (NumericInput)resizeDialog.FindChildByName("width", false);
-                    var heightInput  = (NumericInput)resizeDialog.FindChildByName("height", false);
+                    var widthInput = (NumericInput)resizeDialog.FindChildByName("width");
+                    var heightInput  = (NumericInput)resizeDialog.FindChildByName("height");
 
                     widthInput.Value = Map.Width;
                     heightInput.Value = Map.Height;

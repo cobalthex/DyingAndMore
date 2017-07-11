@@ -52,6 +52,8 @@ namespace DyingAndMore.Editor
             {
                 AddChild(selector);
             };
+
+            selector.SelectedItem = 0;
         }
 
         public override void Start()
@@ -119,6 +121,13 @@ namespace DyingAndMore.Editor
                     var diff = currentWorldPos - selectedDecal.position;
 
                     var theta = (float)System.Math.Atan2(diff.Y, diff.X);
+
+                    if (InputState.IsMod(KeyMod.Shift))
+                    {
+                        var snapAngle = MathHelper.ToRadians(editor.config.snapAngle);
+                        theta = (float)System.Math.Round(theta / snapAngle) * snapAngle;
+                    }
+
                     if (InputState.IsPress(Keys.R))
                         startRotation = theta - selectedDecal.angle;
 

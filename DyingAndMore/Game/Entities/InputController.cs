@@ -19,7 +19,10 @@ namespace DyingAndMore.Game.Entities
             if (Takai.Input.InputState.IsButtonDown(Keys.S))
                 d += Vector2.UnitY;
 
-            actor.Move(d);
+            if (Takai.Input.InputState.IsButtonDown(Takai.Input.MouseButtons.Left))
+                actor.FireWeapon();
+
+            actor.Accelerate(d);
 
             var dir = Takai.Input.InputState.PolarMouseVector;
             dir.Normalize();

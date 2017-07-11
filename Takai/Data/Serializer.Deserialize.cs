@@ -110,7 +110,7 @@ namespace Takai.Data
         public static T TextDeserialize<T>(string file, bool strict = true)
         {
             using (var reader = new StreamReader(file))
-                return CastType<T>(TextDeserialize(reader), strict);
+                return Cast<T>(TextDeserialize(reader), strict);
         }
 
         public static object TextDeserialize(string file)
@@ -121,7 +121,7 @@ namespace Takai.Data
 
         public static T TextDeserialize<T>(StreamReader reader, bool strict = true)
         {
-            return CastType<T>(TextDeserialize(reader), strict);
+            return Cast<T>(TextDeserialize(reader), strict);
         }
 
         /// <summary>
@@ -388,14 +388,14 @@ namespace Takai.Data
                                 }
                             }
 
-                            var cast = pair.Value == null ? null : CastType(field.FieldType, pair.Value);
+                            var cast = pair.Value == null ? null : Cast(field.FieldType, pair.Value);
                             field.SetValue(obj, cast);
                         }
                     }
                     else
                     {
                         var prop = DestType.GetProperty(pair.Key, DefaultBindingFlags);
-                        if (prop != null)
+                        if (prop != null && prop.CanWrite)
                         {
                             if (!Attribute.IsDefined(prop, typeof(IgnoredAttribute)))
                             {
@@ -415,7 +415,7 @@ namespace Takai.Data
                                     }
                                 }
 
-                                var cast = pair.Value == null ? null : CastType(prop.PropertyType, pair.Value);
+                                var cast = pair.Value == null ? null : Cast(prop.PropertyType, pair.Value);
                                 prop.SetValue(obj, cast);
                             }
                         }
@@ -487,9 +487,9 @@ namespace Takai.Data
                                                       | BindingFlags.Instance
                                                       | BindingFlags.Public;
 
-        public static T CastType<T>(object Source, bool Strict = true)
+        public static T Cast<T>(object Source, bool Strict = true)
         {
-            return (T)CastType(typeof(T), Source, Strict);
+            return (T)Cast(typeof(T), Source, Strict);
         }
 
         /// <summary>
@@ -500,7 +500,7 @@ namespace Takai.Data
         /// <param name="Source">The source object</param>
         /// <param name="Strict">Should only cast between equivelent types (If true, casting int to bool would fail)</param>
         /// <returns>The correctly casted object</returns>
-        public static object CastType(Type DestType, object Source, bool Strict = true)
+        public static object Cast(Type DestType, object Source, bool Strict = true)
         {
             if (Source == null)
                 return null;
@@ -551,7 +551,7 @@ namespace Takai.Data
                     throw new InvalidCastException($"Type:{DestType.Name} is an array but '{Source}' is of type:{sourceType.Name}");
 
                 var elType = DestType.GetElementType();
-                list = list.ConvertAll(i => CastType(elType, i, Strict));
+                list = list.ConvertAll(i => Cast(elType, i, Strict));
                 var casted = CastMethod.MakeGenericMethod(elType).Invoke(null, new[] { list });
                 return ToArrayMethod.MakeGenericMethod(elType).Invoke(null, new[] { casted });
             }
@@ -569,7 +569,7 @@ namespace Takai.Data
                         throw new InvalidCastException($"Type:{DestType.Name} is a Tuple but '{Source}' is of type:{sourceType.Name}");
 
                     for (int i = 0; i < sourceList.Count; ++i)
-                        sourceList[i] = CastType(genericArgs[i], sourceList[i], Strict);
+                        sourceList[i] = Cast(genericArgs[i], sourceList[i], Strict);
                     return Activator.CreateInstance(DestType, sourceList.ToArray());
                 }
 
@@ -580,7 +580,7 @@ namespace Takai.Data
                     if (sourceList == null)
                         throw new InvalidCastException($"Type:{DestType.Name} is a {genericType.Name} but '{Source}' is of type:{sourceType.Name}");
 
-                    sourceList = sourceList.ConvertAll(i => CastType(genericArgs[0], i, Strict));
+                    sourceList = sourceList.ConvertAll(i => Cast(genericArgs[0], i, Strict));
                     //return Activator.CreateInstance(DestType, new[] { list.AsEnumerable<object>() });
                     var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
                     return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
@@ -598,7 +598,7 @@ namespace Takai.Data
                     var add = DestType.GetMethod("Add");
 
                     foreach (var pair in srcDict)
-                        add.Invoke(dict, new[] { CastType(genericArgs[0], pair.Key, false), CastType(genericArgs[1], pair.Value, Strict) });
+                        add.Invoke(dict, new[] { Cast(genericArgs[0], pair.Key, false), Cast(genericArgs[1], pair.Value, Strict) });
 
                     return dict;
                 }
@@ -619,11 +619,11 @@ namespace Takai.Data
                     {
                         case MemberTypes.Field:
                             var field = (FieldInfo)memberEnumerator.Current;
-                            field.SetValue(obj, CastType(field.FieldType, sourceList[i], Strict));
+                            field.SetValue(obj, Cast(field.FieldType, sourceList[i], Strict));
                             break;
                         case MemberTypes.Property:
                             var prop = (PropertyInfo)memberEnumerator.Current;
-                            prop.SetValue(obj, CastType(prop.PropertyType, sourceList[i], Strict));
+                            prop.SetValue(obj, Cast(prop.PropertyType, sourceList[i], Strict));
                             break;
                         default:
                             --i; //does not seem to be built in way to filter out non-var members

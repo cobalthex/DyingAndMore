@@ -25,7 +25,7 @@ namespace Tool
             CreatableTypes = new List<System.Type>();
             foreach (var ty in Takai.Data.Serializer.RegisteredTypes)
             {
-                if (System.Attribute.IsDefined(ty.Value, typeof(Takai.Data.DesignerCreatableAttribute)) && ty.Value.GetConstructor(System.Type.EmptyTypes) != null)
+                if (System.Attribute.IsDefined(ty.Value, typeof(Takai.Data.DesignerModdableAttribute)) && ty.Value.GetConstructor(System.Type.EmptyTypes) != null)
                     CreatableTypes.Add(ty.Value);
             }
 

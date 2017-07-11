@@ -4,60 +4,70 @@ using Microsoft.Xna.Framework;
 namespace DyingAndMore.Game.Weapons
 {
     /// <summary>
-    /// The base for a weapon
+    /// The base for all weapons
     /// </summary>
-    [Takai.Data.DesignerCreatable]
-    abstract class Weapon
+    [Takai.Data.DesignerModdable]
+    abstract class WeaponClass : Takai.Game.IObjectClass<WeaponInstance>
     {
         /// <summary>
-        /// When the last shot was taken
+        /// How long to delay between each shot (random)
         /// </summary>
-        protected TimeSpan lastShot = TimeSpan.Zero;
+        public Takai.Game.Range<TimeSpan> Delay { get; set; } = TimeSpan.FromMilliseconds(100);
+
+        /*
+        /// <summary>
+        /// The maximum allowed consecutive shots
+        /// 0 for unlimited
+        /// </summary>
+        public int MaxBurst { get; set; } = 0;
+        */
+
+        public abstract WeaponInstance Create();
+    }
+    abstract class WeaponInstance : Takai.Game.IObjectInstance<WeaponClass>
+    {
+        public virtual WeaponClass Class { get; set; }
+
+        /// <summary>
+        /// When the next shot can be taken (calculated as shot time + random shot delay)
+        /// </summary>
+        public TimeSpan nextShot = TimeSpan.Zero;
+
         /// <summary>
         /// The number of consecutive shots taken
         /// </summary>
-        protected int shotsTaken = 0;
+        //public int burstCount = 0;
 
-        /// <summary>
-        /// How long to delay between each shot
-        /// </summary>
-        public TimeSpan shotDelay = TimeSpan.FromMilliseconds(100);
-        /// <summary>
-        /// The maximum allowed consecutive shots
-        /// </summary>
-        public int maxShots = 0;
+        public WeaponInstance() { }
+        public WeaponInstance(WeaponClass @class)
+        {
+            Class = @class;
+        }
 
         /// <summary>
         /// Attempt to fire the weapon
-        /// Fires in the
         /// </summary>
-        /// <param name="entity">The entity to fire from</param>
+        /// <param name="source">The entity to fire from</param>
         /// <remarks>Fires from the owner entity's position in their forward direction</remarks>
-        public virtual void Fire(TimeSpan TotalTime, Takai.Game.EntityInstance entity)
+        public virtual void Fire(Takai.Game.EntityInstance source)
         {
-            if (CanFire(TotalTime))
+            if (CanFire(source.Map.ElapsedTime))
             {
-                SingleFire(entity);
-                lastShot = TotalTime;
-                ++shotsTaken;
+                ForceFire(source);
+                nextShot = source.Map.ElapsedTime + Takai.Game.RandomRange.Next(Class.Delay);
             }
         }
 
-        /// <summary>
-        /// Is the weapon currently able to fire?
-        /// </summary>
-        /// <param name="Time">The current time</param>
-        /// <returns>True if able to fire</returns>
-        public virtual bool CanFire(TimeSpan elapsedTime)
+        public virtual bool CanFire(TimeSpan totalTime)
         {
-            return (maxShots == 0 || shotsTaken < maxShots) && elapsedTime > lastShot + shotDelay;
+            return totalTime > nextShot;
         }
 
         /// <summary>
-        /// Fire a single shot
+        /// Fire a single shot, even if CanFire returns false
         /// </summary>
         /// <param name="Entity">The entity to fire from</param>
         /// <remarks>Unaffected by firing conditions</remarks>
-        protected abstract void SingleFire(Takai.Game.EntityInstance entity);
+        protected abstract void ForceFire(Takai.Game.EntityInstance entity);
     }
 }

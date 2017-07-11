@@ -64,8 +64,8 @@ namespace Takai.Game
     /// <summary>
     /// Describes a single type of entity. Actors, etc. inherit from this
     /// </summary>
-    [Data.DesignerCreatable]
-    public abstract class EntityClass
+    [Data.DesignerModdable]
+    public abstract class EntityClass : IObjectClass<EntityInstance>
     {
         /// <summary>
         /// The name of this entity. Typically used by other entities or scripts for referencing (and therefore should be unique)
@@ -121,7 +121,7 @@ namespace Takai.Game
     /// <summary>
     /// A single instance of an entity in a map. Mostly logic handled through <see cref="EntityClass"/>
     /// </summary>
-    public abstract class EntityInstance
+    public abstract class EntityInstance : IObjectInstance<EntityClass>
     {
         private static int nextId = 1; //generator for the unique (runtime) IDs
 
@@ -131,7 +131,7 @@ namespace Takai.Game
         /// Primarily used for debugging
         /// </summary>
         [Data.Serializer.Ignored]
-        public int Id { get; private set; } = (nextId++);
+        public int Id { get; private set; } = (nextId++); //todo: map-specific id
 
         public float Radius => State.States.TryGetValue(State.BaseState, out var state) ? state.Radius : 1; //todo: aggregate all sprites + cache
         public float RadiusSq => Radius * Radius; //todo: cache
@@ -153,6 +153,7 @@ namespace Takai.Game
         /// <summary>
         /// A name for this instance, should be unique
         /// </summary>
+        [Data.DesignerModdable]
         public string Name { get; set; } = null;
 
         /// <summary>
@@ -164,6 +165,11 @@ namespace Takai.Game
         /// </summary>
         /// <remarks>This vector should always be normalized</remarks>
         public Vector2 Direction { get; set; } = Vector2.UnitX;
+        /// <summary>
+        /// The velocity of the entity, separate from the direction
+        /// </summary>
+        /// <remarks>This vector should always be normalized</remarks>
+        public Vector2 Velocity { get; set; } = Vector2.UnitX;
 
         /// <summary>
         /// the axis aligned bounding box of this entity, based on radius
@@ -245,6 +251,12 @@ namespace Takai.Game
         }
         private Group _group;
 
+        public EntityInstance() { }
+        public EntityInstance(EntityClass @class)
+        {
+            Class = @class;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is EntityInstance ent && ent.Id == Id;
@@ -266,7 +278,7 @@ namespace Takai.Game
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void Think(System.TimeSpan DeltaTime)
         {
-            //State.Update(DeltaTime);
+            State.Update(DeltaTime);
         }
 
         /// <summary>

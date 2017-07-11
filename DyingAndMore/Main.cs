@@ -146,6 +146,10 @@ namespace DyingAndMore
             map.InitializeGraphics();
             ui = new Takai.UI.Static(new Editor.Editor(map));
 
+            var klass = Takai.Data.Serializer.TextDeserialize<Takai.Game.EntityClass>("Defs/Entities/Player.ent.tk");
+            var inst = map.Spawn(klass, new Vector2(128), Vector2.UnitX, Vector2.Zero);
+            inst.Name = "Player";
+
             base.Initialize();
         }
 

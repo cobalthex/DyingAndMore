@@ -126,6 +126,28 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
+            if (SelectedEntity != null && InputState.IsPress(Keys.Space))
+            {
+                var modal = Takai.Data.Serializer.TextDeserialize<Static>("Defs/UI/Editor/PropsEditor.ui.tk");
+                var props = GeneratePropSheet(SelectedEntity, DefaultFont, DefaultColor);
+                props.HorizontalAlignment = Alignment.Stretch;
+                var scrollBox = modal.FindChildByName("Props");
+                scrollBox.AddChild(props);
+                modal.FindChildByName("Apply").Click += delegate
+                {
+                    //todo: apply props. move info generation to separate function
+                    var ent = SelectedEntity;
+                    SelectedEntity = null;
+                    SelectedEntity = ent;
+                    modal.RemoveFromParent();
+                };
+                modal.FindChildByName("Cancel").Click += delegate
+                {
+                    modal.RemoveFromParent();
+                };
+                AddChild(modal);
+            }
+
             lastWorldPos = currentWorldPos;
             currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
@@ -148,9 +170,7 @@ namespace DyingAndMore.Editor
                             ent = Takai.Data.Serializer.TextDeserialize(reader) as Takai.Game.EntityClass;
 
                         if (ent != null)
-                        {
-                            editor.Map.Spawn(ent, currentWorldPos, Vector2.UnitX);
-                        }
+                            SelectedEntity = editor.Map.Spawn(ent, currentWorldPos, Vector2.UnitX, Vector2.Zero);
                     }
 
                     return false;
@@ -161,7 +181,7 @@ namespace DyingAndMore.Editor
                 if (selected.Count < 1)
                 {
                     if (editor.Map.Bounds.Contains(currentWorldPos) && selector.ents.Count > 0)
-                        SelectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedItem], currentWorldPos, Vector2.UnitX);
+                        SelectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedItem], currentWorldPos, Vector2.UnitX, Vector2.Zero);
                     else
                         SelectedEntity = null;
                 }
@@ -206,9 +226,18 @@ namespace DyingAndMore.Editor
                 {
                     //todo: sector modification?
                     var diff = currentWorldPos - SelectedEntity.Position;
-                    diff.Normalize();
-                    SelectedEntity.Direction = diff;
-
+                    if (InputState.IsMod(KeyMod.Shift))
+                    {
+                        var snapAngle = MathHelper.ToRadians(editor.config.snapAngle);
+                        var theta = (float)System.Math.Atan2(diff.Y, diff.X);
+                        theta = (float)System.Math.Round(theta / snapAngle) * snapAngle;
+                        SelectedEntity.Direction = new Vector2(
+                            (float)System.Math.Cos(theta),
+                            (float)System.Math.Sin(theta)
+                        );
+                    }
+                    else
+                        SelectedEntity.Direction = Vector2.Normalize(diff);
                     return false;
                 }
 
