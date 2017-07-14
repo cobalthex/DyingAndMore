@@ -11,13 +11,19 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Takai.Data
 {
     /// <summary>
-    /// This member/object should be serizlied with the specified (static) method
+    /// This member/object should be serizlied with the specified (instance) method
     /// </summary>
     [AttributeUsage(AttributeTargets.All)]
     [System.Runtime.InteropServices.ComVisible(true)]
     public class CustomSerializeAttribute : Attribute
     {
-        internal MethodInfo serialize;
+        public const BindingFlags Flags = 0
+            | BindingFlags.Public
+            | BindingFlags.NonPublic
+            | BindingFlags.Instance
+            | BindingFlags.IgnoreCase;
+
+        internal string methodName;
 
         /// <summary>
         /// Create a custom serializer
@@ -25,10 +31,9 @@ namespace Takai.Data
         /// <param name="Type">The type containing the method to use for serializing</param>
         /// <param name="MethodName">The name of the method</param>
         /// <param name="OverrideSerializeType">If the object returned is a dictionary, export it as type <see cref="Type"/></param>
-        public CustomSerializeAttribute(Type Type, string MethodName)
+        public CustomSerializeAttribute(string methodName)
         {
-            var method = Type.GetMethod(MethodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
-            serialize = method;
+            this.methodName = methodName;
         }
     }
 
@@ -73,7 +78,7 @@ namespace Takai.Data
         /// <param name="writer">The stream to write to</param>
         /// <param name="serializing">The object to serialize</param>
         /// <remarks>Some data types (Takai/Xna) are custom serialized</remarks>
-        public static void TextSerialize(StreamWriter writer, object serializing, int indentLevel = 0)
+        public static void TextSerialize(StreamWriter writer, object serializing, int indentLevel = 0, bool serializeExternals = false)
         {
             if (serializing == null)
             {
@@ -82,7 +87,23 @@ namespace Takai.Data
             }
 
             var ty = serializing.GetType();
-            var custSerial = ty.GetCustomAttribute<CustomSerializeAttribute>(false);
+
+            //external serialization
+            if (!serializeExternals && typeof(ISerializeExternally).IsAssignableFrom(ty))
+            {
+                var fileProp = ty.GetProperty("File");
+                if (fileProp != null)
+                {
+                    var fileValue = (string)fileProp.GetValue(serializing);
+                    if (fileValue != null)
+                    {
+                        writer.Write($"@\"{fileValue}\"");
+                        return;
+                    }
+                }
+            }
+
+            var custSerial = ty.GetCustomAttribute<CustomSerializeAttribute>(true);
 
             if (ty.IsPrimitive)
                 writer.Write(serializing);
@@ -96,13 +117,18 @@ namespace Takai.Data
                     writer.Write(" [");
                     var e = serializing as Enum;
                     var enumValues = Enum.GetNames(ty);
+                    int n = 0;
                     foreach (var flag in enumValues)
                     {
                         var value = (Enum)Enum.Parse(ty, flag);
                         if (Convert.ToUInt64(value) != 0 && e.HasFlag(value))
-                            writer.Write(" {0}", flag.ToString());
+                        {
+                            if (n++ > 0)
+                                writer.Write(' ');
+                            writer.Write(flag);
+                        }
                     }
-                    writer.Write(" ]");
+                    writer.Write("]");
                 }
                 else
                     writer.Write(".{0}", serializing.ToString());
@@ -112,16 +138,17 @@ namespace Takai.Data
                 writer.Write(serializing.ToString().ToLiteral());
 
             //user-defined serializer
-            else if (custSerial?.serialize != null)
+            else if (custSerial?.methodName != null)
             {
-                var serialized = custSerial.serialize.Invoke(null, new[] { serializing });
-                TextSerialize(writer, serialized, indentLevel);
+                var method = ty.GetMethod(custSerial.methodName, CustomSerializeAttribute.Flags);
+                var serialized = method?.Invoke(serializing, null);
+                TextSerialize(writer, serialized, indentLevel, serializeExternals);
             }
 
             //todo: maybe remove and just add a bunch of custom serializers
             //custom serializer
             else if (Serializers.ContainsKey(ty) && Serializers[ty].Serialize != null)
-                TextSerialize(writer, Serializers[ty].Serialize(serializing), indentLevel);
+                TextSerialize(writer, Serializers[ty].Serialize(serializing), indentLevel, serializeExternals);
 
             else if (typeof(IDictionary).IsAssignableFrom(ty))
             {
@@ -129,17 +156,17 @@ namespace Takai.Data
 
                 var dict = (IDictionary)serializing;
                 var keyType = ty.GetGenericArguments()[0];
-                foreach (var prop in dict.Keys)
+                foreach (var key in dict.Keys)
                 {
                     Indent(writer, indentLevel + 1);
 
                     if (keyType == typeof(char))
-                        writer.Write((UInt16)(char)prop);
+                        writer.Write((UInt16)(char)key);
                     else
-                        writer.Write(prop.ToString());
+                        writer.Write(key.ToString());
 
                     writer.Write(": ");
-                    TextSerialize(writer, dict[prop], indentLevel + 1);
+                    TextSerialize(writer, dict[key], indentLevel + 1, serializeExternals);
                     writer.WriteLine(";");
                 }
 
@@ -154,7 +181,7 @@ namespace Takai.Data
                 foreach (var i in (IEnumerable)serializing)
                 {
                     lastWasSerializer = false;
-                    if (!i.GetType().IsPrimitive)
+                    if (i == null || !i.GetType().IsPrimitive)
                     {
                         writer.WriteLine();
                         Indent(writer, indentLevel + 1);
@@ -164,7 +191,7 @@ namespace Takai.Data
                         writer.Write(' ');
                     once = true;
 
-                    TextSerialize(writer, i, indentLevel + 1);
+                    TextSerialize(writer, i, indentLevel + 1, serializeExternals);
                 }
                 if (lastWasSerializer)
                 {
@@ -178,14 +205,14 @@ namespace Takai.Data
             {
                 writer.WriteLine($"{(WriteFullTypeNames ? ty.FullName : ty.Name)} {{");
 
-                foreach (var field in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                    SerializeMember(writer, field, field.GetValue(serializing), indentLevel);
+                foreach (var prop in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                    SerializeMember(writer, serializing, prop, prop.GetValue(serializing), indentLevel, serializeExternals);
 
                 foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance))
-                    SerializeMember(writer, field, field.GetValue(serializing), indentLevel);
+                    SerializeMember(writer, serializing, field, field.GetValue(serializing), indentLevel, serializeExternals);
 
                 //derived values
-                var derived = ty.GetCustomAttribute<DerivedTypeSerializeAttribute>();
+                var derived = ty.GetCustomAttribute<DerivedTypeSerializeAttribute>(true);
                 if (derived != null)
                 {
                     var props = (Dictionary<string, object>)derived.serialize.Invoke(serializing, null);
@@ -194,7 +221,7 @@ namespace Takai.Data
                     {
                         Indent(writer, indentLevel + 1);
                         writer.Write("{0}: ", prop.Key);
-                        TextSerialize(writer, prop.Value, indentLevel + 1);
+                        TextSerialize(writer, prop.Value, indentLevel + 1, serializeExternals);
                         writer.WriteLine(";");
                     }
                 }
@@ -204,23 +231,31 @@ namespace Takai.Data
             }
         }
 
-        private static void SerializeMember(StreamWriter Stream, MemberInfo Member, object Value, int IndentLevel)
+        private static void SerializeMember(StreamWriter writer, object parent, MemberInfo member, object value, int indentLevel, bool serializeExternals)
         {
-            if (Member.GetCustomAttribute<Data.Serializer.IgnoredAttribute>() != null)
+            if (member.GetCustomAttribute<IgnoredAttribute>(true) != null)
                 return;
 
-            Indent(Stream, IndentLevel + 1);
-            Stream.Write("{0}: ", Member.Name);
+            Indent(writer, indentLevel + 1);
+            writer.Write("{0}: ", member.Name);
 
-            //user-defined serializer
-            var custSerial = Member.GetCustomAttribute<CustomSerializeAttribute>();
-            if (custSerial?.serialize != null)
-                TextSerialize(Stream, custSerial.serialize.Invoke(null, new[] { Value }), IndentLevel + 1);
-            //normal serializer
+            if (value == null)
+            {
+                writer.WriteLine("Null;");
+                return;
+            }
+
+            //custom-defined serializer
+            var custSerial = member.GetCustomAttribute<CustomSerializeAttribute>(true);
+            if (custSerial?.methodName != null)
+            {
+                var method = member.DeclaringType.GetMethod(custSerial.methodName, CustomSerializeAttribute.Flags);
+                TextSerialize(writer, method.Invoke(parent, null), indentLevel + 1, serializeExternals);
+            }
             else
-                TextSerialize(Stream, Value, IndentLevel + 1);
+                TextSerialize(writer, value, indentLevel + 1, serializeExternals);
 
-            Stream.WriteLine(";");
+            writer.WriteLine(";");
         }
 
         private static void Indent(StreamWriter Stream, int IndentLevel)

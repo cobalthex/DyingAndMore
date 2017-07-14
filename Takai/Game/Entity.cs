@@ -16,14 +16,24 @@ namespace Takai.Game
         Active,
     }
 
-    public class EntState : IState
+    public class EntStateClass : IStateClass<EntStateId, EntStateInstance>
     {
+        public string Name { get; set; }
+
+        [Data.Serializer.Ignored]
+        public string File { get; set; } = null;
+
+        public bool IsOverlay { get; set; } = false;
+
         public Graphics.Sprite Sprite { get; set; }
+
+        //Sound
 
         //todo: cache
         public float Radius =>
             Sprite != null ? MathHelper.Max(Sprite.Width, Sprite.Height) / 2 : 1;
 
+        [Data.Serializer.Ignored]
         public bool IsLooping
         {
             get
@@ -36,28 +46,53 @@ namespace Takai.Game
             }
         }
 
-        public bool IsOverlay { get; set; }
+        [Data.Serializer.Ignored]
+        public TimeSpan TotalTime
+        {
+            get => Sprite.TotalLength;
+            set { } //todo
+        }
+
+        public EntStateInstance Create()
+        {
+            return new EntStateInstance()
+            {
+                Class = this,
+                ElapsedTime = TimeSpan.Zero
+            };
+        }
+    }
+
+    public class EntStateInstance : IStateInstance<EntStateId, EntStateClass>
+    {
+        public EntStateId StateId { get; set; }
+
+        [Data.Serializer.Ignored]
+        public EntStateClass Class { get; set; }
+
+        /// <summary>
+        /// The current elapsed time of this state
+        /// </summary>
+        public TimeSpan ElapsedTime { get; set; }
 
         public bool HasFinished()
         {
-            return Sprite.ElapsedTime > Sprite.TotalLength;
+            return ElapsedTime > Class.TotalTime;
         }
 
-        public void Start()
+        public override int GetHashCode()
         {
-            Sprite.Start();
+            return (int)StateId;
         }
 
-        public void Update(TimeSpan DeltaTime)
+        public void Update(TimeSpan deltaTime)
         {
-            Sprite.ElapsedTime += DeltaTime;
+
         }
 
-        public object Clone()
+        public override string ToString()
         {
-            var clone = (EntState)MemberwiseClone();
-            clone.Sprite = (Takai.Graphics.Sprite)Sprite.Clone();
-            return clone;
+            return StateId.ToString();
         }
     }
 
@@ -67,6 +102,9 @@ namespace Takai.Game
     [Data.DesignerModdable]
     public abstract class EntityClass : IObjectClass<EntityInstance>
     {
+        [Data.Serializer.Ignored]
+        public string File { get; set; } = null;
+
         /// <summary>
         /// The name of this entity. Typically used by other entities or scripts for referencing (and therefore should be unique)
         /// </summary>
@@ -91,17 +129,17 @@ namespace Takai.Game
 
         /// <summary>
         /// All of this entity's available states
-        public Dictionary<EntStateId, EntState> States { get; set; }
+        public Dictionary<EntStateId, EntStateClass> States { get; set; }
 
         /// <summary>
         /// Destroy the sprite if it is dead and the animation is finished
         /// </summary>
-        public bool DestroyIfDead { get; set; }
+        public bool DestroyIfDead { get; set; } = true;
 
         /// <summary>
         /// Destroy this entity if it goes off screen (becomes inactive) and is dead
         /// </summary>
-        public bool DestroyIfDeadAndInactive { get; set; }
+        public bool DestroyIfDeadAndInactive { get; set; } = false;
 
         /// <summary>
         /// Should the sprite always be drawn with the original sprite orientation?
@@ -121,6 +159,7 @@ namespace Takai.Game
     /// <summary>
     /// A single instance of an entity in a map. Mostly logic handled through <see cref="EntityClass"/>
     /// </summary>
+    [Takai.Data.DerivedTypeDeserialize(typeof(EntityInstance), "DerivedDeserialize")]
     public abstract class EntityInstance : IObjectInstance<EntityClass>
     {
         private static int nextId = 1; //generator for the unique (runtime) IDs
@@ -133,7 +172,7 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public int Id { get; private set; } = (nextId++); //todo: map-specific id
 
-        public float Radius => State.States.TryGetValue(State.BaseState, out var state) ? state.Radius : 1; //todo: aggregate all sprites + cache
+        public float Radius => State.BaseState?.Class?.Radius ?? 1; //todo: aggregate all sprites + cache
         public float RadiusSq => Radius * Radius; //todo: cache
 
         /// <summary>
@@ -145,7 +184,7 @@ namespace Takai.Game
             set
             {
                 _class = value;
-                State.States = value.States;
+                State.States = Class.States;
             }
         }
         private EntityClass _class;
@@ -188,27 +227,31 @@ namespace Takai.Game
             }
         }
 
-        public StateMachine<EntStateId, EntState> State { get; set; } = new StateMachine<EntStateId, EntState>()
+        [Data.CustomSerialize("CustomSerializeState")]
+        public StateMachine<EntStateId, EntStateClass, EntStateInstance> State { get; set; }
+            = new StateMachine<EntStateId, EntStateClass, EntStateInstance>();
+
+        private object CustomSerializeState()
         {
-            BaseState = EntStateId.Idle
-        };
+            return new Dictionary<string, object>
+            {
+                { "BaseState", State.BaseState },
+                { "OverlaidStates", State.OverlaidStates },
+                { "Transitions", State.Transitions }
+            };
+        }
 
         /// <summary>
-        /// Enumerate through active sprites for this entity
+        /// Enumerate through the classes of active states
         /// </summary>
         [Data.Serializer.Ignored]
-        public IEnumerable<Graphics.Sprite> Sprites
+        public IEnumerable<EntStateInstance> ActiveStates
         {
             get
             {
-                if (State.States.TryGetValue(State.BaseState, out var state))
-                    yield return state.Sprite;
-
-                foreach (var overlay in State.OverlaidStates)
-                {
-                    if (State.States.TryGetValue(overlay, out state))
-                        yield return state.Sprite;
-                }
+                yield return State.BaseState;
+                foreach (var state in State.OverlaidStates)
+                    yield return state.Value;
             }
         }
 
@@ -255,6 +298,7 @@ namespace Takai.Game
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
+            State.Transition(EntStateId.Idle);
         }
 
         public override bool Equals(object obj)
@@ -276,9 +320,9 @@ namespace Takai.Game
         /// The basic think function for this entity, called once a frame
         /// </summary>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void Think(System.TimeSpan DeltaTime)
+        public virtual void Think(System.TimeSpan deltaTime)
         {
-            State.Update(DeltaTime);
+            State.Update(deltaTime);
         }
 
         /// <summary>
@@ -309,8 +353,20 @@ namespace Takai.Game
         /// </summary>
         /// <param name="Type">The type of Fluid collided with</param>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void OnFluidCollision(FluidType Type, TimeSpan DeltaTime) { }
+        public virtual void OnFluidCollision(FluidClass Type, TimeSpan DeltaTime) { }
+
+        protected void DerivedDeserializer(Dictionary<string, object> props)
+        {
+            if (State.BaseState != null && State.States.TryGetValue(State.BaseState.StateId, out var k))
+                State.BaseState.Class = k;
+
+            foreach (var state in State.OverlaidStates)
+            {
+                if (state.Value != null && State.States.TryGetValue(state.Key, out k))
+                    state.Value.Class = k;
+            }
+        }
     }
 }
 
-//todo: come up with shorter names (EntityClass + Entity?)
+//todo: shorter instance/class names

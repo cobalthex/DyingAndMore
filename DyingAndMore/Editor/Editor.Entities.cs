@@ -21,7 +21,7 @@ namespace DyingAndMore.Editor
                 {
                     entInfo.Font = Font;
                     entInfo.Text
-                        = $"`8df{BeautifyMemberName(_selectedEntity.Class.Name)}`x\n"
+                        = $"`8df{BeautifyMemberName(_selectedEntity.Class?.Name)}`x\n"
                         + $"Name: {(string.IsNullOrWhiteSpace(_selectedEntity.Name) ? "(No Name)" : SelectedEntity.Name)}\n"
                         + $"ID: {_selectedEntity.Id}\n"
                         + $"Position: {_selectedEntity.Position}\n"
@@ -33,7 +33,8 @@ namespace DyingAndMore.Editor
                         entInfo.Text
                             += $"Health: {actor.CurrentHealth}/{@class.MaxHealth}\n"
                             +  $"Faction(s): {actor.Faction}\n"
-                            +  $"Controller: {actor.Controller?.GetType().Name}\n";
+                            +  $"Controller: {actor.Controller}\n"
+                            +  $"Weapon: {actor.Weapon}\n";
                     }
                 }
                 entInfo.AutoSize();

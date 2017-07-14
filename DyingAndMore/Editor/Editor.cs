@@ -68,16 +68,14 @@ namespace DyingAndMore.Editor
             modes.AddMode(new DecalsEditorMode(this));
             modes.AddMode(new FluidsEditorMode(this));
             modes.AddMode(new EntitiesEditorMode(this));
-            //modes.AddMode(new GroupsEditorMode(this));
             modes.AddMode(new PathsEditorMode(this));
             modes.AddMode(new TriggersEditorMode(this));
 
             modes.ModeIndex = 0;
 
             //renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
-            renderSettingsConsole = new Static();
-            renderSettingsConsole.Position = new Vector2(100, 0);
-            renderSettingsConsole.VerticalAlignment = Alignment.Middle;
+            //renderSettingsConsole.Position = new Vector2(100, 0);
+            //renderSettingsConsole.VerticalAlignment = Alignment.Middle;
 
             resizeDialog = Serializer.TextDeserialize<Static>("Defs/UI/Editor/ResizeMap.ui.tk");
         }
@@ -145,6 +143,29 @@ namespace DyingAndMore.Editor
                             try
                             {
                                 Serializer.TextSerialize(sfd.FileName, Map);
+                            }
+                            catch
+                            {
+                                //todo
+                            }
+                        }
+                    }
+                    return false;
+                }
+
+                if (InputState.IsPress(Keys.O))
+                {
+                    using (var ofd = new System.Windows.Forms.OpenFileDialog()
+                    {
+                        Filter = "Dying and More! Maps (*.map.tk)|*.map.tk",
+                        RestoreDirectory = true
+                    })
+                    {
+                        if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        {
+                            try
+                            {
+                                Map = Serializer.TextDeserialize<Takai.Game.Map>(ofd.FileName);
                             }
                             catch
                             {

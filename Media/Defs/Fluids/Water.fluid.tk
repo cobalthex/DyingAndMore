@@ -1,4 +1,5 @@
-FluidType {
+FluidClass {
+    Name: "Water";
     Texture: "Textures\\Fluids\\water.png";
     Reflection: "Textures\\Fluids\\water.r.png";
     Alpha: 0.5;

@@ -7,6 +7,18 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Takai.Data
 {
     /// <summary>
+    /// Specifies that this object can be serialized to a file. Used by serializer w/ <see cref="SerializeExternallyAttribute"/>
+    /// </summary>
+    public interface ISerializeExternally
+    {
+        /// <summary>
+        /// The file that this class was loaded from. Null if no file
+        /// </summary>
+        [Serializer.Ignored]
+        string File { get; set; }
+    }
+
+    /// <summary>
     /// Allows for custom serializers of specific types
     /// </summary>
     /// <remarks>Must serialize to a primative,enum,string,array,dict,object</remarks>
@@ -41,6 +53,12 @@ namespace Takai.Data
         [System.Runtime.InteropServices.ComVisible(true)]
         public class ReadOnlyAttribute : Attribute { }
 
+        /// <summary>
+        /// This value is serialized externally if it's member "File" isn't null
+        /// </summary>
+        [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true)]
+        [System.Runtime.InteropServices.ComVisible(true)]
+        public class ExternalAttribute : Attribute { }
 
         public const bool WriteFullTypeNames = false;
         public const bool CaseSensitiveMembers = false;

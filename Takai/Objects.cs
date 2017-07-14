@@ -1,7 +1,9 @@
-﻿namespace Takai.Game
+﻿namespace Takai
 {
-    public interface IObjectClass<TInstance>
+    public interface IObjectClass<TInstance> : Data.ISerializeExternally
     {
+        string Name { get; set; }
+
         TInstance Create();
     }
 

@@ -5,7 +5,7 @@ namespace DyingAndMore.Game.Entities
 {
     class InputController : Controller
     {
-        public PlayerIndex player;
+        public PlayerIndex player = PlayerIndex.One;
 
         public override void Think(System.TimeSpan DeltaTime)
         {

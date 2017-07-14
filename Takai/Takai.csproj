@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssetManager.cs" />
+    <Compile Include="Data\Cache.cs" />
     <Compile Include="Data\Designer.cs" />
     <Compile Include="Data\Serializer.cs" />
     <Compile Include="Data\Serializer.Deserialize.cs">
@@ -88,7 +89,7 @@
     <Compile Include="Game\Map.Updating.cs">
       <DependentUpon>Map.cs</DependentUpon>
     </Compile>
-    <Compile Include="Game\Object.cs" />
+    <Compile Include="Objects.cs" />
     <Compile Include="Game\Path.cs" />
     <Compile Include="Game\Script.cs" />
     <Compile Include="Game\Trigger.cs" />

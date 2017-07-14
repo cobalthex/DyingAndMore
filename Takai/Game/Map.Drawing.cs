@@ -49,6 +49,7 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public RenderSettings renderSettings = (
             (RenderSettings)(~0u)
+            & ~RenderSettings.DrawFluidReflectionMask
             & ~RenderSettings.DrawTriggers
             & ~RenderSettings.DrawGrids
             & ~RenderSettings.DrawSectorsOnGrid
@@ -223,9 +224,9 @@ namespace Takai.Game
                 foreach (var ent in ActiveEnts)
                 {
                     bool didDraw = false;
-                    foreach (var sprite in ent.Sprites)
+                    foreach (var state in ent.ActiveStates)
                     {
-                        if (sprite?.Texture == null)
+                        if (state.Class?.Sprite?.Texture == null)
                             continue;
 
                         didDraw = true;
@@ -235,7 +236,7 @@ namespace Takai.Game
                         else
                         {
                             var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                            sprite.Draw(sbatch, ent.Position, angle);
+                            state.Class.Sprite.Draw(sbatch, ent.Position, angle, Color.White, 1, state.ElapsedTime);
                         }
                     }
 
@@ -274,16 +275,15 @@ namespace Takai.Game
                 foreach (var ent in _drawEntsOutlined)
                 {
                     bool first = true;
-                    foreach (var sprite in ent.Sprites)
+                    foreach (var state in ent.ActiveStates)
                     {
-                        if (sprite?.Texture == null)
-                            continue;
+                        //all sprites should be valid
 
                         //outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
                         //outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
 
                         var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                        sprite.Draw(sbatch, ent.Position, angle, first ? ent.OutlineColor : Color.Transparent);
+                        state.Class.Sprite.Draw(sbatch, ent.Position, angle, first ? ent.OutlineColor : Color.Transparent, 1, state.ElapsedTime);
 
                         first = false;
                     }
@@ -336,8 +336,8 @@ namespace Takai.Game
                         foreach (var fluid in Sectors[y, x].Fluids)
                         {
                             ++profilingInfo.visibleInactiveFluids;
-                            reflectionEffect.Parameters["Reflection"].SetValue(fluid.type.Reflection);
-                            sbatch.Draw(fluid.type.Texture, fluid.position - new Vector2(fluid.type.Texture.Width / 2, fluid.type.Texture.Height / 2), new Color(1, 1, 1, fluid.type.Alpha));
+                            reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
+                            sbatch.Draw(fluid.Class.Texture, fluid.position - new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2), new Color(1, 1, 1, fluid.Class.Alpha));
                         }
                     }
                 }
@@ -345,8 +345,8 @@ namespace Takai.Game
                 foreach (var fluid in ActiveFluids)
                 {
                     ++profilingInfo.visibleActiveFluids;
-                    reflectionEffect.Parameters["Reflection"].SetValue(fluid.type.Reflection);
-                    sbatch.Draw(fluid.type.Texture, fluid.position - new Vector2(fluid.type.Texture.Width / 2, fluid.type.Texture.Height / 2), new Color(1, 1, 1, fluid.type.Alpha));
+                    reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
+                    sbatch.Draw(fluid.Class.Texture, fluid.position - new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2), new Color(1, 1, 1, fluid.Class.Alpha));
                 }
 
                 sbatch.End();

@@ -1,4 +1,5 @@
-FluidType {
+FluidClass {
+    Name: "Something";
     Texture: "Data\\Textures\\Fluids\\Something.png";
     Reflection: "Data\\Textures\\Fluids\\Something.r.png";
     Radius: 54;

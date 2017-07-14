@@ -3,9 +3,11 @@ ActorClass {
     MaxHealth: 1000;
     DefaultFaction: Factions [Enemy];
     DefaultController: ArtilleryController {
-        CanRotate: true;
+        CanRotate: false;
     };
-    FieldOfView: 6.28318530718;
+    FieldOfView: 3.14159;
+
+    #launch force?
 
     States: {
         Idle: {
@@ -63,7 +65,8 @@ ActorClass {
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
 
-    Weapon: SpawnerClass {
+    DefaultWeapon: SpawnerClass {
+        Delay: [2000 4000];
         Spawns: [
             [@"Defs/Entities/InfectedCell.ent.tk" [3 5]]
         ]

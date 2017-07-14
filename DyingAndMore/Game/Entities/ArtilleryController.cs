@@ -1,5 +1,5 @@
 ﻿using System;
-using Takai.Game;
+using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Entities
 {
@@ -24,14 +24,29 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
+            if (!actor.State.Is(Takai.Game.EntStateId.Idle))
+                return; //todo: shoot with moving barrel?
+
+            if (actor.State.Is(Takai.Game.EntStateId.Idle) && actor.Weapon.IsDepleted())
+            {
+                actor.State.Transition(Takai.Game.EntStateId.Idle, Takai.Game.EntStateId.Inactive);
+                return;
+            }
+
             if (trackedActor != null)
             {
-                if (Microsoft.Xna.Framework.Vector2.DistanceSquared(actor.Position, trackedActor.Position) <= MaxRange * MaxRange)
+                //todo: find more efficient test if possible
+                var filter = new System.Collections.Generic.SortedDictionary<float, Takai.Game.EntityInstance>
                 {
+                    { Vector2.DistanceSquared(actor.Position, trackedActor.Position), trackedActor }
+                };
+                if (actor.Map.TraceLine(actor.Position, actor.Direction, out var hit, MaxRange, filter))
+                {
+                    //todo: maybe shoot w/ lead (shoot out in front of target's velocity)
                     if (CanRotate)
-                        actor.Direction = trackedActor.Position - actor.Position; //todo: slerp
+                        actor.Direction = Vector2.Normalize(trackedActor.Position - actor.Position); //todo: slerp
                     actor.FireWeapon();
-                    actor.Map.DrawLine(actor.Position, actor.Position + actor.Direction * MaxRange, Microsoft.Xna.Framework.Color.Orange);
+                    actor.Map.DrawLine(actor.Position, actor.Position + actor.Direction * MaxRange, Color.Orange);
                 }
                 else
                     trackedActor = null;
@@ -41,8 +56,8 @@ namespace DyingAndMore.Game.Entities
                 var ents = actor.Map.FindEntities(actor.Position, MaxRange);
                 foreach (var ent in ents)
                 {
-                    if (ent is ActorInstance nearbyActor && (nearbyActor.Faction & actor.Faction) == 0 &&
-                        actor.CanSee(nearbyActor.Position))
+                    if (ent != actor && ent is ActorInstance nearbyActor && (nearbyActor.Faction & actor.Faction) == 0 &&
+                        actor.IsFacing(nearbyActor.Position))
                     {
                         trackedActor = nearbyActor;
                         break;
