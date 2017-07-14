@@ -13,5 +13,10 @@
         /// </summary>
         /// <param name="DeltaTime">How long since the last Think cycle</param>
         public abstract void Think(System.TimeSpan DeltaTime);
+
+        public override string ToString()
+        {
+            return GetType().Name;
+        }
     }
 }

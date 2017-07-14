@@ -164,8 +164,15 @@ namespace Takai.Game
         /// <returns>A list of entities found</returns>
         public List<EntityInstance> FindEntitiesByClass(EntityClass @class, bool SearchInactive = false)
         {
-            throw new System.NotImplementedException("better filtering");
-            //todo: find all by class name
+            var ents = new List<EntityInstance>();
+            foreach (var ent in ActiveEnts)
+            {
+                if (ent.Class == @class)
+                    ents.Add(ent);
+            }
+
+            return ents;
+            //todo: find all inactive by class name
         }
 
         /// <summary>
@@ -231,34 +238,34 @@ namespace Takai.Game
         /// Calculate a list of entities that are potentially visible (in front of the viewer)
         /// Only searches through active entities.
         /// </summary>
-        /// <param name="Start">Where to look from</param>
-        /// <param name="Direction">What direction to look in</param>
-        /// <param name="FieldOfView">The field of view, in radians (0 to Pi)</param>
-        /// <param name="MaxDistance">The maximum distance to search</param>
+        /// <param name="start">Where to look from</param>
+        /// <param name="direction">What direction to look in</param>
+        /// <param name="fieldOfView">The field of view, in radians (0 to Pi)</param>
+        /// <param name="maxDistance">The maximum distance to search</param>
         /// <returns>The set of potential visible ents, sorted by distance (Dictionary of &lt;distance sq, entity&gt;)</returns>
         /// <remarks>Entities at Start or ignore traces are not added</remarks>
-        public SortedDictionary<float, EntityInstance> PotentialVisibleSet(Vector2 Start, Vector2 Direction, float FieldOfView = MathHelper.Pi, float MaxDistance = 0)
+        public SortedDictionary<float, EntityInstance> PotentialVisibleSet(Vector2 start, Vector2 direction, float fieldOfView = MathHelper.Pi, float maxDistance = 0)
         {
             var ents = new SortedDictionary<float, EntityInstance>();
 
-            MaxDistance *= MaxDistance;
-            FieldOfView = 1 - MathHelper.Clamp(FieldOfView / MathHelper.Pi, 0, 1);
+            maxDistance *= maxDistance;
+            fieldOfView = 1 - MathHelper.Clamp(fieldOfView / MathHelper.Pi, 0, 1);
 
             //todo: move to use sectors
 
             foreach (var ent in ActiveEnts)
             {
-                if (ent.Class.IgnoreTrace || ent.Position == Start)
+                if (ent.Class.IgnoreTrace || ent.Position == start)
                     continue;
 
-                var diff = ent.Position - Start;
+                var diff = ent.Position - start;
 
                 //must be in front of viewer
-                if (Vector2.Dot(diff, Direction) < FieldOfView) //todo: fix to handle non-normalized directions
+                if (Vector2.Dot(diff, direction) < fieldOfView) //todo: fix to handle non-normalized directions
                     continue;
 
                 var lsq = diff.LengthSquared();
-                if (MaxDistance == 0 || lsq <= MaxDistance)
+                if (maxDistance == 0 || lsq <= maxDistance)
                     ents[lsq] = ent;
             }
 
@@ -268,43 +275,48 @@ namespace Takai.Game
         /// <summary>
         /// Trace a line and check for collisions with entities and the map. Uses PotentialVisibleSet (same rules apply)
         /// </summary>
-        /// <param name="Start">The starting position to search</param>
-        /// <param name="Direction">The direction to search from</param>
-        /// <param name="Hit">Collision info, if collided</param>
-        /// <param name="MaxDistance">The maximum search distance (not used if EntsToSearch is provided)</param>
-        /// <param name="EntsToSearch">
+        /// <param name="start">The starting position to search</param>
+        /// <param name="direction">The direction to search from</param>
+        /// <param name="hit">Collision info, if collision exists</param>
+        /// <param name="maxDistance">The maximum search distance</param>
+        /// <param name="entsFilter">
         /// Provide an explicit list of entities to search through
         /// Key should be the squared distance between start and the entity
         /// If null, uses PotentialVisibleSet()
         /// </param>
         /// <returns>True if there was a collision</returns>
-        /// <remarks>Does not perform any map testing (use CanSee)</remarks>
-        public bool TraceLine(Vector2 Start, Vector2 Direction, out TraceHit Hit, float MaxDistance = 0, SortedDictionary<float, EntityInstance> EntsToSearch = null)
+        public bool TraceLine(Vector2 start, Vector2 direction, out TraceHit hit, float maxDistance = 0, SortedDictionary<float, EntityInstance> entsFilter = null)
         {
             var lastT = 0f;
             var mapRect = new Rectangle(0, 0, Width, Height);
 
             const float JumpSize = 10;
 
+            //todo: re-evaluate
+
             //check for intersections
-            foreach (var ent in EntsToSearch ?? PotentialVisibleSet(Start, Direction, MathHelper.Pi, MaxDistance))
+            foreach (var ent in entsFilter ?? PotentialVisibleSet(start, direction, MathHelper.Pi, maxDistance))
             {
-                var diff = ent.Value.Position - Start;
-                var lf = Vector2.Dot(Direction, diff);
+                var diff = ent.Value.Position - start;
+                var lf = Vector2.Dot(direction, diff);
                 var s = ent.Value.RadiusSq - ent.Key + (lf * lf);
 
                 var nextT = diff.Length(); //todo: find a better way
+
+                if (nextT > maxDistance)
+                    break;
+
                 //trace line along map to see if there are any collisions
                 for (var t = lastT; t < nextT; t += JumpSize) //test out granularities (or may assumptions about map corners)
                 {
-                    var pos = (Start + (t * Direction)).ToPoint();
+                    var pos = (start + (t * direction)).ToPoint();
                     var tilePos = new Point(pos.X / TileSize, pos.Y / TileSize);
                     var tileRelPos = new Point(pos.X % TileSize, pos.Y % TileSize);
 
                     //may not be necessary
                     if (!mapRect.Contains(tilePos))
                     {
-                        Hit = new TraceHit()
+                        hit = new TraceHit()
                         {
                             entity = null,
                             distance = t
@@ -318,7 +330,7 @@ namespace Takai.Game
                     mask += tileRelPos.X;
                     if (tile < 0 || (mask < 0 || TilesMask[mask] == false))
                     {
-                        Hit = new TraceHit()
+                        hit = new TraceHit()
                         {
                             entity = null,
                             distance = t
@@ -338,7 +350,7 @@ namespace Takai.Game
                 {
                     if (lf + s >= 0)
                     {
-                        Hit = new TraceHit()
+                        hit = new TraceHit()
                         {
                             entity = ent.Value,
                             distance = lf + s
@@ -350,7 +362,7 @@ namespace Takai.Game
                 }
                 else
                 {
-                    Hit = new TraceHit()
+                    hit = new TraceHit()
                     {
                         entity = ent.Value,
                         distance = lf - s
@@ -361,16 +373,16 @@ namespace Takai.Game
 
             //todo+ factor out map check code
             //todo: check forward pos
-            for (var t2 = lastT; t2 < MathHelper.Min(MaxDistance, 100000); t2 += JumpSize)
+            for (var t2 = lastT; t2 < MathHelper.Min(maxDistance, 100000); t2 += JumpSize)
             {
-                var pos = (Start + (t2 * Direction)).ToPoint();
+                var pos = (start + (t2 * direction)).ToPoint();
                 var tilePos = new Point(pos.X / TileSize, pos.Y / TileSize);
                 var tileRelPos = new Point(pos.X % TileSize, pos.Y % TileSize);
 
                 //may not be necessary
                 if (!mapRect.Contains(tilePos))
                 {
-                    Hit = new TraceHit()
+                    hit = new TraceHit()
                     {
                         entity = null,
                         distance = t2
@@ -384,7 +396,7 @@ namespace Takai.Game
                 mask += tileRelPos.X;
                 if (tile < 0 || (mask < 0 || TilesMask[mask] == false))
                 {
-                    Hit = new TraceHit()
+                    hit = new TraceHit()
                     {
                         entity = null,
                         distance = t2 - JumpSize
@@ -393,7 +405,7 @@ namespace Takai.Game
                 }
             }
 
-            Hit = new TraceHit();
+            hit = new TraceHit();
             return false;
         }
     }

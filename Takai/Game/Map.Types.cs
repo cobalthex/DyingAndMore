@@ -9,6 +9,7 @@ namespace Takai.Game
     /// Specifies a simple min/max range
     /// </summary>
     /// <typeparam name="T">The type of range</typeparam>
+    [Data.CustomSerialize("CustomSerialize")]
     public struct Range<T>
     {
         public T min;
@@ -28,6 +29,11 @@ namespace Takai.Game
         {
             return new Range<T>
                 (value);
+        }
+
+        private object CustomSerialize()
+        {
+            return new object[] { min, max };
         }
     }
 
@@ -83,8 +89,13 @@ namespace Takai.Game
     /// This struct defines the graphics for the Fluid and physical properties that can affect the game
     /// </summary>
     [Data.DesignerModdable]
-    public class FluidType
+    public class FluidClass : IObjectClass<FluidInstance>
     {
+        public string Name { get; set; }
+
+        [Data.Serializer.Ignored]
+        public string File { get; set; } = null;
+
         /// <summary>
         /// The texture to render the Fluid with
         /// </summary>
@@ -108,6 +119,14 @@ namespace Takai.Game
         /// Drag affects both how quickly the Fluid stops moving and how much resistance there is to entities moving through it
         /// </summary>
         public float Drag { get; set; }
+
+        public FluidInstance Create()
+        {
+            return new FluidInstance()
+            {
+                Class = this
+            };
+        }
     }
 
     /// <summary>
@@ -116,9 +135,9 @@ namespace Takai.Game
     /// Fluids can be spawned with a velocity which is decreased by their drag over time. Once the velocity reaches zero, the fluid is considered inactive (permanently)
     /// </summary>
     [Data.DesignerModdable]
-    public struct Fluid
+    public struct FluidInstance : IObjectInstance<FluidClass>
     {
-        public FluidType type;
+        public FluidClass Class { get; set; }
         public Vector2 position;
         public Vector2 velocity;
     }
@@ -131,6 +150,8 @@ namespace Takai.Game
         public float angle;
         public float scale;
     }
+
+    //todo: switch to class/instance system
 
     /// <summary>
     /// A single type of particle

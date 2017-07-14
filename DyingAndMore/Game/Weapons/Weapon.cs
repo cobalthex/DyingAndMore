@@ -7,8 +7,13 @@ namespace DyingAndMore.Game.Weapons
     /// The base for all weapons
     /// </summary>
     [Takai.Data.DesignerModdable]
-    abstract class WeaponClass : Takai.Game.IObjectClass<WeaponInstance>
+    abstract class WeaponClass : Takai.IObjectClass<WeaponInstance>
     {
+        public string Name { get; set; }
+
+        [Takai.Data.Serializer.Ignored]
+        public string File { get; set; } = null;
+
         /// <summary>
         /// How long to delay between each shot (random)
         /// </summary>
@@ -24,7 +29,7 @@ namespace DyingAndMore.Game.Weapons
 
         public abstract WeaponInstance Create();
     }
-    abstract class WeaponInstance : Takai.Game.IObjectInstance<WeaponClass>
+    abstract class WeaponInstance : Takai.IObjectInstance<WeaponClass>
     {
         public virtual WeaponClass Class { get; set; }
 
@@ -49,25 +54,36 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         /// <param name="source">The entity to fire from</param>
         /// <remarks>Fires from the owner entity's position in their forward direction</remarks>
-        public virtual void Fire(Takai.Game.EntityInstance source)
+        public virtual void TryUse(Takai.Game.EntityInstance source)
         {
-            if (CanFire(source.Map.ElapsedTime))
+            if (CanUse(source.Map.ElapsedTime))
             {
-                ForceFire(source);
+                Use(source);
                 nextShot = source.Map.ElapsedTime + Takai.Game.RandomRange.Next(Class.Delay);
             }
         }
 
-        public virtual bool CanFire(TimeSpan totalTime)
+        public virtual bool CanUse(TimeSpan totalTime)
         {
-            return totalTime > nextShot;
+            return !IsDepleted() && totalTime > nextShot;
         }
+
+        /// <summary>
+        /// Is the weapon completely depleted? (should be permanent)
+        /// </summary>
+        /// <returns>True if the weapon is depleted, false otherwise</returns>
+        public abstract bool IsDepleted();
 
         /// <summary>
         /// Fire a single shot, even if CanFire returns false
         /// </summary>
         /// <param name="Entity">The entity to fire from</param>
         /// <remarks>Unaffected by firing conditions</remarks>
-        protected abstract void ForceFire(Takai.Game.EntityInstance entity);
+        protected abstract void Use(Takai.Game.EntityInstance entity);
+
+        public override string ToString()
+        {
+            return GetType().Name;
+        }
     }
 }

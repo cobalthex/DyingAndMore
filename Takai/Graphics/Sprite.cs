@@ -308,6 +308,10 @@ namespace Takai.Graphics
         {
             Draw(spriteBatch, new Rectangle((int)position.X, (int)position.Y, width, height), angle, color, ElapsedTime);
         }
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle, Color color, float scale, TimeSpan elapsedTime)
+        {
+            Draw(spriteBatch, new Rectangle((int)position.X, (int)position.Y, width, height), angle, color, elapsedTime);
+        }
 
         public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle, Color color, TimeSpan elapsedTime)
         {

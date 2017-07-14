@@ -35,7 +35,7 @@ namespace DyingAndMore.Game
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
 
-            pt1 = new Takai.Game.ParticleType()
+            testParticles = new Takai.Game.ParticleType()
             {
                 Graphic = new Takai.Graphics.Sprite(
                     Takai.AssetManager.Load<Texture2D>("Textures/Particles/Blood.png"),
@@ -47,16 +47,16 @@ namespace DyingAndMore.Game
                     true
                 )
             };
-            pt1.Graphic.CenterOrigin();
+            testParticles.Graphic.CenterOrigin();
 
             var curve = new Curve();
             curve.Keys.Add(new CurveKey(0, 0));
             curve.Keys.Add(new CurveKey(1, 1));
 
-            pt1.BlendMode = BlendState.AlphaBlend;
-            pt1.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Aquamarine);
-            pt1.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 2);
-            pt1.Speed = new Takai.Game.ValueCurve<float>(curve, 100, 0);
+            testParticles.BlendMode = BlendState.AlphaBlend;
+            testParticles.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Aquamarine);
+            testParticles.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 2);
+            testParticles.Speed = new Takai.Game.ValueCurve<float>(curve, 100, 0);
 
             map.renderSettings |= Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
 
@@ -73,7 +73,7 @@ namespace DyingAndMore.Game
             });
 
         }
-        Takai.Game.ParticleType pt1, pt2;
+        Takai.Game.ParticleType testParticles;
 
         protected override void OnMapChanged(System.EventArgs e)
         {
@@ -113,7 +113,7 @@ namespace DyingAndMore.Game
 
             Takai.Game.ParticleSpawn pspawn = new Takai.Game.ParticleSpawn()
             {
-                type = pt1,
+                type = testParticles,
                 angle = new Takai.Game.Range<float>(0, MathHelper.TwoPi),
                 position = new Takai.Game.Range<Vector2>(worldMousePos),
                 count = new Takai.Game.Range<int>(3, 5),

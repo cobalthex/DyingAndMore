@@ -83,7 +83,7 @@ namespace DyingAndMore.Editor
                             {
                                 var Fluid = sect.Fluids[i];
 
-                                if (Vector2.DistanceSquared(Fluid.position, currentWorldPos) < Fluid.type.Radius * Fluid.type.Radius)
+                                if (Vector2.DistanceSquared(Fluid.position, currentWorldPos) < Fluid.Class.Radius * Fluid.Class.Radius)
                                 {
                                     sect.Fluids[i] = sect.Fluids[sect.Fluids.Count - 1];
                                     sect.Fluids.RemoveAt(sect.Fluids.Count - 1);

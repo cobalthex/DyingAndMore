@@ -7,22 +7,17 @@ namespace DyingAndMore.Editor.Selectors
 {
     class FluidSelector : Selector
     {
-        public List<Takai.Game.FluidType> fluids;
+        public List<Takai.Game.FluidClass> fluids;
 
         public FluidSelector(Editor editor)
             : base(editor)
         {
-            fluids = new List<Takai.Game.FluidType>();
+            fluids = new List<Takai.Game.FluidClass>();
             foreach (var file in System.IO.Directory.EnumerateFiles("Defs\\Fluids", "*", System.IO.SearchOption.AllDirectories))
             {
                 try
                 {
-                    var deserialized = Takai.Data.Serializer.TextDeserializeAll(file);
-                    foreach (var obj in deserialized)
-                    {
-                        if (obj is Takai.Game.FluidType fluid)
-                            fluids.Add(fluid);
-                    }
+                    fluids.Add(Takai.Data.Cache.Load<Takai.Game.FluidClass>(file));
                 }
                 catch (System.Exception)
                 {

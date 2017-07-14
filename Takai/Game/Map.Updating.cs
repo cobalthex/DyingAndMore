@@ -80,22 +80,22 @@ namespace Takai.Game
 
             for (int i = 0; i < ActiveFluids.Count; ++i)
             {
-                var Fluid = ActiveFluids[i];
-                var deltaV = Fluid.velocity * deltaSeconds;
-                Fluid.position += deltaV;
-                Fluid.velocity -= deltaV * Fluid.type.Drag;
+                var fluid = ActiveFluids[i];
+                var deltaV = fluid.velocity * deltaSeconds;
+                fluid.position += deltaV;
+                fluid.velocity -= deltaV * fluid.Class.Drag;
 
                 //todo: maybe add collision detection for better fluid simulation (combine drag when colliding)
 
-                if (System.Math.Abs(Fluid.velocity.X) < 1 && System.Math.Abs(Fluid.velocity.Y) < 1)
+                if (System.Math.Abs(fluid.velocity.X) < 1 && System.Math.Abs(fluid.velocity.Y) < 1)
                 {
-                    Spawn(Fluid.type, Fluid.position, Vector2.Zero); //this will move the Fluid to the static area of the map
+                    Spawn(fluid.Class, fluid.position, Vector2.Zero); //this will move the Fluid to the static area of the map
                     ActiveFluids[i] = ActiveFluids[ActiveFluids.Count - 1];
                     ActiveFluids.RemoveAt(ActiveFluids.Count - 1);
                     --i;
                 }
                 else
-                    ActiveFluids[i] = Fluid;
+                    ActiveFluids[i] = fluid;
             }
 
             #endregion
@@ -128,13 +128,14 @@ namespace Takai.Game
             {
                 var entBounds = ent.AxisAlignedBounds;
 
-                bool isDead = ent.State.Is(EntStateId.Dead);
+                var isDead = ent.State.TryGet(EntStateId.Dead, out var deadState);
 
+                //todo: redo
                 if (!Bounds.Intersects(entBounds) || //outside of the map
-                    ent.State.BaseState == EntStateId.Invalid || //no state
+                    ent.State.BaseState.StateId == EntStateId.Invalid || //no state
                     (isDead &&
-                     (!ent.Sprites.GetEnumerator().MoveNext() || //no sprite
-                     (ent.Class.DestroyIfDead && ent.State.States[EntStateId.Dead].HasFinished())))) //animation is over and remove after death
+                     (!ent.ActiveStates.GetEnumerator().MoveNext() || //todo: should be no sprite
+                     (ent.Class.DestroyIfDead && deadState.HasFinished())))) //animation is over and remove after death
                         Destroy(ent);
 
                 else if (!ent.Class.AlwaysActive && !visibleRegion.Intersects(entBounds))
@@ -178,22 +179,22 @@ namespace Takai.Game
                                 {
                                     ent.OnMapCollision(targetCell, startPos + (direction * hit.distance), deltaTime); //todo: update w/ correct tile
 
-                                    if (ent.Class.IsPhysical)
-                                        ent.Velocity = Vector2.Zero;
+                                    //improve
+                                    ent.Velocity = Vector2.Zero;
                                 }
                             }
 
                             //Fluid collision
-                            if (!ent.Class.IgnoreTrace)
+                            if (!ent.Class.IgnoreTrace && false) //todo
                             {
                                 var drag = 0f;
                                 var dc = 0u;
                                 var sector = Sectors[targetCell.Y / SectorSize, targetCell.X / SectorSize];
-                                foreach (var Fluid in sector.Fluids)
+                                foreach (var fluid in sector.Fluids)
                                 {
-                                    if (Vector2.DistanceSquared(Fluid.position, targetPos) <= (Fluid.type.Radius * Fluid.type.Radius) + ent.RadiusSq)
+                                    if (Vector2.DistanceSquared(fluid.position, targetPos) <= (fluid.Class.Radius * fluid.Class.Radius) + ent.RadiusSq)
                                     {
-                                        drag += Fluid.type.Drag;
+                                        drag += fluid.Class.Drag;
                                         ++dc;
                                     }
                                 }

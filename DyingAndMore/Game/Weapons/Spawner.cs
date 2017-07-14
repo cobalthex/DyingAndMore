@@ -4,6 +4,8 @@ using Takai.Game;
 
 namespace DyingAndMore.Game.Weapons
 {
+    //todo: custom serialize spawn list (only export object)
+
     class SpawnerClass : WeaponClass
     {
         protected static Random randGen = new Random();
@@ -79,12 +81,12 @@ namespace DyingAndMore.Game.Weapons
             SpawnQueue = new Queue<EntityClass>(_Class.GenerateSpawnList());
         }
 
-        public override bool CanFire(TimeSpan totalTime)
+        public override bool IsDepleted()
         {
-            return SpawnQueue.Count > 0 && base.CanFire(totalTime);
+            return SpawnQueue.Count <= 0;
         }
 
-        protected override void ForceFire(EntityInstance source)
+        protected override void Use(EntityInstance source)
         {
             if (source.Map == null)
                 return;

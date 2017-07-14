@@ -79,7 +79,7 @@ namespace DyingAndMore
         public DyingAndMoreGame()
         {
             gdm = new GraphicsDeviceManager(this);
-            gdm.DeviceCreated += new System.EventHandler<System.EventArgs>(gdm_DeviceCreated);
+            gdm.DeviceCreated += GdmDeviceCreated;
             gdm.PreferMultiSampling = true;
 
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps
@@ -92,7 +92,7 @@ namespace DyingAndMore
             IsFixedTimeStep = false;
         }
 
-        void gdm_DeviceCreated(object sender, System.EventArgs e)
+        void GdmDeviceCreated(object sender, System.EventArgs e)
         {
             Takai.Data.Serializer.LoadTypesFrom(System.Reflection.Assembly.GetEntryAssembly());
 
@@ -167,6 +167,11 @@ namespace DyingAndMore
 
             if (InputState.IsPress(Keys.F12))
                 takingScreenshot = true;
+
+            if (InputState.IsPress(Keys.F6))
+            {
+                Takai.Data.Cache.SaveAllToFile("all.tk");
+            }
 
             InputState.Update(GraphicsDevice.Viewport.Bounds);
 

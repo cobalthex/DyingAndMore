@@ -14,7 +14,7 @@ namespace Takai.Game
         public HashSet<EntityInstance> entities = new HashSet<EntityInstance>();
 
         //static
-        public List<Fluid> Fluids = new List<Fluid>();
+        public List<FluidInstance> Fluids = new List<FluidInstance>();
         public List<Decal> decals = new List<Decal>();
         public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
     }
@@ -117,7 +117,7 @@ namespace Takai.Game
         /// The list of live Fluids. Once the Fluids' velocity is zero, they are removed from this and not re-added
         /// </summary>
         [Data.Serializer.Ignored]
-        public List<Fluid> ActiveFluids { get; protected set; } = new List<Fluid>(128);
+        public List<FluidInstance> ActiveFluids { get; protected set; } = new List<FluidInstance>(128);
 
         [Data.Serializer.Ignored]
         public int TotalEntitiesCount { get; private set; } = 0;
@@ -293,18 +293,18 @@ namespace Takai.Game
         /// </summary>
         /// <param name="position">The position of the fluid</param>
         /// <param name="velocity">The fluid's initial velocity</param>
-        /// <param name="type">The fluid's type</param>
-        public void Spawn(FluidType type, Vector2 position, Vector2 velocity)
+        /// <param name="class">The fluid's type</param>
+        public void Spawn(FluidClass @class, Vector2 position, Vector2 velocity)
         {
             //todo: don't spawn fluids outside the map (position + radius)
 
             if (velocity == Vector2.Zero)
             {
                 var sector = GetOverlappingSector(position);
-                Sectors[sector.Y, sector.X].Fluids.Add(new Fluid { position = position, velocity = velocity, type = type });
+                Sectors[sector.Y, sector.X].Fluids.Add(new FluidInstance { position = position, velocity = velocity, Class = @class });
             }
             else
-                ActiveFluids.Add(new Fluid { position = position, velocity = velocity, type = type });
+                ActiveFluids.Add(new FluidInstance { position = position, velocity = velocity, Class = @class });
         }
 
         /// <summary>

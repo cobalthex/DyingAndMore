@@ -18,12 +18,7 @@ namespace DyingAndMore.Editor.Selectors
             {
                 try
                 {
-                    var deserialized = Takai.Data.Serializer.TextDeserializeAll(file);
-                    foreach (var obj in deserialized)
-                    {
-                        if (obj is Takai.Game.EntityClass ent)
-                            ents.Add(ent);
-                    }
+                    ents.Add(Takai.Data.Cache.Load<Takai.Game.EntityClass>(file));
                 }
                 catch (System.Exception e)
                 {

@@ -34,8 +34,14 @@ namespace DyingAndMore.Game.Entities
         /// <remarks>Whenever this value is modified, the difference is added to current health</remarks>
         public int MaxHealth { get; set; }
 
+        /// <summary>
+        /// The field of vision of this actor. In Radians
+        /// </summary>
         public float FieldOfView { get; set; } = MathHelper.PiOver4 * 3;
 
+        /// <summary>
+        /// How quickly this actor accelerates
+        /// </summary>
         public float MoveForce { get; set; }
 
         //inherited
@@ -115,15 +121,15 @@ namespace DyingAndMore.Game.Entities
             Controller = _Class.DefaultController;
         }
 
-        public override void Think(System.TimeSpan DeltaTime)
+        public override void Think(System.TimeSpan deltaTime)
         {
-            Controller?.Think(DeltaTime);
+            Controller?.Think(deltaTime);
 
             //todo: move to physics
             var vel = Velocity;
 
             if (vel == lastVelocity)
-                vel = Vector2.Lerp(vel, Vector2.Zero, 10 * (float)DeltaTime.TotalSeconds);
+                vel = Vector2.Lerp(vel, Vector2.Zero, 10 * (float)deltaTime.TotalSeconds);
             if (System.Math.Abs(vel.X) < 0.01f)
                 vel.X = 0;
             if (System.Math.Abs(vel.Y) < 0.01f)
@@ -135,7 +141,7 @@ namespace DyingAndMore.Game.Entities
             if (CurrentHealth <= 0 && !State.Is(EntStateId.Dead))
                 State.Transition(EntStateId.Dead);
 
-            base.Think(DeltaTime);
+            base.Think(deltaTime);
         }
 
         public override void OnEntityCollision(EntityInstance Collider, Vector2 Point, System.TimeSpan DeltaTime)
@@ -147,7 +153,7 @@ namespace DyingAndMore.Game.Entities
 
         public void FireWeapon()
         {
-            Weapon?.Fire(this);
+            Weapon?.TryUse(this);
         }
 
         public void Accelerate(Vector2 direction)
@@ -171,7 +177,7 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         /// <param name="Point">The point to check</param>
         /// <returns>True if this entity is facing Point</returns>
-        public bool CanSee(Vector2 Point)
+        public bool IsFacing(Vector2 Point)
         {
             var diff = Point - Position;
             diff.Normalize();

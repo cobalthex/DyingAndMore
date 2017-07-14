@@ -26,10 +26,8 @@ ActorClass {
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
 
-    DefaultWeapon: SpawnerClass {
-        Spawns: [
-            [@"Defs/Entities/InfectedCell.ent.tk" [30 50]]
-            [@"Defs/Entities/Astrovirus.ent.tk" [30 50]]
-        ]
+    DefaultWeapon: GunClass {
+        MaxAmmo: 300;
+        Projectile: @"Defs/Entities/Missile.ent.tk";
     }
 }

@@ -224,8 +224,8 @@ namespace Takai.Data
             {
                 reader.Read();
                 var file = ReadString(reader);
-                var reference = TextDeserialize(file);
-                return reference;
+                //var reference = TextDeserialize(file);
+                return Cache.Load(file);
             }
 
             if (peek == '"' || peek == '\'')
@@ -338,7 +338,8 @@ namespace Takai.Data
 
                 try
                 {
-                    return ParseDictionary(type, dict);
+                    var obj = ParseDictionary(type, dict);
+                    return obj;
                 }
                 catch (Exception expt)
                 {
@@ -350,24 +351,24 @@ namespace Takai.Data
             throw new NotSupportedException(ExceptString($"Unknown identifier: '{word}'", reader));
         }
 
-        public static object ParseDictionary(Type DestType, Dictionary<string, object> Dict)
+        public static object ParseDictionary(Type destType, Dictionary<string, object> dict)
         {
-            var deserial = DestType.GetCustomAttribute<CustomDeserializeAttribute>()?.deserialize;
+            var deserial = destType.GetCustomAttribute<CustomDeserializeAttribute>()?.deserialize;
             if (deserial != null)
             {
-                var deserialied = deserial.Invoke(null, new[] { Dict }); //must be static here
+                var deserialied = deserial.Invoke(null, new[] { dict }); //must be static here
                 if (deserialied != DefaultAction)
                     return deserialied;
             }
 
-            var obj = Activator.CreateInstance(DestType); //todo: use lambda to create
+            var obj = Activator.CreateInstance(destType); //todo: use lambda to create
             //https://vagifabilov.wordpress.com/2010/04/02/dont-use-activator-createinstance-or-constructorinfo-invoke-use-compiled-lambda-expressions/
 
-            foreach (var pair in Dict)
+            foreach (var pair in dict)
             {
                 try
                 {
-                    var field = DestType.GetField(pair.Key, DefaultBindingFlags);
+                    var field = destType.GetField(pair.Key, DefaultBindingFlags);
                     if (field != null)
                     {
                         if (!Attribute.IsDefined(field, typeof(IgnoredAttribute)))
@@ -394,7 +395,7 @@ namespace Takai.Data
                     }
                     else
                     {
-                        var prop = DestType.GetProperty(pair.Key, DefaultBindingFlags);
+                        var prop = destType.GetProperty(pair.Key, DefaultBindingFlags);
                         if (prop != null && prop.CanWrite)
                         {
                             if (!Attribute.IsDefined(prop, typeof(IgnoredAttribute)))
@@ -420,22 +421,22 @@ namespace Takai.Data
                             }
                         }
                         else
-                            System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in DestType:{DestType.Name}");
+                            System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in DestType:{destType.Name}");
                     }
                 }
                 catch (InvalidCastException expt)
                 {
-                    throw new InvalidCastException($"Error casting to field:{pair.Key} in DestType:{DestType.Name}: {expt.Message}", expt);
+                    throw new InvalidCastException($"Error casting to field:{pair.Key} in DestType:{destType.Name}: {expt.Message}", expt);
                 }
                 catch (Exception expt)
                 {
-                    throw new Exception($"Error parsing field:{pair.Key} in DestType:{DestType.Name}: {expt.Message}", expt);
+                    throw new Exception($"Error parsing field:{pair.Key} in DestType:{destType.Name}: {expt.Message}", expt);
                 }
             }
 
-            var derived = DestType.GetCustomAttribute<DerivedTypeDeserializeAttribute>();
+            var derived = destType.GetCustomAttribute<DerivedTypeDeserializeAttribute>();
             if (derived != null)
-                derived.deserialize.Invoke(obj, new[] { Dict });
+                derived.deserialize.Invoke(obj, new[] { dict });
 
             return obj;
         }
