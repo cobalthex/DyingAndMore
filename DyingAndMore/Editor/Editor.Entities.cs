@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
@@ -52,29 +53,8 @@ namespace DyingAndMore.Editor
         public EntitiesEditorMode(Editor editor)
             : base("Entities", editor)
         {
-            VerticalAlignment = Takai.UI.Alignment.Stretch;
-            HorizontalAlignment = Takai.UI.Alignment.Stretch;
-
-            selector = new Selectors.EntSelector(editor)
-            {
-                Size = new Vector2(320, 1),
-                VerticalAlignment = Takai.UI.Alignment.Stretch,
-                HorizontalAlignment = Takai.UI.Alignment.End
-            };
-            selector.SelectionChanged += delegate
-            {
-                //var sprite = selector.ents[selector.SelectedItem].Sprites.GetEnumerator();
-                //if (sprite.MoveNext())
-                //{
-                //    preview.Sprite = sprite.Current;
-                //    preview.AutoSize();
-                //}
-                //else
-                {
-                    preview.Sprite = null;
-                    preview.Size = new Vector2(32);
-                }
-            };
+            VerticalAlignment = Alignment.Stretch;
+            HorizontalAlignment = Alignment.Stretch;
 
             AddChild(preview = new Graphic()
             {
@@ -88,17 +68,69 @@ namespace DyingAndMore.Editor
             {
                 AddChild(selector);
             };
+
+            selector = new Selectors.EntSelector(editor)
+            {
+                Size = new Vector2(320, 1),
+                VerticalAlignment = Alignment.Stretch,
+                HorizontalAlignment = Alignment.End
+            };
+            selector.SelectionChanged += delegate
+            {
+                var state = selector.ents[selector.SelectedItem].States.GetEnumerator();
+                if (state.MoveNext())
+                {
+                    preview.Sprite = state.Current.Value?.Sprite;
+                    preview.Size = Vector2.Max(new Vector2(32), preview.Sprite.Size.ToVector2());
+                }
+                else
+                {
+                    preview.Sprite = null;
+                    preview.Size = new Vector2(32);
+                }
+            };
             selector.SelectedItem = 0;
 
-            AddChild(entInfo = new Takai.UI.Static()
+            AddChild(entInfo = new Static()
             {
                 Position = new Vector2(20),
                 HorizontalAlignment = Alignment.Start,
                 VerticalAlignment = Alignment.End,
                 Font = Font
             });
+
+            watcher = new FileSystemWatcher("Defs/Entities", "*.ent.tk")
+            {
+                NotifyFilter = NotifyFilters.LastWrite,
+                EnableRaisingEvents = true,
+                IncludeSubdirectories = true
+            };
+            watcher.Changed += Watcher_Changed; ;
         }
 
+        FileSystemWatcher watcher;
+        private void Watcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            System.Threading.Thread.Sleep(500);
+            var path = e.FullPath.Replace(System.Environment.CurrentDirectory, "");
+            try
+            {
+                var newClass = Takai.Data.Cache.Load<Takai.Game.EntityClass>(path, true);
+                foreach (var ent in editor.Map.AllEntities)
+                {
+                    if (ent.Class.File == newClass.File)
+                        ent.Class = newClass;
+                }
+
+                for (int i = 0; i < selector.ents.Count; ++i)
+                {
+                    if (selector.ents[i].File == newClass.File)
+                        selector.ents[i] = newClass;
+                }
+                selector.SelectedItem = selector.SelectedItem;
+            }
+            catch { }
+        }
 
         public override void Start()
         {
@@ -258,9 +290,7 @@ namespace DyingAndMore.Editor
         {
             base.DrawSelf(spriteBatch);
             foreach (var ent in editor.Map.ActiveEnts)
-            {
-                editor.Map.DrawArrow(ent.Position, ent.Direction, ent.Radius * 1.5f, Color.Gold);
-            }
+                editor.Map.DrawArrow(ent.Position, ent.Direction, ent.Radius * 1.3f, Color.Gold);
         }
 
         void MoveEnt(Takai.Game.EntityInstance ent, Vector2 newPosition)

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 
@@ -27,7 +27,7 @@ namespace Takai.Data
                 obj = Serializer.TextDeserialize(file);
                 if (obj is ISerializeExternally sxt)
                     sxt.File = file;
-                objects.Add(file, obj);
+                objects[file] = obj;
             }
             return obj;
         }
@@ -40,14 +40,40 @@ namespace Takai.Data
                 obj = Serializer.TextDeserialize<T>(file);
                 if (obj is ISerializeExternally sxt)
                     sxt.File = file;
-                objects.Add(file, obj);
+                objects[file] = obj;
             }
             return (T)obj;
         }
 
+        /// <summary>
+        /// Reload all known defs from their files. Any objects that fail to reload will remain the same
+        /// </summary>
+        /// <returns>The objects that were reloaded</returns>
+        public static Dictionary<string, object> ReloadAll()
+        {
+            var newObjs = new Dictionary<string, object>();
+
+            foreach (var file in objects)
+            {
+                try
+                {
+                    var obj = Serializer.TextDeserialize(file.Key);
+                    if (obj is ISerializeExternally sxt)
+                        sxt.File = file.Key;
+                    newObjs[file.Key] = obj;
+                }
+                catch { }
+            }
+
+            foreach (var obj in newObjs)
+                objects[obj.Key] = obj.Value;
+
+            return newObjs;
+        }
+
         public static void SaveAllToFile(string file)
         {
-            using (var writer = new System.IO.StreamWriter(file))
+            using (var writer = new StreamWriter(file))
                 Serializer.TextSerialize(writer, Objects);
 
             var asdf = Serializer.TextDeserialize(file);

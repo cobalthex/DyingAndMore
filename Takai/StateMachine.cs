@@ -29,7 +29,7 @@ namespace Takai
         /// <summary>
         /// Unique ID for the state
         /// </summary>
-        TKey StateId { get; set; }
+        TKey Id { get; set; }
 
         /// <summary>
         /// How long this state has been active
@@ -43,6 +43,17 @@ namespace Takai
         void Update(TimeSpan deltaTime);
     }
 
+    public class StateCompleteEventArgs<TInstance> : EventArgs
+    {
+        public TInstance State { get; set; }
+    }
+
+    public class TransitionEventArgs<TInstance> : EventArgs
+    {
+        public TInstance Previous { get; set; }
+        public TInstance Next { get; set; }
+    }
+
     /// <summary>
     /// A state machine that allows multiple active states (blending) and handles transitioning between states
     /// </summary>
@@ -54,7 +65,19 @@ namespace Takai
         /// <summary>
         /// All of the available states
         /// </summary>
-        public Dictionary<TKey, TClass> States { get; set; }
+        public Dictionary<TKey, TClass> States
+        {
+            get => _states;
+            set
+            {
+                _states = value;
+                if (BaseState != null)
+                    BaseState.Class = _states[BaseState.Id];
+                foreach (var state in OverlaidStates)
+                    state.Value.Class = _states[state.Value.Id];
+            }
+        }
+        private Dictionary<TKey, TClass> _states;
 
         /// <summary>
         /// The currently active 'base' state. Only one base state can be active at a time
@@ -71,6 +94,13 @@ namespace Takai
         /// All of the current transitions
         /// </summary>
         public Dictionary<TKey, TKey> Transitions { get; set; } = new Dictionary<TKey, TKey>();
+
+        public event EventHandler<StateCompleteEventArgs<TInstance>> StateComplete = null;
+        protected virtual void OnStateComplete(StateCompleteEventArgs<TInstance> e) { }
+
+        public event EventHandler<TransitionEventArgs<TInstance>> Transition = null;
+        protected virtual void OnTransition(TransitionEventArgs<TInstance> e) { }
+
         /// <summary>
         /// Check if a state is active
         /// </summary>
@@ -78,7 +108,7 @@ namespace Takai
         /// <returns>True if the state is currently active</returns>
         public bool Is(TKey activeState)
         {
-            return (BaseState.StateId.Equals(activeState) || OverlaidStates.ContainsKey(activeState));
+            return (BaseState.Id.Equals(activeState) || OverlaidStates.ContainsKey(activeState));
         }
 
         /// <summary>
@@ -88,7 +118,7 @@ namespace Takai
         /// <returns>true if the state was found</returns>
         public bool TryGet(TKey activeState, out TInstance instance)
         {
-            if (BaseState.Equals(activeState))
+            if (BaseState.Id.Equals(activeState))
             {
                 instance = BaseState;
                 return true;
@@ -108,12 +138,12 @@ namespace Takai
         /// </summary>
         /// <param name="NextState">The new state</param>
         /// <returns>False if the state does not exist</returns>
-        public virtual bool Transition(TKey NextState)
+        public virtual bool TransitionTo(TKey NextState)
         {
             if (!NextState.Equals(default(TKey)) && States.TryGetValue(NextState, out var next))
             {
                 var instance = (TInstance)next.Create();
-                instance.StateId = NextState; //todo: automate
+                instance.Id = NextState; //todo: automate
 
                 if (next.IsOverlay)
                     OverlaidStates.Add(NextState, instance);
@@ -129,12 +159,12 @@ namespace Takai
         /// </summary>
         /// <param name="currentState">The state to transition from when it is finished</param>
         /// <param name="nextState">The state to transition to after currentState is finished/></param>
-        public virtual void Transition(TKey currentState, TKey nextState)
+        public virtual void TransitionTo(TKey currentState, TKey nextState)
         {
             Transitions[currentState] = nextState;
         }
 
-        List<TKey> added = new List<TKey>();
+        List<TInstance> added = new List<TInstance>();
         List<TKey> removed = new List<TKey>();
 
         /// <summary>
@@ -143,54 +173,85 @@ namespace Takai
         /// <param name="deltaTime">How much time has passed since the last update</param>
         public virtual void Update(TimeSpan deltaTime)
         {
-            //foreach (var key in added)
-            //{
-            //    var instance = (TInstance)States[key].Create();
-            //    instance.StateId = key;
-            //    if (States[key].IsOverlay)
-            //        OverlaidStates.Add(key, instance);
-            //}
+            if (Transitions.TryGetValue(BaseState.Id, out var nextBase))
+            {
+                Transitions.Remove(BaseState.Id);
+
+                var evArgs = new TransitionEventArgs<TInstance>()
+                {
+                    Previous = BaseState
+                };
+
+                evArgs.Next = BaseState = (TInstance)States[nextBase].Create();
+                BaseState.Id = nextBase;
+
+                OnTransition(evArgs);
+                Transition?.Invoke(this, evArgs);
+            }
+            else
+            {
+                bool notComplete = BaseState.ElapsedTime < BaseState.Class.TotalTime;
+
+                BaseState.ElapsedTime += deltaTime;
+                BaseState.Update(deltaTime);
+
+                if (!notComplete && BaseState.ElapsedTime >= BaseState.Class.TotalTime)
+                {
+                    var completed = new StateCompleteEventArgs<TInstance>()
+                    {
+                        State = BaseState
+                    };
+                    OnStateComplete(completed);
+                    StateComplete?.Invoke(this, completed);
+                }
+            }
 
             foreach (var state in OverlaidStates)
             {
                 if (Transitions.TryGetValue(state.Key, out var nextOverlay))
                 {
                     Transitions.Remove(state.Key);
-                    added.Add(nextOverlay);
                     removed.Add(state.Key);
+
+                    var next = States[nextOverlay].Create();
+                    added.Add(next);
+
+                    var evArgs = new TransitionEventArgs<TInstance>()
+                    {
+                        Previous = state.Value,
+                        Next = next
+                    };
+                    OnTransition(evArgs);
+                    Transition?.Invoke(this, evArgs);
                 }
                 else
                 {
+                    bool notComplete = state.Value.ElapsedTime < state.Value.Class.TotalTime;
+
                     state.Value.ElapsedTime += deltaTime;
                     state.Value.Update(deltaTime);
+
+                    if (notComplete && state.Value.ElapsedTime >= state.Value.Class.TotalTime)
+                    {
+                        var completed = new StateCompleteEventArgs<TInstance>()
+                        {
+                            State = state.Value
+                        };
+                        OnStateComplete(completed);
+                        StateComplete?.Invoke(this, completed);
+                    }
 
                     if (state.Value.ElapsedTime > state.Value.Class.TotalTime)
                         removed.Add(state.Key);
                 }
             }
 
-            if (Transitions.TryGetValue(BaseState.StateId, out var nextBase))
-            {
-                Transitions.Remove(BaseState.StateId);
-                BaseState = (TInstance)States[nextBase].Create();
-                BaseState.StateId = nextBase;
-            }
-            else
-            {
-                BaseState.ElapsedTime += deltaTime;
-                BaseState.Update(deltaTime);
-            }
-
-            foreach (var key in added)
-            {
-                var instance = (TInstance)States[key].Create();
-                instance.StateId = key;
-                OverlaidStates.Add(key, instance);
-            }
+            //udpate overlays
+            foreach (var inst in added)
+                OverlaidStates.Add(inst.Id, inst);
             foreach (var key in removed)
                 OverlaidStates.Remove(key);
 
-            //update overlays
             added.Clear();
             removed.Clear();
         }

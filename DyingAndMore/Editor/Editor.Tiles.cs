@@ -20,22 +20,6 @@ namespace DyingAndMore.Editor
             VerticalAlignment = Takai.UI.Alignment.Stretch;
             HorizontalAlignment = Takai.UI.Alignment.Stretch;
 
-            selector = new Selectors.TileSelector(editor)
-            {
-                Size = new Vector2(320, 1),
-                VerticalAlignment = Takai.UI.Alignment.Stretch,
-                HorizontalAlignment = Takai.UI.Alignment.End
-            };
-            selector.SelectionChanged += delegate
-            {
-                preview.Sprite.ClipRect = new Rectangle(
-                    (selector.SelectedItem % editor.Map.TilesPerRow) * editor.Map.TileSize,
-                    (selector.SelectedItem / editor.Map.TilesPerRow) * editor.Map.TileSize,
-                    editor.Map.TileSize,
-                    editor.Map.TileSize
-                );
-            };
-
             AddChild(preview = new Takai.UI.Graphic()
             {
                 Sprite = new Takai.Graphics.Sprite()
@@ -55,6 +39,24 @@ namespace DyingAndMore.Editor
                 AddChild(selector);
             };
 
+            selector = new Selectors.TileSelector(editor)
+            {
+                Size = new Vector2(320, 1),
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                HorizontalAlignment = Takai.UI.Alignment.End
+            };
+            selector.SelectionChanged += delegate
+            {
+                if (preview.Sprite != null)
+                {
+                    preview.Sprite.ClipRect = new Rectangle(
+                        (selector.SelectedItem % editor.Map.TilesPerRow) * editor.Map.TileSize,
+                        (selector.SelectedItem / editor.Map.TilesPerRow) * editor.Map.TileSize,
+                        editor.Map.TileSize,
+                        editor.Map.TileSize
+                    );
+                }
+            };
             selector.SelectedItem = 0;
         }
 

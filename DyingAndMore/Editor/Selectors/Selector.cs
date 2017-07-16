@@ -52,7 +52,7 @@ namespace DyingAndMore.Editor.Selectors
             get => _selectedItem;
             set
             {
-                _selectedItem = MathHelper.Clamp(value, 0, ItemCount - 1); ;
+                _selectedItem = MathHelper.Clamp(value, 0, ItemCount - 1);
                 SelectionChanged?.Invoke(this, System.EventArgs.Empty);
             }
         }

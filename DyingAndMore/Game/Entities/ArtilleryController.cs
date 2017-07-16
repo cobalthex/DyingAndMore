@@ -29,7 +29,7 @@ namespace DyingAndMore.Game.Entities
 
             if (actor.State.Is(Takai.Game.EntStateId.Idle) && actor.Weapon.IsDepleted())
             {
-                actor.State.Transition(Takai.Game.EntStateId.Idle, Takai.Game.EntStateId.Inactive);
+                actor.State.TransitionTo(Takai.Game.EntStateId.Idle, Takai.Game.EntStateId.Inactive);
                 return;
             }
 

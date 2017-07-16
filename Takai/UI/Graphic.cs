@@ -31,7 +31,6 @@ namespace Takai.UI
             if (Sprite?.Texture != null)
             {
                 var rect = VisibleBounds;
-                rect.Offset(Sprite.Origin);
                 Sprite.Draw(spriteBatch, rect, 0);
             }
             else if (DrawXIfMissingSprite)

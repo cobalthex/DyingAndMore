@@ -4,7 +4,7 @@ Map {
     ActiveCamera: EditorCamera {
         PostEffect: Null;
         Viewport: [0 0 1280 800];
-        Position: [275.5978 192];
+        Position: [192 192];
         Scale: 1;
         Rotation: 0;
         Shake: 0;
@@ -12,7 +12,7 @@ Map {
         MoveSpeed: 1000;
     };
     TilesImage: "Data\\Textures/tiles.png";
-    Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
     Decals: [];
     Triggers: [];
     State: MapState {
@@ -112,7 +112,7 @@ Map {
                 Weapon: SpawnerInstance {
                     Class: SpawnerClass {
                         Spawns: [
-                            Tuple+2 {
+                            Tuple`2 {
                                 Item1: @"Defs/Entities/InfectedCell.ent.tk";
                                 Item2: [3 5];
                             }
@@ -127,14 +127,15 @@ Map {
                         @"Defs/Entities/InfectedCell.ent.tk"
                         @"Defs/Entities/InfectedCell.ent.tk"
                         @"Defs/Entities/InfectedCell.ent.tk"
+                        @"Defs/Entities/InfectedCell.ent.tk"
                     ];
                     nextShot: 0;
                 };
                 Radius: 32;
                 RadiusSq: 1024;
                 Name: Null;
-                Position: [319.5977 346];
-                Direction: [-0.1004987 -0.9949372];
+                Position: [454 238];
+                Direction: [-1 0];
                 Velocity: [0 0];
                 State: {
                     BaseState: EntStateInstance {
@@ -147,12 +148,63 @@ Map {
                     };
                 };
                 OutlineColor: [154 205 50 255];
-                SpawnTime: 44588.1916;
+                SpawnTime: 14585.2878;
+            }
+            ActorInstance {
+                Class: @"Defs/Entities/Cyst.ent.tk";
+                Faction: Factions [Enemy];
+                Controller: ArtilleryController {
+                    MaxRange: 200;
+                    CanRotate: False;
+                    trackedActor: Null;
+                };
+                CurrentHealth: 1000;
+                MaxSpeed: 0;
+                Weapon: SpawnerInstance {
+                    Class: SpawnerClass {
+                        Spawns: [
+                            Tuple`2 {
+                                Item1: @"Defs/Entities/InfectedCell.ent.tk";
+                                Item2: [3 5];
+                            }
+                        ];
+                        Name: Null;
+                        Delay: [
+                            2000
+                            4000
+                        ];
+                    };
+                    SpawnQueue: [
+                        @"Defs/Entities/InfectedCell.ent.tk"
+                        @"Defs/Entities/InfectedCell.ent.tk"
+                        @"Defs/Entities/InfectedCell.ent.tk"
+                        @"Defs/Entities/InfectedCell.ent.tk"
+                    ];
+                    nextShot: 0;
+                };
+                Radius: 32;
+                RadiusSq: 1024;
+                Name: Null;
+                Position: [430 466];
+                Direction: [0.03075468 -0.999527];
+                Velocity: [0 0];
+                State: {
+                    BaseState: EntStateInstance {
+                        StateId: EntStateId.Idle;
+                        ElapsedTime: 0;
+                    };
+                    OverlaidStates: {
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 12217.0252;
             }
         ];
         FluidTypes: [];
         Fluids: [];
-        elapsedTime: 45488.0511;
+        elapsedTime: 16987.1488;
         timeScale: 1;
     };
 }

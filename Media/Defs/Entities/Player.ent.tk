@@ -10,6 +10,7 @@ ActorClass {
                 width: 48;
                 height: 48;
                 origin: [24 24];
+                ClipRect: [0 0 96 48];
                 FrameCount: 2;
                 FrameLength: 100;
                 IsLooping: True;

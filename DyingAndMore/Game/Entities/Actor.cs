@@ -1,21 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Takai.Game;
-using Takai.Graphics;
 
 namespace DyingAndMore.Game.Entities
 {
     /// <summary>
     /// Available factions. Work as bit flags (one actor can have multiple factions)
     /// </summary>
-    [System.Flags]
+    [Flags]
     enum Factions
     {
         None        = 0,
         Player      = (1 << 0),
         Enemy       = (1 << 1),
-        Powerup     = (1 << 2),
+        Boss        = (1 << 2),
+
+        Powerup     = (1 << 4),
 
         Virus       = (1 << 24),
 
@@ -110,18 +110,21 @@ namespace DyingAndMore.Game.Entities
 
         #endregion
 
-        public ActorInstance() { }
+        public ActorInstance() : this(null) { }
         public ActorInstance(ActorClass @class)
             : base(@class)
         {
-            MaxSpeed = RandomRange.Next(_Class.MaxSpeed);
-            CurrentHealth = _Class.MaxHealth;
-            Weapon = _Class.DefaultWeapon?.Create();
-            Faction = _Class.DefaultFaction;
-            Controller = _Class.DefaultController;
+            if (Class != null)
+            {
+                MaxSpeed        = RandomRange.Next(_Class.MaxSpeed);
+                CurrentHealth   = _Class.MaxHealth;
+                Weapon          = _Class.DefaultWeapon?.Create();
+                Faction         = _Class.DefaultFaction;
+                Controller      = _Class.DefaultController;
+            }
         }
 
-        public override void Think(System.TimeSpan deltaTime)
+        public override void Think(TimeSpan deltaTime)
         {
             Controller?.Think(deltaTime);
 
@@ -130,21 +133,21 @@ namespace DyingAndMore.Game.Entities
 
             if (vel == lastVelocity)
                 vel = Vector2.Lerp(vel, Vector2.Zero, 10 * (float)deltaTime.TotalSeconds);
-            if (System.Math.Abs(vel.X) < 0.01f)
+            if (Math.Abs(vel.X) < 0.01f)
                 vel.X = 0;
-            if (System.Math.Abs(vel.Y) < 0.01f)
+            if (Math.Abs(vel.Y) < 0.01f)
                 vel.Y = 0;
 
             Velocity = vel;
             lastVelocity = Velocity;
 
             if (CurrentHealth <= 0 && !State.Is(EntStateId.Dead))
-                State.Transition(EntStateId.Dead);
+                State.TransitionTo(EntStateId.Dead);
 
             base.Think(deltaTime);
         }
 
-        public override void OnEntityCollision(EntityInstance Collider, Vector2 Point, System.TimeSpan DeltaTime)
+        public override void OnEntityCollision(EntityInstance Collider, Vector2 Point, TimeSpan DeltaTime)
         {
             if (Collider is ActorInstance actor)
             {
@@ -161,13 +164,13 @@ namespace DyingAndMore.Game.Entities
             var vel = Velocity + (direction * _Class.MoveForce);
             var lSq = vel.LengthSquared();
             if (lSq > MaxSpeed * MaxSpeed)
-                vel = (vel / (float)System.Math.Sqrt(lSq)) * MaxSpeed;
+                vel = (vel / (float)Math.Sqrt(lSq)) * MaxSpeed;
             Velocity = vel;
         }
 
         public void MoveTo(Vector2 newPosition, Vector2 newDirection)
         {
-            throw new System.NotImplementedException();//todo
+            throw new NotImplementedException(); //todo
         }
 
         #region Helpers

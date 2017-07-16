@@ -65,7 +65,7 @@ namespace Takai.Game
 
     public class EntStateInstance : IStateInstance<EntStateId, EntStateClass>
     {
-        public EntStateId StateId { get; set; }
+        public EntStateId Id { get; set; }
 
         [Data.Serializer.Ignored]
         public EntStateClass Class { get; set; }
@@ -82,7 +82,7 @@ namespace Takai.Game
 
         public override int GetHashCode()
         {
-            return (int)StateId;
+            return (int)Id;
         }
 
         public void Update(TimeSpan deltaTime)
@@ -92,7 +92,7 @@ namespace Takai.Game
 
         public override string ToString()
         {
-            return StateId.ToString();
+            return Id.ToString();
         }
     }
 
@@ -134,7 +134,7 @@ namespace Takai.Game
         /// <summary>
         /// Destroy the sprite if it is dead and the animation is finished
         /// </summary>
-        public bool DestroyIfDead { get; set; } = true;
+        public bool DestroyOnDeath { get; set; } = true;
 
         /// <summary>
         /// Destroy this entity if it goes off screen (becomes inactive) and is dead
@@ -184,7 +184,7 @@ namespace Takai.Game
             set
             {
                 _class = value;
-                State.States = Class.States;
+                State.States = _class.States;
             }
         }
         private EntityClass _class;
@@ -294,11 +294,25 @@ namespace Takai.Game
         }
         private Group _group;
 
-        public EntityInstance() { }
+        public EntityInstance() : this(null) { }
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
-            State.Transition(EntStateId.Idle);
+            State.TransitionTo(EntStateId.Idle);
+
+            State.StateComplete += State_StateComplete;
+            State.Transition += State_Transition;
+        }
+
+        protected void State_Transition(object sender, TransitionEventArgs<EntStateInstance> e)
+        {
+
+        }
+
+        protected void State_StateComplete(object sender, StateCompleteEventArgs<EntStateInstance> e)
+        {
+            if (e.State.Id == EntStateId.Dead && Class.DestroyOnDeath && Map != null)
+                Map.Destroy(this);
         }
 
         public override bool Equals(object obj)
@@ -320,7 +334,7 @@ namespace Takai.Game
         /// The basic think function for this entity, called once a frame
         /// </summary>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void Think(System.TimeSpan deltaTime)
+        public virtual void Think(TimeSpan deltaTime)
         {
             State.Update(deltaTime);
         }
@@ -357,7 +371,7 @@ namespace Takai.Game
 
         protected void DerivedDeserializer(Dictionary<string, object> props)
         {
-            if (State.BaseState != null && State.States.TryGetValue(State.BaseState.StateId, out var k))
+            if (State.BaseState != null && State.States.TryGetValue(State.BaseState.Id, out var k))
                 State.BaseState.Class = k;
 
             foreach (var state in State.OverlaidStates)

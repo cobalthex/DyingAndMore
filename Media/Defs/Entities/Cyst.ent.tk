@@ -64,6 +64,7 @@ ActorClass {
     IsPhysical: True;
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
+    DestroyOnDeath: False;
 
     DefaultWeapon: SpawnerClass {
         Delay: [2000 4000];

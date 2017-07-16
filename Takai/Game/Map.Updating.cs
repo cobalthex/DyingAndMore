@@ -132,10 +132,8 @@ namespace Takai.Game
 
                 //todo: redo
                 if (!Bounds.Intersects(entBounds) || //outside of the map
-                    ent.State.BaseState.StateId == EntStateId.Invalid || //no state
-                    (isDead &&
-                     (!ent.ActiveStates.GetEnumerator().MoveNext() || //todo: should be no sprite
-                     (ent.Class.DestroyIfDead && deadState.HasFinished())))) //animation is over and remove after death
+                    ent.State.BaseState.Id == EntStateId.Invalid || //no state
+                    (isDead && !ent.ActiveStates.GetEnumerator().MoveNext())) //todo: should be no sprite
                         Destroy(ent);
 
                 else if (!ent.Class.AlwaysActive && !visibleRegion.Intersects(entBounds))

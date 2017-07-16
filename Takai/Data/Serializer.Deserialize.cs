@@ -373,7 +373,7 @@ namespace Takai.Data
                     {
                         if (!Attribute.IsDefined(field, typeof(IgnoredAttribute)))
                         {
-                            var customDeserial = field.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
+                            var customDeserial = field.GetCustomAttribute<CustomDeserializeAttribute>(true)?.deserialize;
                             if (customDeserial != null)
                             {
                                 if (customDeserial.IsStatic)
@@ -396,11 +396,11 @@ namespace Takai.Data
                     else
                     {
                         var prop = destType.GetProperty(pair.Key, DefaultBindingFlags);
-                        if (prop != null && prop.CanWrite)
+                        if (prop != null)
                         {
                             if (!Attribute.IsDefined(prop, typeof(IgnoredAttribute)))
                             {
-                                var customDeserial = prop.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
+                                var customDeserial = prop.GetCustomAttribute<CustomDeserializeAttribute>(true)?.deserialize;
                                 if (customDeserial != null)
                                 {
                                     if (customDeserial.IsStatic)
@@ -415,9 +415,11 @@ namespace Takai.Data
                                         continue;
                                     }
                                 }
-
-                                var cast = pair.Value == null ? null : Cast(prop.PropertyType, pair.Value);
-                                prop.SetValue(obj, cast);
+                                else if (prop.CanWrite)
+                                {
+                                    var cast = pair.Value == null ? null : Cast(prop.PropertyType, pair.Value);
+                                    prop.SetValue(obj, cast);
+                                }
                             }
                         }
                         else
@@ -434,7 +436,7 @@ namespace Takai.Data
                 }
             }
 
-            var derived = destType.GetCustomAttribute<DerivedTypeDeserializeAttribute>();
+            var derived = destType.GetCustomAttribute<DerivedTypeDeserializeAttribute>(true);
             if (derived != null)
                 derived.deserialize.Invoke(obj, new[] { dict });
 

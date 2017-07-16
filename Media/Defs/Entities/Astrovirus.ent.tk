@@ -39,5 +39,4 @@ ActorClass {
     IsPhysical: true;
     IgnoreTrace: false;
     AlwaysDrawUpright: true;
-    DestroyIfDead: true;
 }
