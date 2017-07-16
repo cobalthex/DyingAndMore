@@ -24,22 +24,6 @@ namespace DyingAndMore.Editor
             VerticalAlignment = Takai.UI.Alignment.Stretch;
             HorizontalAlignment = Takai.UI.Alignment.Stretch;
 
-            selector = new Selectors.DecalSelector(editor)
-            {
-                Size = new Vector2(320, 1),
-                VerticalAlignment = Takai.UI.Alignment.Stretch,
-                HorizontalAlignment = Takai.UI.Alignment.End
-            };
-            selector.SelectionChanged += delegate
-            {
-                var selectedDecal = selector.textures[selector.SelectedItem];
-                preview.Sprite.Texture = selectedDecal;
-                preview.Sprite.ClipRect = selectedDecal.Bounds;
-                preview.Sprite.Size = selectedDecal.Bounds.Size;
-                preview.Size = Vector2.Clamp(preview.Sprite.Size.ToVector2(),
-                    new Vector2(32), new Vector2(96));
-            };
-
             AddChild(preview = new Takai.UI.Graphic()
             {
                 Sprite = new Takai.Graphics.Sprite(),
@@ -53,6 +37,21 @@ namespace DyingAndMore.Editor
                 AddChild(selector);
             };
 
+            selector = new Selectors.DecalSelector(editor)
+            {
+                Size = new Vector2(320, 1),
+                VerticalAlignment = Alignment.Stretch,
+                HorizontalAlignment = Alignment.End
+            };
+            selector.SelectionChanged += delegate
+            {
+                var selectedDecal = selector.textures[selector.SelectedItem];
+                preview.Sprite.Texture = selectedDecal;
+                preview.Sprite.ClipRect = selectedDecal.Bounds;
+                preview.Sprite.Size = selectedDecal.Bounds.Size;
+                preview.Size = Vector2.Clamp(preview.Sprite.Size.ToVector2(),
+                                             new Vector2(32), new Vector2(96));
+            };
             selector.SelectedItem = 0;
         }
 

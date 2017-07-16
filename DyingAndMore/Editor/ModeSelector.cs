@@ -9,6 +9,7 @@ namespace DyingAndMore.Editor
 {
     class ModeSelector : Static
     {
+        public System.Collections.ObjectModel.ReadOnlyCollection<EditorMode> Modes { get; private set; }
         private List<EditorMode> modes = new List<EditorMode>();
         protected List tabs;
 
@@ -73,6 +74,8 @@ namespace DyingAndMore.Editor
                 HorizontalAlignment = Alignment.Middle,
                 Direction = Direction.Horizontal
             });
+
+            Modes = modes.AsReadOnly();
         }
 
         public void AddMode(EditorMode mode)

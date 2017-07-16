@@ -3,14 +3,13 @@ ProjectileClass {
     Power: 1000;
     AlwaysActive: True;
     IgnoreTrace: True;
-    DestroyIfDead: True;
 
     Range: 300;
     States: {
         Idle: {
             Sprite: {
                 Texture: "Textures/Projectiles/Sharp.png";
-                Origin: [8 4];
+                Origin: [12 4];
             }
         }
     }

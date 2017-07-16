@@ -331,7 +331,7 @@ namespace Takai.UI
         /// </summary>
         [Data.CustomDeserialize(typeof(Static), "DeserializeChildren")]
         public ReadOnlyCollection<Static> Children { get; private set; } //todo: maybe observable
-        protected List<Static> children = new List<Static>();
+        private List<Static> children = new List<Static>();
 
         private void DeserializeChildren(object objects)
         {

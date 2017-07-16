@@ -28,16 +28,22 @@ namespace Takai.Graphics
     /// </summary>
     [Data.DesignerModdable]
     [Data.DerivedTypeDeserialize(typeof(Sprite), "DerivedDeserialize")]
-    public class Sprite : ICloneable
+    public class Sprite : ICloneable, Data.ISerializeExternally
     {
         /// <summary>
-        /// The elapsed time of this graphic (used for calculating current frame)
+        /// The file that this sprite was loaded from
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public string File { get; set; }
+
+        /// <summary>
+        /// The elapsed time of this sprite (used for calculating current frame)
         /// Set this value to update the animation
         /// </summary>
         public TimeSpan ElapsedTime { get; set; } = TimeSpan.Zero;
 
         /// <summary>
-        /// The number of frames of this graphic
+        /// The number of frames of this sprite
         /// </summary>
         public int FrameCount { get; set; } = 1;
 
@@ -94,12 +100,6 @@ namespace Takai.Graphics
                 return (float)frame - (int)frame;
             }
         }
-
-        /// <summary>
-        /// The file that this graphic was loaded from
-        /// </summary>
-        [Data.Serializer.Ignored]
-        public string File { get; set; }
 
         /// <summary>
         /// The source texture
@@ -183,6 +183,11 @@ namespace Takai.Graphics
         /// How inter-frames should be displayed
         /// </summary>
         public TweenStyle Tween { get; set; } = TweenStyle.None;
+
+        /// <summary>
+        /// When drawing with specified bounds, shrink to fit the bounds, or otherwise center
+        /// </summary>
+        public bool ShrinkToFit { get; set; } = true;
 
         public Sprite() { }
 
@@ -297,7 +302,12 @@ namespace Takai.Graphics
 
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle)
         {
-            Draw(spriteBatch, new Rectangle((int)position.X, (int)position.Y, width, height), angle, Color.White, ElapsedTime);
+            Draw(spriteBatch, new Rectangle(
+                (int)position.X - (int)Origin.X,
+                (int)position.Y - (int)Origin.Y,
+                width,
+                height
+            ), angle, Color.White, ElapsedTime);
         }
         public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle)
         {
@@ -306,11 +316,19 @@ namespace Takai.Graphics
 
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle, Color color, float scale = 1)
         {
-            Draw(spriteBatch, new Rectangle((int)position.X, (int)position.Y, width, height), angle, color, ElapsedTime);
+            Draw(spriteBatch, position, angle, color, scale, ElapsedTime);
         }
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle, Color color, float scale, TimeSpan elapsedTime)
         {
-            Draw(spriteBatch, new Rectangle((int)position.X, (int)position.Y, width, height), angle, color, elapsedTime);
+            var xscale = width * scale;
+            var yscale = height * scale;
+            var rect = new Rectangle(
+                (int)(position.X - Origin.X - (xscale - width) / 2),
+                (int)(position.Y - Origin.Y - (yscale - height) / 2),
+                (int)(xscale),
+                (int)(yscale)
+            );
+            Draw(spriteBatch, rect, angle, Color.White, elapsedTime);
         }
 
         public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle, Color color, TimeSpan elapsedTime)
@@ -320,7 +338,11 @@ namespace Takai.Graphics
             var nf = IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount - 1);
             var fd = elapsed % 1;
 
-            //todo: bounds should maybe ignore origin
+            if (ShrinkToFit)
+                bounds = GetFitRect(Width, Height, bounds);
+
+            bounds.X += (int)(Origin.X / width * bounds.Width);
+            bounds.Y += (int)(Origin.Y / height * bounds.Height);
 
             switch (Tween)
             {

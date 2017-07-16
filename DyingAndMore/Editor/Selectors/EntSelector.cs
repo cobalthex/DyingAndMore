@@ -35,8 +35,8 @@ namespace DyingAndMore.Editor.Selectors
 
             if (ent.States.TryGetValue(Takai.Game.EntStateId.Idle, out var state) && state.Sprite?.Texture != null)
             {
-                bounds.X += bounds.Width / 2;
-                bounds.Y += bounds.Height / 2;
+                //bounds.X += (int)state.Sprite.Origin.X;
+                //bounds.Y += (int)state.Sprite.Origin.Y;
                 state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, editor.Map.ElapsedTime);
             }
             else

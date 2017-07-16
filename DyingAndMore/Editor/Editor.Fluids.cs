@@ -17,20 +17,6 @@ namespace DyingAndMore.Editor
             VerticalAlignment = Takai.UI.Alignment.Stretch;
             HorizontalAlignment = Takai.UI.Alignment.Stretch;
 
-            selector = new Selectors.FluidSelector(editor)
-            {
-                Size = new Vector2(320, 1),
-                VerticalAlignment = Takai.UI.Alignment.Stretch,
-                HorizontalAlignment = Takai.UI.Alignment.End
-            };
-            selector.SelectionChanged += delegate
-            {
-                var selectedFluid = selector.fluids[selector.SelectedItem]; //todo: can go into selector
-                preview.Sprite.Texture = selectedFluid.Texture;
-                preview.Sprite.ClipRect = selectedFluid.Texture.Bounds;
-                preview.Sprite.Size = selectedFluid.Texture.Bounds.Size;
-            };
-
             AddChild(preview = new Takai.UI.Graphic()
             {
                 Sprite = new Takai.Graphics.Sprite(),
@@ -45,6 +31,19 @@ namespace DyingAndMore.Editor
                 AddChild(selector);
             };
 
+            selector = new Selectors.FluidSelector(editor)
+            {
+                Size = new Vector2(320, 1),
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                HorizontalAlignment = Takai.UI.Alignment.End
+            };
+            selector.SelectionChanged += delegate
+            {
+                var selectedFluid = selector.fluids[selector.SelectedItem]; //todo: can go into selector
+                preview.Sprite.Texture = selectedFluid.Texture;
+                preview.Sprite.ClipRect = selectedFluid.Texture.Bounds;
+                preview.Sprite.Size = selectedFluid.Texture.Bounds.Size;
+            };
             selector.SelectedItem = 0;
         }
 

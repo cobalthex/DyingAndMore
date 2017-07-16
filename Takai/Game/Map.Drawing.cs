@@ -32,18 +32,19 @@ namespace Takai.Game
         [System.Flags]
         public enum RenderSettings : uint
         {
-            DrawTiles                           = 0b000000000001,
-            DrawEntities                        = 0b000000000010,
-            DrawFluids                          = 0b000000000100,
-            DrawReflections                     = 0b000000001000,
-            DrawFluidReflectionMask             = 0b000000010000,
-            DrawDecals                          = 0b000000100000,
-            DrawParticles                       = 0b000001000000,
-            DrawTriggers                        = 0b000010000000,
-            DrawLines                           = 0b000100000000,
-            DrawGrids                           = 0b001000000000,
-            DrawSectorsOnGrid                   = 0b010000000000,
-            DrawBordersAroundNonDrawingEntities = 0b100000000000,
+            DrawTiles                           = 0b0000000000001,
+            DrawEntities                        = 0b0000000000010,
+            DrawFluids                          = 0b0000000000100,
+            DrawReflections                     = 0b0000000001000,
+            DrawFluidReflectionMask             = 0b0000000010000,
+            DrawDecals                          = 0b0000000100000,
+            DrawParticles                       = 0b0000001000000,
+            DrawTriggers                        = 0b0000010000000,
+            DrawLines                           = 0b0000100000000,
+            DrawGrids                           = 0b0001000000000,
+            DrawSectorsOnGrid                   = 0b0010000000000,
+            DrawBordersAroundNonDrawingEntities = 0b0100000000000,
+            DrawEntBoundingBoxes                = 0b1000000000000,
         }
 
         [Data.Serializer.Ignored]
@@ -264,6 +265,16 @@ namespace Takai.Game
 
                         DrawLine(tl, br, color);
                         DrawLine(bl, tr, color);
+                    }
+
+                    if (renderSettings.HasFlag(RenderSettings.DrawEntBoundingBoxes))
+                    {
+                        var rect = ent.AxisAlignedBounds;
+                        var color = Color.CornflowerBlue;
+                        DrawLine(new Vector2(rect.Left, rect.Top), new Vector2(rect.Right, rect.Top), color);
+                        DrawLine(new Vector2(rect.Right, rect.Top), new Vector2(rect.Right, rect.Bottom), color);
+                        DrawLine(new Vector2(rect.Right, rect.Bottom), new Vector2(rect.Left, rect.Bottom), color);
+                        DrawLine(new Vector2(rect.Left, rect.Bottom), new Vector2(rect.Left, rect.Top), color);
                     }
                 }
 

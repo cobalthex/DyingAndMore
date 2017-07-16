@@ -1,10 +1,10 @@
-Static {
+#*Static {
     Name: "back";
     Text: "« Back";
     Font: @"Defs/Fonts/UISmall.fnt.tk";
     Color: Color.White;
     Position: Vector2 {x:20 y:20};
-}
+}*#
 
 List {
     Margin: 10;

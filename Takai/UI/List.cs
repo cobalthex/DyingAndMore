@@ -31,7 +31,7 @@ namespace Takai.UI
 
             int stretched = 0;
             float size = Direction == Direction.Horizontal ? Size.X : Size.Y;
-            foreach (var child in children)
+            foreach (var child in Children)
             {
                 if ((Direction == Direction.Horizontal
                 && child.HorizontalAlignment == Alignment.Stretch)
@@ -53,7 +53,7 @@ namespace Takai.UI
             //pre-position items into a list
             for (int i = 0; i < Children.Count; ++i)
             {
-                var child = children[i];
+                var child = Children[i];
                 //todo: account for auto size padding (first item offset)
 
                 if (i > 0)

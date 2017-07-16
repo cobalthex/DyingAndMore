@@ -17,8 +17,6 @@ namespace DyingAndMore.Editor
             this.editor = editor;
         }
 
-        //public virtual void OpenConfigurator(bool DidClickOpen) { }
-
         public virtual void Start() { }
         public virtual void End() { }
     }
@@ -64,13 +62,7 @@ namespace DyingAndMore.Editor
                 Font = smallFont
             });
 
-            modes.AddMode(new TilesEditorMode(this));
-            modes.AddMode(new DecalsEditorMode(this));
-            modes.AddMode(new FluidsEditorMode(this));
-            modes.AddMode(new EntitiesEditorMode(this));
-            modes.AddMode(new PathsEditorMode(this));
-            modes.AddMode(new TriggersEditorMode(this));
-
+            AddModes();
             modes.ModeIndex = 0;
 
             //renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
@@ -78,6 +70,16 @@ namespace DyingAndMore.Editor
             //renderSettingsConsole.VerticalAlignment = Alignment.Middle;
 
             resizeDialog = Serializer.TextDeserialize<Static>("Defs/UI/Editor/ResizeMap.ui.tk");
+        }
+
+        void AddModes()
+        {
+            modes.AddMode(new TilesEditorMode(this));
+            modes.AddMode(new DecalsEditorMode(this));
+            modes.AddMode(new FluidsEditorMode(this));
+            modes.AddMode(new EntitiesEditorMode(this));
+            modes.AddMode(new PathsEditorMode(this));
+            modes.AddMode(new TriggersEditorMode(this));
         }
 
         protected override void OnMapChanged(System.EventArgs e)
@@ -119,12 +121,6 @@ namespace DyingAndMore.Editor
             if (InputState.IsPress(Keys.F2))
             {
                 ToggleRenderSettingsConsole();
-                return false;
-            }
-
-            if (InputState.IsPress(Keys.F5))
-            {
-                //todo: reload all defs
                 return false;
             }
 
@@ -174,6 +170,12 @@ namespace DyingAndMore.Editor
                         }
                     }
                     return false;
+                }
+
+                if (InputState.IsPress(Keys.N))
+                {
+                    var resizeMap = Cache.Load<Static>("Defs/UI/Editor/NewMap.ui.tk");
+                    AddChild(resizeMap);
                 }
 
                 if (InputState.IsPress(Keys.R))
