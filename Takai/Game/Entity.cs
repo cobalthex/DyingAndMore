@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using static System.Math;
 
 namespace Takai.Game
 {
@@ -198,12 +199,45 @@ namespace Takai.Game
         /// <summary>
         /// The current position of the entity
         /// </summary>
-        public Vector2 Position { get; set; }
+        public Vector2 Position
+        {
+            get => _position;
+            set
+            {
+                var diff = value - _position;
+                _position = value;
+                lastTransform.Translation = new Vector3(value, 0);
+                AxisAlignedBounds = new Rectangle(
+                    AxisAlignedBounds.X + (int)diff.X,
+                    AxisAlignedBounds.Y + (int)diff.Y,
+                    AxisAlignedBounds.Width,
+                    AxisAlignedBounds.Height
+                );
+            }
+        }
+        private Vector2 _position;
+
         /// <summary>
         /// The (normalized) direction the entity is facing
         /// </summary>
         /// <remarks>This vector should always be normalized</remarks>
-        public Vector2 Direction { get; set; } = Vector2.UnitX;
+        public Vector2 Direction
+        {
+            get => _direction;
+            set
+            {
+                _direction = value;
+                if (Class != null && !Class.AlwaysDrawUpright)
+                {
+                    lastTransform.M11 = lastTransform.M22 = value.X;
+                    lastTransform.M12 = -value.Y;
+                    lastTransform.M21 = value.Y;
+                    UpdateAxisAlignedBounds();
+                }
+            }
+        }
+        private Vector2 _direction = Vector2.UnitX;
+
         /// <summary>
         /// The velocity of the entity, separate from the direction
         /// </summary>
@@ -211,21 +245,11 @@ namespace Takai.Game
         public Vector2 Velocity { get; set; } = Vector2.UnitX;
 
         /// <summary>
-        /// the axis aligned bounding box of this entity, based on radius
+        /// the axis aligned bounding box of this entity
+        /// updated whenever the state, position, or direction changes
         /// </summary>
         [Data.Serializer.Ignored]
-        public Rectangle AxisAlignedBounds
-        {
-            get
-            {
-                return new Rectangle(
-                    (int)Position.X - (int)Radius,
-                    (int)Position.Y - (int)Radius,
-                    (int)Radius * 2,
-                    (int)Radius * 2
-                );
-            }
-        }
+        public Rectangle AxisAlignedBounds { get; private set; }
 
         [Data.CustomSerialize("CustomSerializeState")]
         public StateMachine<EntStateId, EntStateClass, EntStateInstance> State { get; set; }
@@ -302,11 +326,77 @@ namespace Takai.Game
 
             State.StateComplete += State_StateComplete;
             State.Transition += State_Transition;
+
+            lastTransform = GetTransform();
+            lastVisibleSize = GetVisibleSize();
+            UpdateAxisAlignedBounds();
+        }
+
+        public Matrix GetTransform()
+        {
+            return new Matrix(
+                Direction.X, -Direction.Y, Position.X, 0,
+                Direction.Y, Direction.X, Position.Y, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            );
+        }
+        Matrix lastTransform;
+
+        /// <summary>
+        /// Get the size of the visible sprites
+        /// </summary>
+        /// <returns>The calculated extent</returns>
+        public Point GetVisibleSize()
+        {
+            var p = new Point();
+            foreach (var state in ActiveStates)
+            {
+                if (state.Class?.Sprite != null)
+                {
+                    p.X = MathHelper.Max(p.X, state.Class.Sprite.Width);
+                    p.Y = MathHelper.Max(p.Y, state.Class.Sprite.Height);
+                }
+            }
+            return p;
+        }
+        Point lastVisibleSize;
+
+        protected void UpdateAxisAlignedBounds()
+        {
+            var r = new Rectangle(
+                lastVisibleSize.X / -2,
+                lastVisibleSize.Y / -2,
+                lastVisibleSize.X,
+                lastVisibleSize.Y
+            );
+
+            //todo: handle origin
+
+            var transform = lastTransform;
+
+            var min = new Vector2(float.MaxValue);
+            var max = new Vector2(float.MinValue);
+
+            var v = Vector2.Transform(new Vector2(r.X, r.Y), transform);
+            min = Vector2.Min(min, v); max = Vector2.Max(max, v);
+
+            v = Vector2.Transform(new Vector2(r.X + r.Width, r.Y), transform);
+            min = Vector2.Min(min, v); max = Vector2.Max(max, v);
+
+            v = Vector2.Transform(new Vector2(r.X + r.Width, r.Y + r.Height), transform);
+            min = Vector2.Min(min, v); max = Vector2.Max(max, v);
+
+            v = Vector2.Transform(new Vector2(r.X, r.Y + r.Height), transform);
+            min = Vector2.Min(min, v); max = Vector2.Max(max, v);
+
+            AxisAlignedBounds = new Rectangle(min.ToPoint(), (max - min).ToPoint());
         }
 
         protected void State_Transition(object sender, TransitionEventArgs<EntStateInstance> e)
         {
-
+            lastVisibleSize = GetVisibleSize();
+            UpdateAxisAlignedBounds();
         }
 
         protected void State_StateComplete(object sender, StateCompleteEventArgs<EntStateInstance> e)

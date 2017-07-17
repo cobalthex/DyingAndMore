@@ -338,7 +338,7 @@ namespace Takai.Graphics
             var nf = IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount - 1);
             var fd = elapsed % 1;
 
-            if (ShrinkToFit)
+            if (ShrinkToFit) //todo: fit/contain
                 bounds = GetFitRect(Width, Height, bounds);
 
             bounds.X += (int)(Origin.X / width * bounds.Width);

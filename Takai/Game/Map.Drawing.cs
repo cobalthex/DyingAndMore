@@ -270,7 +270,7 @@ namespace Takai.Game
                     if (renderSettings.HasFlag(RenderSettings.DrawEntBoundingBoxes))
                     {
                         var rect = ent.AxisAlignedBounds;
-                        var color = Color.CornflowerBlue;
+                        var color = Color.LightBlue;
                         DrawLine(new Vector2(rect.Left, rect.Top), new Vector2(rect.Right, rect.Top), color);
                         DrawLine(new Vector2(rect.Right, rect.Top), new Vector2(rect.Right, rect.Bottom), color);
                         DrawLine(new Vector2(rect.Right, rect.Bottom), new Vector2(rect.Left, rect.Bottom), color);

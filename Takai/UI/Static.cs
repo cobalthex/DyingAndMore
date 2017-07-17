@@ -1060,20 +1060,52 @@ namespace Takai.UI
             var root = new List() { Margin = 2 };
             var maxWidth = 0f;
 
+            var type = obj.GetType();
+
+            if (type.IsEnum)
+            {
+                var e = obj as System.Enum;
+                var enumValues = System.Enum.GetNames(type);
+                foreach (var flag in enumValues)
+                {
+                    var value = (System.Enum)System.Enum.Parse(type, flag);
+                    if (System.Convert.ToUInt64(value) != 0 && e.HasFlag(value))
+                    {
+                        var check = new CheckBox()
+                        {
+                            Name = flag,
+                            Text = BeautifyMemberName(flag),
+                            Font = font,
+                            Color = color
+                        };
+                        check.Click += delegate
+                        {
+                            //todo
+                        };
+                        check.AutoSize();
+                        root.AddChild(check);
+                        maxWidth = MathHelper.Max(maxWidth, check._size.X);
+                    }
+                }
+                root._size = new Vector2(maxWidth, 1);
+                root.AutoSize();
+                return root;
+            }
+
             //todo: item spacing (can't use list margin without nesting)
 
-            var members = obj.GetType().GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+            var members = type.GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 
             //todo: move these into type handlers
             foreach (var member in members)
             {
-                System.Type type;
+                System.Type memberType;
                 object curValue;
                 System.Action<object, object> setValue;
 
                 if (member is System.Reflection.FieldInfo fInfo)
                 {
-                    type = fInfo.FieldType;
+                    memberType = fInfo.FieldType;
                     curValue = fInfo.GetValue(obj);
                     setValue = fInfo.SetValue;
                 }
@@ -1082,7 +1114,7 @@ namespace Takai.UI
                     if (!pInfo.CanWrite)
                         continue;
 
-                    type = pInfo.PropertyType;
+                    memberType = pInfo.PropertyType;
                     curValue = pInfo.GetValue(obj);
                     setValue = pInfo.SetValue;
                 }
@@ -1091,7 +1123,7 @@ namespace Takai.UI
 
                 Static label = null;
 
-                if (type != typeof(bool))
+                if (memberType != typeof(bool))
                 {
                     label = new Static()
                     {
@@ -1105,7 +1137,7 @@ namespace Takai.UI
                     maxWidth = MathHelper.Max(maxWidth, label._size.X);
                 }
 
-                if (type == typeof(bool))
+                if (memberType == typeof(bool))
                 {
                     var check = new CheckBox()
                     {
@@ -1122,11 +1154,7 @@ namespace Takai.UI
                     root.AddChild(check);
                     maxWidth = MathHelper.Max(maxWidth, check._size.X);
                 }
-                else if (type.IsEnum)
-                {
-                    //todo
-                }
-                else if (type == typeof(int))
+                else if (memberType == typeof(int))
                 {
                     var input = new NumericInput()
                     {
@@ -1146,7 +1174,7 @@ namespace Takai.UI
                     input.AutoSize();
                     root.AddChild(input);
                 }
-                else if (type == typeof(uint))
+                else if (memberType == typeof(uint))
                 {
                     var input = new NumericInput()
                     {
@@ -1166,7 +1194,7 @@ namespace Takai.UI
                     input.AutoSize();
                     root.AddChild(input);
                 }
-                else if (type == typeof(long))
+                else if (memberType == typeof(long))
                 {
                     var input = new NumericInput()
                     {
@@ -1186,7 +1214,7 @@ namespace Takai.UI
                     input.AutoSize();
                     root.AddChild(input);
                 }
-                else if (type == typeof(string))
+                else if (memberType == typeof(string))
                 {
                     //todo: file input where applicable (maybe switch vars to use FileInfo class)
                     var input = new TextInput()
@@ -1204,7 +1232,7 @@ namespace Takai.UI
                     input.AutoSize();
                     root.AddChild(input);
                 }
-                else if (type == typeof(System.IO.FileInfo))
+                else if (memberType == typeof(System.IO.FileInfo))
                 {
                     var input = new FileInput()
                     {
@@ -1221,7 +1249,7 @@ namespace Takai.UI
                     input.AutoSize();
                     root.AddChild(input);
                 }
-                else if (type == typeof(Texture2D))
+                else if (memberType == typeof(Texture2D))
                 {
                     var input = new FileInput()
                     {
@@ -1238,7 +1266,7 @@ namespace Takai.UI
                     input.AutoSize();
                     root.AddChild(input);
                 }
-                else if (type == typeof(System.TimeSpan))
+                else if (memberType == typeof(System.TimeSpan))
                 {
                     var input = new NumericInput()
                     {
@@ -1280,7 +1308,7 @@ namespace Takai.UI
                 }
                 else
                 {
-                    label.Text += $"\n`aab--- ({type.Name}) ---\nthird line`x";
+                    label.Text += $"\n`aab--- ({memberType.Name}) ---\nthird line`x";
                     label.AutoSize();
                 }
             }

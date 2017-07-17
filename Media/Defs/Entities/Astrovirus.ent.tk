@@ -7,11 +7,11 @@ ActorClass {
         Idle: {
             Sprite: {
             	texture: "Textures/Entities/Astrovirus.png";
-                width: 42;
-                height: 42;
-                origin: [21 21];
+                width: 40;
+                height: 40;
+                origin: [20 20];
                 FrameCount: 6;
-                FrameLength: 100;
+                FrameLength: 50;
                 IsLooping: True;
                 Tween: TweenStyle [Overlap];
             };
@@ -19,13 +19,14 @@ ActorClass {
         };
         Dead: {
             Sprite: {
-            	texture: "Textures/Entities/InfectedCell.png";
-                width: 42;
-                height: 42;
-                origin: [21 21];
-                FrameCount: 4;
-                FrameLength: 100;
-                IsLooping: True;
+            	texture: "Textures/Entities/Astrovirus.png";
+                width: 40;
+                height: 40;
+                origin: [20 20];
+                ClipRect: [0 80 240 40];
+                FrameCount: 6;
+                FrameLength: 50;
+                IsLooping: False;
                 Tween: TweenStyle [Overlap];
             };
             Sound: { };

@@ -65,9 +65,9 @@ namespace DyingAndMore.Editor
             AddModes();
             modes.ModeIndex = 0;
 
-            //renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
-            //renderSettingsConsole.Position = new Vector2(100, 0);
-            //renderSettingsConsole.VerticalAlignment = Alignment.Middle;
+            renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
+            renderSettingsConsole.Position = new Vector2(100, 0);
+            renderSettingsConsole.VerticalAlignment = Alignment.Middle;
 
             resizeDialog = Serializer.TextDeserialize<Static>("Defs/UI/Editor/ResizeMap.ui.tk");
         }
@@ -213,8 +213,8 @@ namespace DyingAndMore.Editor
             {
                 //refresh individual render settings
                 var settings = typeof(Takai.Game.Map.RenderSettings);
-                foreach (var child in renderSettingsConsole.Children)
-                    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
+                //foreach (var child in renderSettingsConsole.Children)
+                //    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
 
                 AddChild(renderSettingsConsole);
             }
