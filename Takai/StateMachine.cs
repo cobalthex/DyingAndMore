@@ -145,10 +145,21 @@ namespace Takai
                 var instance = (TInstance)next.Create();
                 instance.Id = NextState; //todo: automate
 
+                var evArgs = new TransitionEventArgs<TInstance>()
+                {
+                    Next = instance
+                };
+
                 if (next.IsOverlay)
                     OverlaidStates.Add(NextState, instance);
                 else
+                {
+                    evArgs.Previous = BaseState;
                     BaseState = instance;
+                }
+
+                OnTransition(evArgs);
+                Transition?.Invoke(this, evArgs);
                 return true;
             }
             return false;

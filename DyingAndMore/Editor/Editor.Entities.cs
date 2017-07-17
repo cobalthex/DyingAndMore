@@ -105,7 +105,11 @@ namespace DyingAndMore.Editor
                 EnableRaisingEvents = true,
                 IncludeSubdirectories = true
             };
-            watcher.Changed += Watcher_Changed; ;
+            watcher.Changed += Watcher_Changed;
+        }
+        ~EntitiesEditorMode()
+        {
+            watcher.Dispose();
         }
 
         FileSystemWatcher watcher;
