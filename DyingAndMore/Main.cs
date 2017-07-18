@@ -150,8 +150,11 @@ namespace DyingAndMore
             var inst = map.Spawn(klass, new Vector2(128), Vector2.UnitX, Vector2.Zero);
             inst.Name = "Player";
 
+            testTex = Takai.AssetManager.Load<Texture2D>("Textures/Background.png");
+
             base.Initialize();
         }
+        Texture2D testTex;
 
         protected override void Update(GameTime gameTime)
         {
@@ -203,7 +206,6 @@ namespace DyingAndMore
             {
                 sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                 ui.Draw(sbatch);
-
                 sbatch.End();
             }
         }

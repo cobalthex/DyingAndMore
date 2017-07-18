@@ -47,7 +47,7 @@ namespace Takai.Game
         /// The collision mask for the tilemap
         /// </summary>
         [Data.Serializer.Ignored]
-        public System.Collections.BitArray TilesMask { get; set; }
+        public System.Collections.BitArray CollisionMask { get; set; }
 
         public int TileSize
         {
