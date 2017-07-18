@@ -22,13 +22,13 @@ namespace Takai.Game
             Color[] pixels = new Color[Texture.Width * Texture.Height];
             Texture.GetData(pixels);
 
-            TilesMask = new System.Collections.BitArray(Texture.Height * Texture.Width);
+            CollisionMask = new System.Collections.BitArray(Texture.Height * Texture.Width);
             for (var i = 0; i < pixels.Length; ++i)
             {
                 if (UseAlpha)
-                    TilesMask[i] = pixels[i].A > 127;
+                    CollisionMask[i] = pixels[i].A > 127;
                 else
-                    TilesMask[i] = (pixels[i].R + pixels[i].G + pixels[i].B) / 3 > 127;
+                    CollisionMask[i] = (pixels[i].R + pixels[i].G + pixels[i].B) / 3 > 127;
             }
         }
 

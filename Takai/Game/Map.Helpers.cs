@@ -328,7 +328,7 @@ namespace Takai.Game
                     var mask = (tile * TileSize) + ((tile / TilesPerRow) * TileSize);
                     mask += (tileRelPos.Y * TilesImage.Width);
                     mask += tileRelPos.X;
-                    if (tile < 0 || (mask < 0 || TilesMask[mask] == false))
+                    if (tile < 0 || (mask < 0 || CollisionMask[mask] == false))
                     {
                         hit = new TraceHit()
                         {
@@ -394,7 +394,7 @@ namespace Takai.Game
                 var mask = (tile * TileSize) + ((tile / TilesPerRow) * TileSize);
                 mask += (tileRelPos.Y * TilesImage.Width);
                 mask += tileRelPos.X;
-                if (tile < 0 || (mask < 0 || TilesMask[mask] == false))
+                if (tile < 0 || (mask < 0 || CollisionMask[mask] == false))
                 {
                     hit = new TraceHit()
                     {

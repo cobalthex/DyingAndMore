@@ -204,15 +204,9 @@ namespace Takai.Game
             get => _position;
             set
             {
-                var diff = value - _position;
                 _position = value;
                 lastTransform.Translation = new Vector3(value, 0);
-                AxisAlignedBounds = new Rectangle(
-                    AxisAlignedBounds.X + (int)diff.X,
-                    AxisAlignedBounds.Y + (int)diff.Y,
-                    AxisAlignedBounds.Width,
-                    AxisAlignedBounds.Height
-                );
+                UpdateAxisAlignedBounds();
             }
         }
         private Vector2 _position;
@@ -242,7 +236,7 @@ namespace Takai.Game
         /// The velocity of the entity, separate from the direction
         /// </summary>
         /// <remarks>This vector should always be normalized</remarks>
-        public Vector2 Velocity { get; set; } = Vector2.UnitX;
+        public Vector2 Velocity { get; set; } = Vector2.Zero;
 
         /// <summary>
         /// the axis aligned bounding box of this entity
@@ -294,29 +288,6 @@ namespace Takai.Game
         /// When this entity was last spawned (in map time). Zero if destroyed or not spawned
         /// </summary>
         public TimeSpan SpawnTime { get; set; } = TimeSpan.Zero;
-
-        /// <summary>
-        /// The group an entity belongs to
-        /// </summary>
-        [Data.Serializer.Ignored]
-        public Group Group
-        {
-            get { return _group; }
-            set
-            {
-                _group = value;
-                //if (group != null)
-                //    group.Entities.Remove(this);
-
-                //group = value;
-
-                //if (group != null)
-                //    group.Entities.Add(this);
-
-                throw new NotImplementedException();
-            }
-        }
-        private Group _group;
 
         public EntityInstance() : this(null) { }
         public EntityInstance(EntityClass @class)
