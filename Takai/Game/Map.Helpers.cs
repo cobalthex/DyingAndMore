@@ -172,6 +172,19 @@ namespace Takai.Game
             }
 
             return ents;
+            //todo: find inactive
+        }
+
+        public List<EntityInstance> FindEntitiesByClassName(string className, bool searchInactive = false)
+        {
+            var ents = new List<EntityInstance>();
+            foreach (var ent in ActiveEnts)
+            {
+                if (ent.Class != null && ent.Class.Name.Equals(className, System.StringComparison.OrdinalIgnoreCase))
+                    ents.Add(ent);
+            }
+
+            return ents;
             //todo: find all inactive by class name
         }
 

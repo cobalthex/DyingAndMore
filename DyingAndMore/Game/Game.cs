@@ -82,7 +82,7 @@ namespace DyingAndMore.Game
             Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawGrids;
             Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawTriggers;
 
-            player = Map.FindEntityByName("Player") as Entities.ActorInstance;
+            player = Map.FindEntitiesByClassName("player")[0] as Entities.ActorInstance;
             if (player != null)
                 player.Controller = new Entities.InputController();
 

@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Entities
 {
+    //todo: magnetism (how fast will track)
+
     /// <summary>
     /// A fixed placement that will fire at nearby enemies (actors of different factions)
     /// </summary>

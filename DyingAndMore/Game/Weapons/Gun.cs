@@ -2,11 +2,31 @@
 
 namespace DyingAndMore.Game.Weapons
 {
+    enum OverchargeAction
+    {
+        None,
+        Discharge,
+        Explode,
+    }
+
     class GunClass : WeaponClass
     {
         public Entities.ProjectileClass Projectile { get; set; }
 
         public int MaxAmmo { get; set; } = 100;
+
+        //clip size, shots reloaded per load
+
+        public int BurstCont { get; set; } = 0;
+        public int ShotsPerBurst { get; set; } = 1;
+
+        public Takai.Game.Range<float> ErrorAngle { get; set; }
+
+        public OverchargeAction OverchargeAction { get; set; } = OverchargeAction.Discharge;
+
+        //spew (how long continuous fire after overcharge)
+
+        //bloom (error angle increases over time)
 
         public override WeaponInstance Create()
         {
@@ -42,7 +62,7 @@ namespace DyingAndMore.Game.Weapons
             return CurrentAmmo <= 0;
         }
 
-        protected override void Use(Takai.Game.EntityInstance source)
+        protected override void Discharge(Takai.Game.EntityInstance source)
         {
             if (source.Map == null)
                 return;
@@ -58,3 +78,8 @@ namespace DyingAndMore.Game.Weapons
     Smoke trail (for trace fire)
 
 */
+
+
+//weak events for states
+//weapons weak subscribe to charge/discharge events
+//one time events?
