@@ -86,7 +86,7 @@ namespace DyingAndMore.Game.Weapons
             return SpawnQueue.Count <= 0;
         }
 
-        protected override void Use(EntityInstance source)
+        protected override void Discharge(EntityInstance source)
         {
             if (source.Map == null)
                 return;

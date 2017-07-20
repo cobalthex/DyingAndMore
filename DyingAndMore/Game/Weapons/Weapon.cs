@@ -15,20 +15,18 @@ namespace DyingAndMore.Game.Weapons
         public string File { get; set; } = null;
 
         /// <summary>
-        /// How long to delay between each shot (random)
+        /// How long to delay between each shot (random) -- todo: calculate from animation
         /// </summary>
         public Takai.Game.Range<TimeSpan> Delay { get; set; } = TimeSpan.FromMilliseconds(100);
-
-        /*
-        /// <summary>
-        /// The maximum allowed consecutive shots
-        /// 0 for unlimited
-        /// </summary>
-        public int MaxBurst { get; set; } = 0;
-        */
-
         public abstract WeaponInstance Create();
+
+        /*animation:
+            charge, (fire) discharge, weapon firing plays between two animations
+            rechamber
+            reload
+        */
     }
+
     abstract class WeaponInstance : Takai.IObjectInstance<WeaponClass>
     {
         public virtual WeaponClass Class { get; set; }
@@ -49,6 +47,14 @@ namespace DyingAndMore.Game.Weapons
             Class = @class;
         }
 
+        public virtual void Think(TimeSpan deltaTime)
+        {
+
+        }
+
+        public void Charge() { }
+        public void Discharge() { }
+
         /// <summary>
         /// Attempt to fire the weapon
         /// </summary>
@@ -58,7 +64,10 @@ namespace DyingAndMore.Game.Weapons
         {
             if (CanUse(source.Map.ElapsedTime))
             {
-                Use(source);
+                //set actor state to charge -> discharge
+                //call discharge on transition to discharge
+
+                Discharge(source);
                 nextShot = source.Map.ElapsedTime + Takai.Game.RandomRange.Next(Class.Delay);
             }
         }
@@ -79,7 +88,7 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         /// <param name="Entity">The entity to fire from</param>
         /// <remarks>Unaffected by firing conditions</remarks>
-        protected abstract void Use(Takai.Game.EntityInstance entity);
+        protected abstract void Discharge(Takai.Game.EntityInstance entity);
 
         public override string ToString()
         {
