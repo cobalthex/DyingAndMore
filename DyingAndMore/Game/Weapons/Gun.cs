@@ -1,14 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Weapons
 {
-    enum OverchargeAction
-    {
-        None,
-        Discharge,
-        Explode,
-    }
-
     class GunClass : WeaponClass
     {
         public Entities.ProjectileClass Projectile { get; set; }
@@ -22,11 +16,11 @@ namespace DyingAndMore.Game.Weapons
 
         public Takai.Game.Range<float> ErrorAngle { get; set; }
 
-        public OverchargeAction OverchargeAction { get; set; } = OverchargeAction.Discharge;
-
         //spew (how long continuous fire after overcharge)
 
         //bloom (error angle increases over time)
+
+        //todo: give states names, instances use ids set to a specific state name in class
 
         public override WeaponInstance Create()
         {
@@ -62,13 +56,21 @@ namespace DyingAndMore.Game.Weapons
             return CurrentAmmo <= 0;
         }
 
-        protected override void Discharge(Takai.Game.EntityInstance source)
+        public override void Discharge()
         {
-            if (source.Map == null)
+            //todo: optimize for cases with no charging (no need to use state machine)
+
+            if (Actor.Map == null || !Actor.State.TryGet(Takai.Game.EntStateId.ChargeWeapon, out var state))
+                return;
+
+            //undercharged
+            if (!state.HasFinished() && _Class.UnderchargeAction == UnderchargeAction.Dissipate)
                 return;
 
             var speed = _Class.Projectile.Power;
-            source.Map.Spawn(_Class.Projectile, source.Position + source.Direction * (source.Radius + 10), source.Direction, source.Direction * speed);
+            Actor.Map.Spawn(_Class.Projectile, Actor.Position + Actor.Direction * (Actor.Radius + 10), Actor.Direction, Actor.Direction * speed);
+
+            base.Discharge();
         }
     }
 }
