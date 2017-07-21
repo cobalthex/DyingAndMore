@@ -15,6 +15,11 @@ namespace Takai.Game
         Idle,
         Inactive,
         Active,
+
+        //game specific (come up with better way?)
+
+        ChargeWeapon = 128,
+        DischargeWeapon
     }
 
     public class EntStateClass : IStateClass<EntStateId, EntStateInstance>
@@ -50,7 +55,7 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public TimeSpan TotalTime
         {
-            get => Sprite.TotalLength;
+            get => Sprite?.TotalLength ?? TimeSpan.Zero;
             set { } //todo
         }
 
@@ -78,7 +83,7 @@ namespace Takai.Game
 
         public bool HasFinished()
         {
-            return ElapsedTime > Class.TotalTime;
+            return ElapsedTime >= Class.TotalTime;
         }
 
         public override int GetHashCode()

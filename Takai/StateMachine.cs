@@ -123,11 +123,8 @@ namespace Takai
                 instance = BaseState;
                 return true;
             }
-            if (OverlaidStates.TryGetValue(activeState, out var state))
-            {
-                instance = state;
+            if (OverlaidStates.TryGetValue(activeState, out instance))
                 return true;
-            }
 
             instance = default(TInstance);
             return false;
@@ -138,9 +135,9 @@ namespace Takai
         /// </summary>
         /// <param name="NextState">The new state</param>
         /// <returns>False if the state does not exist</returns>
-        public virtual bool TransitionTo(TKey NextState)
+        public virtual void TransitionTo(TKey NextState)
         {
-            if (!NextState.Equals(default(TKey)) && States.TryGetValue(NextState, out var next))
+            if (States.TryGetValue(NextState, out var next))
             {
                 var instance = (TInstance)next.Create();
                 instance.Id = NextState; //todo: automate
@@ -160,9 +157,7 @@ namespace Takai
 
                 OnTransition(evArgs);
                 Transition?.Invoke(this, evArgs);
-                return true;
             }
-            return false;
         }
 
         /// <summary>
@@ -170,9 +165,17 @@ namespace Takai
         /// </summary>
         /// <param name="currentState">The state to transition from when it is finished</param>
         /// <param name="nextState">The state to transition to after currentState is finished/></param>
-        public virtual void TransitionTo(TKey currentState, TKey nextState)
+        /// <param name="immediate">If true, the current state is swapped with the next state</param>
+        public virtual void TransitionTo(TKey currentState, TKey nextState, bool immediate = false)
         {
-            Transitions[currentState] = nextState;
+            if (immediate)
+            {
+                if (States[currentState].IsOverlay)
+                    OverlaidStates.Remove(currentState);
+                TransitionTo(nextState);
+            }
+            else if (States.ContainsKey(nextState))
+                Transitions[currentState] = nextState;
         }
 
         List<TInstance> added = new List<TInstance>();

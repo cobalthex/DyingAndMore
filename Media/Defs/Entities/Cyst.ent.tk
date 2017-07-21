@@ -19,14 +19,14 @@ ActorClass {
                 ClipRect: [0 0 64 64];
             };
         };
-        Active: {
+        Dead: {
             Sprite: {
                 texture: "Textures/Entities/Spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];
-                ClipRect: [0 64 320 64];
-                FrameCount: 5;
+                ClipRect: [0 192 192 64];
+                FrameCount: 3;
                 FrameLength: 100;
                 Tween: TweenStyle.Overlap;
                 IsLooping: False;
@@ -45,14 +45,14 @@ ActorClass {
                 IsLooping: False;
             };
         };
-        Dead: {
+        ChargeWeapon: {
             Sprite: {
                 texture: "Textures/Entities/Spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];
-                ClipRect: [0 192 192 64];
-                FrameCount: 3;
+                ClipRect: [0 64 320 64];
+                FrameCount: 5;
                 FrameLength: 100;
                 Tween: TweenStyle.Overlap;
                 IsLooping: False;

@@ -106,7 +106,22 @@ namespace DyingAndMore.Game.Entities
 
         public float MaxSpeed { get; set; }
 
-        public Weapons.WeaponInstance Weapon { get; set; } = null;
+        public Weapons.WeaponInstance Weapon
+        {
+            get => _weapon;
+            set
+            {
+                if (_weapon != value)
+                {
+                    if (_weapon != null)
+                        _weapon.Actor = null;
+
+                    _weapon = value;
+                    _weapon.Actor = this;
+                }
+            }
+        }
+        private Weapons.WeaponInstance _weapon;
 
         #endregion
 
@@ -127,6 +142,7 @@ namespace DyingAndMore.Game.Entities
         public override void Think(TimeSpan deltaTime)
         {
             Controller?.Think(deltaTime);
+            Weapon?.Think(deltaTime);
 
             //todo: move to physics
             var vel = Velocity;
@@ -156,7 +172,7 @@ namespace DyingAndMore.Game.Entities
 
         public void FireWeapon()
         {
-            Weapon?.TryUse(this);
+            Weapon?.Charge();
         }
 
         public void Accelerate(Vector2 direction)

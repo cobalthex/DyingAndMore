@@ -86,13 +86,13 @@ namespace DyingAndMore.Game.Weapons
             return SpawnQueue.Count <= 0;
         }
 
-        protected override void Discharge(EntityInstance source)
+        public override void Discharge()
         {
-            if (source.Map == null)
+            if (IsDepleted())
                 return;
 
             var next = SpawnQueue.Dequeue();
-            source.Map.Spawn(next, source.Position + source.Direction * (source.Radius + 10), source.Direction, source. Direction * 100);
+            Actor.Map.Spawn(next, Actor.Position + Actor.Direction * (Actor.Radius + 10), Actor.Direction, Actor. Direction * 100);
         }
     }
 }
