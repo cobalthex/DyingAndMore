@@ -60,15 +60,21 @@ namespace DyingAndMore.Game.Weapons
         {
             //todo: optimize for cases with no charging (no need to use state machine)
 
-            if (Actor.Map == null || !Actor.State.TryGet(Takai.Game.EntStateId.ChargeWeapon, out var state))
+            if (Actor.Map == null || Actor.State.State != Takai.Game.EntStateId.ChargeWeapon)
                 return;
 
             //undercharged
-            if (!state.HasFinished() && _Class.UnderchargeAction == UnderchargeAction.Dissipate)
+            if (!Actor.State.Instance.HasFinished() &&
+                _Class.UnderchargeAction == UnderchargeAction.Dissipate)
                 return;
 
             var speed = _Class.Projectile.Power;
-            Actor.Map.Spawn(_Class.Projectile, Actor.Position + Actor.Direction * (Actor.Radius + 10), Actor.Direction, Actor.Direction * speed);
+            Actor.Map.Spawn(
+                _Class.Projectile,
+                Actor.Position + Actor.Direction * (Actor.Radius + 10),
+                Actor.Direction,
+                Actor.Direction * speed
+            );
 
             base.Discharge();
         }

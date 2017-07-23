@@ -224,27 +224,26 @@ namespace Takai.Game
 
                 foreach (var ent in ActiveEnts)
                 {
-                    bool didDraw = false;
-                    foreach (var state in ent.ActiveStates)
+                    if (ent.State.Instance?.Class?.Sprite?.Texture != null)
                     {
-                        if (state.Class?.Sprite?.Texture == null)
-                            continue;
-
-                        didDraw = true;
-
                         if (ent.OutlineColor.A > 0)
                             _drawEntsOutlined.Add(ent);
                         else
                         {
                             var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                            state.Class.Sprite.Draw(sbatch, ent.Position, angle, Color.White, 1, state.ElapsedTime);
+
+                            ent.State.Instance.Class.Sprite.Draw(
+                                sbatch,
+                                ent.Position,
+                                angle,
+                                Color.White,
+                                1,
+                                ent.State.Instance.ElapsedTime
+                            );
                         }
-                    }
-
-                    if (didDraw)
                         ++profilingInfo.visibleEnts;
-
-                    if (renderSettings.HasFlag(RenderSettings.DrawBordersAroundNonDrawingEntities) && !didDraw)
+                    }
+                    else if (renderSettings.HasFlag(RenderSettings.DrawBordersAroundNonDrawingEntities))
                     {
                         Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
                                                      -ent.Direction.Y, ent.Direction.X, 0, 0,
@@ -285,19 +284,21 @@ namespace Takai.Game
 
                 foreach (var ent in _drawEntsOutlined)
                 {
-                    bool first = true;
-                    foreach (var state in ent.ActiveStates)
-                    {
-                        //all sprites should be valid
+                    //all sprites should be valid
 
-                        //outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
-                        //outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
+                    //outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
+                    //outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
 
-                        var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
-                        state.Class.Sprite.Draw(sbatch, ent.Position, angle, first ? ent.OutlineColor : Color.Transparent, 1, state.ElapsedTime);
+                    var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
 
-                        first = false;
-                    }
+                    ent.State.Instance.Class.Sprite.Draw(
+                        sbatch,
+                        ent.Position,
+                        angle,
+                        Color.White,
+                        1,
+                        ent.State.Instance.ElapsedTime
+                    );
                 }
 
                 sbatch.End();

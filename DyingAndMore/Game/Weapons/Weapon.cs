@@ -72,7 +72,8 @@ namespace DyingAndMore.Game.Weapons
         {
             //todo: maybe move to weapon base
 
-            if (Actor.State.TryGet(Takai.Game.EntStateId.ChargeWeapon, out var state) && state.HasFinished())
+            if (Actor.State.State == Takai.Game.EntStateId.ChargeWeapon &&
+                Actor.State.Instance.HasFinished())
             {
                 switch (Class.OverchargeAction)
                 {
@@ -94,7 +95,7 @@ namespace DyingAndMore.Game.Weapons
                 return;
 
             if (CanUse(Actor.Map.ElapsedTime))
-                Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon);
+                Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, "ChargeWeapon");
         }
 
         /// <summary>
@@ -103,8 +104,8 @@ namespace DyingAndMore.Game.Weapons
         public virtual void Discharge()
         {
             NextShot = Actor.Map.ElapsedTime + Takai.Game.RandomRange.Next(Class.Delay);
-            Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, Takai.Game.EntStateId.DischargeWeapon);
-            Actor.State.TransitionTo(Takai.Game.EntStateId.DischargeWeapon, Takai.Game.EntStateId.Idle);
+            Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, Takai.Game.EntStateId.DischargeWeapon, "DischargeWeapon");
+            Actor.State.TransitionTo(Takai.Game.EntStateId.DischargeWeapon, Takai.Game.EntStateId.Idle, "Idle");
         }
 
         public virtual bool CanUse(TimeSpan totalTime)
