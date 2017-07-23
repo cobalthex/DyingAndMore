@@ -109,7 +109,7 @@ namespace DyingAndMore.Game.Entities
 
                 Map.Spawn(spawn);
             }
-            Map.Destroy(this);
+            State.TransitionTo(EntStateId.Dead, "Dead"); //todo
 
             if (collider is ActorInstance actor)
             {

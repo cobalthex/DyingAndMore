@@ -167,7 +167,7 @@ namespace Takai.Data
                         throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read object", reader));
 
                     var value = TextDeserialize(reader);
-                    dict[key.ToString().TrimEnd()] = value;
+                    dict[String.Intern(key.ToString().TrimEnd())] = value; //todo: analyze interning
 
                     SkipIgnored(reader);
 
@@ -691,7 +691,7 @@ namespace Takai.Data
                     builder.Append((char)ch);
             }
             Stream.Read();
-            return builder.ToString();
+            return string.Intern(builder.ToString());
         }
 
         public static string ReadWord(StreamReader Stream)

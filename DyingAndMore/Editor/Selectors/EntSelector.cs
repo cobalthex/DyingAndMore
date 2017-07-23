@@ -33,7 +33,7 @@ namespace DyingAndMore.Editor.Selectors
         {
             var ent = ents[itemIndex];
 
-            if (ent.States.TryGetValue(Takai.Game.EntStateId.Idle, out var state) && state.Sprite?.Texture != null)
+            if (ent.States.TryGetValue("Idle", out var state) && state.Sprite?.Texture != null)
             {
                 //bounds.X += (int)state.Sprite.Origin.X;
                 //bounds.Y += (int)state.Sprite.Origin.Y;

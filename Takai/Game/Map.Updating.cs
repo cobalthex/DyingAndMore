@@ -127,18 +127,13 @@ namespace Takai.Game
             foreach (var ent in ActiveEnts)
             {
                 var entBounds = ent.AxisAlignedBounds;
-
-                var isDead = ent.State.TryGet(EntStateId.Dead, out var deadState);
-
-                //todo: redo
                 if (!Bounds.Intersects(entBounds) || //outside of the map
-                    ent.State.BaseState.Id == EntStateId.Invalid || //no state
-                    (isDead && !ent.ActiveStates.GetEnumerator().MoveNext())) //todo: should be no sprite
+                    ent.State.Instance == null) //no state
                         Destroy(ent);
 
                 else if (!ent.Class.AlwaysActive && !visibleRegion.Intersects(entBounds))
                 {
-                    if (isDead)
+                    if (ent.State.Instance.Id == EntStateId.Dead)
                         Destroy(ent);
                     else
                         entsToRemoveFromActive.Add(ent);

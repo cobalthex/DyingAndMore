@@ -35,6 +35,11 @@ namespace Takai.Game
         {
             return new object[] { min, max };
         }
+
+        public override string ToString()
+        {
+            return $"{min.ToString()} - {max.ToString()}";
+        }
     }
 
     public static class RandomRange

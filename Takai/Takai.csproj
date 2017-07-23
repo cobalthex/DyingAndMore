@@ -57,6 +57,9 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.1\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -94,7 +97,7 @@
     <Compile Include="Game\Script.cs" />
     <Compile Include="Game\Trigger.cs" />
     <Compile Include="Runtime.cs" />
-    <Compile Include="StateMachine.cs" />
+    <Compile Include="Game\StateMachine.cs" />
     <Compile Include="Graphics\BitmapFont.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\Primitives2D.cs" />
@@ -116,6 +119,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

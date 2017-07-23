@@ -6,103 +6,6 @@ using static System.Math;
 namespace Takai.Game
 {
     /// <summary>
-    /// All of the possible entity states
-    /// </summary>
-    public enum EntStateId
-    {
-        Invalid,
-        Dead,
-        Idle,
-        Inactive,
-        Active,
-
-        //game specific (come up with better way?)
-
-        ChargeWeapon = 128,
-        DischargeWeapon
-    }
-
-    public class EntStateClass : IStateClass<EntStateId, EntStateInstance>
-    {
-        public string Name { get; set; }
-
-        [Data.Serializer.Ignored]
-        public string File { get; set; } = null;
-
-        public bool IsOverlay { get; set; } = false;
-
-        public Graphics.Sprite Sprite { get; set; }
-
-        //Sound
-
-        //todo: cache
-        public float Radius =>
-            Sprite != null ? MathHelper.Max(Sprite.Width, Sprite.Height) / 2 : 1;
-
-        [Data.Serializer.Ignored]
-        public bool IsLooping
-        {
-            get
-            {
-                return Sprite.IsLooping;
-            }
-            set
-            {
-                Sprite.IsLooping = value;
-            }
-        }
-
-        [Data.Serializer.Ignored]
-        public TimeSpan TotalTime
-        {
-            get => Sprite?.TotalLength ?? TimeSpan.Zero;
-            set { } //todo
-        }
-
-        public EntStateInstance Create()
-        {
-            return new EntStateInstance()
-            {
-                Class = this,
-                ElapsedTime = TimeSpan.Zero
-            };
-        }
-    }
-
-    public class EntStateInstance : IStateInstance<EntStateId, EntStateClass>
-    {
-        public EntStateId Id { get; set; }
-
-        [Data.Serializer.Ignored]
-        public EntStateClass Class { get; set; }
-
-        /// <summary>
-        /// The current elapsed time of this state
-        /// </summary>
-        public TimeSpan ElapsedTime { get; set; }
-
-        public bool HasFinished()
-        {
-            return ElapsedTime >= Class.TotalTime;
-        }
-
-        public override int GetHashCode()
-        {
-            return (int)Id;
-        }
-
-        public void Update(TimeSpan deltaTime)
-        {
-
-        }
-
-        public override string ToString()
-        {
-            return Id.ToString();
-        }
-    }
-
-    /// <summary>
     /// Describes a single type of entity. Actors, etc. inherit from this
     /// </summary>
     [Data.DesignerModdable]
@@ -135,7 +38,7 @@ namespace Takai.Game
 
         /// <summary>
         /// All of this entity's available states
-        public Dictionary<EntStateId, EntStateClass> States { get; set; }
+        public Dictionary<string, EntStateClass> States { get; set; }
 
         /// <summary>
         /// Destroy the sprite if it is dead and the animation is finished
@@ -178,7 +81,7 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public int Id { get; private set; } = (nextId++); //todo: map-specific id
 
-        public float Radius => State.BaseState?.Class?.Radius ?? 1; //todo: aggregate all sprites + cache
+        public float Radius => State.Instance?.Class?.Radius ?? 1; //todo: aggregate all sprites + cache
         public float RadiusSq => Radius * Radius; //todo: cache
 
         /// <summary>
@@ -250,33 +153,7 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public Rectangle AxisAlignedBounds { get; private set; }
 
-        [Data.CustomSerialize("CustomSerializeState")]
-        public StateMachine<EntStateId, EntStateClass, EntStateInstance> State { get; set; }
-            = new StateMachine<EntStateId, EntStateClass, EntStateInstance>();
-
-        private object CustomSerializeState()
-        {
-            return new Dictionary<string, object>
-            {
-                { "BaseState", State.BaseState },
-                { "OverlaidStates", State.OverlaidStates },
-                { "Transitions", State.Transitions }
-            };
-        }
-
-        /// <summary>
-        /// Enumerate through the classes of active states
-        /// </summary>
-        [Data.Serializer.Ignored]
-        public IEnumerable<EntStateInstance> ActiveStates
-        {
-            get
-            {
-                yield return State.BaseState;
-                foreach (var state in State.OverlaidStates)
-                    yield return state.Value;
-            }
-        }
+        public StateMachine State { get; set; } = new StateMachine();
 
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
@@ -298,7 +175,7 @@ namespace Takai.Game
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
-            State.TransitionTo(EntStateId.Idle);
+            State.TransitionTo(EntStateId.Idle, "Idle");
 
             State.StateComplete += State_StateComplete;
             State.Transition += State_Transition;
@@ -325,16 +202,7 @@ namespace Takai.Game
         /// <returns>The calculated extent</returns>
         public Point GetVisibleSize()
         {
-            var p = new Point();
-            foreach (var state in ActiveStates)
-            {
-                if (state.Class?.Sprite != null)
-                {
-                    p.X = MathHelper.Max(p.X, state.Class.Sprite.Width);
-                    p.Y = MathHelper.Max(p.Y, state.Class.Sprite.Height);
-                }
-            }
-            return p;
+            return State.Instance.Class.Sprite.Size;
         }
         Point lastVisibleSize;
 
@@ -369,15 +237,15 @@ namespace Takai.Game
             AxisAlignedBounds = new Rectangle(min.ToPoint(), (max - min).ToPoint());
         }
 
-        protected void State_Transition(object sender, TransitionEventArgs<EntStateInstance> e)
+        protected void State_Transition(object sender, TransitionEventArgs e)
         {
             lastVisibleSize = GetVisibleSize();
             UpdateAxisAlignedBounds();
         }
 
-        protected void State_StateComplete(object sender, StateCompleteEventArgs<EntStateInstance> e)
+        protected void State_StateComplete(object sender, StateCompleteEventArgs e)
         {
-            if (e.State.Id == EntStateId.Dead && Class.DestroyOnDeath && Map != null)
+            if (e.State == EntStateId.Dead && Class.DestroyOnDeath && Map != null)
                 Map.Destroy(this);
         }
 
@@ -434,18 +302,6 @@ namespace Takai.Game
         /// <param name="Type">The type of Fluid collided with</param>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void OnFluidCollision(FluidClass Type, TimeSpan DeltaTime) { }
-
-        protected void DerivedDeserializer(Dictionary<string, object> props)
-        {
-            if (State.BaseState != null && State.States.TryGetValue(State.BaseState.Id, out var k))
-                State.BaseState.Class = k;
-
-            foreach (var state in State.OverlaidStates)
-            {
-                if (state.Value != null && State.States.TryGetValue(state.Key, out k))
-                    state.Value.Class = k;
-            }
-        }
     }
 }
 
