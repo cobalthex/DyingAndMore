@@ -63,7 +63,7 @@ namespace DyingAndMore.Game.Entities
             get => base.Class;
             set
             {
-                System.Diagnostics.Contracts.Contract.Assert(value is ActorClass);
+                System.Diagnostics.Contracts.Contract.Assert(value == null || value is ActorClass);
                 base.Class = value;
                 _Class = value as ActorClass;
             }
@@ -183,12 +183,7 @@ namespace DyingAndMore.Game.Entities
                 vel = (vel / (float)Math.Sqrt(lSq)) * MaxSpeed;
             Velocity = vel;
         }
-
-        public void MoveTo(Vector2 newPosition, Vector2 newDirection)
-        {
-            throw new NotImplementedException(); //todo
-        }
-
+        
         #region Helpers
 
         /// <summary>

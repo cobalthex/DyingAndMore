@@ -72,7 +72,6 @@ namespace Takai.Game
         /// </summary>
         public EntStateId Id { get; set; }
 
-        [Data.Serializer.Ignored] //todo: custom serialize
         public EntStateClass Class { get; set; }
 
         /// <summary>
@@ -137,6 +136,8 @@ namespace Takai.Game
         }
         private Dictionary<string, EntStateClass> _states;
 
+        //todo: come up with better name for state/instance
+
         /// <summary>
         /// The actual state set. The current instance may not match if there was no accompanying class
         /// </summary>
@@ -161,7 +162,7 @@ namespace Takai.Game
         public EntStateInstance TransitionTo(EntStateId nextState, string nextClass)
         {
             State = nextState;
-            if (States.TryGetValue(nextClass, out var stateClass))
+            if (States != null && States.TryGetValue(nextClass, out var stateClass))
             {
                 Instance = stateClass.Create();
                 Instance.Id = nextState;

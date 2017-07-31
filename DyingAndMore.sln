@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DyingAndMore", "DyingAndMore\DyingAndMore.csproj", "{963BDA37-96F7-463E-9CD0-3F256239E90F}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DyingAndMore", "DyingAndMor
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Takai", "Takai\Takai.csproj", "{E5BEBF55-4046-442E-8CB3-7BA445BA5707}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tool", "Tool\Tool.csproj", "{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9370C4D8-F56E-42DB-B494-9891C2B486BB}"
 	ProjectSection(SolutionItems) = preProject
@@ -49,17 +47,6 @@ Global
 		{E5BEBF55-4046-442E-8CB3-7BA445BA5707}.Release|x64.Build.0 = Release|x64
 		{E5BEBF55-4046-442E-8CB3-7BA445BA5707}.Release|x86.ActiveCfg = Release|Any CPU
 		{E5BEBF55-4046-442E-8CB3-7BA445BA5707}.Release|x86.Build.0 = Release|Any CPU
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Debug|x64.ActiveCfg = Debug|x64
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Debug|x86.Build.0 = Debug|Any CPU
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Release|x64.ActiveCfg = Release|x64
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Release|x64.Build.0 = Release|x64
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Release|x86.ActiveCfg = Release|Any CPU
-		{DED49E38-8802-4FC4-B9F1-508D9F29FDB9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

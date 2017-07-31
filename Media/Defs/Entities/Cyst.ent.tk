@@ -68,7 +68,7 @@ ActorClass {
     DestroyOnDeath: False;
 
     DefaultWeapon: SpawnerClass {
-        Delay: [2000 4000];
+        Delay: [1sec 3sec];
         Spawns: [
             [@"Defs/Entities/InfectedCell.ent.tk" [3 5]]
         ]

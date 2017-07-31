@@ -344,24 +344,22 @@ namespace Takai.Graphics
             bounds.X += (int)(Origin.X / width * bounds.Width);
             bounds.Y += (int)(Origin.Y / height * bounds.Height);
 
-            switch (Tween)
+            var (curTween, nextTween) = GetTween(fd, Tween);
+            DrawTexture(spriteBatch, bounds, GetFrameRect(cf), angle, Color.Lerp(color, Color.Transparent, curTween));
+            DrawTexture(spriteBatch, bounds, GetFrameRect(nf), angle, Color.Lerp(color, Color.Transparent, nextTween));
+        }
+
+        public static (float, float) GetTween(float frameDelta, TweenStyle tween)
+        {
+            switch (tween)
             {
-                case TweenStyle.None:
-                    DrawTexture(spriteBatch, bounds, GetFrameRect(cf), angle, color);
-                    break;
-
                 case TweenStyle.Overlap:
-                    //todo: verify works
-                    var nd = MathHelper.Clamp(fd * 2, 0, 1);
-                    fd = MathHelper.Clamp((fd * 2) - 1, 0, 1);
-                    DrawTexture(spriteBatch, bounds, GetFrameRect(cf), angle, Color.Lerp(color, Color.Transparent, fd));
-                    DrawTexture(spriteBatch, bounds, GetFrameRect(nf), angle, Color.Lerp(Color.Transparent, color, nd));
-                    break;
-
+                    return (MathHelper.Max((frameDelta * 2) - 1, 0), 
+                            MathHelper.Max(1 - (frameDelta * 2), 0));
                 case TweenStyle.Sequential:
-                    DrawTexture(spriteBatch, bounds, GetFrameRect(cf), angle, Color.Lerp(color, Color.Transparent, fd));
-                    DrawTexture(spriteBatch, bounds, GetFrameRect(nf), angle, Color.Lerp(Color.Transparent, color, fd));
-                    break;
+                    return (frameDelta, 1 - frameDelta);
+                default:
+                    return (1, 0);
             }
         }
 

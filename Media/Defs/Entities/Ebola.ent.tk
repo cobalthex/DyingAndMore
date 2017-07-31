@@ -11,7 +11,7 @@ ActorClass {
                 height: 16;
                 origin: [27 8];
                 FrameCount: 4;
-                FrameLength: 0;
+                FrameLength: 100;
                 IsLooping: True;
                 Tween: TweenStyle [Overlap];
             };

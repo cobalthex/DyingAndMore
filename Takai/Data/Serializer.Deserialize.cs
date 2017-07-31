@@ -93,6 +93,8 @@ namespace Takai.Data
                 return TextDeserializeAll(reader);
         }
 
+        //custom suffixes
+
         /// <summary>
         /// Read all objects from the file
         /// </summary>
@@ -232,26 +234,57 @@ namespace Takai.Data
                 return ReadString(reader);
 
             string word;
+            do
+            {
+                if (peek == '-' || peek == '+' || peek == '.')
+                    word = (char)reader.Read() + ReadWord(reader);
+                else
+                    word = ReadWord(reader);
+            } while (!reader.EndOfStream && word.Length < 1);
 
-            if (peek == '-' || peek == '+' || peek == '.')
-                word = (char)reader.Read() + ReadWord(reader);
-            else
-                word = ReadWord(reader);
+            if ("-+.".Contains(word[0]) || char.IsDigit(word[0])) //maybe handle ,
+            {
+                if (reader.Peek() == '.')
+                    word += (char)reader.Read() + ReadWord(reader);
 
-            if (word.Length > 0 && ("-+.".Contains(word[0]) || char.IsDigit(word[0])) && reader.Peek() == '.') //maybe handle ,
-                word += (char)reader.Read() + ReadWord(reader);
+                string unit = string.Empty;
+                for (int i = word.Length - 1; i >= 0; --i)
+                {
+                    if ("-+.".Contains(word[i]) || Char.IsDigit(word[i]))
+                    {
+                        unit = word.Substring(i + 1);
+                        word = word.Substring(0, i + 1);
+                        break;
+                    }
+                }
+
+                if (TFloat.TryParse(word, out var @float))
+                {
+                    if (unit.Length > 0)
+                    {
+                        if (unit.Equals("deg", StringComparison.OrdinalIgnoreCase)) //convert from degrees to radians
+                            return @float / 180 * Math.PI;
+                        else if (unit.Equals("sec", StringComparison.OrdinalIgnoreCase)) //convert from seconds to milliseconds
+                            return @float * 1000;
+                        else if (unit.Equals("min", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
+                            return @float * 1000 * 60;
+
+                        else if (!unit.Equals("rad", StringComparison.OrdinalIgnoreCase) &&
+                                 !unit.Equals("msec", StringComparison.OrdinalIgnoreCase))
+                            throw new ArgumentOutOfRangeException($"{unit} is an unknown numeric suffix");
+                    }
+                    return @float;
+                }
+
+                if (TInt.TryParse(word, out var @int))
+                    return @int;
+            }
 
             if (word.ToLower() == "null")
                 return null;
 
             if (bool.TryParse(word, out var @bool))
                 return @bool;
-
-            if (TInt.TryParse(word, out var @int))
-                return @int;
-
-            if (TFloat.TryParse(word, out var @float))
-                return @float;
 
             if (RegisteredTypes.TryGetValue(word, out var type))
             {
@@ -437,8 +470,7 @@ namespace Takai.Data
             }
 
             var derived = destType.GetCustomAttribute<DerivedTypeDeserializeAttribute>(true);
-            if (derived != null)
-                derived.deserialize.Invoke(obj, new[] { dict });
+            derived?.deserialize?.Invoke(obj, new[] { dict });
 
             return obj;
         }

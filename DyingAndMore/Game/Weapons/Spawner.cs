@@ -4,8 +4,6 @@ using Takai.Game;
 
 namespace DyingAndMore.Game.Weapons
 {
-    //todo: custom serialize spawn list (only export object)
-
     class SpawnerClass : WeaponClass
     {
         protected static Random randGen = new Random();
@@ -61,7 +59,7 @@ namespace DyingAndMore.Game.Weapons
             get => base.Class;
             set
             {
-                System.Diagnostics.Contracts.Contract.Assert(value is SpawnerClass);
+                System.Diagnostics.Contracts.Contract.Assert(value == null || value is SpawnerClass);
                 base.Class = value;
                 _Class = value as SpawnerClass;
             }
@@ -93,6 +91,7 @@ namespace DyingAndMore.Game.Weapons
 
             var next = SpawnQueue.Dequeue();
             Actor.Map.Spawn(next, Actor.Position + Actor.Direction * (Actor.Radius + 10), Actor.Direction, Actor. Direction * 100);
+            base.Discharge();
         }
     }
 }

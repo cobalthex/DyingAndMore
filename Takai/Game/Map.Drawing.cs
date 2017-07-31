@@ -345,7 +345,7 @@ namespace Takai.Game
                 {
                     for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
                     {
-                        foreach (var fluid in Sectors[y, x].Fluids)
+                        foreach (var fluid in Sectors[y, x].fluids)
                         {
                             ++profilingInfo.visibleInactiveFluids;
                             reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
@@ -481,7 +481,7 @@ namespace Takai.Game
 
                     var blackLines = debugLines.ConvertAll(line =>
                     {
-                        line.Color = new Color(0, 0, 0, line.Color.A);
+                        line.Color = new Color(Color.Black, line.Color.A);
                         line.Position += new Vector3(1, 1, 0);
                         return line;
                     });

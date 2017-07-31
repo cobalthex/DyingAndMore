@@ -82,10 +82,10 @@ namespace Takai.Data
             //default custom serializers
             Serializers.Add(typeof(Vector2), new CustomTypeSerializer
             {
-                Serialize = (object Value) => { var v = (Vector2)Value; return new[] { v.X, v.Y }; },
-                Deserialize = (object Value) =>
+                Serialize = (object value) => { var v = (Vector2)value; return new[] { v.X, v.Y }; },
+                Deserialize = (object value) =>
                 {
-                    var v = (List<object>)Value;
+                    var v = (List<object>)value;
                     var x = (float)Convert.ChangeType(v[0], typeof(float));
                     var y = (float)Convert.ChangeType(v[1], typeof(float));
                     return new Vector2(x, y);
@@ -94,10 +94,10 @@ namespace Takai.Data
 
             Serializers.Add(typeof(Point), new CustomTypeSerializer
             {
-                Serialize = (object Value) => { var v = (Point)Value; return new[] { v.X, v.Y }; },
-                Deserialize = (object Value) =>
+                Serialize = (object value) => { var v = (Point)value; return new[] { v.X, v.Y }; },
+                Deserialize = (object value) =>
                 {
-                    var v = (List<object>)Value;
+                    var v = (List<object>)value;
                     var x = (int)Convert.ChangeType(v[0], typeof(int));
                     var y = (int)Convert.ChangeType(v[1], typeof(int));
                     return new Point(x, y);
@@ -106,10 +106,10 @@ namespace Takai.Data
 
             Serializers.Add(typeof(Rectangle), new CustomTypeSerializer
             {
-                Serialize = (object Value) => { var v = (Rectangle)Value; return new[] { v.X, v.Y, v.Width, v.Height }; },
-                Deserialize = (object Value) =>
+                Serialize = (object value) => { var v = (Rectangle)value; return new[] { v.X, v.Y, v.Width, v.Height }; },
+                Deserialize = (object value) =>
                 {
-                    var v = (List<object>)Value;
+                    var v = (List<object>)value;
                     var x = (int)Convert.ChangeType(v[0], typeof(int));
                     var y = (int)Convert.ChangeType(v[1], typeof(int));
                     var width = (int)Convert.ChangeType(v[2], typeof(int));
@@ -120,10 +120,10 @@ namespace Takai.Data
 
             Serializers.Add(typeof(Color), new CustomTypeSerializer
             {
-                Serialize = (object Value) => { var v = (Color)Value; return new[] { v.R, v.G, v.B, v.A }; },
-                Deserialize = (object Value) =>
+                Serialize = (object value) => { var v = (Color)value; return new[] { v.R, v.G, v.B, v.A }; },
+                Deserialize = (object value) =>
                 {
-                    var v = (List<object>)Value;
+                    var v = (List<object>)value;
                     var r = (int)Convert.ChangeType(v[0], typeof(int));
                     var g = (int)Convert.ChangeType(v[1], typeof(int));
                     var b = (int)Convert.ChangeType(v[2], typeof(int));
@@ -134,36 +134,36 @@ namespace Takai.Data
 
             Serializers.Add(typeof(Texture2D), new CustomTypeSerializer
             {
-                Serialize = (object Value) => { return ((Texture2D)Value).Name; },
-                Deserialize = (object Value) => { return Takai.AssetManager.Load<Texture2D>((string)Value); }
+                Serialize = (object value) => { return ((Texture2D)value).Name; },
+                Deserialize = (object value) => { return AssetManager.Load<Texture2D>((string)value); }
             });
 
             Serializers.Add(typeof(TimeSpan), new CustomTypeSerializer
             {
-                Serialize = (object Value) => { return ((TimeSpan)Value).TotalMilliseconds; },
-                Deserialize = (object Value) => { return TimeSpan.FromMilliseconds((double)Convert.ChangeType(Value, typeof(double))); }
+                Serialize = (object value) => { return ((TimeSpan)value).TotalMilliseconds; },
+                Deserialize = (object value) => { return TimeSpan.FromMilliseconds((double)Convert.ChangeType(value, typeof(double))); }
             });
-
+            
             Serializers.Add(typeof(BlendState), new CustomTypeSerializer
             {
-                Serialize = (object Value) =>
+                Serialize = (object value) =>
                 {
-                    if (Value == BlendState.Additive)
+                    if (value == BlendState.Additive)
                         return "Additive";
-                    if (Value == BlendState.AlphaBlend)
+                    if (value == BlendState.AlphaBlend)
                         return "AlphaBlend";
-                    if (Value == BlendState.NonPremultiplied)
+                    if (value == BlendState.NonPremultiplied)
                         return "NonPremultiplied";
-                    if (Value == BlendState.Opaque)
+                    if (value == BlendState.Opaque)
                         return "Opaque";
 
                     return "todo";
                 },
-                Deserialize = (object Value) =>
+                Deserialize = (object value) =>
                 {
-                    if (Value is string strValue)
+                    if (value is string strvalue)
                     {
-                        switch ((string)Value)
+                        switch ((string)value)
                         {
                             case "Additive":
                                 return BlendState.Additive;

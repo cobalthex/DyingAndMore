@@ -183,7 +183,7 @@ namespace Takai.Game
                                 var drag = 0f;
                                 var dc = 0u;
                                 var sector = Sectors[targetCell.Y / SectorSize, targetCell.X / SectorSize];
-                                foreach (var fluid in sector.Fluids)
+                                foreach (var fluid in sector.fluids)
                                 {
                                     if (Vector2.DistanceSquared(fluid.position, targetPos) <= (fluid.Class.Radius * fluid.Class.Radius) + ent.RadiusSq)
                                     {

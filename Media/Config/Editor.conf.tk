@@ -1,5 +1,4 @@
 {
-    SnapAngle: 45;
+    SnapAngle: 45deg;
     ShowGridByDefault: true;
-
 }

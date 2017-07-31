@@ -27,3 +27,7 @@ Features to add in the future
 0. Trails that use triangle strips
 
 0. Radial menus for editor
+
+0. Gases
+	0. Damage effects
+	0. Behavior changing

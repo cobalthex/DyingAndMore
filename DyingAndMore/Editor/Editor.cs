@@ -23,7 +23,7 @@ namespace DyingAndMore.Editor
 
     struct EditorConfiguration
     {
-        public float snapAngle; //degrees
+        public float snapAngle;
         public bool showGridByDefault;
     }
 

@@ -30,9 +30,6 @@ namespace DyingAndMore.Editor
 
         protected override bool HandleInput(GameTime time)
         {
-            if (!base.HandleInput(time))
-                return false;
-
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsPress(MouseButtons.Left))
@@ -104,7 +101,7 @@ namespace DyingAndMore.Editor
                 savedWorldPos = currentWorldPos;
             }
 
-            return true;
+            return base.HandleInput(time);
         }
 
         void SelectTrigger(Vector2 Position)
