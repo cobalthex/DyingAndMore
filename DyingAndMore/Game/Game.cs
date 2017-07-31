@@ -13,6 +13,7 @@ namespace DyingAndMore.Game
         Entities.Controller lastController = null;
 
         Static fpsDisplay;
+        Static crapDisplay;
 
         Static renderSettingsConsole;
         void ToggleRenderSettingsConsole()
@@ -54,7 +55,7 @@ namespace DyingAndMore.Game
             curve.Keys.Add(new CurveKey(1, 1));
 
             testParticles.BlendMode = BlendState.AlphaBlend;
-            testParticles.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Aquamarine);
+            testParticles.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Transparent);
             testParticles.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 2);
             testParticles.Speed = new Takai.Game.ValueCurve<float>(curve, 100, 0);
 
@@ -71,7 +72,12 @@ namespace DyingAndMore.Game
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.End,
             });
-
+            AddChild(crapDisplay = new Static()
+            {
+                Position = new Vector2(20),
+                VerticalAlignment = Alignment.Start,
+                HorizontalAlignment = Alignment.End,
+            });
         }
         Takai.Game.ParticleType testParticles;
 
@@ -102,6 +108,9 @@ namespace DyingAndMore.Game
         {
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
+
+            crapDisplay.Text = $"TimeScale:{Map.TimeScale}";
+            crapDisplay.AutoSize();
 
             var scrollDelta = InputState.ScrollDelta();
             if (InputState.IsMod(KeyMod.Control) && scrollDelta != 0)

@@ -4,7 +4,7 @@ Map {
     ActiveCamera: EditorCamera {
         PostEffect: Null;
         Viewport: [0 0 1280 800];
-        Position: [192 192];
+        Position: [192 209.1397];
         Scale: 1;
         Rotation: 0;
         Shake: 0;
@@ -12,36 +12,45 @@ Map {
         MoveSpeed: 1000;
     };
     TilesImage: "Data\\Textures/tiles.png";
-    Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
     Decals: [];
     Triggers: [];
     State: MapState {
         entities: [
             ActorInstance {
-                Class: ActorClass {
-                    MaxHealth: 500;
-                    FieldOfView: 2.356194;
-                    MoveForce: 600;
-                    MaxSpeed: [400 400];
-                    DefaultWeapon: GunClass {
+                Class: @"Defs/Entities/Player.ent.tk";
+                Faction: Factions [Player];
+                Controller: Null;
+                CurrentHealth: 500;
+                MaxSpeed: 400;
+                Weapon: GunInstance {
+                    Class: GunClass {
                         Projectile: @"Defs/Entities/Missile.ent.tk";
                         MaxAmmo: 300;
+                        BurstCont: 0;
+                        ShotsPerBurst: 1;
+                        ErrorAngle: [0 0];
                         Name: Null;
                         Delay: [
                             100
                             100
                         ];
+                        UnderchargeAction: UnderchargeAction.Dissipate;
+                        OverchargeAction: OverchargeAction.Discharge;
                     };
-                    DefaultFaction: Factions [Player];
-                    DefaultController: Null;
-                    Name: "Player";
-                    AlwaysActive: False;
-                    IsPhysical: True;
-                    IgnoreTrace: False;
-                    States: {
-                        Idle: EntStateClass {
+                    CurrentAmmo: 300;
+                    NextShot: 0;
+                };
+                Name: "Player";
+                Position: [128 128];
+                Direction: [1 0];
+                Velocity: [0 0];
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
                             Name: Null;
-                            IsOverlay: False;
                             Sprite: Sprite {
                                 ElapsedTime: 0;
                                 FrameCount: 2;
@@ -52,46 +61,14 @@ Map {
                                 Width: 48;
                                 Height: 48;
                                 Size: [48 48];
-                                ClipRect: [0 0 96 144];
+                                ClipRect: [0 0 96 48];
                                 Origin: [24 24];
                                 Tween: TweenStyle.Overlap;
+                                ShrinkToFit: True;
                             };
                             Radius: 24;
                         };
-                    };
-                    DestroyIfDead: True;
-                    DestroyIfDeadAndInactive: False;
-                    AlwaysDrawUpright: False;
-                };
-                Faction: Factions [Player];
-                Controller: Null;
-                CurrentHealth: 500;
-                MaxSpeed: 400;
-                Weapon: GunInstance {
-                    Class: GunClass {
-                        Projectile: @"Defs/Entities/Missile.ent.tk";
-                        MaxAmmo: 300;
-                        Name: Null;
-                        Delay: [
-                            100
-                            100
-                        ];
-                    };
-                    CurrentAmmo: 300;
-                    nextShot: 0;
-                };
-                Radius: 24;
-                RadiusSq: 576;
-                Name: "Player";
-                Position: [128 128];
-                Direction: [1 0];
-                Velocity: [0 0];
-                State: {
-                    BaseState: EntStateInstance {
-                        StateId: EntStateId.Idle;
                         ElapsedTime: 0;
-                    };
-                    OverlaidStates: {
                     };
                     Transitions: {
                     };
@@ -119,92 +96,57 @@ Map {
                         ];
                         Name: Null;
                         Delay: [
-                            2000
-                            4000
+                            1000
+                            3000
                         ];
+                        UnderchargeAction: UnderchargeAction.Dissipate;
+                        OverchargeAction: OverchargeAction.Discharge;
                     };
                     SpawnQueue: [
                         @"Defs/Entities/InfectedCell.ent.tk"
                         @"Defs/Entities/InfectedCell.ent.tk"
                         @"Defs/Entities/InfectedCell.ent.tk"
-                        @"Defs/Entities/InfectedCell.ent.tk"
                     ];
-                    nextShot: 0;
+                    NextShot: 0;
                 };
-                Radius: 32;
-                RadiusSq: 1024;
                 Name: Null;
-                Position: [454 238];
-                Direction: [-1 0];
+                Position: [352 132];
+                Direction: [-0.9998852 -0.01514978];
                 Velocity: [0 0];
-                State: {
-                    BaseState: EntStateInstance {
-                        StateId: EntStateId.Idle;
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: Null;
+                            Sprite: Sprite {
+                                ElapsedTime: 21515.3895;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                TotalLength: 0.0001;
+                                IsLooping: False;
+                                Texture: "Data\\Textures/Entities/Spawner.png";
+                                Width: 64;
+                                Height: 64;
+                                Size: [64 64];
+                                ClipRect: [0 0 64 64];
+                                Origin: [32 32];
+                                Tween: TweenStyle.None;
+                                ShrinkToFit: True;
+                            };
+                            Radius: 32;
+                        };
                         ElapsedTime: 0;
-                    };
-                    OverlaidStates: {
                     };
                     Transitions: {
                     };
                 };
                 OutlineColor: [154 205 50 255];
-                SpawnTime: 14585.2878;
-            }
-            ActorInstance {
-                Class: @"Defs/Entities/Cyst.ent.tk";
-                Faction: Factions [Enemy];
-                Controller: ArtilleryController {
-                    MaxRange: 200;
-                    CanRotate: False;
-                    trackedActor: Null;
-                };
-                CurrentHealth: 1000;
-                MaxSpeed: 0;
-                Weapon: SpawnerInstance {
-                    Class: SpawnerClass {
-                        Spawns: [
-                            Tuple`2 {
-                                Item1: @"Defs/Entities/InfectedCell.ent.tk";
-                                Item2: [3 5];
-                            }
-                        ];
-                        Name: Null;
-                        Delay: [
-                            2000
-                            4000
-                        ];
-                    };
-                    SpawnQueue: [
-                        @"Defs/Entities/InfectedCell.ent.tk"
-                        @"Defs/Entities/InfectedCell.ent.tk"
-                        @"Defs/Entities/InfectedCell.ent.tk"
-                        @"Defs/Entities/InfectedCell.ent.tk"
-                    ];
-                    nextShot: 0;
-                };
-                Radius: 32;
-                RadiusSq: 1024;
-                Name: Null;
-                Position: [430 466];
-                Direction: [0.03075468 -0.999527];
-                Velocity: [0 0];
-                State: {
-                    BaseState: EntStateInstance {
-                        StateId: EntStateId.Idle;
-                        ElapsedTime: 0;
-                    };
-                    OverlaidStates: {
-                    };
-                    Transitions: {
-                    };
-                };
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 12217.0252;
+                SpawnTime: 7010.0703;
             }
         ];
-        FluidTypes: [];
-        Fluids: [];
-        elapsedTime: 16987.1488;
+        fluids: [];
+        elapsedTime: 10788.1289;
         timeScale: 1;
     };
 }

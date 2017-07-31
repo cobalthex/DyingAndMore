@@ -123,8 +123,7 @@ namespace DyingAndMore.Editor
 
                     if (InputState.IsMod(KeyMod.Shift))
                     {
-                        var snapAngle = MathHelper.ToRadians(editor.config.snapAngle);
-                        theta = (float)System.Math.Round(theta / snapAngle) * snapAngle;
+                        theta = (float)System.Math.Round(theta / editor.config.snapAngle) * editor.config.snapAngle;
                     }
 
                     if (InputState.IsPress(Keys.R))
@@ -195,17 +194,12 @@ namespace DyingAndMore.Editor
 
         bool SelectDecal(Vector2 worldPosition)
         {
-            //todo: improve
-
             //find closest decal
-            var mapSz = new Vector2(editor.Map.Width, editor.Map.Height);
-            var start = Vector2.Clamp((worldPosition / editor.Map.SectorPixelSize) - Vector2.One, Vector2.Zero, mapSz).ToPoint();
-            var end = Vector2.Clamp((worldPosition / editor.Map.SectorPixelSize) + Vector2.One, Vector2.Zero, mapSz).ToPoint();
+            var sectors = editor.Map.GetOverlappingSectors(new Rectangle((worldPosition - new Vector2(5)).ToPoint(), new Point(10)));
 
-            selectedDecal = null;
-            for (int y = start.Y; y < end.Y; ++y)
+            for (int y = sectors.Top; y < sectors.Bottom; ++y)
             {
-                for (int x = start.X; x < end.X; ++x)
+                for (int x = sectors.Left; x < sectors.Right; ++x)
                 {
                     for (var i = 0; i < editor.Map.Sectors[y, x].decals.Count; ++i)
                     {
@@ -226,6 +220,7 @@ namespace DyingAndMore.Editor
                     }
                 }
             }
+            selectedDecal = null;
             return false;
         }
     }

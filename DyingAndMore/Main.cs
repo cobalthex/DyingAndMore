@@ -52,7 +52,7 @@ namespace DyingAndMore
             using (DyingAndMoreGame game = new DyingAndMoreGame())
             {
 #if WINDOWS
-                System.Windows.Forms.Application.EnableVisualStyles();
+                //System.Windows.Forms.Application.EnableVisualStyles();
 #endif
                 game.Run();
             }
@@ -78,15 +78,17 @@ namespace DyingAndMore
         /// </summary>
         public DyingAndMoreGame()
         {
-            gdm = new GraphicsDeviceManager(this);
+            gdm = new GraphicsDeviceManager(this)
+            {
+                PreferredBackBufferWidth = 1280,
+                PreferredBackBufferHeight = 800,
+                PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
+                //PreferMultiSampling = true,
+                GraphicsProfile = GraphicsProfile.HiDef,
+            };
             gdm.DeviceCreated += GdmDeviceCreated;
-            gdm.PreferMultiSampling = true;
 
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps
-            gdm.PreferredBackBufferWidth = 1280;
-            gdm.PreferredBackBufferHeight = 800;
-            gdm.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
-            gdm.PreferMultiSampling = true;
             IsMouseVisible = true;
 
             IsFixedTimeStep = false;

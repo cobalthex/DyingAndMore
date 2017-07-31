@@ -78,14 +78,14 @@ namespace DyingAndMore.Editor
                         for (int x = sectors.Left; x < sectors.Right; ++x)
                         {
                             var sect = editor.Map.Sectors[y, x];
-                            for (var i = 0; i < sect.Fluids.Count; ++i)
+                            for (var i = 0; i < sect.fluids.Count; ++i)
                             {
-                                var Fluid = sect.Fluids[i];
+                                var Fluid = sect.fluids[i];
 
                                 if (Vector2.DistanceSquared(Fluid.position, currentWorldPos) < Fluid.Class.Radius * Fluid.Class.Radius)
                                 {
-                                    sect.Fluids[i] = sect.Fluids[sect.Fluids.Count - 1];
-                                    sect.Fluids.RemoveAt(sect.Fluids.Count - 1);
+                                    sect.fluids[i] = sect.fluids[sect.fluids.Count - 1];
+                                    sect.fluids.RemoveAt(sect.fluids.Count - 1);
                                     --i;
                                 }
                             }

@@ -264,7 +264,8 @@ namespace Takai.Game
             maxDistance *= maxDistance;
             fieldOfView = 1 - MathHelper.Clamp(fieldOfView / MathHelper.Pi, 0, 1);
 
-            //todo: move to use sectors
+            //todo: dda through each sector and build list
+            //todo: get rid of active ent and add lastUpdateTime to entities
 
             foreach (var ent in ActiveEnts)
             {

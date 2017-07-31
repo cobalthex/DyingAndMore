@@ -81,7 +81,9 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public int Id { get; private set; } = (nextId++); //todo: map-specific id
 
+        [Data.Serializer.Ignored]
         public float Radius => State.Instance?.Class?.Radius ?? 1; //todo: aggregate all sprites + cache
+        [Data.Serializer.Ignored]
         public float RadiusSq => Radius * Radius; //todo: cache
 
         /// <summary>
@@ -93,7 +95,8 @@ namespace Takai.Game
             set
             {
                 _class = value;
-                State.States = _class.States;
+                if (_class != null)
+                    State.States = _class.States;
             }
         }
         private EntityClass _class;
@@ -202,7 +205,7 @@ namespace Takai.Game
         /// <returns>The calculated extent</returns>
         public Point GetVisibleSize()
         {
-            return State.Instance.Class.Sprite.Size;
+            return State?.Instance?.Class?.Sprite?.Size ?? new Point(1);
         }
         Point lastVisibleSize;
 

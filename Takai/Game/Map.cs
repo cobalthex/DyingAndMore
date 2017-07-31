@@ -14,7 +14,7 @@ namespace Takai.Game
         public HashSet<EntityInstance> entities = new HashSet<EntityInstance>();
 
         //static
-        public List<FluidInstance> Fluids = new List<FluidInstance>();
+        public List<FluidInstance> fluids = new List<FluidInstance>();
         public List<Decal> decals = new List<Decal>();
         public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
     }
@@ -301,7 +301,7 @@ namespace Takai.Game
             if (velocity == Vector2.Zero)
             {
                 var sector = GetOverlappingSector(position);
-                Sectors[sector.Y, sector.X].Fluids.Add(new FluidInstance { position = position, velocity = velocity, Class = @class });
+                Sectors[sector.Y, sector.X].fluids.Add(new FluidInstance { position = position, velocity = velocity, Class = @class });
             }
             else
                 ActiveFluids.Add(new FluidInstance { position = position, velocity = velocity, Class = @class });

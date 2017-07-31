@@ -35,7 +35,7 @@ namespace DyingAndMore.Game.Weapons
             get => base.Class;
             set
             {
-                System.Diagnostics.Contracts.Contract.Assert(value is GunClass);
+                System.Diagnostics.Contracts.Contract.Assert(value == null || value is GunClass);
                 base.Class = value;
                 _Class = value as GunClass;
             }

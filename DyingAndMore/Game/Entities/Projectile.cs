@@ -34,7 +34,7 @@ namespace DyingAndMore.Game.Entities
             get => base.Class;
             set
             {
-                System.Diagnostics.Contracts.Contract.Assert(value is ProjectileClass);
+                System.Diagnostics.Contracts.Contract.Assert(value == null || value is ProjectileClass);
                 base.Class = value;
                 _Class = value as ProjectileClass;
 

@@ -265,9 +265,8 @@ namespace DyingAndMore.Editor
                     var diff = currentWorldPos - SelectedEntity.Position;
                     if (InputState.IsMod(KeyMod.Shift))
                     {
-                        var snapAngle = MathHelper.ToRadians(editor.config.snapAngle);
                         var theta = (float)System.Math.Atan2(diff.Y, diff.X);
-                        theta = (float)System.Math.Round(theta / snapAngle) * snapAngle;
+                        theta = (float)System.Math.Round(theta / editor.config.snapAngle) * editor.config.snapAngle;
                         SelectedEntity.Direction = new Vector2(
                             (float)System.Math.Cos(theta),
                             (float)System.Math.Sin(theta)

@@ -88,8 +88,8 @@ namespace Takai.Game
         }
         void Deserialize(Dictionary<string, object> Props)
         {
-            Tiles = new short[Height, Width];
             var tiles = Data.Serializer.Cast<List<short>>(Props["Tiles"]);
+            Tiles = new short[Height, Width];
             Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, Width * Height * sizeof(short));
 
             TilesPerRow = (TilesImage != null ? (TilesImage.Width / TileSize) : 0);
@@ -113,25 +113,14 @@ namespace Takai.Game
             if (Props.TryGetValue("State", out var state))
                 LoadState((MapState)state);
         }
-
-        /// <summary>
-        /// todo: use (future) built in class serialization
-        /// </summary>
-        struct FluidSave
-        {
-            public int Class;
-            public Vector2 position;
-            public Vector2 velocity;
-        }
-
+        
         /// <summary>
         /// A temporary struct for organizing state data to be serialized
         /// </summary>
         struct MapState
         {
             public List<EntityInstance> entities;
-            public List<FluidClass> FluidTypes;
-            public List<FluidSave> Fluids;
+            public List<FluidInstance> fluids;
 
             public TimeSpan elapsedTime;
             public float timeScale;
@@ -139,8 +128,7 @@ namespace Takai.Game
             public MapState(Map Map)
             {
                 entities = new List<EntityInstance>(Map.AllEntities);
-                FluidTypes = new List<FluidClass>();
-                Fluids = new List<FluidSave>();
+                fluids = new List<FluidInstance>();
                 elapsedTime = Map.ElapsedTime;
                 timeScale = Map.TimeScale;
 
@@ -148,38 +136,12 @@ namespace Takai.Game
 
                 var classIndices = new Dictionary<FluidClass, int>();
 
-                foreach (var Fluid in Map.ActiveFluids)
-                {
-                    var CLASSES = Fluid.Class;
-                    if (!classIndices.TryGetValue(CLASSES, out var index))
-                    {
-                        index = FluidTypes.Count;
-                        FluidTypes.Add(CLASSES);
-                        classIndices.Add(CLASSES, index);
-                    }
-                    Fluids.Add(new FluidSave { Class = index, position = Fluid.position, velocity = Fluid.velocity });
-                }
+                fluids.AddRange(Map.ActiveFluids);
 
                 foreach (var sector in (System.Collections.IEnumerable)Map.Sectors)
                 {
                     var s = (MapSector)sector;
-
-                    foreach (var Fluid in s.Fluids)
-                    {
-                        var type = Fluid.Class;
-                        if (!classIndices.TryGetValue(type, out var index))
-                        {
-                            index = FluidTypes.Count;
-                            FluidTypes.Add(type);
-                            classIndices.Add(type, index);
-                        }
-                        Fluids.Add(new FluidSave
-                        {
-                            Class = index,
-                            position = Fluid.position,
-                            velocity = Fluid.velocity
-                        });
-                    }
+                    fluids.AddRange(s.fluids);
                 }
             }
         }
@@ -217,20 +179,8 @@ namespace Takai.Game
                 foreach (var ent in State.entities)
                     Spawn(ent);
             }
-
-            var fluidClasses = new Dictionary<int, FluidClass>();
-            for (var i = 0; i < State.FluidTypes?.Count; ++i)
-                fluidClasses[i] = State.FluidTypes[i];
-
-            ActiveFluids = State.Fluids?.Select((FluidSave Save) =>
-            {
-                return new FluidInstance
-                {
-                    Class = fluidClasses[Save.Class],
-                    position = Save.position,
-                    velocity = Save.velocity
-                };
-            }).ToList() ?? new List<FluidInstance>();
+            
+            ActiveFluids = State.fluids;
 
             TimeScale = State.timeScale == 0 ? 1 : State.timeScale;
             ElapsedTime = State.elapsedTime;
