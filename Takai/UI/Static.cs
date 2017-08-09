@@ -23,6 +23,8 @@ namespace Takai.UI
         public Vector2 position;
     }
 
+    //todo: invalidation/dirty states, instead of reflow each time property is updated, mark dirty. On next update, reflow if dirty
+
     /// <summary>
     /// The basic UI element
     /// </summary>

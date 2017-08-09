@@ -14,22 +14,58 @@ namespace Takai.Game
         /// <summary>
         /// Build the tiles mask
         /// </summary>
-        /// <param name="Texture">The source texture to use</param>
+        /// <param name="texture">The source texture to use</param>
         /// <param name="UseAlpha">Use alpha instead of color value</param>
         /// <remarks>Values with luma/alpha < 0.5 are off and all others are on</remarks>
-        public void BuildTileMask(Texture2D Texture, bool UseAlpha = false)
+        public void BuildTileMask(Texture2D texture, bool UseAlpha = true)
         {
-            Color[] pixels = new Color[Texture.Width * Texture.Height];
-            Texture.GetData(pixels);
+            Color[] pixels = new Color[texture.Width * texture.Height];
+            texture.GetData(pixels);
 
-            CollisionMask = new System.Collections.BitArray(Texture.Height * Texture.Width);
-            for (var i = 0; i < pixels.Length; ++i)
+            CollisionMask = new System.Collections.BitArray(texture.Width * texture.Height);
+            for (var y = 0; y < texture.Height; ++y)
             {
-                if (UseAlpha)
-                    CollisionMask[i] = pixels[i].A > 127;
-                else
-                    CollisionMask[i] = (pixels[i].R + pixels[i].G + pixels[i].B) / 3 > 127;
+                for (var x = 0; x < texture.Width; ++x)
+                {
+                    var i = x + (y) * texture.Width; //flip Y
+                    if (UseAlpha)
+                        CollisionMask[x + y * texture.Width] = pixels[i].A > 127;
+                    else
+                        CollisionMask[x + y * texture.Width] = (pixels[i].R + pixels[i].G + pixels[i].B) / 3 > 127;
+                }
             }
+
+            /*
+            //save as tga
+            using (var fs = new FileStream("collision.tga", FileMode.Create))
+            {
+                fs.WriteByte(0);
+                fs.WriteByte(0);
+                fs.WriteByte(3);
+                var bytes = new byte[5 + 4];
+                fs.Write(bytes, 0, bytes.Length);
+
+                bytes = BitConverter.GetBytes((short)texture.Width);
+                fs.Write(bytes, 0, bytes.Length);
+                bytes = BitConverter.GetBytes((short)texture.Height);
+                fs.Write(bytes, 0, bytes.Length);
+
+                fs.WriteByte(8); //bpp
+                fs.WriteByte(0);
+
+                //bytes = new byte[CollisionMask.Length / 8 + (CollisionMask.Length % 8 == 0 ? 0 : 1)];
+                //CollisionMask.CopyTo(bytes, 0);
+                //fs.Write(bytes, 0, bytes.Length);
+
+                for (var y = 0; y < texture.Height; ++y)
+                {
+                    for (var x = 0; x < texture.Width; ++x)
+                    {
+                        fs.WriteByte(CollisionMask[x + y * texture.Width] ? (byte)255 : (byte)0);
+                    }
+                }
+            }
+            */
         }
 
         /// <summary>

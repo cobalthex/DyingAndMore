@@ -274,7 +274,7 @@ namespace Takai.Game
         //}
 
         /// <summary>
-        /// Traca line and check for collisions with entities and the map. Uses PotentialVisibleSet (same rules apply)
+        /// Trace a line and check for collisions with entities and the map. Uses PotentialVisibleSet (same rules apply)
         /// </summary>
         /// <param name="start">The starting position to search</param>
         /// <param name="direction">The direction to search from</param>
@@ -294,12 +294,12 @@ namespace Takai.Game
             var target = start + direction * maxDistance;
             //todo: clip target at map bounds
 
-            var stepSize = 5;
+            var stepSize = 3;
 
             var pos = start;
-            var diff = (target - start);
-            var n = MathHelper.Max(System.Math.Abs(diff.X), System.Math.Abs(diff.Y)) / stepSize;
-            var delta = Vector2.Normalize(diff) * stepSize;
+            var delta = (target - start);
+            var n = MathHelper.Max(System.Math.Abs(delta.X), System.Math.Abs(delta.Y)) / stepSize;
+            var dpos = Vector2.Normalize(delta) * stepSize;
 
             for (int i = 0; i < n; ++i)
             {
@@ -325,13 +325,10 @@ namespace Takai.Game
                     return true;
                 }
 
-                var relPos = new Point((int)pos.X % TileSize, (int)pos.Y % TileSize);
-                var mask = relPos.X + (relPos.Y * TilesImage.Width);
-                mask += (tile % TilesPerRow) * TileSize;
-                mask += (tile / TilesPerRow) * TileSize * TilesImage.Width;
+                var mask = (tile * TileSize) + ((tile / TilesPerRow) * TileSize);
+                mask += (((int)pos.Y % TileSize) * TilesImage.Width) + ((int)pos.X % TileSize);
 
-                var collis = CollisionMask[mask];
-                if (!collis)
+                if (!CollisionMask[mask])
                 {
                     hit = new TraceHit()
                     {
@@ -341,8 +338,8 @@ namespace Takai.Game
                     return true;
                 }
 
-                //DrawRect(new Rectangle((int)pos.X, (int)pos.Y, 1, 1), Color.MintCream);
-                pos += delta;
+                DrawRect(new Rectangle((int)pos.X, (int)pos.Y, 1, 1), Color.MintCream);
+                pos += dpos;
             }
 
             hit = new TraceHit();

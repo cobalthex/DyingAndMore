@@ -140,7 +140,7 @@ namespace DyingAndMore
             var map = new Takai.Game.Map()
             {
                 Tiles = new short[8, 8],
-                TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/tiles.png"),
+                TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles2.png"),
                 TileSize = 48,
             };
             map.BuildTileMask(map.TilesImage, true);

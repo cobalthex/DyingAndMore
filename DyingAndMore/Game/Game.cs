@@ -85,13 +85,15 @@ namespace DyingAndMore.Game
         {
             Map.updateSettings = Takai.Game.MapUpdateSettings.Game;
             Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
-            Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawGrids;
+            //Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawGrids;
             Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawTriggers;
 
-            player = Map.FindEntitiesByClassName("player")[0] as Entities.ActorInstance;
-            if (player != null)
+            var possibles = Map.FindEntitiesByClassName("player");
+            if (possibles.Count > 0)
+            {
+                player = possibles[0] as Entities.ActorInstance;
                 player.Controller = new Entities.InputController();
-
+            }
             Map.ActiveCamera = new Takai.Game.Camera(player);
 
             var testScript = new Scripts.TestScript()
@@ -101,9 +103,11 @@ namespace DyingAndMore.Game
             };
             Map.AddScript(testScript);
 
+            //Map.Tiles[0, 0] = 9;
+
             //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
         }
-
+        
         protected override void UpdateSelf(GameTime time)
         {
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
@@ -111,12 +115,6 @@ namespace DyingAndMore.Game
 
             crapDisplay.Text = $"TimeScale:{Map.TimeScale}";
             crapDisplay.AutoSize();
-
-            var scrollDelta = InputState.ScrollDelta();
-            if (InputState.IsMod(KeyMod.Control) && scrollDelta != 0)
-            {
-                Map.TimeScale += System.Math.Sign(scrollDelta) * 0.1f;
-            }
 
             Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
@@ -146,6 +144,16 @@ namespace DyingAndMore.Game
                 ToggleRenderSettingsConsole();
                 return false;
             }
+
+            var scrollDelta = InputState.ScrollDelta();
+            if (scrollDelta != 0)
+            {
+                if (InputState.IsMod(KeyMod.Control))
+                    Map.TimeScale += System.Math.Sign(scrollDelta) * 0.1f;
+                else
+                    Map.ActiveCamera.Scale += System.Math.Sign(scrollDelta) * 0.1f;
+            }
+
 
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.O))
             {
@@ -220,13 +228,6 @@ namespace DyingAndMore.Game
             base.DrawSelf(spriteBatch);
 
             DefaultFont.Draw(spriteBatch, $"Total entities:{Map.TotalEntitiesCount}", new Vector2(20), Color.Orange);
-
-            Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
-            if (player != null)
-            {
-                var line = Map.TraceLine(player.Position, player.Direction, out var hit, 1000);
-                //Map.DrawLine(player.Position, player.Position + player.Direction * hit.distance, Color.White);
-            }
         }
     }
 }
