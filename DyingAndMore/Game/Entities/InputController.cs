@@ -9,6 +9,9 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(System.TimeSpan DeltaTime)
         {
+            if (actor.Map.TraceLine(actor.Position, actor.Direction, out var hit))
+                actor.Map.DrawLine(actor.Position, actor.Position + actor.Direction * hit.distance, Color.Aquamarine);
+
             var d = Vector2.Zero;
             if (Takai.Input.InputState.IsButtonDown(Keys.A))
                 d -= Vector2.UnitX;

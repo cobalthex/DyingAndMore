@@ -42,16 +42,16 @@ namespace DyingAndMore.Game.Entities
                 {
                     { Vector2.DistanceSquared(actor.Position, trackedActor.Position), trackedActor }
                 };
-                if (actor.Map.TraceLine(actor.Position, actor.Direction, out var hit, MaxRange, filter))
-                {
-                    //todo: maybe shoot w/ lead (shoot out in front of target's velocity)
-                    if (CanRotate)
-                        actor.Direction = Vector2.Normalize(trackedActor.Position - actor.Position); //todo: slerp
-                    actor.FireWeapon();
-                    actor.Map.DrawLine(actor.Position, actor.Position + actor.Direction * MaxRange, Color.Orange);
-                }
-                else
-                    trackedActor = null;
+                //if (actor.Map.TraceLine(actor.Position, actor.Direction, out var hit, MaxRange, filter))
+                //{
+                //    //todo: maybe shoot w/ lead (shoot out in front of target's velocity)
+                //    if (CanRotate)
+                //        actor.Direction = Vector2.Normalize(trackedActor.Position - actor.Position); //todo: slerp
+                //    actor.FireWeapon();
+                //    actor.Map.DrawLine(actor.Position, actor.Position + actor.Direction * MaxRange, Color.Orange);
+                //}
+                //else
+                //    trackedActor = null;
             }
             else
             {
