@@ -85,8 +85,9 @@ namespace DyingAndMore.Game
         {
             Map.updateSettings = Takai.Game.MapUpdateSettings.Game;
             Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
-            //Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawGrids;
+            Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawGrids;
             Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawTriggers;
+            Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawEntBoundingBoxes;
 
             var possibles = Map.FindEntitiesByClassName("player");
             if (possibles.Count > 0)

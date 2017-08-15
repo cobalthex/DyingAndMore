@@ -131,11 +131,16 @@ namespace DyingAndMore.Game.Entities
         {
             if (Class != null)
             {
-                MaxSpeed        = RandomRange.Next(_Class.MaxSpeed);
-                CurrentHealth   = _Class.MaxHealth;
-                Weapon          = _Class.DefaultWeapon?.Create();
-                Faction         = _Class.DefaultFaction;
-                Controller      = _Class.DefaultController;
+                MaxSpeed      = RandomRange.Next(_Class.MaxSpeed);
+                CurrentHealth = _Class.MaxHealth;
+                Weapon        = _Class.DefaultWeapon?.Create();
+                Faction       = _Class.DefaultFaction;
+
+                if (_Class.DefaultController != null)
+                {
+                    Controller = (Controller)_Class.DefaultController.Clone();
+                    Controller.actor = this;
+                }
             }
         }
 

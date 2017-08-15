@@ -5,7 +5,7 @@ ActorClass {
     DefaultController: ArtilleryController {
         CanRotate: false;
     };
-    FieldOfView: 3.14159;
+    FieldOfView: 45deg;
 
     #launch force?
 
