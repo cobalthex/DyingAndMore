@@ -24,6 +24,10 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public ActorInstance trackedActor;
 
+        public bool ShowSweepLines { get; set; } = true;
+
+        protected int sweepLines = 6;
+
         public override void Think(TimeSpan deltaTime)
         {
             if (actor.State.State != Takai.Game.EntStateId.Idle)
@@ -37,21 +41,18 @@ namespace DyingAndMore.Game.Entities
 
             if (trackedActor != null)
             {
-                //todo: find more efficient test if possible
-                var filter = new System.Collections.Generic.SortedDictionary<float, Takai.Game.EntityInstance>
+                var hit = actor.Map.TraceLine(actor.Position, actor.Direction, MaxRange);
+
+                if (hit.entity != null)
                 {
-                    { Vector2.DistanceSquared(actor.Position, trackedActor.Position), trackedActor }
-                };
-                //if (actor.Map.TraceLine(actor.Position, actor.Direction, out var hit, MaxRange, filter))
-                //{
-                //    //todo: maybe shoot w/ lead (shoot out in front of target's velocity)
-                //    if (CanRotate)
-                //        actor.Direction = Vector2.Normalize(trackedActor.Position - actor.Position); //todo: slerp
-                //    actor.FireWeapon();
-                //    actor.Map.DrawLine(actor.Position, actor.Position + actor.Direction * MaxRange, Color.Orange);
-                //}
-                //else
-                //    trackedActor = null;
+                    //todo: maybe shoot w/ lead (shoot out in front of target's velocity)
+                    if (CanRotate)
+                        actor.Direction = Vector2.Normalize(trackedActor.Position - actor.Position); //todo: slerp
+                    actor.FireWeapon();
+                    actor.Map.DrawLine(actor.Position, actor.Position + actor.Direction * MaxRange, Color.Orange);
+                }
+                else
+                    trackedActor = null;
             }
             else
             {
@@ -63,6 +64,45 @@ namespace DyingAndMore.Game.Entities
                     {
                         trackedActor = nearbyActor;
                         break;
+                    }
+                }
+
+                //scanning rays
+                if (ShowSweepLines)
+                {
+                    void ScanRay(Vector2 direction, Color color)
+                    {
+                        var hit = actor.Map.TraceLine(actor.Position, direction, MaxRange);
+                        actor.Map.DrawLine(actor.Position, actor.Position + direction * hit.distance, color);
+                    }
+                    Vector2 TransformDirection(float radians)
+                    {
+                        return Vector2.TransformNormal(
+                            actor.Direction,
+                            Matrix.CreateRotationZ(radians)
+                        );
+                    }
+
+                    var fov = ((ActorClass)actor.Class).FieldOfView / 2;
+
+                    //edges
+                    ScanRay(TransformDirection(-fov), Color.Aquamarine);
+                    ScanRay(TransformDirection( fov), Color.Aquamarine);
+
+                    //how far apart the sweep lines are
+                    //maintain a consistent angle regardless of fov
+                    var phase = (MathHelper.Pi / 24) / fov;
+
+                    //todo: consistent speed regardless of fov
+
+                    for (int i = 0; i < sweepLines; ++i)
+                    {
+                        var step = (float)Math.Sin(
+                            (actor.Map.ElapsedTime.TotalSeconds * 2)
+                            - (phase * i)
+                        ) * fov;
+
+                        ScanRay(TransformDirection(step), Color.MediumAquamarine);
                     }
                 }
             }

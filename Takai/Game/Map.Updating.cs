@@ -156,25 +156,22 @@ namespace Takai.Game
                             var targetCell = (targetPos / tileSize).ToPoint();
 
                             //entity collision
-                            bool didCollide = TraceLine(startPos, direction, out var hit, deltaVLen);
-
-                            if (didCollide)
+                            var hit = TraceLine(startPos, direction, deltaVLen);
+                            
+                            if (hit.entity != null)
                             {
-                                if (hit.entity != null)
-                                {
-                                    ent.OnEntityCollision(hit.entity, startPos + (direction * hit.distance), deltaTime);
-                                    hit.entity.OnEntityCollision(ent, startPos + (direction * hit.distance), deltaTime);
+                                ent.OnEntityCollision(hit.entity, startPos + (direction * hit.distance), deltaTime);
+                                hit.entity.OnEntityCollision(ent, startPos + (direction * hit.distance), deltaTime);
 
-                                    if (ent.Class.IsPhysical)
-                                        ent.Velocity = Vector2.Zero;
-                                }
-                                else
-                                {
-                                    ent.OnMapCollision(targetCell, startPos + (direction * hit.distance), deltaTime); //todo: update w/ correct tile
-
-                                    //improve
+                                if (ent.Class.IsPhysical)
                                     ent.Velocity = Vector2.Zero;
-                                }
+                            }
+                            else if (hit.distance < deltaVLen)
+                            {
+                                ent.OnMapCollision(targetCell, startPos + (direction * hit.distance), deltaTime); //todo: update w/ correct tile
+
+                                //improve
+                                ent.Velocity = Vector2.Zero;
                             }
 
                             //Fluid collision

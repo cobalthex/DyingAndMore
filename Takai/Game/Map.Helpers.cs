@@ -253,46 +253,80 @@ namespace Takai.Game
         public struct TraceHit
         {
             public float distance;
-            public EntityInstance entity;
+            public EntityInstance entity; //null if collided with map
         }
 
-        //bool Intersects(Rectangle rect, Vector2 rayOrigin, Vector2 rayDirection)
-        //{
-        //    var tx1 = (rect.Left - rayOrigin.X) * r.n_inv.x;
-        //    var tx2 = (rect.Right - rayOrigin.X) * r.n_inv.x;
+        public bool Intersects(Vector2 circleOrigin, float radiusSq, Vector2 rayOrigin, Vector2 rayDirection, out float t0, out float t1)
+        {
+            //fast check (won't set t)
+            //var rejection = Util.Reject(circleOrigin - lineStart, lineEnd - lineStart);
+            //return rejection.LengthSquared() < radiusSq;
+            
+            var d = rayOrigin - circleOrigin;
+            var c = Vector2.Dot(d, d) - radiusSq;
+            var b = Vector2.Dot(d, rayDirection);
+            var a = Vector2.Dot(rayDirection, rayDirection); //1 if normalized
 
-        //    var tmin = System.Math.Min(tx1, tx2);
-        //    var tmax = System.Math.Max(tx1, tx2);
+            float disc = b * b - a * c;
+            if (disc < 0.0f)
+            {
+                t0 = t1 = 0;
+                return false;
+            }
 
-        //    var ty1 = (rect.Top - rayOrigin.Y) * r.n_inv.y;
-        //    var ty2 = (rect.Bottom - rayOrigin.Y) * r.n_inv.y;
+            float sqrtDisc = (float)System.Math.Sqrt(disc);
+            float invA = 1 / a;
+         
+            t0 = (-b - sqrtDisc) * invA;
+            t1 = (-b + sqrtDisc) * invA;
 
-        //    tmin = System.Math.Max(tmin, System.Math.Min(ty1, ty2));
-        //    tmax = System.Math.Min(tmax, System.Math.Max(ty1, ty2));
+            return true;
+            
+            //collisions = rayOrigin + t * rayDirection
+            //normals = (collisions - c) * (1 / radius)
+        }
 
-        //    return tmax >= tmin;
-        //}
+        public bool Intersects(Rectangle rect, Vector2 rayOrigin, Vector2 rayDirection)
+        {
+            return false;
+            //todo
+
+            //var tx1 = (rect.Left - rayOrigin.X) * r.n_inv.x;
+            //var tx2 = (rect.Right - rayOrigin.X) * r.n_inv.x;
+
+            //var tmin = System.Math.Min(tx1, tx2);
+            //var tmax = System.Math.Max(tx1, tx2);
+
+            //var ty1 = (rect.Top - rayOrigin.Y) * r.n_inv.y;
+            //var ty2 = (rect.Bottom - rayOrigin.Y) * r.n_inv.y;
+
+            //tmin = System.Math.Max(tmin, System.Math.Min(ty1, ty2));
+            //tmax = System.Math.Min(tmax, System.Math.Max(ty1, ty2));
+
+            //return tmax >= tmin;
+        }
 
         /// <summary>
-        /// Traca line and check for collisions with entities and the map. Uses PotentialVisibleSet (same rules apply)
+        /// Traca line and check for collisions with entities and the map
         /// </summary>
         /// <param name="start">The starting position to search</param>
         /// <param name="direction">The direction to search from</param>
-        /// <param name="hit">Collision info, if collision exists</param>
         /// <param name="maxDistance">The maximum search distance</param>
         /// <param name="entsFilter">
         /// Provide an explicit list of entities to search through
         /// Key should be the squared distance between start and the entity
         /// If null, uses PotentialVisibleSet()
         /// </param>
-        /// <returns>True if there was a collision</returns>
-        public bool TraceLine(Vector2 start, Vector2 direction, out TraceHit hit, float maxDistance = 0)
+        /// <returns>The collision</returns>
+        public TraceHit TraceLine(Vector2 start, Vector2 direction, float maxDistance = 0)
         {
             if (maxDistance == 0)
                 maxDistance = 10000;
 
             var target = start + direction * maxDistance;
             //todo: clip target at map bounds
+            
+            //IEnumerator<EntityInstance> sectorEnum = null;
 
             var stepSize = 5;
 
@@ -306,23 +340,25 @@ namespace Takai.Game
                 //todo: move to pre-calc
                 if (!IsInside(pos))
                 {
-                    hit = new TraceHit()
+                    return new TraceHit()
                     {
                         distance = (pos - start).Length(),
                         entity = null
                     };
-                    return true;
                 }
+
+                //search ents
+
+                //var rejection = Util.Reject(entDiff, diff)
 
                 var tile = Tiles[(int)pos.Y / TileSize, (int)pos.X / TileSize];
                 if (tile == -1)
                 {
-                    hit = new TraceHit()
+                    return new TraceHit()
                     {
                         distance = (pos - start).Length(),
                         entity = null
                     };
-                    return true;
                 }
 
                 var relPos = new Point((int)pos.X % TileSize, (int)pos.Y % TileSize);
@@ -333,20 +369,22 @@ namespace Takai.Game
                 var collis = CollisionMask[mask];
                 if (!collis)
                 {
-                    hit = new TraceHit()
+                    return new TraceHit()
                     {
                         distance = (pos - start).Length(),
                         entity = null
                     };
-                    return true;
                 }
 
                 //DrawRect(new Rectangle((int)pos.X, (int)pos.Y, 1, 1), Color.MintCream);
                 pos += delta;
             }
 
-            hit = new TraceHit();
-            return false;
+            return new TraceHit()
+            {
+                distance = maxDistance, //infinity?
+                entity = null
+            };
         }
     }
 }

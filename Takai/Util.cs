@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 
 namespace Takai
 {
@@ -18,6 +15,13 @@ namespace Takai
                 Array.Copy(original, i * original.GetLength(0), newArray, i * newArray.GetLength(0), minRows);
 
             return newArray;
+        }
+
+        public static Vector2 Reject(this Vector2 a, Vector2 b)
+        {
+            var ab = Vector2.Dot(a, b);
+            var bb = Vector2.Dot(b, b);
+            return a - (b * (ab / bb));
         }
     }
 }
