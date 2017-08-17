@@ -156,7 +156,7 @@ namespace Takai.Game
                             var targetCell = (targetPos / tileSize).ToPoint();
 
                             //entity collision
-                            var hit = TraceLine(startPos, direction, deltaVLen);
+                            var hit = Trace(startPos, direction, deltaVLen);
                             
                             if (hit.entity != null)
                             {
