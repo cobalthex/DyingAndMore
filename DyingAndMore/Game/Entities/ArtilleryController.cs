@@ -41,7 +41,7 @@ namespace DyingAndMore.Game.Entities
 
             if (trackedActor != null)
             {
-                var hit = actor.Map.TraceLine(actor.Position, actor.Direction, MaxRange);
+                var hit = actor.Map.Trace(actor.Position, actor.Direction, MaxRange);
 
                 if (hit.entity != null)
                 {
@@ -72,7 +72,7 @@ namespace DyingAndMore.Game.Entities
                 {
                     void ScanRay(Vector2 direction, Color color)
                     {
-                        var hit = actor.Map.TraceLine(actor.Position, direction, MaxRange);
+                        var hit = actor.Map.Trace(actor.Position, direction, MaxRange);
                         actor.Map.DrawLine(actor.Position, actor.Position + direction * hit.distance, color);
                     }
                     Vector2 TransformDirection(float radians)

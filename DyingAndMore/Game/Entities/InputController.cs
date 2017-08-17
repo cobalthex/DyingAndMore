@@ -10,26 +10,12 @@ namespace DyingAndMore.Game.Entities
         public override void Think(System.TimeSpan DeltaTime)
         {
             var color = Color.MediumAquamarine;
-            var dist = 1000f;
 
-            if (actor.Map.ActiveEnts.Count > 1)
-            {
-                var nextActor = actor.Map.ActiveEnts.GetEnumerator();
-                nextActor.MoveNext();
-                nextActor.MoveNext();
-                if (actor.Map.Intersects(
-                    nextActor.Current.Position,
-                    nextActor.Current.RadiusSq,
-                    actor.Position,
-                    actor.Direction,
-                    out float t0, out float t1))
-                {
-                    dist = t0;
-                    color = Color.Tomato;
-                }
-            }
+            var trace = actor.Map.Trace(actor.Position, actor.Direction);
+            if (trace.entity != null)
+                color = Color.Tomato;
 
-            actor.Map.DrawLine(actor.Position, actor.Position + actor.Direction * dist, color);
+            actor.Map.DrawLine(actor.Position, actor.Position + actor.Direction * trace.distance, color);
 
             var d = Vector2.Zero;
             if (Takai.Input.InputState.IsButtonDown(Keys.W))
