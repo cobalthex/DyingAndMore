@@ -68,13 +68,11 @@ namespace DyingAndMore.Game.Weapons
                 _Class.UnderchargeAction == UnderchargeAction.Dissipate)
                 return;
 
-            var speed = _Class.Projectile.Power;
-            Actor.Map.Spawn(
-                _Class.Projectile,
-                Actor.Position + Actor.Direction * (Actor.Radius + 10),
-                Actor.Direction,
-                Actor.Direction * speed
-            );
+            var projectile = _Class.Projectile.Create();
+            projectile.Position = Actor.Position + (Actor.Direction * (Actor.Radius + projectile.Radius + 1));
+            projectile.Direction = Actor.Direction;
+            projectile.Velocity = Actor.Direction * _Class.Projectile.Power;
+            Actor.Map.Spawn(projectile);
 
             base.Discharge();
         }

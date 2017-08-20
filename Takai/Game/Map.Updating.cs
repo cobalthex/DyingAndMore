@@ -151,38 +151,39 @@ namespace Takai.Game
                             var deltaVLen = deltaV.Length();
 
                             var direction = deltaV / deltaVLen;
-                            var startPos = ent.Position + (ent.Radius * direction);
-                            var targetPos = startPos + deltaV;
-                            var targetCell = (targetPos / tileSize).ToPoint();
 
                             //entity collision
-                            var hit = Trace(startPos, direction, deltaVLen);
+                            var start = ent.Position + ((ent.Radius + 1) * direction);
+                            var hit = Trace(start, direction, deltaVLen, ent);
+                            var target = start + (direction * hit.distance);
+                            DrawLine(start, target, Color.Yellow);
                             
                             if (hit.entity != null)
                             {
-                                ent.OnEntityCollision(hit.entity, startPos + (direction * hit.distance), deltaTime);
-                                hit.entity.OnEntityCollision(ent, startPos + (direction * hit.distance), deltaTime);
+                                ent.OnEntityCollision(hit.entity, target, deltaTime);
+                                hit.entity.OnEntityCollision(ent, target, deltaTime);
 
                                 if (ent.Class.IsPhysical)
                                     ent.Velocity = Vector2.Zero;
                             }
-                            else if (hit.distance < deltaVLen)
+                            else if (Math.Abs(hit.distance - deltaVLen) > 0.5f)
                             {
-                                ent.OnMapCollision(targetCell, startPos + (direction * hit.distance), deltaTime); //todo: update w/ correct tile
+                                ent.OnMapCollision((target / TileSize).ToPoint(), target, deltaTime);
 
                                 //improve
-                                ent.Velocity = Vector2.Zero;
+                                ent.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * ent.Velocity;
                             }
 
                             //Fluid collision
-                            if (!ent.Class.IgnoreTrace && false) //todo
+                            if (!ent.Class.IgnoreTrace)
                             {
                                 var drag = 0f;
                                 var dc = 0u;
-                                var sector = Sectors[targetCell.Y / SectorSize, targetCell.X / SectorSize];
+                                var targetSector = GetOverlappingSector(target);
+                                var sector = Sectors[targetSector.Y, targetSector.X];
                                 foreach (var fluid in sector.fluids)
                                 {
-                                    if (Vector2.DistanceSquared(fluid.position, targetPos) <= (fluid.Class.Radius * fluid.Class.Radius) + ent.RadiusSq)
+                                    if (Vector2.DistanceSquared(fluid.position, target) <= (fluid.Class.Radius * fluid.Class.Radius) + ent.RadiusSq)
                                     {
                                         drag += fluid.Class.Drag;
                                         ++dc;
