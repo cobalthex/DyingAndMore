@@ -336,8 +336,9 @@ namespace Takai.Game
         /// <param name="start">Where to start the search</param>
         /// <param name="direction">What direction to search</param>
         /// <param name="maxDistance">The total distance to search0</param>
+        /// <param name="ignored">Any entities to ignore when searching</param>
         /// <returns>The collision. Entity is null if tilemap collision</returns>
-        public TraceHit Trace(Vector2 start, Vector2 direction, float maxDistance = 0)
+        public TraceHit Trace(Vector2 start, Vector2 direction, float maxDistance = 0, EntityInstance ignored = null)
         {
             if (maxDistance <= 0) //support flipping?
                 maxDistance = 10000;
@@ -350,18 +351,17 @@ namespace Takai.Game
 
             int n = 0;
             if (System.Math.Abs(sectorDiff.X) > System.Math.Abs(sectorDiff.Y))
-                n = (int)System.Math.Abs(sectorDiff.X);
+                n = (int)System.Math.Ceiling(System.Math.Abs(sectorDiff.X));
             else
-                n = (int)System.Math.Abs(sectorDiff.Y);
+                n = (int)System.Math.Ceiling(System.Math.Abs(sectorDiff.Y));
 
             var sectorDelta = sectorDiff / n;
 
             //todo: visited ents?
-
+            
             for (int i = 0; i < n; ++i)
             {
-                if (!new Rectangle(0, 0, Sectors.GetLength(1), Sectors.GetLength(0))
-                    .Contains(sectorPos.ToPoint()))
+                if (!new Rectangle(0, 0, Sectors.GetLength(1), Sectors.GetLength(0)).Contains(sectorPos.ToPoint()))
                     break;
 
                 var sector = Sectors[(int)sectorPos.Y, (int)sectorPos.X];
@@ -370,15 +370,17 @@ namespace Takai.Game
                 var shortestDist = float.MaxValue;
                 foreach (var ent in sector.entities)
                 {
-                    if (ent.Position != start &&
-                        Intersects(ent.Position, ent.RadiusSq, start, direction, out var t0, out var t1) && t0 < shortestDist)
+                    if (!ent.Class.IgnoreTrace &&
+                        ent != ignored &&
+                        Intersects(ent.Position, ent.RadiusSq, start, direction, out var t0, out var t1) && //todo: maybe add source ent radius to search
+                        t0 < shortestDist)
                     {
                         shortest = ent;
-                        shortestDist = t0;
+                        shortestDist = (System.Math.Abs(t0) < System.Math.Abs(t1) ? t0 : t1); //todo: better way?
                     }
                 }
 
-                if (shortest != null)
+                if (shortest != null && shortestDist <= maxDistance)
                 {
                     var target = start + direction * shortestDist;
                     var trace = TraceTiles(start, target);
