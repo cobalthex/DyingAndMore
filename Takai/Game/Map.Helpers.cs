@@ -256,15 +256,37 @@ namespace Takai.Game
             public EntityInstance entity; //null if collided with map
         }
 
-        public bool Intersects(Vector2 circleOrigin, float radiusSq, Vector2 rayOrigin, Vector2 rayDirection, out float t0, out float t1)
+        public bool Intersects(Vector2 circle, float radiusSq, Vector2 rayOrigin, Vector2 rayDirection, out float t0, out float t1)
         {
             //fast check (won't set t)
             //var rejection = Util.Reject(circleOrigin - lineStart, lineEnd - lineStart);
             //return rejection.LengthSquared() < radiusSq;
 
-            var d = rayOrigin - circleOrigin;
+            var diff = circle - rayOrigin;
+            var lf = Vector2.Dot(rayDirection, diff);
+            var s = radiusSq - Vector2.Dot(diff, diff) + (lf * lf);
+
+            if (s < 0)
+            {
+                t0 = t1 = 0;
+                return false;
+            }
+
+            s = (float)System.Math.Sqrt(s);
+            t0 = lf - s;
+            t1 = lf + s;
+            return t0 > 0;
+
+            //alternate, more complex solution (uses quadratic formula)
+
+            //D = ray direction, ∆ = ray origin - circle origin, R = circle radius
+            // δ = (D · ∆)² − |D|² * (|∆|² - R²)
+            // if δ < 0 then no collision, if δ = 0, then tangent, δ > 0 then secant
+
+            /*
+            var d = rayOrigin - circle;
             var c = Vector2.Dot(d, d) - radiusSq;
-            var b = Vector2.Dot(d, rayDirection);
+            var b = Vector2.Dot(rayDirection, d);
             var a = Vector2.Dot(rayDirection, rayDirection); //1 if normalized
 
             float disc = b * b - a * c;
@@ -273,14 +295,20 @@ namespace Takai.Game
                 t0 = t1 = 0;
                 return false;
             }
+            //if disc = 0, tangent
+            //if disc > 0, secant
+
+            //t = [(−D · ∆) ± √δ] ÷ |D|²
 
             float sqrtDisc = (float)System.Math.Sqrt(disc);
             float invA = 1 / a;
 
             t0 = (-b - sqrtDisc) * invA;
             t1 = (-b + sqrtDisc) * invA;
+            //todo: flip
 
-            return true;
+            return (t0 > 0);
+            */
 
             //collisions = rayOrigin + t * rayDirection
             //normals = (collisions - c) * (1 / radius)
