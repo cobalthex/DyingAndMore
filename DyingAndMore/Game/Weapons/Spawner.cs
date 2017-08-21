@@ -81,7 +81,7 @@ namespace DyingAndMore.Game.Weapons
 
         public override bool IsDepleted()
         {
-            return SpawnQueue.Count <= 0;
+            return SpawnQueue != null && SpawnQueue.Count <= 0; //todo: handle deserializing spawn queue better 
         }
 
         public override void Discharge()

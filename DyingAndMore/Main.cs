@@ -135,6 +135,39 @@ namespace DyingAndMore
             //box.Size = new Vector2(300, 400);
             //box.BorderColor = Color.LightBlue;
 
+            ui = new Takai.UI.Static();
+
+            var sbox = new Takai.UI.ScrollBox()
+            {
+                HorizontalAlignment = Takai.UI.Alignment.Middle,
+                VerticalAlignment = Takai.UI.Alignment.Middle,
+                Size = new Vector2(400)
+            };
+            ui.AddChild(sbox);
+            var list = new Takai.UI.List()
+            {
+                HorizontalAlignment = Takai.UI.Alignment.Stretch,
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
+            };
+            sbox.AddChild(list);
+            foreach (var file in System.IO.Directory.EnumerateFiles("Maps", "*.map.tk"))
+            {
+                var row = new Takai.UI.Static()
+                {
+                    Text = file,
+                    HorizontalAlignment = Takai.UI.Alignment.Stretch,
+                };
+                row.Click += delegate (object _sender, Takai.UI.ClickEventArgs _e)
+                {
+                    var map = Takai.Data.Serializer.TextDeserialize<Takai.Game.Map>(((Takai.UI.Static)_sender).Text);
+                    ui = new Takai.UI.Static(new Editor.Editor(map));
+                };
+                row.AutoSize(10);
+                list.AddChild(row);
+            }
+            list.AutoSize();
+            
+            /*
             //var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(
             //    Takai.Data.Serializer.TextDeserialize("Data/Maps/playground.map.tk"));
             var map = new Takai.Game.Map()
@@ -153,7 +186,7 @@ namespace DyingAndMore
             inst.Name = "Player";
 
             testTex = Takai.AssetManager.Load<Texture2D>("Textures/Background.png");
-
+            */
             base.Initialize();
         }
         Texture2D testTex;

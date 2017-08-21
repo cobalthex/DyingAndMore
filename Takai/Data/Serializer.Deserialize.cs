@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Globalization;
 
 using TFloat = System.Double;
 using TInt = System.Int64;
@@ -248,17 +249,43 @@ namespace Takai.Data
                     word += (char)reader.Read() + ReadWord(reader);
 
                 string unit = string.Empty;
-                for (int i = word.Length - 1; i >= 0; --i)
-                {
-                    if ("-+.".Contains(word[i]) || Char.IsDigit(word[i]))
-                    {
-                        unit = word.Substring(i + 1);
-                        word = word.Substring(0, i + 1);
-                        break;
-                    }
-                }
 
-                if (TFloat.TryParse(word, out var @float))
+                //exponential form
+                if (word.EndsWith("E"))
+                {
+                    if (reader.Peek() == '-')
+                        word += (char)reader.Read();
+                    word += ReadWord(reader);
+                }
+                else
+                {
+                    for (int i = word.Length - 1; i >= 0; --i)
+                    {
+                        if ("-+.".Contains(word[i]) || Char.IsDigit(word[i]))
+                        {
+                            unit = word.Substring(i + 1);
+                            word = word.Substring(0, i + 1);
+                            break;
+                        }
+                    }
+                    unit = unit.TrimEnd();
+                }
+                
+                if (TInt.TryParse(word, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out var @int))
+                {
+                    if (unit.Length > 0)
+                    {
+                        if (unit.Equals("sec", StringComparison.OrdinalIgnoreCase)) //convert from seconds to milliseconds
+                            return @int * 1000;
+                        if (unit.Equals("min", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
+                            return @int * 1000 * 60;
+
+                        //all others get converted to float
+                    }
+                    else
+                        return @int;
+                }
+                if (TFloat.TryParse(word, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out var @float))
                 {
                     if (unit.Length > 0)
                     {
@@ -275,9 +302,6 @@ namespace Takai.Data
                     }
                     return @float;
                 }
-
-                if (TInt.TryParse(word, out var @int))
-                    return @int;
             }
 
             if (word.ToLower() == "null")

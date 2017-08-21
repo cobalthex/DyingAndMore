@@ -1009,8 +1009,10 @@ namespace Takai.UI
         {
             if (props.TryGetValue("AutoSize", out var autoSize))
             {
-                if (autoSize is System.Int64 autoSizeValue)
-                    AutoSize(autoSizeValue);
+                if (autoSize is System.Int64 autoSizeInt)
+                    AutoSize(autoSizeInt);
+                else if (autoSize is double autoSizeFloat)
+                    AutoSize((float)autoSizeFloat);
                 else if (autoSize is bool doAutoSize)
                     AutoSize();
             }

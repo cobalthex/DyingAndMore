@@ -234,3 +234,5 @@ namespace Takai.Game
         }
     }
 }
+
+//todo: state instance should maybe be calculated whenever state is set
