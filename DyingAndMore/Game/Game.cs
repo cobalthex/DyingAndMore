@@ -114,7 +114,7 @@ namespace DyingAndMore.Game
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
-            crapDisplay.Text = $"TimeScale:{Map.TimeScale}";
+            crapDisplay.Text = $"TimeScale:{Map.TimeScale}\nZoom:{Map.ActiveCamera.Scale}";
             crapDisplay.AutoSize();
 
             Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);

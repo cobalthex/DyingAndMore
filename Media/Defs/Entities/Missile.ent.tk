@@ -1,6 +1,6 @@
 ProjectileClass {
     Name: "Missile";
-    Power: 1000;
+    Power: 2000;
     AlwaysActive: True;
     IgnoreTrace: True;
     DestroyOnDeath: True;

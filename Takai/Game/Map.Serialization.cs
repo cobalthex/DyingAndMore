@@ -117,6 +117,8 @@ namespace Takai.Game
             return new Dictionary<string, object>
             {
                 ["Tiles"] = Tiles,
+                ["Width"] = Width,
+                ["Height"] = Height,
                 ["Decals"] = decals,
                 ["Triggers"] = triggers,
                 ["State"] = new MapState(this)
@@ -125,8 +127,23 @@ namespace Takai.Game
         void Deserialize(Dictionary<string, object> Props)
         {
             var tiles = Data.Serializer.Cast<List<short>>(Props["Tiles"]);
-            Tiles = new short[Height, Width];
-            Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, Width * Height * sizeof(short));
+
+            int width = 1, height = 1;
+            if (Props.TryGetValue("Width", out var _width) && _width is long width_)
+            {
+                width = (int)width_;
+                height = tiles.Count / width;
+            }
+            else if (Props.TryGetValue("Height", out var _height) && _height is long height_)
+            {
+                height = (int)height_;
+                width = tiles.Count / height;
+            }
+            else
+                throw new ArgumentException("Maps must have either a Width or Height property (measuring number of tiles)");
+
+            Tiles = new short[height, width];
+            Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, width * height * sizeof(short));
 
             TilesPerRow = (TilesImage != null ? (TilesImage.Width / TileSize) : 0);
             SectorPixelSize = SectorSize * TileSize;
@@ -148,6 +165,8 @@ namespace Takai.Game
 
             if (Props.TryGetValue("State", out var state))
                 LoadState((MapState)state);
+
+            InitializeGraphics();
         }
         
         /// <summary>
@@ -216,7 +235,8 @@ namespace Takai.Game
                     Spawn(ent);
             }
             
-            ActiveFluids = State.fluids;
+            if (State.fluids != null)
+                ActiveFluids = State.fluids;
 
             TimeScale = State.timeScale == 0 ? 1 : State.timeScale;
             ElapsedTime = State.elapsedTime;

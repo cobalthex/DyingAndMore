@@ -119,6 +119,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\Media\Maps\**\*.*">
+      <Link>Maps\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="..\Media\Config\**\*.*">
       <Link>Config\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
