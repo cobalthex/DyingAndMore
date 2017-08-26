@@ -1068,23 +1068,33 @@ namespace Takai.UI
 
             if (type.IsEnum)
             {
-                var e = obj as System.Enum;
+                var @enum = obj as System.Enum;
                 var enumValues = System.Enum.GetNames(type);
                 foreach (var flag in enumValues)
                 {
                     var value = (System.Enum)System.Enum.Parse(type, flag);
-                    if (System.Convert.ToUInt64(value) != 0 && e.HasFlag(value))
+                    if (System.Convert.ToUInt64(value) != 0)
                     {
                         var check = new CheckBox()
                         {
                             Name = flag,
                             Text = BeautifyMemberName(flag),
                             Font = font,
-                            Color = color
+                            Color = color,
+                            IsChecked = @enum.HasFlag(value)
                         };
-                        check.Click += delegate
+                        check.Click += delegate (object sender, ClickEventArgs e)
                         {
-                            //todo
+                            var chkbx = (CheckBox)sender;
+                            var parsed = System.Convert.ToUInt64(System.Enum.Parse(type, chkbx.Name));
+                            var n = System.Convert.ToUInt64(@enum);
+
+                            if (chkbx.IsChecked)
+                                obj = System.Enum.ToObject(type, n | parsed);
+                            else
+                                obj = System.Enum.ToObject(type, n & ~parsed);
+
+                            //todo: doesn't work
                         };
                         check.AutoSize();
                         root.AddChild(check);

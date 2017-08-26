@@ -4,16 +4,17 @@ Map {
     ActiveCamera: EditorCamera {
         PostEffect: Null;
         Viewport: [0 0 1280 800];
-        Position: [648 235.7466];
-        Scale: 0.6880269;
+        Position: [576 192];
+        Scale: 1;
         Rotation: 0;
         Shake: 0;
         Follow: Null;
         MoveSpeed: 1000;
     };
     TilesImage: "Data\\Textures/tiles.png";
-    Height: 8;
     Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    Width: 24;
+    Height: 8;
     Decals: [];
     Triggers: [];
     State: MapState {
@@ -53,7 +54,7 @@ Map {
                         Class: EntStateClass {
                             Name: Null;
                             Sprite: Sprite {
-                                ElapsedTime: 22476.2428;
+                                ElapsedTime: 22476;
                                 FrameCount: 2;
                                 FrameLength: 100;
                                 TotalLength: 200;
@@ -75,7 +76,7 @@ Map {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 16395.323;
+                SpawnTime: 0;
             }
             ActorInstance {
                 Class: @"Defs/Entities/Astrovirus.ent.tk";
@@ -85,7 +86,7 @@ Map {
                 MaxSpeed: 294.5054;
                 Weapon: Null;
                 Name: Null;
-                Position: [258 103];
+                Position: [254 95];
                 Direction: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
@@ -95,7 +96,7 @@ Map {
                         Class: EntStateClass {
                             Name: Null;
                             Sprite: Sprite {
-                                ElapsedTime: 35337.1236;
+                                ElapsedTime: 35337;
                                 FrameCount: 6;
                                 FrameLength: 50;
                                 TotalLength: 300;
@@ -117,7 +118,7 @@ Map {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 12740.7732;
+                SpawnTime: 0;
             }
             ActorInstance {
                 Class: @"Defs/Entities/Astrovirus.ent.tk";
@@ -137,7 +138,7 @@ Map {
                         Class: EntStateClass {
                             Name: Null;
                             Sprite: Sprite {
-                                ElapsedTime: 35337.1236;
+                                ElapsedTime: 35337;
                                 FrameCount: 6;
                                 FrameLength: 50;
                                 TotalLength: 300;
@@ -159,49 +160,7 @@ Map {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 13008.4033;
-            }
-            ActorInstance {
-                Class: @"Defs/Entities/Astrovirus.ent.tk";
-                Faction: Factions [Enemy Virus Common];
-                Controller: Null;
-                CurrentHealth: 40;
-                MaxSpeed: 275.5593;
-                Weapon: Null;
-                Name: Null;
-                Position: [334 201];
-                Direction: [1 0];
-                Velocity: [0 0];
-                State: StateMachine {
-                    State: EntStateId.Idle;
-                    Instance: EntStateInstance {
-                        Id: EntStateId.Idle;
-                        Class: EntStateClass {
-                            Name: Null;
-                            Sprite: Sprite {
-                                ElapsedTime: 35337.1236;
-                                FrameCount: 6;
-                                FrameLength: 50;
-                                TotalLength: 300;
-                                IsLooping: True;
-                                Texture: "Data\\Textures/Entities/Astrovirus.png";
-                                Width: 40;
-                                Height: 40;
-                                Size: [40 40];
-                                ClipRect: [0 0 240 120];
-                                Origin: [20 20];
-                                Tween: TweenStyle.Overlap;
-                                ShrinkToFit: True;
-                            };
-                            Radius: 20;
-                        };
-                        ElapsedTime: 0;
-                    };
-                    Transitions: {
-                    };
-                };
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 13294.8573;
+                SpawnTime: 0;
             }
             ActorInstance {
                 Class: @"Defs/Entities/Cyst.ent.tk";
@@ -217,10 +176,10 @@ Map {
                 Weapon: SpawnerInstance {
                     Class: SpawnerClass {
                         Spawns: [
-                            [
-                                @"Defs/Entities/InfectedCell.ent.tk"
-                                [3 5]
-                            ]
+                            Tuple`2 {
+                                Item1: @"Defs/Entities/InfectedCell.ent.tk";
+                                Item2: [3 5];
+                            }
                         ];
                         Name: Null;
                         Delay: [
@@ -230,6 +189,7 @@ Map {
                         UnderchargeAction: UnderchargeAction.Dissipate;
                         OverchargeAction: OverchargeAction.Discharge;
                     };
+                    SpawnQueue: Null;
                     NextShot: 0;
                 };
                 Name: Null;
@@ -243,10 +203,10 @@ Map {
                         Class: EntStateClass {
                             Name: Null;
                             Sprite: Sprite {
-                                ElapsedTime: 34170.8555;
+                                ElapsedTime: 34171;
                                 FrameCount: 1;
-                                FrameLength: 0.0001;
-                                TotalLength: 0.0001;
+                                FrameLength: 0;
+                                TotalLength: 0;
                                 IsLooping: False;
                                 Texture: "Data\\Textures/Entities/Spawner.png";
                                 Width: 64;
@@ -265,7 +225,91 @@ Map {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 40442.8554;
+                SpawnTime: 0;
+            }
+            ActorInstance {
+                Class: @"Defs/Entities/Ebola.ent.tk";
+                Faction: Factions [Enemy];
+                Controller: Null;
+                CurrentHealth: 500;
+                MaxSpeed: 213.7508;
+                Weapon: Null;
+                Name: Null;
+                Position: [742.8334 143.0873];
+                Direction: [-0.9863939 0.164399];
+                Velocity: [0 0];
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: Null;
+                            Sprite: Sprite {
+                                ElapsedTime: 39426;
+                                FrameCount: 4;
+                                FrameLength: 100;
+                                TotalLength: 400;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/Ebola.png";
+                                Width: 54;
+                                Height: 16;
+                                Size: [54 16];
+                                ClipRect: [0 0 108 32];
+                                Origin: [27 8];
+                                Tween: TweenStyle.Overlap;
+                                ShrinkToFit: True;
+                            };
+                            Radius: 27;
+                        };
+                        ElapsedTime: 0;
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 0;
+            }
+            ActorInstance {
+                Class: @"Defs/Entities/Huge.ent.tk";
+                Faction: Factions [Enemy Boss];
+                Controller: Null;
+                CurrentHealth: 5000;
+                MaxSpeed: 0;
+                Weapon: Null;
+                Name: Null;
+                Position: [994.8235 176.1559];
+                Direction: [-1 8.742278E-08];
+                Velocity: [0 0];
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: Null;
+                            Sprite: Sprite {
+                                ElapsedTime: 27165;
+                                FrameCount: 1;
+                                FrameLength: 0;
+                                TotalLength: 0;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/Rhinovirus.png";
+                                Width: 128;
+                                Height: 128;
+                                Size: [128 128];
+                                ClipRect: [0 0 128 128];
+                                Origin: [64 64];
+                                Tween: TweenStyle.None;
+                                ShrinkToFit: True;
+                            };
+                            Radius: 64;
+                        };
+                        ElapsedTime: 0;
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [154 205 50 255];
+                SpawnTime: 0;
             }
             ActorInstance {
                 Class: @"Defs/Entities/Astrovirus.ent.tk";
@@ -285,7 +329,7 @@ Map {
                         Class: EntStateClass {
                             Name: Null;
                             Sprite: Sprite {
-                                ElapsedTime: 35337.1236;
+                                ElapsedTime: 35337;
                                 FrameCount: 6;
                                 FrameLength: 50;
                                 TotalLength: 300;
@@ -307,7 +351,7 @@ Map {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 13294.8573;
+                SpawnTime: 0;
             }
             ActorInstance {
                 Class: @"Defs/Entities/Astrovirus.ent.tk";
@@ -327,7 +371,7 @@ Map {
                         Class: EntStateClass {
                             Name: Null;
                             Sprite: Sprite {
-                                ElapsedTime: 35337.1236;
+                                ElapsedTime: 35337;
                                 FrameCount: 6;
                                 FrameLength: 50;
                                 TotalLength: 300;
@@ -349,7 +393,7 @@ Map {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 13576.4407;
+                SpawnTime: 0;
             }
             ActorInstance {
                 Class: @"Defs/Entities/Astrovirus.ent.tk";
@@ -369,7 +413,7 @@ Map {
                         Class: EntStateClass {
                             Name: Null;
                             Sprite: Sprite {
-                                ElapsedTime: 35337.1236;
+                                ElapsedTime: 35337;
                                 FrameCount: 6;
                                 FrameLength: 50;
                                 TotalLength: 300;
@@ -391,7 +435,7 @@ Map {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 13758.7466;
+                SpawnTime: 0;
             }
             ActorInstance {
                 Class: @"Defs/Entities/Astrovirus.ent.tk";
@@ -411,7 +455,7 @@ Map {
                         Class: EntStateClass {
                             Name: Null;
                             Sprite: Sprite {
-                                ElapsedTime: 35337.1236;
+                                ElapsedTime: 35337;
                                 FrameCount: 6;
                                 FrameLength: 50;
                                 TotalLength: 300;
@@ -433,7 +477,7 @@ Map {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 14009.3072;
+                SpawnTime: 0;
             }
             ActorInstance {
                 Class: @"Defs/Entities/Cyst.ent.tk";
@@ -449,10 +493,10 @@ Map {
                 Weapon: SpawnerInstance {
                     Class: SpawnerClass {
                         Spawns: [
-                            [
-                                @"Defs/Entities/InfectedCell.ent.tk"
-                                [3 5]
-                            ]
+                            Tuple`2 {
+                                Item1: @"Defs/Entities/InfectedCell.ent.tk";
+                                Item2: [3 5];
+                            }
                         ];
                         Name: Null;
                         Delay: [
@@ -462,238 +506,7 @@ Map {
                         UnderchargeAction: UnderchargeAction.Dissipate;
                         OverchargeAction: OverchargeAction.Discharge;
                     };
-                    NextShot: 0;
-                };
-                Name: Null;
-                Position: [560.7941 22.09216];
-                Direction: [-4.371139E-08 1];
-                Velocity: [0 0];
-                State: StateMachine {
-                    State: EntStateId.Idle;
-                    Instance: EntStateInstance {
-                        Id: EntStateId.Idle;
-                        Class: EntStateClass {
-                            Name: Null;
-                            Sprite: Sprite {
-                                ElapsedTime: 34170.8555;
-                                FrameCount: 1;
-                                FrameLength: 0.0001;
-                                TotalLength: 0.0001;
-                                IsLooping: False;
-                                Texture: "Data\\Textures/Entities/Spawner.png";
-                                Width: 64;
-                                Height: 64;
-                                Size: [64 64];
-                                ClipRect: [0 0 64 64];
-                                Origin: [32 32];
-                                Tween: TweenStyle.None;
-                                ShrinkToFit: True;
-                            };
-                            Radius: 32;
-                        };
-                        ElapsedTime: 0;
-                    };
-                    Transitions: {
-                    };
-                };
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 40442.8554;
-            }
-            ActorInstance {
-                Class: @"Defs/Entities/Ebola.ent.tk";
-                Faction: Factions [Enemy];
-                Controller: Null;
-                CurrentHealth: 500;
-                MaxSpeed: 213.7508;
-                Weapon: Null;
-                Name: Null;
-                Position: [746.8334 147.0873];
-                Direction: [-0.9863939 0.164399];
-                Velocity: [0 0];
-                State: StateMachine {
-                    State: EntStateId.Idle;
-                    Instance: EntStateInstance {
-                        Id: EntStateId.Idle;
-                        Class: EntStateClass {
-                            Name: Null;
-                            Sprite: Sprite {
-                                ElapsedTime: 39425.9291;
-                                FrameCount: 4;
-                                FrameLength: 100;
-                                TotalLength: 400;
-                                IsLooping: True;
-                                Texture: "Data\\Textures/Entities/Ebola.png";
-                                Width: 54;
-                                Height: 16;
-                                Size: [54 16];
-                                ClipRect: [0 0 108 32];
-                                Origin: [27 8];
-                                Tween: TweenStyle.Overlap;
-                                ShrinkToFit: True;
-                            };
-                            Radius: 27;
-                        };
-                        ElapsedTime: 0;
-                    };
-                    Transitions: {
-                    };
-                };
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 45381.197;
-            }
-            ActorInstance {
-                Class: @"Defs/Entities/Huge.ent.tk";
-                Faction: Factions [Enemy Boss];
-                Controller: Null;
-                CurrentHealth: 5000;
-                MaxSpeed: 0;
-                Weapon: Null;
-                Name: Null;
-                Position: [996.8235 176.1559];
-                Direction: [-1 8.742278E-08];
-                Velocity: [0 0];
-                State: StateMachine {
-                    State: EntStateId.Idle;
-                    Instance: EntStateInstance {
-                        Id: EntStateId.Idle;
-                        Class: EntStateClass {
-                            Name: Null;
-                            Sprite: Sprite {
-                                ElapsedTime: 27164.9783;
-                                FrameCount: 1;
-                                FrameLength: 0.0001;
-                                TotalLength: 0.0001;
-                                IsLooping: True;
-                                Texture: "Data\\Textures/Entities/Rhinovirus.png";
-                                Width: 128;
-                                Height: 128;
-                                Size: [128 128];
-                                ClipRect: [0 0 128 128];
-                                Origin: [64 64];
-                                Tween: TweenStyle.None;
-                                ShrinkToFit: True;
-                            };
-                            Radius: 64;
-                        };
-                        ElapsedTime: 0;
-                    };
-                    Transitions: {
-                    };
-                };
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 32655.6646;
-            }
-            ActorInstance {
-                Class: @"Defs/Entities/Ebola.ent.tk";
-                Faction: Factions [Enemy];
-                Controller: Null;
-                CurrentHealth: 500;
-                MaxSpeed: 213.7508;
-                Weapon: Null;
-                Name: Null;
-                Position: [746.8334 147.0873];
-                Direction: [-0.9863939 0.164399];
-                Velocity: [0 0];
-                State: StateMachine {
-                    State: EntStateId.Idle;
-                    Instance: EntStateInstance {
-                        Id: EntStateId.Idle;
-                        Class: EntStateClass {
-                            Name: Null;
-                            Sprite: Sprite {
-                                ElapsedTime: 39425.9291;
-                                FrameCount: 4;
-                                FrameLength: 100;
-                                TotalLength: 400;
-                                IsLooping: True;
-                                Texture: "Data\\Textures/Entities/Ebola.png";
-                                Width: 54;
-                                Height: 16;
-                                Size: [54 16];
-                                ClipRect: [0 0 108 32];
-                                Origin: [27 8];
-                                Tween: TweenStyle.Overlap;
-                                ShrinkToFit: True;
-                            };
-                            Radius: 27;
-                        };
-                        ElapsedTime: 0;
-                    };
-                    Transitions: {
-                    };
-                };
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 45381.197;
-            }
-            ActorInstance {
-                Class: @"Defs/Entities/Huge.ent.tk";
-                Faction: Factions [Enemy Boss];
-                Controller: Null;
-                CurrentHealth: 5000;
-                MaxSpeed: 0;
-                Weapon: Null;
-                Name: Null;
-                Position: [996.8235 176.1559];
-                Direction: [-1 8.742278E-08];
-                Velocity: [0 0];
-                State: StateMachine {
-                    State: EntStateId.Idle;
-                    Instance: EntStateInstance {
-                        Id: EntStateId.Idle;
-                        Class: EntStateClass {
-                            Name: Null;
-                            Sprite: Sprite {
-                                ElapsedTime: 27164.9783;
-                                FrameCount: 1;
-                                FrameLength: 0.0001;
-                                TotalLength: 0.0001;
-                                IsLooping: True;
-                                Texture: "Data\\Textures/Entities/Rhinovirus.png";
-                                Width: 128;
-                                Height: 128;
-                                Size: [128 128];
-                                ClipRect: [0 0 128 128];
-                                Origin: [64 64];
-                                Tween: TweenStyle.None;
-                                ShrinkToFit: True;
-                            };
-                            Radius: 64;
-                        };
-                        ElapsedTime: 0;
-                    };
-                    Transitions: {
-                    };
-                };
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 32655.6646;
-            }
-            ActorInstance {
-                Class: @"Defs/Entities/Cyst.ent.tk";
-                Faction: Factions [Enemy];
-                Controller: ArtilleryController {
-                    MaxRange: 200;
-                    CanRotate: False;
-                    ShowSweepLines: True;
-                    trackedActor: Null;
-                };
-                CurrentHealth: 1000;
-                MaxSpeed: 0;
-                Weapon: SpawnerInstance {
-                    Class: SpawnerClass {
-                        Spawns: [
-                            [
-                                @"Defs/Entities/InfectedCell.ent.tk"
-                                [3 5]
-                            ]
-                        ];
-                        Name: Null;
-                        Delay: [
-                            1000
-                            3000
-                        ];
-                        UnderchargeAction: UnderchargeAction.Dissipate;
-                        OverchargeAction: OverchargeAction.Discharge;
-                    };
+                    SpawnQueue: Null;
                     NextShot: 0;
                 };
                 Name: Null;
@@ -707,10 +520,10 @@ Map {
                         Class: EntStateClass {
                             Name: Null;
                             Sprite: Sprite {
-                                ElapsedTime: 34170.8555;
+                                ElapsedTime: 34171;
                                 FrameCount: 1;
-                                FrameLength: 0.0001;
-                                TotalLength: 0.0001;
+                                FrameLength: 0;
+                                TotalLength: 0;
                                 IsLooping: False;
                                 Texture: "Data\\Textures/Entities/Spawner.png";
                                 Width: 64;
@@ -729,7 +542,7 @@ Map {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 37322.4109;
+                SpawnTime: 0;
             }
             ActorInstance {
                 Class: @"Defs/Entities/Ebola.ent.tk";
@@ -749,7 +562,7 @@ Map {
                         Class: EntStateClass {
                             Name: Null;
                             Sprite: Sprite {
-                                ElapsedTime: 39425.9291;
+                                ElapsedTime: 39426;
                                 FrameCount: 4;
                                 FrameLength: 100;
                                 TotalLength: 400;
@@ -771,137 +584,11 @@ Map {
                     };
                 };
                 OutlineColor: [154 205 50 255];
-                SpawnTime: 46232.1959;
-            }
-            ActorInstance {
-                Class: @"Defs/Entities/Huge.ent.tk";
-                Faction: Factions [Enemy Boss];
-                Controller: Null;
-                CurrentHealth: 5000;
-                MaxSpeed: 0;
-                Weapon: Null;
-                Name: Null;
-                Position: [996.8235 176.1559];
-                Direction: [-1 8.742278E-08];
-                Velocity: [0 0];
-                State: StateMachine {
-                    State: EntStateId.Idle;
-                    Instance: EntStateInstance {
-                        Id: EntStateId.Idle;
-                        Class: EntStateClass {
-                            Name: Null;
-                            Sprite: Sprite {
-                                ElapsedTime: 27164.9783;
-                                FrameCount: 1;
-                                FrameLength: 0.0001;
-                                TotalLength: 0.0001;
-                                IsLooping: True;
-                                Texture: "Data\\Textures/Entities/Rhinovirus.png";
-                                Width: 128;
-                                Height: 128;
-                                Size: [128 128];
-                                ClipRect: [0 0 128 128];
-                                Origin: [64 64];
-                                Tween: TweenStyle.None;
-                                ShrinkToFit: True;
-                            };
-                            Radius: 64;
-                        };
-                        ElapsedTime: 0;
-                    };
-                    Transitions: {
-                    };
-                };
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 32655.6646;
-            }
-            ActorInstance {
-                Class: @"Defs/Entities/Ebola.ent.tk";
-                Faction: Factions [Enemy];
-                Controller: Null;
-                CurrentHealth: 500;
-                MaxSpeed: 247.6396;
-                Weapon: Null;
-                Name: Null;
-                Position: [743.9265 237.2];
-                Direction: [-0.9414236 -0.3372262];
-                Velocity: [0 0];
-                State: StateMachine {
-                    State: EntStateId.Idle;
-                    Instance: EntStateInstance {
-                        Id: EntStateId.Idle;
-                        Class: EntStateClass {
-                            Name: Null;
-                            Sprite: Sprite {
-                                ElapsedTime: 39425.9291;
-                                FrameCount: 4;
-                                FrameLength: 100;
-                                TotalLength: 400;
-                                IsLooping: True;
-                                Texture: "Data\\Textures/Entities/Ebola.png";
-                                Width: 54;
-                                Height: 16;
-                                Size: [54 16];
-                                ClipRect: [0 0 108 32];
-                                Origin: [27 8];
-                                Tween: TweenStyle.Overlap;
-                                ShrinkToFit: True;
-                            };
-                            Radius: 27;
-                        };
-                        ElapsedTime: 0;
-                    };
-                    Transitions: {
-                    };
-                };
-                OutlineColor: [154 205 50 255];
-                SpawnTime: 46232.1959;
-            }
-            ActorInstance {
-                Class: @"Defs/Entities/Huge.ent.tk";
-                Faction: Factions [Enemy Boss];
-                Controller: Null;
-                CurrentHealth: 5000;
-                MaxSpeed: 0;
-                Weapon: Null;
-                Name: Null;
-                Position: [996.8235 176.1559];
-                Direction: [-1 8.742278E-08];
-                Velocity: [0 0];
-                State: StateMachine {
-                    State: EntStateId.Idle;
-                    Instance: EntStateInstance {
-                        Id: EntStateId.Idle;
-                        Class: EntStateClass {
-                            Name: Null;
-                            Sprite: Sprite {
-                                ElapsedTime: 27164.9783;
-                                FrameCount: 1;
-                                FrameLength: 0.0001;
-                                TotalLength: 0.0001;
-                                IsLooping: True;
-                                Texture: "Data\\Textures/Entities/Rhinovirus.png";
-                                Width: 128;
-                                Height: 128;
-                                Size: [128 128];
-                                ClipRect: [0 0 128 128];
-                                Origin: [64 64];
-                                Tween: TweenStyle.None;
-                                ShrinkToFit: True;
-                            };
-                            Radius: 64;
-                        };
-                        ElapsedTime: 0;
-                    };
-                    Transitions: {
-                    };
-                };
-                OutlineColor: [0 0 0 0];
-                SpawnTime: 32655.6646;
+                SpawnTime: 0;
             }
         ];
         fluids: [];
-        elapsedTime: 48818.503;
+        elapsedTime: 68503.179;
         timeScale: 1;
     };
 }

@@ -59,7 +59,7 @@ namespace DyingAndMore.Game
             testParticles.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 2);
             testParticles.Speed = new Takai.Game.ValueCurve<float>(curve, 100, 0);
 
-            map.renderSettings |= Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
+            map.renderSettings.DrawBordersAroundNonDrawingEntities = true;
 
             //renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
             renderSettingsConsole = new Static();
@@ -77,6 +77,7 @@ namespace DyingAndMore.Game
                 Position = new Vector2(20),
                 VerticalAlignment = Alignment.Start,
                 HorizontalAlignment = Alignment.End,
+                Color = Color.PaleGreen
             });
         }
         Takai.Game.ParticleType testParticles;
@@ -84,10 +85,7 @@ namespace DyingAndMore.Game
         protected override void OnMapChanged(System.EventArgs e)
         {
             Map.updateSettings = Takai.Game.MapUpdateSettings.Game;
-            Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
-            Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawGrids;
-            Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawTriggers;
-            Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawEntBoundingBoxes;
+            Map.renderSettings = Takai.Game.Map.RenderSettings.Default;
 
             var possibles = Map.FindEntitiesByClassName("player");
             if (possibles.Count > 0)

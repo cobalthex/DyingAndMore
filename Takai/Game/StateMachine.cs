@@ -130,7 +130,17 @@ namespace Takai.Game
             set
             {
                 _states = value;
-                if (Instance != null)
+
+                if (value == null)
+                    return;
+
+                foreach (var state in _states)
+                {
+                    if (state.Value.Name == null)
+                        state.Value.Name = state.Key;
+                }
+
+                if (Instance != null && Instance.Class.Name != null)
                     Instance.Class = _states[Instance.Class.Name];
             }
         }
@@ -153,10 +163,10 @@ namespace Takai.Game
         public Dictionary<EntStateId, (EntStateId Id, string name)> Transitions { get; set; }
             = new Dictionary<EntStateId, (EntStateId, string)>();
 
-        public event EventHandler<StateCompleteEventArgs> StateComplete = null;
+        public event EventHandler<StateCompleteEventArgs> StateComplete;
         protected virtual void OnStateComplete(StateCompleteEventArgs e) { }
 
-        public event EventHandler<TransitionEventArgs> Transition = null;
+        public event EventHandler<TransitionEventArgs> Transition;
         protected virtual void OnTransition(TransitionEventArgs e) { }
 
         public EntStateInstance TransitionTo(EntStateId nextState, string nextClass)
@@ -234,5 +244,3 @@ namespace Takai.Game
         }
     }
 }
-
-//todo: state instance should maybe be calculated whenever state is set
