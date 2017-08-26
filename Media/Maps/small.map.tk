@@ -1,0 +1,128 @@
+Map {
+    Name: Null;
+    TileSize: 48;
+    ActiveCamera: EditorCamera {
+        PostEffect: Null;
+        Viewport: [0 0 1280 800];
+        Position: [192 192];
+        Scale: 1;
+        Rotation: 0;
+        Shake: 0;
+        Follow: Null;
+        MoveSpeed: 1000;
+    };
+    TilesImage: "Data\\Textures/tiles.png";
+    Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    Width: 8;
+    Height: 8;
+    Decals: [];
+    Triggers: [];
+    State: MapState {
+        entities: [
+            ActorInstance {
+                Class: @"Defs/Entities/Player.ent.tk";
+                Faction: Factions [Player];
+                Controller: Null;
+                CurrentHealth: 500;
+                MaxSpeed: 400;
+                Weapon: GunInstance {
+                    Class: GunClass {
+                        Projectile: @"Defs/Entities/Missile.ent.tk";
+                        MaxAmmo: 300;
+                        BurstCont: 0;
+                        ShotsPerBurst: 1;
+                        ErrorAngle: [0 0];
+                        Name: Null;
+                        Delay: [
+                            100
+                            100
+                        ];
+                        UnderchargeAction: UnderchargeAction.Dissipate;
+                        OverchargeAction: OverchargeAction.Discharge;
+                    };
+                    CurrentAmmo: 300;
+                    NextShot: 0;
+                };
+                Name: Null;
+                Position: [76 72];
+                Direction: [0.7071068 0.7071068];
+                Velocity: [0 0];
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: "Idle";
+                            Sprite: Sprite {
+                                ElapsedTime: 7415.8907;
+                                FrameCount: 2;
+                                FrameLength: 100;
+                                TotalLength: 200;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/Player.png";
+                                Width: 48;
+                                Height: 48;
+                                Size: [48 48];
+                                ClipRect: [0 0 96 48];
+                                Origin: [24 24];
+                                Tween: TweenStyle.Overlap;
+                                ShrinkToFit: True;
+                            };
+                            Radius: 24;
+                        };
+                        ElapsedTime: 0;
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 3053.9833;
+            }
+            ActorInstance {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Faction: Factions [Enemy Virus Common];
+                Controller: Null;
+                CurrentHealth: 40;
+                MaxSpeed: 365.6198;
+                Weapon: Null;
+                Name: Null;
+                Position: [192 190];
+                Direction: [1 0];
+                Velocity: [0 0];
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: "Idle";
+                            Sprite: Sprite {
+                                ElapsedTime: 9268.9603;
+                                FrameCount: 6;
+                                FrameLength: 50;
+                                TotalLength: 300;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/Astrovirus.png";
+                                Width: 40;
+                                Height: 40;
+                                Size: [40 40];
+                                ClipRect: [0 0 240 120];
+                                Origin: [20 20];
+                                Tween: TweenStyle.Overlap;
+                                ShrinkToFit: True;
+                            };
+                            Radius: 20;
+                        };
+                        ElapsedTime: 0;
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [154 205 50 255];
+                SpawnTime: 6074.4338;
+            }
+        ];
+        fluids: [];
+        elapsedTime: 6558.2411;
+        timeScale: 1;
+    };
+}

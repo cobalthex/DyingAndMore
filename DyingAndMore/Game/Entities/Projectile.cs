@@ -37,8 +37,6 @@ namespace DyingAndMore.Game.Entities
                 System.Diagnostics.Contracts.Contract.Assert(value == null || value is ProjectileClass);
                 base.Class = value;
                 _Class = value as ProjectileClass;
-
-                //apply defaults
             }
         }
         private ProjectileClass _Class;
@@ -50,8 +48,7 @@ namespace DyingAndMore.Game.Entities
 
         }
 
-        System.TimeSpan flipTime;
-        public override void Think(System.TimeSpan DeltaTime)
+        public override void Think(TimeSpan DeltaTime)
         {
             if (_Class.trail != null)
             {
@@ -83,7 +80,6 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnSpawn()
         {
-            flipTime = Map.ElapsedTime;
         }
 
         public override void OnMapCollision(Point tile, Vector2 point, System.TimeSpan deltaTime)

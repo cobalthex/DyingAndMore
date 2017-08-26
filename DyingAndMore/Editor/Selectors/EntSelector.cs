@@ -18,7 +18,9 @@ namespace DyingAndMore.Editor.Selectors
             {
                 try
                 {
-                    ents.Add(Takai.Data.Cache.Load<Takai.Game.EntityClass>(file));
+                    var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(file);
+                    if (ent is Game.Entities.ActorClass) //+ other classes
+                        ents.Add(ent);
                 }
                 catch (System.Exception e)
                 {
@@ -34,14 +36,9 @@ namespace DyingAndMore.Editor.Selectors
             var ent = ents[itemIndex];
 
             if (ent.States.TryGetValue("Idle", out var state) && state.Sprite?.Texture != null)
-            {
-                //bounds.X += (int)state.Sprite.Origin.X;
-                //bounds.Y += (int)state.Sprite.Origin.Y;
                 state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, editor.Map.ElapsedTime);
-            }
             else
             {
-                //todo: draw x as placeholder
                 bounds.Inflate(-4, -4);
                 Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Tomato, bounds);
                 bounds.Offset(0, 2);

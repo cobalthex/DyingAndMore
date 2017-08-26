@@ -20,12 +20,12 @@ namespace DyingAndMore.Editor
 
         public override void Start()
         {
-            editor.Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawTriggers;
+            editor.Map.renderSettings.DrawTriggers = true;
         }
 
         public override void End()
         {
-            editor.Map.renderSettings &= ~Takai.Game.Map.RenderSettings.DrawTriggers;
+            editor.Map.renderSettings.DrawTriggers = false;
         }
 
         protected override bool HandleInput(GameTime time)

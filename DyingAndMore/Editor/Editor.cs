@@ -25,6 +25,7 @@ namespace DyingAndMore.Editor
     {
         public float snapAngle;
         public bool showGridByDefault;
+        public Takai.Game.Map.RenderSettings renderSettings;
     }
 
     class Editor : MapView
@@ -87,10 +88,7 @@ namespace DyingAndMore.Editor
             Map.ActiveCamera = new EditorCamera();
 
             Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
-            Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawBordersAroundNonDrawingEntities;
-            Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawSectorsOnGrid;
-            if (config.showGridByDefault)
-                Map.renderSettings |= Takai.Game.Map.RenderSettings.DrawGrids;
+            Map.renderSettings = config.renderSettings;
 
             //start zoomed out to see the whole map
             var mapSize = new Vector2(Map.Width, Map.Height) * Map.TileSize;
@@ -213,8 +211,8 @@ namespace DyingAndMore.Editor
             {
                 //refresh individual render settings
                 var settings = typeof(Takai.Game.Map.RenderSettings);
-                //foreach (var child in renderSettingsConsole.Children)
-                //    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
+                foreach (var child in renderSettingsConsole.Children)
+                    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
 
                 AddChild(renderSettingsConsole);
             }

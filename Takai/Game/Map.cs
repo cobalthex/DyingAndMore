@@ -141,11 +141,20 @@ namespace Takai.Game
         {
             get
             {
-                //todo: this is not unique
-                foreach (var sector in Sectors)
+                for (int y = 0; y < Sectors.GetLength(0); ++y)
                 {
-                    foreach (var ent in sector.entities)
-                        yield return ent;
+                    for (int x = 0; x < Sectors.GetLength(1); ++x)
+                    {
+                        var sx = x * SectorPixelSize;
+                        var sy = y * SectorPixelSize;
+
+                        foreach (var ent in Sectors[y, x].entities)
+                        {
+                            if (ent.AxisAlignedBounds.X >= sx &&
+                                ent.AxisAlignedBounds.Y >= sy)
+                                yield return ent;
+                        }
+                    }
                 }
             }
         }

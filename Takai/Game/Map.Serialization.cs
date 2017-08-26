@@ -232,7 +232,10 @@ namespace Takai.Game
             if (State.entities != null)
             {
                 foreach (var ent in State.entities)
+                {
+                    ent.Position = ent.Position; //force update axis aligned bounds
                     Spawn(ent);
+                }
             }
             
             if (State.fluids != null)

@@ -11,7 +11,7 @@ namespace DyingAndMore.Game.Entities
         {
             var color = Color.MediumAquamarine;
 
-            var trace = actor.Map.Trace(actor.Position, actor.Direction);
+            var trace = actor.Map.Trace(actor.Position, actor.Direction, 100);
             if (trace.entity != null)
                 color = Color.Tomato;
 

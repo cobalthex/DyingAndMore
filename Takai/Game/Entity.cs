@@ -95,7 +95,7 @@ namespace Takai.Game
             set
             {
                 _class = value;
-                if (_class != null)
+                if (_class != null && State != null)
                     State.States = _class.States;
             }
         }
@@ -156,7 +156,33 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public Rectangle AxisAlignedBounds { get; private set; }
 
-        public StateMachine State { get; set; } = new StateMachine();
+        public StateMachine State
+        {
+            get => _state;
+            set
+            {
+                if (_state != null)
+                {
+                    _state.StateComplete -= State_StateComplete;
+                    _state.Transition -= State_Transition;
+                }
+
+                //todo: custom serialize state?
+                _state = value;
+                if (_state != null)
+                {
+                    _state.States = Class?.States;
+
+                    _state.StateComplete += State_StateComplete;
+                    _state.Transition += State_Transition;
+
+                    lastTransform = GetTransform();
+                    lastVisibleSize = GetVisibleSize();
+                    UpdateAxisAlignedBounds();
+                }
+            }
+        }
+        private StateMachine _state = null;
 
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
@@ -178,14 +204,9 @@ namespace Takai.Game
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
+
+            State = new StateMachine();
             State.TransitionTo(EntStateId.Idle, "Idle");
-
-            State.StateComplete += State_StateComplete;
-            State.Transition += State_Transition;
-
-            lastTransform = GetTransform();
-            lastVisibleSize = GetVisibleSize();
-            UpdateAxisAlignedBounds();
         }
 
         public Matrix GetTransform()
@@ -240,18 +261,6 @@ namespace Takai.Game
             AxisAlignedBounds = new Rectangle(min.ToPoint(), (max - min).ToPoint());
         }
 
-        protected void State_Transition(object sender, TransitionEventArgs e)
-        {
-            lastVisibleSize = GetVisibleSize();
-            UpdateAxisAlignedBounds();
-        }
-
-        protected void State_StateComplete(object sender, StateCompleteEventArgs e)
-        {
-            if (e.State == EntStateId.Dead && Class.DestroyOnDeath && Map != null)
-                Map.Destroy(this);
-        }
-
         public override bool Equals(object obj)
         {
             return obj is EntityInstance ent && ent.Id == Id;
@@ -274,6 +283,18 @@ namespace Takai.Game
         public virtual void Think(TimeSpan deltaTime)
         {
             State.Update(deltaTime);
+        }
+       
+        protected void State_Transition(object sender, TransitionEventArgs e)
+        {
+            lastVisibleSize = GetVisibleSize();
+            UpdateAxisAlignedBounds();
+        }
+
+        protected void State_StateComplete(object sender, StateCompleteEventArgs e)
+        {
+            if (e.State == EntStateId.Dead && Class.DestroyOnDeath && Map != null)
+                Map.Destroy(this);
         }
 
         /// <summary>
