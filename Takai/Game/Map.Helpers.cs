@@ -387,7 +387,7 @@ namespace Takai.Game
 
             //todo: visited ents?
             
-            for (int i = 0; i < n; ++i)
+            for (int i = 0; i <= n; ++i) //todo: improve on number of sectors searching
             {
                 if (!new Rectangle(0, 0, Sectors.GetLength(1), Sectors.GetLength(0)).Contains(sectorPos.ToPoint()))
                     break;

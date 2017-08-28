@@ -61,8 +61,7 @@ namespace DyingAndMore.Game
 
             map.renderSettings.DrawBordersAroundNonDrawingEntities = true;
 
-            //renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
-            renderSettingsConsole = new Static();
+            renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
             renderSettingsConsole.Position = new Vector2(100, 0);
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;
 
