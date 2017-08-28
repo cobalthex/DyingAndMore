@@ -272,6 +272,7 @@ namespace Takai.Game
             if (instance.Map != this && instance.Map != null)
                 instance.Map.Destroy(instance);
 
+            instance.RefreshBounds();
             instance.Map = this;
             instance.SpawnTime = ElapsedTime;
 

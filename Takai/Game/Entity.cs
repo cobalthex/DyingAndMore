@@ -230,6 +230,20 @@ namespace Takai.Game
         }
         Point lastVisibleSize;
 
+        /// <summary>
+        /// Refresh the calculated bounds of this entity. usually called on spawn
+        /// </summary>
+        public void RefreshBounds()
+        {
+            Position = Position;
+            Direction = Direction;
+            lastVisibleSize = GetVisibleSize();
+            UpdateAxisAlignedBounds();
+        }
+
+        /// <summary>
+        /// Update the axis aligned bounds
+        /// </summary>
         protected void UpdateAxisAlignedBounds()
         {
             var r = new Rectangle(
