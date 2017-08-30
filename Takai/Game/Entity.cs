@@ -20,12 +20,6 @@ namespace Takai.Game
         public string Name { get; set; }
 
         /// <summary>
-        /// Determines if this entity is always part of the active set and therefore always updated
-        /// </summary>
-        /// <remarks>This is typically used for things like projectiles</remarks>
-        public bool AlwaysActive { get; set; } = false;
-
-        /// <summary>
         /// On collision, should this entity try to 'uncollide' with the entity
         /// </summary>
         /// <example>Triggers would have this set to false</example>
@@ -49,6 +43,8 @@ namespace Takai.Game
         /// Destroy this entity if it goes off screen (becomes inactive) and is dead
         /// </summary>
         public bool DestroyIfDeadAndInactive { get; set; } = false;
+
+        public bool DestroyIfInactive { get; set; } = false;
 
         /// <summary>
         /// Should the sprite always be drawn with the original sprite orientation?

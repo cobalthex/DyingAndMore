@@ -1,4 +1,5 @@
 {
+    MaxMapSize: 200;
     SnapAngle: 45deg;
 
     RenderSettings: {

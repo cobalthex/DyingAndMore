@@ -5,12 +5,16 @@ using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.UI;
 
+using FxList = System.Collections.Generic.List<Takai.Game.IGameEffect>;
+
 namespace DyingAndMore.Game
 {
     class Game : MapView
     {
         Entities.ActorInstance player = null;
         Entities.Controller lastController = null;
+
+        FxList testEffect;
 
         Static fpsDisplay;
         Static crapDisplay;
@@ -36,29 +40,6 @@ namespace DyingAndMore.Game
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
 
-            testParticles = new Takai.Game.ParticleType()
-            {
-                Graphic = new Takai.Graphics.Sprite(
-                    Takai.AssetManager.Load<Texture2D>("Textures/Particles/Blood.png"),
-                    10,
-                    10,
-                    6,
-                    System.TimeSpan.FromMilliseconds(100),
-                    Takai.Graphics.TweenStyle.Sequential,
-                    true
-                )
-            };
-            testParticles.Graphic.CenterOrigin();
-
-            var curve = new Curve();
-            curve.Keys.Add(new CurveKey(0, 0));
-            curve.Keys.Add(new CurveKey(1, 1));
-
-            testParticles.BlendMode = BlendState.AlphaBlend;
-            testParticles.Color = new Takai.Game.ValueCurve<Color>(curve, Color.White, Color.Transparent);
-            testParticles.Scale = new Takai.Game.ValueCurve<float>(curve, 1, 2);
-            testParticles.Speed = new Takai.Game.ValueCurve<float>(curve, 100, 0);
-
             map.renderSettings.DrawBordersAroundNonDrawingEntities = true;
 
             renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
@@ -78,8 +59,9 @@ namespace DyingAndMore.Game
                 HorizontalAlignment = Alignment.End,
                 Color = Color.PaleGreen
             });
+
+            testEffect = Takai.Data.Cache.Load<FxList>("defs/effects/test.fx.tk");
         }
-        Takai.Game.ParticleType testParticles;
 
         protected override void OnMapChanged(System.EventArgs e)
         {
@@ -116,16 +98,6 @@ namespace DyingAndMore.Game
 
             Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
-            Takai.Game.ParticleSpawn pspawn = new Takai.Game.ParticleSpawn()
-            {
-                type = testParticles,
-                angle = new Takai.Game.Range<float>(0, MathHelper.TwoPi),
-                position = new Takai.Game.Range<Vector2>(worldMousePos),
-                count = new Takai.Game.Range<int>(3, 5),
-                lifetime = new Takai.Game.Range<System.TimeSpan>(System.TimeSpan.FromMilliseconds(400), System.TimeSpan.FromMilliseconds(800))
-            };
-            Map.Spawn(pspawn);
-
             base.UpdateSelf(time);
         }
 
@@ -141,6 +113,12 @@ namespace DyingAndMore.Game
             {
                 ToggleRenderSettingsConsole();
                 return false;
+            }
+
+            if (InputState.IsPress(MouseButtons.Left))
+            {
+                var pos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+                Map.Spawn(testEffect, pos, Vector2.Normalize(player.Position - pos));
             }
 
             var scrollDelta = InputState.ScrollDelta();

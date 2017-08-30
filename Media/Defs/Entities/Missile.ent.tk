@@ -1,9 +1,8 @@
 ProjectileClass {
     Name: "Missile";
     Power: 2000;
-    AlwaysActive: True;
+    DestroyIfInactive :True;
     IgnoreTrace: True;
-    DestroyOnDeath: True;
 
     Range: 300;
     States: {

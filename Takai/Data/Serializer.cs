@@ -77,7 +77,6 @@ namespace Takai.Data
             Serializers = new Dictionary<Type, CustomTypeSerializer>();
 
             LoadTypesFrom(Assembly.GetExecutingAssembly());
-            RegisteredTypes.Add(typeof(PlayerIndex).Name, typeof(PlayerIndex));
 
             //default custom serializers
             Serializers.Add(typeof(Vector2), new CustomTypeSerializer
@@ -157,29 +156,8 @@ namespace Takai.Data
                     if (value == BlendState.Opaque)
                         return "Opaque";
 
-                    return "todo";
+                    return DefaultAction;
                 },
-                Deserialize = (object value) =>
-                {
-                    if (value is string strvalue)
-                    {
-                        switch ((string)value)
-                        {
-                            case "Additive":
-                                return BlendState.Additive;
-                            case "AlphaBlend":
-                                return BlendState.AlphaBlend;
-                            case "NonPremultiplied":
-                                return BlendState.NonPremultiplied;
-                            case "Opaque":
-                                return BlendState.Opaque;
-                            default:
-                                return null;
-                        }
-                    }
-
-                    return null;
-                }
             });
         }
 
@@ -199,15 +177,25 @@ namespace Takai.Data
                     RegisterType(type);
             }
 
-            RegisterType(typeof(Curve));
-            RegisterType(typeof(CurveKey));
-            RegisterType(typeof(Color));
-            RegisterType(typeof(Vector2));
-            RegisterType(typeof(Vector3));
-            RegisterType(typeof(Vector4));
-            RegisterType(typeof(Rectangle));
+            RegisterType<PlayerIndex>();
+            RegisterType<BlendState>();
+
+            RegisterType<Curve>();
+            RegisterType<CurveKey>();
+            RegisterType<CurveContinuity>();
+            RegisterType<CurveLoopType>();
+
+            RegisterType<Color>();
+            RegisterType<Vector2>();
+            RegisterType<Vector3>();
+            RegisterType<Vector4>();
+            RegisterType<Rectangle>();
         }
 
+        public static void RegisterType<T>()
+        {
+            RegisterType(typeof(T));
+        }
         public static void RegisterType(Type type)
         {
             RegisteredTypes[WriteFullTypeNames ? type.FullName : type.Name] = type;

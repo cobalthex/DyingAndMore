@@ -23,9 +23,11 @@ namespace DyingAndMore.Editor
 
     struct EditorConfiguration
     {
+#pragma warning disable 0649
+        public int maxMapSize;
         public float snapAngle;
-        public bool showGridByDefault;
         public Takai.Game.Map.RenderSettings renderSettings;
+#pragma warning restore 0649
     }
 
     class Editor : MapView
@@ -180,6 +182,8 @@ namespace DyingAndMore.Editor
                 {
                     var widthInput = (NumericInput)resizeDialog.FindChildByName("width");
                     var heightInput  = (NumericInput)resizeDialog.FindChildByName("height");
+
+                    widthInput.Maximum = heightInput.Maximum = config.maxMapSize;
 
                     widthInput.Value = Map.Width;
                     heightInput.Value = Map.Height;

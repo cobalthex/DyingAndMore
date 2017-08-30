@@ -104,7 +104,7 @@ namespace Takai.Game
         /// The list of active particles. Not serialized
         /// </summary>
         [Data.Serializer.Ignored]
-        public Dictionary<ParticleType, List<Particle>> Particles { get; protected set; } = new Dictionary<ParticleType, List<Particle>>();
+        public Dictionary<ParticleClass, List<Particle>> Particles { get; protected set; } = new Dictionary<ParticleClass, List<Particle>>();
 
         /// <summary>
         /// The set of live entities that are being updated.
@@ -306,7 +306,9 @@ namespace Takai.Game
         /// <param name="class">The fluid's type</param>
         public void Spawn(FluidClass @class, Vector2 position, Vector2 velocity)
         {
-            //todo: don't spawn fluids outside the map (position + radius)
+            var loc = position - new Vector2(@class.Radius);
+            if (!Bounds.Intersects(new Rectangle(loc.ToPoint(), new Point((int)@class.Radius))))
+                return;
 
             if (velocity == Vector2.Zero)
             {
@@ -317,47 +319,64 @@ namespace Takai.Game
                 ActiveFluids.Add(new FluidInstance { position = position, velocity = velocity, Class = @class });
         }
 
-        /// <summary>
-        /// Spawn particles
-        /// </summary>
-        /// <param name="spawn">The rules for spawning</param>
-        public void Spawn(ParticleSpawn spawn)
+        public void Spawn(IGameEffect effect, Vector2 position, Vector2 direction)
         {
-            int count = random.Next(spawn.count.min, spawn.count.max);
-
-            if (!Particles.ContainsKey(spawn.type))
-                Particles.Add(spawn.type, new List<Particle>());
-
-            for (int i = 0; i < count; ++i)
+            if (effect is ParticleEffect pe)
             {
-                var lifetime = RandTime(spawn.lifetime.min, spawn.lifetime.max);
-                if (lifetime <= System.TimeSpan.Zero)
-                    continue;
+                if (pe.Class == null)
+                    return;
 
-                var delay = RandTime(spawn.delay.min, spawn.delay.max);
+                if (!Particles.ContainsKey(pe.Class))
+                    Particles.Add(pe.Class, new List<Particle>());
 
-                var theta = RandFloat(spawn.angle.min, spawn.angle.max);
-                var dir = new Vector2
-                (
-                    (float)System.Math.Cos(theta),
-                    (float)System.Math.Sin(theta)
-                );
-
-                Particles[spawn.type].Add(new Particle
+                var numParticles = RandomRange.Next(pe.Count);
+                Particles[pe.Class].Capacity += numParticles;
+                for (int i = 0; i < numParticles; ++i)
                 {
-                    time     = ElapsedTime,
-                    lifetime = lifetime,
-                    delay    = delay,
+                    var angle = RandomRange.Next(pe.Spread);
+                    var speed = RandomRange.Next(pe.Speed);
+                    var lifetime = RandomRange.Next(pe.Class.LifeTime);
 
-                    position = RandVector2(spawn.position.min, spawn.position.max),
-                    direction = dir,
+                    var particle = new Particle()
+                    {
+                        color = Color.White,
+                        delay = System.TimeSpan.Zero,
+                        direction = Vector2.TransformNormal(direction, Matrix.CreateRotationZ(angle)),
+                        position = position,
+                        lifetime = lifetime,
+                        rotation = 0,
+                        scale = 1,
+                        speed = speed,
+                        time = ElapsedTime
+                    };
 
-                    //cached
-                    speed = spawn.type.Speed.start,
-                    scale = spawn.type.Scale.start,
-                    color = spawn.type.Color.start
-                });
+                    Particles[pe.Class].Add(particle);
+                }
             }
+            else if (effect is FluidEffect fe)
+            {
+                if (fe.Class == null)
+                    return;
+
+                var numFluids = RandomRange.Next(fe.Count);
+                ActiveFluids.Capacity += numFluids;
+                for (int i = 0; i < numFluids; ++i)
+                {
+                    var angle = RandomRange.Next(fe.Spread);
+                    var speed = RandomRange.Next(fe.Speed);
+                    Spawn(
+                        fe.Class,
+                        position,
+                        speed * Vector2.TransformNormal(direction, Matrix.CreateRotationZ(angle))
+                    );
+                }
+            }
+        }
+
+        public void Spawn(List<IGameEffect> effects, Vector2 position, Vector2 direction) //todo: better name
+        {
+            foreach (var effect in effects)
+                Spawn(effect, position, direction);
         }
 
         /// <summary>

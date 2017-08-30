@@ -44,7 +44,7 @@ namespace Takai.Game
         {
             get
             {
-                return Sprite.IsLooping;
+                return Sprite?.IsLooping ?? false;
             }
             set
             {
