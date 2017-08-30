@@ -189,7 +189,6 @@ namespace DyingAndMore
             */
             base.Initialize();
         }
-        Texture2D testTex;
 
         protected override void Update(GameTime gameTime)
         {

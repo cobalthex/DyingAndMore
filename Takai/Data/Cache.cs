@@ -74,9 +74,7 @@ namespace Takai.Data
         public static void SaveAllToFile(string file)
         {
             using (var writer = new StreamWriter(file))
-                Serializer.TextSerialize(writer, Objects);
-
-            var asdf = Serializer.TextDeserialize(file);
+                Serializer.TextSerialize(writer, Objects, 0, true);
         }
 
         public static string Normalize(string path)

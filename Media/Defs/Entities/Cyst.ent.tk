@@ -61,7 +61,6 @@ ActorClass {
         DischargeWeapon: { }
     };
 
-    AlwaysActive: False;
     IsPhysical: True;
     IgnoreTrace: False;
     AlwaysDrawUpright: False;

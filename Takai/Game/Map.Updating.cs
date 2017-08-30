@@ -87,7 +87,7 @@ namespace Takai.Game
 
                 //todo: maybe add collision detection for better fluid simulation (combine drag when colliding)
 
-                if (System.Math.Abs(fluid.velocity.X) < 1 && System.Math.Abs(fluid.velocity.Y) < 1)
+                if (Math.Abs(fluid.velocity.X) < 1 && Math.Abs(fluid.velocity.Y) < 1)
                 {
                     Spawn(fluid.Class, fluid.position, Vector2.Zero); //this will move the Fluid to the static area of the map
                     ActiveFluids[i] = ActiveFluids[ActiveFluids.Count - 1];
@@ -131,9 +131,10 @@ namespace Takai.Game
                     ent.State.Instance == null) //no state
                         Destroy(ent);
 
-                else if (!ent.Class.AlwaysActive && !visibleRegion.Intersects(entBounds))
+                else if (!visibleRegion.Intersects(entBounds))
                 {
-                    if (ent.State.Instance.Id == EntStateId.Dead)
+                    if (ent.Class.DestroyIfInactive ||
+                        (ent.Class.DestroyIfDeadAndInactive && ent.State.Instance.Id == EntStateId.Dead))
                         Destroy(ent);
                     else
                         entsToRemoveFromActive.Add(ent);
@@ -156,7 +157,7 @@ namespace Takai.Game
                             var start = ent.Position + ((ent.Radius + 1) * direction);
                             var hit = Trace(start, direction, deltaVLen, ent);
                             var target = start + (direction * hit.distance);
-                            DrawLine(start, target, Color.Yellow);
+                            //DrawLine(start, target, Color.Yellow);
                             
                             if (hit.entity != null)
                             {
@@ -250,7 +251,7 @@ namespace Takai.Game
 
                     var life = (float)((ElapsedTime - (x.time + x.delay)).TotalSeconds / x.lifetime.TotalSeconds);
 
-                    x.speed = MathHelper.Lerp(p.Key.Speed.start, p.Key.Speed.end, p.Key.Speed.curve.Evaluate(life));
+                    //x.speed = MathHelper.Lerp(p.Key.Speed.start, p.Key.Speed.end, p.Key.Speed.curve.Evaluate(life));
                     x.scale = MathHelper.Lerp(p.Key.Scale.start, p.Key.Scale.end, p.Key.Scale.curve.Evaluate(life));
                     x.color = Color.Lerp(p.Key.Color.start, p.Key.Color.end, p.Key.Color.curve.Evaluate(life));
 

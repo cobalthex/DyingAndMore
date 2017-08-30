@@ -176,10 +176,10 @@ Map {
                 Weapon: SpawnerInstance {
                     Class: SpawnerClass {
                         Spawns: [
-                            Tuple`2 {
-                                Item1: @"Defs/Entities/InfectedCell.ent.tk";
-                                Item2: [3 5];
-                            }
+                            [
+                                @"Defs/Entities/InfectedCell.ent.tk"
+                                [3 5]
+                            ]
                         ];
                         Name: Null;
                         Delay: [
@@ -493,10 +493,10 @@ Map {
                 Weapon: SpawnerInstance {
                     Class: SpawnerClass {
                         Spawns: [
-                            Tuple`2 {
-                                Item1: @"Defs/Entities/InfectedCell.ent.tk";
-                                Item2: [3 5];
-                            }
+                            [
+                                @"Defs/Entities/InfectedCell.ent.tk"
+                                [3 5]
+                            ]
                         ];
                         Name: Null;
                         Delay: [

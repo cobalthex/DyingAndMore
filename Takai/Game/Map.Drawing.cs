@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
+using XnaEffect = Microsoft.Xna.Framework.Graphics.Effect;
+
 namespace Takai.Game
 {
     public partial class Map
@@ -13,9 +15,9 @@ namespace Takai.Game
         protected RenderTarget2D reflectedRenderTarget; //draw all things that should be reflected here
         protected DepthStencilState stencilWrite, stencilRead;
         protected AlphaTestEffect mapAlphaTest;
-        protected Effect outlineEffect;
-        protected Effect fluidEffect;
-        protected Effect reflectionEffect; //writes color and reflection information to two render targets
+        protected XnaEffect outlineEffect;
+        protected XnaEffect fluidEffect;
+        protected XnaEffect reflectionEffect; //writes color and reflection information to two render targets
 
         public Texture2D TilesImage { get; set; }
 
@@ -23,7 +25,7 @@ namespace Takai.Game
         /// A set of lines to draw during the next frame (map relative coordinates)
         /// </summary>
         protected List<VertexPositionColor> debugLines = new List<VertexPositionColor>(32);
-        protected Effect lineEffect;
+        protected XnaEffect lineEffect;
         protected RasterizerState lineRaster;
 
         /// <summary>
@@ -123,7 +125,7 @@ namespace Takai.Game
             if (Runtime.GraphicsDevice != null)
             {
                 sbatch = new SpriteBatch(Runtime.GraphicsDevice);
-                lineEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Line.mgfx");
+                lineEffect = Takai.AssetManager.Load<XnaEffect>("Shaders/DX11/Line.mgfx");
                 lineRaster = new RasterizerState()
                 {
                     CullMode = CullMode.None,
@@ -159,9 +161,9 @@ namespace Takai.Game
                 reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
                 //todo: some of the render targets may be able to be combined
 
-                outlineEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Outline.mgfx");
-                fluidEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Fluid.mgfx");
-                reflectionEffect = Takai.AssetManager.Load<Effect>("Shaders/DX11/Reflection.mgfx");
+                outlineEffect = Takai.AssetManager.Load<XnaEffect>("Shaders/DX11/Outline.mgfx");
+                fluidEffect = Takai.AssetManager.Load<XnaEffect>("Shaders/DX11/Fluid.mgfx");
+                reflectionEffect = Takai.AssetManager.Load<XnaEffect>("Shaders/DX11/Reflection.mgfx");
             }
         }
 
@@ -181,7 +183,7 @@ namespace Takai.Game
         /// <param name="PostEffect">An optional fullscreen post effect to render with</param>
         /// <param name="DrawSectorEntities">Draw entities in sectors. Typically used for debugging/map editing</param>
         /// <remarks>All rendering management handled internally</remarks>
-        public void Draw(Camera Camera = null, Effect PostEffect = null)
+        public void Draw(Camera Camera = null, XnaEffect PostEffect = null)
         {
             if (Camera == null)
                 Camera = ActiveCamera;
@@ -311,7 +313,7 @@ namespace Takai.Game
             {
                 foreach (var p in Particles)
                 {
-                    sbatch.Begin(SpriteSortMode.BackToFront, p.Key.BlendMode, null, stencilRead, null, null, cameraTransform);
+                    sbatch.Begin(SpriteSortMode.BackToFront, p.Key.Blend, null, stencilRead, null, null, cameraTransform);
 
                     for (int i = 0; i < p.Value.Count; ++i)
                     {
@@ -352,7 +354,15 @@ namespace Takai.Game
                         {
                             ++profilingInfo.visibleInactiveFluids;
                             reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
-                            sbatch.Draw(fluid.Class.Texture, fluid.position - new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2), new Color(1, 1, 1, fluid.Class.Alpha));
+
+                            var sz = new Vector2(fluid.Class.Texture.Width, fluid.Class.Texture.Height) * fluid.Class.Scale;
+                            var dest = new Rectangle(
+                                (int)(fluid.position.X - sz.X / 2),
+                                (int)(fluid.position.Y - sz.Y / 2),
+                                (int)sz.X,
+                                (int)sz.Y
+                            );
+                            sbatch.Draw(fluid.Class.Texture, dest, new Color(1, 1, 1, fluid.Class.Alpha));
                         }
                     }
                 }
@@ -361,7 +371,14 @@ namespace Takai.Game
                 {
                     ++profilingInfo.visibleActiveFluids;
                     reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
-                    sbatch.Draw(fluid.Class.Texture, fluid.position - new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2), new Color(1, 1, 1, fluid.Class.Alpha));
+                    var sz = new Vector2(fluid.Class.Texture.Width, fluid.Class.Texture.Height) * fluid.Class.Scale;
+                    var dest = new Rectangle(
+                        (int)(fluid.position.X - sz.X / 2),
+                        (int)(fluid.position.Y - sz.Y / 2),
+                        (int)sz.X,
+                        (int)sz.Y
+                    );
+                    sbatch.Draw(fluid.Class.Texture, dest, new Color(1, 1, 1, fluid.Class.Alpha));
                 }
 
                 sbatch.End();

@@ -27,24 +27,7 @@ Map {
                 };
                 CurrentHealth: 500;
                 MaxSpeed: 400;
-                Weapon: GunInstance {
-                    Class: GunClass {
-                        Projectile: @"Defs/Entities/Missile.ent.tk";
-                        MaxAmmo: 300;
-                        BurstCont: 0;
-                        ShotsPerBurst: 1;
-                        ErrorAngle: [0 0];
-                        Name: Null;
-                        Delay: [
-                            100
-                            100
-                        ];
-                        UnderchargeAction: UnderchargeAction.Dissipate;
-                        OverchargeAction: OverchargeAction.Discharge;
-                    };
-                    CurrentAmmo: 300;
-                    NextShot: 37900.0068;
-                };
+                
                 Name: Null;
                 Position: [160.0546 92.03748];
                 Direction: [0.8953726 0.4453176];

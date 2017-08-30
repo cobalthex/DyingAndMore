@@ -27,8 +27,7 @@ namespace Takai.Game
 
         public static implicit operator Range<T>(T value)
         {
-            return new Range<T>
-                (value);
+            return new Range<T>(value);
         }
 
         private object CustomSerialize()
@@ -69,6 +68,7 @@ namespace Takai.Game
         }
     }
 
+    [Data.CustomSerialize("CustomSerialize")]
     public struct ValueCurve<T>
     {
         public Curve curve;
@@ -86,6 +86,11 @@ namespace Takai.Game
             curve = Curve;
             start = Start;
             end = End;
+        }
+
+        private object CustomSerialize()
+        {
+            return new object[] { curve, start, end };
         }
     }
 
@@ -117,6 +122,11 @@ namespace Takai.Game
         public float Alpha { get; set; } = 1;
 
         /// <summary>
+        /// The scale of the textures. Does not affect radius
+        /// </summary>
+        public float Scale { get; set; } = 1;
+
+        /// <summary>
         /// The radius of an individual Fluid
         /// </summary>
         public float Radius { get; set; }
@@ -124,6 +134,7 @@ namespace Takai.Game
         /// Drag affects both how quickly the Fluid stops moving and how much resistance there is to entities moving through it
         /// </summary>
         public float Drag { get; set; }
+
 
         public FluidInstance Create()
         {
@@ -162,7 +173,7 @@ namespace Takai.Game
     /// A single type of particle
     /// </summary>
     [Data.DesignerModdable]
-    public class ParticleType
+    public class ParticleClass
     {
         /// <summary>
         /// The grahpic used for each particle of this type
@@ -171,7 +182,7 @@ namespace Takai.Game
         /// <summary>
         /// How to blend this particle
         /// </summary>
-        public BlendState BlendMode { get; set; }
+        public BlendState Blend { get; set; }
 
         /// <summary>
         /// Color over time
@@ -189,6 +200,8 @@ namespace Takai.Game
         /// Angle over time (not angular velocity)
         /// </summary>
         public ValueCurve<float> Angle { get; set; }
+
+        public Range<TimeSpan> LifeTime { get; set; }
 
         //todo: multiple values
     }
@@ -211,37 +224,5 @@ namespace Takai.Game
         public float speed;
         public float rotation; //not angular velocity
         public Color color;
-    }
-
-    /// <summary>
-    /// Description for spawning particles
-    /// </summary>
-    public struct ParticleSpawn
-    {
-        /// <summary>
-        /// The type of particles to spawn
-        /// </summary>
-        public ParticleType type;
-
-        /// <summary>
-        /// The number of particles to spawn
-        /// </summary>
-        public Range<int> count;
-        /// <summary>
-        /// How long each particle should live for
-        /// </summary>
-        public Range<TimeSpan> lifetime;
-        /// <summary>
-        /// How long to wait before drawing the particle
-        /// </summary>
-        public Range<TimeSpan> delay;
-        /// <summary>
-        /// Where to spawn the particles from
-        /// </summary>
-        public Range<Vector2> position;
-        /// <summary>
-        /// the directional cone to spawn particles from
-        /// </summary>
-        public Range<float> angle;
     }
 }

@@ -36,7 +36,6 @@ ActorClass {
     FieldOfView: 2.356194;
     MaxSpeed: [200 400];
     MoveForce: 500;
-    AlwaysActive: false;
     IsPhysical: true;
     IgnoreTrace: false;
     AlwaysDrawUpright: true;

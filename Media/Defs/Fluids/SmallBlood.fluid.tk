@@ -2,7 +2,7 @@ FluidClass {
     Name: "Blood";
     Texture: "Data\\Textures\\Fluids\\Blood.png";
     Reflection: "Data\\Textures\\Fluids\\Blood.r.png";
-    Radius: 27;
-    Scale: 0.5;
+    Radius: 14;
+    Scale: 0.25;
     Drag: 0.2;
 }

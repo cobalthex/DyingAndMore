@@ -580,6 +580,8 @@ namespace Takai.Data
                     return deserialed;
             }
 
+            //GetConstructor ?
+
             if (!Strict)
             {
                 if (Source is string sourceString)
@@ -661,6 +663,17 @@ namespace Takai.Data
 
                     return dict;
                 }
+
+                //implicit cast (limited support)
+                if (genericArgs.Length == 1 && !sourceType.IsGenericType)
+                {
+                    var implCast = DestType.GetMethod("op_Implicit", new[] { genericArgs[0] });
+                    if (implCast != null)
+                    {
+                        var genericCvt = Cast(genericArgs[0], Source, Strict);
+                        return implCast.Invoke(null, new[] { genericCvt });
+                    }
+                }
             }
 
             //struct initialization using shorthand array syntax
@@ -705,7 +718,7 @@ namespace Takai.Data
 
             canConvert |= (isDestInt && isSourceInt);
             canConvert |= (isDestFloat || isDestInt) && (isSourceFloat || isSourceInt);
-
+            
             if (canConvert)
                 return Convert.ChangeType(Source, DestType);
 
