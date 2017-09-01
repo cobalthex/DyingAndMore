@@ -115,7 +115,7 @@ namespace DyingAndMore
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
             Takai.Runtime.Game = this;
-            Takai.AssetManager.Initialize(GraphicsDevice, "Data\\");
+            Takai.AssetManager.Initialize("Data\\");
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
@@ -166,7 +166,9 @@ namespace DyingAndMore
                 list.AddChild(row);
             }
             list.AutoSize();
-            
+
+            Takai.Data.Serializer.TextSerialize("test.tk", new Foo());
+
             /*
             //var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(
             //    Takai.Data.Serializer.TextDeserialize("Data/Maps/playground.map.tk"));
@@ -188,6 +190,17 @@ namespace DyingAndMore
             testTex = Takai.AssetManager.Load<Texture2D>("Textures/Background.png");
             */
             base.Initialize();
+        }
+
+        class Foo
+        {
+            public int x = 5;
+            public System.TimeSpan t = System.TimeSpan.FromSeconds(5);
+            public Color c = Color.Aqua;
+            public Rectangle r;
+            public Vector2 v2 = new Vector2(0.001f, 0.002f);
+            public Vector3 v3 = new Vector3(0.01f, 0.02f, 0.03f);
+            public Vector4 v4 = new Vector4(0.1f, 0.2f, 0.3f, 0.4f);
         }
 
         protected override void Update(GameTime gameTime)

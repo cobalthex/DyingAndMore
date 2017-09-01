@@ -7,33 +7,16 @@
                 Width: 10;
                 Height: 10;
                 FrameLength: 100msec;
+                Center: true;
             };
             Blend: BlendState.AlphaBlend;
-            Color: [
-                Curve {
-                    IsConstant: True;
-                    PreLoop: CurveLoopType.Constant;
-                    PostLoop: CurveLoopType.Constant;
-                    Keys: [
-                        CurveKey {
-                            Continuity: CurveContinuity.Smooth;
-                            Position: 0.3;
-                            TangentIn: 0;
-                            TangentOut: 0;
-                            Value: 0.8;
-                        }
-                    ];
-                }
-                [255 255 255 255]
-                [255 0 0 255]
-            ];
-            Speed: [{} 40 80];
-            Scale: [{} 1 1];
-            Angle: [{} 0 360deg];
-            lifetime: 2sec;
+            ColorOverTime: {
+                start: Color.White;
+                end: Color.Transparent;
+            }
+            InitialSpeed: [20 40];
+            lifetime: [1sec 3sec];
         }
-        Speed: [5 100];
-        Spread: [-20deg 20deg];
         Count: [10 200];
     }
     ParticleEffect {
@@ -42,39 +25,48 @@
                 Texture: "Textures/Particles/trail.png"
                 Width: 8;
                 Height: 8;
+                Center: true;
             };
             Blend: BlendState.Additive;
-            Color: [
-                Curve {
-                    IsConstant: True;
-                    PreLoop: CurveLoopType.Constant;
-                    PostLoop: CurveLoopType.Constant;
+            AngleOverTime: {
+                start: 0;
+                end: 4pi;
+            };
+            ColorOverTime: {
+                Curve: {
                     Keys: [
                         CurveKey {
-                            Continuity: CurveContinuity.Smooth;
-                            Position: 0.3;
-                            TangentIn: 0;
-                            TangentOut: 0;
-                            Value: 0.8;
+                            Position: 0;
+                            Value: 0;
                         }
-                    ];
+                        CurveKey {
+                            Position: 0.5;
+                            Value: 0;
+                        }
+                        CurveKey {
+                            Position: 1;
+                            Value: 1;
+                        }
+                    ]
                 }
-                [255 255 255 255]
-                [255 0 0 255]
-            ];
-            Speed: [{} 10 60];
-            Scale: [{} 1 1];
-            Angle: [{} 0 360deg];
+                start: Color.White;
+                end: Color.Red;
+            }
+            InitialSpeed: [10 50];
             lifetime: [2sec 5sec];
         }
-        Speed: [15 50];
-        Spread: [-40deg 40deg];
         Count: [10 50];
     }
     FluidEffect {
         Class: @"Defs/Fluids/Blood.fluid.tk";
         Speed: [5 20];
-        Spread: [-50deg 50deg];
         Count: [10 20];
+    }
+    SoundImpulse {
+        Permutations: [
+            SoundClass {
+                sound: "Sounds/open_fx.ogg";
+            }
+        ]
     }
 ]

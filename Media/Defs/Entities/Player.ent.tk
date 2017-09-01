@@ -16,6 +16,9 @@ ActorClass {
                 IsLooping: True;
                 Tween: TweenStyle [Overlap];
             };
+            Sound: {
+                Sound: "Sounds/mech8.ogg";
+            }
         };
     };
 

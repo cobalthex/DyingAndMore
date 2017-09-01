@@ -235,7 +235,7 @@ namespace Takai.Game
                             _drawEntsOutlined.Add(ent);
                         else
                         {
-                            var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                            var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
                             ent.State.Instance.Class.Sprite.Draw(
                                 sbatch,
@@ -250,8 +250,8 @@ namespace Takai.Game
                     }
                     else if (renderSettings.DrawBordersAroundNonDrawingEntities)
                     {
-                        Matrix transform = new Matrix(ent.Direction.X, ent.Direction.Y, 0, 0,
-                                                     -ent.Direction.Y, ent.Direction.X, 0, 0,
+                        Matrix transform = new Matrix(ent.Forward.X, ent.Forward.Y, 0, 0,
+                                                     -ent.Forward.Y, ent.Forward.X, 0, 0,
                                                       0, 0, 1, 0,
                                                       0, 0, 0, 1);
 
@@ -294,7 +294,7 @@ namespace Takai.Game
                     //outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
                     //outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
 
-                    var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Direction.Y, ent.Direction.X);
+                    var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
                     ent.State.Instance.Class.Sprite.Draw(
                         sbatch,
@@ -320,15 +320,13 @@ namespace Takai.Game
                         if (p.Value[i].time == System.TimeSpan.Zero)
                             continue;
 
-                        var sz = p.Key.Graphic.Size.ToVector2();
-                        sz *= p.Value[i].scale;
-
                         p.Key.Graphic.Draw
                         (
                             sbatch,
-                            new Rectangle(p.Value[i].position.ToPoint(), sz.ToPoint()),
-                            p.Value[i].rotation,
+                            p.Value[i].position,
+                            p.Value[i].angle,
                             p.Value[i].color,
+                            p.Value[i].scale,
                             ElapsedTime - p.Value[i].time
                         );
                     }
@@ -355,14 +353,8 @@ namespace Takai.Game
                             ++profilingInfo.visibleInactiveFluids;
                             reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
 
-                            var sz = new Vector2(fluid.Class.Texture.Width, fluid.Class.Texture.Height) * fluid.Class.Scale;
-                            var dest = new Rectangle(
-                                (int)(fluid.position.X - sz.X / 2),
-                                (int)(fluid.position.Y - sz.Y / 2),
-                                (int)sz.X,
-                                (int)sz.Y
-                            );
-                            sbatch.Draw(fluid.Class.Texture, dest, new Color(1, 1, 1, fluid.Class.Alpha));
+                            var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
+                            sbatch.Draw(fluid.Class.Texture, fluid.position, null, new Color(1, 1, 1, fluid.Class.Alpha), 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
                         }
                     }
                 }
@@ -371,14 +363,9 @@ namespace Takai.Game
                 {
                     ++profilingInfo.visibleActiveFluids;
                     reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
-                    var sz = new Vector2(fluid.Class.Texture.Width, fluid.Class.Texture.Height) * fluid.Class.Scale;
-                    var dest = new Rectangle(
-                        (int)(fluid.position.X - sz.X / 2),
-                        (int)(fluid.position.Y - sz.Y / 2),
-                        (int)sz.X,
-                        (int)sz.Y
-                    );
-                    sbatch.Draw(fluid.Class.Texture, dest, new Color(1, 1, 1, fluid.Class.Alpha));
+
+                    var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
+                    sbatch.Draw(fluid.Class.Texture, fluid.position, null, new Color(1, 1, 1, fluid.Class.Alpha), 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
                 }
 
                 sbatch.End();

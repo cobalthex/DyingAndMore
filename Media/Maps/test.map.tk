@@ -45,7 +45,7 @@ Map {
                 };
                 Name: Null;
                 Position: [134 155];
-                Direction: [0.9989581 -0.04563629];
+                forward: [0.9989581 -0.04563629];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -87,7 +87,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [254 95];
-                Direction: [1 0];
+                forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -129,7 +129,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [290 147];
-                Direction: [1 0];
+                forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -194,7 +194,7 @@ Map {
                 };
                 Name: Null;
                 Position: [560.7941 22.09216];
-                Direction: [-4.371139E-08 1];
+                forward: [-4.371139E-08 1];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -236,7 +236,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [742.8334 143.0873];
-                Direction: [-0.9863939 0.164399];
+                forward: [-0.9863939 0.164399];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -278,7 +278,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [994.8235 176.1559];
-                Direction: [-1 8.742278E-08];
+                forward: [-1 8.742278E-08];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -320,7 +320,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [334 201];
-                Direction: [1 0];
+                forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -362,7 +362,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [326 253];
-                Direction: [1 0];
+                forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -404,7 +404,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [292 295];
-                Direction: [1 0];
+                forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -446,7 +446,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [248 213];
-                Direction: [1 0];
+                forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -511,7 +511,7 @@ Map {
                 };
                 Name: Null;
                 Position: [714.8578 365.102];
-                Direction: [-4.371139E-08 -1];
+                forward: [-4.371139E-08 -1];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -553,7 +553,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [743.9265 237.2];
-                Direction: [-0.9414236 -0.3372262];
+                forward: [-0.9414236 -0.3372262];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;

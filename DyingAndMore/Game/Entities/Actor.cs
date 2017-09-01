@@ -188,7 +188,7 @@ namespace DyingAndMore.Game.Entities
                 vel = (vel / (float)Math.Sqrt(lSq)) * MaxSpeed;
             Velocity = vel;
         }
-        
+
         #region Helpers
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace DyingAndMore.Game.Entities
             var diff = Point - Position;
             diff.Normalize();
 
-            var dot = Vector2.Dot(Direction, diff);
+            var dot = Vector2.Dot(Forward, diff);
 
             return (dot > (1 - (_Class.FieldOfView / MathHelper.Pi)));
         }
@@ -216,7 +216,7 @@ namespace DyingAndMore.Game.Entities
             var diff = Ent.Position - Position;
             diff.Normalize();
 
-            var dot = Vector2.Dot(diff, Ent.Direction);
+            var dot = Vector2.Dot(diff, Ent.Forward);
             return (dot > (_Class.FieldOfView / MathHelper.Pi) - 1);
         }
 

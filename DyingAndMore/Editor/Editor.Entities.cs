@@ -267,13 +267,13 @@ namespace DyingAndMore.Editor
                     {
                         var theta = (float)System.Math.Atan2(diff.Y, diff.X);
                         theta = (float)System.Math.Round(theta / editor.config.snapAngle) * editor.config.snapAngle;
-                        SelectedEntity.Direction = new Vector2(
+                        SelectedEntity.Forward = new Vector2(
                             (float)System.Math.Cos(theta),
                             (float)System.Math.Sin(theta)
                         );
                     }
                     else
-                        SelectedEntity.Direction = Vector2.Normalize(diff);
+                        SelectedEntity.Forward = Vector2.Normalize(diff);
                     return false;
                 }
 
@@ -293,7 +293,7 @@ namespace DyingAndMore.Editor
         {
             base.DrawSelf(spriteBatch);
             foreach (var ent in editor.Map.ActiveEnts)
-                editor.Map.DrawArrow(ent.Position, ent.Direction, ent.Radius * 1.3f, Color.Gold);
+                editor.Map.DrawArrow(ent.Position, ent.Forward, ent.Radius * 1.3f, Color.Gold);
         }
 
         void MoveEnt(Takai.Game.EntityInstance ent, Vector2 newPosition)

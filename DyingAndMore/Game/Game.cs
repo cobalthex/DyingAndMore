@@ -65,7 +65,7 @@ namespace DyingAndMore.Game
 
         protected override void OnMapChanged(System.EventArgs e)
         {
-            Map.updateSettings = Takai.Game.MapUpdateSettings.Game;
+            Map.updateSettings = Takai.Game.Map.UpdateSettings.Game;
             Map.renderSettings = Takai.Game.Map.RenderSettings.Default;
 
             var possibles = Map.FindEntitiesByClassName("player");
@@ -87,7 +87,7 @@ namespace DyingAndMore.Game
 
             //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
         }
-        
+
         protected override void UpdateSelf(GameTime time)
         {
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";

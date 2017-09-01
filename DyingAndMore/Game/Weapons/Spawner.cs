@@ -90,7 +90,7 @@ namespace DyingAndMore.Game.Weapons
                 return;
 
             var next = SpawnQueue.Dequeue();
-            Actor.Map.Spawn(next, Actor.Position + Actor.Direction * (Actor.Radius + 10), Actor.Direction, Actor. Direction * 100);
+            Actor.Map.Spawn(next, Actor.Position + Actor.Forward * (Actor.Radius + 10), Actor.Forward, Actor. Forward * 100);
             base.Discharge();
         }
     }

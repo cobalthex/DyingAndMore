@@ -5,34 +5,37 @@ using System;
 
 namespace Takai.Game
 {
-    public class MapUpdateSettings
-    {
-        public bool isAiEnabled;
-        public bool isInputEnabled;
-        public bool isPhysicsEnabled;
-        public bool isCollisionEnabled;
-
-        public static readonly MapUpdateSettings Game = new MapUpdateSettings
-        {
-            isAiEnabled = true,
-            isInputEnabled = true,
-            isPhysicsEnabled = true,
-            isCollisionEnabled = true,
-        };
-
-        public static readonly MapUpdateSettings Editor = new MapUpdateSettings
-        {
-            isAiEnabled = false,
-            isInputEnabled = false,
-            isPhysicsEnabled = false,
-            isCollisionEnabled = true
-        };
-    }
-
     public partial class Map
     {
+        public class UpdateSettings
+        {
+            public bool isAiEnabled;
+            public bool isInputEnabled;
+            public bool isPhysicsEnabled;
+            public bool isCollisionEnabled;
+            public bool isSoundEnabled;
+
+            public static readonly UpdateSettings Game = new UpdateSettings
+            {
+                isAiEnabled = true,
+                isInputEnabled = true,
+                isPhysicsEnabled = true,
+                isCollisionEnabled = true,
+                isSoundEnabled = true,
+            };
+
+            public static readonly UpdateSettings Editor = new UpdateSettings
+            {
+                isAiEnabled = false,
+                isInputEnabled = false,
+                isPhysicsEnabled = false,
+                isCollisionEnabled = true,
+                isSoundEnabled = false,
+            };
+        }
+
         [Data.Serializer.Ignored]
-        public MapUpdateSettings updateSettings = new MapUpdateSettings();
+        public UpdateSettings updateSettings = new UpdateSettings();
 
         /// <summary>
         /// How long since this map started (updated every Update()). Affected by <see cref="TimeScale"/>
@@ -158,7 +161,7 @@ namespace Takai.Game
                             var hit = Trace(start, direction, deltaVLen, ent);
                             var target = start + (direction * hit.distance);
                             //DrawLine(start, target, Color.Yellow);
-                            
+
                             if (hit.entity != null)
                             {
                                 ent.OnEntityCollision(hit.entity, target, deltaTime);
@@ -251,13 +254,47 @@ namespace Takai.Game
 
                     var life = (float)((ElapsedTime - (x.time + x.delay)).TotalSeconds / x.lifetime.TotalSeconds);
 
-                    //x.speed = MathHelper.Lerp(p.Key.Speed.start, p.Key.Speed.end, p.Key.Speed.curve.Evaluate(life));
-                    x.scale = MathHelper.Lerp(p.Key.Scale.start, p.Key.Scale.end, p.Key.Scale.curve.Evaluate(life));
-                    x.color = Color.Lerp(p.Key.Color.start, p.Key.Color.end, p.Key.Color.curve.Evaluate(life));
+                    x.color = Color.Lerp(
+                        p.Key.ColorOverTime.start,
+                        p.Key.ColorOverTime.end,
+                        (p.Key.ColorOverTime.curve ?? ValueCurve<Color>.Linear).Evaluate(life)
+                    );
 
-                    x.position += (x.direction * x.speed) * deltaSeconds;
+                    x.scale = MathHelper.Lerp(
+                        p.Key.ScaleOverTime.start,
+                        p.Key.ScaleOverTime.end,
+                        (p.Key.ScaleOverTime.curve ?? ValueCurve<float>.Linear).Evaluate(life)
+                    );
+
+                    x.angle = MathHelper.Lerp(
+                        p.Key.AngleOverTime.start,
+                        p.Key.AngleOverTime.end,
+                        (p.Key.AngleOverTime.curve ?? ValueCurve<float>.Linear).Evaluate(life)
+                    );
+
+                    x.position += x.velocity * deltaSeconds;
 
                     p.Value[i] = x;
+                }
+            }
+
+            #endregion
+
+            #region sounds
+
+            if (updateSettings.isSoundEnabled)
+            {
+                for (int i = 0; i < ActiveSounds.Count; ++i)
+                {
+                    //handle sound positioning here (relative to camera)
+
+                    if (ActiveSounds[i].Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Stopped)
+                    {
+                        ActiveSounds[i].Instance.Dispose();
+                        ActiveSounds[i] = ActiveSounds[ActiveSounds.Count - 1];
+                        ActiveSounds.RemoveAt(ActiveSounds.Count - 1);
+                        --i;
+                    }
                 }
             }
 

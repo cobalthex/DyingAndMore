@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Takai.Data
 {
@@ -79,9 +80,10 @@ namespace Takai.Data
             LoadTypesFrom(Assembly.GetExecutingAssembly());
 
             //default custom serializers
+
             Serializers.Add(typeof(Vector2), new CustomTypeSerializer
             {
-                Serialize = (object value) => { var v = (Vector2)value; return new[] { v.X, v.Y }; },
+                Serialize = (object value) => LinearStruct,
                 Deserialize = (object value) =>
                 {
                     var v = (List<object>)value;
@@ -91,9 +93,36 @@ namespace Takai.Data
                 }
             });
 
+            Serializers.Add(typeof(Vector3), new CustomTypeSerializer
+            {
+                Serialize = (object value) => LinearStruct,
+                Deserialize = (object value) =>
+                {
+                    var v = (List<object>)value;
+                    var x = (float)Convert.ChangeType(v[0], typeof(float));
+                    var y = (float)Convert.ChangeType(v[1], typeof(float));
+                    var z = (float)Convert.ChangeType(v[2], typeof(float));
+                    return new Vector3(x, y, z);
+                }
+            });
+
+            Serializers.Add(typeof(Vector4), new CustomTypeSerializer
+            {
+                Serialize = (object value) => LinearStruct,
+                Deserialize = (object value) =>
+                {
+                    var v = (List<object>)value;
+                    var x = (float)Convert.ChangeType(v[0], typeof(float));
+                    var y = (float)Convert.ChangeType(v[1], typeof(float));
+                    var z = (float)Convert.ChangeType(v[2], typeof(float));
+                    var w = (float)Convert.ChangeType(v[3], typeof(float));
+                    return new Vector4(x, y, z, w);
+                }
+            });
+
             Serializers.Add(typeof(Point), new CustomTypeSerializer
             {
-                Serialize = (object value) => { var v = (Point)value; return new[] { v.X, v.Y }; },
+                Serialize = (object value) => LinearStruct,
                 Deserialize = (object value) =>
                 {
                     var v = (List<object>)value;
@@ -105,7 +134,7 @@ namespace Takai.Data
 
             Serializers.Add(typeof(Rectangle), new CustomTypeSerializer
             {
-                Serialize = (object value) => { var v = (Rectangle)value; return new[] { v.X, v.Y, v.Width, v.Height }; },
+                Serialize = (object value) => { var r = (Rectangle)value; return new[] { r.X, r.Y, r.Width, r.Height }; },
                 Deserialize = (object value) =>
                 {
                     var v = (List<object>)value;
@@ -119,7 +148,7 @@ namespace Takai.Data
 
             Serializers.Add(typeof(Color), new CustomTypeSerializer
             {
-                Serialize = (object value) => { var v = (Color)value; return new[] { v.R, v.G, v.B, v.A }; },
+                Serialize = (object value) => { var c = (Color)value; return new[] { c.R, c.G, c.B, c.A }; },
                 Deserialize = (object value) =>
                 {
                     var v = (List<object>)value;
@@ -131,10 +160,23 @@ namespace Takai.Data
                 }
             });
 
+            Serializers.Add(typeof(Curve), new CustomTypeSerializer
+            {
+                Deserialize = (object value) => {
+                    return null; //todo
+                },
+            });
+
             Serializers.Add(typeof(Texture2D), new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((Texture2D)value).Name; },
                 Deserialize = (object value) => { return AssetManager.Load<Texture2D>((string)value); }
+            });
+
+            Serializers.Add(typeof(SoundEffect), new CustomTypeSerializer
+            {
+                Serialize = (object value) => { return ((SoundEffect)value).Name; },
+                Deserialize = (object value) => { return AssetManager.Load<SoundEffect>((string)value); }
             });
 
             Serializers.Add(typeof(TimeSpan), new CustomTypeSerializer
@@ -142,19 +184,19 @@ namespace Takai.Data
                 Serialize = (object value) => { return ((TimeSpan)value).TotalMilliseconds; },
                 Deserialize = (object value) => { return TimeSpan.FromMilliseconds((double)Convert.ChangeType(value, typeof(double))); }
             });
-            
+
             Serializers.Add(typeof(BlendState), new CustomTypeSerializer
             {
                 Serialize = (object value) =>
                 {
                     if (value == BlendState.Additive)
-                        return "Additive";
+                        return "BlendState.Additive";
                     if (value == BlendState.AlphaBlend)
-                        return "AlphaBlend";
+                        return "BlendState.AlphaBlend";
                     if (value == BlendState.NonPremultiplied)
-                        return "NonPremultiplied";
+                        return "BlendState.NonPremultiplied";
                     if (value == BlendState.Opaque)
-                        return "Opaque";
+                        return "BlendState.Opaque";
 
                     return DefaultAction;
                 },

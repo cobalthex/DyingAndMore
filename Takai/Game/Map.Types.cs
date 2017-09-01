@@ -32,7 +32,7 @@ namespace Takai.Game
 
         private object CustomSerialize()
         {
-            return new object[] { min, max };
+            return Data.Serializer.LinearStruct;
         }
 
         public override string ToString()
@@ -75,22 +75,37 @@ namespace Takai.Game
         public T start;
         public T end;
 
-        public ValueCurve(T Value)
+        //todo: multiple values along curve
+        //todo: custom serialize curve
+
+        public static readonly Curve Linear = new Curve();
+        static ValueCurve()
         {
-            curve = new Curve();
-            start = Value;
-            end = Value;
+            Linear.Keys.Add(new CurveKey(0, 0));
+            Linear.Keys.Add(new CurveKey(1, 1));
         }
-        public ValueCurve(Curve Curve, T Start, T End)
+
+        public ValueCurve(T value)
         {
-            curve = Curve;
-            start = Start;
-            end = End;
+            curve = Linear;
+            start = value;
+            end = value;
+        }
+        public ValueCurve(Curve curve, T start, T end)
+        {
+            this.curve = curve;
+            this.start = start;
+            this.end = end;
+        }
+
+        public static implicit operator ValueCurve<T>(T value)
+        {
+            return new ValueCurve<T>(value);
         }
 
         private object CustomSerialize()
         {
-            return new object[] { curve, start, end };
+            return Data.Serializer.LinearStruct;
         }
     }
 
@@ -184,45 +199,37 @@ namespace Takai.Game
         /// </summary>
         public BlendState Blend { get; set; }
 
-        /// <summary>
-        /// Color over time
-        /// </summary>
-        public ValueCurve<Color> Color { get; set; }
-        /// <summary>
-        /// Speed over time
-        /// </summary>
-        public ValueCurve<float> Speed { get; set; }
-        /// <summary>
-        /// Scale over time
-        /// </summary>
-        public ValueCurve<float> Scale { get; set; }
-        /// <summary>
-        /// Angle over time (not angular velocity)
-        /// </summary>
-        public ValueCurve<float> Angle { get; set; }
+        public ValueCurve<Color> ColorOverTime { get; set; } = Color.White;
+        public ValueCurve<float> ScaleOverTime { get; set; } = 1;
+        public ValueCurve<float> AngleOverTime { get; set; } = 0;
 
-        public Range<TimeSpan> LifeTime { get; set; }
+        /// <summary>
+        /// How long each particle should last
+        /// </summary>
+        public Range<TimeSpan> Lifetime { get; set; } = TimeSpan.FromSeconds(1);
 
-        //todo: multiple values
+        //start delay
+
+        public Range<float> InitialSpeed { get; set; } = 1;
+        public float Drag { get; set; } = 0.05f;
     }
 
     /// <summary>
     /// An individual particle
     /// </summary>
-    public struct Particle
+    public struct ParticleInstance
     {
         public TimeSpan time; //spawn time
         public TimeSpan lifetime;
         public TimeSpan delay;
 
         public Vector2 position;
-        public Vector2 direction;
+        public Vector2 velocity;
         //angular velocity
 
         //cached properties
-        public float scale;
-        public float speed;
-        public float rotation; //not angular velocity
         public Color color;
+        public float scale;
+        public float angle;
     }
 }

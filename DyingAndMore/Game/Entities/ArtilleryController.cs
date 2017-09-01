@@ -41,15 +41,15 @@ namespace DyingAndMore.Game.Entities
 
             if (trackedActor != null)
             {
-                var hit = actor.Map.Trace(actor.Position, actor.Direction, MaxRange);
+                var hit = actor.Map.Trace(actor.Position, actor.Forward, MaxRange);
 
                 if (hit.entity != null)
                 {
                     //todo: maybe shoot w/ lead (shoot out in front of target's velocity)
                     if (CanRotate)
-                        actor.Direction = Vector2.Normalize(trackedActor.Position - actor.Position); //todo: slerp
+                        actor.Forward = Vector2.Normalize(trackedActor.Position - actor.Position); //todo: slerp
                     actor.FireWeapon();
-                    actor.Map.DrawLine(actor.Position, actor.Position + actor.Direction * MaxRange, Color.Orange);
+                    actor.Map.DrawLine(actor.Position, actor.Position + actor.Forward * MaxRange, Color.Orange);
                 }
                 else
                     trackedActor = null;
@@ -78,7 +78,7 @@ namespace DyingAndMore.Game.Entities
                     Vector2 TransformDirection(float radians)
                     {
                         return Vector2.TransformNormal(
-                            actor.Direction,
+                            actor.Forward,
                             Matrix.CreateRotationZ(radians)
                         );
                     }
