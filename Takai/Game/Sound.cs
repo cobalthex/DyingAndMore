@@ -29,6 +29,8 @@ namespace Takai.Game
         /// </summary>
         public string Caption { get; set; }
 
+        public float Gain { get; set; } = 1;
+
         public SoundInstance Create()
         {
             return new SoundInstance(this);
@@ -41,9 +43,9 @@ namespace Takai.Game
 
         public SoundEffectInstance Instance { get; set; }
 
-        Vector2 Position { get; set; }
-        Vector2 Forward { get; set; }
-        Vector2 Velocity { get; set; }
+        public Vector2 Position { get; set; }
+        public Vector2 Forward { get; set; }
+        public Vector2 Velocity { get; set; } //this does not update position
 
         public SoundInstance(SoundClass @class)
         {
@@ -53,6 +55,11 @@ namespace Takai.Game
                 Instance = Class.Sound?.CreateInstance();
             else
                 Instance = null;
+
+            if (Instance != null)
+            {
+                Instance.Volume = Class.Gain;
+            }
 
             Position = Vector2.Zero;
             Forward = Vector2.UnitX;

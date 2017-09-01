@@ -66,6 +66,7 @@
         Permutations: [
             SoundClass {
                 sound: "Sounds/open_fx.ogg";
+                gain: 0.1;
             }
         ]
     }
