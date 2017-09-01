@@ -17,7 +17,7 @@ ActorClass {
                 Tween: TweenStyle [Overlap];
             };
             Sound: {
-                Sound: "Sounds/mech8.ogg";
+                #Sound: "Sounds/mech8.ogg";
             }
         };
     };

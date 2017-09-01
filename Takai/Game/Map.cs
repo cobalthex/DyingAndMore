@@ -326,7 +326,13 @@ namespace Takai.Game
 
         public void Spawn(SoundClass sound, Vector2 position, Vector2 forward)
         {
+            if (sound.Sound == null)
+                return;
+
             var instance = sound.Create();
+            instance.Position = position;
+            instance.Forward = forward;
+            //velocity
             instance.Instance.Play();
             ActiveSounds.Add(instance);
         }
