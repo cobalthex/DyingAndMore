@@ -36,6 +36,8 @@ namespace Takai.Game
 
         public Graphics.Sprite Sprite { get; set; }
 
+        public SoundClass Sound { get; set; }
+
         public float Radius =>
             Sprite != null ? MathHelper.Max(Sprite.Width, Sprite.Height) / 2 : 1;
 
@@ -72,7 +74,32 @@ namespace Takai.Game
         /// </summary>
         public EntStateId Id { get; set; }
 
-        public EntStateClass Class { get; set; }
+        public EntStateClass Class
+        {
+            get => _Class;
+            set
+            {
+                _Class = value;
+
+                if (_Class != null)
+                {
+                    Sound.Instance?.Dispose();
+                    if (_Class.Sound != null)
+                    {
+                        Sound = _Class.Sound.Create();
+                        if (Sound.Instance != null)
+                        {
+                            Sound.Instance.IsLooped = _Class.IsLooping;
+                            Sound.Instance.Play();
+                        }
+                    }
+                }
+            }
+        }
+        private EntStateClass _Class;
+
+        [Data.Serializer.Ignored]
+        public SoundInstance Sound { get; set; }
 
         /// <summary>
         /// The current elapsed time of this state
@@ -174,6 +201,7 @@ namespace Takai.Game
             State = nextState;
             if (States != null && States.TryGetValue(nextClass, out var stateClass))
             {
+                Instance?.Sound.Instance?.Dispose();
                 Instance = stateClass.Create();
                 Instance.Id = nextState;
                 return Instance;

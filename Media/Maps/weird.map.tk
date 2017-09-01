@@ -30,7 +30,7 @@ Map {
                 
                 Name: Null;
                 Position: [160.0546 92.03748];
-                Direction: [0.8953726 0.4453176];
+                forward: [0.8953726 0.4453176];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -72,7 +72,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [348 108];
-                Direction: [1 0];
+                forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Dead;

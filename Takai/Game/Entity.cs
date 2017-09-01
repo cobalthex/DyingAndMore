@@ -51,6 +51,8 @@ namespace Takai.Game
         /// </summary>
         public bool AlwaysDrawUpright { get; set; } = false;
 
+        //idle audio (plays randomly when idle)
+
         public EntityClass() { }
 
         public abstract EntityInstance Create();
@@ -122,12 +124,12 @@ namespace Takai.Game
         /// The (normalized) direction the entity is facing
         /// </summary>
         /// <remarks>This vector should always be normalized</remarks>
-        public Vector2 Direction
+        public Vector2 Forward
         {
-            get => _direction;
+            get => _forward;
             set
             {
-                _direction = value;
+                _forward = value;
                 if (Class != null && !Class.AlwaysDrawUpright)
                 {
                     lastTransform.M11 = lastTransform.M22 = value.X;
@@ -137,7 +139,7 @@ namespace Takai.Game
                 }
             }
         }
-        private Vector2 _direction = Vector2.UnitX;
+        private Vector2 _forward = Vector2.UnitX;
 
         /// <summary>
         /// The velocity of the entity, separate from the direction
@@ -208,8 +210,8 @@ namespace Takai.Game
         public Matrix GetTransform()
         {
             return new Matrix(
-                Direction.X, -Direction.Y, Position.X, 0,
-                Direction.Y, Direction.X, Position.Y, 0,
+                Forward.X, -Forward.Y, Position.X, 0,
+                Forward.Y, Forward.X, Position.Y, 0,
                 0, 0, 1, 0,
                 0, 0, 0, 1
             );
@@ -232,7 +234,7 @@ namespace Takai.Game
         public void RefreshBounds()
         {
             Position = Position;
-            Direction = Direction;
+            Forward = Forward;
             lastVisibleSize = GetVisibleSize();
             UpdateAxisAlignedBounds();
         }
@@ -294,7 +296,7 @@ namespace Takai.Game
         {
             State.Update(deltaTime);
         }
-       
+
         protected void State_Transition(object sender, TransitionEventArgs e)
         {
             lastVisibleSize = GetVisibleSize();

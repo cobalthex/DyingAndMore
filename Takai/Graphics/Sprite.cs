@@ -320,15 +320,14 @@ namespace Takai.Graphics
         }
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle, Color color, float scale, TimeSpan elapsedTime)
         {
-            var xscale = width * scale;
-            var yscale = height * scale;
-            var rect = new Rectangle(
-                (int)(position.X - Origin.X - (xscale - width) / 2),
-                (int)(position.Y - Origin.Y - (yscale - height) / 2),
-                (int)(xscale),
-                (int)(yscale)
-            );
-            Draw(spriteBatch, rect, angle, Color.White, elapsedTime);
+            var elapsed = (float)(elapsedTime.TotalSeconds / FrameLength.TotalSeconds);
+            var cf = IsLooping ? ((int)elapsed % FrameCount) : MathHelper.Clamp((int)elapsed, 0, FrameCount - 1);
+            var nf = IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount - 1);
+            var fd = elapsed % 1;
+
+            var (curTween, nextTween) = GetTween(fd, Tween);
+            spriteBatch.Draw(Texture, position, GetFrameRect(cf), Color.Lerp(color, Color.Transparent, curTween), angle, Origin, scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(Texture, position, GetFrameRect(nf), Color.Lerp(color, Color.Transparent, nextTween), angle, Origin, scale, SpriteEffects.None, 0);
         }
 
         public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle, Color color, TimeSpan elapsedTime)
@@ -345,8 +344,8 @@ namespace Takai.Graphics
             bounds.Y += (int)(Origin.Y / height * bounds.Height);
 
             var (curTween, nextTween) = GetTween(fd, Tween);
-            DrawTexture(spriteBatch, bounds, GetFrameRect(cf), angle, Color.Lerp(color, Color.Transparent, curTween));
-            DrawTexture(spriteBatch, bounds, GetFrameRect(nf), angle, Color.Lerp(color, Color.Transparent, nextTween));
+            spriteBatch.Draw(Texture, bounds, GetFrameRect(cf), Color.Lerp(color, Color.Transparent, curTween), angle, Origin, SpriteEffects.None, 0);
+            spriteBatch.Draw(Texture, bounds, GetFrameRect(nf), Color.Lerp(color, Color.Transparent, nextTween), angle, Origin, SpriteEffects.None, 0);
         }
 
         public static (float, float) GetTween(float frameDelta, TweenStyle tween)
@@ -361,20 +360,6 @@ namespace Takai.Graphics
                 default:
                     return (1, 0);
             }
-        }
-
-        /// <summary>
-        /// Draw the actual texture of the graphic. Used by Draw()
-        /// </summary>
-        /// <param name="spriteBatch">The spritebatch to use</param>
-        /// <param name="bounds">Where to draw the frame</param>
-        /// <param name="sourceRect">What part of the graphic to draw</param>
-        /// <param name="angle">The angle to rotate the drawing by (in radians)</param>
-        /// <param name="color">The color to tint the image</param>
-        /// <remarks>Does not check if texture is null</remarks>
-        public void DrawTexture(SpriteBatch spriteBatch, Rectangle bounds, Rectangle sourceRect, float angle, Color color)
-        {
-            spriteBatch.Draw(Texture, bounds, sourceRect, color, angle, Origin, SpriteEffects.None, 0);
         }
 
         /// <summary>
@@ -416,6 +401,10 @@ namespace Takai.Graphics
                 Width = Texture?.Width ?? 1;
             if (!hasSize && !props.ContainsKey("Height"))
                 Height = Texture?.Height ?? 1;
+
+            if (props.TryGetValue("Center", out var center) &&
+                center is bool doCenter && doCenter)
+                CenterOrigin(); //maybe default this to true
         }
     }
 }

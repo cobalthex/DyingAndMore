@@ -69,9 +69,9 @@ namespace DyingAndMore.Game.Weapons
                 return;
 
             var projectile = _Class.Projectile.Create();
-            projectile.Position = Actor.Position + (Actor.Direction * (Actor.Radius + projectile.Radius + 1));
-            projectile.Direction = Actor.Direction;
-            projectile.Velocity = Actor.Direction * _Class.Projectile.Power;
+            projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + 1));
+            projectile.Forward = Actor.Forward;
+            projectile.Velocity = Actor.Forward * _Class.Projectile.Power;
             Actor.Map.Spawn(projectile); 
 
             base.Discharge();

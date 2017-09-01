@@ -168,7 +168,7 @@ namespace Takai.Game
 
             InitializeGraphics();
         }
-        
+
         /// <summary>
         /// A temporary struct for organizing state data to be serialized
         /// </summary>
@@ -234,7 +234,7 @@ namespace Takai.Game
                 foreach (var ent in State.entities)
                     Spawn(ent);
             }
-            
+
             if (State.fluids != null)
                 ActiveFluids = State.fluids;
 

@@ -47,7 +47,7 @@ Map {
                 };
                 Name: Null;
                 Position: [76 72];
-                Direction: [0.9936052 0.1129097];
+                forward: [0.9936052 0.1129097];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -89,7 +89,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [92 110];
-                Direction: [1 0];
+                forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -131,7 +131,7 @@ Map {
                 Weapon: Null;
                 Name: Null;
                 Position: [48 192];
-                Direction: [1 0];
+                forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;

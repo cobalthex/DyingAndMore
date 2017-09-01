@@ -270,7 +270,7 @@ namespace Takai.Data
                     }
                     unit = unit.TrimEnd();
                 }
-                
+
                 if (TInt.TryParse(word, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out var @int))
                 {
                     if (unit.Length > 0)
@@ -295,6 +295,8 @@ namespace Takai.Data
                             return @float * 1000;
                         else if (unit.Equals("min", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
                             return @float * 1000 * 60;
+                        else if (unit.Equals("pi", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
+                            return @float * Math.PI;
 
                         else if (!unit.Equals("rad", StringComparison.OrdinalIgnoreCase) &&
                                  !unit.Equals("msec", StringComparison.OrdinalIgnoreCase))
@@ -695,7 +697,10 @@ namespace Takai.Data
                             break;
                         case MemberTypes.Property:
                             var prop = (PropertyInfo)memberEnumerator.Current;
-                            prop.SetValue(obj, Cast(prop.PropertyType, sourceList[i], Strict));
+                            if (prop.CanWrite)
+                                prop.SetValue(obj, Cast(prop.PropertyType, sourceList[i], Strict));
+                            else
+                                goto default;
                             break;
                         default:
                             --i; //does not seem to be built in way to filter out non-var members
@@ -718,7 +723,7 @@ namespace Takai.Data
 
             canConvert |= (isDestInt && isSourceInt);
             canConvert |= (isDestFloat || isDestInt) && (isSourceFloat || isSourceInt);
-            
+
             if (canConvert)
                 return Convert.ChangeType(Source, DestType);
 

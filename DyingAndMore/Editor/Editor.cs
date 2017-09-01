@@ -89,7 +89,7 @@ namespace DyingAndMore.Editor
         {
             Map.ActiveCamera = new EditorCamera();
 
-            Map.updateSettings = Takai.Game.MapUpdateSettings.Editor;
+            Map.updateSettings = Takai.Game.Map.UpdateSettings.Editor;
             Map.renderSettings = config.renderSettings;
 
             //start zoomed out to see the whole map

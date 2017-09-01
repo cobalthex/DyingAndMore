@@ -104,7 +104,7 @@ namespace Takai.Game
         /// The list of active particles. Not serialized
         /// </summary>
         [Data.Serializer.Ignored]
-        public Dictionary<ParticleClass, List<Particle>> Particles { get; protected set; } = new Dictionary<ParticleClass, List<Particle>>();
+        public Dictionary<ParticleClass, List<ParticleInstance>> Particles { get; protected set; } = new Dictionary<ParticleClass, List<ParticleInstance>>();
 
         /// <summary>
         /// The set of live entities that are being updated.
@@ -118,6 +118,11 @@ namespace Takai.Game
         /// </summary>
         [Data.Serializer.Ignored]
         public List<FluidInstance> ActiveFluids { get; protected set; } = new List<FluidInstance>(128);
+
+        /// <summary>
+        /// Currently playing sounds
+        /// </summary>
+        public List<SoundInstance> ActiveSounds { get; protected set; } = new List<SoundInstance>(16);
 
         [Data.Serializer.Ignored]
         public int TotalEntitiesCount { get; private set; } = 0;
@@ -286,12 +291,12 @@ namespace Takai.Game
             ++TotalEntitiesCount;
         }
 
-        public EntityInstance Spawn(EntityClass @class, Vector2 position, Vector2 direction, Vector2 velocity)
+        public EntityInstance Spawn(EntityClass entity, Vector2 position, Vector2 forward, Vector2 velocity)
         {
-            var instance = @class.Create();
+            var instance = entity.Create();
 
             instance.Position = position;
-            instance.Direction = direction;
+            instance.Forward = forward;
             instance.Velocity = velocity;
 
             Spawn(instance);
@@ -303,20 +308,27 @@ namespace Takai.Game
         /// </summary>
         /// <param name="position">The position of the fluid</param>
         /// <param name="velocity">The fluid's initial velocity</param>
-        /// <param name="class">The fluid's type</param>
-        public void Spawn(FluidClass @class, Vector2 position, Vector2 velocity)
+        /// <param name="fluid">The fluid's type</param>
+        public void Spawn(FluidClass fluid, Vector2 position, Vector2 velocity)
         {
-            var loc = position - new Vector2(@class.Radius);
-            if (!Bounds.Intersects(new Rectangle(loc.ToPoint(), new Point((int)@class.Radius))))
+            var loc = position - new Vector2(fluid.Radius);
+            if (!Bounds.Intersects(new Rectangle(loc.ToPoint(), new Point((int)fluid.Radius))))
                 return;
 
             if (velocity == Vector2.Zero)
             {
                 var sector = GetOverlappingSector(position);
-                Sectors[sector.Y, sector.X].fluids.Add(new FluidInstance { position = position, velocity = velocity, Class = @class });
+                Sectors[sector.Y, sector.X].fluids.Add(new FluidInstance { position = position, velocity = velocity, Class = fluid });
             }
             else
-                ActiveFluids.Add(new FluidInstance { position = position, velocity = velocity, Class = @class });
+                ActiveFluids.Add(new FluidInstance { position = position, velocity = velocity, Class = fluid });
+        }
+
+        public void Spawn(SoundClass sound, Vector2 position, Vector2 forward)
+        {
+            var instance = sound.Create();
+            instance.Instance.Play();
+            ActiveSounds.Add(instance);
         }
 
         public void Spawn(IGameEffect effect, Vector2 position, Vector2 direction)
@@ -327,26 +339,25 @@ namespace Takai.Game
                     return;
 
                 if (!Particles.ContainsKey(pe.Class))
-                    Particles.Add(pe.Class, new List<Particle>());
+                    Particles.Add(pe.Class, new List<ParticleInstance>());
 
                 var numParticles = RandomRange.Next(pe.Count);
                 Particles[pe.Class].Capacity += numParticles;
                 for (int i = 0; i < numParticles; ++i)
                 {
                     var angle = RandomRange.Next(pe.Spread);
-                    var speed = RandomRange.Next(pe.Speed);
-                    var lifetime = RandomRange.Next(pe.Class.LifeTime);
+                    var speed = RandomRange.Next(pe.Class.InitialSpeed);
+                    var lifetime = RandomRange.Next(pe.Class.Lifetime);
 
-                    var particle = new Particle()
+                    var particle = new ParticleInstance()
                     {
                         color = Color.White,
                         delay = System.TimeSpan.Zero,
-                        direction = Vector2.TransformNormal(direction, Matrix.CreateRotationZ(angle)),
                         position = position,
+                        velocity = speed * Vector2.TransformNormal(direction, Matrix.CreateRotationZ(angle)),
                         lifetime = lifetime,
-                        rotation = 0,
+                        angle = 0,
                         scale = 1,
-                        speed = speed,
                         time = ElapsedTime
                     };
 
@@ -369,6 +380,14 @@ namespace Takai.Game
                         position,
                         speed * Vector2.TransformNormal(direction, Matrix.CreateRotationZ(angle))
                     );
+                }
+            }
+            else if (effect is SoundImpulse si)
+            {
+                if (si.Permutations.Count > 0)
+                {
+                    var rnd = random.Next(si.Permutations.Count);
+                    Spawn(si.Permutations[rnd], position, direction);
                 }
             }
         }

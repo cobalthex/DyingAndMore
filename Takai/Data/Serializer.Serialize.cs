@@ -63,6 +63,11 @@ namespace Takai.Data
 
     public static partial class Serializer
     {
+        /// <summary>
+        /// Specifies that a custom serializer should serialize the object to an ordered array of all members
+        /// </summary>
+        public static readonly object LinearStruct = new object();
+
         public static void TextSerialize(string file, object serializing)
         {
             var dir = Path.GetDirectoryName(file);
@@ -148,7 +153,13 @@ namespace Takai.Data
             //todo: maybe remove and just add a bunch of custom serializers
             //custom serializer
             else if (Serializers.ContainsKey(ty) && Serializers[ty].Serialize != null)
-                TextSerialize(writer, Serializers[ty].Serialize(serializing), indentLevel, serializeExternals);
+            {
+                var serialized = Serializers[ty].Serialize(serializing);
+                if (serialized == LinearStruct)
+                    SerializeLinear(writer, serializing, serializeExternals);
+                else
+                    TextSerialize(writer, serialized, indentLevel, serializeExternals);
+            }
 
             else if (typeof(IDictionary).IsAssignableFrom(ty))
             {
@@ -256,6 +267,32 @@ namespace Takai.Data
                 TextSerialize(writer, value, indentLevel + 1, serializeExternals);
 
             writer.WriteLine(";");
+        }
+
+        private static void SerializeLinear(StreamWriter writer, object serializing, bool serializeExternals)
+        {
+            writer.Write('[');
+            var ty = serializing.GetType();
+            int n = 0;
+            foreach (var member in ty.GetMembers(BindingFlags.Instance | BindingFlags.Public))
+            {
+                switch (member.MemberType)
+                {
+                    case MemberTypes.Field:
+                        if (n++ > 0)
+                            writer.Write(' ');
+
+                        TextSerialize(writer, ((FieldInfo)member).GetValue(serializing), 0, serializeExternals);
+                        break;
+                    case MemberTypes.Property:
+                        if (n++ > 0)
+                            writer.Write(' ');
+
+                        TextSerialize(writer, ((PropertyInfo)member).GetValue(serializing), 0, serializeExternals);
+                        break;
+                }
+            }
+            writer.Write(']');
         }
 
         private static void Indent(StreamWriter Stream, int IndentLevel)
