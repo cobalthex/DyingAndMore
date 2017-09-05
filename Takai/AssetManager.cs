@@ -22,6 +22,8 @@ namespace Takai
         /// </summary>
         private static Dictionary<string, IDisposable> assets;
 
+        public static System.Collections.ObjectModel.ReadOnlyDictionary<string, IDisposable> Assets { get; private set; }
+
         /// <summary>
         /// The total number of loaded assets in the manager
         /// </summary>
@@ -30,6 +32,7 @@ namespace Takai
         static AssetManager()
         {
             assets = new Dictionary<string, IDisposable>();
+            Assets = new System.Collections.ObjectModel.ReadOnlyDictionary<string, IDisposable>(assets);
         }
 
         /// <summary>
@@ -40,7 +43,6 @@ namespace Takai
         public static void Initialize(string rootDirectory = "")
         {
             RootDirectory = rootDirectory;
-            assets = new Dictionary<string, IDisposable>();
         }
 
         public static Dictionary<string, Type> AssetTypes { get; set; } = new Dictionary<string, System.Type>
@@ -189,7 +191,7 @@ namespace Takai
             }
             else if (typeof(T) == typeof(Effect))
                 asset = new Effect(Runtime.GraphicsDevice, ReadToEnd(stream));
-            
+
             if (asset != null)
             {
                 assets.Add(name, asset);
@@ -230,7 +232,7 @@ namespace Takai
                     samples[i * 2] = (byte)(n & 0xff);
                     samples[i * 2 + 1] = (byte)((n >> 8) & 0xff);
                 }
-                
+
                 return new SoundEffect(samples, vorbis.SampleRate, (AudioChannels)vorbis.Channels);
             }
         }
@@ -361,14 +363,6 @@ namespace Takai
             }
 
             assets.Clear();
-        }
-
-        /// <summary>
-        /// The enumerator for the assets
-        /// </summary>
-        public static Dictionary<string, IDisposable>.Enumerator GetEnumerator()
-        {
-            return assets.GetEnumerator();
         }
     }
 }

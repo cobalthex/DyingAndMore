@@ -4,5 +4,5 @@ FluidClass {
     Reflection: "Data\\Textures\\Fluids\\Blood.r.png";
     Radius: 14;
     Scale: 0.25;
-    Drag: 0.2;
+    Drag: 0.6;
 }

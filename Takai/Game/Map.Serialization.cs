@@ -180,6 +180,8 @@ namespace Takai.Game
             public TimeSpan elapsedTime;
             public float timeScale;
 
+            //todo: sounds
+
             public MapState(Map Map)
             {
                 entities = new List<EntityInstance>(Map.AllEntities);

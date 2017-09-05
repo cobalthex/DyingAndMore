@@ -23,5 +23,10 @@ namespace Takai
             var bb = Vector2.Dot(b, b);
             return a - (b * (ab / bb));
         }
+
+        public static float Angle(this Vector2 v)
+        {
+            return (float)Math.Atan2(v.Y, v.X);
+        }
     }
 }

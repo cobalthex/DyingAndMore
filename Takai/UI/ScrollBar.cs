@@ -258,17 +258,35 @@ namespace Takai.UI
 
         protected override void OnResize(EventArgs e)
         {
+            var hsize = Size.X;
+            var vsize = Size.Y;
+
+            if (horizontalScrollbar.ContentSize > hsize)
+                vsize -= horizontalScrollbar.Size.Y;
+            if (verticalScrollbar.ContentSize > vsize)
+                hsize -= verticalScrollbar.Size.X;
+
             horizontalScrollbar.Size = new Vector2(
-                Size.X - verticalScrollbar.Size.X,
+                hsize,
                 horizontalScrollbar.Size.Y
             );
 
             verticalScrollbar.Size = new Vector2(
                 verticalScrollbar.Size.X,
-                Size.Y - horizontalScrollbar.Size.Y
+                vsize
             );
 
-            contentArea.Size = Size - new Vector2(verticalScrollbar.Size.X, horizontalScrollbar.Size.Y);
+            if (horizontalScrollbar.IsThumbVisible)
+                base.AddChild(horizontalScrollbar);
+            else
+                base.RemoveChild(horizontalScrollbar);
+
+            if (verticalScrollbar.IsThumbVisible)
+                base.AddChild(verticalScrollbar);
+            else
+                base.RemoveChild(verticalScrollbar);
+
+            contentArea.Size = new Vector2(hsize, vsize);
         }
 
         protected override bool HandleInput(GameTime time)
