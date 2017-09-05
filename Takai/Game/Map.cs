@@ -122,6 +122,7 @@ namespace Takai.Game
         /// <summary>
         /// Currently playing sounds
         /// </summary>
+        [Data.Serializer.Ignored]
         public List<SoundInstance> ActiveSounds { get; protected set; } = new List<SoundInstance>(16);
 
         [Data.Serializer.Ignored]
@@ -355,14 +356,17 @@ namespace Takai.Game
                     var speed = RandomRange.Next(pe.Class.InitialSpeed);
                     var lifetime = RandomRange.Next(pe.Class.Lifetime);
 
+                    var dir = Vector2.TransformNormal(direction, Matrix.CreateRotationZ(angle));
+                    var initAngle = (float)System.Math.Atan2(dir.Y, dir.X);
+
                     var particle = new ParticleInstance()
                     {
-                        color = Color.White,
+                        color = pe.Class.ColorOverTime.start,
                         delay = System.TimeSpan.Zero,
                         position = position,
-                        velocity = speed * Vector2.TransformNormal(direction, Matrix.CreateRotationZ(angle)),
+                        velocity = speed * dir,
                         lifetime = lifetime,
-                        angle = 0,
+                        angle = initAngle,
                         scale = 1,
                         time = ElapsedTime
                     };

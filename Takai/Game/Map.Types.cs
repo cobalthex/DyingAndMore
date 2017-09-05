@@ -204,6 +204,12 @@ namespace Takai.Game
         public ValueCurve<float> AngleOverTime { get; set; } = 0;
 
         /// <summary>
+        /// Spawn a fluid on the death of a particle
+        /// </summary>
+        public FluidClass FluidOnDeath { get; set; } = null;
+        //death fluid cutoff?
+
+        /// <summary>
         /// How long each particle should last
         /// </summary>
         public Range<TimeSpan> Lifetime { get; set; } = TimeSpan.FromSeconds(1);

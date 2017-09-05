@@ -249,6 +249,10 @@ namespace Takai.Game
                         p.Value[i] = p.Value[p.Value.Count - 1];
                         p.Value.RemoveAt(p.Value.Count - 1);
                         i--;
+
+                        if (p.Key.FluidOnDeath != null)
+                            Spawn(p.Key.FluidOnDeath, x.position, x.velocity / 10);
+
                         continue;
                     }
 
@@ -266,13 +270,16 @@ namespace Takai.Game
                         (p.Key.ScaleOverTime.curve ?? ValueCurve<float>.Linear).Evaluate(life)
                     );
 
-                    x.angle = MathHelper.Lerp(
+                    //todo: calculating angle may be slow (relative)
+                    x.angle = x.velocity.Angle() + MathHelper.Lerp(
                         p.Key.AngleOverTime.start,
                         p.Key.AngleOverTime.end,
                         (p.Key.AngleOverTime.curve ?? ValueCurve<float>.Linear).Evaluate(life)
                     );
 
-                    x.position += x.velocity * deltaSeconds;
+                    var deltaV = x.velocity * deltaSeconds;
+                    x.velocity -= deltaV * p.Key.Drag;
+                    x.position += deltaV;
 
                     p.Value[i] = x;
                 }

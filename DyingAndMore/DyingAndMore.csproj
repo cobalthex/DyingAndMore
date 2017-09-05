@@ -66,6 +66,7 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AssetView.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
     <Compile Include="Editor\Editor.Triggers.cs" />

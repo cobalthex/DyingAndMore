@@ -167,8 +167,6 @@ namespace DyingAndMore
             }
             list.AutoSize();
 
-            Takai.Data.Serializer.TextSerialize("test.tk", new Foo());
-
             /*
             //var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(
             //    Takai.Data.Serializer.TextDeserialize("Data/Maps/playground.map.tk"));
@@ -192,17 +190,6 @@ namespace DyingAndMore
             base.Initialize();
         }
 
-        class Foo
-        {
-            public int x = 5;
-            public System.TimeSpan t = System.TimeSpan.FromSeconds(5);
-            public Color c = Color.Aqua;
-            public Rectangle r;
-            public Vector2 v2 = new Vector2(0.001f, 0.002f);
-            public Vector3 v3 = new Vector3(0.01f, 0.02f, 0.03f);
-            public Vector4 v4 = new Vector4(0.1f, 0.2f, 0.3f, 0.4f);
-        }
-
         protected override void Update(GameTime gameTime)
         {
             if (InputState.IsPress(Keys.Q)
@@ -221,6 +208,11 @@ namespace DyingAndMore
             if (InputState.IsPress(Keys.F6))
             {
                 Takai.Data.Cache.SaveAllToFile("all.tk");
+            }
+
+            if (InputState.IsPress(Keys.F7))
+            {
+                ui.ReplaceAllChildren(new AssetView());
             }
 
             InputState.Update(GraphicsDevice.Viewport.Bounds);

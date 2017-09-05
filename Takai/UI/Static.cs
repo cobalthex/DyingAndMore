@@ -412,6 +412,12 @@ namespace Takai.UI
 
         public virtual void AddChild(Static child)
         {
+            if (child.Parent == this)
+                return;
+
+            if (child.Parent != null)
+                child.RemoveFromParent();
+
             //todo: come up with a common interface for modifying children
             child._parent = this;
             children.Add(child);
