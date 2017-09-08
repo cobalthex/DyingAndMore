@@ -1,22 +1,22 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
     public partial class Map
     {
-        protected System.Random random = new System.Random();
+        protected Random random = new Random();
         private byte[] _r64b = new byte[8];
 
         protected float RandFloat(float Min, float Max)
         {
             return (float)(random.NextDouble() * (Max - Min)) + Min;
         }
-        protected System.TimeSpan RandTime(System.TimeSpan Min, System.TimeSpan Max)
+        protected TimeSpan RandTime(TimeSpan Min, TimeSpan Max)
         {
             var diff = Max.Ticks - Min.Ticks;
-            return System.TimeSpan.FromTicks(diff != 0 ? (System.BitConverter.ToInt64(_r64b, 0) % diff) : 0) + Min;
+            return TimeSpan.FromTicks(diff != 0 ? (BitConverter.ToInt64(_r64b, 0) % diff) : 0) + Min;
         }
         protected Vector2 RandVector2(Vector2 Min, Vector2 Max)
         {
@@ -180,7 +180,7 @@ namespace Takai.Game
             var ents = new List<EntityInstance>();
             foreach (var ent in ActiveEnts)
             {
-                if (ent.Class != null && ent.Class.Name.Equals(className, System.StringComparison.OrdinalIgnoreCase))
+                if (ent.Class != null && ent.Class.Name.Equals(className, StringComparison.OrdinalIgnoreCase))
                     ents.Add(ent);
             }
 
@@ -206,48 +206,6 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Find a path between two points
-        /// </summary>
-        /// <param name="Start">Where to start the search from</param>
-        /// <param name="End">Where to try and navigate to</param>
-        /// <returns>The points in the navigation set, or null if not able to path to</returns>
-        /// <remarks>Will navigate around entities that dont ignore trace</remarks>
-        public List<Vector2> GetPath(Vector2 Start, Vector2 End)
-        {
-            //todo: use mtd* lite
-
-            //jps
-            /*var successors:Vector.< Node > = new Vector.< Node > ();
-            var neighbours:Vector.< Node > = nodeNeighbours(current);
-
-            for each(var neighbour: Node in neighbours) {
-                // Direction from current node to neighbor:
-                var dX:int = clamp(neighbour.x - current.x, -1, 1);
-                var dY:int = clamp(neighbour.y - current.y, -1, 1);
-
-
-                // Try to find a node to jump to:
-                var jumpPoint:Node = jump(current.x, current.y, dX, dY, start, end);
-
-
-                // If found add it to the list:
-                if (jumpPoint) successors.push(jumpPoint);
-            }*/
-
-            var successors = new List<Vector2>();
-            var neighbors = new List<Vector2>(new[] { Start });
-
-            for (var i = 0; i < neighbors.Count; ++i)
-            {
-
-            }
-
-            //return successors;
-
-            return null;
-        }
-
-        /// <summary>
         /// The outcome of a trace
         /// </summary>
         public struct TraceHit
@@ -262,56 +220,22 @@ namespace Takai.Game
             //var rejection = Util.Reject(circleOrigin - lineStart, lineEnd - lineStart);
             //return rejection.LengthSquared() < radiusSq;
 
+            //does ray direction have to be normalized?
+
             var diff = circle - rayOrigin;
-            var lf = Vector2.Dot(rayDirection, diff);
+            var lf = Vector2.Dot(diff, rayDirection); //scalar projection
             var s = radiusSq - Vector2.Dot(diff, diff) + (lf * lf);
 
             if (s < 0)
             {
-                t0 = t1 = 0;
+                t0 = t1 = float.PositiveInfinity;
                 return false;
             }
 
-            s = (float)System.Math.Sqrt(s);
+            s = (float)Math.Sqrt(s);
             t0 = lf - s;
             t1 = lf + s;
-            return t0 > 0;
-
-            //alternate, more complex solution (uses quadratic formula)
-
-            //D = ray direction, ∆ = ray origin - circle origin, R = circle radius
-            // δ = (D · ∆)² − |D|² * (|∆|² - R²)
-            // if δ < 0 then no collision, if δ = 0, then tangent, δ > 0 then secant
-
-            /*
-            var d = rayOrigin - circle;
-            var c = Vector2.Dot(d, d) - radiusSq;
-            var b = Vector2.Dot(rayDirection, d);
-            var a = Vector2.Dot(rayDirection, rayDirection); //1 if normalized
-
-            float disc = b * b - a * c;
-            if (disc < 0.0f)
-            {
-                t0 = t1 = 0;
-                return false;
-            }
-            //if disc = 0, tangent
-            //if disc > 0, secant
-
-            //t = [(−D · ∆) ± √δ] ÷ |D|²
-
-            float sqrtDisc = (float)System.Math.Sqrt(disc);
-            float invA = 1 / a;
-
-            t0 = (-b - sqrtDisc) * invA;
-            t1 = (-b + sqrtDisc) * invA;
-            //todo: flip
-
-            return (t0 > 0);
-            */
-
-            //collisions = rayOrigin + t * rayDirection
-            //normals = (collisions - c) * (1 / radius)
+            return t0 > 0; //todo: does not work if ray is inside of circle and in front of origin
         }
 
         /// <summary>
@@ -327,7 +251,7 @@ namespace Takai.Game
 
             var pos = start;
             var diff = (end - start);
-            var n = MathHelper.Max(System.Math.Abs(diff.X), System.Math.Abs(diff.Y)) / stepSize;
+            var n = MathHelper.Max(Math.Abs(diff.X), Math.Abs(diff.Y)) / stepSize;
             var delta = Vector2.Normalize(diff) * stepSize;
 
             for (int i = 0; i < n; ++i)
@@ -363,7 +287,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="start">Where to start the search</param>
         /// <param name="direction">What direction to search</param>
-        /// <param name="maxDistance">The total distance to search0</param>
+        /// <param name="maxDistance">The total distance to search (in the tilemap)</param>
         /// <param name="ignored">Any entities to ignore when searching</param>
         /// <returns>The collision. Entity is null if tilemap collision</returns>
         public TraceHit Trace(Vector2 start, Vector2 direction, float maxDistance = 0, EntityInstance ignored = null)
@@ -378,15 +302,15 @@ namespace Takai.Game
             var sectorDiff = sectorEnd - sectorPos;
 
             int n = 0;
-            if (System.Math.Abs(sectorDiff.X) > System.Math.Abs(sectorDiff.Y))
-                n = (int)System.Math.Ceiling(System.Math.Abs(sectorDiff.X));
+            if (Math.Abs(sectorDiff.X) > Math.Abs(sectorDiff.Y))
+                n = (int)Math.Ceiling(Math.Abs(sectorDiff.X));
             else
-                n = (int)System.Math.Ceiling(System.Math.Abs(sectorDiff.Y));
+                n = (int)Math.Ceiling(Math.Abs(sectorDiff.Y));
 
             var sectorDelta = sectorDiff / n;
 
             //todo: visited ents?
-            
+
             for (int i = 0; i <= n; ++i) //todo: improve on number of sectors searching
             {
                 if (!new Rectangle(0, 0, Sectors.GetLength(1), Sectors.GetLength(0)).Contains(sectorPos.ToPoint()))
@@ -404,7 +328,7 @@ namespace Takai.Game
                         t0 < shortestDist)
                     {
                         shortest = ent;
-                        shortestDist = (System.Math.Abs(t0) < System.Math.Abs(t1) ? t0 : t1); //todo: better way?
+                        shortestDist = (Math.Abs(t0) < Math.Abs(t1) ? t0 : t1); //todo: better way?
                     }
                 }
 

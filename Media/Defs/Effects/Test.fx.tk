@@ -1,3 +1,5 @@
+[]
+
 [
     ParticleEffect {
         Class: {
@@ -26,7 +28,7 @@
     ParticleEffect {
         Class: {
             Graphic: {
-                Texture: "Textures/Particles/trailglow.png"
+                Texture: "Textures/Particles/trail.png"
                 width:8;
                 height:8;
                 frameLength:100msec;
@@ -60,11 +62,11 @@
         }
         Count: [100 500];
     }
-    #*FluidEffect {
+    FluidEffect {
         Class: @"Defs/Fluids/SmallBlood.fluid.tk";
         Speed: [30 60];
         Count: [10 20];
-    }*#
+    }
     SoundImpulse {
         Permutations: [
             SoundClass {

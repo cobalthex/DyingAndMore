@@ -22,15 +22,25 @@ Map {
             ActorInstance {
                 Class: @"Defs/Entities/Player.ent.tk";
                 Faction: Factions [Player];
-                Controller: InputController {
-                    player: PlayerIndex.One;
-                };
+                Controller: Null;
                 CurrentHealth: 500;
                 MaxSpeed: 400;
-                
+                Weapon: GunInstance {
+                    Class: GunClass {
+                        Projectile: @"Defs/Entities/Missile.ent.tk";
+                        MaxAmmo: 300;
+                        BurstCont: 0;
+                        ShotsPerBurst: 1;
+                        Name: Null;
+                        UnderchargeAction: UnderchargeAction.Dissipate;
+                        OverchargeAction: OverchargeAction.Discharge;
+                    };
+                    CurrentAmmo: 300;
+                    NextShot: 0;
+                };
                 Name: Null;
-                Position: [160.0546 92.03748];
-                forward: [0.8953726 0.4453176];
+                Position: [192 191];
+                Forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
                     State: EntStateId.Idle;
@@ -39,7 +49,7 @@ Map {
                         Class: EntStateClass {
                             Name: "Idle";
                             Sprite: Sprite {
-                                ElapsedTime: 0;
+                                ElapsedTime: 11519.0586;
                                 FrameCount: 2;
                                 FrameLength: 100;
                                 TotalLength: 200;
@@ -53,61 +63,222 @@ Map {
                                 Tween: TweenStyle.Overlap;
                                 ShrinkToFit: True;
                             };
+                            Sound: SoundClass {
+                                Name: Null;
+                                Sound: Null;
+                                Subtitle: Null;
+                                Caption: Null;
+                                Gain: 1;
+                            };
                             Radius: 24;
                         };
-                        ElapsedTime: 4535.756;
+                        ElapsedTime: 0;
                     };
                     Transitions: {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 0;
+                SpawnTime: 112200.3701;
             }
             ActorInstance {
                 Class: @"Defs/Entities/Astrovirus.ent.tk";
                 Faction: Factions [Enemy Virus Common];
                 Controller: Null;
-                CurrentHealth: -5960;
-                MaxSpeed: 388.8092;
+                CurrentHealth: 40;
+                MaxSpeed: 397.0587;
                 Weapon: Null;
                 Name: Null;
-                Position: [348 108];
-                forward: [1 0];
+                Position: [192 155];
+                Forward: [1 0];
                 Velocity: [0 0];
                 State: StateMachine {
-                    State: EntStateId.Dead;
+                    State: EntStateId.Idle;
                     Instance: EntStateInstance {
-                        Id: EntStateId.Dead;
+                        Id: EntStateId.Idle;
                         Class: EntStateClass {
-                            Name: "Dead";
+                            Name: "Idle";
                             Sprite: Sprite {
-                                ElapsedTime: 0;
+                                ElapsedTime: 28652.0481;
                                 FrameCount: 6;
                                 FrameLength: 50;
                                 TotalLength: 300;
-                                IsLooping: False;
-                                Texture: "Data\\Textures/Entities/AstrovirusTest.png";
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/Astrovirus.png";
                                 Width: 40;
                                 Height: 40;
                                 Size: [40 40];
-                                ClipRect: [0 80 240 40];
+                                ClipRect: [0 0 240 120];
                                 Origin: [20 20];
                                 Tween: TweenStyle.Overlap;
                                 ShrinkToFit: True;
                             };
+                            Sound: SoundClass {
+                                Name: Null;
+                                Sound: Null;
+                                Subtitle: Null;
+                                Caption: Null;
+                                Gain: 1;
+                            };
                             Radius: 20;
                         };
-                        ElapsedTime: 20499.3814;
+                        ElapsedTime: 0;
                     };
                     Transitions: {
                     };
                 };
                 OutlineColor: [0 0 0 0];
-                SpawnTime: 0;
+                SpawnTime: 114985.9156;
+            }
+            ActorInstance {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Faction: Factions [Enemy Virus Common];
+                Controller: Null;
+                CurrentHealth: 40;
+                MaxSpeed: 332.1552;
+                Weapon: Null;
+                Name: Null;
+                Position: [154 193];
+                Forward: [1 0];
+                Velocity: [0 0];
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: "Idle";
+                            Sprite: Sprite {
+                                ElapsedTime: 28652.0481;
+                                FrameCount: 6;
+                                FrameLength: 50;
+                                TotalLength: 300;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/Astrovirus.png";
+                                Width: 40;
+                                Height: 40;
+                                Size: [40 40];
+                                ClipRect: [0 0 240 120];
+                                Origin: [20 20];
+                                Tween: TweenStyle.Overlap;
+                                ShrinkToFit: True;
+                            };
+                            Sound: SoundClass {
+                                Name: Null;
+                                Sound: Null;
+                                Subtitle: Null;
+                                Caption: Null;
+                                Gain: 1;
+                            };
+                            Radius: 20;
+                        };
+                        ElapsedTime: 0;
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 119471.9351;
+            }
+            ActorInstance {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Faction: Factions [Enemy Virus Common];
+                Controller: Null;
+                CurrentHealth: 40;
+                MaxSpeed: 237.0882;
+                Weapon: Null;
+                Name: Null;
+                Position: [230 193];
+                Forward: [1 0];
+                Velocity: [0 0];
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: "Idle";
+                            Sprite: Sprite {
+                                ElapsedTime: 28652.0481;
+                                FrameCount: 6;
+                                FrameLength: 50;
+                                TotalLength: 300;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/Astrovirus.png";
+                                Width: 40;
+                                Height: 40;
+                                Size: [40 40];
+                                ClipRect: [0 0 240 120];
+                                Origin: [20 20];
+                                Tween: TweenStyle.Overlap;
+                                ShrinkToFit: True;
+                            };
+                            Sound: SoundClass {
+                                Name: Null;
+                                Sound: Null;
+                                Subtitle: Null;
+                                Caption: Null;
+                                Gain: 1;
+                            };
+                            Radius: 20;
+                        };
+                        ElapsedTime: 0;
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [154 205 50 255];
+                SpawnTime: 127013.338;
+            }
+            ActorInstance {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Faction: Factions [Enemy Virus Common];
+                Controller: Null;
+                CurrentHealth: 40;
+                MaxSpeed: 322.9115;
+                Weapon: Null;
+                Name: Null;
+                Position: [192 227];
+                Forward: [1 0];
+                Velocity: [0 0];
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: "Idle";
+                            Sprite: Sprite {
+                                ElapsedTime: 28652.0481;
+                                FrameCount: 6;
+                                FrameLength: 50;
+                                TotalLength: 300;
+                                IsLooping: True;
+                                Texture: "Data\\Textures/Entities/Astrovirus.png";
+                                Width: 40;
+                                Height: 40;
+                                Size: [40 40];
+                                ClipRect: [0 0 240 120];
+                                Origin: [20 20];
+                                Tween: TweenStyle.Overlap;
+                                ShrinkToFit: True;
+                            };
+                            Sound: SoundClass {
+                                Name: Null;
+                                Sound: Null;
+                                Subtitle: Null;
+                                Caption: Null;
+                                Gain: 1;
+                            };
+                            Radius: 20;
+                        };
+                        ElapsedTime: 0;
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 121940.2499;
             }
         ];
         fluids: [];
-        elapsedTime: 103440.239;
+        elapsedTime: 130932.0372;
         timeScale: 1;
     };
 }
