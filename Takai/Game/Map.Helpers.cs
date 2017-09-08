@@ -214,11 +214,29 @@ namespace Takai.Game
             public EntityInstance entity; //null if collided with map
         }
 
+        /// <summary>
+        /// Test if a ray collides with a circle.
+        /// If ray is inside of the circle, t0 and t1 = 0
+        /// </summary>
+        /// <param name="circle">the circle's origin to check</param>
+        /// <param name="radiusSq">the squared radius of the cirlce</param>
+        /// <param name="rayOrigin">the origin of the ray</param>
+        /// <param name="rayDirection">the (normalized) direction of the ray</param>
+        /// <param name="t0">the length along the ray where the ray collided with the circle, infinity if none</param>
+        /// <param name="t1">the length along the ray where the ray collided with the back of the circle, infinity if none</param>
+        /// <returns>true if the ray collided with the circle</returns>
         public bool Intersects(Vector2 circle, float radiusSq, Vector2 rayOrigin, Vector2 rayDirection, out float t0, out float t1)
         {
             //fast check (won't set t)
             //var rejection = Util.Reject(circleOrigin - lineStart, lineEnd - lineStart);
             //return rejection.LengthSquared() < radiusSq;
+
+            //ray starts inside circle
+            if (Vector2.DistanceSquared(circle, rayOrigin) < radiusSq)
+            {
+                t0 = t1 = 0;
+                return true;
+            }
 
             //does ray direction have to be normalized?
 
@@ -226,6 +244,7 @@ namespace Takai.Game
             var lf = Vector2.Dot(diff, rayDirection); //scalar projection
             var s = radiusSq - Vector2.Dot(diff, diff) + (lf * lf);
 
+            //no collision
             if (s < 0)
             {
                 t0 = t1 = float.PositiveInfinity;
@@ -235,7 +254,7 @@ namespace Takai.Game
             s = (float)Math.Sqrt(s);
             t0 = lf - s;
             t1 = lf + s;
-            return t0 > 0; //todo: does not work if ray is inside of circle and in front of origin
+            return t0 > 0; //make sure the object is in front of the ray
         }
 
         /// <summary>
