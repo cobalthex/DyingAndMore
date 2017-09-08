@@ -18,6 +18,11 @@ namespace DyingAndMore.Game.Entities
         /// <remarks>Use zero for infinite</remarks>
         public float Range { get; set; } = 0;
 
+        /// <summary>
+        /// Allow this projectile to damage the creator of this projectile
+        /// </summary>
+        public bool AllowSourceDamage { get; set; } = false;
+
         public ProjectileClass()
         {
             DestroyIfInactive = true;
@@ -43,11 +48,16 @@ namespace DyingAndMore.Game.Entities
         }
         private ProjectileClass _Class;
 
+        /// <summary>
+        /// Who created this projectile
+        /// </summary>
+        public EntityInstance Source { get; set; }
+
         public ProjectileInstance() { }
         public ProjectileInstance(ProjectileClass @class)
             : base(@class)
         {
-            
+
         }
 
         public override void Think(TimeSpan DeltaTime)
@@ -69,8 +79,10 @@ namespace DyingAndMore.Game.Entities
         public override void OnEntityCollision(EntityInstance collider, Vector2 point, System.TimeSpan deltaTime)
         {
             State.TransitionTo(EntStateId.Dead, "Dead"); //todo
+            Takai.LogBuffer.Append(ToString() + " " + collider.ToString());
 
-            if (collider is ActorInstance actor)
+            if (collider is ActorInstance actor &&
+                (collider != Source || _Class.AllowSourceDamage))
             {
                 actor.CurrentHealth -= (int)_Class.Power;//todo
             }

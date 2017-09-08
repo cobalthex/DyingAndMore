@@ -11,11 +11,11 @@ namespace DyingAndMore.Game.Entities
         {
             var color = Color.MediumAquamarine;
 
-            var trace = actor.Map.Trace(actor.Position, actor.Forward, 100);
-            if (trace.entity != null)
-                color = Color.Tomato;
+            //var trace = actor.Map.Trace(actor.Position, actor.Forward, 100);
+            //if (trace.entity != null)
+            //    color = Color.Tomato;
 
-            actor.Map.DrawLine(actor.Position, actor.Position + actor.Forward * trace.distance, color);
+            //actor.Map.DrawLine(actor.Position, actor.Position + actor.Forward * trace.distance, color);
 
             var d = Vector2.Zero;
             if (Takai.Input.InputState.IsButtonDown(Keys.W))

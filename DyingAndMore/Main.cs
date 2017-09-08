@@ -73,6 +73,10 @@ namespace DyingAndMore
         SpriteBatch sbatch;
         Takai.UI.Static ui;
 
+        Takai.Graphics.BitmapFont debugFont;
+
+        Takai.FpsGraph fpsGraph;
+
         /// <summary>
         /// Create the game
         /// </summary>
@@ -125,6 +129,8 @@ namespace DyingAndMore
             Takai.UI.Static.DefaultFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>(
                 "Fonts/UISmall.bfnt");
 
+            debugFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
+
             //testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
 
             //var testAutoUi = Takai.UI.Static.GeneratePropSheet(
@@ -166,6 +172,12 @@ namespace DyingAndMore
                 list.AddChild(row);
             }
             list.AutoSize();
+
+            fpsGraph = new Takai.FpsGraph()
+            {
+                Bounds = new Rectangle(20, 20, 800, 100),
+                HorizontalAlignment = Takai.UI.Alignment.Middle
+            };
 
             /*
             //var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(
@@ -214,6 +226,16 @@ namespace DyingAndMore
             {
                 ui.ReplaceAllChildren(new AssetView());
             }
+            if (InputState.IsPress(Keys.F8))
+            {
+                if (fpsGraph.Parent != null)
+                    fpsGraph.RemoveFromParent();
+                else
+                {
+                    fpsGraph.Clear();
+                    ui.AddChild(fpsGraph);
+                }
+            }
 
             InputState.Update(GraphicsDevice.Viewport.Bounds);
 
@@ -245,6 +267,18 @@ namespace DyingAndMore
             {
                 sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                 ui.Draw(sbatch);
+
+                int y = GraphicsDevice.Viewport.Height - 70;
+                foreach (var row in Takai.LogBuffer.Entries)
+                {
+                    if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
+                    {
+                        var sz = debugFont.MeasureString(row.text);
+                        debugFont.Draw(sbatch, row.text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.MediumSeaGreen);
+                    }
+                    y -= debugFont.MaxCharHeight;
+                }
+
                 sbatch.End();
             }
         }

@@ -77,6 +77,7 @@ namespace DyingAndMore
                     HorizontalAlignment = Alignment.Middle,
                     VerticalAlignment = Alignment.Middle
                 };
+                inp.HasFocus = true;
                 view.ReplaceAllChildren(inp);
             }
             else if (asset is SoundEffect sfx)

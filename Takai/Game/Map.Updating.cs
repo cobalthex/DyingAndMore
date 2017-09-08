@@ -73,6 +73,9 @@ namespace Takai.Game
             var deltaSeconds = (float)deltaTime.TotalSeconds;
             ElapsedTime += deltaTime;
 
+            //if (deltaTicks == 0)
+            //    return;
+
             var invTransform = Matrix.Invert(Camera.Transform);
 
             var visibleRegion = Camera.VisibleRegion;
@@ -147,7 +150,7 @@ namespace Takai.Game
                     if (updateSettings.isAiEnabled)
                         ent.Think(deltaTime);
 
-                    if (updateSettings.isPhysicsEnabled)
+                    if (updateSettings.isPhysicsEnabled && deltaTicks != 0)
                     {
                         if (ent.Velocity != Vector2.Zero)
                         {
