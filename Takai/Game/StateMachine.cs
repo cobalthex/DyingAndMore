@@ -36,7 +36,15 @@ namespace Takai.Game
 
         public Graphics.Sprite Sprite { get; set; }
 
+        /// <summary>
+        /// Looping state sound
+        /// </summary>
         public SoundClass Sound { get; set; }
+
+        /// <summary>
+        /// An optional event to play when this state is activated
+        /// </summary>
+        public EffectsEvent Effect { get; set; }
 
         public float Radius =>
             Sprite != null ? MathHelper.Max(Sprite.Width, Sprite.Height) / 2 : 1;

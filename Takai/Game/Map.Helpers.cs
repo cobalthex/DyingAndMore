@@ -205,6 +205,46 @@ namespace Takai.Game
             return null;
         }
 
+        public enum CleanupOptions
+        {
+            None            = 0,
+            All             = ~0,
+            Fluids          = 0b0001,
+            Decals          = 0b0010,
+            Particles       = 0b0100,
+            DeadEntities    = 0b1000,
+            //non players
+        }
+
+        public void CleanupAll(CleanupOptions options)
+        {
+            if (options.HasFlag(CleanupOptions.Fluids))
+                ActiveFluids.Clear();
+
+            if (options.HasFlag(CleanupOptions.DeadEntities))
+                ActiveEnts.RemoveWhere((ent) => ent.State.State == EntStateId.Dead); //todo: use destroy?
+
+            if (options.HasFlag(CleanupOptions.Particles))
+                Particles.Clear();
+
+            foreach (var sector in Sectors)
+            {
+                if (options.HasFlag(CleanupOptions.Fluids))
+                    sector.fluids.Clear();
+
+                if (options.HasFlag(CleanupOptions.Decals))
+                    sector.decals.Clear();
+
+                if (options.HasFlag(CleanupOptions.DeadEntities))
+                    sector.entities.RemoveWhere((ent) => ent.State.State == EntStateId.Dead);
+            }
+        }
+
+        public void CleanupOffscreen(CleanupOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// The outcome of a trace
         /// </summary>

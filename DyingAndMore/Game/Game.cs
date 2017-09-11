@@ -5,7 +5,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.UI;
 
-using FxList = System.Collections.Generic.List<Takai.Game.IGameEffect>;
+using System;
+using Takai.Game;
 
 namespace DyingAndMore.Game
 {
@@ -14,7 +15,7 @@ namespace DyingAndMore.Game
         Entities.ActorInstance player = null;
         Entities.Controller lastController = null;
 
-        FxList testEffect;
+        EffectsEvent fx;
 
         Static fpsDisplay;
         Static crapDisplay;
@@ -60,13 +61,44 @@ namespace DyingAndMore.Game
                 Color = Color.PaleGreen
             });
 
-            testEffect = Takai.Data.Cache.Load<FxList>("defs/effects/test.fx.tk");
+            fx = Takai.Data.Cache.Load<EffectsEvent>("defs/effects/test.fx.tk");
         }
 
-        protected override void OnMapChanged(System.EventArgs e)
+        class BulletTimeScript : Script
         {
-            Map.updateSettings = Takai.Game.Map.UpdateSettings.Game;
-            Map.renderSettings = Takai.Game.Map.RenderSettings.Default;
+            public Curve timeSlow = new Curve();
+            TimeSpan totalTime = TimeSpan.FromSeconds(5);
+            TimeSpan elapsedTime;
+
+            public BulletTimeScript() : base("Test")
+            {
+                timeSlow.Keys.Add(new CurveKey(0, 1));
+                timeSlow.Keys.Add(new CurveKey(0.5f, 0.25f));
+                timeSlow.Keys.Add(new CurveKey(0.95f, 0.1f));
+                timeSlow.Keys.Add(new CurveKey(1, 1));
+            }
+
+            public override void Step(TimeSpan deltaTime)
+            {
+                deltaTime = TimeSpan.FromMilliseconds(deltaTime.TotalMilliseconds / Map.TimeScale);
+                if (elapsedTime < totalTime)
+                {
+                    var pct = elapsedTime.TotalMilliseconds / totalTime.TotalMilliseconds;
+                    Map.TimeScale = timeSlow.Evaluate((float)pct);
+                    elapsedTime += deltaTime;
+                }
+                else
+                {
+                    //Map.TimeScale = 1;
+                    //destroy this script
+                }
+            }
+        }
+
+        protected override void OnMapChanged(EventArgs e)
+        {
+            Map.updateSettings = Map.UpdateSettings.Game;
+            Map.renderSettings = Map.RenderSettings.Default;
 
             var possibles = Map.FindEntitiesByClassName("player");
             if (possibles.Count > 0)
@@ -76,16 +108,22 @@ namespace DyingAndMore.Game
             }
             Map.ActiveCamera = new Takai.Game.Camera(player);
 
-            var testScript = new Scripts.TestScript()
-            {
-                totalTime = System.TimeSpan.FromSeconds(10),
-                victim = player
-            };
+            var testScript = new BulletTimeScript();
             Map.AddScript(testScript);
 
             //Map.Tiles[0, 0] = 9;
 
             //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
+
+            foreach (var entity in Map.AllEntities)
+            {
+                if (entity != player)
+                {
+                    entity.Parent = player;
+                    entity.Position = new Vector2(40);
+                    break;
+                }
+            }
         }
 
         protected override void UpdateSelf(GameTime time)
@@ -117,8 +155,7 @@ namespace DyingAndMore.Game
 
             if (InputState.IsPress(MouseButtons.Left))
             {
-                var pos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
-                Map.Spawn(testEffect, pos, Vector2.Normalize(player.Position - pos));
+                Map.Spawn(fx, Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), Vector2.UnitX);
             }
 
             var scrollDelta = InputState.ScrollDelta();

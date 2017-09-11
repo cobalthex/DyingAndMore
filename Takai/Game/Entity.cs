@@ -100,6 +100,25 @@ namespace Takai.Game
         private EntityClass _class;
 
         /// <summary>
+        /// An optional entity to attach to. This entity's position becomes relative while attached
+        /// </summary>
+        public EntityInstance Parent
+        {
+            get => _parent;
+            set
+            {
+                var nextPosition = Position;
+                if (_parent != null)
+                    nextPosition += _parent.Position;
+                _parent = value;
+                if (_parent != null)
+                    nextPosition -= _parent.Position;
+                Position = nextPosition;
+            }
+        }
+        private EntityInstance _parent;
+
+        /// <summary>
         /// A name for this instance, should be unique
         /// </summary>
         [Data.DesignerModdable]

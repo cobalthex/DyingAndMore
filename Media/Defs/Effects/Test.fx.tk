@@ -1,78 +1,78 @@
-[]
-
-[
-    ParticleEffect {
-        Class: {
-            Graphic: {
-                Texture: "Textures/Particles/decay.png"
-                Width: 8;
-                Height: 8;
-                FrameLength: 100msec;
-                Center: true;
-            };
-            FluidOnDeath: @"Defs/Fluids/SmallBlood.fluid.tk";
-            Blend: BlendState.Additive;
-            ColorOverTime: {
-                start: Color.White;
-                end: Color.White;
-            }
-            AngleOverTime: {
-                start: 0;
-                end: 4pi;
-            };
-            InitialSpeed: [20 40];
-            lifetime: [1sec 3sec];
-        }
-        Count: [5 20];
-    }
-    ParticleEffect {
-        Class: {
-            Graphic: {
-                Texture: "Textures/Particles/trail.png"
-                width:8;
-                height:8;
-                frameLength:100msec;
-                Center: true;
-            };
-            Blend: BlendState.Additive;
-            ColorOverTime: {
-                Curve: {
-                    Keys: [
-                        CurveKey {
-                            Position: 0;
-                            Value: 0;
-                        }
-                        CurveKey {
-                            Position: 0.5;
-                            Value: 0;
-                        }
-                        CurveKey {
-                            Position: 1;
-                            Value: 1;
-                        }
-                    ]
+EffectsEvent {
+    Effects: [
+        ParticleEffect {
+            Class: {
+                Graphic: {
+                    Texture: "Textures/Particles/decay.png"
+                    Width: 8;
+                    Height: 8;
+                    FrameLength: 100msec;
+                    Center: true;
+                };
+                FluidOnDeath: @"Defs/Fluids/SmallBlood.fluid.tk";
+                Blend: BlendState.Additive;
+                ColorOverTime: {
+                    start: Color.White;
+                    end: Color.White;
                 }
-                start: Color.White;
-                end: [127 0 0 0];
+                AngleOverTime: {
+                    start: 0;
+                    end: 4pi;
+                };
+                InitialSpeed: [20 40];
+                lifetime: [1sec 3sec];
             }
-            AngleOverTime: {start:0 end:6pi};
-            InitialSpeed: [100 200];
-            Drag: 1.3;
-            lifetime: [2sec 3sec];
+            Count: [5 20];
         }
-        Count: [100 500];
-    }
-    FluidEffect {
-        Class: @"Defs/Fluids/SmallBlood.fluid.tk";
-        Speed: [30 60];
-        Count: [10 20];
-    }
-    SoundImpulse {
-        Permutations: [
-            SoundClass {
-                sound: "Sounds/open_fx.ogg";
-                gain: 0.1;
+        ParticleEffect {
+            Class: {
+                Graphic: {
+                    Texture: "Textures/Particles/trail.png"
+                    width:8;
+                    height:8;
+                    frameLength:100msec;
+                    Center: true;
+                };
+                Blend: BlendState.Additive;
+                ColorOverTime: {
+                    Curve: {
+                        Keys: [
+                            CurveKey {
+                                Position: 0;
+                                Value: 0;
+                            }
+                            CurveKey {
+                                Position: 0.5;
+                                Value: 0;
+                            }
+                            CurveKey {
+                                Position: 1;
+                                Value: 1;
+                            }
+                        ]
+                    }
+                    start: Color.White;
+                    end: [127 0 0 0];
+                }
+                AngleOverTime: {start:0 end:6pi};
+                InitialSpeed: [100 200];
+                Drag: 1.3;
+                lifetime: [2sec 3sec];
             }
-        ]
-    }
-]
+            Count: [100 500];
+        }
+        FluidEffect {
+            Class: @"Defs/Fluids/SmallBlood.fluid.tk";
+            Speed: [30 60];
+            Count: [10 20];
+        }
+        SoundImpulse {
+            Permutations: [
+                SoundClass {
+                    sound: "Sounds/open_fx.ogg";
+                    gain: 0.1;
+                }
+            ]
+        }
+    ]
+}
