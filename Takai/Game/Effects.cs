@@ -47,4 +47,21 @@ namespace Takai.Game
     {
 
     }
+
+    public class EffectsEvent : Data.ISerializeExternally //todo: better name?
+    {
+        [Data.Serializer.Ignored]
+        public string File { get; set; }
+
+        public float SkipChance { get; set; }
+
+        public Range<TimeSpan> Delay { get; set; } //todo: queuedEvents in map
+
+        /// <summary>
+        /// Relative position to the spawn point
+        /// </summary>
+        public Vector2 Offset { get; set; } = Vector2.Zero;
+
+        public List<IGameEffect> Effects { get; set; }
+    }
 }

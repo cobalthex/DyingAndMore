@@ -7,11 +7,14 @@ namespace DyingAndMore.Game.Weapons
     {
         public Entities.ProjectileClass Projectile { get; set; }
 
+        /// <summary>
+        /// Maximum ammo count, use 0 for infinite
+        /// </summary>
         public int MaxAmmo { get; set; } = 100;
 
         //clip size, shots reloaded per load
 
-        public int BurstCont { get; set; } = 0;
+        public int BurstCount { get; set; } = 0;
         public int ShotsPerBurst { get; set; } = 1;
 
         public Takai.Game.Range<float> ErrorAngle { get; set; }

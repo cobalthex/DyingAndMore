@@ -58,17 +58,17 @@ namespace Takai.Game
         /// Update the map state
         /// Updates the active set and then the contents of the active set
         /// </summary>
-        /// <param name="RealTime">(Real) game time</param>
-        /// <param name="Camera">Where on the map to view</param>
+        /// <param name="realTime">(Real) game time</param>
+        /// <param name="camera">Where on the map to view</param>
         /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
-        public void Update(GameTime RealTime, Camera Camera = null)
+        public void Update(GameTime realTime, Camera camera = null)
         {
-            if (Camera == null)
-                Camera = ActiveCamera;
+            if (camera == null)
+                camera = ActiveCamera;
 
-            Camera.Update(RealTime);
+            camera.Update(realTime);
 
-            var deltaTicks = (long)(RealTime.ElapsedGameTime.Ticks * (double)TimeScale);
+            var deltaTicks = (long)(realTime.ElapsedGameTime.Ticks * (double)TimeScale);
             var deltaTime = TimeSpan.FromTicks(deltaTicks);
             var deltaSeconds = (float)deltaTime.TotalSeconds;
             ElapsedTime += deltaTime;
@@ -76,9 +76,9 @@ namespace Takai.Game
             //if (deltaTicks == 0)
             //    return;
 
-            var invTransform = Matrix.Invert(Camera.Transform);
+            var invTransform = Matrix.Invert(camera.Transform);
 
-            var visibleRegion = Camera.VisibleRegion;
+            var visibleRegion = camera.VisibleRegion;
             var visibleSectors = GetOverlappingSectors(visibleRegion);
             var mapBounds = Bounds;
 
@@ -118,7 +118,7 @@ namespace Takai.Game
                 ent.SpawnTime = TimeSpan.Zero;
 
                 ActiveEnts.Remove(ent);
-                var sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
+                var sectors = GetOverlappingSectors(ent.AxisAlignedBounds); //todo: needs parent offset
                 for (int y = sectors.Top; y < sectors.Bottom; ++y)
                 {
                     for (int x = sectors.Left; x < sectors.Right; ++x)
@@ -133,6 +133,13 @@ namespace Takai.Game
             foreach (var ent in ActiveEnts)
             {
                 var entBounds = ent.AxisAlignedBounds;
+                var entPos = ent.Position;
+                if (ent.Parent != null)
+                {
+                    entPos += ent.Parent.Position;
+                    entBounds.Offset(ent.Parent.Position); //todo: maybe apply inside entity (RelativePosition?)
+                }
+
                 if (!Bounds.Intersects(entBounds) || //outside of the map
                     ent.State.Instance == null) //no state
                         Destroy(ent);
@@ -160,7 +167,7 @@ namespace Takai.Game
                             var direction = deltaV / deltaVLen;
 
                             //entity collision
-                            var start = ent.Position + ((ent.Radius + 1) * direction);
+                            var start = entPos + ((ent.Radius + 1) * direction);
                             var hit = Trace(start, direction, deltaVLen, ent);
                             var target = start + (direction * hit.distance);
                             //DrawLine(start, target, Color.Yellow);

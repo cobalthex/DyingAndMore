@@ -227,7 +227,6 @@ namespace Takai.Game
 
         private void LoadState(MapState State)
         {
-            eventHandlers.Clear();
             scripts.Clear();
 
             ActiveEnts.Clear();

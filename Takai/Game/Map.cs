@@ -129,12 +129,6 @@ namespace Takai.Game
         public int TotalEntitiesCount { get; private set; } = 0;
 
         /// <summary>
-        /// Event handlers for specific game events
-        /// Event name -> Handlers
-        /// </summary>
-        protected Dictionary<string, GameEvent> eventHandlers = new Dictionary<string, GameEvent>();
-
-        /// <summary>
         /// Active scripts running on this map
         /// </summary>
         protected Dictionary<string, Script> scripts = new Dictionary<string, Script>();
@@ -196,53 +190,6 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Add an event handler
-        /// </summary>
-        /// <param name="name">The name of the event to add a handler to. Null or empty names are ignored</param>
-        /// <param name="eventHandler">The event handler to add</param>
-        /// <returns>True if the handler was added, false otherwise</returns>
-        public bool AddEventHandler(string name, GameEvent eventHandler)
-        {
-            if (string.IsNullOrEmpty(name))
-                return false;
-
-            if (eventHandlers.ContainsKey(name))
-                eventHandlers[name] += eventHandler;
-            else
-                eventHandlers[name] = eventHandler;
-
-            return true;
-        }
-
-        /// <summary>
-        /// Remove an event handler
-        /// </summary>
-        /// <param name="name">The name of the event to remove the handler from</param>
-        /// <param name="eventHandler">The event handler to remove</param>
-        /// <returns>True if the handler was removed, false otherwise</returns>
-        public bool RemoveEventHandler(string name, GameEvent eventHandler)
-        {
-            if (eventHandlers.ContainsKey(name))
-            {
-                eventHandlers[name] -= eventHandler;
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Trigger an event
-        /// </summary>
-        /// <param name="name">The name of the trigger</param>
-        /// <param name="value">The value of the trigger. Value interpreted by the handler</param>
-        public void TriggerEvent(string name, int value)
-        {
-            if (eventHandlers.TryGetValue(name, out var handler))
-                handler(name, value);
-        }
-
-
-        /// <summary>
         /// Add a script to the map, overwrites any existing scripts with the sane name
         /// </summary>
         /// <param name="script">The script to add</param>
@@ -256,13 +203,21 @@ namespace Takai.Game
                 old.Map = null;
 
             script.Map = this;
-            scripts[script.Name] = script;
+            script.StartTime = ElapsedTime;
+            scripts[script.Name] = script; //todo: not unique
+            script.OnSpawn();
             return true;
         }
 
         public bool RemoveScript(string Name)
         {
-            return scripts.Remove(Name);
+            if (scripts.TryGetValue(Name, out var script))
+            {
+                script.OnDestroy();
+                scripts.Remove(Name);
+                return true;
+            }
+            return false;
         }
         public bool RemoveScript(Script script)
         {
@@ -402,10 +357,13 @@ namespace Takai.Game
             }
         }
 
-        public void Spawn(List<IGameEffect> effects, Vector2 position, Vector2 direction) //todo: better name
+        public void Spawn(EffectsEvent effects, Vector2 position, Vector2 direction) //todo: better name
         {
-            foreach (var effect in effects)
-                Spawn(effect, position, direction);
+            if (effects.SkipChance > 0 && random.NextDouble() < effects.SkipChance)
+                return;
+
+            foreach (var effect in effects.Effects)
+                Spawn(effect, position + effects.Offset, direction);
         }
 
         /// <summary>
