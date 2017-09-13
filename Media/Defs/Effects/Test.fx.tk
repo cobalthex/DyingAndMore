@@ -1,15 +1,18 @@
+{}
+
 EffectsEvent {
     Effects: [
         ParticleEffect {
             Class: {
                 Graphic: {
-                    Texture: "Textures/Particles/decay.png"
-                    Width: 8;
-                    Height: 8;
+                    Texture: "Textures/Particles/blood.png"
+                    Width: 10;
+                    Height: 10;
+                    FrameCount: 6;
                     FrameLength: 100msec;
                     Center: true;
                 };
-                FluidOnDeath: @"Defs/Fluids/SmallBlood.fluid.tk";
+                FluidOnDeath: @"Defs/Fluids/Blood.fluid.tk";
                 Blend: BlendState.Additive;
                 ColorOverTime: {
                     start: Color.White;
@@ -22,7 +25,7 @@ EffectsEvent {
                 InitialSpeed: [20 40];
                 lifetime: [1sec 3sec];
             }
-            Count: [5 20];
+            Count: [5 10];
         }
         ParticleEffect {
             Class: {

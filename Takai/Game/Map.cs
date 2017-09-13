@@ -11,7 +11,7 @@ namespace Takai.Game
     public class MapSector
     {
         //dynamic
-        public HashSet<EntityInstance> entities = new HashSet<EntityInstance>();
+        public HashSet<EntityInstance> entities = new HashSet<EntityInstance>(); //todo: profile against list
 
         //static
         public List<FluidInstance> fluids = new List<FluidInstance>();
@@ -280,7 +280,7 @@ namespace Takai.Game
                 ActiveFluids.Add(new FluidInstance { position = position, velocity = velocity, Class = fluid });
         }
 
-        public void Spawn(SoundClass sound, Vector2 position, Vector2 forward)
+        public void Spawn(SoundClass sound, Vector2 position, Vector2 forward, Vector2 velocity)
         {
             if (sound.Sound == null)
                 return;
@@ -288,12 +288,19 @@ namespace Takai.Game
             var instance = sound.Create();
             instance.Position = position;
             instance.Forward = forward;
-            //velocity
+            instance.Velocity = velocity;
             instance.Instance.Play();
             ActiveSounds.Add(instance);
         }
 
-        public void Spawn(IGameEffect effect, Vector2 position, Vector2 direction)
+        /// <summary>
+        /// Spawn an effect
+        /// </summary>
+        /// <param name="effect">The effect to spawn</param>
+        /// <param name="position">Where to spawn the effect</param>
+        /// <param name="forward">What direction to spawn the effect facing (used for things like spread)</param>
+        /// <param name="velocity">Velocity added to any effects' calculated velocity</param>
+        public void Spawn(IGameEffect effect, Vector2 position, Vector2 forward, Vector2 velocity)
         {
             if (effect is ParticleEffect pe)
             {
@@ -311,7 +318,7 @@ namespace Takai.Game
                     var speed = RandomRange.Next(pe.Class.InitialSpeed);
                     var lifetime = RandomRange.Next(pe.Class.Lifetime);
 
-                    var dir = Vector2.TransformNormal(direction, Matrix.CreateRotationZ(angle));
+                    var dir = Vector2.TransformNormal(forward, Matrix.CreateRotationZ(angle));
                     var initAngle = (float)System.Math.Atan2(dir.Y, dir.X);
 
                     var particle = new ParticleInstance()
@@ -319,7 +326,7 @@ namespace Takai.Game
                         color = pe.Class.ColorOverTime.start,
                         delay = System.TimeSpan.Zero,
                         position = position,
-                        velocity = speed * dir,
+                        velocity = speed * dir + velocity,
                         lifetime = lifetime,
                         angle = initAngle,
                         scale = 1,
@@ -343,7 +350,7 @@ namespace Takai.Game
                     Spawn(
                         fe.Class,
                         position,
-                        speed * Vector2.TransformNormal(direction, Matrix.CreateRotationZ(angle))
+                        speed * Vector2.TransformNormal(forward, Matrix.CreateRotationZ(angle)) + velocity
                     );
                 }
             }
@@ -352,18 +359,18 @@ namespace Takai.Game
                 if (si.Permutations.Count > 0)
                 {
                     var rnd = random.Next(si.Permutations.Count);
-                    Spawn(si.Permutations[rnd], position, direction);
+                    Spawn(si.Permutations[rnd], position, forward, velocity);
                 }
             }
         }
 
-        public void Spawn(EffectsEvent effects, Vector2 position, Vector2 direction) //todo: better name
+        public void Spawn(EffectsEvent effects, Vector2 position, Vector2 direction, Vector2 velocity) //todo: better name
         {
-            if (effects.SkipChance > 0 && random.NextDouble() < effects.SkipChance)
+            if (effects?.Effects == null || effects.SkipChance > 0 && random.NextDouble() < effects.SkipChance)
                 return;
 
             foreach (var effect in effects.Effects)
-                Spawn(effect, position + effects.Offset, direction);
+                Spawn(effect, position + effects.Offset, direction, velocity);
         }
 
         /// <summary>

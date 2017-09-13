@@ -1,0 +1,4 @@
+GunClass {
+	Name: "Test fluid gun";
+	MaxAmmo: 0;
+}

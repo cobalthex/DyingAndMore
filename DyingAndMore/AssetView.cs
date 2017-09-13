@@ -83,6 +83,54 @@ namespace DyingAndMore
             else if (asset is SoundEffect sfx)
             {
                 activeSound = sfx.CreateInstance();
+
+                var list = new List()
+                {
+                    Direction = Direction.Vertical,
+                    HorizontalAlignment = Alignment.Middle,
+                    VerticalAlignment = Alignment.Middle,
+                    Margin = 10,
+                };
+
+                list.AddChild(new Static() { Text = "Pitch", Size = new Xna.Vector2(80, 30) });
+                var track = new TrackBar()
+                {
+                    Text = "Pitch",
+                    Minimum = -1000,
+                    Maximum = 1000,
+                    Value = 0,
+                    Increment = 1,
+                    HorizontalAlignment = Alignment.Middle,
+                    Size = new Xna.Vector2(200, 30)
+                };
+                track.Click += delegate (object _sender, ClickEventArgs _e)
+                {
+                    if (activeSound != null)
+                    {
+                        activeSound.Pitch = ((TrackBar)_sender).Value / 1000f;
+                        activeSound.Stop();
+                        activeSound.Play();
+                    }
+                };
+                list.AddChild(track);
+
+                list.AddChild(new Static() { Text = "Pan", Size = new Xna.Vector2(80, 30) });
+                track = (TrackBar)track.Clone();
+                track.Text = "Pan";
+                track.Click += delegate (object _sender, ClickEventArgs _e)
+                {
+                    if (activeSound != null)
+                    {
+                        activeSound.Pan = ((TrackBar)_sender).Value / 1000f;
+                        activeSound.Stop();
+                        activeSound.Play();
+                    }
+                };
+                list.AddChild(track);
+                list.AutoSize();
+
+                view.ReplaceAllChildren(list);
+
                 activeSound.Play();
             }
         }

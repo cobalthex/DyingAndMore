@@ -6,6 +6,8 @@ namespace Takai.UI
     //scroll base?
     public class TrackBar : NumericBase
     {
+        public override bool CanFocus => true;
+
         protected override bool HandleInput(GameTime time)
         {
             if (DidPressInside())

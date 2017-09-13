@@ -238,6 +238,8 @@ namespace Takai.Game
                 if (options.HasFlag(CleanupOptions.DeadEntities))
                     sector.entities.RemoveWhere((ent) => ent.State.State == EntStateId.Dead);
             }
+
+            TotalEntitiesCount = System.Linq.Enumerable.Count(AllEntities);
         }
 
         public void CleanupOffscreen(CleanupOptions options)

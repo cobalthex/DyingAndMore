@@ -82,6 +82,7 @@ namespace Takai.UI
 
             //todo: stretched elements
 
+            //currently broken:
             //todo: decide how to handle alignment on main axis, vertical list with child:vertical-middle will put child in middle of list container
 
             base.Reflow();

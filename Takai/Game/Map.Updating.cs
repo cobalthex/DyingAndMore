@@ -118,7 +118,7 @@ namespace Takai.Game
                 ent.SpawnTime = TimeSpan.Zero;
 
                 ActiveEnts.Remove(ent);
-                var sectors = GetOverlappingSectors(ent.AxisAlignedBounds); //todo: needs parent offset
+                var sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
                 for (int y = sectors.Top; y < sectors.Bottom; ++y)
                 {
                     for (int x = sectors.Left; x < sectors.Right; ++x)
@@ -126,6 +126,7 @@ namespace Takai.Game
                 }
 
                 ent.Map = null;
+                ent.Parent = null;
                 --TotalEntitiesCount;
             }
             entsToDestroy.Clear();
@@ -133,12 +134,6 @@ namespace Takai.Game
             foreach (var ent in ActiveEnts)
             {
                 var entBounds = ent.AxisAlignedBounds;
-                var entPos = ent.Position;
-                if (ent.Parent != null)
-                {
-                    entPos += ent.Parent.Position;
-                    entBounds.Offset(ent.Parent.Position); //todo: maybe apply inside entity (RelativePosition?)
-                }
 
                 if (!Bounds.Intersects(entBounds) || //outside of the map
                     ent.State.Instance == null) //no state
@@ -167,7 +162,7 @@ namespace Takai.Game
                             var direction = deltaV / deltaVLen;
 
                             //entity collision
-                            var start = entPos + ((ent.Radius + 1) * direction);
+                            var start = ent.Position + ((ent.Radius + 1) * direction);
                             var hit = Trace(start, direction, deltaVLen, ent);
                             var target = start + (direction * hit.distance);
                             //DrawLine(start, target, Color.Yellow);

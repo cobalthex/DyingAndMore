@@ -101,22 +101,28 @@ namespace Takai.Game
 
         /// <summary>
         /// An optional entity to attach to. This entity's position becomes relative while attached
+        /// Circular relationships are not safe heres
         /// </summary>
         public EntityInstance Parent
-        {
+        { //todo: serialize?
             get => _parent;
             set
             {
-                var nextPosition = Position;
                 if (_parent != null)
-                    nextPosition += _parent.Position;
+                    _parent.Children.Remove(this);
+
                 _parent = value;
                 if (_parent != null)
-                    nextPosition -= _parent.Position;
-                Position = nextPosition;
+                    _parent.Children.Add(this);
             }
         }
         private EntityInstance _parent;
+
+        /// <summary>
+        /// The cached list of children attached to this entity
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public List<EntityInstance> Children { get; set; } = new List<EntityInstance>(); //use a hash set if more than ~20 items
 
         /// <summary>
         /// A name for this instance, should be unique
@@ -132,12 +138,30 @@ namespace Takai.Game
             get => _position;
             set
             {
+                var diff = value - _position;
                 _position = value;
+                foreach (var child in Children)
+                    child.Position += diff;
                 lastTransform.Translation = new Vector3(value, 0);
                 UpdateAxisAlignedBounds();
             }
         }
         private Vector2 _position;
+
+        /// <summary>
+        /// This entity's position relative to its parent. Only used if there is a parent
+        /// </summary>
+        public Vector2 RelativePosition
+        {
+            get => _relativePosition;
+            set
+            {
+                _relativePosition = value;
+                if (Parent != null)
+                    Position = Parent.Position + _relativePosition;
+            }
+        }
+        private Vector2 _relativePosition;
 
         /// <summary>
         /// The (normalized) direction the entity is facing
@@ -172,6 +196,14 @@ namespace Takai.Game
         /// </summary>
         [Data.Serializer.Ignored]
         public Rectangle AxisAlignedBounds { get; private set; }
+
+        /// <summary>
+        /// The mass of this object.
+        /// 0 for light objects
+        /// 1 for 'normal' mass objects
+        /// 10 for very heavy objects
+        /// </summary>
+        public float Mass { get; set; } = 1;
 
         public StateMachine State
         {
@@ -289,7 +321,11 @@ namespace Takai.Game
             v = Vector2.Transform(new Vector2(r.X, r.Y + r.Height), transform);
             min = Vector2.Min(min, v); max = Vector2.Max(max, v);
 
-            AxisAlignedBounds = new Rectangle(min.ToPoint(), (max - min).ToPoint());
+            r = new Rectangle(min.ToPoint(), (max - min).ToPoint());
+
+            foreach (var child in Children)
+                r = Rectangle.Union(r, child.AxisAlignedBounds);
+            AxisAlignedBounds = r;
         }
 
         public override bool Equals(object obj)

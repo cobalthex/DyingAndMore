@@ -79,7 +79,6 @@
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Effects.cs" />
     <Compile Include="Game\Entity.cs" />
-    <Compile Include="Game\Group.cs" />
     <Compile Include="Game\Map.cs" />
     <Compile Include="Game\Map.Drawing.cs">
       <DependentUpon>Map.cs</DependentUpon>

@@ -84,27 +84,27 @@ namespace Takai.Game
 
         public EntStateClass Class
         {
-            get => _Class;
+            get => _class;
             set
             {
-                _Class = value;
+                _class = value;
 
-                if (_Class != null)
+                if (_class != null)
                 {
                     Sound.Instance?.Dispose();
-                    if (_Class.Sound != null)
+                    if (_class.Sound != null)
                     {
-                        Sound = _Class.Sound.Create();
+                        Sound = _class.Sound.Create();
                         if (Sound.Instance != null)
                         {
-                            Sound.Instance.IsLooped = _Class.IsLooping;
+                            Sound.Instance.IsLooped = _class.IsLooping;
                             Sound.Instance.Play();
                         }
                     }
                 }
             }
         }
-        private EntStateClass _Class;
+        private EntStateClass _class;
 
         [Data.Serializer.Ignored]
         public SoundInstance Sound { get; set; }

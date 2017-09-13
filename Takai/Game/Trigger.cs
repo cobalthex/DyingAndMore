@@ -20,7 +20,7 @@ namespace Takai.Game
         /// <summary>
         /// Entities currently inside this trigger region
         /// </summary>
-        internal HashSet<EntityClass> ContainedEntities { get; set; } = new HashSet<EntityClass>();
+        internal HashSet<EntityClass> ContainedEntities { get; set; } = new HashSet<EntityClass>(); //todo: coroutine?
 
         public Trigger()
         {

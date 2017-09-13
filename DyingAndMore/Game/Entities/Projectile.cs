@@ -43,10 +43,10 @@ namespace DyingAndMore.Game.Entities
             {
                 System.Diagnostics.Contracts.Contract.Assert(value == null || value is ProjectileClass);
                 base.Class = value;
-                _Class = value as ProjectileClass;
+                _class = value as ProjectileClass;
             }
         }
-        private ProjectileClass _Class;
+        private ProjectileClass _class;
 
         /// <summary>
         /// Who created this projectile
@@ -82,9 +82,9 @@ namespace DyingAndMore.Game.Entities
             Takai.LogBuffer.Append(ToString() + " " + collider.ToString());
 
             if (collider is ActorInstance actor &&
-                (collider != Source || _Class.AllowSourceDamage))
+                (collider != Source || _class.AllowSourceDamage))
             {
-                actor.CurrentHealth -= (int)_Class.Power;//todo
+                actor.CurrentHealth -= (int)_class.Power;//todo
             }
         }
     }
