@@ -65,10 +65,10 @@ namespace DyingAndMore.Game.Entities
             {
                 System.Diagnostics.Contracts.Contract.Assert(value == null || value is ActorClass);
                 base.Class = value;
-                _Class = value as ActorClass;
+                _class = value as ActorClass;
             }
         }
-        private ActorClass _Class;
+        private ActorClass _class;
 
         /// <summary>
         /// The current faction. Typically used by the AI to determine enemies
@@ -131,14 +131,14 @@ namespace DyingAndMore.Game.Entities
         {
             if (Class != null)
             {
-                MaxSpeed      = RandomRange.Next(_Class.MaxSpeed);
-                CurrentHealth = _Class.MaxHealth;
-                Weapon        = _Class.DefaultWeapon?.Create();
-                Faction       = _Class.DefaultFaction;
+                MaxSpeed      = RandomRange.Next(_class.MaxSpeed);
+                CurrentHealth = _class.MaxHealth;
+                Weapon        = _class.DefaultWeapon?.Create();
+                Faction       = _class.DefaultFaction;
 
-                if (_Class.DefaultController != null)
+                if (_class.DefaultController != null)
                 {
-                    Controller = (Controller)_Class.DefaultController.Clone();
+                    Controller = (Controller)_class.DefaultController.Clone();
                     Controller.actor = this;
                 }
             }
@@ -182,7 +182,7 @@ namespace DyingAndMore.Game.Entities
 
         public void Accelerate(Vector2 direction)
         {
-            var vel = Velocity + (direction * _Class.MoveForce);
+            var vel = Velocity + (direction * _class.MoveForce);
             var lSq = vel.LengthSquared();
             if (lSq > MaxSpeed * MaxSpeed)
                 vel = (vel / (float)Math.Sqrt(lSq)) * MaxSpeed;
@@ -203,7 +203,7 @@ namespace DyingAndMore.Game.Entities
 
             var dot = Vector2.Dot(Forward, diff);
 
-            return (dot > (1 - (_Class.FieldOfView / MathHelper.Pi)));
+            return (dot > (1 - (_class.FieldOfView / MathHelper.Pi)));
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace DyingAndMore.Game.Entities
             diff.Normalize();
 
             var dot = Vector2.Dot(diff, Ent.Forward);
-            return (dot > (_Class.FieldOfView / MathHelper.Pi) - 1);
+            return (dot > (_class.FieldOfView / MathHelper.Pi) - 1);
         }
 
         #endregion

@@ -93,9 +93,17 @@ namespace Takai.UI
         /// </summary>
         public bool AllowLetters { get; set; } = true;
 
-        [Data.Serializer.Ignored]
+        /// <summary>
+        /// Called whenever the text has changed
+        /// </summary>
         public event System.EventHandler TextChanged = null;
         protected virtual void OnTextChanged(System.EventArgs e) { }
+
+        /// <summary>
+        /// Called whenever the enter key is pressed
+        /// </summary>
+        public event System.EventHandler Submit = null;
+        protected virtual void OnSubmit(System.EventArgs e) { }
 
         /// <summary>
         /// When the last character was inputted (in system ticks)
@@ -217,7 +225,13 @@ namespace Takai.UI
                              System.Environment.TickCount < lastInputTick + KeyRepeatDelayInMSec))) //or the repeat is delayed
                         continue;
 
-                    if (key == Keys.Left && Caret > 0)
+                    if (key == Keys.Enter)
+                    {
+                        OnSubmit(System.EventArgs.Empty);
+                        Submit?.Invoke(this, System.EventArgs.Empty);
+                    }
+
+                    else if (key == Keys.Left && Caret > 0)
                     {
                         if (isCtrl)
                             Caret = FindPreviousWordStart();

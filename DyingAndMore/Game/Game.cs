@@ -20,6 +20,8 @@ namespace DyingAndMore.Game
         Static fpsDisplay;
         Static crapDisplay;
 
+        TextInput debugConsole;
+
         Static renderSettingsConsole;
         void ToggleRenderSettingsConsole()
         {
@@ -34,9 +36,9 @@ namespace DyingAndMore.Game
             }
         }
 
-        public Game(Takai.Game.Map map)
+        public Game(Map map)
         {
-            Map = map ?? throw new System.ArgumentNullException("There must be a map to play");
+            Map = map ?? throw new ArgumentNullException("There must be a map to play");
 
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
@@ -60,6 +62,21 @@ namespace DyingAndMore.Game
                 HorizontalAlignment = Alignment.End,
                 Color = Color.PaleGreen
             });
+
+            debugConsole = new TextInput()
+            {
+                Position = new Vector2(20),
+                Size = new Vector2(400, 30),
+                VerticalAlignment = Alignment.End,
+                Font = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/xbox.bfnt"),
+            };
+            debugConsole.Submit += delegate (object sender, EventArgs e)
+            {
+                var inp = (TextInput)sender;
+                ParseCommand(inp.Text);
+                inp.RemoveFromParent();
+                inp.Text = String.Empty;
+            };
 
             fx = Takai.Data.Cache.Load<EffectsEvent>("defs/effects/test.fx.tk");
         }
@@ -100,13 +117,18 @@ namespace DyingAndMore.Game
             Map.updateSettings = Map.UpdateSettings.Game;
             Map.renderSettings = Map.RenderSettings.Default;
 
+            Map.CleanupAll(
+                Map.CleanupOptions.DeadEntities |
+                Map.CleanupOptions.Particles
+            );
+
             var possibles = Map.FindEntitiesByClassName("player");
             if (possibles.Count > 0)
             {
                 player = possibles[0] as Entities.ActorInstance;
                 player.Controller = new Entities.InputController();
             }
-            Map.ActiveCamera = new Takai.Game.Camera(player);
+            Map.ActiveCamera = new Camera(player);
 
             var testScript = new BulletTimeScript();
             Map.AddScript(testScript);
@@ -120,7 +142,7 @@ namespace DyingAndMore.Game
                 if (entity != player)
                 {
                     entity.Parent = player;
-                    entity.Position = new Vector2(40);
+                    entity.RelativePosition = new Vector2(50);
                     break;
                 }
             }
@@ -139,8 +161,69 @@ namespace DyingAndMore.Game
             base.UpdateSelf(time);
         }
 
+        void ParseCommand(string command)
+        {
+            if (string.IsNullOrEmpty(command))
+                return;
+
+            var words = command.ToLowerInvariant().Split(' ');
+            switch (words[0])
+            {
+                case "cleanup":
+                    {
+                        var cleans = Map.CleanupOptions.None;
+                        for (int i = 1; i < words.Length; ++i)
+                        {
+                            switch (words[i])
+                            {
+                                case "all":
+                                    cleans |= Map.CleanupOptions.All;
+                                    i = words.Length;
+                                    break;
+
+                                case "fluid":
+                                case "fluids":
+                                    cleans |= Map.CleanupOptions.Fluids;
+                                    Takai.LogBuffer.Append("Removing all fluids");
+                                    break;
+
+                                case "particles":
+                                    cleans |= Map.CleanupOptions.Particles;
+                                    Takai.LogBuffer.Append("Removing all particles");
+                                    break;
+                            }
+                        }
+                        Map.CleanupAll(cleans);
+                    }
+                    break;
+
+                case "timescale":
+                    if (words.Length == 1)
+                        Takai.LogBuffer.Append("Time scale: " + Map.TimeScale);
+                    else
+                        Map.TimeScale = float.Parse(words[1]);
+                    break;
+
+                case "exit":
+                case "quit":
+                    Takai.Runtime.IsExiting = true;
+                    break;
+
+                default:
+                    Takai.LogBuffer.Append("Unkown command: " + words[0]);
+                    break;
+            }
+        }
+
         protected override bool HandleInput(GameTime time)
         {
+            if (InputState.IsPress(Keys.OemTilde))
+            {
+                debugConsole.HasFocus = true;
+                AddChild(debugConsole);
+                return false;
+            }
+
             if (InputState.IsPress(Keys.F1))
             {
                 Parent.ReplaceAllChildren(new Editor.Editor(Map));
@@ -155,16 +238,16 @@ namespace DyingAndMore.Game
 
             if (InputState.IsPress(MouseButtons.Left))
             {
-                Map.Spawn(fx, Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), Vector2.UnitX);
+                Map.Spawn(fx, Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), Vector2.UnitX, Vector2.Zero);
             }
 
             var scrollDelta = InputState.ScrollDelta();
             if (scrollDelta != 0)
             {
                 if (InputState.IsMod(KeyMod.Control))
-                    Map.TimeScale += System.Math.Sign(scrollDelta) * 0.1f;
+                    Map.TimeScale += Math.Sign(scrollDelta) * 0.1f;
                 else
-                    Map.ActiveCamera.Scale += System.Math.Sign(scrollDelta) * 0.1f;
+                    Map.ActiveCamera.Scale += Math.Sign(scrollDelta) * 0.1f;
             }
 
 
@@ -180,7 +263,7 @@ namespace DyingAndMore.Game
                 if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     using (var stream = ofd.OpenFile())
-                        Map = Takai.Game.Map.Load(stream);
+                        Map = Map.Load(stream);
                 }
                 return false;
             }

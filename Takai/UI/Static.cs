@@ -390,7 +390,7 @@ namespace Takai.UI
         /// Clone this item, should not modify parent or children
         /// </summary>
         /// <returns>The cloned item</returns>
-        protected Static CloneSelf()
+        protected virtual Static CloneSelf()
         {
             return (Static)MemberwiseClone();
         }
@@ -812,7 +812,6 @@ namespace Takai.UI
             VisibleBounds = Parent != null
                 ? Rectangle.Intersect(Parent.VisibleBounds, VirtualBounds)
                 : VirtualBounds;
-
         }
 
         /// <summary>

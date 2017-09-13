@@ -65,13 +65,13 @@ namespace Takai.Graphics
         /// </summary>
         /// <param name="stream">The stream to load from</param>
         /// <returns>The bitmap font if created, null if not</returns>
-        public static BitmapFont FromStream(GraphicsDevice GDev, System.IO.Stream Stream)
+        public static BitmapFont FromStream(GraphicsDevice graphicsDevice, System.IO.Stream stream)
         {
             BitmapFont font = new BitmapFont()
             {
                 Tracking = Point.Zero
             };
-            var read = new DeflateStream(Stream, CompressionMode.Decompress);
+            var read = new DeflateStream(stream, CompressionMode.Decompress);
 
             //broken up because of flipped endians on xbox
             byte[] block = new byte[4];
@@ -113,7 +113,7 @@ namespace Takai.Graphics
             } while (red > 0);
 
             ms.Seek(0, System.IO.SeekOrigin.Begin);
-            font.Texture = Texture2D.FromStream(GDev, ms);
+            font.Texture = Texture2D.FromStream(graphicsDevice, ms);
 
             read.Close();
 

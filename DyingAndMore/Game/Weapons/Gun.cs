@@ -40,10 +40,10 @@ namespace DyingAndMore.Game.Weapons
             {
                 System.Diagnostics.Contracts.Contract.Assert(value == null || value is GunClass);
                 base.Class = value;
-                _Class = value as GunClass;
+                _class = value as GunClass;
             }
         }
-        private GunClass _Class;
+        private GunClass _class;
 
         public int CurrentAmmo { get; set; }
 
@@ -68,13 +68,13 @@ namespace DyingAndMore.Game.Weapons
 
             //undercharged
             if (!Actor.State.Instance.HasFinished() &&
-                _Class.UnderchargeAction == UnderchargeAction.Dissipate)
+                _class.UnderchargeAction == UnderchargeAction.Dissipate)
                 return;
 
-            var projectile = (Entities.ProjectileInstance)_Class.Projectile.Create();
+            var projectile = (Entities.ProjectileInstance)_class.Projectile.Create();
             projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + 2));
             projectile.Forward = Actor.Forward;
-            projectile.Velocity = Actor.Forward * _Class.Projectile.Power;
+            projectile.Velocity = Actor.Forward * _class.Projectile.Power;
             projectile.Source = Actor;
             Actor.Map.Spawn(projectile);
 

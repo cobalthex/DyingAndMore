@@ -230,7 +230,6 @@ namespace Takai.Game
 
                 foreach (var ent in ActiveEnts)
                 {
-                    var entPos = ent.Position + (ent.Parent != null ? ent.Parent.Position : Vector2.Zero);
                     if (ent.State.Instance?.Class?.Sprite?.Texture != null)
                     {
                         if (ent.OutlineColor.A > 0)
@@ -241,7 +240,7 @@ namespace Takai.Game
 
                             ent.State.Instance.Class.Sprite.Draw(
                                 sbatch,
-                                entPos,
+                                ent.Position,
                                 angle,
                                 Color.White,
                                 1,
@@ -258,10 +257,10 @@ namespace Takai.Game
                                                       0, 0, 0, 1);
 
                         Rectangle rect = new Rectangle(new Point(-(int)ent.Radius), new Point((int)ent.Radius * 2));
-                        var tl = entPos + Vector2.TransformNormal(new Vector2(rect.Left, rect.Top), transform);
-                        var tr = entPos + Vector2.TransformNormal(new Vector2(rect.Right, rect.Top), transform);
-                        var bl = entPos + Vector2.TransformNormal(new Vector2(rect.Left, rect.Bottom), transform);
-                        var br = entPos + Vector2.TransformNormal(new Vector2(rect.Right, rect.Bottom), transform);
+                        var tl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Top), transform);
+                        var tr = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Top), transform);
+                        var bl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Bottom), transform);
+                        var br = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Bottom), transform);
 
                         var color = ent.OutlineColor.A == 0 ? Color.Cyan : ent.OutlineColor;
                         DrawLine(tl, tr, color);
@@ -276,9 +275,6 @@ namespace Takai.Game
                     if (renderSettings.DrawEntBoundingBoxes)
                     {
                         var rect = ent.AxisAlignedBounds;
-                        if (ent.Parent != null)
-                            rect.Offset(ent.Parent.Position);
-
                         var color = Color.LightBlue;
                         DrawLine(new Vector2(rect.Left, rect.Top), new Vector2(rect.Right, rect.Top), color);
                         DrawLine(new Vector2(rect.Right, rect.Top), new Vector2(rect.Right, rect.Bottom), color);

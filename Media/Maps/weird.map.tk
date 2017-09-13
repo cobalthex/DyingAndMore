@@ -26,15 +26,7 @@ Map {
                 CurrentHealth: 500;
                 MaxSpeed: 400;
                 Weapon: GunInstance {
-                    Class: GunClass {
-                        Projectile: @"Defs/Entities/Missile.ent.tk";
-                        MaxAmmo: 300;
-                        BurstCont: 0;
-                        ShotsPerBurst: 1;
-                        Name: Null;
-                        UnderchargeAction: UnderchargeAction.Dissipate;
-                        OverchargeAction: OverchargeAction.Discharge;
-                    };
+                    Class: @"Defs/Weapons/Test.wpn.tk";
                     CurrentAmmo: 300;
                     NextShot: 0;
                 };

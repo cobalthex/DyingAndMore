@@ -29,8 +29,5 @@ ActorClass {
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
 
-    DefaultWeapon: GunClass {
-        MaxAmmo: 300;
-        Projectile: @"Defs/Entities/Missile.ent.tk";
-    }
+    DefaultWeapon: @"Defs/Weapons/Test.wpn.tk";
 }

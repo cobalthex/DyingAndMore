@@ -36,7 +36,7 @@ namespace DyingAndMore.Game.Weapons
 
         public OverchargeAction OverchargeAction { get; set; } = OverchargeAction.Discharge;
 
-        //effects are handled by state machine
+        public Takai.Game.EffectsEvent DischargeEffect { get; set; }
 
         public abstract WeaponInstance Create();
 
@@ -108,7 +108,7 @@ namespace DyingAndMore.Game.Weapons
             NextShot = Actor.Map.ElapsedTime + Takai.Game.RandomRange.Next(Class.Delay);
             Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, Takai.Game.EntStateId.DischargeWeapon, "DischargeWeapon");
             Actor.State.TransitionTo(Takai.Game.EntStateId.DischargeWeapon, Takai.Game.EntStateId.Idle, "Idle");
-
+            Actor.Map.Spawn(Class.DischargeEffect, Actor.Position, Actor.Forward, Actor.Velocity);
         }
 
         public virtual bool CanUse(TimeSpan totalTime)

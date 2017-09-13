@@ -482,7 +482,7 @@ namespace Takai.Data
                             }
                         }
                         else
-                            System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in DestType:{destType.Name}");
+                            System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in DestType:{destType.Name}"); //pass filename through?
                     }
                 }
                 catch (InvalidCastException expt)
