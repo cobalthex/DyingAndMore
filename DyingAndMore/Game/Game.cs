@@ -131,7 +131,7 @@ namespace DyingAndMore.Game
             Map.ActiveCamera = new Camera(player);
 
             var testScript = new BulletTimeScript();
-            Map.AddScript(testScript);
+            //Map.AddScript(testScript);
 
             //Map.Tiles[0, 0] = 9;
 
@@ -324,6 +324,13 @@ namespace DyingAndMore.Game
             base.DrawSelf(spriteBatch);
 
             DefaultFont.Draw(spriteBatch, $"Total entities:{Map.TotalEntitiesCount}", new Vector2(20), Color.Orange);
+
+            if (player != null)
+            {
+                var hud = $"Health: {player.CurrentHealth}\n"
+                        + $"Ammo: {((Weapons.GunInstance)player.Weapon)?.CurrentAmmo}";
+                DefaultFont.Draw(spriteBatch, hud, new Vector2(20, 40), Color.White);
+            }
         }
     }
 }

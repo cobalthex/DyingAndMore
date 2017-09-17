@@ -27,7 +27,7 @@ Map {
                 MaxSpeed: 400;
                 Weapon: GunInstance {
                     Class: @"Defs/Weapons/Test.wpn.tk";
-                    CurrentAmmo: 300;
+                    CurrentAmmo: 30;
                     NextShot: 0;
                 };
                 Name: Null;

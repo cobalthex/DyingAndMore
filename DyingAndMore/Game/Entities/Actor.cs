@@ -175,11 +175,6 @@ namespace DyingAndMore.Game.Entities
             }
         }
 
-        public void FireWeapon()
-        {
-            Weapon?.Charge();
-        }
-
         public void Accelerate(Vector2 direction)
         {
             var vel = Velocity + (direction * _class.MoveForce);

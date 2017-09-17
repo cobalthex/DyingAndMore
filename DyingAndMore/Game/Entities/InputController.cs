@@ -28,7 +28,9 @@ namespace DyingAndMore.Game.Entities
                 d += Vector2.UnitX;
 
             if (Takai.Input.InputState.IsButtonDown(Takai.Input.MouseButtons.Left))
-                actor.FireWeapon();
+                actor.Weapon?.Charge();
+            if (Takai.Input.InputState.IsClick(Takai.Input.MouseButtons.Left))
+                actor.Weapon?.Reset();
 
             actor.Accelerate(d);
 
