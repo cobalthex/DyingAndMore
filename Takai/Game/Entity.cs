@@ -140,8 +140,6 @@ namespace Takai.Game
             {
                 var diff = value - _position;
                 _position = value;
-                foreach (var child in Children)
-                    child.Position += diff;
                 lastTransform.Translation = new Vector3(value, 0);
                 UpdateAxisAlignedBounds();
             }

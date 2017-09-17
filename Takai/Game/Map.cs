@@ -300,8 +300,10 @@ namespace Takai.Game
         /// <param name="position">Where to spawn the effect</param>
         /// <param name="forward">What direction to spawn the effect facing (used for things like spread)</param>
         /// <param name="velocity">Velocity added to any effects' calculated velocity</param>
-        public void Spawn(IGameEffect effect, Vector2 position, Vector2 forward, Vector2 velocity)
+        public void Spawn(IGameEffect effect, Vector2 position, Vector2 forward, Vector2 velocity, EntityInstance creator = null)
         {
+            //move to delegates
+
             if (effect is ParticleEffect pe)
             {
                 if (pe.Class == null)
@@ -362,15 +364,28 @@ namespace Takai.Game
                     Spawn(si.Permutations[rnd], position, forward, velocity);
                 }
             }
+            else if (effect is DamageEffect de)
+            {
+                //todo: consolidate arguments (position+velocity can be inherited from entity maybe)
+                var ents = FindEntities(position, de.Radius);
+                foreach (var ent in ents)
+                {
+                    if (ent == creator && !de.CanDamageCreator)
+                        continue;
+
+                    var rSq = Vector2.DistanceSquared(position, ent.Position);
+                    //damage ent by 1/r^2
+                }
+            }
         }
 
-        public void Spawn(EffectsEvent effects, Vector2 position, Vector2 direction, Vector2 velocity) //todo: better name
+        public void Spawn(EffectsEvent effects, Vector2 position, Vector2 direction, Vector2 velocity, EntityInstance creator = null) //todo: better name
         {
             if (effects?.Effects == null || effects.SkipChance > 0 && random.NextDouble() < effects.SkipChance)
                 return;
 
             foreach (var effect in effects.Effects)
-                Spawn(effect, position + effects.Offset, direction, velocity);
+                Spawn(effect, position + effects.Offset, direction, velocity, creator);
         }
 
         /// <summary>
