@@ -47,6 +47,8 @@ namespace DyingAndMore.Game.Weapons
 
         public int CurrentAmmo { get; set; }
 
+        protected int burst = 0;
+
         public GunInstance() { }
         public GunInstance(GunClass @class)
             : base(@class)
@@ -56,7 +58,12 @@ namespace DyingAndMore.Game.Weapons
 
         public override bool IsDepleted()
         {
-            return CurrentAmmo <= 0;
+            return _class.MaxAmmo > 0 && CurrentAmmo <= 0;
+        }
+
+        public override void Reset()
+        {
+            burst = 0;
         }
 
         public override void Discharge()
@@ -71,12 +78,21 @@ namespace DyingAndMore.Game.Weapons
                 _class.UnderchargeAction == UnderchargeAction.Dissipate)
                 return;
 
-            var projectile = (Entities.ProjectileInstance)_class.Projectile.Create();
-            projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + 2));
-            projectile.Forward = Actor.Forward;
-            projectile.Velocity = Actor.Forward * _class.Projectile.Power;
-            projectile.Source = Actor;
-            Actor.Map.Spawn(projectile);
+            if (_class.BurstCount > 0 && burst >= _class.BurstCount)
+                return;
+
+            if (_class.Projectile != null)
+            {
+                var projectile = (Entities.ProjectileInstance)_class.Projectile.Create();
+                projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + 2));
+                projectile.Forward = Actor.Forward;
+                projectile.Velocity = Actor.Forward * _class.Projectile.Power;
+                projectile.Source = Actor;
+                Actor.Map.Spawn(projectile);
+            }
+
+            --CurrentAmmo;
+            ++burst;
 
             base.Discharge();
         }

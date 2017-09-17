@@ -1,5 +1,6 @@
 GunClass {
-    MaxAmmo: 300;
+    MaxAmmo: 100;
+	BurstCount: 3;
     Projectile: @"Defs/Entities/Missile.ent.tk";
 
     DischargeEffect: {

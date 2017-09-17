@@ -111,6 +111,12 @@ namespace DyingAndMore.Game.Weapons
             Actor.Map.Spawn(Class.DischargeEffect, Actor.Position, Actor.Forward, Actor.Velocity);
         }
 
+        /// <summary>
+        /// Reset the firing state. For example, should reset burst counter
+        /// Called whenever player depresses fire button
+        /// </summary>
+        public virtual void Reset() { }
+
         public virtual bool CanUse(TimeSpan totalTime)
         {
             return !IsDepleted() && totalTime > NextShot;
