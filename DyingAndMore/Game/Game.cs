@@ -142,7 +142,7 @@ namespace DyingAndMore.Game
                 if (entity != player)
                 {
                     entity.Parent = player;
-                    entity.RelativePosition = new Vector2(50);
+                    entity.RelativePosition = new Vector2(100);
                     break;
                 }
             }

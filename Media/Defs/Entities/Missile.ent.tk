@@ -8,8 +8,12 @@ ProjectileClass {
     States: {
         Idle: {
             Sprite: {
-                Texture: "Textures/Projectiles/Sharp.png";
-                Origin: [12 4];
+                Texture: "Textures/Projectiles/Powerball.png";
+                Width: 24;
+                Height: 24;
+                FrameLength: 100msec;
+                FrameCount: 8;
+                Center: true;
             }
         }
     }

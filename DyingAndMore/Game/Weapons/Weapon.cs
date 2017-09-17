@@ -41,7 +41,7 @@ namespace DyingAndMore.Game.Weapons
         public abstract WeaponInstance Create();
 
         /*animation:
-            charge, (fire) discharge, weapon firing plays between two animations
+            charge, [weapon fires], discharge
             rechamber
             reload
         */
@@ -88,6 +88,11 @@ namespace DyingAndMore.Game.Weapons
             }
         }
 
+        protected void SetNextShotTime(TimeSpan delay)
+        {
+            NextShot = Actor.Map.ElapsedTime + delay;
+        }
+
         /// <summary>
         /// Begin charging the weapon
         /// </summary>
@@ -102,10 +107,11 @@ namespace DyingAndMore.Game.Weapons
 
         /// <summary>
         /// Discharge the active charge. Behavior is implementation defined
+        /// Called automatically by Think()
         /// </summary>
         public virtual void Discharge()
         {
-            NextShot = Actor.Map.ElapsedTime + Takai.Game.RandomRange.Next(Class.Delay);
+            SetNextShotTime(Takai.Game.RandomRange.Next(Class.Delay));
             Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, Takai.Game.EntStateId.DischargeWeapon, "DischargeWeapon");
             Actor.State.TransitionTo(Takai.Game.EntStateId.DischargeWeapon, Takai.Game.EntStateId.Idle, "Idle");
             Actor.Map.Spawn(Class.DischargeEffect, Actor.Position, Actor.Forward, Actor.Velocity);
@@ -114,12 +120,15 @@ namespace DyingAndMore.Game.Weapons
         /// <summary>
         /// Reset the firing state. For example, should reset burst counter
         /// Called whenever player depresses fire button
+        /// Should not reset the gun entirely (create a new instance for that)
         /// </summary>
         public virtual void Reset() { }
 
         public virtual bool CanUse(TimeSpan totalTime)
         {
-            return !IsDepleted() && totalTime > NextShot;
+            return !IsDepleted() &&
+                Actor.State.State != Takai.Game.EntStateId.ChargeWeapon &&
+                Actor.State .State != Takai.Game.EntStateId.DischargeWeapon;
         }
 
         /// <summary>

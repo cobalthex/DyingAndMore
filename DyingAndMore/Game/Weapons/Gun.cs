@@ -48,6 +48,7 @@ namespace DyingAndMore.Game.Weapons
         public int CurrentAmmo { get; set; }
 
         protected int burst = 0;
+        protected bool canShoot = true;
 
         public GunInstance() { }
         public GunInstance(GunClass @class)
@@ -63,7 +64,35 @@ namespace DyingAndMore.Game.Weapons
 
         public override void Reset()
         {
-            burst = 0;
+            canShoot = true;
+            base.Reset();
+        }
+
+        protected virtual void DoCharge()
+        {
+            base.Charge();
+        }
+
+        public override void Charge()
+        {
+            if (canShoot)
+            {
+                DoCharge();
+                canShoot = false;
+            }
+        }
+
+        public override void Think(TimeSpan deltaTime)
+        {
+            if (burst > 0)
+            {
+                if (burst < _class.BurstCount)
+                    DoCharge();
+                else
+                    burst = 0;
+            }
+
+            base.Think(deltaTime);
         }
 
         public override void Discharge()
@@ -76,9 +105,6 @@ namespace DyingAndMore.Game.Weapons
             //undercharged
             if (!Actor.State.Instance.HasFinished() &&
                 _class.UnderchargeAction == UnderchargeAction.Dissipate)
-                return;
-
-            if (_class.BurstCount > 0 && burst >= _class.BurstCount)
                 return;
 
             if (_class.Projectile != null)

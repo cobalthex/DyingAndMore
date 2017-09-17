@@ -48,6 +48,24 @@ namespace Takai.Game
 
     }
 
+    /// <summary>
+    /// An area of effect damge
+    /// </summary>
+    public class DamageEffect : IGameEffect
+    {
+        public int DamageAtOrigin { get; set; }
+        public float Radius { get; set; }
+
+        public bool CanDamageCreator { get; set; }
+
+        //falloff curve?
+
+        //target mask (cant damage creator, etc)
+
+        //material dampeners
+        //breaking effect
+    }
+
     public class EffectsEvent : Data.ISerializeExternally //todo: better name?
     {
         [Data.Serializer.Ignored]
