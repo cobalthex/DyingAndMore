@@ -12,10 +12,22 @@ namespace DyingAndMore.Game
 {
     class Game : MapView
     {
+        public enum GameDifficulty
+        {
+            Trivial,
+            Easy,
+            Hard,
+            Impossible
+        }
+
+        public struct GameplaySettings
+        {
+            public GameDifficulty difficulty;
+            public bool allowFriendlyFire;
+        }
+
         Entities.ActorInstance player = null;
         Entities.Controller lastController = null;
-
-        EffectsEvent fx;
 
         Static fpsDisplay;
         Static crapDisplay;
@@ -28,7 +40,7 @@ namespace DyingAndMore.Game
             if (!renderSettingsConsole.RemoveFromParent())
             {
                 //refresh individual render settings
-                var settings = typeof(Takai.Game.Map.RenderSettings);
+                var settings = typeof(Map.RenderSettings);
                 foreach (var child in renderSettingsConsole.Children)
                     ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
 
@@ -77,8 +89,6 @@ namespace DyingAndMore.Game
                 inp.RemoveFromParent();
                 inp.Text = String.Empty;
             };
-
-            fx = Takai.Data.Cache.Load<EffectsEvent>("defs/effects/test.fx.tk");
         }
 
         class BulletTimeScript : Script
@@ -235,12 +245,7 @@ namespace DyingAndMore.Game
                 ToggleRenderSettingsConsole();
                 return false;
             }
-
-            if (InputState.IsPress(MouseButtons.Left))
-            {
-                Map.Spawn(fx, Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), Vector2.UnitX, Vector2.Zero);
-            }
-
+            
             var scrollDelta = InputState.ScrollDelta();
             if (scrollDelta != 0)
             {

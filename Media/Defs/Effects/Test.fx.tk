@@ -1,6 +1,6 @@
 {}
 
-EffectsEvent {
+EffectsClass {
     Effects: [
         ParticleEffect {
             Class: {

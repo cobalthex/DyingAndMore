@@ -6,12 +6,12 @@ namespace Takai.Game
 {
     public partial class Map
     {
-        protected Random random = new Random();
+        public Random Random { get; private set; } = new Random();
         private byte[] _r64b = new byte[8];
 
         protected float RandFloat(float Min, float Max)
         {
-            return (float)(random.NextDouble() * (Max - Min)) + Min;
+            return (float)(Random.NextDouble() * (Max - Min)) + Min;
         }
         protected TimeSpan RandTime(TimeSpan Min, TimeSpan Max)
         {
