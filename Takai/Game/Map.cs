@@ -258,7 +258,7 @@ namespace Takai.Game
             Spawn(instance);
             return instance;
         }
-
+        
         /// <summary>
         /// Spawn a single fluid onto the map
         /// </summary>
@@ -293,99 +293,13 @@ namespace Takai.Game
             ActiveSounds.Add(instance);
         }
 
-        /// <summary>
-        /// Spawn an effect
-        /// </summary>
-        /// <param name="effect">The effect to spawn</param>
-        /// <param name="position">Where to spawn the effect</param>
-        /// <param name="forward">What direction to spawn the effect facing (used for things like spread)</param>
-        /// <param name="velocity">Velocity added to any effects' calculated velocity</param>
-        public void Spawn(IGameEffect effect, Vector2 position, Vector2 forward, Vector2 velocity, EntityInstance creator = null)
+        public void Spawn(EffectsInstance effects)
         {
-            //move to delegates
-
-            if (effect is ParticleEffect pe)
-            {
-                if (pe.Class == null)
-                    return;
-
-                if (!Particles.ContainsKey(pe.Class))
-                    Particles.Add(pe.Class, new List<ParticleInstance>());
-
-                var numParticles = RandomRange.Next(pe.Count);
-                Particles[pe.Class].Capacity += numParticles;
-                for (int i = 0; i < numParticles; ++i)
-                {
-                    var angle = RandomRange.Next(pe.Spread);
-                    var speed = RandomRange.Next(pe.Class.InitialSpeed);
-                    var lifetime = RandomRange.Next(pe.Class.Lifetime);
-
-                    var dir = Vector2.TransformNormal(forward, Matrix.CreateRotationZ(angle));
-                    var initAngle = (float)System.Math.Atan2(dir.Y, dir.X);
-
-                    var particle = new ParticleInstance()
-                    {
-                        color = pe.Class.ColorOverTime.start,
-                        delay = System.TimeSpan.Zero,
-                        position = position,
-                        velocity = speed * dir + velocity,
-                        lifetime = lifetime,
-                        angle = initAngle,
-                        scale = 1,
-                        time = ElapsedTime
-                    };
-
-                    Particles[pe.Class].Add(particle);
-                }
-            }
-            else if (effect is FluidEffect fe)
-            {
-                if (fe.Class == null)
-                    return;
-
-                var numFluids = RandomRange.Next(fe.Count);
-                ActiveFluids.Capacity += numFluids;
-                for (int i = 0; i < numFluids; ++i)
-                {
-                    var angle = RandomRange.Next(fe.Spread);
-                    var speed = RandomRange.Next(fe.Speed);
-                    Spawn(
-                        fe.Class,
-                        position,
-                        speed * Vector2.TransformNormal(forward, Matrix.CreateRotationZ(angle)) + velocity
-                    );
-                }
-            }
-            else if (effect is SoundImpulse si)
-            {
-                if (si.Permutations.Count > 0)
-                {
-                    var rnd = random.Next(si.Permutations.Count);
-                    Spawn(si.Permutations[rnd], position, forward, velocity);
-                }
-            }
-            else if (effect is DamageEffect de)
-            {
-                //todo: consolidate arguments (position+velocity can be inherited from entity maybe)
-                var ents = FindEntities(position, de.Radius);
-                foreach (var ent in ents)
-                {
-                    if (ent == creator && !de.CanDamageCreator)
-                        continue;
-
-                    var rSq = Vector2.DistanceSquared(position, ent.Position);
-                    //damage ent by 1/r^2
-                }
-            }
-        }
-
-        public void Spawn(EffectsEvent effects, Vector2 position, Vector2 direction, Vector2 velocity, EntityInstance creator = null) //todo: better name
-        {
-            if (effects?.Effects == null || effects.SkipChance > 0 && random.NextDouble() < effects.SkipChance)
+            if (effects.Class == null)
                 return;
 
-            foreach (var effect in effects.Effects)
-                Spawn(effect, position + effects.Offset, direction, velocity, creator);
+            foreach (var effect in effects.Class.Effects)
+                effect.Spawn(this, effects);
         }
 
         /// <summary>
