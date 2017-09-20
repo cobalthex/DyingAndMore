@@ -17,7 +17,8 @@ namespace DyingAndMore.Game
             Trivial,
             Easy,
             Hard,
-            Impossible
+            Impossible,
+            Custom
         }
 
         public struct GameplaySettings
@@ -160,6 +161,8 @@ namespace DyingAndMore.Game
 
         protected override void UpdateSelf(GameTime time)
         {
+            Map.DrawCircle(new Vector2(200), 30, Color.Cyan);
+
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
@@ -176,8 +179,8 @@ namespace DyingAndMore.Game
             if (string.IsNullOrEmpty(command))
                 return;
 
-            var words = command.ToLowerInvariant().Split(' ');
-            switch (words[0])
+            var words = command.Split(' ');
+            switch (words[0].ToLowerInvariant())
             {
                 case "cleanup":
                     {
@@ -214,6 +217,21 @@ namespace DyingAndMore.Game
                         Map.TimeScale = float.Parse(words[1]);
                     break;
 
+                //this should go elsewhere
+                case "makedef":
+                    using (var stream = new System.IO.StreamWriter("defs.tk"))
+                    {
+                        for (int i = 1; i < words.Length; ++i)
+                        {
+                            if (Takai.Data.Serializer.RegisteredTypes.TryGetValue(words[i], out var ty))
+                            {
+                                Takai.Data.Serializer.TextSerialize(stream, Activator.CreateInstance(ty));
+                                stream.WriteLine('\n');
+                            }
+                        }
+                    }
+                    break;
+
                 case "exit":
                 case "quit":
                     Takai.Runtime.IsExiting = true;
@@ -245,7 +263,7 @@ namespace DyingAndMore.Game
                 ToggleRenderSettingsConsole();
                 return false;
             }
-            
+
             var scrollDelta = InputState.ScrollDelta();
             if (scrollDelta != 0)
             {

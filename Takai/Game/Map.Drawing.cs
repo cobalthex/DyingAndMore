@@ -9,6 +9,12 @@ namespace Takai.Game
 {
     public partial class Map
     {
+        protected struct MapText
+        {
+            public string text;
+            public Vector2 position;
+        }
+
         protected SpriteBatch sbatch;
         protected RenderTarget2D preRenderTarget;
         protected RenderTarget2D fluidsRenderTarget;
@@ -22,12 +28,14 @@ namespace Takai.Game
 
         public Texture2D TilesImage { get; set; }
 
-        /// <summary>
-        /// A set of lines to draw during the next frame (map relative coordinates)
-        /// </summary>
-        protected List<VertexPositionColor> debugLines = new List<VertexPositionColor>(32);
+        //a collection of primatives to draw next frame (for one frame)
+        protected List<VertexPositionColor> renderedLines = new List<VertexPositionColor>(32);
+        protected List<VertexPositionColorTexture> renderedCircles = new List<VertexPositionColorTexture>(32);
+        protected List<MapText> renderedText = new List<MapText>(32);
+
         protected XnaEffect lineEffect;
-        protected RasterizerState lineRaster;
+        protected XnaEffect circleEffect;
+        protected RasterizerState shapeRaster;
 
         /// <summary>
         /// All of the available render settings customizations
@@ -66,20 +74,19 @@ namespace Takai.Game
         /// <summary>
         /// Draw a line next frame
         /// </summary>
-        /// <param name="start">The start position of the line</param>
-        /// <param name="end">The end position of the line</param>
+        /// <param name="start">The start position of the line (in map space)</param>
+        /// <param name="end">The end position of the line (in map space)</param>
         /// <param name="color">The color of the line</param>
-        /// <remarks>Lines are world relative</remarks>
         public void DrawLine(Vector2 start, Vector2 end, Color color)
         {
-            debugLines.Add(new VertexPositionColor { Position = new Vector3(start, 0), Color = color });
-            debugLines.Add(new VertexPositionColor { Position = new Vector3(end, 0), Color = color });
+            renderedLines.Add(new VertexPositionColor(new Vector3(start, 0), color));
+            renderedLines.Add(new VertexPositionColor(new Vector3(end, 0), color));
         }
 
         /// <summary>
         /// Draw an outlined rectangle next frame
         /// </summary>
-        /// <param name="rect">the region to draw</param>
+        /// <param name="rect">the region to draw (in map space)</param>
         /// <param name="color">The color to use</param>
         public void DrawRect(Rectangle rect, Color color)
         {
@@ -87,6 +94,23 @@ namespace Takai.Game
             DrawLine(new Vector2(rect.Left, rect.Top), new Vector2(rect.Left, rect.Bottom), color);
             DrawLine(new Vector2(rect.Right, rect.Top), new Vector2(rect.Right, rect.Bottom), color);
             DrawLine(new Vector2(rect.Left, rect.Bottom), new Vector2(rect.Right, rect.Bottom), color);
+        }
+
+        /// <summary>
+        /// Draw an outlined circle next frame
+        /// </summary>
+        /// <param name="center">The center of the circle (in map space)</param>
+        /// <param name="radius">The radius of the circle</param>
+        /// <param name="color">The color to use</param>
+        public void DrawCircle(Vector2 center, float radius, Color color)
+        {
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius), 0), color, new Vector2(0)));
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius, -radius), 0), color, new Vector2(1, 0)));
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius, radius), 0), color, new Vector2(0, 1)));
+
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius, radius), 0), color, new Vector2(0, 1)));
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius, -radius), 0), color, new Vector2(1, 0)));
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius), 0), color, new Vector2(1)));
         }
 
         static readonly Matrix arrowWingTransform = Matrix.CreateRotationZ(120);
@@ -126,12 +150,13 @@ namespace Takai.Game
             if (Runtime.GraphicsDevice != null)
             {
                 sbatch = new SpriteBatch(Runtime.GraphicsDevice);
-                lineEffect = Takai.AssetManager.Load<XnaEffect>("Shaders/DX11/Line.mgfx");
-                lineRaster = new RasterizerState()
+
+                shapeRaster = new RasterizerState()
                 {
                     CullMode = CullMode.None,
-                    MultiSampleAntiAlias = true
+                    MultiSampleAntiAlias = true,
                 };
+
                 stencilWrite = new DepthStencilState()
                 {
                     StencilEnable = true,
@@ -162,9 +187,11 @@ namespace Takai.Game
                 reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
                 //todo: some of the render targets may be able to be combined
 
-                outlineEffect = Takai.AssetManager.Load<XnaEffect>("Shaders/DX11/Outline.mgfx");
-                fluidEffect = Takai.AssetManager.Load<XnaEffect>("Shaders/DX11/Fluid.mgfx");
-                reflectionEffect = Takai.AssetManager.Load<XnaEffect>("Shaders/DX11/Reflection.mgfx");
+                lineEffect = AssetManager.Load<XnaEffect>("Shaders/DX11/Line.mgfx");
+                circleEffect = AssetManager.Load<XnaEffect>("Shaders/DX11/Circle.mgfx");
+                outlineEffect = AssetManager.Load<XnaEffect>("Shaders/DX11/Outline.mgfx");
+                fluidEffect = AssetManager.Load<XnaEffect>("Shaders/DX11/Fluid.mgfx");
+                reflectionEffect = AssetManager.Load<XnaEffect>("Shaders/DX11/Reflection.mgfx");
             }
         }
 
@@ -480,15 +507,32 @@ namespace Takai.Game
 
             if (renderSettings.DrawLines)
             {
-                if (debugLines.Count > 0)
+                if (renderedCircles.Count > 0)
                 {
-                    Runtime.GraphicsDevice.RasterizerState = lineRaster;
+                    Runtime.GraphicsDevice.RasterizerState = shapeRaster;
+                    Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+                    Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
+                    var circleTransform = cameraTransform * Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
+                    circleEffect.Parameters["Transform"].SetValue(circleTransform);
+
+                    foreach (EffectPass pass in circleEffect.CurrentTechnique.Passes)
+                    {
+                        pass.Apply();
+                        Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, renderedCircles.ToArray(), 0, renderedCircles.Count / 3);
+                    }
+
+                    renderedCircles.Clear();
+                }
+
+                if (renderedLines.Count > 0)
+                {
+                    Runtime.GraphicsDevice.RasterizerState = shapeRaster;
                     Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                     Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
                     var lineTransform = cameraTransform * Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
                     lineEffect.Parameters["Transform"].SetValue(lineTransform);
 
-                    var blackLines = debugLines.ConvertAll(line =>
+                    var blackLines = renderedLines.ConvertAll(line =>
                     {
                         line.Color = new Color(Color.Black, line.Color.A);
                         line.Position += new Vector3(1, 1, 0);
@@ -503,15 +547,15 @@ namespace Takai.Game
                     foreach (EffectPass pass in lineEffect.CurrentTechnique.Passes)
                     {
                         pass.Apply();
-                        Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, debugLines.ToArray(), 0, debugLines.Count / 2);
+                        Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, renderedLines.ToArray(), 0, renderedLines.Count / 2);
                     }
-                    debugLines.Clear();
+                    renderedLines.Clear();
                 }
             }
 
             if (renderSettings.DrawGrids)
             {
-                Runtime.GraphicsDevice.RasterizerState = lineRaster;
+                Runtime.GraphicsDevice.RasterizerState = shapeRaster;
                 Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                 Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
                 var viewProjection = Matrix.CreateOrthographicOffCenter(Camera.Viewport, 0, 1);
