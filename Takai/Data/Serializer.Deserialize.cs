@@ -271,6 +271,9 @@ namespace Takai.Data
                     unit = unit.TrimEnd();
                 }
 
+                if (reader.Peek() == '%')
+                    unit = "%";
+
                 if (TInt.TryParse(word, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out var @int))
                 {
                     if (unit.Length > 0)
@@ -297,6 +300,8 @@ namespace Takai.Data
                             return @float * 1000 * 60;
                         else if (unit.Equals("pi", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
                             return @float * Math.PI;
+                        else if (unit.Equals("%", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
+                            return @float / 100;
 
                         else if (!unit.Equals("rad", StringComparison.OrdinalIgnoreCase) &&
                                  !unit.Equals("msec", StringComparison.OrdinalIgnoreCase))

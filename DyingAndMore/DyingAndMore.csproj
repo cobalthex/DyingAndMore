@@ -104,6 +104,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Data\Shaders\Circle.fx" />
     <Content Include="Game.ico">
     </Content>
   </ItemGroup>

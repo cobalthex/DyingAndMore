@@ -258,7 +258,7 @@ namespace Takai.Game
             Spawn(instance);
             return instance;
         }
-        
+
         /// <summary>
         /// Spawn a single fluid onto the map
         /// </summary>
@@ -298,8 +298,9 @@ namespace Takai.Game
             if (effects.Class == null)
                 return;
 
+            effects.Map = this;
             foreach (var effect in effects.Class.Effects)
-                effect.Spawn(this, effects);
+                effect.Spawn(effects);
         }
 
         /// <summary>

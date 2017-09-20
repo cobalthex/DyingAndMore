@@ -21,10 +21,9 @@ namespace DyingAndMore.Game
         //material dampeners
         //breaking effect
 
-        public void Spawn(Map map, EffectsInstance instance)
+        public void Spawn(EffectsInstance instance)
         {
-            //todo: consolidate arguments (position+velocity can be inherited from entity maybe)
-            var ents = map.FindEntities(instance.Position, Radius);
+            var ents = instance.Map.FindEntities(instance.Position, Radius);
             foreach (var ent in ents)
             {
                 if ((ent == instance.Source && !CanDamageCreator) ||
@@ -32,7 +31,7 @@ namespace DyingAndMore.Game
                     continue;
 
                 var rSq = Vector2.DistanceSquared(instance.Position, ent.Position);
-                actor.CurrentHealth -= (int)(DamageScale * (1 / rSq));
+                actor.CurrentHealth -= (int)(DamageScale * (1 / rSq)); //todo: Damage()
             }
         }
     }
