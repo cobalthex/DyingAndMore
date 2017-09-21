@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
@@ -9,12 +8,6 @@ namespace Takai.Game
 {
     public partial class Map
     {
-        protected struct MapText
-        {
-            public string text;
-            public Vector2 position;
-        }
-
         protected SpriteBatch sbatch;
         protected RenderTarget2D preRenderTarget;
         protected RenderTarget2D fluidsRenderTarget;
@@ -31,7 +24,6 @@ namespace Takai.Game
         //a collection of primatives to draw next frame (for one frame)
         protected List<VertexPositionColor> renderedLines = new List<VertexPositionColor>(32);
         protected List<VertexPositionColorTexture> renderedCircles = new List<VertexPositionColorTexture>(32);
-        protected List<MapText> renderedText = new List<MapText>(32);
 
         protected XnaEffect lineEffect;
         protected XnaEffect circleEffect;
@@ -307,6 +299,8 @@ namespace Takai.Game
                         DrawLine(new Vector2(rect.Right, rect.Top), new Vector2(rect.Right, rect.Bottom), color);
                         DrawLine(new Vector2(rect.Right, rect.Bottom), new Vector2(rect.Left, rect.Bottom), color);
                         DrawLine(new Vector2(rect.Left, rect.Bottom), new Vector2(rect.Left, rect.Top), color);
+
+                        DrawCircle(ent.Position, ent.Radius, Color.Gold);
                     }
                 }
 

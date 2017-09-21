@@ -17,11 +17,10 @@ Output vmain(float4 position : POSITION, float4 color : COLOR0, float2 uv : TEXC
 	return output;
 }
 
-float4 pmain(float2 uv : TEXCOORD0, float4 color : COLOR0) : SV_Target
+float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0) : SV_Target
 {
-	uv = uv * 2 - 1;
-	return float4(dot(uv, uv) / 10, 1, 1, 1);
-	return (dot(uv, uv) <= 1 /*&& dot(uv, uv) >= 0.5*/) ? color : 0;
+	uv = uv * float2(2, 2) - float2(1, 1);
+	return (dot(uv, uv) <= 1 && dot(uv, uv) >= 0.9) ? color : 0;
 }
 
 technique Technique1

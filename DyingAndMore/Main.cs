@@ -220,6 +220,7 @@ namespace DyingAndMore
             if (InputState.IsPress(Keys.F6))
             {
                 Takai.Data.Cache.SaveAllToFile("all.tk");
+                System.Diagnostics.Process.Start("all.tk");
             }
 
             if (InputState.IsPress(Keys.F7))

@@ -161,8 +161,6 @@ namespace DyingAndMore.Game
 
         protected override void UpdateSelf(GameTime time)
         {
-            Map.DrawCircle(new Vector2(200), 30, Color.Cyan);
-
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
