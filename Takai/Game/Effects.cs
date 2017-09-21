@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Game
 {
@@ -183,9 +184,27 @@ namespace Takai.Game
         }
     }
 
+    public struct ScreenFlash
+    {
+        public BlendState blendState;
+        public ValueCurve<Color> color;
+
+        //todo: convert to class/instance
+    }
     public class ScreenEffect : IGameEffect
     {
-        //todo
-        public void Spawn(EffectsInstance instance) { }
+        public ScreenFlash Flash { get; set; }
+
+        //Camera shake
+
+        //temporary camera rotation
+        //permanent camera rotation
+
+        public void Spawn(EffectsInstance instance)
+        {
+
+        }
     }
+
+    //floating text
 }

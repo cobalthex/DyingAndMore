@@ -105,6 +105,8 @@ namespace DyingAndMore.Editor
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
+            Map.DrawCircle(new Vector2(50), 60, Color.Cyan);
+
             base.UpdateSelf(time);
         }
 

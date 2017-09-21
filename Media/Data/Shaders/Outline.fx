@@ -17,7 +17,7 @@ float Adjacent(float2 uv, float2 distance)
 float offset[] = { 0.0, 1.3846153846, 3.2307692308 };
 float weight[] = { 0.2270270270, 0.3162162162, 0.0702702703 };
 
-float4 main(float2 uv : TEXCOORD0, float4 color : COLOR0) : SV_Target
+float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0) : SV_Target
 {
     /*float4 tex = tex2D(Tex, uv / 1024.0) * weight[0];
 
@@ -46,6 +46,6 @@ technique Technique1
 {
     pass Pass1
     {
-        PixelShader = compile ps_4_0 main();
+        PixelShader = compile ps_4_0 pmain();
     }
 }

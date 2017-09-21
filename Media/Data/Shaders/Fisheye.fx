@@ -2,7 +2,7 @@ sampler2D Tex;
 
 float Fov = 2.1; //in Radians
 
-float4 main(float2 uv : TEXCOORD0, float4 color : COLOR0) : SV_Target
+float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0) : SV_Target
 {
 	uv -= 0.5;
 	float z = sqrt(1.0 - uv.x * uv.x - uv.y * uv.y);
@@ -15,6 +15,6 @@ technique Technique1
 {
     pass Pass1
     {
-        PixelShader = compile ps_4_0 main();
+        PixelShader = compile ps_4_0 pmain();
     }
 }

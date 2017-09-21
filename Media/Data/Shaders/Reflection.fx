@@ -7,7 +7,7 @@ struct PSOutput
     float4 reflection : COLOR1;
 };
 
-PSOutput main(float2 uv : TEXCOORD0, float4 color : COLOR0)
+PSOutput pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0)
 {
     PSOutput output;
     output.color = tex2D(Tex, uv) * color;
@@ -20,6 +20,6 @@ technique Technique1
 {
     pass Pass1
     {
-        PixelShader = compile ps_4_0 main();
+        PixelShader = compile ps_4_0 pmain();
     }
 }
