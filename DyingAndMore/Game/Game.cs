@@ -10,22 +10,27 @@ using Takai.Game;
 
 namespace DyingAndMore.Game
 {
+    public enum GameDifficulty
+    {
+        Trivial,
+        Easy,
+        Hard,
+        Impossible,
+        Custom
+    }
+
+    public struct GameInstance
+    {
+        public static GameInstance Current { get; set; }
+
+        public GameDifficulty difficulty;
+        public bool allowFriendlyFire;
+
+        //campaign
+    }
+
     class Game : MapView
     {
-        public enum GameDifficulty
-        {
-            Trivial,
-            Easy,
-            Hard,
-            Impossible,
-            Custom
-        }
-
-        public struct GameplaySettings
-        {
-            public GameDifficulty difficulty;
-            public bool allowFriendlyFire;
-        }
 
         Entities.ActorInstance player = null;
         Entities.Controller lastController = null;
@@ -34,6 +39,10 @@ namespace DyingAndMore.Game
         Static crapDisplay;
 
         TextInput debugConsole;
+
+        Takai.Graphics.BitmapFont tinyFont;
+
+        EffectsClass testEffect;
 
         Static renderSettingsConsole;
         void ToggleRenderSettingsConsole()
@@ -90,6 +99,12 @@ namespace DyingAndMore.Game
                 inp.RemoveFromParent();
                 inp.Text = String.Empty;
             };
+
+            tinyFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
+
+            testEffect = Takai.Data.Cache.Load<EffectsClass>("Defs/Effects/Damage.fx.tk");
+
+            GameInstance.Current = new GameInstance();
         }
 
         class BulletTimeScript : Script
@@ -243,6 +258,15 @@ namespace DyingAndMore.Game
 
         protected override bool HandleInput(GameTime time)
         {
+            if (InputState.IsPress(MouseButtons.Left))
+            {
+                var fx = testEffect.Create();
+                fx.Position = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+                fx.Direction = fx.Position - player.Position;
+                Map.Spawn(fx);
+                return false;
+            }
+
             if (InputState.IsPress(Keys.OemTilde))
             {
                 debugConsole.HasFocus = true;
@@ -346,11 +370,20 @@ namespace DyingAndMore.Game
 
             DefaultFont.Draw(spriteBatch, $"Total entities:{Map.TotalEntitiesCount}", new Vector2(20), Color.Orange);
 
-            if (player != null)
+            foreach (var ent in Map.ActiveEnts)
             {
-                var hud = $"Health: {player.CurrentHealth}\n"
-                        + $"Ammo: {((Weapons.GunInstance)player.Weapon)?.CurrentAmmo}";
-                DefaultFont.Draw(spriteBatch, hud, new Vector2(20, 40), Color.White);
+                if (ent is Entities.ActorInstance actor)
+                {
+                    var pos = Vector2.Transform(actor.Position, Map.ActiveCamera.Transform)
+                              - new Vector2(ent.Radius * 1.5f);
+
+                    tinyFont.Draw(spriteBatch, actor.CurrentHealth.ToString(), pos, Color.Tomato);
+                    if (actor.Weapon is Weapons.GunInstance gun)
+                    {
+                        pos.Y += 10;
+                        tinyFont.Draw(spriteBatch, gun.CurrentAmmo.ToString(), pos, Color.LightSteelBlue);
+                    }
+                }
             }
         }
     }

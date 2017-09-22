@@ -14,7 +14,7 @@ namespace DyingAndMore.Game
         /// <summary>
         /// Can this effect damage the creator of this effect?
         /// </summary>
-        public bool CanDamageCreator { get; set; }
+        public bool CanDamageSource { get; set; }
 
         //falloff curve?
 
@@ -26,12 +26,16 @@ namespace DyingAndMore.Game
             var ents = instance.Map.FindEntities(instance.Position, Radius);
             foreach (var ent in ents)
             {
-                if ((ent == instance.Source && !CanDamageCreator) ||
+                if ((ent == instance.Source && !CanDamageSource) ||
                     !(ent is Entities.ActorInstance actor))
                     continue;
 
                 var rSq = Vector2.DistanceSquared(instance.Position, ent.Position);
-                actor.CurrentHealth -= (int)(DamageScale * (1 / rSq)); //todo: Damage()
+                int damageAmount = (int)(DamageScale * (rSq / (Radius * Radius)));
+                actor.ReceiveDamage(damageAmount, instance.Source);
+
+                Takai.LogBuffer.Append(damageAmount.ToString());
+                instance.Map.DrawCircle(instance.Position, Radius, Color.Gold);
             }
         }
     }

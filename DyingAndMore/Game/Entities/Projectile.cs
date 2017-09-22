@@ -21,7 +21,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// Allow this projectile to damage the creator of this projectile
         /// </summary>
-        public bool AllowSourceDamage { get; set; } = false;
+        public bool CanDamageSource { get; set; } = false;
 
         public ProjectileClass()
         {
@@ -71,21 +71,19 @@ namespace DyingAndMore.Game.Entities
         {
         }
 
-        public override void OnMapCollision(Point tile, Vector2 point, System.TimeSpan deltaTime)
+        public override void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime)
         {
             Map.Destroy(this);
         }
 
-        public override void OnEntityCollision(EntityInstance collider, Vector2 point, System.TimeSpan deltaTime)
+        public override void OnEntityCollision(EntityInstance collider, Vector2 point, TimeSpan deltaTime)
         {
             State.TransitionTo(EntStateId.Dead, "Dead"); //todo
             Takai.LogBuffer.Append(ToString() + " " + collider.ToString());
 
             if (collider is ActorInstance actor &&
-                (collider != Source || _class.AllowSourceDamage))
-            {
-                actor.CurrentHealth -= (int)_class.Power;//todo
-            }
+                (collider != Source || _class.CanDamageSource))
+                actor.ReceiveDamage((int)_class.Power, Source);
         }
     }
 }
