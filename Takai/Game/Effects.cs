@@ -184,16 +184,38 @@ namespace Takai.Game
         }
     }
 
-    public struct ScreenFlash
+    /*
+    public class ScreenFlashClass : IObjectClass<ScreenFlashInstance>
     {
+        public string Name { get; set; }
+
+        [Data.Serializer.Ignored]
+        public string File { get; set; }
+
         public BlendState blendState;
         public ValueCurve<Color> color;
 
+        public ScreenFlashInstance Create()
+        {
+            return new ScreenFlashInstance(this);
+        }
+
         //todo: convert to class/instance
     }
+
+    public struct ScreenFlashInstance : IObjectInstance<ScreenFlashClass>
+    {
+        public ScreenFlashClass Class { get; set; }
+
+        public ScreenFlashInstance(ScreenFlashClass @class)
+        {
+            Class = @class;
+        }
+    }
+
     public class ScreenEffect : IGameEffect
     {
-        public ScreenFlash Flash { get; set; }
+        public ScreenFlashClass Flash { get; set; }
 
         //Camera shake
 
@@ -204,7 +226,7 @@ namespace Takai.Game
         {
 
         }
-    }
+    }*/
 
-    //floating text
+    //floating text?
 }

@@ -184,6 +184,21 @@ namespace DyingAndMore.Game.Entities
             Velocity = vel;
         }
 
+        /// <summary>
+        /// Try to receive damage (instantly). Tests friendly fire, etc
+        /// </summary>
+        /// <param name="damage">the amount of damage to apply</param>
+        /// <param name="source">The entity that is responsible for this damage</param>
+        public void ReceiveDamage(int damage, EntityInstance source = null)
+        {
+            if (!GameInstance.Current.allowFriendlyFire &&
+                source is ActorInstance actor &&
+                (actor.Faction & Faction) != 0)
+                return;
+
+            CurrentHealth -= damage;
+        }
+
         #region Helpers
 
         /// <summary>
