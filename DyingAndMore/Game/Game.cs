@@ -21,6 +21,8 @@ namespace DyingAndMore.Game
 
     public struct GameInstance
     {
+        //move into Game?
+
         public static GameInstance Current { get; set; }
 
         public GameDifficulty difficulty;
@@ -375,7 +377,7 @@ namespace DyingAndMore.Game
                 if (ent is Entities.ActorInstance actor)
                 {
                     var pos = Vector2.Transform(actor.Position, Map.ActiveCamera.Transform)
-                              - new Vector2(ent.Radius * 1.5f);
+                              - new Vector2(ent.Radius * 1.5f * Map.ActiveCamera.Scale);
 
                     tinyFont.Draw(spriteBatch, actor.CurrentHealth.ToString(), pos, Color.Tomato);
                     if (actor.Weapon is Weapons.GunInstance gun)
