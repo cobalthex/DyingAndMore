@@ -8,7 +8,7 @@ namespace DyingAndMore.Game
     /// </summary>
     public class DamageEffect : IGameEffect
     {
-        public float DamageScale { get; set; }
+        public float MaxDamage { get; set; }
         public float Radius { get; set; }
 
         /// <summary>
@@ -24,17 +24,20 @@ namespace DyingAndMore.Game
         public void Spawn(EffectsInstance instance)
         {
             var ents = instance.Map.FindEntities(instance.Position, Radius);
+            var rSq = Radius * Radius;
             foreach (var ent in ents)
             {
                 if ((ent == instance.Source && !CanDamageSource) ||
                     !(ent is Entities.ActorInstance actor))
                     continue;
 
-                var rSq = Vector2.DistanceSquared(instance.Position, ent.Position);
-                int damageAmount = (int)(DamageScale * (rSq / (Radius * Radius)));
-                actor.ReceiveDamage(damageAmount, instance.Source);
+                var distSq = Vector2.DistanceSquared(instance.Position, ent.Position);
 
-                Takai.LogBuffer.Append(damageAmount.ToString());
+                if (distSq == 0)
+                    actor.ReceiveDamage((int)MaxDamage, instance.Source);
+                if (distSq < rSq)
+                    actor.ReceiveDamage((int)(MaxDamage * (rSq - distSq) / rSq), instance.Source);
+
                 instance.Map.DrawCircle(instance.Position, Radius, Color.Gold);
             }
         }
