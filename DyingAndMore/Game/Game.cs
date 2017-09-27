@@ -33,7 +33,6 @@ namespace DyingAndMore.Game
 
     class Game : MapView
     {
-
         Entities.ActorInstance player = null;
         Entities.Controller lastController = null;
 

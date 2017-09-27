@@ -36,7 +36,7 @@ namespace DyingAndMore.Game
                 if (distSq == 0)
                     actor.ReceiveDamage((int)MaxDamage, instance.Source);
                 if (distSq < rSq)
-                    actor.ReceiveDamage((int)(MaxDamage * (rSq - distSq) / rSq), instance.Source);
+                    actor.ReceiveDamage((int)(MaxDamage * (rSq - distSq) / rSq), instance.Source); //falloff curve?
 
                 instance.Map.DrawCircle(instance.Position, Radius, Color.Gold);
             }
