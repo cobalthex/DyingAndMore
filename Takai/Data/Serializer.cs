@@ -215,7 +215,9 @@ namespace Takai.Data
             Type[] types = assembly.GetTypes();
             foreach (var type in types)
             {
-                if (!type.IsGenericType && !Attribute.IsDefined(type, typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false))
+                if (!type.IsGenericType &&
+                    !Attribute.IsDefined(type, typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false) &&
+                    !Attribute.IsDefined(type, typeof(IgnoredAttribute), true))
                     RegisterType(type);
             }
 
@@ -241,6 +243,67 @@ namespace Takai.Data
         public static void RegisterType(Type type)
         {
             RegisteredTypes[WriteFullTypeNames ? type.FullName : type.Name] = type;
+        }
+
+        public static Dictionary<string, object> DescribeType(Type type)
+        {
+            var dict = new Dictionary<string, object>();
+
+            if (type.IsEnum)
+            {
+                foreach (var val in type.GetEnumValues())
+                    dict[type.GetEnumName(val)] = Convert.ToInt64(val);
+                return dict;
+            }
+
+            string SerializeMemberType(Type mtype)
+            {
+                if (mtype == null)
+                    return null;
+
+                string name;
+                if (mtype.IsGenericType)
+                {
+                    name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
+                    name = name.Substring(0, name.IndexOf('`')) + '<';
+                    for (int i = 0; i < mtype.GenericTypeArguments.Length; ++i)
+                    {
+                        if (i > 0)
+                            name += ',';
+                        name += SerializeMemberType(mtype.GenericTypeArguments[i]);
+                    }
+                    return name + ">";
+                }
+                else
+                    name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
+
+                //pass in member info and check attributes
+
+                return name;
+            }
+
+            foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (Attribute.IsDefined(member, typeof(IgnoredAttribute)))
+                    continue;
+
+                switch (member.MemberType)
+                {
+                    case MemberTypes.Field:
+                        dict[member.Name] = SerializeMemberType(((FieldInfo)member).FieldType);
+                        break;
+                    case MemberTypes.Property:
+                        if (((PropertyInfo)member).CanWrite)
+                            dict[member.Name] = SerializeMemberType(((PropertyInfo)member).PropertyType);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            //todo: handle derived +,custom *
+
+            return dict;
         }
     }
 }

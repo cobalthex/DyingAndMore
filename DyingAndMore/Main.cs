@@ -7,6 +7,7 @@ using Takai.Input;
 namespace DyingAndMore
 {
     #region startup (Windows/Xbox/Zune)
+    [Takai.Data.Serializer.Ignored]
     static class Program
     {
         [DllImport("kernel32.dll", SetLastError = true)]
