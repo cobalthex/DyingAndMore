@@ -6,6 +6,7 @@ namespace Takai.Game
 {
     public partial class Map
     {
+        [Data.Serializer.Ignored]
         public Random Random { get; private set; } = new Random();
         private byte[] _r64b = new byte[8];
 
