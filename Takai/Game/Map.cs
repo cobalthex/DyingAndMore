@@ -59,9 +59,9 @@ namespace Takai.Game
                 SectorPixelSize = SectorSize * value;
             }
         }
-        private int tileSize;
+        private int tileSize = 1;
         [Data.Serializer.Ignored]
-        public int TilesPerRow { get; private set; }
+        public int TilesPerRow { get; private set; } = 1;
 
         /// <summary>
         /// The horizontal size of the map in tiles
@@ -92,13 +92,13 @@ namespace Takai.Game
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>
         [Data.Serializer.Ignored]
-        public short[,] Tiles { get; set; }
+        public short[,] Tiles { get; set; } = new short[0, 0];
         /// <summary>
         /// All of the sectors in the map
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>
         [Data.Serializer.Ignored]
-        public MapSector[,] Sectors { get; protected set; }
+        public MapSector[,] Sectors { get; protected set; } = new MapSector[0, 0];
 
         /// <summary>
         /// The list of active particles. Not serialized

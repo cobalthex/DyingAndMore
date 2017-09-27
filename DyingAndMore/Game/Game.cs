@@ -245,6 +245,7 @@ namespace DyingAndMore.Game
                             }
                         }
                     }
+                    System.Diagnostics.Process.Start("defs.tk");
                     break;
 
                 case "exit":
