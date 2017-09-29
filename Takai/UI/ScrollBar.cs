@@ -74,7 +74,7 @@ namespace Takai.UI
 
         public override bool CanFocus => IsThumbVisible;
 
-        public event System.EventHandler<ScrollEventArgs> Scroll;
+        public event EventHandler<ScrollEventArgs> Scroll;
         protected virtual void OnScroll(ScrollEventArgs e) { }
 
         public ScrollBar()
@@ -234,13 +234,20 @@ namespace Takai.UI
             };
         }
 
-        //todo: virtualize
+        //todo: unified method between all add modes?
         public override void AddChild(Static child)
         {
             contentArea.AddChild(child);
+            ResizeContentArea();
         }
 
-        public override void Reflow()
+        protected override void OnResize(EventArgs e)
+        {
+            ResizeContentArea();
+            base.OnResize(e);
+        }
+
+        protected void ResizeContentArea()
         {
             //todo:
             // maybe use contentContainer and contentArea
@@ -253,11 +260,7 @@ namespace Takai.UI
 
             horizontalScrollbar.ContentSize = bounds.Width;
             verticalScrollbar.ContentSize = bounds.Height;
-            base.Reflow();
-        }
 
-        protected override void OnResize(EventArgs e)
-        {
             var hsize = Size.X;
             var vsize = Size.Y;
 
@@ -265,6 +268,8 @@ namespace Takai.UI
                 vsize -= horizontalScrollbar.Size.Y;
             if (verticalScrollbar.ContentSize > vsize)
                 hsize -= verticalScrollbar.Size.X;
+            if (horizontalScrollbar.ContentSize > hsize)
+                vsize -= horizontalScrollbar.Size.Y;
 
             horizontalScrollbar.Size = new Vector2(
                 hsize,

@@ -232,19 +232,39 @@ namespace DyingAndMore.Game
                     break;
 
                 //this should go elsewhere
-                case "makedef":
-                    using (var stream = new System.IO.StreamWriter("defs.tk"))
+                case "typeinfo":
                     {
-                        for (int i = 1; i < words.Length; ++i)
+                        if (words.Length < 2)
+                            break;
+
+                        ScrollBox s = new ScrollBox()
                         {
-                            if (Takai.Data.Serializer.RegisteredTypes.TryGetValue(words[i], out var ty))
-                            {
-                                Takai.Data.Serializer.TextSerialize(stream, Activator.CreateInstance(ty));
-                                stream.WriteLine('\n');
-                            }
+                            BackgroundColor = Color.DarkGray,
+                            Size = new Vector2(400),
+                            HorizontalAlignment = Alignment.Middle,
+                            VerticalAlignment = Alignment.Middle
+                        };
+                        s.Click += delegate (object sender, ClickEventArgs e) { ((Static)sender).RemoveFromParent(); };
+
+                        System.Collections.Generic.Dictionary<string, object> type;
+                        try
+                        {
+                            type = Takai.Data.Serializer.DescribeType(Takai.Data.Serializer.RegisteredTypes[words[1]]);
                         }
+                        catch
+                        {
+                            break;
+                        }
+
+                        var info = new Static()
+                        {
+                            Text = words[1] + "\n" + string.Join("\n", type.Select(e => "    " + e.Key + ": " + e.Value).ToArray()),
+                        };
+                        info.AutoSize();
+                        s.AddChild(info);
+
+                        AddChild(s);
                     }
-                    System.Diagnostics.Process.Start("defs.tk");
                     break;
 
                 case "exit":

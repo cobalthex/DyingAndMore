@@ -20,36 +20,6 @@ namespace DyingAndMore
         [System.STAThread]
         static void Main(string[] args)
         {
-            if (args.Length > 0)
-            {
-                if (args[0].Equals("MakeDef", System.StringComparison.OrdinalIgnoreCase))
-                {
-                    AttachConsole();
-
-                    using (var stream = new System.IO.StreamWriter(System.Console.OpenStandardOutput()))
-                    {
-                        stream.AutoFlush = true;
-                        System.Console.SetOut(stream);
-
-                        stream.WriteLine("Test");
-
-                        for (int i = 1; i < args.Length; ++i)
-                        {
-                            if (Takai.Data.Serializer.RegisteredTypes.TryGetValue(args[i], out var type))
-                            {
-                                var obj = System.Activator.CreateInstance(type);
-                                Takai.Data.Serializer.TextSerialize(stream, obj);
-                                stream.WriteLine();
-                            }
-                        }
-
-                        stream.WriteLine();
-                    }
-                    return;
-                }
-            }
-
-
             using (DyingAndMoreGame game = new DyingAndMoreGame())
             {
 #if WINDOWS
