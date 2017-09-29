@@ -509,6 +509,9 @@ namespace Takai.UI
 
         public virtual Static RemoveChildAt(int index)
         {
+            if (index < 0 || index >= children.Count)
+                return null;
+
             var child = children[index];
             children.RemoveAt(index);
             child._parent = null;
