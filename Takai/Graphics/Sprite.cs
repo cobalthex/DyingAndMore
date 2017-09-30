@@ -27,8 +27,7 @@ namespace Takai.Graphics
     /// A graphic animation. Typically synchronized with a map's timer
     /// </summary>
     [Data.DesignerModdable]
-    [Data.DerivedTypeDeserialize(typeof(Sprite), "DerivedDeserialize")]
-    public class Sprite : ICloneable, Data.ISerializeExternally
+    public class Sprite : ICloneable, Data.ISerializeExternally, Data.IDerivedDeserialize
     {
         /// <summary>
         /// The file that this sprite was loaded from
@@ -353,7 +352,7 @@ namespace Takai.Graphics
             switch (tween)
             {
                 case TweenStyle.Overlap:
-                    return (MathHelper.Max((frameDelta * 2) - 1, 0), 
+                    return (MathHelper.Max((frameDelta * 2) - 1, 0),
                             MathHelper.Max(1 - (frameDelta * 2), 0));
                 case TweenStyle.Sequential:
                     return (frameDelta, 1 - frameDelta);
@@ -393,7 +392,7 @@ namespace Takai.Graphics
             return new Rectangle(region.X + MathHelper.Max(0, (region.Width - width) / 2), region.Y + MathHelper.Max(0, (region.Height - height) / 2), width, height);
         }
 
-        protected void DerivedDeserialize(System.Collections.Generic.Dictionary<string, object> props)
+        public void DerivedDeserialize(System.Collections.Generic.Dictionary<string, object> props)
         {
             bool hasSize = props.ContainsKey("Size");
 

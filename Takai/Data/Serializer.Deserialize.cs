@@ -31,27 +31,11 @@ namespace Takai.Data
     }
 
     /// <summary>
-    /// The object should use the specified method to read custom dictionary fields from a deserialized object
-    /// The reverse of DerivedTypeSerialize
+    /// Allows for custom deserialization on top of the default deserialization
     /// </summary>
-    /// <remarks>Only used if a typed object is serialized (dictionaries/primatives ignored)</remarks>
-    [AttributeUsage(AttributeTargets.All)]
-    [System.Runtime.InteropServices.ComVisible(true)]
-    public class DerivedTypeDeserializeAttribute : Attribute
+    public interface IDerivedDeserialize
     {
-        internal MethodInfo deserialize;
-
-        /// <summary>
-        /// Create a derived type serializer
-        /// </summary>
-        /// <param name="type">The object to look in for the serialize method</param>
-        /// <param name="methodName">The name of the method to search for (Must be non-static, can be public or non public)</param>
-        /// <remarks>format: Dictionary&lt;string, object&gt;(object Source)</remarks>
-        public DerivedTypeDeserializeAttribute(Type type, string methodName)
-        {
-            var method = type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            deserialize = method;
-        }
+        void DerivedDeserialize(Dictionary<string, object> props);
     }
 
     public static partial class Serializer
@@ -500,8 +484,8 @@ namespace Takai.Data
                 }
             }
 
-            var derived = destType.GetCustomAttribute<DerivedTypeDeserializeAttribute>(true);
-            derived?.deserialize?.Invoke(obj, new[] { dict });
+            if (obj is IDerivedDeserialize derived)
+                derived.DerivedDeserialize(dict);
 
             return obj;
         }

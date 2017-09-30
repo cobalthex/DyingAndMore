@@ -66,7 +66,6 @@ namespace Takai.Game
     /// <summary>
     /// A single instance of an entity in a map. Mostly logic handled through <see cref="EntityClass"/>
     /// </summary>
-    [Takai.Data.DerivedTypeDeserialize(typeof(EntityInstance), "DerivedDeserialize")]
     public abstract class EntityInstance : IObjectInstance<EntityClass>
     {
         private static int nextId = 1; //generator for the unique (runtime) IDs

@@ -28,8 +28,7 @@ namespace Takai.UI
     /// <summary>
     /// The basic UI element
     /// </summary>
-    [Data.DerivedTypeDeserialize(typeof(Static), "DerivedDeserialize")]
-    public class Static
+    public class Static : Data.IDerivedDeserialize
     {
         /// <summary>
         /// A font to use for drawing debug info.
@@ -1013,7 +1012,7 @@ namespace Takai.UI
             Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleBounds, position, Color);
         }
 
-        protected void DerivedDeserialize(Dictionary<string, object> props)
+        public void DerivedDeserialize(Dictionary<string, object> props)
         {
             if (props.TryGetValue("AutoSize", out var autoSize))
             {
