@@ -7,9 +7,8 @@ using System.Linq;
 
 namespace Takai.Game
 {
-    [Data.DerivedTypeSerialize(typeof(Map), "Serialize"),
-     Data.DerivedTypeDeserialize(typeof(Map), "Deserialize")]
-    public partial class Map
+    [Data.DerivedTypeSerialize(typeof(Map), "Serialize")]
+    public partial class Map : Data.IDerivedDeserialize
     {
         /// <summary>
         /// Build the tiles mask
@@ -124,7 +123,7 @@ namespace Takai.Game
                 ["State"] = new MapState(this)
             };
         }
-        void Deserialize(Dictionary<string, object> Props)
+        public void DerivedDeserialize(Dictionary<string, object> Props)
         {
             var tiles = Data.Serializer.Cast<List<short>>(Props["Tiles"]);
 
