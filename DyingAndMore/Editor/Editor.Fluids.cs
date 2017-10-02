@@ -63,7 +63,7 @@ namespace DyingAndMore.Editor
             {
                 lastFluidTime = time.TotalGameTime;
 
-                if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Bounds.Contains(currentWorldPos))
+                if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Class.Bounds.Contains(currentWorldPos))
                 {
                     editor.Map.Spawn(selectedFluid, currentWorldPos, Vector2.Zero);
                     return false;

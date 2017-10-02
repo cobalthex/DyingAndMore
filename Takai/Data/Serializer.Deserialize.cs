@@ -211,7 +211,6 @@ namespace Takai.Data
             {
                 reader.Read();
                 var file = ReadString(reader);
-                //var reference = TextDeserialize(file);
                 return Cache.Load(file);
             }
 
@@ -399,6 +398,11 @@ namespace Takai.Data
             throw new NotSupportedException(ExceptString($"Unknown identifier: '{word}'", reader));
         }
 
+        public static T ParseDictionary<T>(Dictionary<string, object> dict)
+        {
+            return (T)ParseDictionary(typeof(T), dict);
+        }
+
         public static object ParseDictionary(Type destType, Dictionary<string, object> dict)
         {
             var deserial = destType.GetCustomAttribute<CustomDeserializeAttribute>()?.deserialize;
@@ -548,9 +552,9 @@ namespace Takai.Data
         /// </summary>
         /// <param name="DestType">The type to cast to</param>
         /// <param name="Source">The source object</param>
-        /// <param name="Strict">Should only cast between equivelent types (If true, casting int to bool would fail)</param>
+        /// <param name="isStrict">Should only cast between equivelent types (If true, casting int to bool would fail)</param>
         /// <returns>The correctly casted object</returns>
-        public static object Cast(Type DestType, object Source, bool Strict = true)
+        public static object Cast(Type DestType, object Source, bool isStrict = true)
         {
             if (Source == null)
                 return null;
@@ -573,7 +577,7 @@ namespace Takai.Data
 
             //GetConstructor ?
 
-            if (!Strict)
+            if (!isStrict)
             {
                 if (Source is string sourceString)
                 {
@@ -603,7 +607,7 @@ namespace Takai.Data
                     throw new InvalidCastException($"Type:{DestType.Name} is an array but '{Source}' is of type:{sourceType.Name}");
 
                 var elType = DestType.GetElementType();
-                list = list.ConvertAll(i => Cast(elType, i, Strict));
+                list = list.ConvertAll(i => Cast(elType, i, isStrict));
                 var casted = CastMethod.MakeGenericMethod(elType).Invoke(null, new[] { list });
                 return ToArrayMethod.MakeGenericMethod(elType).Invoke(null, new[] { casted });
             }
@@ -614,6 +618,8 @@ namespace Takai.Data
                 var genericType = DestType.GetGenericTypeDefinition();
                 var genericArgs = DestType.GetGenericArguments();
 
+                //if (genericType is typeof(Lazy<>))
+
                 //todo: support any number of items in tuple
                 if (genericType == typeof(Tuple<,>))
                 {
@@ -621,21 +627,27 @@ namespace Takai.Data
                         throw new InvalidCastException($"Type:{DestType.Name} is a Tuple but '{Source}' is of type:{sourceType.Name}");
 
                     for (int i = 0; i < sourceList.Count; ++i)
-                        sourceList[i] = Cast(genericArgs[i], sourceList[i], Strict);
+                        sourceList[i] = Cast(genericArgs[i], sourceList[i], isStrict);
                     return Activator.CreateInstance(DestType, sourceList.ToArray());
                 }
 
+                if (genericType == typeof(List<>))
+                {
+                    sourceList = sourceList.ConvertAll(i => Cast(genericArgs[0], i, isStrict));
+                    var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
+                    return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
+                }
+
                 //if (typeof(IEnumerable<>).IsAssignableFrom(genericType) && genericArgs.Count() == 1)
-                if (genericType == typeof(List<>) || genericType == typeof(HashSet<>) ||
-                    genericType == typeof(Queue<>) || genericType == typeof(Stack<>))
+                if (genericType == typeof(HashSet<>) || genericType == typeof(Queue<>) || genericType == typeof(Stack<>))
                 {
                     if (sourceList == null)
                         throw new InvalidCastException($"Type:{DestType.Name} is a {genericType.Name} but '{Source}' is of type:{sourceType.Name}");
 
-                    sourceList = sourceList.ConvertAll(i => Cast(genericArgs[0], i, Strict));
-                    //return Activator.CreateInstance(DestType, new[] { list.AsEnumerable<object>() });
+                    sourceList = sourceList.ConvertAll(i => Cast(genericArgs[0], i, isStrict));
                     var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
-                    return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
+                    return Activator.CreateInstance(DestType, new[] { casted });
+                    //return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
                 }
 
                 if (genericType == typeof(Dictionary<,>))
@@ -650,7 +662,7 @@ namespace Takai.Data
                     var add = DestType.GetMethod("Add");
 
                     foreach (var pair in srcDict)
-                        add.Invoke(dict, new[] { Cast(genericArgs[0], pair.Key, false), Cast(genericArgs[1], pair.Value, Strict) });
+                        add.Invoke(dict, new[] { Cast(genericArgs[0], pair.Key, false), Cast(genericArgs[1], pair.Value, isStrict) });
 
                     return dict;
                 }
@@ -661,7 +673,7 @@ namespace Takai.Data
                     var implCast = DestType.GetMethod("op_Implicit", new[] { genericArgs[0] });
                     if (implCast != null)
                     {
-                        var genericCvt = Cast(genericArgs[0], Source, Strict);
+                        var genericCvt = Cast(genericArgs[0], Source, isStrict);
                         return implCast.Invoke(null, new[] { genericCvt });
                     }
                 }
@@ -682,12 +694,12 @@ namespace Takai.Data
                     {
                         case MemberTypes.Field:
                             var field = (FieldInfo)memberEnumerator.Current;
-                            field.SetValue(obj, Cast(field.FieldType, sourceList[i], Strict));
+                            field.SetValue(obj, Cast(field.FieldType, sourceList[i], isStrict));
                             break;
                         case MemberTypes.Property:
                             var prop = (PropertyInfo)memberEnumerator.Current;
                             if (prop.CanWrite)
-                                prop.SetValue(obj, Cast(prop.PropertyType, sourceList[i], Strict));
+                                prop.SetValue(obj, Cast(prop.PropertyType, sourceList[i], isStrict));
                             else
                                 goto default;
                             break;

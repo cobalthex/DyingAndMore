@@ -1,24 +1,22 @@
-Map {
+MapClass {
     Name: Null;
     TileSize: 48;
-    ActiveCamera: EditorCamera {
-        PostEffect: Null;
-        Viewport: [0 0 1280 800];
-        Position: [192 192];
-        Scale: 1;
-        Rotation: 0;
-        Shake: 0;
-        Follow: Null;
-        MoveSpeed: 1000;
-    };
     TilesImage: "Data\\Textures/tiles.png";
     Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
     Width: 8;
     Height: 8;
-    Decals: [];
-    Triggers: [];
-    State: MapState {
-        entities: [
+    DefaultState: {
+        ActiveCamera: EditorCamera {
+            PostEffect: Null;
+            Viewport: [0 0 1280 800];
+            Position: [192 192];
+            Scale: 1;
+            Rotation: 0;
+            Shake: 0;
+            Follow: Null;
+            MoveSpeed: 1000;
+        };
+        Entities: [
             ActorInstance {
                 Class: @"Defs/Entities/Player.ent.tk";
                 Faction: Factions [Player];
@@ -270,7 +268,7 @@ Map {
             }
         ];
         fluids: [];
-        elapsedTime: 130932.0372;
+        elapsedTime: 0;
         timeScale: 1;
     };
 }

@@ -1,0 +1,74 @@
+MapClass {
+    Name: Null;
+    TileSize: 48;
+    Width: 24;
+    Height: 8;
+    InitialState: InitialMapState {
+        Entities: [
+            EntitySpawn {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Position: [311 129];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Position: [461 129];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Position: [255 265];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Position: [69 137];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Position: [149 155];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Position: [169 201];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Position: [167 257];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Position: [107 283];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Position: [243 197];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Defs/Entities/Astrovirus.ent.tk";
+                Position: [253 143];
+                Forward: [1 0];
+                Name: Null;
+            }
+        ];
+        Fluids: [];
+        Decals: [];
+    };
+    TilesImage: "Data\\Textures/tiles.png";
+    Tiles: [8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 11];
+}

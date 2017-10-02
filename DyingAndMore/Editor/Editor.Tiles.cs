@@ -24,12 +24,12 @@ namespace DyingAndMore.Editor
             {
                 Sprite = new Takai.Graphics.Sprite()
                 {
-                    Width = editor.Map.TileSize,
-                    Height = editor.Map.TileSize,
-                    Texture = editor.Map.TilesImage
+                    Width = editor.Map.Class.TileSize,
+                    Height = editor.Map.Class.TileSize,
+                    Texture = editor.Map.Class.TilesImage
                 },
                 Position = new Vector2(20),
-                Size = new Vector2(editor.Map.TileSize),
+                Size = new Vector2(editor.Map.Class.TileSize),
                 HorizontalAlignment = Takai.UI.Alignment.End,
                 VerticalAlignment = Takai.UI.Alignment.Start,
                 BorderColor = Color.White
@@ -50,10 +50,10 @@ namespace DyingAndMore.Editor
                 if (preview.Sprite != null)
                 {
                     preview.Sprite.ClipRect = new Rectangle(
-                        (selector.SelectedItem % editor.Map.TilesPerRow) * editor.Map.TileSize,
-                        (selector.SelectedItem / editor.Map.TilesPerRow) * editor.Map.TileSize,
-                        editor.Map.TileSize,
-                        editor.Map.TileSize
+                        (selector.SelectedItem % editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
+                        (selector.SelectedItem / editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
+                        editor.Map.Class.TileSize,
+                        editor.Map.Class.TileSize
                     );
                 }
             };
@@ -93,8 +93,8 @@ namespace DyingAndMore.Editor
                     //draw rect
                     if (InputState.IsMod(KeyMod.Shift))
                     {
-                        var start = (savedWorldPos / editor.Map.TileSize).ToPoint();
-                        var end = (currentWorldPos / editor.Map.TileSize).ToPoint();
+                        var start = (savedWorldPos / editor.Map.Class.TileSize).ToPoint();
+                        var end = (currentWorldPos / editor.Map.Class.TileSize).ToPoint();
 
                         if (start.X > end.X)
                         {
@@ -109,13 +109,13 @@ namespace DyingAndMore.Editor
                             end.Y = tmp;
                         }
 
-                        var bounds = new Rectangle(0, 0, editor.Map.Width, editor.Map.Height);
+                        var bounds = new Rectangle(0, 0, editor.Map.Class.Width, editor.Map.Class.Height);
                         for (var y = start.Y; y <= end.Y; ++y)
                         {
                             for (var x = start.X; x <= end.X; ++x)
                             {
                                 if (bounds.Contains(x, y))
-                                    editor.Map.Tiles[y, x] = tile;
+                                    editor.Map.Class.Tiles[y, x] = tile;
                             }
                         }
                     }
@@ -140,15 +140,15 @@ namespace DyingAndMore.Editor
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             //draw rect around tile under cursor
-            if (editor.Map.IsInside(lastWorldPos))
+            if (editor.Map.Class.Bounds.Contains(lastWorldPos))
             {
                 editor.Map.DrawRect
                 (
                     new Rectangle
                     (
-                        (int)(lastWorldPos.X / editor.Map.TileSize) * editor.Map.TileSize,
-                        (int)(lastWorldPos.Y / editor.Map.TileSize) * editor.Map.TileSize,
-                        editor.Map.TileSize, editor.Map.TileSize
+                        (int)(lastWorldPos.X / editor.Map.Class.TileSize) * editor.Map.Class.TileSize,
+                        (int)(lastWorldPos.Y / editor.Map.Class.TileSize) * editor.Map.Class.TileSize,
+                        editor.Map.Class.TileSize, editor.Map.Class.TileSize
                     ),
                     Color.Orange
                 );
@@ -162,8 +162,8 @@ namespace DyingAndMore.Editor
                 {
                     editor.Map.DrawRect(new Rectangle(savedWorldPos.ToPoint(), diff.ToPoint()), Color.GreenYellow);
 
-                    var w = (System.Math.Abs((int)diff.X) - 1) / editor.Map.TileSize + 1;
-                    var h = (System.Math.Abs((int)diff.Y) - 1) / editor.Map.TileSize + 1;
+                    var w = (System.Math.Abs((int)diff.X) - 1) / editor.Map.Class.TileSize + 1;
+                    var h = (System.Math.Abs((int)diff.Y) - 1) / editor.Map.Class.TileSize + 1;
                     Font.Draw(spriteBatch, $"w:{w}, h:{w}", editor.Map.ActiveCamera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
                 else
@@ -173,7 +173,7 @@ namespace DyingAndMore.Editor
                         angle += 360;
                     editor.Map.DrawLine(savedWorldPos, lastWorldPos, Color.GreenYellow);
 
-                    diff /= editor.Map.TileSize;
+                    diff /= editor.Map.Class.TileSize;
                     Font.Draw(spriteBatch, $"x:{System.Math.Ceiling(diff.X)} y:{System.Math.Ceiling(diff.Y)} deg:{angle}",
                         editor.Map.ActiveCamera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
@@ -183,8 +183,8 @@ namespace DyingAndMore.Editor
         //Tile a line, start and end in world coords
         void TileLine(Vector2 Start, Vector2 End, short TileValue)
         {
-            var start = new Vector2((int)Start.X / editor.Map.TileSize, (int)Start.Y / editor.Map.TileSize).ToPoint();
-            var end = new Vector2((int)End.X / editor.Map.TileSize, (int)End.Y / editor.Map.TileSize).ToPoint();
+            var start = new Vector2((int)Start.X / editor.Map.Class.TileSize, (int)Start.Y / editor.Map.Class.TileSize).ToPoint();
+            var end = new Vector2((int)End.X / editor.Map.Class.TileSize, (int)End.Y / editor.Map.Class.TileSize).ToPoint();
 
             var diff = end - start;
             var sx = diff.X > 0 ? 1 : -1;
@@ -194,11 +194,11 @@ namespace DyingAndMore.Editor
 
             var err = (diff.X > diff.Y ? diff.X : -diff.Y) / 2;
 
-            var bounds = new Rectangle(0, 0, editor.Map.Width, editor.Map.Height);
+            var bounds = new Rectangle(0, 0, editor.Map.Class.Width, editor.Map.Class.Height);
             while (true)
             {
                 if (bounds.Contains(start))
-                    editor.Map.Tiles[start.Y, start.X] = TileValue;
+                    editor.Map.Class.Tiles[start.Y, start.X] = TileValue;
 
                 if (start.X == end.X && start.Y == end.Y)
                     break;
@@ -219,11 +219,11 @@ namespace DyingAndMore.Editor
 
         void TileFill(Vector2 Position, short TileValue)
         {
-            if (!editor.Map.IsInside(Position))
+            if (!editor.Map.Class.Bounds.Contains(Position))
                 return;
 
-            var initial = (Position / editor.Map.TileSize).ToPoint();
-            var initialValue = editor.Map.Tiles[initial.Y, initial.X];
+            var initial = (Position / editor.Map.Class.TileSize).ToPoint();
+            var initialValue = editor.Map.Class.Tiles[initial.Y, initial.X];
 
             if (initialValue == TileValue)
                 return;
@@ -237,17 +237,17 @@ namespace DyingAndMore.Editor
 
                 var left = first.X;
                 var right = first.X;
-                for (; left > 0 && editor.Map.Tiles[first.Y, left - 1] == initialValue; --left) ;
-                for (; right < editor.Map.Width - 1 && editor.Map.Tiles[first.Y, right + 1] == initialValue; ++right) ;
+                for (; left > 0 && editor.Map.Class.Tiles[first.Y, left - 1] == initialValue; --left) ;
+                for (; right < editor.Map.Class.Width - 1 && editor.Map.Class.Tiles[first.Y, right + 1] == initialValue; ++right) ;
 
                 for (; left <= right; ++left)
                 {
-                    editor.Map.Tiles[first.Y, left] = TileValue;
+                    editor.Map.Class.Tiles[first.Y, left] = TileValue;
 
-                    if (first.Y > 0 && editor.Map.Tiles[first.Y - 1, left] == initialValue)
+                    if (first.Y > 0 && editor.Map.Class.Tiles[first.Y - 1, left] == initialValue)
                         queue.Enqueue(new Point(left, first.Y - 1));
 
-                    if (first.Y < editor.Map.Height - 1 && editor.Map.Tiles[first.Y + 1, left] == initialValue)
+                    if (first.Y < editor.Map.Class.Height - 1 && editor.Map.Class.Tiles[first.Y + 1, left] == initialValue)
                         queue.Enqueue(new Point(left, first.Y + 1));
                 }
             }

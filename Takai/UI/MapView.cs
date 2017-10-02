@@ -8,7 +8,7 @@ namespace Takai.UI
     /// </summary>
     public class MapView : Static
     {
-        public Game.Map Map
+        public Game.MapInstance Map
         {
             get => map;
             set
@@ -21,7 +21,7 @@ namespace Takai.UI
                 }
             }
         }
-        private Game.Map map;
+        private Game.MapInstance map;
 
         /// <summary>
         /// Called whenever the map changes

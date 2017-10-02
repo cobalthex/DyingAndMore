@@ -136,8 +136,9 @@ namespace DyingAndMore
                 };
                 row.Click += delegate (object _sender, Takai.UI.ClickEventArgs _e)
                 {
-                    var map = Takai.Data.Serializer.TextDeserialize<Takai.Game.Map>(((Takai.UI.Static)_sender).Text);
-                    ui = new Takai.UI.Static(new Editor.Editor(map));
+                    var map = Takai.Data.Cache.Load<Takai.Game.MapClass>(((Takai.UI.Static)_sender).Text);
+                    map.InitializeGraphics();
+                    ui = new Takai.UI.Static(new Editor.Editor(map.Create()));
                 };
                 row.AutoSize(10);
                 list.AddChild(row);

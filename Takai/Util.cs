@@ -28,5 +28,10 @@ namespace Takai
         {
             return (float)Math.Atan2(v.Y, v.X);
         }
+
+        public static int CeilDiv(int n, int m)
+        {
+            return (n / m) + ((n % m) > 0 ? 1 : 0);
+        }
     }
 }

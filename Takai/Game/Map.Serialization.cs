@@ -1,14 +1,12 @@
 ﻿using System;
-using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Linq;
 
 namespace Takai.Game
 {
-    [Data.DerivedTypeSerialize(typeof(Map), "Serialize")]
-    public partial class Map : Data.IDerivedDeserialize
+    public partial class MapClass : Data.IDerivedSerialize, Data.IDerivedDeserialize
     {
         /// <summary>
         /// Build the tiles mask
@@ -67,73 +65,25 @@ namespace Takai.Game
             */
         }
 
-        /// <summary>
-        /// Create the spacial subdivisions for the map
-        /// </summary>
-        public void BuildSectors()
+        public Dictionary<string, object> DerivedSerialize()
         {
-            //round up
-            var width = 1 + ((Width - 1) / SectorSize);
-            var height = 1 + ((Height - 1) / SectorSize);
-
-            Sectors = new MapSector[height, width];
-
-            for (var y = 0; y < height; ++y)
-            {
-                for (var x = 0; x < width; ++x)
-                    Sectors[y, x] = new MapSector();
-            }
-        }
-
-        public void Save(Stream Stream)
-        {
-            using (var writer = new StreamWriter(Stream))
-                Data.Serializer.TextSerialize(writer, this);
-        }
-
-        public static Map Load(Stream Stream)
-        {
-            Map map;
-            using (var reader = new StreamReader(Stream))
-                map = (Map)Data.Serializer.TextDeserialize(reader);
-
-            map.InitializeGraphics();
-            GC.Collect();
-            return map;
-        }
-
-        Dictionary<string, object> Serialize()
-        {
-            var decals = new List<Decal>();
-            var triggers = new HashSet<Trigger>();
-
-            foreach (var sector in Sectors)
-            {
-                decals.AddRange(sector.decals);
-                triggers.UnionWith(sector.triggers);
-            }
-
             return new Dictionary<string, object>
             {
-                ["Tiles"] = Tiles,
-                ["Width"] = Width,
-                ["Height"] = Height,
-                ["Decals"] = decals,
-                ["Triggers"] = triggers,
-                ["State"] = new MapState(this)
+                ["Tiles"] = Tiles
             };
         }
-        public void DerivedDeserialize(Dictionary<string, object> Props)
+
+        public void DerivedDeserialize(Dictionary<string, object> props)
         {
-            var tiles = Data.Serializer.Cast<List<short>>(Props["Tiles"]);
+            var tiles = Data.Serializer.Cast<List<short>>(props["Tiles"]);
 
             int width = 1, height = 1;
-            if (Props.TryGetValue("Width", out var _width) && _width is long width_)
+            if (props.TryGetValue("Width", out var _width) && _width is long width_)
             {
                 width = (int)width_;
                 height = tiles.Count / width;
             }
-            else if (Props.TryGetValue("Height", out var _height) && _height is long height_)
+            else if (props.TryGetValue("Height", out var _height) && _height is long height_)
             {
                 height = (int)height_;
                 width = tiles.Count / height;
@@ -148,98 +98,84 @@ namespace Takai.Game
             SectorPixelSize = SectorSize * TileSize;
 
             BuildTileMask(TilesImage, true);
-            BuildSectors();
+        }
+    }
 
-            if (Props.TryGetValue("Triggers", out var triggers))
-            {
-                foreach (var trigger in Data.Serializer.Cast<List<Trigger>>(triggers))
-                    AddTrigger(trigger);
-            }
-
-            if (Props.TryGetValue("Decals", out var decals))
-            {
-                foreach (var decal in Data.Serializer.Cast<List<Decal>>(decals))
-                    AddDecal(decal);
-            }
-
-            if (Props.TryGetValue("State", out var state))
-                LoadState((MapState)state);
-
-            InitializeGraphics();
+    public partial class MapInstance : Data.IDerivedSerialize, Data.IDerivedDeserialize
+    {
+        /// <summary>
+        /// Save this map instance as a save state
+        /// </summary>
+        /// <param name="file">The file to save to</param>
+        public void Save(string file)
+        {
+            Data.Serializer.TextSerialize(file, this);
         }
 
         /// <summary>
-        /// A temporary struct for organizing state data to be serialized
+        /// Save this instance as a new map, setting the default state of the class to this
         /// </summary>
-        struct MapState
+        /// <param name="file">The file to save to</param>
+        public void SaveAsMap(string file)
         {
-            public List<EntityInstance> entities;
-            public List<FluidInstance> fluids;
-
-            public TimeSpan elapsedTime;
-            public float timeScale;
-
-            //todo: sounds
-
-            public MapState(Map Map)
+            //create default state
+            var state = new InitialMapState
             {
-                entities = new List<EntityInstance>(Map.AllEntities);
-                fluids = new List<FluidInstance>();
-                elapsedTime = Map.ElapsedTime;
-                timeScale = Map.TimeScale;
-
-                //todo: particles?
-
-                var classIndices = new Dictionary<FluidClass, int>();
-
-                fluids.AddRange(Map.ActiveFluids);
-
-                foreach (var sector in (System.Collections.IEnumerable)Map.Sectors)
+                Entities = Enumerable.Select(AllEntities, e => new InitialMapState.EntitySpawn()
                 {
-                    var s = (MapSector)sector;
-                    fluids.AddRange(s.fluids);
-                }
-            }
+                    Class = e.Class,
+                    Position = e.Position,
+                    Forward = e.Forward,
+                    Name = e.Name
+                }).ToList(),
+                Fluids = new List<FluidInstance>(),
+                Decals = new List<Decal>()
+            };
+
+            Class.InitialState = state;
+            Class.File = null;
+
+            //todo: less hacky (make class ReadOnly and custom serialize?
+            var cls = Class;
+            _class = null;
+            Data.Serializer.TextSerialize(file, cls);
+            _class = cls;
+            Class.File = file;
         }
 
-        public void SaveState(Stream Stream)
+        public Dictionary<string, object> DerivedSerialize()
         {
-            var save = new MapState(this);
-            using (var writer = new StreamWriter(Stream))
-                Data.Serializer.TextSerialize(writer, save);
-        }
-
-        public void LoadState(Stream Stream)
-        {
-            MapState load;
-            using (var reader = new StreamReader(Stream))
+            return new Dictionary<string, object>
             {
-                var temp = Data.Serializer.TextDeserialize(reader);
-                if (!(temp is MapState))
-
-                    return;
-                load = (MapState)temp;
-            }
-
-            LoadState(load);
+                ["Entities"] = AllEntities
+            };
         }
 
-        private void LoadState(MapState State)
+        public void DerivedDeserialize(Dictionary<string, object> props)
         {
-            scripts.Clear();
-
-            ActiveEnts.Clear();
-            if (State.entities != null)
+            if (props.TryGetValue("Entities", out var ents))
             {
-                foreach (var ent in State.entities)
+                foreach (var ent in (List<EntityInstance>)ents)
                     Spawn(ent);
             }
 
-            if (State.fluids != null)
-                ActiveFluids = State.fluids;
+            if (props.TryGetValue("Fluids", out var fluids))
+            {
+                foreach (var fluid in (List<FluidInstance>)fluids)
+                    Spawn(fluid);
+            }
 
-            TimeScale = State.timeScale == 0 ? 1 : State.timeScale;
-            ElapsedTime = State.elapsedTime;
+            if (props.TryGetValue("Decals", out var decals))
+            {
+                foreach (var decal in (List<Decal>)decals)
+                    AddDecal(decal);
+            }
+
+            if (props.TryGetValue("Triggers", out var triggers))
+            {
+                foreach (var trigger in (List<Trigger>)triggers)
+                    AddTrigger(trigger);
+            }
         }
     }
 }

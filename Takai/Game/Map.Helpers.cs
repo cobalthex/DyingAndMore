@@ -4,28 +4,37 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
-    public partial class Map
+    public partial class MapClass
+    {
+        internal void Resize(int newWidth, int newHeight)
+        {
+            Tiles = Tiles.Resize(newHeight, newWidth);
+        }
+    }
+
+    public partial class MapInstance
     {
         [Data.Serializer.Ignored]
-        public Random Random { get; private set; } = new Random();
+        public Random Random { get; private set; } = new Random(); //todo: may not be necessary
         private byte[] _r64b = new byte[8];
 
-        protected float RandFloat(float Min, float Max)
+        public void Resize(int newWidth, int newHeight)
         {
-            return (float)(Random.NextDouble() * (Max - Min)) + Min;
-        }
-        protected TimeSpan RandTime(TimeSpan Min, TimeSpan Max)
-        {
-            var diff = Max.Ticks - Min.Ticks;
-            return TimeSpan.FromTicks(diff != 0 ? (BitConverter.ToInt64(_r64b, 0) % diff) : 0) + Min;
-        }
-        protected Vector2 RandVector2(Vector2 Min, Vector2 Max)
-        {
-            return new Vector2
-            (
-                RandFloat(Min.X, Max.X),
-                RandFloat(Min.Y, Max.Y)
-            );
+            System.Diagnostics.Contracts.Contract.Requires(newWidth > 0);
+            System.Diagnostics.Contracts.Contract.Requires(newHeight > 0);
+
+            Class.Resize(newWidth, newHeight);
+
+            Sectors = Sectors.Resize((newHeight - 1) / MapClass.SectorSize + 1, (newWidth - 1) / MapClass.SectorSize + 1);
+
+            for (int y = 0; y < Sectors.GetLength(0); ++y)
+            {
+                for (int x = 0; x < Sectors.GetLength(1); ++x)
+                {
+                    if (Sectors[y, x] == null)
+                        Sectors[y, x] = new MapSector();
+                }
+            }
         }
 
         /// <summary>
@@ -35,44 +44,37 @@ namespace Takai.Game
         /// <returns>The sector coordinates. Clamped to the map bounds</returns>
         public Point GetOverlappingSector(Vector2 position)
         {
-            return Vector2.Clamp(position / SectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
+            return Vector2.Clamp(position / Class.SectorPixelSize, Vector2.Zero, new Vector2(Sectors.GetLength(1) - 1, Sectors.GetLength(0) - 1)).ToPoint();
         }
 
         /// <summary>
-        /// Get the region of sectors overlapping this region
+        /// Get the sectors overlapping a region
         /// </summary>
-        /// <param name="region">The region to consider</param>
-        /// <returns>The region of sectors contained by this region (Clamped in the map bounds)</returns>
+        /// <param name="region">The region to consider (in pixels)</param>
+        /// <returns>The sectors (start/end) contained by this region (Clamped in the map bounds)</returns>
         public Rectangle GetOverlappingSectors(Rectangle region)
         {
             var rect = new Rectangle(
-                MathHelper.Max(0, region.X / SectorPixelSize),
-                MathHelper.Max(0, region.Y / SectorPixelSize),
-                ((region.X % SectorPixelSize) + region.Width - 1) / SectorPixelSize + 1,
-                ((region.Y % SectorPixelSize) + region.Height - 1) / SectorPixelSize + 1
+                region.X / Class.SectorPixelSize,
+                region.Y / Class.SectorPixelSize,
+                Util.CeilDiv(region.Width, Class.SectorPixelSize),
+                Util.CeilDiv(region.Height, Class.SectorPixelSize)
             );
-            rect.Width = MathHelper.Min((Width - 1) / SectorSize + 1 - rect.X, rect.Width);
-            rect.Height = MathHelper.Min((Height - 1) / SectorSize + 1 - rect.Y, rect.Height);
-            return rect;
+            return Rectangle.Intersect(rect, new Rectangle(0, 0, Sectors.GetLength(1), Sectors.GetLength(0)));
         }
 
-        /// <summary>
-        /// Check if a point is 'inside' the map
-        /// </summary>
-        /// <param name="position">The point to test</param>
-        /// <returns>True if the point is in a navicable area</returns>
-        public bool IsInside(Vector2 position)
+        public IEnumerable<EntityInstance> EnumerateEntitiesInSectors(Rectangle sectors)
         {
-            return IsInside(position.ToPoint());
+            //sectors = Rectangle.Intersect(sectors, new Rectangle(0, 0, Sectors.GetLength(1), Sectors.GetLength(0)));
+            for (int y = sectors.Top; y < sectors.Bottom; ++y)
+                for (int x = sectors.Left; x < sectors.Right; ++x)
+                    foreach (var ent in Sectors[y, x].entities)
+                        yield return ent; //todo: needs to test if >= sector bounds (to not draw twice)
         }
-        /// <summary>
-        /// Check if a point is 'inside' the map
-        /// </summary>
-        /// <param name="position">The point to test</param>
-        /// <returns>True if the point is in a navicable area</returns>
-        public bool IsInside(Point position)
+
+        public IEnumerable<EntityInstance> EnumerateVisibleEntities()
         {
-            return (position.X >= 0 && position.X < (Width * TileSize) && position.Y >= 0 && position.Y < (Height * TileSize));
+            return EnumerateEntitiesInSectors(GetOverlappingSectors(ActiveCamera.VisibleRegion));
         }
 
         /// <summary>
@@ -81,116 +83,45 @@ namespace Takai.Game
         /// <param name="position">The origin search point</param>
         /// <param name="searchRadius">The maximum search radius</param>
         /// <param name="searchInSectors">Also search entities in sectors</param>
-        public List<EntityInstance> FindEntities(Vector2 position, float searchRadius, bool searchInSectors = false)
+        public List<EntityInstance> FindEntities(Vector2 position, float searchRadius)
         {
+            var ents = new HashSet<EntityInstance>();
+
             var radiusSq = searchRadius * searchRadius;
-            var vr = new Vector2(searchRadius);
 
-            List<EntityInstance> ents = new List<EntityInstance>();
+            var rect = new Rectangle(position.ToPoint(), new Point((int)(searchRadius * 2)));
+            var sectors = GetOverlappingSectors(rect);
 
-            foreach (var ent in ActiveEnts)
+            foreach (var ent in EnumerateEntitiesInSectors(sectors))
             {
-                if (Vector2.DistanceSquared(ent.Position, position) < radiusSq + ent.RadiusSq)
+                if (Vector2.DistanceSquared(ent.Position, position) < radiusSq)
                     ents.Add(ent);
             }
 
-            if (searchInSectors && Bounds.Contains(position))
-            {
-                var mapSz = new Vector2(Width, Height);
-                var start = Vector2.Clamp((position - vr) / SectorPixelSize, Vector2.Zero, mapSz).ToPoint();
-                var end = (Vector2.Clamp((position + vr) / SectorPixelSize, Vector2.Zero, mapSz) + Vector2.One).ToPoint();
-
-                for (int y = start.Y; y < end.Y; ++y)
-                {
-                    for (int x = start.X; x < end.X; ++x)
-                    {
-                        foreach (var ent in Sectors[y, x].entities)
-                        {
-                            if (Vector2.DistanceSquared(ent.Position, position) < radiusSq + ent.RadiusSq)
-                                ents.Add(ent);
-                        }
-                    }
-                }
-            }
-
-            return ents;
+            return new List<EntityInstance>(ents);
         }
 
         /// <summary>
         /// Find entities inside a rectangle
         /// </summary>
-        /// <param name="Region">The rectangle to search</param>
-        /// <param name="SearchInSectors">Also search entities in sectors</param>
+        /// <param name="region">The region of the map to search</param>
         /// <returns></returns>
-        public List<EntityInstance> FindEntities(Rectangle Region, bool SearchInSectors = false)
+        public List<EntityInstance> FindEntities(Rectangle region)
         {
-            List<EntityInstance> ents = new List<EntityInstance>();
+            var ents = new HashSet<EntityInstance>();
 
-            foreach (var ent in ActiveEnts)
+            var sectors = GetOverlappingSectors(region);
+            foreach (var ent in EnumerateEntitiesInSectors(sectors))
             {
-                if (Rectangle.Union(Region, ent.AxisAlignedBounds).Contains(ent.Position))
+                if (region.Intersects(ent.AxisAlignedBounds))
                     ents.Add(ent);
             }
 
-            if (SearchInSectors)
-            {
-                var searchSectors = new Rectangle(
-                    Region.X / SectorPixelSize,
-                    Region.Y / SectorPixelSize,
-                    ((Region.Width - 1) / SectorPixelSize) + 1,
-                    ((Region.Height - 1) / SectorPixelSize) + 1
-                );
-
-                for (int y = searchSectors.Top; y < searchSectors.Bottom; ++y)
-                {
-                    for (int x = searchSectors.Left; x < searchSectors.Right; ++x)
-                    {
-                        foreach (var ent in Sectors[y, x].entities)
-                        {
-                            if (Rectangle.Union(Region, ent.AxisAlignedBounds).Contains(ent.Position))
-                                ents.Add(ent);
-                        }
-                    }
-                }
-            }
-
-            return ents;
+            return new List<EntityInstance>(ents);
         }
 
         /// <summary>
-        /// Find all of the entities
-        /// </summary>
-        /// <param name="class">The class type to search</param>
-        /// <param name="SearchInactive">Search in the inactive entities as well</param>
-        /// <returns>A list of entities found</returns>
-        public List<EntityInstance> FindEntitiesByClass(EntityClass @class, bool SearchInactive = false)
-        {
-            var ents = new List<EntityInstance>();
-            foreach (var ent in ActiveEnts)
-            {
-                if (ent.Class == @class)
-                    ents.Add(ent);
-            }
-
-            return ents;
-            //todo: find inactive
-        }
-
-        public List<EntityInstance> FindEntitiesByClassName(string className, bool searchInactive = false)
-        {
-            var ents = new List<EntityInstance>();
-            foreach (var ent in ActiveEnts)
-            {
-                if (ent.Class != null && ent.Class.Name.Equals(className, StringComparison.OrdinalIgnoreCase))
-                    ents.Add(ent);
-            }
-
-            return ents;
-            //todo: find all inactive by class name
-        }
-
-        /// <summary>
-        /// Find an  entity by its name
+        /// Find an entity by its name
         /// </summary>
         /// <param name="name"></param>
         /// <returns>The first entity found or null if none</returns>
@@ -204,6 +135,17 @@ namespace Takai.Game
             }
 
             return null;
+        }
+
+        public List<EntityInstance> FindEntitiesByClassName(string name)
+        {
+            var ents = new List<EntityInstance>();
+            foreach (var ent in AllEntities)
+            {
+                if (ent.Class?.Name == name)
+                    ents.Add(ent);
+            }
+            return ents;
         }
 
         public enum CleanupOptions
@@ -220,10 +162,7 @@ namespace Takai.Game
         public void CleanupAll(CleanupOptions options)
         {
             if (options.HasFlag(CleanupOptions.Fluids))
-                ActiveFluids.Clear();
-
-            if (options.HasFlag(CleanupOptions.DeadEntities))
-                ActiveEnts.RemoveWhere((ent) => ent.State.State == EntStateId.Dead); //todo: use destroy?
+                LiveFluids.Clear();
 
             if (options.HasFlag(CleanupOptions.Particles))
                 Particles.Clear();
@@ -240,7 +179,14 @@ namespace Takai.Game
                     sector.entities.RemoveWhere((ent) => ent.State.State == EntStateId.Dead);
             }
 
-            TotalEntitiesCount = System.Linq.Enumerable.Count(AllEntities);
+            if (options.HasFlag(CleanupOptions.DeadEntities))
+            {
+                foreach (var ent in _allEntities)
+                {
+                    if (ent.State.State == EntStateId.Dead)
+                        FinalDestroy(ent);
+                }
+            }
         }
 
         public void CleanupOffscreen(CleanupOptions options)
@@ -319,19 +265,19 @@ namespace Takai.Game
             for (int i = 0; i < n; ++i)
             {
                 //todo: move to pre-calc (clip start/end at map bounds)
-                if (!IsInside(pos))
+                if (!Class.Bounds.Contains(pos))
                     return pos;
 
-                var tile = Tiles[(int)pos.Y / TileSize, (int)pos.X / TileSize];
+                var tile = Class.Tiles[(int)pos.Y / Class.TileSize, (int)pos.X / Class.TileSize];
                 if (tile == -1)
                     return pos;
 
-                var relPos = new Point((int)pos.X % TileSize, (int)pos.Y % TileSize);
-                var mask = relPos.X + (relPos.Y * TilesImage.Width);
-                mask += (tile % TilesPerRow) * TileSize;
-                mask += (tile / TilesPerRow) * TileSize * TilesImage.Width;
+                var relPos = new Point((int)pos.X % Class.TileSize, (int)pos.Y % Class.TileSize);
+                var mask = relPos.X + (relPos.Y * Class.TilesImage.Width);
+                mask += (tile % Class.TilesPerRow) * Class.TileSize;
+                mask += (tile / Class.TilesPerRow) * Class.TileSize * Class.TilesImage.Width;
 
-                var collis = CollisionMask[mask];
+                var collis = Class.CollisionMask[mask];
                 if (!collis)
                     return pos;
 
@@ -359,8 +305,8 @@ namespace Takai.Game
 
             var end = (start + direction * maxDistance);
 
-            var sectorPos = start / SectorPixelSize;
-            var sectorEnd = end / SectorPixelSize;
+            var sectorPos = start / Class.SectorPixelSize;
+            var sectorEnd = end / Class.SectorPixelSize;
             var sectorDiff = sectorEnd - sectorPos;
 
             int n = 0;
