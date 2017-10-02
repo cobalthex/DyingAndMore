@@ -37,28 +37,9 @@ namespace Takai.Data
         }
     }
 
-    /// <summary>
-    /// The object should use the specified method to add custom fields to the serialized object
-    /// Useful for adding aggregate/derived data to a serialized type
-    /// </summary>
-    /// <remarks>Only used if a typed object is serialized (dictionaries/primatives ignored)</remarks>
-    [AttributeUsage(AttributeTargets.All)]
-    [System.Runtime.InteropServices.ComVisible(true)]
-    public class DerivedTypeSerializeAttribute : Attribute
+    public interface IDerivedSerialize
     {
-        internal MethodInfo serialize;
-
-        /// <summary>
-        /// Create a derived type serializer
-        /// </summary>
-        /// <param name="type">The object to look in for the serialize method</param>
-        /// <param name="methodName">The name of the method to search for (Must be non-static, can be public or non public)</param>
-        /// <remarks>format: Dictionary&lt;string, object&gt;(object Source)</remarks>
-        public DerivedTypeSerializeAttribute(Type type, string methodName)
-        {
-            var method = type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            serialize = method;
-        }
+        Dictionary<string, object> DerivedSerialize();
     }
 
     public static partial class Serializer
@@ -94,17 +75,12 @@ namespace Takai.Data
             var ty = serializing.GetType();
 
             //external serialization
-            if (!serializeExternals && typeof(ISerializeExternally).IsAssignableFrom(ty))
+            if (!serializeExternals && serializing is ISerializeExternally sex)
             {
-                var fileProp = ty.GetProperty("File");
-                if (fileProp != null)
+                if (sex.File != null)
                 {
-                    var fileValue = (string)fileProp.GetValue(serializing);
-                    if (fileValue != null)
-                    {
-                        writer.Write($"@\"{fileValue}\"");
-                        return;
-                    }
+                    writer.Write($"@\"{sex.File}\"");
+                    return;
                 }
             }
 
@@ -222,18 +198,18 @@ namespace Takai.Data
                 foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance))
                     SerializeMember(writer, serializing, field, field.GetValue(serializing), indentLevel, serializeExternals);
 
-                //derived values
-                var derived = ty.GetCustomAttribute<DerivedTypeSerializeAttribute>(true);
-                if (derived != null)
+                if (serializing is IDerivedSerialize derived)
                 {
-                    var props = (Dictionary<string, object>)derived.serialize.Invoke(serializing, null);
-
-                    foreach (var prop in props)
+                    var props = derived.DerivedSerialize();
+                    if (props != null)
                     {
-                        Indent(writer, indentLevel + 1);
-                        writer.Write("{0}: ", prop.Key);
-                        TextSerialize(writer, prop.Value, indentLevel + 1, serializeExternals);
-                        writer.WriteLine(";");
+                        foreach (var prop in props)
+                        {
+                            Indent(writer, indentLevel + 1);
+                            writer.Write("{0}: ", prop.Key);
+                            TextSerialize(writer, prop.Value, indentLevel + 1, serializeExternals);
+                            writer.WriteLine(";");
+                        }
                     }
                 }
 

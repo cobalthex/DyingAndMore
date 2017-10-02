@@ -17,7 +17,7 @@ namespace Takai.Game
         /// The map this script is running on
         /// </summary>
         [Data.Serializer.Ignored]
-        public Map Map { get; set; }
+        public MapInstance Map { get; set; }
 
         /// <summary>
         /// When this script was started

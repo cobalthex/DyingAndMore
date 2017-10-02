@@ -51,7 +51,7 @@ namespace DyingAndMore.Game
             if (!renderSettingsConsole.RemoveFromParent())
             {
                 //refresh individual render settings
-                var settings = typeof(Map.RenderSettings);
+                var settings = typeof(MapInstance.RenderSettings);
                 foreach (var child in renderSettingsConsole.Children)
                     ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
 
@@ -59,7 +59,7 @@ namespace DyingAndMore.Game
             }
         }
 
-        public Game(Map map)
+        public Game(MapInstance map)
         {
             Map = map ?? throw new ArgumentNullException("There must be a map to play");
 
@@ -141,12 +141,12 @@ namespace DyingAndMore.Game
 
         protected override void OnMapChanged(EventArgs e)
         {
-            Map.updateSettings = Map.UpdateSettings.Game;
-            Map.renderSettings = Map.RenderSettings.Default;
+            Map.updateSettings = MapInstance.UpdateSettings.Game;
+            Map.renderSettings = MapInstance.RenderSettings.Default;
 
             Map.CleanupAll(
-                Map.CleanupOptions.DeadEntities |
-                Map.CleanupOptions.Particles
+                MapInstance.CleanupOptions.DeadEntities |
+                MapInstance.CleanupOptions.Particles
             );
 
             var possibles = Map.FindEntitiesByClassName("player");
@@ -198,24 +198,24 @@ namespace DyingAndMore.Game
             {
                 case "cleanup":
                     {
-                        var cleans = Map.CleanupOptions.None;
+                        var cleans = MapInstance.CleanupOptions.None;
                         for (int i = 1; i < words.Length; ++i)
                         {
                             switch (words[i])
                             {
                                 case "all":
-                                    cleans |= Map.CleanupOptions.All;
+                                    cleans |= MapInstance.CleanupOptions.All;
                                     i = words.Length;
                                     break;
 
                                 case "fluid":
                                 case "fluids":
-                                    cleans |= Map.CleanupOptions.Fluids;
+                                    cleans |= MapInstance.CleanupOptions.Fluids;
                                     Takai.LogBuffer.Append("Removing all fluids");
                                     break;
 
                                 case "particles":
-                                    cleans |= Map.CleanupOptions.Particles;
+                                    cleans |= MapInstance.CleanupOptions.Particles;
                                     Takai.LogBuffer.Append("Removing all particles");
                                     break;
                             }
@@ -317,41 +317,9 @@ namespace DyingAndMore.Game
                     Map.ActiveCamera.Scale += Math.Sign(scrollDelta) * 0.1f;
             }
 
-
-            if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.O))
-            {
-                var ofd = new System.Windows.Forms.OpenFileDialog()
-                {
-                    SupportMultiDottedExtensions = true,
-                    Filter = "Map (*.Map.tk)|*.Map.tk|All Files (*.*)|*.*",
-                    InitialDirectory = System.IO.Path.GetDirectoryName(Map.File),
-                    FileName = System.IO.Path.GetFileName(Map.File)
-                };
-                if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    using (var stream = ofd.OpenFile())
-                        Map = Map.Load(stream);
-                }
-                return false;
-            }
-
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
                 Takai.Runtime.IsExiting = true;
-                return false;
-            }
-
-            if (InputState.IsPress(Keys.F5))
-            {
-                using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Create))
-                    Map.SaveState(stream);
-                return false;
-            }
-            if (InputState.IsPress(Keys.F9))
-            {
-                using (var stream = new System.IO.FileStream("test.sav.tk", System.IO.FileMode.Open))
-                    Map.LoadState(stream);
-                OnMapChanged(System.EventArgs.Empty);
                 return false;
             }
 
@@ -359,7 +327,7 @@ namespace DyingAndMore.Game
 #if DEBUG
             if (InputState.IsMod(KeyMod.Alt) && InputState.IsPress(MouseButtons.Left))
             {
-                var targets = Map.FindEntities(Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 5, false);
+                var targets = Map.FindEntities(Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 5);
 
                 foreach (var ent in targets)
                 {
@@ -390,21 +358,21 @@ namespace DyingAndMore.Game
         {
             base.DrawSelf(spriteBatch);
 
-            DefaultFont.Draw(spriteBatch, $"Total entities:{Map.TotalEntitiesCount}", new Vector2(20), Color.Orange);
+            DefaultFont.Draw(spriteBatch, $"Total entities:{Map.AllEntities.Count()}", new Vector2(20), Color.Orange);
 
-            foreach (var ent in Map.ActiveEnts)
+            foreach (var ent in Map.EnumerateVisibleEntities())
             {
-                if (ent is Entities.ActorInstance actor)
-                {
-                    var pos = Vector2.Transform(actor.Position, Map.ActiveCamera.Transform)
-                              - new Vector2(ent.Radius * 1.5f * Map.ActiveCamera.Scale);
+                if (!(ent is Entities.ActorInstance actor))
+                    continue;
 
-                    tinyFont.Draw(spriteBatch, actor.CurrentHealth.ToString(), pos, Color.Tomato);
-                    if (actor.Weapon is Weapons.GunInstance gun)
-                    {
-                        pos.Y += 10;
-                        tinyFont.Draw(spriteBatch, gun.CurrentAmmo.ToString(), pos, Color.LightSteelBlue);
-                    }
+                var pos = Vector2.Transform(actor.Position, Map.ActiveCamera.Transform)
+                            - new Vector2(ent.Radius * 1.5f * Map.ActiveCamera.Scale);
+
+                tinyFont.Draw(spriteBatch, actor.CurrentHealth.ToString(), pos, Color.Tomato);
+                if (actor.Weapon is Weapons.GunInstance gun)
+                {
+                    pos.Y += 10;
+                    tinyFont.Draw(spriteBatch, gun.CurrentAmmo.ToString(), pos, Color.LightSteelBlue);
                 }
             }
         }

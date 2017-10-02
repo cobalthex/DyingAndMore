@@ -5,21 +5,6 @@ using System.Collections.Generic;
 namespace Takai.Game
 {
     /// <summary>
-    /// A single sector of the map, used for spacial calculations
-    /// Sectors typically contain inactive entities that are not visible as well as dummy objects (inactive Fluids, decals).
-    /// </summary>
-    public class MapSector
-    {
-        //dynamic
-        public HashSet<EntityInstance> entities = new HashSet<EntityInstance>(); //todo: profile against list
-
-        //static
-        public List<FluidInstance> fluids = new List<FluidInstance>();
-        public List<Decal> decals = new List<Decal>();
-        public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
-    }
-
-    /// <summary>
     /// An event handler for game events
     /// </summary>
     /// <param name="eventName">The name of the event that triggered this handler</param>

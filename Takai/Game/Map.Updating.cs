@@ -5,7 +5,7 @@ using System;
 
 namespace Takai.Game
 {
-    public partial class Map
+    public partial class MapInstance
     {
         public class UpdateSettings
         {
@@ -40,19 +40,17 @@ namespace Takai.Game
         /// <summary>
         /// How long since this map started (updated every Update()). Affected by <see cref="TimeScale"/>
         /// </summary>
-        [Takai.Data.Serializer.Ignored] //serialized in state
         public TimeSpan ElapsedTime { get; set; } = TimeSpan.Zero;
+
         /// <summary>
         /// How fast the game is moving (default = 1)
         /// </summary>
-        [Takai.Data.Serializer.Ignored] //serialized in state
         public float TimeScale { get; set; } = 1;
 
         /// <summary>
         /// Ents that are to be destroyed during the next Update()
         /// </summary>
         protected List<EntityInstance> entsToDestroy = new List<EntityInstance>(8);
-        protected List<EntityInstance> entsToRemoveFromActive = new List<EntityInstance>(16);
 
         /// <summary>
         /// Update the map state
@@ -80,13 +78,13 @@ namespace Takai.Game
 
             var visibleRegion = camera.VisibleRegion;
             var visibleSectors = GetOverlappingSectors(visibleRegion);
-            var mapBounds = Bounds;
+            var mapBounds = Class.Bounds;
 
-            #region active Fluids
+            #region moving/live Fluids
 
-            for (int i = 0; i < ActiveFluids.Count; ++i)
+            for (int i = 0; i < LiveFluids.Count; ++i)
             {
-                var fluid = ActiveFluids[i];
+                var fluid = LiveFluids[i];
                 var deltaV = fluid.velocity * deltaSeconds;
                 fluid.position += deltaV;
                 fluid.velocity -= deltaV * fluid.Class.Drag;
@@ -96,12 +94,12 @@ namespace Takai.Game
                 if (Math.Abs(fluid.velocity.X) < 1 && Math.Abs(fluid.velocity.Y) < 1)
                 {
                     Spawn(fluid.Class, fluid.position, Vector2.Zero); //this will move the Fluid to the static area of the map
-                    ActiveFluids[i] = ActiveFluids[ActiveFluids.Count - 1];
-                    ActiveFluids.RemoveAt(ActiveFluids.Count - 1);
+                    LiveFluids[i] = LiveFluids[LiveFluids.Count - 1];
+                    LiveFluids.RemoveAt(LiveFluids.Count - 1);
                     --i;
                 }
                 else
-                    ActiveFluids[i] = fluid;
+                    LiveFluids[i] = fluid;
             }
 
             #endregion
@@ -111,41 +109,27 @@ namespace Takai.Game
             //remove entities that have been destroyed
             foreach (var ent in entsToDestroy)
             {
-                //if (ent.Map != this)
-                //    continue;
-
-                ent.OnDestroy();
-                ent.SpawnTime = TimeSpan.Zero;
-
-                ActiveEnts.Remove(ent);
-                var sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
-                for (int y = sectors.Top; y < sectors.Bottom; ++y)
-                {
-                    for (int x = sectors.Left; x < sectors.Right; ++x)
-                        Sectors[y, x].entities.Remove(ent);
-                }
-
-                ent.Map = null;
-                ent.Parent = null;
-                --TotalEntitiesCount;
+                FinalDestroy(ent);
+                RemoveFromSectors(ent);
             }
             entsToDestroy.Clear();
 
-            foreach (var ent in ActiveEnts)
+            var activeSectors = visibleSectors;
+            foreach (var ent in EnumerateEntitiesInSectors(activeSectors))
             {
-                var entBounds = ent.AxisAlignedBounds;
+                    var entBounds = ent.AxisAlignedBounds;
 
-                if (!Bounds.Intersects(entBounds) || //outside of the map
+                if (!Class.Bounds.Intersects(entBounds) || //outside of the map
                     ent.State.Instance == null) //no state
                         Destroy(ent);
 
                 else if (!visibleRegion.Intersects(entBounds))
                 {
+                    //todo: reorganize
+
                     if (ent.Class.DestroyIfInactive ||
                         (ent.Class.DestroyIfDeadAndInactive && ent.State.Instance.Id == EntStateId.Dead))
                         Destroy(ent);
-                    else
-                        entsToRemoveFromActive.Add(ent);
                 }
                 else
                 {
@@ -177,7 +161,7 @@ namespace Takai.Game
                             }
                             else if (Math.Abs(hit.distance - deltaVLen) > 0.5f)
                             {
-                                ent.OnMapCollision((target / TileSize).ToPoint(), target, deltaTime);
+                                ent.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
 
                                 //improve
                                 ent.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * ent.Velocity;
@@ -227,16 +211,6 @@ namespace Takai.Game
                         }
                     }
                 }
-            }
-
-            ActiveEnts.ExceptWith(entsToRemoveFromActive);
-            entsToRemoveFromActive.Clear();
-
-            //add new entities to active set (will be updated next frame)
-            for (int y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
-            {
-                for (int x = visibleSectors.Left; x < visibleSectors.Right; ++x)
-                    ActiveEnts.UnionWith(Sectors[y, x].entities);
             }
 
             #endregion
@@ -296,15 +270,15 @@ namespace Takai.Game
 
             if (updateSettings.isSoundEnabled)
             {
-                for (int i = 0; i < ActiveSounds.Count; ++i)
+                for (int i = 0; i < Sounds.Count; ++i)
                 {
                     //handle sound positioning here (relative to camera)
 
-                    if (ActiveSounds[i].Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Stopped)
+                    if (Sounds[i].Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Stopped)
                     {
-                        ActiveSounds[i].Instance.Dispose();
-                        ActiveSounds[i] = ActiveSounds[ActiveSounds.Count - 1];
-                        ActiveSounds.RemoveAt(ActiveSounds.Count - 1);
+                        Sounds[i].Instance.Dispose();
+                        Sounds[i] = Sounds[Sounds.Count - 1];
+                        Sounds.RemoveAt(Sounds.Count - 1);
                         --i;
                     }
                 }
@@ -312,7 +286,7 @@ namespace Takai.Game
 
             #endregion
 
-            foreach (var script in scripts)
+            foreach (var script in Scripts)
                 script.Value.Step(deltaTime);
         }
     }

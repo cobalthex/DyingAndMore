@@ -174,7 +174,7 @@ namespace Takai.Game
     }
 
     [Data.DesignerModdable]
-    public class Decal
+    public class Decal //todo: make struct
     {
         public Texture2D texture;
         public Vector2 position;

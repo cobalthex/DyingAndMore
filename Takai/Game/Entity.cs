@@ -239,7 +239,7 @@ namespace Takai.Game
         /// The map the entity is in
         /// </summary>
         [Data.Serializer.Ignored]
-        public Map Map { get; internal set; } = null;
+        public MapInstance Map { get; internal set; } = null;
 
         /// <summary>
         /// When this entity was last spawned (in map time). Zero if destroyed or not spawned

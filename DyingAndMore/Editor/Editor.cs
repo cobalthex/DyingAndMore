@@ -26,7 +26,7 @@ namespace DyingAndMore.Editor
 #pragma warning disable 0649
         public int maxMapSize;
         public float snapAngle;
-        public Takai.Game.Map.RenderSettings renderSettings;
+        public Takai.Game.MapInstance.RenderSettings renderSettings;
 #pragma warning restore 0649
     }
 
@@ -39,7 +39,7 @@ namespace DyingAndMore.Editor
 
         public EditorConfiguration config;
 
-        public Editor(Takai.Game.Map map)
+        public Editor(Takai.Game.MapInstance map)
         {
             config = Serializer.TextDeserialize<EditorConfiguration>("Config/Editor.conf.tk");
 
@@ -89,11 +89,11 @@ namespace DyingAndMore.Editor
         {
             Map.ActiveCamera = new EditorCamera();
 
-            Map.updateSettings = Takai.Game.Map.UpdateSettings.Editor;
+            Map.updateSettings = Takai.Game.MapInstance.UpdateSettings.Editor;
             Map.renderSettings = config.renderSettings;
 
             //start zoomed out to see the whole map
-            var mapSize = new Vector2(Map.Width, Map.Height) * Map.TileSize;
+            var mapSize = new Vector2(Map.Class.Width, Map.Class.Height) * Map.Class.TileSize;
             var xyScale = new Vector2(Takai.Runtime.GraphicsDevice.Viewport.Width - 20,
                                       Takai.Runtime.GraphicsDevice.Viewport.Height - 20) / mapSize;
             Map.ActiveCamera.Scale = MathHelper.Clamp(MathHelper.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
@@ -126,6 +126,29 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
+            if (InputState.IsPress(Keys.F5))
+            {
+                using (var sfd = new System.Windows.Forms.SaveFileDialog()
+                {
+                    Filter = "Dying and More! Maps (*.sav.tk)|*.sav.tk",
+                    RestoreDirectory = true
+                })
+                {
+                    if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        try
+                        {
+                            Map.Save(sfd.FileName);
+                        }
+                        catch
+                        {
+                            //todo
+                        }
+                    }
+                }
+                return false;
+            }
+
             if (InputState.IsMod(KeyMod.Control))
             {
                 if (InputState.IsPress(Keys.S))
@@ -140,7 +163,7 @@ namespace DyingAndMore.Editor
                         {
                             try
                             {
-                                Serializer.TextSerialize(sfd.FileName, Map);
+                                Map.SaveAsMap(sfd.FileName);
                             }
                             catch
                             {
@@ -163,7 +186,8 @@ namespace DyingAndMore.Editor
                         {
                             try
                             {
-                                Map = Serializer.TextDeserialize<Takai.Game.Map>(ofd.FileName);
+                                throw new System.NotImplementedException();//todo
+                                Map = Serializer.TextDeserialize<Takai.Game.MapInstance>(ofd.FileName);
                             }
                             catch
                             {
@@ -187,8 +211,8 @@ namespace DyingAndMore.Editor
 
                     widthInput.Maximum = heightInput.Maximum = config.maxMapSize;
 
-                    widthInput.Value = Map.Width;
-                    heightInput.Value = Map.Height;
+                    widthInput.Value = Map.Class.Width;
+                    heightInput.Value = Map.Class.Height;
 
                     var resizeBtn = resizeDialog.FindChildByName("resize", false);
                     var cancelBtn = resizeDialog.FindChildByName("cancel", false);
@@ -216,7 +240,7 @@ namespace DyingAndMore.Editor
             if (!renderSettingsConsole.RemoveFromParent())
             {
                 //refresh individual render settings
-                var settings = typeof(Takai.Game.Map.RenderSettings);
+                var settings = typeof(Takai.Game.MapInstance.RenderSettings);
                 foreach (var child in renderSettingsConsole.Children)
                     ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
 

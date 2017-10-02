@@ -65,7 +65,7 @@ namespace Takai.Game
         public EffectsClass Class { get; set; }
 
         [Data.Serializer.Ignored]
-        public Map Map { get; set; }
+        public MapInstance Map { get; set; }
 
         public Vector2 Position { get; set; }
         public Vector2 Direction { get; set; }
@@ -170,7 +170,7 @@ namespace Takai.Game
         public void Spawn(EffectsInstance instance)
         {
             var count = RandomRange.Next(Count);
-            instance.Map.ActiveFluids.Capacity += count;
+            instance.Map.LiveFluids.Capacity += count;
             for (int i = 0; i < count; ++i)
             {
                 var angle = RandomRange.Next(Spread);

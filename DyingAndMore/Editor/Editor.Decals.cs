@@ -79,11 +79,11 @@ namespace DyingAndMore.Editor
 
             if (InputState.IsPress(MouseButtons.Left))
             {
-                if (!SelectDecal(currentWorldPos) && editor.Map.Bounds.Contains(currentWorldPos))
+                if (!SelectDecal(currentWorldPos) && editor.Map.Class.Bounds.Contains(currentWorldPos))
                 {
                     //add new decal under cursor
                     selectedDecal = editor.Map.AddDecal(selector.textures[selector.SelectedItem], currentWorldPos);
-                    var pos = (currentWorldPos / editor.Map.SectorPixelSize).ToPoint();
+                    var pos = (currentWorldPos / editor.Map.Class.SectorPixelSize).ToPoint();
                     return false;
                 }
             }

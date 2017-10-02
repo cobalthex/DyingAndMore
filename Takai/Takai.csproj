@@ -86,6 +86,7 @@
     <Compile Include="Game\Map.Helpers.cs">
       <DependentUpon>Map.cs</DependentUpon>
     </Compile>
+    <None Include="Game\Map.old.cs" />
     <Compile Include="Game\Map.Pathing.cs" />
     <Compile Include="Game\Map.Serialization.cs">
       <DependentUpon>Map.cs</DependentUpon>
