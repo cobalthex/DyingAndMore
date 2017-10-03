@@ -66,7 +66,7 @@ namespace DyingAndMore
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps
             IsMouseVisible = true;
 
-            IsFixedTimeStep = false;
+            IsFixedTimeStep = true;
         }
 
         void GdmDeviceCreated(object sender, System.EventArgs e)

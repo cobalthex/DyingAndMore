@@ -48,9 +48,15 @@ namespace Takai.Game
         public float TimeScale { get; set; } = 1;
 
         /// <summary>
-        /// Ents that are to be destroyed during the next Update()
+        /// Ents to destroy during the next Update()
         /// </summary>
         protected List<EntityInstance> entsToDestroy = new List<EntityInstance>(8);
+        protected List<EntityInstance> entsToRemoveFromActive = new List<EntityInstance>(32);
+
+        /// <summary>
+        /// Ents to add to the map during the next Update()
+        /// </summary>
+        protected HashSet<EntityInstance> activeEntities = new HashSet<EntityInstance>();
 
         /// <summary>
         /// Update the map state
@@ -112,18 +118,27 @@ namespace Takai.Game
                 FinalDestroy(ent);
                 RemoveFromSectors(ent);
             }
+
             entsToDestroy.Clear();
 
-            var activeSectors = visibleSectors;
-            foreach (var ent in EnumerateEntitiesInSectors(activeSectors))
-            {
-                    var entBounds = ent.AxisAlignedBounds;
+            activeEntities.UnionWith(EnumerateEntitiesInSectors(visibleSectors));
 
-                if (!Class.Bounds.Intersects(entBounds) || //outside of the map
+            var exclusionZone = visibleRegion;
+            exclusionZone.Inflate(Class.SectorPixelSize, Class.SectorPixelSize);
+
+            foreach (var ent in activeEntities)
+            {
+                if (!ent.AxisAlignedBounds.Intersects(exclusionZone))
+                {
+                    entsToRemoveFromActive.Add(ent);
+                    continue;
+                }
+
+                if (!Class.Bounds.Intersects(ent.AxisAlignedBounds) || //outside of the map
                     ent.State.Instance == null) //no state
                         Destroy(ent);
 
-                else if (!visibleRegion.Intersects(entBounds))
+                else if (!visibleRegion.Intersects(ent.AxisAlignedBounds))
                 {
                     //todo: reorganize
 
@@ -212,6 +227,9 @@ namespace Takai.Game
                     }
                 }
             }
+
+            activeEntities.ExceptWith(entsToRemoveFromActive);
+            entsToRemoveFromActive.Clear();
 
             #endregion
 

@@ -186,8 +186,9 @@ namespace DyingAndMore.Editor
                         {
                             try
                             {
-                                throw new System.NotImplementedException();//todo
-                                Map = Serializer.TextDeserialize<Takai.Game.MapInstance>(ofd.FileName);
+                                var mapClass = Cache.Load<Takai.Game.MapClass>(ofd.FileName);
+                                mapClass.InitializeGraphics();
+                                Map = mapClass.Create();
                             }
                             catch
                             {
