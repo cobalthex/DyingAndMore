@@ -19,14 +19,16 @@ namespace DyingAndMore.Game
         Custom
     }
 
-    public struct GameInstance
+    struct GameInstance
     {
         //move into Game?
 
-        public static GameInstance Current { get; set; }
+        public static GameInstance Current;
 
         public GameDifficulty difficulty;
         public bool allowFriendlyFire;
+
+        public System.Collections.Generic.List<Entities.ActorInstance> players;
 
         //campaign
     }
@@ -149,30 +151,33 @@ namespace DyingAndMore.Game
                 MapInstance.CleanupOptions.Particles
             );
 
-            var possibles = Map.FindEntitiesByClassName("player");
-            if (possibles.Count > 0)
+            //create players
+
+            var players = new System.Collections.Generic.List<Entities.ActorInstance>();
+            foreach (var ent in Map.AllEntities)
             {
-                player = possibles[0] as Entities.ActorInstance;
-                player.Controller = new Entities.InputController();
+                if (ent is Entities.ActorInstance actor && actor.Controller is Entities.InputController)
+                    players.Add(actor);
             }
-            Map.ActiveCamera = new Camera(player);
 
-            var testScript = new BulletTimeScript();
-            //Map.AddScript(testScript);
+            int numPlayers = 1;
 
-            //Map.Tiles[0, 0] = 9;
-
-            //camera.PostEffect = Takai.AssetManager.Load<Effect>("Shaders/Fisheye.mgfx");
-
-            foreach (var entity in Map.AllEntities)
+            //create extra players if not enough
+            for (int i = players.Count; i < numPlayers; ++i)
             {
-                if (entity != player)
-                {
-                    entity.Parent = player;
-                    entity.RelativePosition = new Vector2(100);
-                    break;
-                }
+                //spawn players behind the last
             }
+
+            if (players.Count > 0)
+            {
+                GameInstance.Current.players = players.GetRange(0, numPlayers);
+                for (int i = numPlayers; i < players.Count; ++i)
+                    Map.Destroy(players[i]);
+
+                player = GameInstance.Current.players[0];
+            }
+
+            Map.ActiveCamera = new Camera(player); //todo: resume control
         }
 
         protected override void UpdateSelf(GameTime time)
@@ -280,7 +285,7 @@ namespace DyingAndMore.Game
 
         protected override bool HandleInput(GameTime time)
         {
-            if (InputState.IsPress(MouseButtons.Left))
+            if (player != null && InputState.IsPress(MouseButtons.Left))
             {
                 var fx = testEffect.Create();
                 fx.Position = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);

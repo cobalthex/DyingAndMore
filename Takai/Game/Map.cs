@@ -91,12 +91,17 @@ namespace Takai.Game
 
             if (InitialState != null)
             {
-                foreach (var ent in InitialState.Entities)
-                    instance.Spawn(ent.Class, ent.Position, ent.Forward, Vector2.Zero, ent.Name);
-                foreach (var fluid in InitialState.Fluids)
-                    instance.Spawn(fluid);
-                foreach (var decal in InitialState.Decals)
-                    instance.AddDecal(decal);
+                if (InitialState.Entities != null)
+                    foreach (var ent in InitialState.Entities)
+                        instance.Spawn(ent.Class, ent.Position, ent.Forward, Vector2.Zero, ent.Name);
+
+                if (InitialState.Fluids != null)
+                    foreach (var fluid in InitialState.Fluids)
+                        instance.Spawn(fluid);
+
+                if (InitialState.Decals != null)
+                    foreach (var decal in InitialState.Decals)
+                        instance.AddDecal(decal);
             }
 
             return instance;
@@ -135,8 +140,8 @@ namespace Takai.Game
                     _class = value;
 
                     Sectors = new MapSector[
-                        Util.CeilDiv(_class.Width, MapClass.SectorSize),
-                        Util.CeilDiv(_class.Height, MapClass.SectorSize)
+                        Util.CeilDiv(_class.Height, MapClass.SectorSize),
+                        Util.CeilDiv(_class.Width, MapClass.SectorSize)
                     ];
 
                     for (int y = 0; y < Sectors.GetLength(0); ++y)
@@ -226,11 +231,13 @@ namespace Takai.Game
         public void Spawn(EntityInstance instance)
         {
             if (instance.Map != this && instance.Map != null)
-                instance.Map.RemoveFromSectors(instance);
+                instance.Map.Destroy(instance);
 
             instance.Map = this;
             instance.SpawnTime = ElapsedTime;
             instance.RefreshBounds();
+
+            _allEntities.Add(instance);
 
             var sectors = GetOverlappingSectors(instance.AxisAlignedBounds);
             for (int y = sectors.Top; y < sectors.Bottom; ++y)
@@ -238,7 +245,6 @@ namespace Takai.Game
                 for (int x = sectors.Left; x < sectors.Right; ++x)
                     Sectors[y, x].entities.Add(instance);
             }
-            _allEntities.Add(instance);
         }
 
         public void Destroy(EntityInstance ent)
@@ -249,26 +255,27 @@ namespace Takai.Game
         /// <summary>
         /// Destroy an entity without removing it from the map
         /// </summary>
-        /// <param name="ent">the ent to destroy</param>
-        protected void FinalDestroy(EntityInstance ent)
+        /// <param name="instance">the ent to destroy</param>
+        protected void FinalDestroy(EntityInstance instance)
         {
-            ent.OnDestroy();
-            ent.SpawnTime = TimeSpan.Zero;
-            ent.Map = null;
-            ent.Parent = null;
-            _allEntities.Remove(ent);
+            instance.OnDestroy();
+            instance.SpawnTime = TimeSpan.Zero;
+            instance.Map = null;
+            instance.Parent = null;
+            activeEntities.Remove(instance);
+            _allEntities.Remove(instance);
         }
         /// <summary>
         /// Remove an entity from the map sectors
         /// </summary>
-        /// <param name="ent">The entity to remove</param>
-        protected void RemoveFromSectors(EntityInstance ent)
+        /// <param name="instance">The entity to remove</param>
+        protected void RemoveFromSectors(EntityInstance instance)
         {
-            var sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
+            var sectors = GetOverlappingSectors(instance.AxisAlignedBounds);
             for (int y = sectors.Top; y < sectors.Bottom; ++y)
             {
                 for (int x = sectors.Left; x < sectors.Right; ++x)
-                    Sectors[y, x].entities.Remove(ent);
+                    Sectors[y, x].entities.Remove(instance);
             }
         }
 

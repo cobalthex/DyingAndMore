@@ -112,14 +112,9 @@ namespace Takai.Game
             Data.Serializer.TextSerialize(file, this);
         }
 
-        /// <summary>
-        /// Save this instance as a new map, setting the default state of the class to this
-        /// </summary>
-        /// <param name="file">The file to save to</param>
-        public void SaveAsMap(string file)
+        InitialMapState CreateInitialState()
         {
-            //create default state
-            var state = new InitialMapState
+            return new InitialMapState
             {
                 Entities = Enumerable.Select(AllEntities, e => new InitialMapState.EntitySpawn()
                 {
@@ -131,8 +126,16 @@ namespace Takai.Game
                 Fluids = new List<FluidInstance>(),
                 Decals = new List<Decal>()
             };
+        }
 
-            Class.InitialState = state;
+        /// <summary>
+        /// Save this instance as a new map, setting the default state of the class to this
+        /// </summary>
+        /// <param name="file">The file to save to</param>
+        public void SaveAsMap(string file)
+        {
+            //create default state
+            Class.InitialState = CreateInitialState();
             Class.File = null;
 
             //todo: less hacky (make class ReadOnly and custom serialize?

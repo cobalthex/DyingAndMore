@@ -30,4 +30,6 @@ ActorClass {
     AlwaysDrawUpright: False;
 
     DefaultWeapon: @"Defs/Weapons/Test.wpn.tk";
+
+    DefaultController: InputController { }
 }
