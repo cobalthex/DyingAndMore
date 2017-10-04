@@ -6,21 +6,21 @@ List {
 
     Static {
         Text: "No map loaded";
-        Font: "Fonts/UILarge.bfnt";
+        Font: "UILarge.bfnt";
         Color: Color.White;
         HorizontalAlignment: Alignment.Middle;
     }
     Static {
         Name: "new";
         Text: "Press Ctrl+N to create a new map";
-        Font: @"Defs/Fonts/UISmall.fnt.tk";
+        Font: @"UISmall.fnt.tk";
         Color: Color.White;
         HorizontalAlignment: Alignment.Middle;
     }
     Static {
         Name: "open";
         Text: "or Ctrl+O to open a map";
-        Font: @"Defs/Fonts/UISmall.fnt.tk";
+        Font: @"UISmall.fnt.tk";
         Color: Color.White;
         HorizontalAlignment: Alignment.Middle;
     }

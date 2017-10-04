@@ -1,5 +1,5 @@
 Tileset {
-	Texture: "Textures/Tiles/Healthy.png";
+	Texture: "Tiles/Healthy.png";
 	Size: 48;
 	Background: "";
 	BackgroundPlacement: Placement [ Fill ];

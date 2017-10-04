@@ -12,7 +12,7 @@ ActorClass {
     States: {
         Idle: {
             Sprite: {
-                texture: "Textures/Entities/Spawner.png";
+                texture: "Entities/Spawner.png";
                 Width: 64;
                 Height: 64;
                 origin: [32 32];
@@ -21,7 +21,7 @@ ActorClass {
         };
         Dead: {
             Sprite: {
-                texture: "Textures/Entities/Spawner.png";
+                texture: "Entities/Spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];
@@ -34,7 +34,7 @@ ActorClass {
         };
         Inactive: {
             Sprite: {
-                texture: "Textures/Entities/Spawner.png";
+                texture: "Entities/Spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];
@@ -47,7 +47,7 @@ ActorClass {
         };
         ChargeWeapon: {
             Sprite: {
-                texture: "Textures/Entities/Spawner.png";
+                texture: "Entities/Spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];
@@ -69,7 +69,7 @@ ActorClass {
     DefaultWeapon: SpawnerClass {
         Delay: [1sec 3sec];
         Spawns: [
-            [@"Defs/Entities/InfectedCell.ent.tk" [3 5]]
+            [@"Entities/InfectedCell.ent.tk" [3 5]]
         ]
     }
 }

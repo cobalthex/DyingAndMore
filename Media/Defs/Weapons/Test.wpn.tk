@@ -2,14 +2,14 @@ GunClass {
     MaxAmmo: 100;
 	BurstCount: 3;
 	Delay: [0 0];
-    Projectile: @"Defs/Entities/Missile.ent.tk";
+    Projectile: @"Entities/Missile.ent.tk";
 
     DischargeEffect: {
         Effects: [
             ParticleEffect {
                 Class: {
                     Graphic: {
-                        Texture: "Textures/Particles/trail.png"
+                        Texture: "Particles/trail.png"
                         width:8;
                         height:8;
                         frameLength:100msec;
@@ -47,7 +47,7 @@ GunClass {
             SoundImpulse {
                 Permutations: [
                     SoundClass {
-                        sound: "Sounds/open_fx.ogg";
+                        sound: "open_fx.ogg";
                         gain: 0.1;
                     }
                 ]

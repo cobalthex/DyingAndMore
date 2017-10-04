@@ -1,7 +1,7 @@
 FluidClass {
     Name: "Large Blood";
-    Texture: "Data\\Textures\\Fluids\\Blood.png";
-    Reflection: "Data\\Textures\\Fluids\\Blood.r.png";
+    Texture: "Fluids/Blood.png";
+    Reflection: "Fluids/Blood.r.png";
     Radius: 54;
     Drag: 0.2;
 }

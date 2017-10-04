@@ -48,8 +48,8 @@ namespace DyingAndMore.Editor
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
 
-            var smallFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UISmall.bfnt");
-            var largeFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UILarge.bfnt");
+            var smallFont = Cache.Load<Takai.Graphics.BitmapFont>("UISmall.bfnt");
+            var largeFont = Cache.Load<Takai.Graphics.BitmapFont>("UILarge.bfnt");
 
             AddChild(modes = new ModeSelector(largeFont, smallFont)
             {
@@ -72,7 +72,7 @@ namespace DyingAndMore.Editor
             renderSettingsConsole.Position = new Vector2(100, 0);
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;
 
-            resizeDialog = Serializer.TextDeserialize<Static>("Defs/UI/Editor/ResizeMap.ui.tk");
+            resizeDialog = Cache.Load<Static>("UI/Editor/ResizeMap.ui.tk");
         }
 
         void AddModes()
@@ -130,7 +130,7 @@ namespace DyingAndMore.Editor
             {
                 using (var sfd = new System.Windows.Forms.SaveFileDialog()
                 {
-                    Filter = "Dying and More! Maps (*.sav.tk)|*.sav.tk",
+                    Filter = "Dying and More! Saves (*.d2sav)|*.d2sav",
                     RestoreDirectory = true
                 })
                 {
@@ -155,7 +155,7 @@ namespace DyingAndMore.Editor
                 {
                     using (var sfd = new System.Windows.Forms.SaveFileDialog()
                     {
-                        Filter = "Dying and More! Maps (*.map.tk)|*.map.tk",
+                        Filter = "Dying and More! Maps (*.d2map)|*.d2map",
                         RestoreDirectory = true
                     })
                     {
@@ -178,7 +178,7 @@ namespace DyingAndMore.Editor
                 {
                     using (var ofd = new System.Windows.Forms.OpenFileDialog()
                     {
-                        Filter = "Dying and More! Maps (*.map.tk)|*.map.tk",
+                        Filter = "Dying and More! Maps (*.d2map)|*.d2map",
                         RestoreDirectory = true
                     })
                     {
@@ -203,7 +203,7 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsPress(Keys.N))
                 {
-                    var resizeMap = Cache.Load<Static>("Defs/UI/Editor/NewMap.ui.tk");
+                    var resizeMap = Cache.Load<Static>("UI/Editor/NewMap.ui.tk");
                     AddChild(resizeMap);
                 }
 
