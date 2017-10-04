@@ -1,6 +1,6 @@
 FluidClass {
     Name: "Mucus";
-    Texture: "Data\\Textures\\Fluids\\Mucus.png";
+    Texture: "Fluids/Mucus.png";
     Radius: 54;
     Drag: 0.9;
 }

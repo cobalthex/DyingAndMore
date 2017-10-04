@@ -6,7 +6,7 @@ ActorClass {
     States: {
         Idle: {
             Sprite: {
-                texture: "Textures/Entities/Player.png";
+                texture: "Entities/Player.png";
                 width: 48;
                 height: 48;
                 origin: [24 24];
@@ -17,7 +17,7 @@ ActorClass {
                 Tween: TweenStyle [Overlap];
             };
             Sound: {
-                #Sound: "Sounds/mech8.ogg";
+                #Sound: "mech8.ogg";
             }
         };
     };
@@ -29,7 +29,7 @@ ActorClass {
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
 
-    DefaultWeapon: @"Defs/Weapons/Test.wpn.tk";
+    DefaultWeapon: @"Weapons/Test.wpn.tk";
 
     DefaultController: InputController { }
 }

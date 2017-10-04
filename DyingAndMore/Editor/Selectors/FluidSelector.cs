@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
@@ -13,11 +14,12 @@ namespace DyingAndMore.Editor.Selectors
             : base(editor)
         {
             fluids = new List<Takai.Game.FluidClass>();
-            foreach (var file in System.IO.Directory.EnumerateFiles("Defs\\Fluids", "*", System.IO.SearchOption.AllDirectories))
+            var searchPath = Path.Combine(Takai.Data.Cache.DefsFolder, "Fluids");
+            foreach (var file in Directory.EnumerateFiles(searchPath, "*", SearchOption.AllDirectories))
             {
                 try
                 {
-                    fluids.Add(Takai.Data.Cache.Load<Takai.Game.FluidClass>(file));
+                    fluids.Add(Takai.Data.Cache.Load<Takai.Game.FluidClass>(Path.Combine("Fluids", Path.GetFileName(file))));
                 }
                 catch (System.Exception)
                 {

@@ -23,6 +23,9 @@ namespace Takai.Data
             }
         }
 
+        public static string DataFolder = "Data/";
+        public static string DefsFolder = "Defs/";
+
         /// <summary>
         /// Custom loaders for specific file extensions (Do not include the first . in the extension)
         /// All other formats will be deserialized using the Serializer
@@ -55,8 +58,7 @@ namespace Takai.Data
 
             CustomLoaders.Add("mgfx", LoadEffect);
 
-            //todo: custom loaders load from data/whatever
-            //all others load from defs
+            CustomLoaders.Add("d2map", (path) => Serializer.TextDeserialize(path));
         }
 
         //todo: LoadZip
@@ -71,13 +73,12 @@ namespace Takai.Data
 
             if (forceLoad || !exists)
             {
-                var ext = Path.GetExtension(file);
-
+                var ext = GetExtension(file);
                 if (CustomLoaders.TryGetValue(ext, out var loader))
                     obj.value = loader?.Invoke(file);
                 else
                 {
-                    obj.value = Serializer.TextDeserialize(file);
+                    obj.value = Serializer.TextDeserialize(TransformPath(file, DefsFolder));
                     if (obj.value is ISerializeExternally sxt)
                         sxt.File = file;
                 }
@@ -104,6 +105,22 @@ namespace Takai.Data
         public static string Normalize(string path)
         {
             return path.Replace("\\\\", "/").Replace('\\', '/');
+        }
+
+        public static string GetExtension(string path)
+        {
+            return path.Substring(path.LastIndexOf('.') + 1);
+
+            //var dir = path.LastIndexOfAny(new[] { '\\', '/' }) + 1;
+            //var ext = path.IndexOf('.', dir) + 1;
+            //return path.Substring(ext == 0 ? dir : ext);
+        }
+
+        public static string TransformPath(string path, params string[] root)
+        {
+            if (Path.IsPathRooted(path))
+                return path;
+            return Normalize(Path.Combine(Path.Combine(root), path));
         }
 
         public static void TrackReferences()
@@ -139,19 +156,19 @@ namespace Takai.Data
 
         internal static object LoadTexture(string file)
         {
-            using (var stream = new FileStream(file, FileMode.Open))
+            using (var stream = new FileStream(TransformPath(file, DataFolder, "Textures"), FileMode.Open))
                 return Texture2D.FromStream(Runtime.GraphicsDevice, stream);
         }
 
         internal static object LoadBitmapFont(string file)
         {
-            using (var stream = new FileStream(file, FileMode.Open))
+            using (var stream = new FileStream(TransformPath(file, DataFolder, "Fonts"), FileMode.Open))
                 return Graphics.BitmapFont.FromStream(Runtime.GraphicsDevice, stream);
         }
 
         internal static object LoadOgg(string file)
         {
-            using (var stream = new FileStream(file, FileMode.Open))
+            using (var stream = new FileStream(TransformPath(file, DataFolder, "Sounds"), FileMode.Open))
             {
                 using (var vorbis = new NVorbis.VorbisReader(stream, false))
                 {
@@ -186,13 +203,13 @@ namespace Takai.Data
 
         internal static object LoadSound(string file)
         {
-            using (var stream = new FileStream(file, FileMode.Open))
+            using (var stream = new FileStream(TransformPath(file, DataFolder, "Sounds"), FileMode.Open))
                 return SoundEffect.FromStream(stream);
         }
 
         internal static object LoadEffect(string file)
         {
-            file = Path.Combine("Shaders", "DX11", file); //todo: more standard method
+            file = TransformPath(file, DataFolder, "Shaders", "DX11");
             return new Effect(Runtime.GraphicsDevice, File.ReadAllBytes(file));
         }
 

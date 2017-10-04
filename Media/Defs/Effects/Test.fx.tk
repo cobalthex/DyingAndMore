@@ -5,14 +5,14 @@ EffectsClass {
         ParticleEffect {
             Class: {
                 Graphic: {
-                    Texture: "Textures/Particles/blood.png"
+                    Texture: "Particles/blood.png"
                     Width: 10;
                     Height: 10;
                     FrameCount: 6;
                     FrameLength: 100msec;
                     Center: true;
                 };
-                FluidOnDeath: @"Defs/Fluids/Blood.fluid.tk";
+                FluidOnDeath: @"Fluids/Blood.fluid.tk";
                 Blend: BlendState.Additive;
                 ColorOverTime: {
                     start: Color.White;
@@ -30,7 +30,7 @@ EffectsClass {
         ParticleEffect {
             Class: {
                 Graphic: {
-                    Texture: "Textures/Particles/trail.png"
+                    Texture: "Particles/trail.png"
                     width:8;
                     height:8;
                     frameLength:100msec;
@@ -65,14 +65,14 @@ EffectsClass {
             Count: [100 500];
         }
         FluidEffect {
-            Class: @"Defs/Fluids/SmallBlood.fluid.tk";
+            Class: @"Fluids/SmallBlood.fluid.tk";
             Speed: [30 60];
             Count: [10 20];
         }
         SoundImpulse {
             Permutations: [
                 SoundClass {
-                    sound: "Sounds/open_fx.ogg";
+                    sound: "open_fx.ogg";
                     gain: 0.1;
                 }
             ]

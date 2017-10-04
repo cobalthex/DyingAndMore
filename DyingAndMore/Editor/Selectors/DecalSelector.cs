@@ -13,9 +13,10 @@ namespace DyingAndMore.Editor.Selectors
             : base(Editor)
         {
             textures = new List<Texture2D>();
-            foreach (var file in Directory.EnumerateFiles("Data\\Textures\\Decals", "*", SearchOption.AllDirectories))
+            var searchPath = Path.Combine(Takai.Data.Cache.DataFolder, "Textures", "Decals");
+            foreach (var file in Directory.EnumerateFiles(searchPath, "*", SearchOption.AllDirectories))
             {
-                var tex = Takai.Data.Cache.Load<Texture2D>(file);
+                var tex = Takai.Data.Cache.Load<Texture2D>(Path.Combine("Decals", Path.GetFileName(file)));
                 if (tex != null)
                     textures.Add(tex);
             }

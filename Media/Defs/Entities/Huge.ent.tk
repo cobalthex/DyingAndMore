@@ -6,7 +6,7 @@ ActorClass {
     States: {
     	Idle: {
     		Sprite: {
-				Texture: "Textures/Entities/Rhinovirus.png";
+				Texture: "Entities/Rhinovirus.png";
 				Origin: [64 64];
 				IsLooping: True;
     		};

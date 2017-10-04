@@ -29,8 +29,7 @@ Actor {
 Gun { /* extract to file */
         Projectile: Projectile {
             Sprite: {
-                texture: 'Textures/Projectiles/sharp.png';
-                width: 16;
+                texture: 'Projectiles/sharp.png'; width: 16;
                 height: 8;
             }
         };

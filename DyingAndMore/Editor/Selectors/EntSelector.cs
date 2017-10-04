@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,11 +15,12 @@ namespace DyingAndMore.Editor.Selectors
             ItemSize = new Point(64);
             Padding = 5;
 
-            foreach (var file in System.IO.Directory.EnumerateFiles("Defs\\Entities", "*", System.IO.SearchOption.AllDirectories))
+            var searchPath = Path.Combine(Takai.Data.Cache.DefsFolder, "Entities");
+            foreach (var file in Directory.EnumerateFiles(searchPath, "*", SearchOption.AllDirectories))
             {
                 try
                 {
-                    var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(file);
+                    var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(Path.Combine("Entities", Path.GetFileName(file)));
                     if (ent is Game.Entities.ActorClass) //+ other classes
                         ents.Add(ent);
                 }
