@@ -90,17 +90,16 @@ namespace DyingAndMore
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
             Takai.Runtime.Game = this;
-            Takai.AssetManager.Initialize("Data\\");
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            Takai.UI.Static.DefaultFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>(
+            Takai.UI.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>(
                 "Fonts/UISmall.bfnt");
 
-            debugFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
+            debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
 
             //testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
 

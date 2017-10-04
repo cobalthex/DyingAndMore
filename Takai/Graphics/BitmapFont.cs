@@ -55,7 +55,7 @@ namespace Takai.Graphics
         private static object DeserializeFont(object transform)
         {
             if (transform is string file)
-                return AssetManager.Load<BitmapFont>(file);
+                return Data.Cache.Load<BitmapFont>(file);
 
             return Data.Serializer.DefaultAction;
         }

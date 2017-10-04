@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Takai.Input;
 
 namespace DyingAndMore.Editor.Selectors
 {
@@ -16,7 +15,7 @@ namespace DyingAndMore.Editor.Selectors
             textures = new List<Texture2D>();
             foreach (var file in Directory.EnumerateFiles("Data\\Textures\\Decals", "*", SearchOption.AllDirectories))
             {
-                var tex = Takai.AssetManager.Load<Texture2D>(file);
+                var tex = Takai.Data.Cache.Load<Texture2D>(file);
                 if (tex != null)
                     textures.Add(tex);
             }

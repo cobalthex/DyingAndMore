@@ -27,12 +27,15 @@ namespace DyingAndMore
                 HorizontalAlignment = Alignment.Stretch,
             };
 
-            foreach (var ass in Takai.AssetManager.Assets)
+            foreach (var obj in Takai.Data.Cache.Objects)
             {
+                if (!(obj.Value.value is IDisposable))
+                    continue;
+
                 var listItem = new Static()
                 {
-                    Name = ass.Key,
-                    Text = System.IO.Path.GetFileName(ass.Key),
+                    Name = obj.Key,
+                    Text = System.IO.Path.GetFileName(obj.Key),
                     HorizontalAlignment = Alignment.Stretch
                 };
                 listItem.AutoSize(10);
@@ -49,7 +52,7 @@ namespace DyingAndMore
 
         private void ListItem_Click(object sender, ClickEventArgs e)
         {
-            var asset = Takai.AssetManager.Assets[((Static)sender).Name];
+            var asset = Takai.Data.Cache.Objects[((Static)sender).Name].value;
 
             if (activeSound != null)
             {

@@ -170,13 +170,13 @@ namespace Takai.Data
             Serializers.Add(typeof(Texture2D), new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((Texture2D)value).Name; },
-                Deserialize = (object value) => { return AssetManager.Load<Texture2D>((string)value); }
+                Deserialize = (object value) => { return Cache.Load<Texture2D>((string)value); }
             });
 
             Serializers.Add(typeof(SoundEffect), new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((SoundEffect)value).Name; },
-                Deserialize = (object value) => { return AssetManager.Load<SoundEffect>((string)value); }
+                Deserialize = (object value) => { return Cache.Load<SoundEffect>((string)value); }
             });
 
             Serializers.Add(typeof(TimeSpan), new CustomTypeSerializer
