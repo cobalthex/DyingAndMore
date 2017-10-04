@@ -75,11 +75,11 @@ namespace Takai.Game
             //todo: some of the render targets may be able to be combined
 
             //todo: cross platform support
-            lineEffect = AssetManager.Load<XnaEffect>("Shaders/DX11/Line.mgfx");
-            circleEffect = AssetManager.Load<XnaEffect>("Shaders/DX11/Circle.mgfx");
-            outlineEffect = AssetManager.Load<XnaEffect>("Shaders/DX11/Outline.mgfx");
-            fluidEffect = AssetManager.Load<XnaEffect>("Shaders/DX11/Fluid.mgfx");
-            reflectionEffect = AssetManager.Load<XnaEffect>("Shaders/DX11/Reflection.mgfx");
+            lineEffect = Data.Cache.Load<XnaEffect>("Line.mgfx");
+            circleEffect = Data.Cache.Load<XnaEffect>("Circle.mgfx");
+            outlineEffect = Data.Cache.Load<XnaEffect>("Outline.mgfx");
+            fluidEffect = Data.Cache.Load<XnaEffect>("Fluid.mgfx");
+            reflectionEffect = Data.Cache.Load<XnaEffect>("Reflection.mgfx");
         }
     }
 

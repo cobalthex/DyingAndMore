@@ -48,8 +48,8 @@ namespace DyingAndMore.Editor
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
 
-            var smallFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UISmall.bfnt");
-            var largeFont = Takai.AssetManager.Load<Takai.Graphics.BitmapFont>("Fonts/UILarge.bfnt");
+            var smallFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UISmall.bfnt");
+            var largeFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UILarge.bfnt");
 
             AddChild(modes = new ModeSelector(largeFont, smallFont)
             {
@@ -186,9 +186,11 @@ namespace DyingAndMore.Editor
                         {
                             try
                             {
+                                Cache.TrackReferences();
                                 var mapClass = Cache.Load<Takai.Game.MapClass>(ofd.FileName);
                                 mapClass.InitializeGraphics();
                                 Map = mapClass.Create();
+                                Cache.CleanupStaleReferences();
                             }
                             catch
                             {

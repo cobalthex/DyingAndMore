@@ -1282,7 +1282,7 @@ namespace Takai.UI
                     };
                     input.FileSelected += delegate
                     {
-                        setValue(obj, Takai.AssetManager.Load<Texture2D>(input.Text));
+                        setValue(obj, Takai.Data.Cache.Load<Texture2D>(input.Text));
                     };
                     input.AutoSize();
                     root.AddChild(input);
