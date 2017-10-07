@@ -9,7 +9,7 @@ GunClass {
             ParticleEffect {
                 Class: {
                     Graphic: {
-                        Texture: "Particles/trail.png"
+                        Texture: "Textures/Particles/trail.png"
                         width:8;
                         height:8;
                         frameLength:100msec;
@@ -47,7 +47,7 @@ GunClass {
             SoundImpulse {
                 Permutations: [
                     SoundClass {
-                        sound: "open_fx.ogg";
+                        sound: "Sounds/open_fx.ogg";
                         gain: 0.1;
                     }
                 ]

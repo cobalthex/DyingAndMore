@@ -71,7 +71,7 @@ List {
                 }
             ]
         }
-        
+
         Static {
             Text: "Tileset";
             Font: @"Fonts/UISmall.fnt.tk";
@@ -80,7 +80,7 @@ List {
 
         FileInput {
             Name: "tileset";
-            Filter: "PNG Image (*.png)|*.png";
+            Filter: "Textures/PNG Image (*.png)|*.png";
             Width: 300;
             Font: @"Fonts/UISmall.fnt.tk";
         }

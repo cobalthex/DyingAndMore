@@ -32,7 +32,7 @@ namespace Takai.Data
         /// <summary>
         /// Takes in a known format and outputs the destination object
         /// </summary>
-        public Func<object, object> Deserialize;
+        public Func<object, Serializer.DeserializationContext, object> Deserialize;
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ namespace Takai.Data
             Serializers.Add(typeof(Vector2), new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
-                Deserialize = (object value) =>
+                Deserialize = (object value, DeserializationContext cxt) =>
                 {
                     var v = (List<object>)value;
                     var x = (float)Convert.ChangeType(v[0], typeof(float));
@@ -96,7 +96,7 @@ namespace Takai.Data
             Serializers.Add(typeof(Vector3), new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
-                Deserialize = (object value) =>
+                Deserialize = (object value, DeserializationContext cxt) =>
                 {
                     var v = (List<object>)value;
                     var x = (float)Convert.ChangeType(v[0], typeof(float));
@@ -109,7 +109,7 @@ namespace Takai.Data
             Serializers.Add(typeof(Vector4), new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
-                Deserialize = (object value) =>
+                Deserialize = (object value, DeserializationContext cxt) =>
                 {
                     var v = (List<object>)value;
                     var x = (float)Convert.ChangeType(v[0], typeof(float));
@@ -123,7 +123,7 @@ namespace Takai.Data
             Serializers.Add(typeof(Point), new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
-                Deserialize = (object value) =>
+                Deserialize = (object value, DeserializationContext cxt) =>
                 {
                     var v = (List<object>)value;
                     var x = (int)Convert.ChangeType(v[0], typeof(int));
@@ -135,7 +135,7 @@ namespace Takai.Data
             Serializers.Add(typeof(Rectangle), new CustomTypeSerializer
             {
                 Serialize = (object value) => { var r = (Rectangle)value; return new[] { r.X, r.Y, r.Width, r.Height }; },
-                Deserialize = (object value) =>
+                Deserialize = (object value, DeserializationContext cxt) =>
                 {
                     var v = (List<object>)value;
                     var x = (int)Convert.ChangeType(v[0], typeof(int));
@@ -149,7 +149,7 @@ namespace Takai.Data
             Serializers.Add(typeof(Color), new CustomTypeSerializer
             {
                 Serialize = (object value) => { var c = (Color)value; return new[] { c.R, c.G, c.B, c.A }; },
-                Deserialize = (object value) =>
+                Deserialize = (object value, DeserializationContext cxt) =>
                 {
                     var v = (List<object>)value;
                     var r = (int)Convert.ChangeType(v[0], typeof(int));
@@ -162,7 +162,7 @@ namespace Takai.Data
 
             Serializers.Add(typeof(Curve), new CustomTypeSerializer
             {
-                Deserialize = (object value) => {
+                Deserialize = (object value, DeserializationContext cxt) => {
                     return null; //todo
                 },
             });
@@ -170,19 +170,19 @@ namespace Takai.Data
             Serializers.Add(typeof(Texture2D), new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((Texture2D)value).Name; },
-                Deserialize = (object value) => { return Cache.Load<Texture2D>((string)value); }
+                Deserialize = (object value, DeserializationContext cxt) => { return Cache.Load<Texture2D>((string)value, cxt.root); } //todo: pass in serialization context
             });
 
             Serializers.Add(typeof(SoundEffect), new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((SoundEffect)value).Name; },
-                Deserialize = (object value) => { return Cache.Load<SoundEffect>((string)value); }
+                Deserialize = (object value, DeserializationContext cxt) => { return Cache.Load<SoundEffect>((string)value, cxt.root); }
             });
 
             Serializers.Add(typeof(TimeSpan), new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((TimeSpan)value).TotalMilliseconds; },
-                Deserialize = (object value) => { return TimeSpan.FromMilliseconds((double)Convert.ChangeType(value, typeof(double))); }
+                Deserialize = (object value, DeserializationContext cxt) => { return TimeSpan.FromMilliseconds((double)Convert.ChangeType(value, typeof(double))); }
             });
 
             Serializers.Add(typeof(BlendState), new CustomTypeSerializer

@@ -6,7 +6,7 @@ ActorClass {
 	States: {
         Idle: {
             Sprite: {
-            	texture: "Entities/Astrovirus.png";
+            	texture: "Textures/Entities/Astrovirus.png";
                 width: 40;
                 height: 40;
                 origin: [20 20];
@@ -19,7 +19,7 @@ ActorClass {
         };
         Dead: {
             Sprite: {
-            	texture: "Entities/Astrovirus.png";
+            	texture: "Textures/Entities/Astrovirus.png";
                 width: 40;
                 height: 40;
                 origin: [20 20];

@@ -49,6 +49,18 @@ namespace Takai.Data
         /// </summary>
         public static readonly object DefaultAction = new object();
 
+        public struct DeserializationContext
+        {
+            internal StreamReader stream; //public?
+
+            public string file;
+            public string root;
+
+            public bool strict;
+
+            //todo: option to load into cache here?
+        }
+
         public static long GetStreamOffset(StreamReader reader)
         {
             int charPos = (int)reader.GetType().InvokeMember("charPos",
@@ -66,49 +78,14 @@ namespace Takai.Data
             return reader.BaseStream.Position - charLen + charPos;
         }
 
-        private static string ExceptString(string BaseExceptionMessage, StreamReader Stream)
+        internal static string GetExceptionMessage(string error, ref DeserializationContext context)
         {
-            try { return BaseExceptionMessage + $" [Offset:{GetStreamOffset(Stream)}]"; }
-            catch { return BaseExceptionMessage; }
+            return error; //todo
         }
 
-        public static List<object> TextDeserializeAll(string file)
+        public static T TextDeserialize<T>(DeserializationContext context)
         {
-            using (var reader = new StreamReader(file))
-                return TextDeserializeAll(reader);
-        }
-
-        //custom suffixes
-
-        /// <summary>
-        /// Read all objects from the file
-        /// </summary>
-        /// <param name="reader">The stream to read from</param>
-        /// <returns>The objects created</returns>
-        public static List<object> TextDeserializeAll(StreamReader reader)
-        {
-            var objects = new List<object>();
-            while (!reader.EndOfStream)
-                objects.Add(TextDeserialize(reader));
-
-            return objects;
-        }
-
-        public static T TextDeserialize<T>(string file, bool strict = true)
-        {
-            using (var reader = new StreamReader(file))
-                return Cast<T>(TextDeserialize(reader), strict);
-        }
-
-        public static object TextDeserialize(string file)
-        {
-            using (var reader = new StreamReader(file))
-                return TextDeserialize(reader);
-        }
-
-        public static T TextDeserialize<T>(StreamReader reader, bool strict = true)
-        {
-            return Cast<T>(TextDeserialize(reader), strict);
+            return Cast<T>(TextDeserialize(context), context);
         }
 
         /// <summary>
@@ -116,129 +93,129 @@ namespace Takai.Data
         /// </summary>
         /// <param name="reader">The stream to read from</param>
         /// <returns>The object created</returns>
-        public static object TextDeserialize(StreamReader reader)
+        public static object TextDeserialize(DeserializationContext context)
         {
-            SkipIgnored(reader);
+            SkipIgnored(context.stream);
 
-            if (reader.EndOfStream)
+            if (context.stream.EndOfStream)
                 return null;
 
-            var peek = reader.Peek();
+            var peek = context.stream.Peek();
 
             //read dictionary
             if (peek == '{')
             {
-                reader.Read(); //skip {
-                SkipIgnored(reader);
+                context.stream.Read(); //skip {
+                SkipIgnored(context.stream);
 
                 var dict = new Dictionary<string, object>(CaseSensitiveMembers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
 
-                while ((peek = reader.Peek()) != -1 && peek != '}')
+                while ((peek = context.stream.Peek()) != -1 && peek != '}')
                 {
                     var key = new StringBuilder();
-                    while ((peek = reader.Peek()) != ':')
+                    while ((peek = context.stream.Peek()) != ':')
                     {
                         if (peek == -1)
-                            throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected '}' to close object", reader));
+                            throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected '}' to close object", ref context));
 
                         if (peek == ';' && key.Length == 0)
                         {
-                            reader.Read();
+                            context.stream.Read();
                             break;
                         }
 
-                        key.Append((char)reader.Read());
+                        key.Append((char)context.stream.Read());
                     }
 
-                    if (reader.Read() == -1)
-                        throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read object", reader));
+                    if (context.stream.Read() == -1)
+                        throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream while trying to read object", ref context));
 
-                    var value = TextDeserialize(reader);
+                    var value = TextDeserialize(context);
                     dict[String.Intern(key.ToString().TrimEnd())] = value; //todo: analyze interning
 
-                    SkipIgnored(reader);
+                    SkipIgnored(context.stream);
 
-                    if ((peek = reader.Peek()) == -1)
-                        throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected '}' to close object", reader));
+                    if ((peek = context.stream.Peek()) == -1)
+                        throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected '}' to close object", ref context));
 
                     if (peek == ';')
                     {
-                        reader.Read(); //skip ;
-                        SkipIgnored(reader);
+                        context.stream.Read(); //skip ;
+                        SkipIgnored(context.stream);
                     }
                     //else if (peek != '}')
-                    //    throw new InvalidDataException(ExceptString("Unexpected token. Expected ';' or '}' while trying to read object", reader));
+                    //    throw new InvalidDataException(GetExceptionMessage("Unexpected token. Expected ';' or '}' while trying to read object", context));
                 }
 
-                reader.Read();
+                context.stream.Read();
                 return dict;
             }
 
             //read list
             if (peek == '[')
             {
-                reader.Read(); //skip [
-                SkipIgnored(reader);
+                context.stream.Read(); //skip [
+                SkipIgnored(context.stream);
 
                 var values = new List<object>();
-                while (!reader.EndOfStream && reader.Peek() != ']')
+                while (!context.stream.EndOfStream && context.stream.Peek() != ']')
                 {
-                    if ((peek = reader.Peek()) == ';')
+                    if ((peek = context.stream.Peek()) == ';')
                     {
-                        reader.Read(); //skip ;
-                        SkipIgnored(reader);
+                        context.stream.Read(); //skip ;
+                        SkipIgnored(context.stream);
 
-                        if (reader.Peek() == ';')
-                            throw new InvalidDataException(ExceptString("Unexpected ';' in list (missing value)", reader));
+                        if (context.stream.Peek() == ';')
+                            throw new InvalidDataException(GetExceptionMessage("Unexpected ';' in list (missing value)", ref context));
 
                         continue;
                     }
 
                     if (peek == -1)
-                        throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read list", reader));
+                        throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream while trying to read list", ref context));
 
-                    values.Add(TextDeserialize(reader));
-                    SkipIgnored(reader);
+                    values.Add(TextDeserialize(context));
+                    SkipIgnored(context.stream);
                 }
 
-                if (reader.Read() == -1) //skip ]
-                    throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected ']' to close list", reader));
+                if (context.stream.Read() == -1) //skip ]
+                    throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected ']' to close list", ref context));
 
                 return values;
             }
 
             if (peek == '@')
             {
-                reader.Read();
-                var file = ReadString(reader);
-                return Cache.Load(file);
+                context.stream.Read();
+                var file = ReadString(context.stream);
+                return Cache.Load(file, context.root, false);
             }
 
             if (peek == '"' || peek == '\'')
-                return ReadString(reader);
+                return ReadString(context.stream);
 
             string word;
             do
             {
                 if (peek == '-' || peek == '+' || peek == '.')
-                    word = (char)reader.Read() + ReadWord(reader);
+                    word = (char)context.stream.Read() + ReadWord(context.stream);
                 else
-                    word = ReadWord(reader);
-            } while (!reader.EndOfStream && word.Length < 1);
+                    word = ReadWord(context.stream);
+            } while (!context.stream.EndOfStream && word.Length < 1);
 
             if ("-+.".Contains(word[0]) || char.IsDigit(word[0])) //maybe handle ,
             {
-                if (reader.Peek() == '.')
-                    word += (char)reader.Read() + ReadWord(reader);
+                if (context.stream.Peek() == '.')
+                    word += (char)context.stream.Read() + ReadWord(context.stream);
 
                 string unit = string.Empty;
 
                 //exponential form
                 if (word.EndsWith("E"))
                 {
-                    if (reader.Peek() == '-')
-                        word += (char)reader.Read();
-                    word += ReadWord(reader);
+                    if (context.stream.Peek() == '-')
+                        word += (char)context.stream.Read();
+                    word += ReadWord(context.stream);
                 }
                 else
                 {
@@ -254,7 +231,7 @@ namespace Takai.Data
                     unit = unit.TrimEnd();
                 }
 
-                if (reader.Peek() == '%')
+                if (context.stream.Peek() == '%')
                     unit = "%";
 
                 if (TInt.TryParse(word, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out var @int))
@@ -302,67 +279,67 @@ namespace Takai.Data
 
             if (RegisteredTypes.TryGetValue(word, out var type))
             {
-                SkipIgnored(reader);
+                SkipIgnored(context.stream);
 
-                peek = reader.Peek();
+                peek = context.stream.Peek();
 
                 if (type.IsEnum)
                 {
-                    peek = reader.Read();
+                    peek = context.stream.Read();
                     if (peek == '[')
                     {
-                        SkipIgnored(reader);
+                        SkipIgnored(context.stream);
 
                         var valuesCount = 0;
                         UInt64 values = 0;
 
-                        while (!reader.EndOfStream && reader.Peek() != ']')
+                        while (!context.stream.EndOfStream && context.stream.Peek() != ']')
                         {
-                            if ((peek = reader.Peek()) == ';')
+                            if ((peek = context.stream.Peek()) == ';')
                             {
-                                reader.Read(); //skip ;
-                                SkipIgnored(reader);
+                                context.stream.Read(); //skip ;
+                                SkipIgnored(context.stream);
 
-                                if (reader.Peek() == ';')
-                                    throw new InvalidDataException(ExceptString("Unexpected ';' in enum (missing value)", reader));
+                                if (context.stream.Peek() == ';')
+                                    throw new InvalidDataException(GetExceptionMessage("Unexpected ';' in enum (missing value)", ref context));
 
                                 continue;
                             }
 
                             if (peek == -1)
-                                throw new EndOfStreamException(ExceptString("Unexpected end of stream while trying to read enum", reader));
+                                throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream while trying to read enum", ref context));
 
-                            var value = ReadWord(reader);
+                            var value = ReadWord(context.stream);
                             values |= Convert.ToUInt64(Enum.Parse(type, value));
                             ++valuesCount;
 
-                            SkipIgnored(reader);
+                            SkipIgnored(context.stream);
                         }
 
-                        if (reader.Read() == -1) //skip ]
-                            throw new EndOfStreamException(ExceptString("Unexpected end of stream. Expected ']' to close enum", reader));
+                        if (context.stream.Read() == -1) //skip ]
+                            throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected ']' to close enum", ref context));
 
                         if (valuesCount == 0)
-                            throw new ArgumentOutOfRangeException(ExceptString("Expected at least one enum value", reader));
+                            throw new ArgumentOutOfRangeException(GetExceptionMessage("Expected at least one enum value", ref context));
 
                         if (valuesCount > 1 && !Attribute.IsDefined(type, typeof(FlagsAttribute), true))
-                            throw new ArgumentOutOfRangeException(ExceptString($"{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", reader));
+                            throw new ArgumentOutOfRangeException(GetExceptionMessage("{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", ref context));
 
                         return Enum.ToObject(type, values);
                     }
                     if (peek == '.')
-                        return Enum.Parse(type, ReadWord(reader));
+                        return Enum.Parse(type, ReadWord(context.stream));
 
-                    if (reader.Read() != '[')
-                        throw new InvalidDataException(ExceptString($"Expected a '[' when reading enum value (EnumType[Key1; Key2]) or '.' (EnumType.Key) while attempting to read '{word}'", reader));
+                    if (context.stream.Read() != '[')
+                        throw new InvalidDataException(GetExceptionMessage("Expected a '[' when reading enum value (EnumType[Key1; Key2]) or '.' (EnumType.Key) while attempting to read '{word}'", ref context));
                 }
 
                 //static/single enum value
                 if (peek == '.')
                 {
-                    reader.Read();
-                    SkipIgnored(reader);
-                    var staticVal = ReadWord(reader);
+                    context.stream.Read();
+                    SkipIgnored(context.stream);
+                    var staticVal = ReadWord(context.stream);
 
                     var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static);
                     if (field != null)
@@ -372,38 +349,38 @@ namespace Takai.Data
                     if (prop != null)
                         return prop.GetValue(null);
 
-                    throw new InvalidDataException(ExceptString($"Expected static value when reading {staticVal} from type '{word}'", reader));
+                    throw new InvalidDataException(GetExceptionMessage("Expected static value when reading {staticVal} from type '{word}'", ref context));
                 }
 
                 //read object
                 if (peek != '{')
-                    throw new InvalidDataException(ExceptString($"Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", reader));
+                    throw new InvalidDataException(GetExceptionMessage("Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", ref context));
 
-                var dict = TextDeserialize(reader) as Dictionary<string, object>;
+                var dict = TextDeserialize(context) as Dictionary<string, object>;
                 if (dict == null)
-                    throw new InvalidDataException(ExceptString($"Expected an object definition when reading type '{word}' (Type {{ }})", reader));
+                    throw new InvalidDataException(GetExceptionMessage("Expected an object definition when reading type '{word}' (Type {{ }})", ref context));
 
                 try
                 {
-                    var obj = ParseDictionary(type, dict);
+                    var obj = ParseDictionary(type, dict, context);
                     return obj;
                 }
                 catch (Exception expt)
                 {
-                    expt.Data.Add("Offset", GetStreamOffset(reader));
+                    expt.Data.Add("Offset", GetStreamOffset(context.stream));
                     throw expt;
                 }
             }
 
-            throw new NotSupportedException(ExceptString($"Unknown identifier: '{word}'", reader));
+            throw new NotSupportedException(GetExceptionMessage("Unknown identifier: '{word}'", ref context));
         }
 
-        public static T ParseDictionary<T>(Dictionary<string, object> dict)
+        public static T ParseDictionary<T>(Dictionary<string, object> dict, DeserializationContext context = default(DeserializationContext))
         {
-            return (T)ParseDictionary(typeof(T), dict);
+            return (T)ParseDictionary(typeof(T), dict, context);
         }
 
-        public static object ParseDictionary(Type destType, Dictionary<string, object> dict)
+        public static object ParseDictionary(Type destType, Dictionary<string, object> dict, DeserializationContext context = default(DeserializationContext))
         {
             var deserial = destType.GetCustomAttribute<CustomDeserializeAttribute>()?.deserialize;
             if (deserial != null)
@@ -441,7 +418,7 @@ namespace Takai.Data
                                 }
                             }
 
-                            var cast = pair.Value == null ? null : Cast(field.FieldType, pair.Value);
+                            var cast = pair.Value == null ? null : Cast(field.FieldType, pair.Value, context);
                             field.SetValue(obj, cast);
                         }
                     }
@@ -469,7 +446,7 @@ namespace Takai.Data
                                 }
                                 else if (prop.CanWrite)
                                 {
-                                    var cast = pair.Value == null ? null : Cast(prop.PropertyType, pair.Value);
+                                    var cast = pair.Value == null ? null : Cast(prop.PropertyType, pair.Value, context);
                                     prop.SetValue(obj, cast);
                                 }
                             }
@@ -541,9 +518,9 @@ namespace Takai.Data
                                                       | BindingFlags.Instance
                                                       | BindingFlags.Public;
 
-        public static T Cast<T>(object Source, bool Strict = true)
+        public static T Cast<T>(object Source, DeserializationContext context = default(DeserializationContext))
         {
-            return (T)Cast(typeof(T), Source, Strict);
+            return (T)Cast(typeof(T), Source, context);
         }
 
         /// <summary>
@@ -554,7 +531,7 @@ namespace Takai.Data
         /// <param name="Source">The source object</param>
         /// <param name="isStrict">Should only cast between equivelent types (If true, casting int to bool would fail)</param>
         /// <returns>The correctly casted object</returns>
-        public static object Cast(Type DestType, object Source, bool isStrict = true)
+        public static object Cast(Type DestType, object Source, DeserializationContext context = default(DeserializationContext))
         {
             if (Source == null)
                 return null;
@@ -565,7 +542,7 @@ namespace Takai.Data
                 return Source;
 
             if (Serializers.TryGetValue(DestType, out var deserial) && deserial.Deserialize != null)
-                return deserial.Deserialize(Source);
+                return deserial.Deserialize(Source, context);
 
             var customDeserial = DestType.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
             if (customDeserial != null)
@@ -577,7 +554,7 @@ namespace Takai.Data
 
             //GetConstructor ?
 
-            if (!isStrict)
+            if (!context.strict)
             {
                 if (Source is string sourceString)
                 {
@@ -607,7 +584,7 @@ namespace Takai.Data
                     throw new InvalidCastException($"Type:{DestType.Name} is an array but '{Source}' is of type:{sourceType.Name}");
 
                 var elType = DestType.GetElementType();
-                list = list.ConvertAll(i => Cast(elType, i, isStrict));
+                list = list.ConvertAll(i => Cast(elType, i, context));
                 var casted = CastMethod.MakeGenericMethod(elType).Invoke(null, new[] { list });
                 return ToArrayMethod.MakeGenericMethod(elType).Invoke(null, new[] { casted });
             }
@@ -627,13 +604,13 @@ namespace Takai.Data
                         throw new InvalidCastException($"Type:{DestType.Name} is a Tuple but '{Source}' is of type:{sourceType.Name}");
 
                     for (int i = 0; i < sourceList.Count; ++i)
-                        sourceList[i] = Cast(genericArgs[i], sourceList[i], isStrict);
+                        sourceList[i] = Cast(genericArgs[i], sourceList[i], context);
                     return Activator.CreateInstance(DestType, sourceList.ToArray());
                 }
 
                 if (genericType == typeof(List<>))
                 {
-                    sourceList = sourceList.ConvertAll(i => Cast(genericArgs[0], i, isStrict));
+                    sourceList = sourceList.ConvertAll(i => Cast(genericArgs[0], i, context));
                     var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
                     return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
                 }
@@ -644,7 +621,7 @@ namespace Takai.Data
                     if (sourceList == null)
                         throw new InvalidCastException($"Type:{DestType.Name} is a {genericType.Name} but '{Source}' is of type:{sourceType.Name}");
 
-                    sourceList = sourceList.ConvertAll(i => Cast(genericArgs[0], i, isStrict));
+                    sourceList = sourceList.ConvertAll(i => Cast(genericArgs[0], i, context));
                     var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
                     return Activator.CreateInstance(DestType, new[] { casted });
                     //return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
@@ -662,7 +639,7 @@ namespace Takai.Data
                     var add = DestType.GetMethod("Add");
 
                     foreach (var pair in srcDict)
-                        add.Invoke(dict, new[] { Cast(genericArgs[0], pair.Key, false), Cast(genericArgs[1], pair.Value, isStrict) });
+                        add.Invoke(dict, new[] { Cast(genericArgs[0], pair.Key, context), Cast(genericArgs[1], pair.Value, context) });
 
                     return dict;
                 }
@@ -673,7 +650,7 @@ namespace Takai.Data
                     var implCast = DestType.GetMethod("op_Implicit", new[] { genericArgs[0] });
                     if (implCast != null)
                     {
-                        var genericCvt = Cast(genericArgs[0], Source, isStrict);
+                        var genericCvt = Cast(genericArgs[0], Source, context);
                         return implCast.Invoke(null, new[] { genericCvt });
                     }
                 }
@@ -694,12 +671,12 @@ namespace Takai.Data
                     {
                         case MemberTypes.Field:
                             var field = (FieldInfo)memberEnumerator.Current;
-                            field.SetValue(obj, Cast(field.FieldType, sourceList[i], isStrict));
+                            field.SetValue(obj, Cast(field.FieldType, sourceList[i], context));
                             break;
                         case MemberTypes.Property:
                             var prop = (PropertyInfo)memberEnumerator.Current;
                             if (prop.CanWrite)
-                                prop.SetValue(obj, Cast(prop.PropertyType, sourceList[i], isStrict));
+                                prop.SetValue(obj, Cast(prop.PropertyType, sourceList[i], context));
                             else
                                 goto default;
                             break;
@@ -712,7 +689,7 @@ namespace Takai.Data
             }
 
             if (sourceType == typeof(Dictionary<string, object>))
-                return ParseDictionary(DestType, (Dictionary<string, object>)Source);
+                return ParseDictionary(DestType, (Dictionary<string, object>)Source, context);
 
             bool canConvert = false;
 

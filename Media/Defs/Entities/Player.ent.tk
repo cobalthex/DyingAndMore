@@ -6,7 +6,7 @@ ActorClass {
     States: {
         Idle: {
             Sprite: {
-                texture: "Entities/Player.png";
+                texture: "Textures/Entities/Player.png";
                 width: 48;
                 height: 48;
                 origin: [24 24];
@@ -17,7 +17,7 @@ ActorClass {
                 Tween: TweenStyle [Overlap];
             };
             Sound: {
-                #Sound: "mech8.ogg";
+                #Sound: "Sounds/mech8.ogg";
             }
         };
     };

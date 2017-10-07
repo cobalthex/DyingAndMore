@@ -6,7 +6,7 @@ ActorClass {
     States: {
         Idle: {
             Sprite: {
-                texture: "Entities/Ebola.png";
+                texture: "Textures/Entities/Ebola.png";
                 width: 54;
                 height: 16;
                 origin: [27 8];

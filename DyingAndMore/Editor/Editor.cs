@@ -41,15 +41,15 @@ namespace DyingAndMore.Editor
 
         public Editor(Takai.Game.MapInstance map)
         {
-            config = Serializer.TextDeserialize<EditorConfiguration>("Config/Editor.conf.tk");
+            config = Cache.Load<EditorConfiguration>("Config/Editor.conf.tk");
 
             Map = map ?? throw new System.ArgumentNullException("There must be a map to edit");
 
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
 
-            var smallFont = Cache.Load<Takai.Graphics.BitmapFont>("UISmall.bfnt");
-            var largeFont = Cache.Load<Takai.Graphics.BitmapFont>("UILarge.bfnt");
+            var smallFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UISmall.bfnt");
+            var largeFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UILarge.bfnt");
 
             AddChild(modes = new ModeSelector(largeFont, smallFont)
             {
