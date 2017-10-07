@@ -115,11 +115,12 @@ namespace DyingAndMore.Editor
         FileSystemWatcher watcher;
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
+            //todo: can use e.Name?
             System.Threading.Thread.Sleep(500);
             var path = e.FullPath.Replace(System.Environment.CurrentDirectory, "");
             try
             {
-                var newClass = Takai.Data.Cache.Load<Takai.Game.EntityClass>(path, true);
+                var newClass = Takai.Data.Cache.Load<Takai.Game.EntityClass>(path, null, true);
                 foreach (var ent in editor.Map.AllEntities)
                 {
                     if (ent.Class.File == newClass.File)
@@ -163,28 +164,6 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
-            if (SelectedEntity != null && InputState.IsPress(Keys.Space))
-            {
-                var modal = Takai.Data.Serializer.TextDeserialize<Static>("Defs/UI/Editor/PropsEditor.ui.tk");
-                var props = GeneratePropSheet(SelectedEntity, DefaultFont, DefaultColor);
-                props.HorizontalAlignment = Alignment.Stretch;
-                var scrollBox = modal.FindChildByName("Props");
-                scrollBox.AddChild(props);
-                modal.FindChildByName("Apply").Click += delegate
-                {
-                    //todo: apply props. move info generation to separate function
-                    var ent = SelectedEntity;
-                    SelectedEntity = null;
-                    SelectedEntity = ent;
-                    modal.RemoveFromParent();
-                };
-                modal.FindChildByName("Cancel").Click += delegate
-                {
-                    modal.RemoveFromParent();
-                };
-                AddChild(modal);
-            }
-
             lastWorldPos = currentWorldPos;
             currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
@@ -202,10 +181,7 @@ namespace DyingAndMore.Editor
                     };
                     if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
-                        Takai.Game.EntityClass ent;
-                        using (var reader = new System.IO.StreamReader(ofd.OpenFile()))
-                            ent = Takai.Data.Serializer.TextDeserialize(reader) as Takai.Game.EntityClass;
-
+                        var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(ofd.FileName);
                         if (ent != null)
                             SelectedEntity = editor.Map.Spawn(ent, currentWorldPos, Vector2.UnitX, Vector2.Zero);
                     }

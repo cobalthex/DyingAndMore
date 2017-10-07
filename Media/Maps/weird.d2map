@@ -1,7 +1,7 @@
 MapClass {
     Name: Null;
     TileSize: 48;
-    TilesImage: "tiles.png";
+    TilesImage: "Textures/tiles.png";
     Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
     Width: 8;
     Height: 8;

@@ -15,7 +15,7 @@ namespace DyingAndMore.Editor.Selectors
             ItemSize = new Point(64);
             Padding = 5;
 
-            var searchPath = Path.Combine(Takai.Data.Cache.DefsFolder, "Entities");
+            var searchPath = Path.Combine(Takai.Data.Cache.DefaultRoot, "Entities");
             foreach (var file in Directory.EnumerateFiles(searchPath, "*", SearchOption.AllDirectories))
             {
                 try

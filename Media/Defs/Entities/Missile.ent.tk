@@ -8,7 +8,7 @@ ProjectileClass {
     States: {
         Idle: {
             Sprite: {
-                Texture: "Projectiles/Powerball.png";
+                Texture: "Textures/Projectiles/Powerball.png";
                 Width: 24;
                 Height: 24;
                 FrameLength: 100msec;

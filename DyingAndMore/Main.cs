@@ -96,9 +96,9 @@ namespace DyingAndMore
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            Takai.UI.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UISmall.bfnt");
+            Takai.UI.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Data/Fonts/UISmall.bfnt");
 
-            debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("rct2.bfnt");
+            debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Data/Fonts/rct2.bfnt");
 
             //testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
 
@@ -148,6 +148,8 @@ namespace DyingAndMore
                 Bounds = new Rectangle(20, 20, 800, 100),
                 HorizontalAlignment = Takai.UI.Alignment.Middle
             };
+
+            Takai.Data.Cache.LoadZip("Defs/Test.zip");
 
             /*
             //var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(

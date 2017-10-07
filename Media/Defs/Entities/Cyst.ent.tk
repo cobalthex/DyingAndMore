@@ -12,7 +12,7 @@ ActorClass {
     States: {
         Idle: {
             Sprite: {
-                texture: "Entities/Spawner.png";
+                texture: "Textures/Entities/Spawner.png";
                 Width: 64;
                 Height: 64;
                 origin: [32 32];
@@ -21,7 +21,7 @@ ActorClass {
         };
         Dead: {
             Sprite: {
-                texture: "Entities/Spawner.png";
+                texture: "Textures/Entities/Spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];
@@ -34,7 +34,7 @@ ActorClass {
         };
         Inactive: {
             Sprite: {
-                texture: "Entities/Spawner.png";
+                texture: "Textures/Entities/Spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];
@@ -47,7 +47,7 @@ ActorClass {
         };
         ChargeWeapon: {
             Sprite: {
-                texture: "Entities/Spawner.png";
+                texture: "Textures/Entities/Spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];

@@ -1,8 +1,8 @@
 Tileset {
-	Texture: "Tiles/Healthy.png";
+	Texture: "Textures/Tiles/Healthy.png";
 	Size: 48;
 	Background: "";
 	BackgroundPlacement: Placement [ Fill ];
 	//preview image
-	//mask file (if not provided, one is generated) 
+	//mask file (if not provided, one is generated)
 }

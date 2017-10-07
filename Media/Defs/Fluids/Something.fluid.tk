@@ -1,7 +1,7 @@
 FluidClass {
     Name: "Something";
-    Texture: "Fluids/Something.png";
-    Reflection: "Fluids/Something.r.png";
+    Texture: "Textures/Fluids/Something.png";
+    Reflection: "Textures/Fluids/Something.r.png";
     Radius: 54;
     Drag: 0.8;
 }

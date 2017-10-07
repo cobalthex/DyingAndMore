@@ -5,7 +5,7 @@ EffectsClass {
         ParticleEffect {
             Class: {
                 Graphic: {
-                    Texture: "Particles/blood.png"
+                    Texture: "Textures/Particles/blood.png"
                     Width: 10;
                     Height: 10;
                     FrameCount: 6;
@@ -30,7 +30,7 @@ EffectsClass {
         ParticleEffect {
             Class: {
                 Graphic: {
-                    Texture: "Particles/trail.png"
+                    Texture: "Textures/Particles/trail.png"
                     width:8;
                     height:8;
                     frameLength:100msec;
@@ -72,7 +72,7 @@ EffectsClass {
         SoundImpulse {
             Permutations: [
                 SoundClass {
-                    sound: "open_fx.ogg";
+                    sound: "Sounds/open_fx.ogg";
                     gain: 0.1;
                 }
             ]
