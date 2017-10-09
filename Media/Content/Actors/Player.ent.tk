@@ -1,0 +1,35 @@
+ActorClass {
+    Name: "Player";
+    MaxHealth: 500;
+    DefaultFaction: Factions [Player];
+
+    States: {
+        Idle: {
+            Sprite: {
+                texture: "Actors/Player.png";
+                width: 48;
+                height: 48;
+                origin: [24 24];
+                ClipRect: [0 0 96 48];
+                FrameCount: 2;
+                FrameLength: 100;
+                IsLooping: True;
+                Tween: TweenStyle [Overlap];
+            };
+            Sound: {
+                #Sound: "mech8.ogg";
+            }
+        };
+    };
+
+    FieldOfView: 2.356194;
+    MaxSpeed: [400 400];
+    MoveForce: 600;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: False;
+
+    DefaultWeapon: @"Weapons/Test.wpn.tk";
+
+    DefaultController: InputController { }
+}

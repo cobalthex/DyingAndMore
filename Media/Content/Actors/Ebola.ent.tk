@@ -1,0 +1,27 @@
+ActorClass {
+    Name: "Ebola";
+    MaxHealth: 500;
+    DefaultFaction: Factions [Enemy];
+
+    States: {
+        Idle: {
+            Sprite: {
+                texture: "Actors/Ebola.png";
+                width: 54;
+                height: 16;
+                origin: [27 8];
+                FrameCount: 4;
+                FrameLength: 100;
+                IsLooping: True;
+                Tween: TweenStyle [Overlap];
+            };
+        };
+    };
+
+    FieldOfView: 1.0;
+    MaxSpeed: [200 300];
+    MoveForce: 300;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: False;
+}

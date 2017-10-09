@@ -24,7 +24,7 @@ namespace Takai.Data
             }
         }
 
-        public static string DefaultRoot = "";
+        public static string DefaultRoot = "Content";
 
         public struct CustomLoad
         {
@@ -97,7 +97,12 @@ namespace Takai.Data
             //if file begins with ./, parse at current folder (should be in deserializer?)
 
             root = root ?? DefaultRoot;
-            var name = Normalize(Path.Combine(root, file));
+
+            string name;
+            if (Path.IsPathRooted(file) || PathStartsWith(file, root))
+                name = file;
+            else
+                name = Normalize(Path.Combine(root, file));
 
             bool exists = objects.TryGetValue(name, out var obj);
             if (!exists)
@@ -149,7 +154,6 @@ namespace Takai.Data
             }
 
             obj.generation = generation;
-
             objects[file] = obj;
 
             return obj.value;
@@ -178,6 +182,11 @@ namespace Takai.Data
         public static string Normalize(string path)
         {
             return path.Replace("\\\\", "/").Replace('\\', '/');
+        }
+
+        public static bool PathStartsWith(string path, string root)
+        {
+            return (path.StartsWith(root) && (path.Length <= root.Length || path[root.Length] == '\\' || path[root.Length] == '/'));
         }
 
         public static string GetExtension(string path)

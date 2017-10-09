@@ -38,6 +38,12 @@ namespace Takai.Data
         void DerivedDeserialize(Dictionary<string, object> props);
     }
 
+    public struct DeserializeOptions
+    {
+        public string file;
+        public string context;
+    }
+
     public static partial class Serializer
     {
         private static readonly MethodInfo CastMethod = typeof(Enumerable).GetMethod("Cast");
@@ -188,10 +194,6 @@ namespace Takai.Data
             {
                 context.stream.Read();
                 var file = ReadString(context.stream);
-
-                if (context.file != null && (file.StartsWith("./") || file.StartsWith(".\\")))
-                    file = Path.Combine(Path.GetDirectoryName(context.file), file.Substring(2));
-
                 return Cache.Load(file, context.root, false);
             }
 

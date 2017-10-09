@@ -96,9 +96,9 @@ namespace DyingAndMore
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            Takai.UI.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Data/Fonts/UISmall.bfnt");
+            Takai.UI.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/UISmall.bfnt");
 
-            debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Data/Fonts/rct2.bfnt");
+            debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/rct2.bfnt");
 
             //testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
 
@@ -125,7 +125,7 @@ namespace DyingAndMore
                 VerticalAlignment = Takai.UI.Alignment.Stretch,
             };
             sbox.AddChild(list);
-            foreach (var file in System.IO.Directory.EnumerateFiles("Maps", "*.d2map"))
+            foreach (var file in System.IO.Directory.EnumerateFiles(System.IO.Path.Combine(Takai.Data.Cache.DefaultRoot, "Maps"), "*.map.tk"))
             {
                 var row = new Takai.UI.Static()
                 {
@@ -134,7 +134,8 @@ namespace DyingAndMore
                 };
                 row.Click += delegate (object _sender, Takai.UI.ClickEventArgs _e)
                 {
-                    var map = Takai.Data.Cache.Load<Takai.Game.MapClass>(((Takai.UI.Static)_sender).Text);
+                    var _file = ((Takai.UI.Static)_sender).Text;
+                    var map = Takai.Data.Cache.Load<Takai.Game.MapClass>(_file);
                     map.InitializeGraphics();
                     ui = new Takai.UI.Static(new Editor.Editor(map.Create()));
                 };
@@ -149,7 +150,7 @@ namespace DyingAndMore
                 HorizontalAlignment = Takai.UI.Alignment.Middle
             };
 
-            Takai.Data.Cache.LoadZip("Defs/Test.zip");
+            //Takai.Data.Cache.LoadZip("Defs/Test.zip");
 
             /*
             //var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(

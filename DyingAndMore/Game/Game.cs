@@ -93,7 +93,7 @@ namespace DyingAndMore.Game
                 Position = new Vector2(20),
                 Size = new Vector2(400, 30),
                 VerticalAlignment = Alignment.End,
-                Font = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("xbox.bfnt"),
+                Font = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/xbox.bfnt"),
             };
             debugConsole.Submit += delegate (object sender, EventArgs e)
             {
@@ -103,7 +103,7 @@ namespace DyingAndMore.Game
                 inp.Text = String.Empty;
             };
 
-            tinyFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UITiny.bfnt");
+            tinyFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/UITiny.bfnt");
 
             testEffect = Takai.Data.Cache.Load<EffectsClass>("Effects/Damage.fx.tk");
 

@@ -1,0 +1,57 @@
+GunClass {
+    MaxAmmo: 100;
+	BurstCount: 3;
+	Delay: [0 0];
+    Projectile: @"Weapons/Projectiles/Missile.ent.tk";
+
+    DischargeEffect: {
+        Effects: [
+            ParticleEffect {
+                Class: {
+                    Graphic: {
+                        Texture: "Effects/trail.png"
+                        width:8;
+                        height:8;
+                        frameLength:100msec;
+                        Center: true;
+                    };
+                    Blend: BlendState.Additive;
+                    ColorOverTime: {
+                        Curve: {
+                            Keys: [
+                                CurveKey {
+                                    Position: 0;
+                                    Value: 0;
+                                }
+                                CurveKey {
+                                    Position: 0.5;
+                                    Value: 0;
+                                }
+                                CurveKey {
+                                    Position: 1;
+                                    Value: 1;
+                                }
+                            ]
+                        }
+                        start: Color.White;
+                        end: [127 0 0 0];
+                    }
+                    AngleOverTime: {start:0 end:6pi};
+                    InitialSpeed: [30 120];
+                    Drag: 1.3;
+                    lifetime: [2sec 3sec];
+                }
+                Count: [10 20];
+                Spread: [-30deg 30deg];
+            }
+            SoundImpulse {
+                Permutations: [
+                    SoundClass {
+                        sound: "open_fx.ogg";
+                        gain: 0.1;
+                    }
+                ]
+            }
+        ]
+    }
+}

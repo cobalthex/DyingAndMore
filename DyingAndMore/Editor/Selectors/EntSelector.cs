@@ -15,12 +15,12 @@ namespace DyingAndMore.Editor.Selectors
             ItemSize = new Point(64);
             Padding = 5;
 
-            var searchPath = Path.Combine(Takai.Data.Cache.DefaultRoot, "Entities");
+            var searchPath = Path.Combine(Takai.Data.Cache.DefaultRoot, "Actors");
             foreach (var file in Directory.EnumerateFiles(searchPath, "*", SearchOption.AllDirectories))
             {
                 try
                 {
-                    var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(Path.Combine("Entities", Path.GetFileName(file)));
+                    var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(file);
                     if (ent is Game.Entities.ActorClass) //+ other classes
                         ents.Add(ent);
                 }
