@@ -1,0 +1,75 @@
+ActorClass {
+    Name: "Cyst";
+    MaxHealth: 1000;
+    DefaultFaction: Factions [Enemy];
+    DefaultController: ArtilleryController {
+        CanRotate: false;
+    };
+    FieldOfView: 45deg;
+
+    #launch force?
+
+    States: {
+        Idle: {
+            Sprite: {
+                texture: "Actors/Spawner.png";
+                Width: 64;
+                Height: 64;
+                origin: [32 32];
+                ClipRect: [0 0 64 64];
+            };
+        };
+        Dead: {
+            Sprite: {
+                texture: "Actors/Spawner.png";
+                width: 64;
+                height: 64;
+                origin: [32 32];
+                ClipRect: [0 192 192 64];
+                FrameCount: 3;
+                FrameLength: 100;
+                Tween: TweenStyle.Overlap;
+                IsLooping: False;
+            };
+        };
+        Inactive: {
+            Sprite: {
+                texture: "Actors/Spawner.png";
+                width: 64;
+                height: 64;
+                origin: [32 32];
+                ClipRect: [0 128 192 64];
+                FrameCount: 3;
+                FrameLength: 100;
+                Tween: TweenStyle.Overlap;
+                IsLooping: False;
+            };
+        };
+        ChargeWeapon: {
+            Sprite: {
+                texture: "Actors/Spawner.png";
+                width: 64;
+                height: 64;
+                origin: [32 32];
+                ClipRect: [0 64 320 64];
+                FrameCount: 5;
+                FrameLength: 100;
+                Tween: TweenStyle.Overlap;
+                IsLooping: False;
+            };
+        };
+        DischargeWeapon: { }
+    };
+
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: False;
+    DestroyOnDeath: False;
+
+    DefaultWeapon: SpawnerClass {
+        Delay: [1sec 3sec];
+        Spawns: [
+            [@"Actors/InfectedCell.ent.tk" [3 5]]
+        ]
+    }
+}

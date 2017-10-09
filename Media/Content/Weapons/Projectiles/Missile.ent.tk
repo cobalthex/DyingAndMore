@@ -1,0 +1,20 @@
+ProjectileClass {
+    Name: "Missile";
+    Power: 800;
+    DestroyIfInactive :True;
+    IgnoreTrace: True;
+
+    Range: 300;
+    States: {
+        Idle: {
+            Sprite: {
+                Texture: "Weapons/Projectiles/Powerball.png";
+                Width: 24;
+                Height: 24;
+                FrameLength: 100msec;
+                FrameCount: 8;
+                Center: true;
+            }
+        }
+    }
+}

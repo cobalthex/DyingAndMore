@@ -1,0 +1,8 @@
+FluidClass {
+    Name: "Blood";
+    Texture: "Fluids/Blood.png";
+    Reflection: "Fluids/Blood.r.png";
+    Radius: 27;
+    Scale: 0.5;
+    Drag: 0.2;
+}

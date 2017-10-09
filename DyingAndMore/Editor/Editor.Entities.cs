@@ -99,7 +99,7 @@ namespace DyingAndMore.Editor
                 Font = Font
             });
 
-            watcher = new FileSystemWatcher("Defs/Entities", "*.ent.tk")
+            watcher = new FileSystemWatcher(Path.Combine(Takai.Data.Cache.DefaultRoot, "Actors"), "*.ent.tk")
             {
                 NotifyFilter = NotifyFilters.LastWrite,
                 EnableRaisingEvents = true,

@@ -1,7 +1,0 @@
-FluidClass {
-    Name: "Bile";
-    Texture: "Textures/Fluids/Bile.png";
-    Reflection: "Textures/Fluids/Bile.r.png";
-    Radius: 54;
-    Drag: 0.7;
-}
