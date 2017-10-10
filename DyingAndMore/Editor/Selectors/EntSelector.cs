@@ -16,7 +16,7 @@ namespace DyingAndMore.Editor.Selectors
             Padding = 5;
 
             var searchPath = Path.Combine(Takai.Data.Cache.DefaultRoot, "Actors");
-            foreach (var file in Directory.EnumerateFiles(searchPath, "*", SearchOption.AllDirectories))
+            foreach (var file in Directory.EnumerateFiles(searchPath, "*.ent.tk", SearchOption.AllDirectories))
             {
                 try
                 {
