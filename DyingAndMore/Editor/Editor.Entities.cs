@@ -115,12 +115,10 @@ namespace DyingAndMore.Editor
         FileSystemWatcher watcher;
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            //todo: can use e.Name?
             System.Threading.Thread.Sleep(500);
-            var path = e.FullPath.Replace(System.Environment.CurrentDirectory, "");
             try
             {
-                var newClass = Takai.Data.Cache.Load<Takai.Game.EntityClass>(path, null, true);
+                var newClass = Takai.Data.Cache.Load<Takai.Game.EntityClass>(e.FullPath, null, true);
                 foreach (var ent in editor.Map.AllEntities)
                 {
                     if (ent.Class.File == newClass.File)

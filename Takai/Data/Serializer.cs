@@ -262,7 +262,13 @@ namespace Takai.Data
                     return null;
 
                 string name;
-                if (mtype.IsGenericType)
+                if (mtype.IsEnum)
+                {
+                    name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
+                    bool isFlags = mtype.GetCustomAttribute(typeof(FlagsAttribute)) != null;
+                    return name + $"{(isFlags ? "[" : "(")}{string.Join(" ", Enum.GetNames(mtype))}{(isFlags ? "]" : ")")}"; //todo
+                }
+                else if (mtype.IsGenericType)
                 {
                     name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
                     name = name.Substring(0, name.IndexOf('`')) + '<';

@@ -46,8 +46,6 @@ namespace Takai.Data
 
         private static Dictionary<string, ZipArchive> openZips = new Dictionary<string, ZipArchive>();
 
-        public static bool DeserializeStrict = true;
-
         static Cache()
         {
             objects = new Dictionary<string, CacheRef>();
@@ -144,7 +142,6 @@ namespace Takai.Data
                         stream = new StreamReader(load.stream),
                         file = file,
                         root = root,
-                        strict = DeserializeStrict,
                     };
                     obj.value = Serializer.TextDeserialize(context);
                     if (obj.value is ISerializeExternally sxt)
