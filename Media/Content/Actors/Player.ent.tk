@@ -6,7 +6,7 @@ ActorClass {
     States: {
         Idle: {
             Sprite: {
-                texture: "Actors/Player.png";
+                texture: @"./Player.png";
                 width: 48;
                 height: 48;
                 origin: [24 24];

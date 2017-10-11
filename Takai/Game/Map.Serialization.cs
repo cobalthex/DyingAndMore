@@ -93,11 +93,12 @@ namespace Takai.Game
 
             Tiles = new short[height, width];
             Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, width * height * sizeof(short));
-
             TilesPerRow = (TilesImage != null ? (TilesImage.Width / TileSize) : 0);
             SectorPixelSize = SectorSize * TileSize;
 
             BuildTileMask(TilesImage, true);
+
+            //build hueristic
         }
     }
 
