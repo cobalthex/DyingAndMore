@@ -54,11 +54,12 @@ namespace Takai.Game
         /// <returns>The sectors (start/end) contained by this region (Clamped in the map bounds)</returns>
         public Rectangle GetOverlappingSectors(Rectangle region)
         {
+            var x = region.X / Class.SectorPixelSize;
+            var y = region.Y / Class.SectorPixelSize;
             var rect = new Rectangle(
-                region.X / Class.SectorPixelSize,
-                region.Y / Class.SectorPixelSize,
-                Util.CeilDiv(region.Width, Class.SectorPixelSize),
-                Util.CeilDiv(region.Height, Class.SectorPixelSize)
+                x, y,
+                Util.CeilDiv(region.Right, Class.SectorPixelSize) - x,
+                Util.CeilDiv(region.Bottom, Class.SectorPixelSize) - y
             );
             return Rectangle.Intersect(rect, new Rectangle(0, 0, Sectors.GetLength(1), Sectors.GetLength(0)));
         }
@@ -89,7 +90,8 @@ namespace Takai.Game
 
             var radiusSq = searchRadius * searchRadius;
 
-            var rect = new Rectangle(position.ToPoint(), new Point((int)(searchRadius * 2)));
+            var ptr = new Point((int)(searchRadius * 2));
+            var rect = new Rectangle(position.ToPoint() - ptr, new Point(ptr.X * 2, ptr.Y * 2));
             var sectors = GetOverlappingSectors(rect);
 
             foreach (var ent in EnumerateEntitiesInSectors(sectors))

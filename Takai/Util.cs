@@ -5,8 +5,20 @@ namespace Takai
 {
     public static class Util
     {
+        /// <summary>
+        /// Resize an array
+        /// </summary>
+        /// <typeparam name="T">The array type</typeparam>
+        /// <param name="original">The original array to copy data from</param>
+        /// <param name="rows">the new number of rows</param>
+        /// <param name="columns">the new number of columns</param>
+        /// <returns>The resized array, or the original array if the size is unchanged</returns>
         public static T[,] Resize<T>(this T[,] original, int rows, int columns)
         {
+            if (original.GetLength(0) == rows &&
+                original.GetLength(1) == columns)
+                return original;
+
             T[,] newArray = new T[rows, columns];
             int minRows = Math.Min(original.GetLength(0), newArray.GetLength(0));
             int minCols = Math.Min(original.GetLength(1), newArray.GetLength(1));

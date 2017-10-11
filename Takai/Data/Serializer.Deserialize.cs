@@ -51,27 +51,30 @@ namespace Takai.Data
 
         public struct DeserializationContext
         {
-            internal StreamReader stream; //public?
+            internal TextReader reader; //public?
 
             public string file;
             public string root;
         }
 
-        public static long GetStreamOffset(StreamReader reader)
+        public static long GetStreamOffset(TextReader reader)
         {
-            int charPos = (int)reader.GetType().InvokeMember("charPos",
+            if (!(reader is StreamReader stream))
+                return 0;
+
+            int charPos = (int)stream.GetType().InvokeMember("charPos",
                             BindingFlags.DeclaredOnly |
                             BindingFlags.Public | BindingFlags.NonPublic |
                             BindingFlags.Instance | BindingFlags.GetField,
-                            null, reader, null);
+                            null, stream, null);
 
-            int charLen = (int)reader.GetType().InvokeMember("charLen",
+            int charLen = (int)stream.GetType().InvokeMember("charLen",
                             BindingFlags.DeclaredOnly |
                             BindingFlags.Public | BindingFlags.NonPublic |
                             BindingFlags.Instance | BindingFlags.GetField,
-                            null, reader, null);
+                            null, stream, null);
 
-            return reader.BaseStream.Position - charLen + charPos;
+            return stream.BaseStream.Position - charLen + charPos;
         }
 
         internal static string GetExceptionMessage(string error, ref DeserializationContext context)
@@ -91,77 +94,77 @@ namespace Takai.Data
         /// <returns>The object created</returns>
         public static object TextDeserialize(DeserializationContext context)
         {
-            SkipIgnored(context.stream);
+            SkipIgnored(context.reader);
 
-            if (context.stream.EndOfStream)
+            if (context.reader.Peek() == -1)
                 return null;
 
-            var peek = context.stream.Peek();
+            var peek = context.reader.Peek();
 
             //read dictionary
             if (peek == '{')
             {
-                context.stream.Read(); //skip {
-                SkipIgnored(context.stream);
+                context.reader.Read(); //skip {
+                SkipIgnored(context.reader);
 
                 var dict = new Dictionary<string, object>(CaseSensitiveMembers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
 
-                while ((peek = context.stream.Peek()) != -1 && peek != '}')
+                while ((peek = context.reader.Peek()) != -1 && peek != '}')
                 {
                     var key = new StringBuilder();
-                    while ((peek = context.stream.Peek()) != ':')
+                    while ((peek = context.reader.Peek()) != ':')
                     {
                         if (peek == -1)
                             throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected '}' to close object", ref context));
 
                         if (peek == ';' && key.Length == 0)
                         {
-                            context.stream.Read();
+                            context.reader.Read();
                             break;
                         }
 
-                        key.Append((char)context.stream.Read());
+                        key.Append((char)context.reader.Read());
                     }
 
-                    if (context.stream.Read() == -1)
+                    if (context.reader.Read() == -1)
                         throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream while trying to read object", ref context));
 
                     var value = TextDeserialize(context);
                     dict[String.Intern(key.ToString().TrimEnd())] = value; //todo: analyze interning
 
-                    SkipIgnored(context.stream);
+                    SkipIgnored(context.reader);
 
-                    if ((peek = context.stream.Peek()) == -1)
+                    if ((peek = context.reader.Peek()) == -1)
                         throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected '}' to close object", ref context));
 
                     if (peek == ';')
                     {
-                        context.stream.Read(); //skip ;
-                        SkipIgnored(context.stream);
+                        context.reader.Read(); //skip ;
+                        SkipIgnored(context.reader);
                     }
                     //else if (peek != '}')
                     //    throw new InvalidDataException(GetExceptionMessage("Unexpected token. Expected ';' or '}' while trying to read object", context));
                 }
 
-                context.stream.Read();
+                context.reader.Read();
                 return dict;
             }
 
             //read list
             if (peek == '[')
             {
-                context.stream.Read(); //skip [
-                SkipIgnored(context.stream);
+                context.reader.Read(); //skip [
+                SkipIgnored(context.reader);
 
                 var values = new List<object>();
-                while (!context.stream.EndOfStream && context.stream.Peek() != ']')
+                while (context.reader.Peek() > 0 && context.reader.Peek() != ']')
                 {
-                    if ((peek = context.stream.Peek()) == ';')
+                    if ((peek = context.reader.Peek()) == ';')
                     {
-                        context.stream.Read(); //skip ;
-                        SkipIgnored(context.stream);
+                        context.reader.Read(); //skip ;
+                        SkipIgnored(context.reader);
 
-                        if (context.stream.Peek() == ';')
+                        if (context.reader.Peek() == ';')
                             throw new InvalidDataException(GetExceptionMessage("Unexpected ';' in list (missing value)", ref context));
 
                         continue;
@@ -171,10 +174,10 @@ namespace Takai.Data
                         throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream while trying to read list", ref context));
 
                     values.Add(TextDeserialize(context));
-                    SkipIgnored(context.stream);
+                    SkipIgnored(context.reader);
                 }
 
-                if (context.stream.Read() == -1) //skip ]
+                if (context.reader.Read() == -1) //skip ]
                     throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected ']' to close list", ref context));
 
                 return values;
@@ -182,8 +185,8 @@ namespace Takai.Data
 
             if (peek == '@')
             {
-                context.stream.Read();
-                var file = ReadString(context.stream);
+                context.reader.Read();
+                var file = ReadString(context.reader);
 
                 if (context.file != null && (file.StartsWith("./") || file.StartsWith(".\\")))
                     file = Path.Combine(Path.GetDirectoryName(context.file), file.Substring(2));
@@ -192,30 +195,30 @@ namespace Takai.Data
             }
 
             if (peek == '"' || peek == '\'')
-                return ReadString(context.stream);
+                return ReadString(context.reader);
 
             string word;
             do
             {
                 if (peek == '-' || peek == '+' || peek == '.')
-                    word = (char)context.stream.Read() + ReadWord(context.stream);
+                    word = (char)context.reader.Read() + ReadWord(context.reader);
                 else
-                    word = ReadWord(context.stream);
-            } while (!context.stream.EndOfStream && word.Length < 1);
+                    word = ReadWord(context.reader);
+            } while (context.reader.Peek() > 0 && word.Length < 1);
 
             if ("-+.".Contains(word[0]) || char.IsDigit(word[0])) //maybe handle ,
             {
-                if (context.stream.Peek() == '.')
-                    word += (char)context.stream.Read() + ReadWord(context.stream);
+                if (context.reader.Peek() == '.')
+                    word += (char)context.reader.Read() + ReadWord(context.reader);
 
                 string unit = string.Empty;
 
                 //exponential form
                 if (word.EndsWith("E"))
                 {
-                    if (context.stream.Peek() == '-')
-                        word += (char)context.stream.Read();
-                    word += ReadWord(context.stream);
+                    if (context.reader.Peek() == '-')
+                        word += (char)context.reader.Read();
+                    word += ReadWord(context.reader);
                 }
                 else
                 {
@@ -231,7 +234,7 @@ namespace Takai.Data
                     unit = unit.TrimEnd();
                 }
 
-                if (context.stream.Peek() == '%')
+                if (context.reader.Peek() == '%')
                     unit = "%";
 
                 if (TInt.TryParse(word, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out var @int))
@@ -279,28 +282,28 @@ namespace Takai.Data
 
             if (RegisteredTypes.TryGetValue(word, out var type))
             {
-                SkipIgnored(context.stream);
+                SkipIgnored(context.reader);
 
-                peek = context.stream.Peek();
+                peek = context.reader.Peek();
 
                 if (type.IsEnum)
                 {
-                    peek = context.stream.Read();
+                    peek = context.reader.Read();
                     if (peek == '[')
                     {
-                        SkipIgnored(context.stream);
+                        SkipIgnored(context.reader);
 
                         var valuesCount = 0;
                         UInt64 values = 0;
 
-                        while (!context.stream.EndOfStream && context.stream.Peek() != ']')
+                        while (context.reader.Peek() > 0 && context.reader.Peek() != ']')
                         {
-                            if ((peek = context.stream.Peek()) == ';')
+                            if ((peek = context.reader.Peek()) == ';')
                             {
-                                context.stream.Read(); //skip ;
-                                SkipIgnored(context.stream);
+                                context.reader.Read(); //skip ;
+                                SkipIgnored(context.reader);
 
-                                if (context.stream.Peek() == ';')
+                                if (context.reader.Peek() == ';')
                                     throw new InvalidDataException(GetExceptionMessage("Unexpected ';' in enum (missing value)", ref context));
 
                                 continue;
@@ -309,14 +312,14 @@ namespace Takai.Data
                             if (peek == -1)
                                 throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream while trying to read enum", ref context));
 
-                            var value = ReadWord(context.stream);
+                            var value = ReadWord(context.reader);
                             values |= Convert.ToUInt64(Enum.Parse(type, value));
                             ++valuesCount;
 
-                            SkipIgnored(context.stream);
+                            SkipIgnored(context.reader);
                         }
 
-                        if (context.stream.Read() == -1) //skip ]
+                        if (context.reader.Read() == -1) //skip ]
                             throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected ']' to close enum", ref context));
 
                         if (valuesCount == 0)
@@ -328,18 +331,18 @@ namespace Takai.Data
                         return Enum.ToObject(type, values);
                     }
                     if (peek == '.')
-                        return Enum.Parse(type, ReadWord(context.stream));
+                        return Enum.Parse(type, ReadWord(context.reader));
 
-                    if (context.stream.Read() != '[')
+                    if (context.reader.Read() != '[')
                         throw new InvalidDataException(GetExceptionMessage("Expected a '[' when reading enum value (EnumType[Key1; Key2]) or '.' (EnumType.Key) while attempting to read '{word}'", ref context));
                 }
 
                 //static/single enum value
                 if (peek == '.')
                 {
-                    context.stream.Read();
-                    SkipIgnored(context.stream);
-                    var staticVal = ReadWord(context.stream);
+                    context.reader.Read();
+                    SkipIgnored(context.reader);
+                    var staticVal = ReadWord(context.reader);
 
                     var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static);
                     if (field != null)
@@ -367,7 +370,7 @@ namespace Takai.Data
                 }
                 catch (Exception expt)
                 {
-                    expt.Data.Add("Offset", GetStreamOffset(context.stream));
+                    expt.Data.Add("Offset", GetStreamOffset(context.reader));
                     throw expt;
                 }
             }
@@ -708,9 +711,9 @@ namespace Takai.Data
             throw new InvalidCastException($"Error converting '{Source}' from type:{sourceType.Name} to type:{DestType.Name}");
         }
 
-        public static char FromLiteral(char EscapeChar)
+        public static char FromLiteral(char escape)
         {
-            switch (EscapeChar)
+            switch (escape)
             {
                 case '0': return '\0';
                 case 'a': return '\a';
@@ -721,54 +724,54 @@ namespace Takai.Data
                 case 't': return '\t';
                 case 'v': return '\v';
                 default:
-                    return EscapeChar;
+                    return escape;
             }
         }
 
         /// <summary>
         /// Read a string enclosed in quotes
         /// </summary>
-        /// <param name="Stream">The stream to read from</param>
+        /// <param name="reader">The stream to read from</param>
         /// <returns>The string (without quotes)</returns>
-        public static string ReadString(StreamReader Stream)
+        public static string ReadString(TextReader reader)
         {
             var builder = new StringBuilder();
-            var end = Stream.Read();
-            while (!Stream.EndOfStream && Stream.Peek() != end)
+            var end = reader.Read();
+            while (reader.Peek() > 0 && reader.Peek() != end)
             {
-                var ch = Stream.Read();
-                if (ch == '\\' && !Stream.EndOfStream)
-                    builder.Append(FromLiteral((char)Stream.Read()));
+                var ch = reader.Read();
+                if (ch == '\\' && reader.Peek() > 0)
+                    builder.Append(FromLiteral((char)reader.Read()));
                 else
                     builder.Append((char)ch);
             }
-            Stream.Read();
+            reader.Read();
             return string.Intern(builder.ToString());
         }
 
-        public static string ReadWord(StreamReader Stream)
+        public static string ReadWord(TextReader reader)
         {
             var builder = new StringBuilder();
             char pk;
-            while (!Stream.EndOfStream &&
-                   !Char.IsSeparator(pk = (char)Stream.Peek()) &&
+            while (reader.Peek() > 0 &&
+                   !Char.IsSeparator(pk = (char)reader.Peek()) &&
                    !Char.IsPunctuation(pk))
-                builder.Append((char)Stream.Read());
+                builder.Append((char)reader.Read());
             return builder.ToString();
         }
 
         /// <summary>
         /// Assumes immediately at a comment (Post SkipWhitespace)
         /// </summary>
-        /// <param name="Stream"></param>
-        public static void SkipComments(StreamReader Stream)
+        /// <param name="reader"></param>
+        public static void SkipComments(TextReader reader)
         {
-            var ch = Stream.Peek();
+            var ch = reader.Peek();
             if (ch == -1 || ch != '#')
                 return;
 
-            Stream.Read(); //skip #
-            ch = Stream.Read();
+            reader.Read(); //skip #
+            ch = reader.Read();
 
             if (ch == -1)
                 return;
@@ -777,30 +780,30 @@ namespace Takai.Data
             if (ch == '*')
             {
                 //read until *#
-                while ((ch = Stream.Read()) != -1 && ch != '*' &&
-                       (ch = Stream.Read()) != -1 && ch != '#') ;
+                while ((ch = reader.Read()) != -1 && ch != '*' &&
+                       (ch = reader.Read()) != -1 && ch != '#') ;
             }
             else
-                while ((ch = Stream.Read()) != -1 && ch != '\n') ;
+                while ((ch = reader.Read()) != -1 && ch != '\n') ;
         }
 
-        public static void SkipWhitespace(StreamReader Stream)
+        public static void SkipWhitespace(TextReader reader)
         {
             int ch;
-            while ((ch = Stream.Peek()) != -1 && Char.IsWhiteSpace((char)ch))
-                Stream.Read();
+            while ((ch = reader.Peek()) != -1 && Char.IsWhiteSpace((char)ch))
+                reader.Read();
         }
 
         /// <summary>
         /// Skip comments and whitespace
         /// </summary>
-        public static void SkipIgnored(StreamReader Stream)
+        public static void SkipIgnored(TextReader reader)
         {
-            SkipWhitespace(Stream);
-            while (!Stream.EndOfStream && Stream.Peek() == '#')
+            SkipWhitespace(reader);
+            while (reader.Peek() > 0 && reader.Peek() == '#')
             {
-                SkipComments(Stream);
-                SkipWhitespace(Stream);
+                SkipComments(reader);
+                SkipWhitespace(reader);
             }
         }
     }

@@ -44,7 +44,7 @@ namespace Takai.Data
         private static Dictionary<string, CacheRef> objects;
         private static uint generation = 0;
 
-        private static Dictionary<string, ZipArchive> openZips = new Dictionary<string, ZipArchive>();
+        private static Dictionary<string, ZipArchive> openZips = new Dictionary<string, ZipArchive>(); //todo: load files into case-insensitive dictionary
 
         static Cache()
         {
@@ -139,7 +139,7 @@ namespace Takai.Data
                 {
                     var context = new Serializer.DeserializationContext
                     {
-                        stream = new StreamReader(load.stream),
+                        reader = new StreamReader(load.stream),
                         file = file,
                         root = root,
                     };

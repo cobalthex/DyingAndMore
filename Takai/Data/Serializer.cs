@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
@@ -245,6 +246,38 @@ namespace Takai.Data
             RegisteredTypes[WriteFullTypeNames ? type.FullName : type.Name] = type;
         }
 
+        static string DescribeMemberType(Type mtype)
+        {
+            if (mtype == null)
+                return null;
+
+            string name;
+            if (mtype.IsEnum)
+            {
+                name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
+                bool isFlags = mtype.GetCustomAttribute(typeof(FlagsAttribute)) != null;
+                return name + $"{(isFlags ? "[" : "(")}{string.Join(" ", Enum.GetNames(mtype))}{(isFlags ? "]" : ")")}"; //todo
+            }
+            else if (mtype.IsGenericType)
+            {
+                name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
+                name = name.Substring(0, name.IndexOf('`')) + '<';
+                for (int i = 0; i < mtype.GenericTypeArguments.Length; ++i)
+                {
+                    if (i > 0)
+                        name += ',';
+                    name += DescribeMemberType(mtype.GenericTypeArguments[i]);
+                }
+                return name + ">";
+            }
+            else
+                name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
+
+            //pass in member info and check attributes
+
+            return name;
+        }
+
         public static Dictionary<string, object> DescribeType(Type type)
         {
             var dict = new Dictionary<string, object>();
@@ -256,38 +289,6 @@ namespace Takai.Data
                 return dict;
             }
 
-            string SerializeMemberType(Type mtype)
-            {
-                if (mtype == null)
-                    return null;
-
-                string name;
-                if (mtype.IsEnum)
-                {
-                    name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
-                    bool isFlags = mtype.GetCustomAttribute(typeof(FlagsAttribute)) != null;
-                    return name + $"{(isFlags ? "[" : "(")}{string.Join(" ", Enum.GetNames(mtype))}{(isFlags ? "]" : ")")}"; //todo
-                }
-                else if (mtype.IsGenericType)
-                {
-                    name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
-                    name = name.Substring(0, name.IndexOf('`')) + '<';
-                    for (int i = 0; i < mtype.GenericTypeArguments.Length; ++i)
-                    {
-                        if (i > 0)
-                            name += ',';
-                        name += SerializeMemberType(mtype.GenericTypeArguments[i]);
-                    }
-                    return name + ">";
-                }
-                else
-                    name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
-
-                //pass in member info and check attributes
-
-                return name;
-            }
-
             foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
             {
                 if (Attribute.IsDefined(member, typeof(IgnoredAttribute)))
@@ -296,11 +297,11 @@ namespace Takai.Data
                 switch (member.MemberType)
                 {
                     case MemberTypes.Field:
-                        dict[member.Name] = SerializeMemberType(((FieldInfo)member).FieldType);
+                        dict[member.Name] = DescribeMemberType(((FieldInfo)member).FieldType);
                         break;
                     case MemberTypes.Property:
                         if (((PropertyInfo)member).CanWrite)
-                            dict[member.Name] = SerializeMemberType(((PropertyInfo)member).PropertyType);
+                            dict[member.Name] = DescribeMemberType(((PropertyInfo)member).PropertyType);
                         break;
                     default:
                         break;
@@ -310,6 +311,14 @@ namespace Takai.Data
             //todo: handle derived +,custom *
 
             return dict;
+        }
+
+        static Dictionary<string, object> DescribeDictionary(Dictionary<string, object> dict)
+        {
+            var dest = new Dictionary<string, object>(dict.Count);
+            foreach (var p in dict)
+                dest[p.Key] = DescribeMemberType(p.Value.GetType());
+            return dest;
         }
     }
 }

@@ -64,7 +64,7 @@ namespace Takai.Data
         /// <param name="writer">The stream to write to</param>
         /// <param name="serializing">The object to serialize</param>
         /// <remarks>Some data types (Takai/Xna) are custom serialized</remarks>
-        public static void TextSerialize(StreamWriter writer, object serializing, int indentLevel = 0, bool serializeExternals = false)
+        public static void TextSerialize(TextWriter writer, object serializing, int indentLevel = 0, bool serializeExternals = false)
         {
             if (serializing == null)
             {
@@ -218,7 +218,7 @@ namespace Takai.Data
             }
         }
 
-        private static void SerializeMember(StreamWriter writer, object parent, MemberInfo member, object value, int indentLevel, bool serializeExternals)
+        private static void SerializeMember(TextWriter writer, object parent, MemberInfo member, object value, int indentLevel, bool serializeExternals)
         {
             if (member.GetCustomAttribute<IgnoredAttribute>(true) != null)
                 return;
@@ -245,7 +245,7 @@ namespace Takai.Data
             writer.WriteLine(";");
         }
 
-        private static void SerializeLinear(StreamWriter writer, object serializing, bool serializeExternals)
+        private static void SerializeLinear(TextWriter writer, object serializing, bool serializeExternals)
         {
             writer.Write('[');
             var ty = serializing.GetType();
@@ -271,16 +271,16 @@ namespace Takai.Data
             writer.Write(']');
         }
 
-        private static void Indent(StreamWriter Stream, int IndentLevel)
+        private static void Indent(TextWriter writer, int indent)
         {
-            Stream.Write(new string(' ', IndentLevel * 4));
+            writer.Write(new string(' ', indent * 4));
         }
 
-        private static string ToLiteral(this string Input)
+        private static string ToLiteral(this string input)
         {
-            var literal = new StringBuilder(Input.Length + 2);
+            var literal = new StringBuilder(input.Length + 2);
             literal.Append("\"");
-            foreach (var c in Input)
+            foreach (var c in input)
             {
                 switch (c)
                 {

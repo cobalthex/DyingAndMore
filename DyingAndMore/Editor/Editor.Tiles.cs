@@ -230,7 +230,6 @@ namespace DyingAndMore.Editor
 
             var queue = new System.Collections.Generic.Queue<Point>();
             queue.Enqueue(initial);
-
             while (queue.Count > 0)
             {
                 var first = queue.Dequeue();
