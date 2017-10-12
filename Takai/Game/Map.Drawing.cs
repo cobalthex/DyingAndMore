@@ -105,29 +105,30 @@ namespace Takai.Game
         /// </summary>
         public class RenderSettings
         {
-            public bool DrawTiles;
-            public bool DrawEntities;
-            public bool DrawFluids;
-            public bool DrawReflections;
-            public bool DrawFluidReflectionMask;
-            public bool DrawDecals;
-            public bool DrawParticles;
-            public bool DrawTriggers;
-            public bool DrawLines;
-            public bool DrawGrids;
-            public bool DrawSectorsOnGrid;
-            public bool DrawBordersAroundNonDrawingEntities;
-            public bool DrawEntBoundingBoxes;
+            public bool drawTiles;
+            public bool drawEntities;
+            public bool drawFluids;
+            public bool drawReflections;
+            public bool drawFluidReflectionMask;
+            public bool drawDecals;
+            public bool drawParticles;
+            public bool drawTriggers;
+            public bool drawLines;
+            public bool drawGrids;
+            public bool drawSectorsOnGrid;
+            public bool drawBordersAroundNonDrawingEntities;
+            public bool drawEntBoundingBoxes;
+            public bool drawPathHeuristic;
 
             public static readonly RenderSettings Default = new RenderSettings
             {
-                DrawTiles = true,
-                DrawEntities = true,
-                DrawFluids = true,
-                DrawReflections = true,
-                DrawDecals = true,
-                DrawParticles = true,
-                DrawLines = true,
+                drawTiles = true,
+                drawEntities = true,
+                drawFluids = true,
+                drawReflections = true,
+                drawDecals = true,
+                drawParticles = true,
+                drawLines = true,
             };
         }
 
@@ -240,7 +241,7 @@ namespace Takai.Game
             Runtime.GraphicsDevice.SetRenderTarget(Class.reflectedRenderTarget);
             Runtime.GraphicsDevice.Clear(Color.TransparentBlack);
 
-            if (renderSettings.DrawEntities)
+            if (renderSettings.drawEntities)
             {
                 Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, null, cameraTransform);
 
@@ -265,7 +266,7 @@ namespace Takai.Game
                         }
                         ++profilingInfo.visibleEnts;
                     }
-                    else if (renderSettings.DrawBordersAroundNonDrawingEntities)
+                    else if (renderSettings.drawBordersAroundNonDrawingEntities)
                     {
                         Matrix transform = new Matrix(ent.Forward.X, ent.Forward.Y, 0, 0,
                                                      -ent.Forward.Y, ent.Forward.X, 0, 0,
@@ -288,7 +289,7 @@ namespace Takai.Game
                         DrawLine(bl, tr, color);
                     }
 
-                    if (renderSettings.DrawEntBoundingBoxes)
+                    if (renderSettings.drawEntBoundingBoxes)
                     {
                         var rect = ent.AxisAlignedBounds;
                         var color = Color.LightBlue;
@@ -329,7 +330,7 @@ namespace Takai.Game
                 Class.spriteBatch.End();
             }
 
-            if (renderSettings.DrawParticles)
+            if (renderSettings.drawParticles)
             {
                 foreach (var p in Particles)
                 {
@@ -358,8 +359,8 @@ namespace Takai.Game
             Runtime.GraphicsDevice.SetRenderTargets(Class.fluidsRenderTarget, Class.reflectionRenderTarget);
             Runtime.GraphicsDevice.Clear(Color.TransparentBlack);
 
-            if (renderSettings.DrawFluids ||
-                renderSettings.DrawFluidReflectionMask)
+            if (renderSettings.drawFluids ||
+                renderSettings.drawFluidReflectionMask)
             {
                 Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, Class.reflectionEffect, cameraTransform);
 
@@ -394,7 +395,30 @@ namespace Takai.Game
             //main render
             Runtime.GraphicsDevice.SetRenderTargets(Class.preRenderTarget);
 
-            if (renderSettings.DrawTiles)
+
+            if (renderSettings.drawPathHeuristic)
+            {
+                Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilWrite, null, null, cameraTransform);
+
+                for (var y = visibleTiles.Top; y < visibleTiles.Bottom; ++y)
+                {
+                    for (var x = visibleTiles.Left; x < visibleTiles.Right; ++x)
+                    {
+                        var path = Class.PathInfo[y, x];
+                        if (path.heuristic == uint.MaxValue)
+                            continue;
+
+                        Graphics.Primitives2D.DrawFill(
+                            Class.spriteBatch,
+                            Util.ColorFromHSL(path.heuristic * 10, 1, 0.8f, 1),
+                            new Rectangle(x * Class.TileSize, y * Class.TileSize, Class.TileSize, Class.TileSize)
+                        );
+                    }
+                }
+
+                Class.spriteBatch.End();
+            }
+            else if (renderSettings.drawTiles)
             {
                 var projection = Matrix.CreateOrthographicOffCenter(camera.Viewport, 0, 1);
                 Class.mapAlphaTest.Projection = projection;
@@ -422,7 +446,7 @@ namespace Takai.Game
                 Class.spriteBatch.End();
             }
 
-            if (renderSettings.DrawDecals)
+            if (renderSettings.drawDecals)
             {
                 Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, null, cameraTransform);
 
@@ -453,20 +477,20 @@ namespace Takai.Game
 
             #region Present fluids + reflections
 
-            if (renderSettings.DrawFluidReflectionMask)
+            if (renderSettings.drawFluidReflectionMask)
             {
                 Class.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
                 Class.spriteBatch.Draw(Class.reflectionRenderTarget, Vector2.Zero, Color.White);
                 Class.spriteBatch.End();
             }
 
-            if (renderSettings.DrawFluids)
+            if (renderSettings.drawFluids)
             {
                 //todo: transform correctly
 
                 Class.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, Class.stencilRead, null, Class.fluidEffect);
                 Class.fluidEffect.Parameters["Mask"].SetValue(Class.reflectionRenderTarget);
-                Class.fluidEffect.Parameters["Reflection"].SetValue(renderSettings.DrawReflections ? Class.reflectedRenderTarget : null);
+                Class.fluidEffect.Parameters["Reflection"].SetValue(renderSettings.drawReflections ? Class.reflectedRenderTarget : null);
                 Class.spriteBatch.Draw(Class.fluidsRenderTarget, Vector2.Zero, Color.White);
                 Class.spriteBatch.End();
             }
@@ -481,7 +505,7 @@ namespace Takai.Game
 
             #endregion
 
-            if (renderSettings.DrawTriggers)
+            if (renderSettings.drawTriggers)
             {
                 _drawTriggers.Clear();
                 for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
@@ -496,7 +520,7 @@ namespace Takai.Game
                 Class.spriteBatch.End();
             }
 
-            if (renderSettings.DrawLines)
+            if (renderSettings.drawLines)
             {
                 if (renderedCircles.Count > 0)
                 {
@@ -544,7 +568,7 @@ namespace Takai.Game
                 }
             }
 
-            if (renderSettings.DrawGrids)
+            if (renderSettings.drawGrids)
             {
                 Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
                 Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
@@ -554,7 +578,7 @@ namespace Takai.Game
 
                 var grids = new VertexPositionColor[visibleTiles.Width * 2 + visibleTiles.Height * 2 + 4];
                 var gridColor = new Color(Color.Gray, 0.3f);
-                var sectorColor = renderSettings.DrawSectorsOnGrid ? new Color(Color.MediumAquamarine, 0.65f) : gridColor;
+                var sectorColor = renderSettings.drawSectorsOnGrid ? new Color(Color.MediumAquamarine, 0.65f) : gridColor;
                 var cameraOffset = -new Vector2(visibleRegion.X % Class.TileSize, visibleRegion.Y % Class.TileSize);
                 for (int i = 0; i <= visibleTiles.Width; ++i)
                 {

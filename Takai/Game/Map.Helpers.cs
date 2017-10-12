@@ -9,6 +9,7 @@ namespace Takai.Game
         internal void Resize(int newWidth, int newHeight)
         {
             Tiles = Tiles.Resize(newHeight, newWidth);
+            BuildHeuristic(new Point(3)); //todo: correct start
         }
     }
 
