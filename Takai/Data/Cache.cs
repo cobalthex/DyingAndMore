@@ -16,6 +16,7 @@ namespace Takai.Data
         {
             public object value;
             internal uint generation; //set to uint.MaxValue to make permanent
+            //generation can be ushort
 
             public CacheRef(object value)
             {
@@ -228,12 +229,16 @@ namespace Takai.Data
 
         internal static object LoadTexture(CustomLoad load)
         {
-            return Texture2D.FromStream(Runtime.GraphicsDevice, load.stream);
+            var loaded = Texture2D.FromStream(Runtime.GraphicsDevice, load.stream);
+            loaded.Name = load.file;
+            return loaded;
         }
 
         internal static object LoadBitmapFont(CustomLoad load)
         {
-            return Graphics.BitmapFont.FromStream(Runtime.GraphicsDevice, load.stream);
+            var loaded = Graphics.BitmapFont.FromStream(Runtime.GraphicsDevice, load.stream);
+            //loaded.Name = load.file; //todo
+            return loaded;
         }
 
         internal static object LoadOgg(CustomLoad load)
@@ -264,13 +269,18 @@ namespace Takai.Data
                     samples[i * 2 + 1] = (byte)((n >> 8) & 0xff);
                 }
 
-                return new SoundEffect(samples, vorbis.SampleRate, (AudioChannels)vorbis.Channels);
+                return new SoundEffect(samples, vorbis.SampleRate, (AudioChannels)vorbis.Channels)
+                {
+                    Name = load.file
+                };
             }
         }
 
         internal static object LoadSound(CustomLoad load)
         {
-            return SoundEffect.FromStream(load.stream);
+            var loaded = SoundEffect.FromStream(load.stream);
+            loaded.Name = load.file;
+            return loaded;
         }
 
         internal static object LoadEffect(CustomLoad load)
@@ -279,7 +289,10 @@ namespace Takai.Data
             load.stream.Read(bytes, 0, bytes.Length);
 
             //load = TransformPath(file, DataFolder, "Shaders", "DX11");
-            return new Effect(Runtime.GraphicsDevice, bytes);
+            return new Effect(Runtime.GraphicsDevice, bytes)
+            {
+                Name = load.file
+            };
         }
 
         #endregion

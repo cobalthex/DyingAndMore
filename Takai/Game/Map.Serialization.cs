@@ -98,7 +98,7 @@ namespace Takai.Game
 
             BuildTileMask(TilesImage, true);
 
-            //build hueristic
+            BuildHeuristic(new Point(3)); //todo: proper heuristic
         }
     }
 
