@@ -557,25 +557,18 @@ namespace Takai.Data
 
             //GetConstructor ?
 
-            //if (!context.strict)
-            //{
-            //    if (Source is string sourceString)
-            //    {
-            //        //chars can be represented as numbers (or as strings if object key)
-            //        if (DestType == typeof(char))
-            //        {
-            //            if (TInt.TryParse(sourceString, out var @int))
-            //                return (char)@int;
-            //        }
+            if (Source is string sourceString)
+            {
+                //chars can be represented as numbers (or as strings if object key)
+                if (DestType == typeof(char))
+                {
+                    if (TInt.TryParse(sourceString, out var @int))
+                        return (char)@int;
+                }
 
-            //        if (DestType.IsEnum)
-            //            return Enum.Parse(DestType, sourceString);
-            //    }
-
-
-            //    try { return Convert.ChangeType(Source, DestType); }
-            //    catch { }
-            //}
+                if (DestType.IsEnum)
+                    return Enum.Parse(DestType, sourceString);
+            }
 
             if (Source == null && DestType.IsPrimitive)
                 throw new InvalidCastException($"Type:{DestType} is primative and cannot be null");

@@ -55,13 +55,6 @@ namespace Takai.Data
         [System.Runtime.InteropServices.ComVisible(true)]
         public class ReadOnlyAttribute : Attribute { }
 
-        /// <summary>
-        /// This value is serialized externally if it's member "File" isn't null
-        /// </summary>
-        [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true)]
-        [System.Runtime.InteropServices.ComVisible(true)]
-        public class ExternalAttribute : Attribute { }
-
         public const bool WriteFullTypeNames = false;
         public const bool CaseSensitiveMembers = false;
 

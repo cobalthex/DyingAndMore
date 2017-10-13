@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Linq;
 
 namespace DyingAndMore.Editor.Selectors
 {
@@ -29,6 +30,12 @@ namespace DyingAndMore.Editor.Selectors
                     System.Diagnostics.Debug.WriteLine($"Could not load Entity definitions from {file}:\n  {e}");
                 }
             }
+
+            //foreach (var obj in Takai.Data.Cache.LoadZip("Content/Actors.zip"))
+            //{
+            //    if (obj is Takai.Game.EntityClass ent)
+            //        ents.Add(ent);
+            //}
 
             ItemCount = ents.Count;
         }

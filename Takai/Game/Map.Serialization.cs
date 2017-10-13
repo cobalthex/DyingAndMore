@@ -159,25 +159,25 @@ namespace Takai.Game
         {
             if (props.TryGetValue("Entities", out var ents))
             {
-                foreach (var ent in (List<EntityInstance>)ents)
+                foreach (var ent in Data.Serializer.Cast<List<EntityInstance>>(ents))
                     Spawn(ent);
             }
 
             if (props.TryGetValue("Fluids", out var fluids))
             {
-                foreach (var fluid in (List<FluidInstance>)fluids)
+                foreach (var fluid in Data.Serializer.Cast<List<FluidInstance>>(fluids))
                     Spawn(fluid);
             }
 
             if (props.TryGetValue("Decals", out var decals))
             {
-                foreach (var decal in (List<Decal>)decals)
+                foreach (var decal in Data.Serializer.Cast<List<Decal>>(decals))
                     AddDecal(decal);
             }
 
             if (props.TryGetValue("Triggers", out var triggers))
             {
-                foreach (var trigger in (List<Trigger>)triggers)
+                foreach (var trigger in Data.Serializer.Cast<List<Trigger>>(triggers))
                     AddTrigger(trigger);
             }
         }

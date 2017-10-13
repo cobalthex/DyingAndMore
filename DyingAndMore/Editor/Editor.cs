@@ -131,7 +131,7 @@ namespace DyingAndMore.Editor
                 using (var sfd = new System.Windows.Forms.SaveFileDialog()
                 {
                     Filter = "Dying and More! Saves (*.d2sav)|*.d2sav",
-                    RestoreDirectory = true
+                    RestoreDirectory = true,
                 })
                 {
                     if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -155,8 +155,9 @@ namespace DyingAndMore.Editor
                 {
                     using (var sfd = new System.Windows.Forms.SaveFileDialog()
                     {
-                        Filter = "Dying and More! Maps (*.d2map)|*.d2map",
-                        RestoreDirectory = true
+                        Filter = "Dying and More! Maps (*.map.tk)|*.map.tk",
+                        RestoreDirectory = true,
+                        SupportMultiDottedExtensions = true,
                     })
                     {
                         if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -178,24 +179,38 @@ namespace DyingAndMore.Editor
                 {
                     using (var ofd = new System.Windows.Forms.OpenFileDialog()
                     {
-                        Filter = "Dying and More! Maps (*.d2map)|*.d2map",
-                        RestoreDirectory = true
+                        Filter = "Dying and More! Maps (*.map.tk)|*.map.tk|Dying and More! Saves (*.d2sav)|*.d2sav",
+                        RestoreDirectory = true,
+                        SupportMultiDottedExtensions = true,
                     })
                     {
                         if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         {
-                            try
+                            //try
                             {
                                 Cache.TrackReferences();
-                                var mapClass = Cache.Load<Takai.Game.MapClass>(ofd.FileName);
-                                mapClass.InitializeGraphics();
-                                Map = mapClass.Create();
+
+                                if (ofd.FileName.EndsWith(".d2sav"))
+                                {
+                                    var instance = Cache.Load<Takai.Game.MapInstance>(ofd.FileName);
+                                    if (instance.Class != null)
+                                    {
+                                        instance.Class.InitializeGraphics();
+                                        Parent.ReplaceAllChildren(new Editor(instance));
+                                    }
+                                }
+                                else
+                                {
+                                    var mapClass = Cache.Load<Takai.Game.MapClass>(ofd.FileName);
+                                    mapClass.InitializeGraphics();
+                                    Parent.ReplaceAllChildren(new Editor(mapClass.Create()));
+                                }
                                 Cache.CleanupStaleReferences();
                             }
-                            catch
-                            {
-                                //todo
-                            }
+                            //catch
+                            //{
+                            //    //todo
+                            //}
                         }
                     }
                     return false;

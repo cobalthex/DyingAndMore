@@ -19,7 +19,7 @@ namespace DyingAndMore.Editor.Selectors
             {
                 try
                 {
-                    fluids.Add(Takai.Data.Cache.Load<Takai.Game.FluidClass>(Path.Combine("Fluids", Path.GetFileName(file))));
+                    fluids.Add(Takai.Data.Cache.Load<Takai.Game.FluidClass>(file));
                 }
                 catch (System.Exception)
                 {

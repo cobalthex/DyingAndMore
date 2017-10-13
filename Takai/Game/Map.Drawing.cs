@@ -36,45 +36,49 @@ namespace Takai.Game
             if (Runtime.GraphicsDevice == null)
                 return;
 
-            spriteBatch = new SpriteBatch(Runtime.GraphicsDevice);
-
-            shapeRaster = new RasterizerState()
+            if (spriteBatch == null)
             {
-                CullMode = CullMode.None,
-                MultiSampleAntiAlias = true,
-            };
+                spriteBatch = new SpriteBatch(Runtime.GraphicsDevice);
 
-            stencilWrite = new DepthStencilState()
-            {
-                StencilEnable = true,
-                StencilFunction = CompareFunction.Always,
-                StencilPass = StencilOperation.Replace,
-                ReferenceStencil = 1,
-                DepthBufferEnable = false,
-            };
-            stencilRead = new DepthStencilState()
-            {
-                StencilEnable = true,
-                StencilFunction = CompareFunction.Equal,
-                StencilPass = StencilOperation.Keep,
-                ReferenceStencil = 1,
-                DepthBufferEnable = false,
-            };
+                shapeRaster = new RasterizerState()
+                {
+                    CullMode = CullMode.None,
+                    MultiSampleAntiAlias = true,
+                };
 
-            var width = Runtime.GraphicsDevice.PresentationParameters.BackBufferWidth;
-            var height = Runtime.GraphicsDevice.PresentationParameters.BackBufferHeight;
+                stencilWrite = new DepthStencilState()
+                {
+                    StencilEnable = true,
+                    StencilFunction = CompareFunction.Always,
+                    StencilPass = StencilOperation.Replace,
+                    ReferenceStencil = 1,
+                    DepthBufferEnable = false,
+                };
+                stencilRead = new DepthStencilState()
+                {
+                    StencilEnable = true,
+                    StencilFunction = CompareFunction.Equal,
+                    StencilPass = StencilOperation.Keep,
+                    ReferenceStencil = 1,
+                    DepthBufferEnable = false,
+                };
 
-            mapAlphaTest = new AlphaTestEffect(Runtime.GraphicsDevice)
-            {
-                ReferenceAlpha = 1
-            };
-            preRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
-            fluidsRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-            reflectionRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-            reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-            //todo: some of the render targets may be able to be combined
+                var width = Runtime.GraphicsDevice.PresentationParameters.BackBufferWidth;
+                var height = Runtime.GraphicsDevice.PresentationParameters.BackBufferHeight;
 
-            //todo: cross platform support
+                mapAlphaTest = new AlphaTestEffect(Runtime.GraphicsDevice)
+                {
+                    ReferenceAlpha = 1
+                };
+                preRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                fluidsRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                reflectionRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+                //todo: some of the render targets may be able to be combined
+            }
+
+            //must be 'reloaded' or will be deleted if Cache.TrackReferences is called
+
             lineEffect = Data.Cache.Load<XnaEffect>("Shaders/Line.mgfx");
             circleEffect = Data.Cache.Load<XnaEffect>("Shaders/Circle.mgfx");
             outlineEffect = Data.Cache.Load<XnaEffect>("Shaders/Outline.mgfx");
@@ -395,7 +399,6 @@ namespace Takai.Game
             //main render
             Runtime.GraphicsDevice.SetRenderTargets(Class.preRenderTarget);
 
-
             if (renderSettings.drawPathHeuristic)
             {
                 Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilWrite, null, null, cameraTransform);
@@ -410,7 +413,7 @@ namespace Takai.Game
 
                         Graphics.Primitives2D.DrawFill(
                             Class.spriteBatch,
-                            Util.ColorFromHSL(path.heuristic * 10, 1, 0.8f, 1),
+                            Util.ColorFromHSL(path.heuristic, 1, 0.8f, 1),
                             new Rectangle(x * Class.TileSize, y * Class.TileSize, Class.TileSize, Class.TileSize)
                         );
                     }
