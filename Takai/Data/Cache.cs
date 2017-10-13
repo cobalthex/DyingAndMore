@@ -29,6 +29,7 @@ namespace Takai.Data
 
         public struct CustomLoad
         {
+            public string name;
             public string file;
             public Stream stream;
             public long length;
@@ -72,14 +73,14 @@ namespace Takai.Data
         /// <summary>
         /// Load all entries of a zip file into the cache
         /// </summary>
-        /// <param name="file">The location of the zip</param>
-        public static void LoadZip(string file, bool forceLoad = false)
+        /// <param name="file">The (absolute or working-directory relative) location of the zip</param>
+        public static IEnumerable<object> LoadZip(string file, bool forceLoad = false)
         {
             using (var zip = new ZipArchive(File.OpenRead(file), ZipArchiveMode.Read, false))
             {
                 openZips.Add(file, zip);
                 foreach (var entry in zip.Entries)
-                    Load(entry.FullName, file, forceLoad);
+                    yield return Load(entry.FullName, file, forceLoad);
                 openZips.Remove(file);
             }
         }
@@ -88,28 +89,32 @@ namespace Takai.Data
         /// Load a single file into the cache
         /// </summary>
         /// <param name="file">The relative location of file to load from</param>
-        /// <param name="root">Where to search for the file. This is passed to any recursive loads</param>
+        /// <param name="root">Where to search for the file. This is passed to any recursive loads. Use "" to load from working directory, null to load from DefaultRoot</param>
         /// <param name="forceLoad">Load the file even if it already exists in the cache</param>
         /// <returns>The loaded object</returns>
         public static object Load(string file, string root = null, bool forceLoad = false)
         {
-            //if file begins with ./, parse at current folder (should be in deserializer?)
-
             root = root ?? DefaultRoot;
+            file = Normalize(file);
 
-            string name;
-            if (Path.IsPathRooted(file) || PathStartsWith(file, root))
-                name = file;
+            string realFile;
+            if (PathStartsWith(file, DefaultRoot) && root == DefaultRoot)
+            {
+                realFile = file;
+                file = file.Substring(DefaultRoot.Length + 1);
+            }
+            else if (Path.IsPathRooted(file) || PathStartsWith(file, root))
+                realFile = file;
             else
-                name = Normalize(Path.Combine(root, file));
+                realFile = Normalize(Path.Combine(root, file));
 
-            bool exists = objects.TryGetValue(name, out var obj);
+            bool exists = objects.TryGetValue(realFile, out var obj);
             if (!exists)
                 obj = new CacheRef();
 
             if (forceLoad || !exists)
             {
-                var load = new CustomLoad { file = name };
+                var load = new CustomLoad { name = file, file = realFile };
                 if (root != null && openZips.TryGetValue(root, out var zip))
                 {
                     var entry = zip.GetEntry(file);
@@ -128,7 +133,7 @@ namespace Takai.Data
                 }
                 else
                 {
-                    var fi = new FileInfo(name);
+                    var fi = new FileInfo(realFile);
                     load.length = fi.Length;
                     load.stream = fi.OpenRead();
                 }
@@ -146,13 +151,13 @@ namespace Takai.Data
                     };
                     obj.value = Serializer.TextDeserialize(context);
                     if (obj.value is ISerializeExternally sxt)
-                        sxt.File = name;
+                        sxt.File = file;
                 }
                 load.stream.Dispose();
             }
 
             obj.generation = generation;
-            objects[file] = obj;
+            objects[realFile] = obj;
 
             return obj.value;
         }
@@ -203,6 +208,8 @@ namespace Takai.Data
 
         public static void CleanupStaleReferences()
         {
+            return; // todo: doesn't handle nested references
+
             var stale = new List<string>();
             foreach (var obj in objects)
             {
@@ -230,14 +237,14 @@ namespace Takai.Data
         internal static object LoadTexture(CustomLoad load)
         {
             var loaded = Texture2D.FromStream(Runtime.GraphicsDevice, load.stream);
-            loaded.Name = load.file;
+            loaded.Name = load.name;
             return loaded;
         }
 
         internal static object LoadBitmapFont(CustomLoad load)
         {
             var loaded = Graphics.BitmapFont.FromStream(Runtime.GraphicsDevice, load.stream);
-            //loaded.Name = load.file; //todo
+            //loaded.Name = load.name; //todo
             return loaded;
         }
 
@@ -271,7 +278,7 @@ namespace Takai.Data
 
                 return new SoundEffect(samples, vorbis.SampleRate, (AudioChannels)vorbis.Channels)
                 {
-                    Name = load.file
+                    Name = load.name
                 };
             }
         }
@@ -279,7 +286,7 @@ namespace Takai.Data
         internal static object LoadSound(CustomLoad load)
         {
             var loaded = SoundEffect.FromStream(load.stream);
-            loaded.Name = load.file;
+            loaded.Name = load.name;
             return loaded;
         }
 
@@ -291,7 +298,7 @@ namespace Takai.Data
             //load = TransformPath(file, DataFolder, "Shaders", "DX11");
             return new Effect(Runtime.GraphicsDevice, bytes)
             {
-                Name = load.file
+                Name = load.name
             };
         }
 

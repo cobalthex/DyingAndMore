@@ -150,8 +150,6 @@ namespace DyingAndMore
                 HorizontalAlignment = Takai.UI.Alignment.Middle
             };
 
-            //Takai.Data.Cache.LoadZip("Defs/Test.zip");
-
             /*
             //var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(
             //    Takai.Data.Serializer.TextDeserialize("Data/Maps/playground.map.tk"));

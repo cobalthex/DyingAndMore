@@ -1,0 +1,87 @@
+MapInstance {
+    Class: @"Maps/zigzag.map.tk";
+    Sounds: [];
+    Scripts: {
+    };
+    ActiveCamera: EditorCamera {
+        PostEffect: Null;
+        Viewport: [0 0 1280 800];
+        Position: [164 185];
+        Scale: 1;
+        Rotation: 0;
+        Shake: 0;
+        Follow: Null;
+        MoveSpeed: 1000;
+    };
+    ElapsedTime: 33320;
+    TimeScale: 1;
+    Entities: [
+        ActorInstance {
+            Class: @"Actors/Player.ent.tk";
+            Faction: Factions [Player];
+            Controller: InputController {
+                ActionInputs: {
+                    Fire: [
+                        ActionInput {
+                            type: ActionInputType.MouseButton;
+                            which: 0;
+                        }
+                    ];
+                };
+                player: PlayerIndex.One;
+            };
+            CurrentHealth: 500;
+            MaxSpeed: 400;
+            Weapon: GunInstance {
+                Class: @"Weapons/Test.wpn.tk";
+                CurrentAmmo: 100;
+                NextShot: 0;
+            };
+            Parent: Null;
+            Name: Null;
+            Position: [336 143];
+            RelativePosition: [0 0];
+            Forward: [1 0];
+            Velocity: [0 0];
+            Mass: 1;
+            State: StateMachine {
+                State: EntStateId.Idle;
+                Instance: EntStateInstance {
+                    Id: EntStateId.Idle;
+                    Class: EntStateClass {
+                        Name: "Idle";
+                        Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 2;
+                            FrameLength: 100;
+                            TotalLength: 200;
+                            IsLooping: True;
+                            Texture: "Actors/Player.png";
+                            Width: 48;
+                            Height: 48;
+                            Size: [48 48];
+                            ClipRect: [0 0 96 48];
+                            Origin: [24 24];
+                            Tween: TweenStyle.Overlap;
+                            ShrinkToFit: True;
+                        };
+                        Sound: SoundClass {
+                            Name: Null;
+                            Sound: Null;
+                            Subtitle: Null;
+                            Caption: Null;
+                            Gain: 1;
+                        };
+                        Effect: Null;
+                        Radius: 24;
+                    };
+                    ElapsedTime: 0;
+                };
+                Transitions: {
+                };
+            };
+            OutlineColor: [154 205 50 255];
+            SpawnTime: 3026;
+        }
+    ];
+}

@@ -3,7 +3,7 @@ EffectsClass {
 		DamageEffect {
 			MaxDamage: 20;
 			Radius: 100;
-			CanDamageCreator: false;
+			CanDamageSource: false;
 		}
 	];
 }
