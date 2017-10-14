@@ -247,8 +247,8 @@ namespace Takai.Game
                         p.Value.RemoveAt(p.Value.Count - 1);
                         i--;
 
-                        if (p.Key.FluidOnDeath != null)
-                            Spawn(p.Key.FluidOnDeath, x.position, x.velocity / 10);
+                        if (p.Key.DestructionFluid != null)
+                            Spawn(p.Key.DestructionFluid, x.position, x.velocity / 10);
 
                         continue;
                     }
