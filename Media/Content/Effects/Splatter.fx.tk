@@ -3,14 +3,14 @@ EffectsClass {
 		ParticleEffect {
             Class: {
                 Graphic: {
-                    Texture: "./blood.png"
+                    Texture: @"./blood.png"
                     Width: 10;
                     Height: 10;
                     FrameCount: 6;
                     FrameLength: 100msec;
                     Center: true;
                 };
-                FluidOnDeath: @"Fluids/SmallBlood.fluid.tk";
+                DestructionFluid: @"Fluids/Blood.fluid.tk";
                 Blend: BlendState.Additive;
                 ColorOverTime: {
                     start: Color.White;

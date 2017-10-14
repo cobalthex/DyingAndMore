@@ -206,7 +206,7 @@ namespace Takai.Game
         /// <summary>
         /// Spawn a fluid on the death of a particle
         /// </summary>
-        public FluidClass FluidOnDeath { get; set; } = null;
+        public FluidClass DestructionFluid { get; set; } = null;
         //death fluid cutoff?
 
         /// <summary>

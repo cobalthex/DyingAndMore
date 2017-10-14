@@ -51,7 +51,16 @@ namespace Takai.Game
         /// </summary>
         public bool AlwaysDrawUpright { get; set; } = false;
 
-        //idle audio (plays randomly when idle)
+        /// <summary>
+        /// An effect created at the entity's position when its spawned in a map
+        /// </summary>
+        public EffectsClass SpawnEffect { get; set; }
+        /// <summary>
+        /// An effect created at the entity's position when it is destroyed from a map
+        /// </summary>
+        public EffectsClass DestructionEffect { get; set; }
+
+        //random idle audio
 
         public EntityClass() { }
 
