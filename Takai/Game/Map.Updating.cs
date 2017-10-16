@@ -151,6 +151,12 @@ namespace Takai.Game
                     if (updateSettings.isAiEnabled)
                         ent.Think(deltaTime);
 
+                    if (ent.State.Instance.Class.Effect != null)
+                    {
+                        var fx = ent.State.Instance.Class.Effect.Create(ent);
+                        Spawn(fx);
+                    }
+
                     if (updateSettings.isPhysicsEnabled && deltaTicks != 0)
                     {
                         if (ent.Velocity != Vector2.Zero)

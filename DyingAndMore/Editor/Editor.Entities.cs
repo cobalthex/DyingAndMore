@@ -98,41 +98,6 @@ namespace DyingAndMore.Editor
                 VerticalAlignment = Alignment.End,
                 Font = Font
             });
-
-            watcher = new FileSystemWatcher(Path.Combine(Takai.Data.Cache.DefaultRoot, "Actors"), "*.ent.tk")
-            {
-                NotifyFilter = NotifyFilters.LastWrite,
-                EnableRaisingEvents = true,
-                IncludeSubdirectories = true
-            };
-            watcher.Changed += Watcher_Changed;
-        }
-        ~EntitiesEditorMode()
-        {
-            watcher.Dispose();
-        }
-
-        FileSystemWatcher watcher;
-        private void Watcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            System.Threading.Thread.Sleep(500);
-            try
-            {
-                var newClass = Takai.Data.Cache.Load<Takai.Game.EntityClass>(e.FullPath, null, true);
-                foreach (var ent in editor.Map.AllEntities)
-                {
-                    if (ent.Class.File == newClass.File)
-                        ent.Class = newClass;
-                }
-
-                for (int i = 0; i < selector.ents.Count; ++i)
-                {
-                    if (selector.ents[i].File == newClass.File)
-                        selector.ents[i] = newClass;
-                }
-                selector.SelectedItem = selector.SelectedItem;
-            }
-            catch { }
         }
 
         public override void Start()

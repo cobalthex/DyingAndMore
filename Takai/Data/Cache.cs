@@ -40,7 +40,7 @@ namespace Takai.Data
         /// All other formats will be deserialized using the Serializer
         /// </summary>
         public static Dictionary<string, System.Func<CustomLoad, object>> CustomLoaders { get; private set; }
-            = new Dictionary<string, System.Func<CustomLoad, object>>();
+            = new Dictionary<string, System.Func<CustomLoad, object>>(System.StringComparer.OrdinalIgnoreCase);
 
         public static ReadOnlyDictionary<string, CacheRef> Objects { get; private set; }
         private static Dictionary<string, CacheRef> objects;
@@ -157,7 +157,14 @@ namespace Takai.Data
             }
 
             obj.generation = generation;
-            objects[realFile] = obj;
+            if (forceLoad && objects.ContainsKey(realFile))
+            {
+                //todo: specific option for applying rather than replacing (and maybe serializer.get dictionary)
+                Serializer.ApplyObject(objects[realFile].value, Serializer.Cast(objects[realFile].value.GetType(), obj.value));
+                obj = objects[realFile];
+            }
+            else
+                objects[realFile] = obj;
 
             return obj.value;
         }
@@ -300,6 +307,26 @@ namespace Takai.Data
             {
                 Name = load.name
             };
+        }
+
+        internal static Dictionary<string, FileSystemWatcher> fsWatchers = new Dictionary<string, FileSystemWatcher>(System.StringComparer.OrdinalIgnoreCase);
+        public static void WatchDirectory(string directory, string filter = "*.*")
+        {
+            var watcher = new FileSystemWatcher(directory, filter)
+            {
+                NotifyFilter = NotifyFilters.LastWrite,
+                EnableRaisingEvents = true,
+                IncludeSubdirectories = true
+            };
+            watcher.Changed += Watcher_Changed;
+            fsWatchers[directory] = watcher;
+        }
+
+        private static void Watcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            System.Threading.Thread.Sleep(500);
+            try { Load(e.FullPath, null, true); }
+            catch { }
         }
 
         #endregion

@@ -31,6 +31,8 @@ namespace Takai.Game
             public uint value;
         }
 
+        internal uint MaxHeuristic = 0;
+
         /// <summary>
         /// Build the hueristic from a speicified start point.
         /// Only overwrites areas that can be reached from start
@@ -51,6 +53,8 @@ namespace Takai.Game
             while (queue.Count > 0)
             {
                 var first = queue.Dequeue();
+
+                MaxHeuristic = Math.Max(MaxHeuristic, first.value);
 
                 var left = first.tile.X;
                 var right = first.tile.X;

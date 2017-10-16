@@ -42,9 +42,10 @@ namespace Takai.Game
         public SoundClass Sound { get; set; }
 
         /// <summary>
-        /// An optional event to play when this state is activated
+        /// An effect to play (repeatedly) while the state is active
         /// </summary>
         public EffectsClass Effect { get; set; }
+        //todo: enter/exit effects?
 
         public float Radius =>
             Sprite != null ? MathHelper.Max(Sprite.Width, Sprite.Height) / 2 : 1;

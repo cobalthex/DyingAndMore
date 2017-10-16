@@ -149,7 +149,7 @@ namespace Takai.Data
                     var r = (int)Convert.ChangeType(v[0], typeof(int));
                     var g = (int)Convert.ChangeType(v[1], typeof(int));
                     var b = (int)Convert.ChangeType(v[2], typeof(int));
-                    var a = (int)Convert.ChangeType(v[3], typeof(int));
+                    var a = v.Count > 3 ? (int)Convert.ChangeType(v[3], typeof(int)) : 255;
                     return new Color(r, g, b, a);
                 }
             });

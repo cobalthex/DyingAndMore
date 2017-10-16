@@ -375,7 +375,7 @@ namespace Takai.Data
                 }
             }
 
-            throw new NotSupportedException(GetExceptionMessage("Unknown identifier: '{word}'", ref context));
+            throw new NotSupportedException(GetExceptionMessage($"Unknown identifier: '{word}'", ref context));
         }
 
         public static T ParseDictionary<T>(Dictionary<string, object> dict, DeserializationContext context = default(DeserializationContext))
@@ -667,7 +667,8 @@ namespace Takai.Data
                     {
                         case MemberTypes.Field:
                             var field = (FieldInfo)memberEnumerator.Current;
-                            field.SetValue(obj, Cast(field.FieldType, sourceList[i], context));
+                            if (!field.IsInitOnly)
+                                field.SetValue(obj, Cast(field.FieldType, sourceList[i], context));
                             break;
                         case MemberTypes.Property:
                             var prop = (PropertyInfo)memberEnumerator.Current;
@@ -797,6 +798,29 @@ namespace Takai.Data
             {
                 SkipComments(reader);
                 SkipWhitespace(reader);
+            }
+        }
+
+        /// <summary>
+        /// Apply an object's values to another object of the same type
+        /// </summary>
+        /// <param name="target">The object to apply to</param>
+        /// <param name="source">The object to read from</param>
+        public static void ApplyObject(object target, object source)
+        {
+            var type = target.GetType();
+            if (type != source.GetType())
+                throw new ArgumentException("Source object must be the same as target option");
+
+            foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (prop.CanWrite)
+                    prop.SetValue(target, prop.GetValue(source));
+            }
+            foreach (var val in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (!val.IsInitOnly)
+                    val.SetValue(target, val.GetValue(source));
             }
         }
     }

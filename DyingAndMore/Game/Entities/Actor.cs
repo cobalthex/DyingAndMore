@@ -86,11 +86,11 @@ namespace DyingAndMore.Game.Entities
             set
             {
                 if (controller != null)
-                    controller.actor = null;
+                    controller.Actor = null;
 
                 controller = value;
                 if (controller != null)
-                    controller.actor = this;
+                    controller.Actor = this;
             }
         }
         private Controller controller;
@@ -139,7 +139,7 @@ namespace DyingAndMore.Game.Entities
                 if (_class.DefaultController != null)
                 {
                     Controller = (Controller)_class.DefaultController.Clone();
-                    Controller.actor = this;
+                    Controller.Actor = this;
                 }
             }
         }

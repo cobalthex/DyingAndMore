@@ -46,11 +46,17 @@ namespace Takai.Game
         public abstract void Step(TimeSpan deltaTime);
     }
 
-    public abstract class EntityScript
+    public abstract class EntityScript : Script
     {
         /// <summary>
         /// The entity that this script is attached to
         /// </summary>
         public EntityInstance Entity { get; set; }
+
+        public EntityScript(string name, EntityInstance entity)
+            : base(name)
+        {
+            Entity = entity;
+        }
     }
 }

@@ -1,6 +1,6 @@
 ProjectileClass {
     Name: "Missile";
-    Power: 800;
+    Power: 200;
     DestroyIfInactive: True;
     IgnoreTrace: True;
 
@@ -14,7 +14,8 @@ ProjectileClass {
                 FrameLength: 100msec;
                 FrameCount: 8;
                 Center: true;
-            }
+            };
+            Effect: @"./Test.fx.tk";
         }
     }
 }
