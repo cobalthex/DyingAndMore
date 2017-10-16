@@ -30,40 +30,40 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
-            if (actor.State.State != Takai.Game.EntStateId.Idle)
+            if (Actor.State.State != Takai.Game.EntStateId.Idle)
                 return; //todo: shoot with moving barrel?
 
-            if (actor.State.State == Takai.Game.EntStateId.Idle && actor.Weapon.IsDepleted())
+            if (Actor.State.State == Takai.Game.EntStateId.Idle && Actor.Weapon.IsDepleted())
             {
-                actor.State.TransitionTo(Takai.Game.EntStateId.Idle, Takai.Game.EntStateId.Inactive, "Inactive");
+                Actor.State.TransitionTo(Takai.Game.EntStateId.Idle, Takai.Game.EntStateId.Inactive, "Inactive");
                 return;
             }
 
             if (trackedActor != null)
             {
-                var hit = actor.Map.Trace(actor.Position, actor.Forward, MaxRange, actor);
+                var hit = Actor.Map.Trace(Actor.Position, Actor.Forward, MaxRange, Actor);
 
                 if (hit.entity != null)
                 {
                     //todo: maybe shoot w/ lead (shoot out in front of target's velocity)
                     if (CanRotate)
-                        actor.Forward = Vector2.Normalize(trackedActor.Position - actor.Position); //todo: slerp
-                    actor.Weapon?.Charge();
-                    actor.Map.DrawLine(actor.Position, actor.Position + actor.Forward * MaxRange, Color.Orange);
+                        Actor.Forward = Vector2.Normalize(trackedActor.Position - Actor.Position); //todo: slerp
+                    Actor.Weapon?.Charge();
+                    Actor.Map.DrawLine(Actor.Position, Actor.Position + Actor.Forward * MaxRange, Color.Orange);
                 }
                 else
                 {
                     trackedActor = null;
-                    actor.Weapon?.Reset();
+                    Actor.Weapon?.Reset();
                 }
             }
             else
             {
-                var ents = actor.Map.FindEntities(actor.Position, MaxRange);
+                var ents = Actor.Map.FindEntities(Actor.Position, MaxRange);
                 foreach (var ent in ents)
                 {
-                    if (ent != actor && ent is ActorInstance nearbyActor && (nearbyActor.Faction & actor.Faction) == 0 &&
-                        actor.IsFacing(nearbyActor.Position))
+                    if (ent != Actor && ent is ActorInstance nearbyActor && (nearbyActor.Faction & Actor.Faction) == 0 &&
+                        Actor.IsFacing(nearbyActor.Position))
                     {
                         trackedActor = nearbyActor;
                         break;
@@ -75,18 +75,18 @@ namespace DyingAndMore.Game.Entities
                 {
                     void ScanRay(Vector2 direction, Color color)
                     {
-                        var hit = actor.Map.Trace(actor.Position, direction, MaxRange, actor);
-                        actor.Map.DrawLine(actor.Position, actor.Position + direction * hit.distance, color);
+                        var hit = Actor.Map.Trace(Actor.Position, direction, MaxRange, Actor);
+                        Actor.Map.DrawLine(Actor.Position, Actor.Position + direction * hit.distance, color);
                     }
                     Vector2 TransformDirection(float radians)
                     {
                         return Vector2.TransformNormal(
-                            actor.Forward,
+                            Actor.Forward,
                             Matrix.CreateRotationZ(radians)
                         );
                     }
 
-                    var fov = ((ActorClass)actor.Class).FieldOfView / 2;
+                    var fov = ((ActorClass)Actor.Class).FieldOfView / 2;
 
                     //edges
                     ScanRay(TransformDirection(-fov), Color.Aquamarine);
@@ -101,7 +101,7 @@ namespace DyingAndMore.Game.Entities
                     for (int i = 0; i < sweepLines; ++i)
                     {
                         var step = (float)Math.Sin(
-                            (actor.Map.ElapsedTime.TotalSeconds * 2)
+                            (Actor.Map.ElapsedTime.TotalSeconds * 2)
                             - (phase * i)
                         ) * fov;
 

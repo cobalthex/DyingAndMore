@@ -403,6 +403,7 @@ namespace Takai.Game
             {
                 Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilWrite, null, null, cameraTransform);
 
+                var mult = 360f / Class.MaxHeuristic;
                 for (var y = visibleTiles.Top; y < visibleTiles.Bottom; ++y)
                 {
                     for (var x = visibleTiles.Left; x < visibleTiles.Right; ++x)
@@ -413,7 +414,7 @@ namespace Takai.Game
 
                         Graphics.Primitives2D.DrawFill(
                             Class.spriteBatch,
-                            Util.ColorFromHSL(path.heuristic, 1, 0.8f, 1),
+                            Util.ColorFromHSL(path.heuristic * mult, 1, 0.8f, 1),
                             new Rectangle(x * Class.TileSize, y * Class.TileSize, Class.TileSize, Class.TileSize)
                         );
                     }

@@ -163,11 +163,23 @@ namespace Takai.Game
                     Spawn(ent);
             }
 
+            if (Class?.InitialState != null)
+            {
+                foreach (var decal in Class.InitialState.Decals)
+                    AddDecal(decal);
+            }
+
             //fluids should be serialized? (maybe only some fluids are serialized)
             //decals load from initial state
             //triggers load from class
 
-            if (props.TryGetValue("Triggers", out var triggers))
+            if (props.TryGetValue("Fluids", out var fluids)) //todo: load from class?
+            {
+                foreach (var fluid in Data.Serializer.Cast<List<FluidInstance>>(fluids))
+                    Spawn(fluid);
+            }
+
+            if (props.TryGetValue("Triggers", out var triggers)) //todo: load from class?
             {
                 foreach (var trigger in Data.Serializer.Cast<List<Trigger>>(triggers))
                     AddTrigger(trigger);

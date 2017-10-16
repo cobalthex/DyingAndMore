@@ -110,34 +110,21 @@ namespace DyingAndMore.Game
             GameInstance.Current = new GameInstance();
         }
 
-        class BulletTimeScript : Script
+        class NavigateToPlayer : EntityScript
         {
-            public Curve timeSlow = new Curve();
-            TimeSpan totalTime = TimeSpan.FromSeconds(5);
-            TimeSpan elapsedTime;
+            EntityInstance player;
 
-            public BulletTimeScript() : base("Test")
+            public NavigateToPlayer(EntityInstance entity)
+                : base("NavigateToPlayer", entity) { }
+
+            public override void OnSpawn()
             {
-                timeSlow.Keys.Add(new CurveKey(0, 1));
-                timeSlow.Keys.Add(new CurveKey(0.5f, 0.25f));
-                timeSlow.Keys.Add(new CurveKey(0.95f, 0.1f));
-                timeSlow.Keys.Add(new CurveKey(1, 1));
+                player = GameInstance.Current.players[0];
             }
 
             public override void Step(TimeSpan deltaTime)
             {
-                deltaTime = TimeSpan.FromMilliseconds(deltaTime.TotalMilliseconds / Map.TimeScale);
-                if (elapsedTime < totalTime)
-                {
-                    var pct = elapsedTime.TotalMilliseconds / totalTime.TotalMilliseconds;
-                    Map.TimeScale = timeSlow.Evaluate((float)pct);
-                    elapsedTime += deltaTime;
-                }
-                else
-                {
-                    //Map.TimeScale = 1;
-                    //destroy this script
-                }
+
             }
         }
 
@@ -151,13 +138,20 @@ namespace DyingAndMore.Game
                 MapInstance.CleanupOptions.Particles
             );
 
+            Entities.ActorInstance enemy = null;
+
             //create players
 
             var players = new System.Collections.Generic.List<Entities.ActorInstance>();
             foreach (var ent in Map.AllEntities)
             {
-                if (ent is Entities.ActorInstance actor && actor.Controller is Entities.InputController)
-                    players.Add(actor);
+                if (ent is Entities.ActorInstance actor)
+                {
+                    if (actor.Controller is Entities.InputController)
+                        players.Add(actor);
+                    else if (enemy == null)
+                        enemy = actor;
+                }
             }
 
             int numPlayers = 1;
@@ -176,6 +170,9 @@ namespace DyingAndMore.Game
 
                 player = GameInstance.Current.players[0];
             }
+
+            if (enemy != null)
+                Map.Spawn(new NavigateToPlayer(enemy));
 
             Map.ActiveCamera = new Camera(player); //todo: resume control
         }

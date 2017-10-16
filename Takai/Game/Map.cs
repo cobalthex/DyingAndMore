@@ -67,6 +67,11 @@ namespace Takai.Game
         /// </summary>
         public int Height => Tiles.GetLength(0);
 
+        /// <summary>
+        /// The bounds of the map in tiles
+        /// </summary>
+        public Rectangle TileBounds => new Rectangle(0, 0, Width, Height);
+
         public const int SectorSize = 4; //The number of tiles that a map sector spans
         [Data.Serializer.Ignored]
         public int SectorPixelSize { get; private set; } = 0;
@@ -372,6 +377,19 @@ namespace Takai.Game
             effects.Map = this;
             foreach (var effect in effects.Class.Effects)
                 effect.Spawn(effects);
+        }
+
+        public void Spawn(Script script)
+        {
+            script.Map = this;
+            script.StartTime = ElapsedTime;
+            script.OnSpawn();
+            Scripts[script.Name] = script;
+        }
+
+        public void Destroy(Script script)
+        {
+            Scripts.Remove(script.Name); //todo: use hashset?
         }
 
         /// <summary>

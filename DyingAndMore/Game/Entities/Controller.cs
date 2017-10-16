@@ -6,7 +6,7 @@
     abstract class Controller : System.ICloneable
     {
         [Takai.Data.Serializer.Ignored]
-        public ActorInstance actor;
+        public virtual ActorInstance Actor { get; set; }
 
         public virtual object Clone()
         {
@@ -16,8 +16,8 @@
         /// <summary>
         /// One frame of time to control the actor
         /// </summary>
-        /// <param name="DeltaTime">How long since the last Think cycle</param>
-        public abstract void Think(System.TimeSpan DeltaTime);
+        /// <param name="deltaTime">How long since the last Think cycle</param>
+        public abstract void Think(System.TimeSpan deltaTime);
 
         public override string ToString()
         {

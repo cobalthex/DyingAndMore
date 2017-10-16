@@ -74,15 +74,15 @@ namespace DyingAndMore.Game.Entities
 
         public PlayerIndex player = PlayerIndex.One;
 
-        public override void Think(System.TimeSpan DeltaTime)
+        public override void Think(System.TimeSpan deltaTime)
         {
             var color = Color.MediumAquamarine;
 
-            var trace = actor.Map.Trace(actor.Position, actor.Forward, 0, actor);
+            var trace = Actor.Map.Trace(Actor.Position, Actor.Forward, 0, Actor);
             if (trace.entity != null)
                 color = Color.Tomato;
 
-            actor.Map.DrawLine(actor.Position, actor.Position + actor.Forward * trace.distance, color);
+            Actor.Map.DrawLine(Actor.Position, Actor.Position + Actor.Forward * trace.distance, color);
 
             var d = Vector2.Zero;
             if (InputState.IsButtonDown(Keys.W))
@@ -95,15 +95,15 @@ namespace DyingAndMore.Game.Entities
                 d += Vector2.UnitX;
 
             if (InputState.IsButtonDown(MouseButtons.Left))
-                actor.Weapon?.Charge();
+                Actor.Weapon?.Charge();
             if (InputState.IsClick(MouseButtons.Left))
-                actor.Weapon?.Reset();
+                Actor.Weapon?.Reset();
 
-            actor.Accelerate(d);
+            Actor.Accelerate(d);
 
             var dir = InputState.PolarMouseVector;
             dir.Normalize();
-            actor.Forward = dir;
+            Actor.Forward = dir;
         }
     }
 }
