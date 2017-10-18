@@ -1,19 +1,18 @@
 MapInstance {
-    Class: @"Maps/zigzag.map.tk";
-    Sounds: [];
+    Class: @"Maps/big.map.tk";
     Scripts: {
     };
     ActiveCamera: EditorCamera {
         PostEffect: Null;
         Viewport: [0 0 1280 800];
-        Position: [164 185];
-        Scale: 1;
+        Position: [669.5383 452.923];
+        Scale: 0.5078125;
         Rotation: 0;
         Shake: 0;
         Follow: Null;
         MoveSpeed: 1000;
     };
-    ElapsedTime: 33320;
+    ElapsedTime: 6171;
     TimeScale: 1;
     Entities: [
         ActorInstance {
@@ -34,14 +33,14 @@ MapInstance {
             MaxSpeed: 400;
             Weapon: GunInstance {
                 Class: @"Weapons/Test.wpn.tk";
-                CurrentAmmo: 100;
-                NextShot: 0;
+                CurrentAmmo: 96;
+                NextShot: 3587;
             };
             Parent: Null;
             Name: Null;
-            Position: [336 143];
+            Position: [117.1731 86.24221];
             RelativePosition: [0 0];
-            Forward: [1 0];
+            Forward: [0.9873728 0.1584137];
             Velocity: [0 0];
             Mass: 1;
             State: StateMachine {
@@ -75,13 +74,340 @@ MapInstance {
                         Effect: Null;
                         Radius: 24;
                     };
-                    ElapsedTime: 0;
+                    ElapsedTime: 1105;
                 };
                 Transitions: {
                 };
             };
-            OutlineColor: [154 205 50 255];
-            SpawnTime: 3026;
+            OutlineColor: [0 0 0 0];
+            SpawnTime: 0;
+        }
+        ProjectileInstance {
+            Class: @"Weapons/Projectiles/Missile.ent.tk";
+            Source: ActorInstance {
+                Class: @"Actors/Player.ent.tk";
+                Faction: Factions [Player];
+                Controller: InputController {
+                    ActionInputs: {
+                        Fire: [
+                            ActionInput {
+                                type: ActionInputType.MouseButton;
+                                which: 0;
+                            }
+                        ];
+                    };
+                    player: PlayerIndex.One;
+                };
+                CurrentHealth: 500;
+                MaxSpeed: 400;
+                Weapon: GunInstance {
+                    Class: @"Weapons/Test.wpn.tk";
+                    CurrentAmmo: 96;
+                    NextShot: 3587;
+                };
+                Parent: Null;
+                Name: Null;
+                Position: [117.1731 86.24221];
+                RelativePosition: [0 0];
+                Forward: [0.9873728 0.1584137];
+                Velocity: [0 0];
+                Mass: 1;
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: "Idle";
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 2;
+                                FrameLength: 100;
+                                TotalLength: 200;
+                                IsLooping: True;
+                                Texture: "Actors/Player.png";
+                                Width: 48;
+                                Height: 48;
+                                Size: [48 48];
+                                ClipRect: [0 0 96 48];
+                                Origin: [24 24];
+                                Tween: TweenStyle.Overlap;
+                                ShrinkToFit: True;
+                            };
+                            Sound: SoundClass {
+                                Name: Null;
+                                Sound: Null;
+                                Subtitle: Null;
+                                Caption: Null;
+                                Gain: 1;
+                            };
+                            Effect: Null;
+                            Radius: 24;
+                        };
+                        ElapsedTime: 1105;
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 0;
+            };
+            Parent: Null;
+            Name: Null;
+            Position: [539.3639 89.18101];
+            RelativePosition: [0 0];
+            Forward: [0.9999758 0.006960388];
+            Velocity: [199.9952 1.392078];
+            Mass: 1;
+            State: StateMachine {
+                State: EntStateId.Idle;
+                Instance: EntStateInstance {
+                    Id: EntStateId.Idle;
+                    Class: EntStateClass {
+                        Name: "Idle";
+                        Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 8;
+                            FrameLength: 100;
+                            TotalLength: 800;
+                            IsLooping: False;
+                            Texture: "Weapons/Projectiles/Powerball.png";
+                            Width: 24;
+                            Height: 24;
+                            Size: [24 24];
+                            ClipRect: [0 0 192 24];
+                            Origin: [12 12];
+                            Tween: TweenStyle.None;
+                            ShrinkToFit: True;
+                        };
+                        Sound: Null;
+                        Effect: @"Weapons/Projectiles/Test.fx.tk";
+                        Radius: 12;
+                    };
+                    ElapsedTime: 1921;
+                };
+                Transitions: {
+                };
+            };
+            OutlineColor: [0 0 0 0];
+            SpawnTime: 2788;
+        }
+        ProjectileInstance {
+            Class: @"Weapons/Projectiles/Missile.ent.tk";
+            Source: ActorInstance {
+                Class: @"Actors/Player.ent.tk";
+                Faction: Factions [Player];
+                Controller: InputController {
+                    ActionInputs: {
+                        Fire: [
+                            ActionInput {
+                                type: ActionInputType.MouseButton;
+                                which: 0;
+                            }
+                        ];
+                    };
+                    player: PlayerIndex.One;
+                };
+                CurrentHealth: 500;
+                MaxSpeed: 400;
+                Weapon: GunInstance {
+                    Class: @"Weapons/Test.wpn.tk";
+                    CurrentAmmo: 96;
+                    NextShot: 3587;
+                };
+                Parent: Null;
+                Name: Null;
+                Position: [117.1731 86.24221];
+                RelativePosition: [0 0];
+                Forward: [0.9873728 0.1584137];
+                Velocity: [0 0];
+                Mass: 1;
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: "Idle";
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 2;
+                                FrameLength: 100;
+                                TotalLength: 200;
+                                IsLooping: True;
+                                Texture: "Actors/Player.png";
+                                Width: 48;
+                                Height: 48;
+                                Size: [48 48];
+                                ClipRect: [0 0 96 48];
+                                Origin: [24 24];
+                                Tween: TweenStyle.Overlap;
+                                ShrinkToFit: True;
+                            };
+                            Sound: SoundClass {
+                                Name: Null;
+                                Sound: Null;
+                                Subtitle: Null;
+                                Caption: Null;
+                                Gain: 1;
+                            };
+                            Effect: Null;
+                            Radius: 24;
+                        };
+                        ElapsedTime: 1105;
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 0;
+            };
+            Parent: Null;
+            Name: Null;
+            Position: [468.2161 133.4211];
+            RelativePosition: [0 0];
+            Forward: [0.9910893 0.1331988];
+            Velocity: [198.2179 26.63976];
+            Mass: 1;
+            State: StateMachine {
+                State: EntStateId.Idle;
+                Instance: EntStateInstance {
+                    Id: EntStateId.Idle;
+                    Class: EntStateClass {
+                        Name: "Idle";
+                        Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 8;
+                            FrameLength: 100;
+                            TotalLength: 800;
+                            IsLooping: False;
+                            Texture: "Weapons/Projectiles/Powerball.png";
+                            Width: 24;
+                            Height: 24;
+                            Size: [24 24];
+                            ClipRect: [0 0 192 24];
+                            Origin: [12 12];
+                            Tween: TweenStyle.None;
+                            ShrinkToFit: True;
+                        };
+                        Sound: Null;
+                        Effect: @"Weapons/Projectiles/Test.fx.tk";
+                        Radius: 12;
+                    };
+                    ElapsedTime: 1581;
+                };
+                Transitions: {
+                };
+            };
+            OutlineColor: [0 0 0 0];
+            SpawnTime: 3128;
+        }
+        ProjectileInstance {
+            Class: @"Weapons/Projectiles/Missile.ent.tk";
+            Source: ActorInstance {
+                Class: @"Actors/Player.ent.tk";
+                Faction: Factions [Player];
+                Controller: InputController {
+                    ActionInputs: {
+                        Fire: [
+                            ActionInput {
+                                type: ActionInputType.MouseButton;
+                                which: 0;
+                            }
+                        ];
+                    };
+                    player: PlayerIndex.One;
+                };
+                CurrentHealth: 500;
+                MaxSpeed: 400;
+                Weapon: GunInstance {
+                    Class: @"Weapons/Test.wpn.tk";
+                    CurrentAmmo: 96;
+                    NextShot: 3587;
+                };
+                Parent: Null;
+                Name: Null;
+                Position: [117.1731 86.24221];
+                RelativePosition: [0 0];
+                Forward: [0.9873728 0.1584137];
+                Velocity: [0 0];
+                Mass: 1;
+                State: StateMachine {
+                    State: EntStateId.Idle;
+                    Instance: EntStateInstance {
+                        Id: EntStateId.Idle;
+                        Class: EntStateClass {
+                            Name: "Idle";
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 2;
+                                FrameLength: 100;
+                                TotalLength: 200;
+                                IsLooping: True;
+                                Texture: "Actors/Player.png";
+                                Width: 48;
+                                Height: 48;
+                                Size: [48 48];
+                                ClipRect: [0 0 96 48];
+                                Origin: [24 24];
+                                Tween: TweenStyle.Overlap;
+                                ShrinkToFit: True;
+                            };
+                            Sound: SoundClass {
+                                Name: Null;
+                                Sound: Null;
+                                Subtitle: Null;
+                                Caption: Null;
+                                Gain: 1;
+                            };
+                            Effect: Null;
+                            Radius: 24;
+                        };
+                        ElapsedTime: 1105;
+                    };
+                    Transitions: {
+                    };
+                };
+                OutlineColor: [0 0 0 0];
+                SpawnTime: 0;
+            };
+            Parent: Null;
+            Name: Null;
+            Position: [374.4777 137.703];
+            RelativePosition: [0 0];
+            Forward: [0.9805807 0.1961161];
+            Velocity: [196.1161 39.22323];
+            Mass: 1;
+            State: StateMachine {
+                State: EntStateId.Idle;
+                Instance: EntStateInstance {
+                    Id: EntStateId.Idle;
+                    Class: EntStateClass {
+                        Name: "Idle";
+                        Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 8;
+                            FrameLength: 100;
+                            TotalLength: 800;
+                            IsLooping: False;
+                            Texture: "Weapons/Projectiles/Powerball.png";
+                            Width: 24;
+                            Height: 24;
+                            Size: [24 24];
+                            ClipRect: [0 0 192 24];
+                            Origin: [12 12];
+                            Tween: TweenStyle.None;
+                            ShrinkToFit: True;
+                        };
+                        Sound: Null;
+                        Effect: @"Weapons/Projectiles/Test.fx.tk";
+                        Radius: 12;
+                    };
+                    ElapsedTime: 1122;
+                };
+                Transitions: {
+                };
+            };
+            OutlineColor: [0 0 0 0];
+            SpawnTime: 3587;
         }
     ];
 }
