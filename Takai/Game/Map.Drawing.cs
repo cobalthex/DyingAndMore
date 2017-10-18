@@ -8,6 +8,8 @@ namespace Takai.Game
 {
     public partial class MapClass
     {
+        //todo: should all of these gpu props be static?
+
         internal SpriteBatch spriteBatch;
         internal RenderTarget2D preRenderTarget;
         internal RenderTarget2D fluidsRenderTarget;

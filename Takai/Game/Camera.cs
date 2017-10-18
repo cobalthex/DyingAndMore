@@ -6,7 +6,6 @@ namespace Takai.Game
     /// <summary>
     /// A simple camera that can either track its own position or follow an entity
     /// </summary>
-    [Data.DesignerModdable]
     public class Camera
     {
         /// <summary>

@@ -1,33 +1,31 @@
 #*Static {
     Name: "back";
     Text: "« Back";
-    Font: @"Fonts/UISmall.fnt.tk";
     Color: Color.White;
     Position: Vector2 {x:20 y:20};
 }*#
 
 List {
+    BackgroundColor: Color.Gray;
     Margin: 10;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
     Children: [
         Static {
             Text: "Create a New Map";
-            Font: "Fonts/UILarge.bfnt";
+            Font: @"UI/Fonts/UILarge.bfnt";
             Color: Color.White;
             HorizontalAlignment: Alignment.Middle;
         }
 
         Static {
             Text: "Name";
-            Font: @"Fonts/UISmall.fnt.tk";
             HorizontalAlignment: Alignment.Start;
         }
         TextInput {
             Name: "name";
             Width: 300;
             MaxLength: 32;
-            Font: @"Fonts/UISmall.fnt.tk";
         }
 
         List {
@@ -39,7 +37,6 @@ List {
                     Children: [;
                         Static {
                             Text: "Width";
-                            Font: @"Fonts/UISmall.fnt.tk";
                             HorizontalAlignment: Alignment.Start;
                         }
                         NumericInput {
@@ -47,7 +44,6 @@ List {
                             Minimum: 1;
                             Maximum: 256;
                             Width: 145;
-                            Font: @"Fonts/UISmall.fnt.tk";
                         }
                     ]
                 }
@@ -57,7 +53,6 @@ List {
                     Children: [;
                         Static {
                             Text: "Height";
-                            Font: @"Fonts/UISmall.fnt.tk";
                             HorizontalAlignment: Alignment.Start;
                         }
                         NumericInput {
@@ -65,7 +60,6 @@ List {
                             Minimum: 1;
                             Maximum: 256;
                             Width: 145;
-                            Font: @"Fonts/UISmall.fnt.tk";
                         }
                     ]
                 }
@@ -74,21 +68,19 @@ List {
 
         Static {
             Text: "Tileset";
-            Font: @"Fonts/UISmall.fnt.tk";
             HorizontalAlignment: Alignment.Start;
         }
 
         FileInput {
             Name: "tileset";
-            Filter: "PNG Image (*.png)|*.png";
+            Filter: "Tilesets (*.tiles.tk)|*.tiles.tk";
             Width: 300;
-            Font: @"Fonts/UISmall.fnt.tk";
         }
 
         Static {
             Name: "create";
             Text: "Create";
-            Font: "Fonts/UILarge.bfnt";
+            Font: @"UI/Fonts/UILarge.bfnt";
             Width: 200;
             HorizontalAlignment: Alignment.Middle;
         }

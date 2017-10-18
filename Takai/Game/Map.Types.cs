@@ -43,16 +43,16 @@ namespace Takai.Game
 
     public static class RandomRange
     {
-        private static Random randomGen = new Random();
+        public static readonly Random RandomGenerator = new Random();
 
         public static int Next(Range<int> range)
         {
-            return randomGen.Next(range.min, range.max);
+            return RandomGenerator.Next(range.min, range.max);
         }
 
         public static float Next(Range<float> range)
         {
-            return (float)randomGen.NextDouble() * (range.max - range.min) + range.min;
+            return (float)RandomGenerator.NextDouble() * (range.max - range.min) + range.min;
         }
 
         public static TimeSpan Next(Range<TimeSpan> range)
@@ -61,7 +61,7 @@ namespace Takai.Game
                 return range.min;
 
             byte[] buf = new byte[8];
-            randomGen.NextBytes(buf);
+            RandomGenerator.NextBytes(buf);
             long longRand = BitConverter.ToInt64(buf, 0);
 
             return TimeSpan.FromTicks(Math.Abs(longRand % (range.max.Ticks - range.min.Ticks)) + range.min.Ticks);
@@ -113,7 +113,6 @@ namespace Takai.Game
     /// A single type of Fluid
     /// This struct defines the graphics for the Fluid and physical properties that can affect the game
     /// </summary>
-    [Data.DesignerModdable]
     public class FluidClass : IObjectClass<FluidInstance>
     {
         public string Name { get; set; }
@@ -165,7 +164,6 @@ namespace Takai.Game
     /// Fluids can have physics per their fluid type
     /// Fluids can be spawned with a velocity which is decreased by their drag over time. Once the velocity reaches zero, the fluid is considered inactive (permanently)
     /// </summary>
-    [Data.DesignerModdable]
     public struct FluidInstance : IObjectInstance<FluidClass>
     {
         public FluidClass Class { get; set; }
@@ -173,7 +171,6 @@ namespace Takai.Game
         public Vector2 velocity;
     }
 
-    [Data.DesignerModdable]
     public class Decal //todo: make struct
     {
         public Texture2D texture;
@@ -187,7 +184,6 @@ namespace Takai.Game
     /// <summary>
     /// A single type of particle
     /// </summary>
-    [Data.DesignerModdable]
     public class ParticleClass
     {
         /// <summary>
@@ -195,7 +191,7 @@ namespace Takai.Game
         /// </summary>
         public Graphics.Sprite Graphic { get; set; }
         /// <summary>
-        /// How to blend this particle
+        /// The render blend state this particle
         /// </summary>
         public BlendState Blend { get; set; }
 
@@ -218,6 +214,8 @@ namespace Takai.Game
 
         public Range<float> InitialSpeed { get; set; } = 1;
         public float Drag { get; set; } = 0.05f;
+
+        //angular velocity/drag?
     }
 
     /// <summary>

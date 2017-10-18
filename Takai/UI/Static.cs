@@ -402,8 +402,7 @@ namespace Takai.UI
         {
             if (Parent != null)
             {
-                _parent.RemoveChild(this);
-                _parent = null;
+                Parent.RemoveChild(this);
                 return true;
             }
             return false;

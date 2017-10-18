@@ -107,8 +107,6 @@ namespace DyingAndMore.Editor
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
-            Map.DrawCircle(new Vector2(50), 60, Color.Cyan);
-
             base.UpdateSelf(time);
         }
 
@@ -221,6 +219,26 @@ namespace DyingAndMore.Editor
                 if (InputState.IsPress(Keys.N))
                 {
                     var resizeMap = Cache.Load<Static>("UI/Editor/NewMap.ui.tk");
+
+                    resizeMap.FindChildByName("create").Click += delegate (object sender, ClickEventArgs e)
+                    {
+                        var width = ((NumericBase)resizeMap.FindChildByName("width")).Value;
+                        var height = ((NumericBase)resizeMap.FindChildByName("height")).Value;
+                        var tileset = Cache.Load<Takai.Game.Tileset>(resizeMap.FindChildByName("tileset").Text);
+
+                        var map = new Takai.Game.MapClass
+                        {
+                            Name = resizeMap.FindChildByName("name").Text,
+                            Tiles = new short[height, width],
+                            TilesImage = tileset.texture,
+                            TileSize = tileset.size,
+                        };
+                        map.BuildTileMask(map.TilesImage);
+                        map.InitializeGraphics();
+                        Map = map.Create();
+                        resizeMap.RemoveFromParent();
+                    };
+
                     AddChild(resizeMap);
                 }
 

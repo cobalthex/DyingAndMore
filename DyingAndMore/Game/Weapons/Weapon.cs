@@ -19,7 +19,6 @@ namespace DyingAndMore.Game.Weapons
     /// <summary>
     /// The base for all weapons
     /// </summary>
-    [Takai.Data.DesignerModdable]
     abstract class WeaponClass : Takai.IObjectClass<WeaponInstance>
     {
         public string Name { get; set; }

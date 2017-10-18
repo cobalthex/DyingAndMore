@@ -8,7 +8,6 @@ namespace Takai.Game
     /// <summary>
     /// Describes a single type of entity. Actors, etc. inherit from this
     /// </summary>
-    [Data.DesignerModdable]
     public abstract class EntityClass : IObjectClass<EntityInstance>
     {
         [Data.Serializer.Ignored]
@@ -135,7 +134,6 @@ namespace Takai.Game
         /// <summary>
         /// A name for this instance, should be unique
         /// </summary>
-        [Data.DesignerModdable]
         public string Name { get; set; } = null;
 
         /// <summary>

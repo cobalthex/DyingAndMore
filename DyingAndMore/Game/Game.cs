@@ -10,6 +10,8 @@ using Takai.Game;
 
 namespace DyingAndMore.Game
 {
+    //map spawn configurations? (akin to difficulty)
+
     public enum GameDifficulty
     {
         Trivial,
@@ -119,7 +121,7 @@ namespace DyingAndMore.Game
 
             public override void OnSpawn()
             {
-                player = GameInstance.Current.players[0];
+                player = GameInstance.Current.players.FirstOrDefault();
             }
 
             public override void Step(TimeSpan deltaTime)

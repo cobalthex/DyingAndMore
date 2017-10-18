@@ -26,7 +26,6 @@ namespace Takai.Graphics
     /// <summary>
     /// A graphic animation. Typically synchronized with a map's timer
     /// </summary>
-    [Data.DesignerModdable]
     public class Sprite : ICloneable, Data.ISerializeExternally, Data.IDerivedDeserialize
     {
         /// <summary>

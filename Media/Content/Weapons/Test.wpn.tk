@@ -1,10 +1,10 @@
 GunClass {
     MaxAmmo: 100;
-	BurstCount: 3;
+	BurstCount: 0;
 	Delay: [0 0];
     Projectile: @"Weapons/Projectiles/Missile.ent.tk";
 
-    DischargeEffect: {
+    DischargeEffect: { #move to spawn effect on projectile?
         Effects: [
             ParticleEffect {
                 Class: {

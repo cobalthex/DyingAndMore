@@ -15,20 +15,20 @@ namespace Takai.UI
         /// </summary>
         public NumericBaseType Value
         {
-            get => value;
+            get => _value;
             set
             {
                 var newVal = (value < Minimum ? Minimum : (value > Maximum ? Maximum : value));
 
-                if (this.value != newVal)
+                if (this._value != newVal)
                 {
-                    this.value = newVal;
-                    OnValueChanged(System.EventArgs.Empty);
-                    ValueChanged?.Invoke(this, System.EventArgs.Empty);
+                    this._value = newVal;
+                    OnValueChanged(EventArgs.Empty);
+                    ValueChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
-        private NumericBaseType value;
+        private NumericBaseType _value;
 
         /// <summary>
         /// The normalized value (from 0 to 1) of this range
@@ -49,7 +49,8 @@ namespace Takai.UI
             set
             {
                 minimum = value;
-                Value = (value > minimum ? value : minimum);
+                if (Value < minimum)
+                    Value = minimum;
             }
         }
 
@@ -63,7 +64,8 @@ namespace Takai.UI
             set
             {
                 maximum = value;
-                Value = (value > maximum ? maximum : value);
+                if (Value > maximum)
+                    Value = maximum;
             }
         }
         protected NumericBaseType minimum = NumericBaseType.MinValue;
@@ -77,9 +79,9 @@ namespace Takai.UI
         /// <summary>
         /// called whenever this numeric's value has changed
         /// </summary>
-        public event System.EventHandler ValueChanged;
+        public event EventHandler ValueChanged;
 
-        protected virtual void OnValueChanged(System.EventArgs e) { }
+        protected virtual void OnValueChanged(EventArgs e) { }
     }
 
     /// <summary>
