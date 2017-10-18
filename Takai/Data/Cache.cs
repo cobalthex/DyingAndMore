@@ -99,7 +99,7 @@ namespace Takai.Data
             else
                 realFile = Normalize(Path.Combine(root, file));
 
-            bool exists = objects.TryGetValue(realFile, out var obj);
+            bool exists = objects.TryGetValue(realFile, out var obj) && obj.IsAlive;
             if (forceLoad || !exists)
             {
                 var load = new CustomLoad { name = file, file = realFile };
@@ -128,7 +128,7 @@ namespace Takai.Data
 
                 var ext = GetExtension(file);
                 if (CustomLoaders.TryGetValue(ext, out var loader))
-                    obj.value = new WeakReference(loader?.Invoke(load));
+                    obj = new WeakReference(loader?.Invoke(load));
                 else
                 {
                     var context = new Serializer.DeserializationContext
@@ -137,24 +137,23 @@ namespace Takai.Data
                         file = file,
                         root = root,
                     };
-                    obj.value = new WeakReference(Serializer.TextDeserialize(context));
-                    if (obj.value is ISerializeExternally sxt)
+                    obj = new WeakReference(Serializer.TextDeserialize(context));
+                    if (obj.Target is ISerializeExternally sxt)
                         sxt.File = file;
                 }
                 load.stream.Dispose();
             }
 
-            obj.generation = generation;
-            if (forceLoad && objects.ContainsKey(realFile))
+            if (forceLoad && exists)
             {
                 //todo: specific option for applying rather than replacing (and maybe serializer.get dictionary)
-                Serializer.ApplyObject(objects[realFile].value, Serializer.Cast(objects[realFile].value.GetType(), obj.value));
+                Serializer.ApplyObject(objects[realFile].Target, Serializer.Cast(objects[realFile].Target.GetType(), obj.Target));
                 obj = objects[realFile];
             }
             else
                 objects[realFile] = obj;
 
-            return obj.value;
+            return obj.Target;
         }
 
 
@@ -196,19 +195,24 @@ namespace Takai.Data
             //return path.Substring(ext == 0 ? dir : ext);
         }
 
-        public static void CleanupStaleReferences()
+        /// <summary>
+        /// Remove any objects from the cache that are not used elsewhere
+        /// </summary>
+        /// <param name="gcCollect">Call <see cref="GC.Collect"/> first (Will make sure all objects are found)</param>
+        public static void CleanupStaleReferences(bool gcCollect = true)
         {
-            return; // todo: doesn't handle nested references
+            if (gcCollect)
+            {
+                GC.WaitForPendingFinalizers(); //necessary?
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true);
+            }
 
             var stale = new List<string>();
+
             foreach (var obj in objects)
             {
-                if (obj.Value.generation < generation)
-                {
-                    if (obj.Value.value is IDisposable dis)
-                        dis.Dispose();
+                if (!obj.Value.IsAlive)
                     stale.Add(obj.Key);
-                }
             }
 
             foreach (var key in stale)

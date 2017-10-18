@@ -188,8 +188,6 @@ namespace DyingAndMore.Editor
                         {
                             //try
                             {
-                                Cache.TrackReferences();
-
                                 if (ofd.FileName.EndsWith(".d2sav"))
                                 {
                                     var instance = Cache.Load<Takai.Game.MapInstance>(ofd.FileName);
@@ -205,6 +203,7 @@ namespace DyingAndMore.Editor
                                     mapClass.InitializeGraphics();
                                     Parent.ReplaceAllChildren(new Editor(mapClass.Create()));
                                 }
+
                                 Cache.CleanupStaleReferences();
                             }
                             //catch

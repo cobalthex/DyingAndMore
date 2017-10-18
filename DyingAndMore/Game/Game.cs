@@ -177,10 +177,18 @@ namespace DyingAndMore.Game
                 Map.Spawn(new NavigateToPlayer(enemy));
 
             Map.ActiveCamera = new Camera(player); //todo: resume control
+            x = false;
         }
 
+        bool x = false;
         protected override void UpdateSelf(GameTime time)
         {
+            if(!x)
+            {
+                x = true;
+                Takai.Data.Cache.CleanupStaleReferences(); //todo: find better place for this
+            }
+
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
