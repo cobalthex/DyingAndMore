@@ -1,9 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Data
 {
@@ -12,19 +13,6 @@ namespace Takai.Data
     /// </summary>
     public static class Cache
     {
-        public struct CacheRef
-        {
-            public object value;
-            internal uint generation; //set to uint.MaxValue to make permanent
-            //generation can be ushort
-
-            public CacheRef(object value)
-            {
-                this.value = value;
-                generation = 0;
-            }
-        }
-
         public static string DefaultRoot = "Content";
 
         public struct CustomLoad
@@ -39,19 +27,19 @@ namespace Takai.Data
         /// Custom loaders for specific file extensions (Do not include the first . in the extension)
         /// All other formats will be deserialized using the Serializer
         /// </summary>
-        public static Dictionary<string, System.Func<CustomLoad, object>> CustomLoaders { get; private set; }
-            = new Dictionary<string, System.Func<CustomLoad, object>>(System.StringComparer.OrdinalIgnoreCase);
+        public static Dictionary<string, Func<CustomLoad, object>> CustomLoaders { get; private set; }
+            = new Dictionary<string, Func<CustomLoad, object>>(StringComparer.OrdinalIgnoreCase);
 
-        public static ReadOnlyDictionary<string, CacheRef> Objects { get; private set; }
-        private static Dictionary<string, CacheRef> objects;
+        public static ReadOnlyDictionary<string, WeakReference> Objects { get; private set; }
+        private static Dictionary<string, WeakReference> objects;
         private static uint generation = 0;
 
         private static Dictionary<string, ZipArchive> openZips = new Dictionary<string, ZipArchive>(); //todo: load files into case-insensitive dictionary
 
         static Cache()
         {
-            objects = new Dictionary<string, CacheRef>();
-            Objects = new ReadOnlyDictionary<string, CacheRef>(objects);
+            objects = new Dictionary<string, WeakReference>();
+            Objects = new ReadOnlyDictionary<string, WeakReference>(objects);
 
             CustomLoaders.Add("png", LoadTexture);
             CustomLoaders.Add("jpg", LoadTexture);
@@ -94,6 +82,9 @@ namespace Takai.Data
         /// <returns>The loaded object</returns>
         public static object Load(string file, string root = null, bool forceLoad = false)
         {
+            if (string.IsNullOrWhiteSpace(file))
+                throw new ArgumentException(nameof(file) + " cannot be null or empty");
+
             root = root ?? DefaultRoot;
             file = Normalize(file);
 
@@ -109,9 +100,6 @@ namespace Takai.Data
                 realFile = Normalize(Path.Combine(root, file));
 
             bool exists = objects.TryGetValue(realFile, out var obj);
-            if (!exists)
-                obj = new CacheRef();
-
             if (forceLoad || !exists)
             {
                 var load = new CustomLoad { name = file, file = realFile };
@@ -140,7 +128,7 @@ namespace Takai.Data
 
                 var ext = GetExtension(file);
                 if (CustomLoaders.TryGetValue(ext, out var loader))
-                    obj.value = loader?.Invoke(load);
+                    obj.value = new WeakReference(loader?.Invoke(load));
                 else
                 {
                     var context = new Serializer.DeserializationContext
@@ -149,7 +137,7 @@ namespace Takai.Data
                         file = file,
                         root = root,
                     };
-                    obj.value = Serializer.TextDeserialize(context);
+                    obj.value = new WeakReference(Serializer.TextDeserialize(context));
                     if (obj.value is ISerializeExternally sxt)
                         sxt.File = file;
                 }
@@ -208,11 +196,6 @@ namespace Takai.Data
             //return path.Substring(ext == 0 ? dir : ext);
         }
 
-        public static void TrackReferences()
-        {
-            unchecked { ++generation; }
-        }
-
         public static void CleanupStaleReferences()
         {
             return; // todo: doesn't handle nested references
@@ -222,7 +205,7 @@ namespace Takai.Data
             {
                 if (obj.Value.generation < generation)
                 {
-                    if (obj.Value.value is System.IDisposable dis)
+                    if (obj.Value.value is IDisposable dis)
                         dis.Dispose();
                     stale.Add(obj.Key);
                 }
@@ -238,7 +221,7 @@ namespace Takai.Data
 
         internal static object UnsuportedExtension(CustomLoad load)
         {
-            throw new System.NotSupportedException($"Reading from {Path.GetExtension(load.file)} is not supported");
+            throw new NotSupportedException($"Reading from {Path.GetExtension(load.file)} is not supported");
         }
 
         internal static object LoadTexture(CustomLoad load)
@@ -260,10 +243,10 @@ namespace Takai.Data
             using (var vorbis = new NVorbis.VorbisReader(load.stream, false))
             {
                 if (vorbis.Channels < 1 || vorbis.Channels > 2)
-                    throw new System.FormatException($"Audio must be in mono or stero (provided: {vorbis.Channels})");
+                    throw new FormatException($"Audio must be in mono or stero (provided: {vorbis.Channels})");
 
                 if (vorbis.SampleRate < 8000 || vorbis.SampleRate > 48000)
-                    throw new System.FormatException($"Audio must be between 8kHz and 48kHz (provided: {vorbis.SampleRate}Hz");
+                    throw new FormatException($"Audio must be between 8kHz and 48kHz (provided: {vorbis.SampleRate}Hz");
 
                 //todo: 16bit pcm can maybe be retrieved direcltly from load
 
@@ -309,7 +292,7 @@ namespace Takai.Data
             };
         }
 
-        internal static Dictionary<string, FileSystemWatcher> fsWatchers = new Dictionary<string, FileSystemWatcher>(System.StringComparer.OrdinalIgnoreCase);
+        internal static Dictionary<string, FileSystemWatcher> fsWatchers = new Dictionary<string, FileSystemWatcher>(StringComparer.OrdinalIgnoreCase);
         public static void WatchDirectory(string directory, string filter = "*.*")
         {
             var watcher = new FileSystemWatcher(directory, filter)

@@ -122,6 +122,7 @@ namespace Takai.Game
 
         public Range<int> Count { get; set; } = 0;
         public Range<float> Spread { get; set; } = new Range<float>(0, MathHelper.TwoPi);
+        public float Radius { get; set; } = 0; //spawn radius around the spawn point
 
         public void Spawn(EffectsInstance instance)
         {
@@ -142,11 +143,19 @@ namespace Takai.Game
                 var dir = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(angle));
                 var initAngle = (float)Math.Atan2(dir.Y, dir.X);
 
+                var position = instance.Position;
+                if (Radius != 0)
+                {
+                    var spawnRadiusAngle = RandomRange.RandomGenerator.NextDouble() * MathHelper.TwoPi;
+                    position += new Vector2((float)Math.Cos(spawnRadiusAngle), (float)Math.Sin(spawnRadiusAngle))
+                        * (float)RandomRange.RandomGenerator.NextDouble() * Radius;
+                }
+
                 var particle = new ParticleInstance()
                 {
                     color = Class.ColorOverTime.start,
                     delay = TimeSpan.Zero,
-                    position = instance.Position,
+                    position = position,
                     velocity = speed * dir + instance.Velocity,
                     lifetime = lifetime,
                     angle = initAngle,

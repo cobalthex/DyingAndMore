@@ -5,6 +5,7 @@ EffectsClass {
                 Graphic: {
                     Texture: @"Effects/Trail.png"
                     Center: true;
+                    Tween: TweenStyle.Overlap;
                 };
                 Blend: BlendState.Additive;
                 ColorOverTime: {
@@ -15,11 +16,12 @@ EffectsClass {
                     start: 0;
                     end: 4pi;
                 };
-                InitialSpeed: [-100 -200];
+                InitialSpeed: [50 100];
                 lifetime: [0.2sec 0.5sec];
             }
             Count: [0 3];
-            Spread: [-0.1pi 0.1pi]
+            Spread: [-0.9pi -1.1pi];
+            Radius: 3;
         }
 	]
 }

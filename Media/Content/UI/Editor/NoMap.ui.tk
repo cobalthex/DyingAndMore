@@ -13,14 +13,12 @@ List {
     Static {
         Name: "new";
         Text: "Press Ctrl+N to create a new map";
-        Font: @"UISmall.fnt.tk";
         Color: Color.White;
         HorizontalAlignment: Alignment.Middle;
     }
     Static {
         Name: "open";
         Text: "or Ctrl+O to open a map";
-        Font: @"UISmall.fnt.tk";
         Color: Color.White;
         HorizontalAlignment: Alignment.Middle;
     }

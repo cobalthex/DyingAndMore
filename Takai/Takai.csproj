@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Cache.cs" />
-    <Compile Include="Data\Designer.cs" />
     <Compile Include="Data\Serializer.cs" />
     <Compile Include="Data\Serializer.Deserialize.cs">
       <DependentUpon>Serializer.cs</DependentUpon>

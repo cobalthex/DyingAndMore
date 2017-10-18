@@ -22,6 +22,18 @@ namespace Takai.Game
         public List<Decal> Decals { get; set; }
     }
 
+    /// <summary>
+    /// An intermediate struct encapsulating tileset properties
+    /// </summary>
+    public struct Tileset
+    {
+        public Texture2D texture; //sprite?
+        public int size;
+    }
+
+    /// <summary>
+    /// The (mostly) static properties of a single map
+    /// </summary>
     public partial class MapClass : IObjectClass<MapInstance>
     {
         [Data.Serializer.Ignored]
