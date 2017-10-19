@@ -23,7 +23,6 @@ List {
             width: 400;
             height: 400;
             Direction: Direction.Vertical;
-            HorizontalAlignment: Alignment.Middle;
             Children: [
                 List {
                     Direction: Direction.Vertical;

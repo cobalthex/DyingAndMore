@@ -112,24 +112,6 @@ namespace DyingAndMore.Game
             GameInstance.Current = new GameInstance();
         }
 
-        class NavigateToPlayer : EntityScript
-        {
-            EntityInstance player;
-
-            public NavigateToPlayer(EntityInstance entity)
-                : base("NavigateToPlayer", entity) { }
-
-            public override void OnSpawn()
-            {
-                player = GameInstance.Current.players.FirstOrDefault();
-            }
-
-            public override void Step(TimeSpan deltaTime)
-            {
-
-            }
-        }
-
         protected override void OnMapChanged(EventArgs e)
         {
             Map.updateSettings = MapInstance.UpdateSettings.Game;
@@ -174,7 +156,7 @@ namespace DyingAndMore.Game
             }
 
             if (enemy != null)
-                Map.Spawn(new NavigateToPlayer(enemy));
+                Map.Spawn(new Scripts.NavigateToPlayer(enemy));
 
             Map.ActiveCamera = new Camera(player); //todo: resume control
             x = false;
@@ -186,7 +168,7 @@ namespace DyingAndMore.Game
             if(!x)
             {
                 x = true;
-                Takai.Data.Cache.CleanupStaleReferences(); //todo: find better place for this
+                Takai.Data.Cache.CleanupStaleReferences(); //todo: find better place for this (editor needs to be fully out of scope)
             }
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";

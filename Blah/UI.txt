@@ -1,0 +1,25 @@
+UIActions:
+
+	** (actions?)
+	NextPage
+	PreviousPage
+
+
+	Function
+
+	ActionString
+
+	LoadUI
+
+	Confirm
+	Cancel
+
+Wizard:
+	Pages[]
+
+	GetState()
+	{
+		returns list of all inputtable properties for each page
+
+		(interface IUIInput ?)
+	}

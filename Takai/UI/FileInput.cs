@@ -53,12 +53,19 @@ namespace Takai.UI
             get => textInput.Color;
             set
             {
-                textInput.Color = pickerButton.Color = value;
+                if (textInput != null)
+                    textInput.Color = pickerButton.Color = value;
             }
         }
 
-        protected TextInput textInput;
-        protected Static pickerButton;
+        protected TextInput textInput = new TextInput
+        {
+            BorderColor = Color.Transparent
+        };
+        protected Static pickerButton = new Static
+        {
+            Text = "..."
+        };
 
         private Color lastOutlineColor;
         private bool fileWasInvalid = false;
@@ -73,16 +80,8 @@ namespace Takai.UI
         {
             Direction = Direction.Horizontal;
 
-            textInput = new TextInput()
-            {
-                BorderColor = Color.Transparent
-            };
             textInput.TextChanged += delegate { ValidateFile(); };
 
-            pickerButton = new Static()
-            {
-                Text = "..."
-            };
             pickerButton.Click += delegate
             {
 #if WINDOWS && DEBUG

@@ -20,9 +20,9 @@ namespace Takai.UI
             {
                 var newVal = (value < Minimum ? Minimum : (value > Maximum ? Maximum : value));
 
-                if (this._value != newVal)
+                if (_value != newVal)
                 {
-                    this._value = newVal;
+                    _value = newVal;
                     OnValueChanged(EventArgs.Empty);
                     ValueChanged?.Invoke(this, EventArgs.Empty);
                 }
@@ -45,14 +45,15 @@ namespace Takai.UI
         /// </summary>
         public NumericBaseType Minimum
         {
-            get => minimum;
+            get => _minimum;
             set
             {
-                minimum = value;
-                if (Value < minimum)
-                    Value = minimum;
+                _minimum = value;
+                if (Value < _minimum)
+                    Value = _minimum;
             }
         }
+        private NumericBaseType _minimum = NumericBaseType.MinValue;
 
         /// <summary>
         /// The maximum allowed value
@@ -60,16 +61,15 @@ namespace Takai.UI
         /// </summary>
         public NumericBaseType Maximum
         {
-            get => maximum;
+            get => _maximum;
             set
             {
-                maximum = value;
-                if (Value > maximum)
-                    Value = maximum;
+                _maximum = value;
+                if (Value > _maximum)
+                    Value = _maximum;
             }
         }
-        protected NumericBaseType minimum = NumericBaseType.MinValue;
-        protected NumericBaseType maximum = NumericBaseType.MaxValue;
+        private NumericBaseType _maximum = NumericBaseType.MaxValue;
 
         /// <summary>
         /// How much to increase or decrease the value by each step
@@ -107,8 +107,18 @@ namespace Takai.UI
             }
         }
 
-        protected TextInput textInput;
-        protected Static upButton, downButton;
+        protected TextInput textInput = new TextInput
+        {
+            Text = "0",
+            AllowLetters = false,
+            AllowNumbers = true,
+            AllowSpaces = false,
+            AllowSpecialCharacters = false,
+            MaxLength = 20,
+            BorderColor = Color.Transparent,
+        };
+        protected Static upButton = new Static { Text = "+" };
+        protected Static downButton = new Static { Text = "-" };
 
         public NumericInput()
         {
@@ -119,16 +129,6 @@ namespace Takai.UI
                 upButton.Size = downButton.Size = new Vector2(height);
             };
 
-            textInput = new TextInput()
-            {
-                Text = "0",
-                AllowLetters = false,
-                AllowNumbers = true,
-                AllowSpaces = false,
-                AllowSpecialCharacters = false,
-                MaxLength = 20,
-                BorderColor = Color.Transparent,
-            };
             textInput.TextChanged += delegate
             {
                 if (NumericBaseType.TryParse(textInput.Text, out var val))
@@ -141,20 +141,12 @@ namespace Takai.UI
 
             BorderColor = Color;
 
-            upButton = new Static()
-            {
-                Text = "+",
-            };
             upButton.Click += delegate
             {
                 Value += Increment;
                 textInput.Text = Value.ToString();
             };
 
-            downButton = new Static()
-            {
-                Text = "-",
-            };
             downButton.Click += delegate
             {
                 Value -= Increment;
@@ -167,6 +159,7 @@ namespace Takai.UI
         protected override void OnValueChanged(EventArgs e)
         {
             textInput.Text = Value.ToString();
+            textInput.ScrollPosition = 0;
             base.OnValueChanged(e);
         }
 
