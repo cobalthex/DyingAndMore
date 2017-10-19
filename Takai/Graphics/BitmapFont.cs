@@ -327,6 +327,9 @@ namespace Takai.Graphics
         /// <remarks>Characters not in the font are ignored, escape characters are ignored aswell</remarks>
         public Vector2 MeasureString(string text, int startIndex, int length)
         {
+            if (text == null)
+                return Vector2.Zero;
+
             Vector2 total = Vector2.Zero;
             Vector2 row = Vector2.Zero;
 

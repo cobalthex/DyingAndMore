@@ -110,21 +110,9 @@ namespace DyingAndMore
             //box.Size = new Vector2(300, 400);
             //box.BorderColor = Color.LightBlue;
 
-            ui = new Takai.UI.Static();
+            ui = Takai.Data.Cache.Load<Takai.UI.Static>("UI/NoMap.ui.tk");
+            var mapList = (Takai.UI.List)ui.FindChildByName("maps");
 
-            var sbox = new Takai.UI.ScrollBox()
-            {
-                HorizontalAlignment = Takai.UI.Alignment.Middle,
-                VerticalAlignment = Takai.UI.Alignment.Middle,
-                Size = new Vector2(400)
-            };
-            ui.AddChild(sbox);
-            var list = new Takai.UI.List()
-            {
-                HorizontalAlignment = Takai.UI.Alignment.Stretch,
-                VerticalAlignment = Takai.UI.Alignment.Stretch,
-            };
-            sbox.AddChild(list);
             foreach (var file in System.IO.Directory.EnumerateFiles(System.IO.Path.Combine(Takai.Data.Cache.DefaultRoot, "Maps"), "*.map.tk"))
             {
                 var row = new Takai.UI.Static()
@@ -140,9 +128,16 @@ namespace DyingAndMore
                     ui = new Takai.UI.Static(new Editor.Editor(map.Create()));
                 };
                 row.AutoSize(10);
-                list.AddChild(row);
+                mapList.AddChild(row);
             }
-            list.AutoSize();
+            mapList.AutoSize();
+
+            var newMap = ui.FindChildByName("new");
+            newMap.Click += delegate (object _sender, Takai.UI.ClickEventArgs _e)
+            {
+                ui.ReplaceAllChildren(Takai.Data.Cache.Load<Takai.UI.Static>("UI/Editor/NewMap.ui.tk"));
+                //todo: hook up
+            };
 
             fpsGraph = new Takai.FpsGraph()
             {
@@ -200,9 +195,7 @@ namespace DyingAndMore
             }
             if (InputState.IsPress(Keys.F8))
             {
-                if (fpsGraph.Parent != null)
-                    fpsGraph.RemoveFromParent();
-                else
+                if (!fpsGraph.RemoveFromParent())
                 {
                     fpsGraph.Clear();
                     ui.AddChild(fpsGraph);

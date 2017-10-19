@@ -334,7 +334,7 @@ namespace Takai.UI
 
             if (textWidth < ScrollPosition)
                 ScrollPosition -= (int)Size.X;
-            //todo
+            //todo: scroll position is broken
             ScrollPosition = (int)MathHelper.Clamp(textWidth, 0, textSize.X - Size.X);
         }
 
