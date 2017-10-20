@@ -66,10 +66,10 @@ ActorClass {
     AlwaysDrawUpright: False;
     DestroyOnDeath: False;
 
-    DefaultWeapon: SpawnerClass {
+    DefaultWeapon: @"Weapons/Test.wpn.tk"; #*SpawnerClass {
         Delay: [1sec 3sec];
         Spawns: [
             [@"Actors/InfectedCell.ent.tk" [3 5]]
-        ]
+        ]*#
     }
 }
