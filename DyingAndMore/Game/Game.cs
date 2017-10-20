@@ -162,6 +162,7 @@ namespace DyingAndMore.Game
             x = false;
         }
 
+
         bool x = false;
         protected override void UpdateSelf(GameTime time)
         {
@@ -176,8 +177,6 @@ namespace DyingAndMore.Game
 
             crapDisplay.Text = $"TimeScale:{Map.TimeScale}\nZoom:{Map.ActiveCamera.Scale}";
             crapDisplay.AutoSize();
-
-            Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
             base.UpdateSelf(time);
         }
@@ -271,13 +270,36 @@ namespace DyingAndMore.Game
                     break;
             }
         }
+        Vector2 lastClick;
 
+        System.Diagnostics.Stopwatch swatch = new System.Diagnostics.Stopwatch();
         protected override bool HandleInput(GameTime time)
         {
+            Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+
+            if (player != null)
+            {
+                swatch.Restart();
+                var a = player.Position;
+                var b = worldMousePos;
+                var path = Map.AStarBuildPath(a, b);
+                Map.DrawLine(a, b, Color.Black);
+                for (int i = 1; i < path.Count; ++i)
+                {
+                    Map.DrawLine(
+                        path[i - 1].ToVector2() * Map.Class.TileSize,
+                        path[i].ToVector2() * Map.Class.TileSize,
+                        Takai.Util.ColorFromHSL(((float)i / path.Count) * 360, 1, 0.65f)
+                    );
+                }
+                swatch.Stop();
+                //Takai.LogBuffer.Append(swatch.ElapsedMilliseconds.ToString());
+            }
+
             if (player != null && InputState.IsPress(MouseButtons.Left))
             {
                 var fx = testEffect.Create();
-                fx.Position = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+                fx.Position = worldMousePos;
                 fx.Direction = fx.Position - player.Position;
                 Map.Spawn(fx);
                 return false;
@@ -321,7 +343,7 @@ namespace DyingAndMore.Game
 #if DEBUG
             if (InputState.IsMod(KeyMod.Alt) && InputState.IsPress(MouseButtons.Left))
             {
-                var targets = Map.FindEntities(Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 5);
+                var targets = Map.FindEntities(worldMousePos, 5);
 
                 foreach (var ent in targets)
                 {

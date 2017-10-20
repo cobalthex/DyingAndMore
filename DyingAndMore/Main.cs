@@ -66,7 +66,7 @@ namespace DyingAndMore
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps
             IsMouseVisible = true;
 
-            IsFixedTimeStep = true;
+            IsFixedTimeStep = false;
         }
 
         void GdmDeviceCreated(object sender, System.EventArgs e)
@@ -179,6 +179,9 @@ namespace DyingAndMore
                 Exit();
                 return;
             }
+
+            if (InputState.IsPress(Keys.F10))
+                Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? debugFont : null);
 
             if (InputState.IsPress(Keys.F12))
                 takingScreenshot = true;

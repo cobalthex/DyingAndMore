@@ -13,7 +13,7 @@ namespace DyingAndMore.Game.Scripts
 
         public override void OnSpawn()
         {
-            player = GameInstance.Current.players.FirstOrDefault();
+            player = GameInstance.Current.players?.FirstOrDefault();
         }
 
         public override void Step(TimeSpan deltaTime)

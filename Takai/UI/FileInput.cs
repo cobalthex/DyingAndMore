@@ -1,4 +1,7 @@
-﻿using System.Windows.Forms;
+﻿using System.IO;
+#if WINDOWS
+using System.Windows.Forms;
+#endif
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,9 +13,32 @@ namespace Takai.UI
         Save
     }
 
-    public class FileInput : List
+    public class FileInputBase : List
     {
         //todo: directory support
+
+        /// <summary>
+        /// The mode of this file input, by default, open
+        /// </summary>
+        public DialogMode Mode { get; set; } = DialogMode.Open;
+
+        /// <summary>
+        /// On input, show a little marker whether or not the file exists
+        /// </summary>
+        public bool VerifyFileExists { get; set; } = true;
+
+        public virtual string InitialDirectory { get; set; } = "";
+        public virtual string Filter { get; set; } = null;
+
+        /// <summary>
+        /// Called whenever a valid file name is entered
+        /// </summary>
+        public System.EventHandler FileSelected;
+        protected virtual void OnFileSelected(System.EventArgs e) { }
+    }
+
+    public class FileInput : FileInputBase
+    {
 
         public static Color InvalidFileOutlineColor = Color.Tomato;
 
@@ -25,19 +51,6 @@ namespace Takai.UI
                 ValidateFile();
             }
         }
-
-        /// <summary>
-        /// The mode of this file input, by default, open
-        /// </summary>
-        public DialogMode Mode { get; set; } = DialogMode.Open;
-
-        /// <summary>
-        /// On input, show a little marker whether or not the file exists
-        /// </summary>
-        public bool VerifyFileExists { get; set; } = true;
-
-        public string InitialDirectory { get; set; } = "";
-        public string Filter { get; set; } = null;
 
         public override Graphics.BitmapFont Font
         {
@@ -68,13 +81,8 @@ namespace Takai.UI
         };
 
         private Color lastOutlineColor;
-        private bool fileWasInvalid = false;
 
-        /// <summary>
-        /// Called whenever a valid file name is entered
-        /// </summary>
-        public System.EventHandler FileSelected;
-        protected virtual void OnFileSelected(System.EventArgs e) { }
+        private bool fileWasInvalid = false;
 
         public FileInput()
         {
@@ -157,7 +165,43 @@ namespace Takai.UI
                 FileSelected?.Invoke(this, System.EventArgs.Empty);
             }
         }
+    }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch) { }
+    public class FileSelect : FileInputBase
+    {
+        public override string InitialDirectory
+        {
+            get => base.InitialDirectory;
+            set
+            {
+                base.InitialDirectory = value;
+                RefreshList();
+            }
+        }
+
+        public override string Filter
+        {
+            get => base.Filter;
+            set
+            {
+                base.Filter = value;
+                RefreshList();
+            }
+        }
+
+        /// <summary>
+        /// Load files in subdirectories of the InitialDirectory (recursive)
+        /// </summary>
+        public bool LoadSubdirectories { get; set; } = true;
+
+        protected void RefreshList()
+        {
+            RemoveAllChildren();
+
+            foreach (var file in Directory.EnumerateFiles(InitialDirectory, Filter, LoadSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
+            {
+
+            }
+        }
     }
 }

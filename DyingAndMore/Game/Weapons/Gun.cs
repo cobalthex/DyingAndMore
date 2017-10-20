@@ -14,8 +14,18 @@ namespace DyingAndMore.Game.Weapons
 
         //clip size, shots reloaded per load
 
-        public int BurstCount { get; set; } = 0;
+        /// <summary>
+        /// The maximum number of bursts per trigger pull
+        /// Use 0 for infinite
+        /// </summary>
+        public int MaxBursts { get; set; } = 0;
+
+        /// <summary>
+        /// The number of shots in a single burst
+        /// </summary>
         public int ShotsPerBurst { get; set; } = 1;
+
+        //burst delay?
 
         public Takai.Game.Range<float> ErrorAngle { get; set; }
 
@@ -47,8 +57,8 @@ namespace DyingAndMore.Game.Weapons
 
         public int CurrentAmmo { get; set; }
 
-        protected int burst = 0;
-        protected bool canShoot = true;
+        protected int burstShot = 0; //shot number of current burst
+        protected int burstCount = 0; //number of bursts since last reset
 
         public GunInstance() { }
         public GunInstance(GunClass @class)
@@ -64,7 +74,7 @@ namespace DyingAndMore.Game.Weapons
 
         public override void Reset()
         {
-            canShoot = true;
+            burstCount = 0;
             base.Reset();
         }
 
@@ -75,21 +85,21 @@ namespace DyingAndMore.Game.Weapons
 
         public override void Charge()
         {
-            if (canShoot)
-            {
+            if (_class.MaxBursts == 0 || burstCount < _class.MaxBursts)
                 DoCharge();
-                canShoot = false;
-            }
         }
 
         public override void Think(TimeSpan deltaTime)
         {
-            if (burst > 0)
+            if (burstShot > 0)
             {
-                if (burst < _class.BurstCount)
+                if (burstShot < _class.ShotsPerBurst)
                     DoCharge();
                 else
-                    burst = 0;
+                {
+                    burstShot = 0;
+                    ++burstCount;
+                }
             }
 
             base.Think(deltaTime);
@@ -118,7 +128,7 @@ namespace DyingAndMore.Game.Weapons
             }
 
             --CurrentAmmo;
-            ++burst;
+            ++burstShot;
 
             base.Discharge();
         }

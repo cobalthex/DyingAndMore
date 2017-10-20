@@ -2,7 +2,7 @@ List {
     Margin: 10;
     Direction: Direction.Vertical;
     HorizontalAlignment: Alignment.Middle;
-    verticalAlignment: Alignment.Middle;
+    VerticalAlignment: Alignment.Middle;
 
     Children: [
         Static {
@@ -23,6 +23,7 @@ List {
             width: 400;
             height: 400;
             Direction: Direction.Vertical;
+            HorizontalAlignment: Alignment.Middle;
             Children: [
                 List {
                     Direction: Direction.Vertical;

@@ -312,7 +312,11 @@ namespace Takai.Data
         private static void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             System.Threading.Thread.Sleep(500);
-            try { Load(e.FullPath, null, true); }
+            try
+            {
+                Load(e.FullPath, null, true);
+                LogBuffer.Append("Refreshed " + e.FullPath);
+            }
             catch { }
         }
 

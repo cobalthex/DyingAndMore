@@ -1,6 +1,7 @@
 GunClass {
     MaxAmmo: 100;
-	BurstCount: 0;
+	ShotsPerBurst: 3;
+    MaxBursts: 2;
 	Delay: [0 0];
     Projectile: @"Weapons/Projectiles/Missile.ent.tk";
 

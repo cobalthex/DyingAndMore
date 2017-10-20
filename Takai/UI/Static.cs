@@ -45,6 +45,9 @@ namespace Takai.UI
         /// </summary>
         public static Color DefaultColor = Color.White;
 
+        /// <summary>
+        /// The color to use when drawing the focus rectangle around the focused element
+        /// </summary>
         public static Color FocusedBorderColor = Color.RoyalBlue;
 
         /// <summary>
