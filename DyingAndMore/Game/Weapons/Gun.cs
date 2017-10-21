@@ -57,8 +57,8 @@ namespace DyingAndMore.Game.Weapons
 
         public int CurrentAmmo { get; set; }
 
-        protected int burstShot = 0; //shot number of current burst
-        protected int burstCount = 0; //number of bursts since last reset
+        protected int currentBurstShotCount = 0;
+        protected int burstCount = 0;
 
         public GunInstance() { }
         public GunInstance(GunClass @class)
@@ -91,13 +91,13 @@ namespace DyingAndMore.Game.Weapons
 
         public override void Think(TimeSpan deltaTime)
         {
-            if (burstShot > 0)
+            if (currentBurstShotCount > 0)
             {
-                if (burstShot < _class.ShotsPerBurst)
+                if (currentBurstShotCount < _class.ShotsPerBurst)
                     DoCharge();
                 else
                 {
-                    burstShot = 0;
+                    currentBurstShotCount = 0;
                     ++burstCount;
                 }
             }
@@ -128,7 +128,7 @@ namespace DyingAndMore.Game.Weapons
             }
 
             --CurrentAmmo;
-            ++burstShot;
+            ++currentBurstShotCount;
 
             base.Discharge();
         }
