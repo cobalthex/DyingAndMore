@@ -397,6 +397,20 @@ namespace Takai.Game
         /// <param name="Type">The type of Fluid collided with</param>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void OnFluidCollision(FluidClass Type, TimeSpan DeltaTime) { }
+
+        /// <summary>
+        /// Destroy this entity
+        /// </summary>
+        /// <param name="destroyChildren">Destroy any of this entity's children (recursive)</param>
+        public void DestroySelf(bool destroyChildren = false)
+        {
+            if (destroyChildren)
+            {
+                foreach (var child in Children)
+                    child.DestroySelf(true);
+            }
+            Map?.Destroy(this);
+        }
     }
 }
 

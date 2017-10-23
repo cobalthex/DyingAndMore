@@ -277,7 +277,7 @@ namespace DyingAndMore.Game
         {
             Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
-            if (player != null)
+            /*if (player != null)
             {
                 swatch.Restart();
                 var a = player.Position;
@@ -294,7 +294,7 @@ namespace DyingAndMore.Game
                 }
                 swatch.Stop();
                 //Takai.LogBuffer.Append(swatch.ElapsedMilliseconds.ToString());
-            }
+            }*/
 
             if (player != null && InputState.IsPress(MouseButtons.Left))
             {
@@ -388,7 +388,7 @@ namespace DyingAndMore.Game
                 if (actor.Weapon is Weapons.GunInstance gun)
                 {
                     pos.Y += 10;
-                    tinyFont.Draw(spriteBatch, gun.CurrentAmmo.ToString(), pos, Color.LightSteelBlue);
+                    tinyFont.Draw(spriteBatch, gun.AmmoCount.ToString(), pos, Color.LightSteelBlue);
                 }
             }
         }

@@ -8,20 +8,48 @@ namespace Takai.Game
     {
         public struct PathTile
         {
-            internal bool marked;
             public uint heuristic;
         }
 
         [Data.Serializer.Ignored]
         public PathTile[,] PathInfo { get; set; }
 
-        struct HeuristicPoint
+        public struct HeuristicScore
         {
             public Point tile;
             public uint value;
         }
 
         internal uint MaxHeuristic = 0;
+
+        internal static readonly Point[] HeuristicDirections =
+        {
+            new Point( 0, -1),
+            new Point(-1,  0),
+            new Point( 0,  1),
+            new Point( 1,  0),
+        };
+
+        public static readonly Point[] NavigationDirections =
+        {
+            new Point(-1, -1),
+            new Point( 0, -1),
+            new Point( 1, -1),
+            new Point(-1,  0),
+            new Point( 1,  0),
+            new Point(-1,  1),
+            new Point( 0,  1),
+            new Point( 1,  1),
+        };
+
+        public bool CanPath(Point tile)
+        {
+            if (!TileBounds.Contains(tile))
+                return false;
+            return Tiles[tile.Y, tile.X] >= 0;
+        }
+
+        //dynamic heuristic that only builds to visible region/entities
 
         /// <summary>
         /// Build the hueristic from a speicified start point.
@@ -35,35 +63,27 @@ namespace Takai.Game
                 for (int x = 0; x < Width; ++x)
                     PathInfo[y, x] = new PathTile { heuristic = uint.MaxValue };
 
-            if (Tiles[start.Y, start.X] < 0)
+            if (!CanPath(start))
                 return;
 
-            var queue = new Queue<HeuristicPoint>();
-            queue.Enqueue(new HeuristicPoint { tile = start, value = 1 });
+            PathInfo[start.Y, start.X] = new PathTile { heuristic = 0 };
+
+            var queue = new Queue<HeuristicScore>();
+            queue.Enqueue(new HeuristicScore { tile = start, value = 1 });
             while (queue.Count > 0)
             {
                 var first = queue.Dequeue();
 
                 MaxHeuristic = Math.Max(MaxHeuristic, first.value);
 
-                var left = first.tile.X;
-                var right = first.tile.X;
-                for (; left > 0 && Tiles[first.tile.Y, left - 1] >= 0 && !PathInfo[first.tile.Y, left - 1].marked; --left) ;
-                for (; right < Width - 1 && Tiles[first.tile.Y, right + 1] >= 0 && !PathInfo[first.tile.Y, right + 1].marked; ++right) ;
-
-                for (; left <= right; ++left)
+                foreach (var i in HeuristicDirections)
                 {
-                    PathInfo[first.tile.Y, left] = new PathTile
+                    var pos = first.tile + i;
+                    if (CanPath(pos) && PathInfo[pos.Y, pos.X].heuristic == uint.MaxValue)
                     {
-                        heuristic = first.value + (uint)Math.Abs(first.tile.X - left),
-                        marked = true,
-                    };
-
-                    if (first.tile.Y > 0 && Tiles[first.tile.Y - 1, left] >= 0 && !PathInfo[first.tile.Y - 1, left].marked)
-                        queue.Enqueue(new HeuristicPoint { tile = new Point(left, first.tile.Y - 1), value = PathInfo[first.tile.Y, left].heuristic + 1 });
-
-                    if (first.tile.Y < Height - 1 && Tiles[first.tile.Y + 1, left] >= 0 && !PathInfo[first.tile.Y + 1, left].marked)
-                        queue.Enqueue(new HeuristicPoint { tile = new Point(left, first.tile.Y + 1), value = PathInfo[first.tile.Y, left].heuristic + 1 });
+                        PathInfo[pos.Y, pos.X] = new PathTile { heuristic = first.value };
+                        queue.Enqueue(new HeuristicScore { tile = pos, value = first.value + 1 });
+                    }
                 }
             }
         }
@@ -115,13 +135,6 @@ namespace Takai.Game
             return StraightCost * (dx + dy) + (DiagonalCost - 2 * StraightCost) * Math.Min(dx, dy);
         }
 
-        public bool CanPath(Point tile)
-        {
-            if (!Class.TileBounds.Contains(tile))
-                return false;
-            return Class.Tiles[tile.Y, tile.X] >= 0;
-        }
-
         //fluids should affect cost of moving through tile
 
         public List<Point> AStarBuildPath(Vector2 start, Vector2 goal)
@@ -129,7 +142,7 @@ namespace Takai.Game
             var pstart = (start / Class.TileSize).ToPoint();
             var pgoal = (goal / Class.TileSize).ToPoint();
 
-            if (!CanPath(pstart) || !CanPath(pgoal))
+            if (!Class.CanPath(pstart) || !Class.CanPath(pgoal))
                 return new List<Point> { pstart };
 
             AStarPathNode goalNode = new AStarPathNode(pgoal, 0, 0);
@@ -183,12 +196,12 @@ namespace Takai.Game
                     //jump to end
                     var neighbor = new AStarPathNode(current.tile + dir.tile, 0, 0);
 
-                    if (closed.Contains(neighbor.tile) || !CanPath(neighbor.tile)) //neighbor part of closed set or cannot be pathed on
+                    if (closed.Contains(neighbor.tile) || !Class.CanPath(neighbor.tile)) //neighbor part of closed set or cannot be pathed on
                         continue;
 
                     //if diagonal check if cardinals are blocked to disable corner cutting
                     if ((Math.Abs(dir.tile.X) == Math.Abs(dir.tile.Y)) &&
-                        (!CanPath(new Point(current.tile.X, neighbor.tile.Y)) || !CanPath(new Point(neighbor.tile.X, current.tile.Y))))
+                        (!Class.CanPath(new Point(current.tile.X, neighbor.tile.Y)) || !Class.CanPath(new Point(neighbor.tile.X, current.tile.Y))))
                         continue;
 
                     int cost = current.cost + dir.cost;

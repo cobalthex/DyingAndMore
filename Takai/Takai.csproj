@@ -58,6 +58,7 @@
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Effects.cs" />
     <Compile Include="Game\Entity.cs" />
+    <Compile Include="Game\Fluid.cs" />
     <Compile Include="Game\Map.cs" />
     <Compile Include="Game\Map.Drawing.cs">
       <DependentUpon>Map.cs</DependentUpon>
@@ -76,6 +77,7 @@
     <Compile Include="Game\Map.Updating.cs">
       <DependentUpon>Map.cs</DependentUpon>
     </Compile>
+    <Compile Include="Game\Particles.cs" />
     <Compile Include="Game\Sound.cs" />
     <Compile Include="Diagnostics.cs" />
     <Compile Include="Objects.cs" />

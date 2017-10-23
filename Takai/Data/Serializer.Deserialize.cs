@@ -115,7 +115,7 @@ namespace Takai.Data
                     while ((peek = context.reader.Peek()) != ':')
                     {
                         if (peek == -1)
-                            throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected '}' to close object", ref context));
+                            throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected '}}' to close object", ref context));
 
                         if (peek == ';' && key.Length == 0)
                         {
@@ -127,7 +127,7 @@ namespace Takai.Data
                     }
 
                     if (context.reader.Read() == -1)
-                        throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream while trying to read object", ref context));
+                        throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read object", ref context));
 
                     var value = TextDeserialize(context);
                     dict[String.Intern(key.ToString().TrimEnd())] = value; //todo: analyze interning
@@ -135,7 +135,7 @@ namespace Takai.Data
                     SkipIgnored(context.reader);
 
                     if ((peek = context.reader.Peek()) == -1)
-                        throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected '}' to close object", ref context));
+                        throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected '}}' to close object", ref context));
 
                     if (peek == ';')
                     {
@@ -143,7 +143,7 @@ namespace Takai.Data
                         SkipIgnored(context.reader);
                     }
                     //else if (peek != '}')
-                    //    throw new InvalidDataException(GetExceptionMessage("Unexpected token. Expected ';' or '}' while trying to read object", context));
+                    //    throw new InvalidDataException(GetExceptionMessage($"Unexpected token. Expected ';' or '}' while trying to read object", context));
                 }
 
                 context.reader.Read();
@@ -165,20 +165,20 @@ namespace Takai.Data
                         SkipIgnored(context.reader);
 
                         if (context.reader.Peek() == ';')
-                            throw new InvalidDataException(GetExceptionMessage("Unexpected ';' in list (missing value)", ref context));
+                            throw new InvalidDataException(GetExceptionMessage($"Unexpected ';' in list (missing value)", ref context));
 
                         continue;
                     }
 
                     if (peek == -1)
-                        throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream while trying to read list", ref context));
+                        throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read list", ref context));
 
                     values.Add(TextDeserialize(context));
                     SkipIgnored(context.reader);
                 }
 
                 if (context.reader.Read() == -1) //skip ]
-                    throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected ']' to close list", ref context));
+                    throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected ']' to close list", ref context));
 
                 return values;
             }
@@ -304,13 +304,13 @@ namespace Takai.Data
                                 SkipIgnored(context.reader);
 
                                 if (context.reader.Peek() == ';')
-                                    throw new InvalidDataException(GetExceptionMessage("Unexpected ';' in enum (missing value)", ref context));
+                                    throw new InvalidDataException(GetExceptionMessage($"Unexpected ';' in enum (missing value)", ref context));
 
                                 continue;
                             }
 
                             if (peek == -1)
-                                throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream while trying to read enum", ref context));
+                                throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read enum", ref context));
 
                             var value = ReadWord(context.reader);
                             values |= Convert.ToUInt64(Enum.Parse(type, value));
@@ -320,13 +320,13 @@ namespace Takai.Data
                         }
 
                         if (context.reader.Read() == -1) //skip ]
-                            throw new EndOfStreamException(GetExceptionMessage("Unexpected end of stream. Expected ']' to close enum", ref context));
+                            throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected ']' to close enum", ref context));
 
                         if (valuesCount == 0)
-                            throw new ArgumentOutOfRangeException(GetExceptionMessage("Expected at least one enum value", ref context));
+                            throw new ArgumentOutOfRangeException(GetExceptionMessage($"Expected at least one enum value", ref context));
 
                         if (valuesCount > 1 && !Attribute.IsDefined(type, typeof(FlagsAttribute), true))
-                            throw new ArgumentOutOfRangeException(GetExceptionMessage("{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", ref context));
+                            throw new ArgumentOutOfRangeException(GetExceptionMessage($"{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", ref context));
 
                         return Enum.ToObject(type, values);
                     }
@@ -334,7 +334,7 @@ namespace Takai.Data
                         return Enum.Parse(type, ReadWord(context.reader));
 
                     if (context.reader.Read() != '[')
-                        throw new InvalidDataException(GetExceptionMessage("Expected a '[' when reading enum value (EnumType[Key1; Key2]) or '.' (EnumType.Key) while attempting to read '{word}'", ref context));
+                        throw new InvalidDataException(GetExceptionMessage($"Expected a '[' when reading enum value (EnumType[Key1; Key2]) or '.' (EnumType.Key) while attempting to read '{word}'", ref context));
                 }
 
                 //static/single enum value
@@ -344,24 +344,24 @@ namespace Takai.Data
                     SkipIgnored(context.reader);
                     var staticVal = ReadWord(context.reader);
 
-                    var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static);
+                    var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveMembers ? BindingFlags.IgnoreCase : 0));
                     if (field != null)
                         return field.GetValue(null);
 
-                    var prop = type.GetProperty(staticVal, BindingFlags.Public | BindingFlags.Static);
+                    var prop = type.GetProperty(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveMembers ? BindingFlags.IgnoreCase : 0));
                     if (prop != null)
                         return prop.GetValue(null);
 
-                    throw new InvalidDataException(GetExceptionMessage("Expected static value when reading {staticVal} from type '{word}'", ref context));
+                    throw new InvalidDataException(GetExceptionMessage($"Expected static value when reading '{staticVal}' from type '{word}'", ref context));
                 }
 
                 //read object
                 if (peek != '{')
-                    throw new InvalidDataException(GetExceptionMessage("Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", ref context));
+                    throw new InvalidDataException(GetExceptionMessage($"Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", ref context));
 
                 var dict = TextDeserialize(context) as Dictionary<string, object>;
                 if (dict == null)
-                    throw new InvalidDataException(GetExceptionMessage("Expected an object definition when reading type '{word}' (Type {{ }})", ref context));
+                    throw new InvalidDataException(GetExceptionMessage($"Expected an object definition when reading type '{word}' (Type {{ }})", ref context));
 
                 try
                 {

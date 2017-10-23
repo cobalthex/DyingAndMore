@@ -1,7 +1,7 @@
 FluidClass {
     Name: "Bile";
-    Texture: "Fluids/Bile.png";
-    Reflection: "Fluids/Bile.r.png";
+    Texture: @"Fluids/Bile.png";
+    Reflection: @"Fluids/Bile.r.png";
     Radius: 54;
     Drag: 0.7;
 }

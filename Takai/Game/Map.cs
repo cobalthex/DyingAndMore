@@ -253,6 +253,7 @@ namespace Takai.Game
             instance.Map = this;
             instance.SpawnTime = ElapsedTime;
             instance.RefreshBounds();
+            instance.OnSpawn();
 
             _allEntities.Add(instance);
 

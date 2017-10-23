@@ -27,7 +27,7 @@ namespace DyingAndMore.Game.Weapons
         public string File { get; set; } = null;
 
         /// <summary>
-        /// How long to delay between each shot (random) -- todo: calculate from animation
+        /// How long to delay between each shot (random)
         /// </summary>
         public Takai.Game.Range<TimeSpan> Delay { get; set; } = TimeSpan.FromMilliseconds(100);
 
@@ -39,10 +39,12 @@ namespace DyingAndMore.Game.Weapons
 
         public abstract WeaponInstance Create();
 
-        /*animation:
+        /*possible animations:
             charge, [weapon fires], discharge
             rechamber
             reload
+
+            ** firing speeds tied to animation length
         */
     }
 

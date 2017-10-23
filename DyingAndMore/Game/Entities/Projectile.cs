@@ -15,7 +15,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// How far this shot will go before destroying itself
         /// </summary>
-        /// <remarks>Use zero for infinite</remarks>
+        /// <remarks>Use zero for infinity</remarks>
         public float Range { get; set; } = 0;
 
         /// <summary>
@@ -53,6 +53,11 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public EntityInstance Source { get; set; }
 
+        /// <summary>
+        /// Where the projectile was spawned
+        /// </summary>
+        protected Vector2 origin; //origin angle?
+
         public ProjectileInstance() { }
         public ProjectileInstance(ProjectileClass @class)
             : base(@class)
@@ -62,23 +67,26 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan DeltaTime)
         {
-            //todo: destroy if 0 velocity
+            if (Velocity.LengthSquared() < 0.001f ||
+                (_class.Range != 0 && Vector2.DistanceSquared(origin, Position) > _class.Range * _class.Range))
+                DestroySelf();
 
             base.Think(DeltaTime);
         }
 
         public override void OnSpawn()
         {
+            origin = Position;
         }
 
         public override void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime)
         {
-            Map.Destroy(this);
+            DestroySelf();
         }
 
         public override void OnEntityCollision(EntityInstance collider, Vector2 point, TimeSpan deltaTime)
         {
-            State.TransitionTo(EntStateId.Dead, "Dead"); //todo
+            State.TransitionTo(EntStateId.Dead, "Dead"); //todo: transition immediate
             Takai.LogBuffer.Append(ToString() + " " + collider.ToString());
 
             if (collider is ActorInstance actor &&
