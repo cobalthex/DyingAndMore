@@ -1,10 +1,10 @@
 ActorClass {
     Name: "Cyst";
     MaxHealth: 1000;
-    DefaultFaction: Factions [Enemy];
+    DefaultFaction: Factions [ Enemy; Common ];
     DefaultController: ArtilleryController {
         CanRotate: false;
-    };
+    }
     FieldOfView: 45deg;
 
     #launch force?
@@ -70,6 +70,6 @@ ActorClass {
         Delay: [1sec 3sec];
         Spawns: [
             [@"Actors/InfectedCell.ent.tk" [3 5]]
-        ]*#
-    }
+        ]
+    }*#
 }

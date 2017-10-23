@@ -55,7 +55,7 @@ namespace DyingAndMore.Game.Weapons
         }
         private GunClass _class;
 
-        public int CurrentAmmo { get; set; }
+        public int AmmoCount { get; set; }
 
         protected int currentBurstShotCount = 0;
         protected int burstCount = 0;
@@ -64,12 +64,12 @@ namespace DyingAndMore.Game.Weapons
         public GunInstance(GunClass @class)
             : base(@class)
         {
-            CurrentAmmo = @class.MaxAmmo;
+            AmmoCount = @class.MaxAmmo;
         }
 
         public override bool IsDepleted()
         {
-            return _class.MaxAmmo > 0 && CurrentAmmo <= 0;
+            return _class.MaxAmmo > 0 && AmmoCount <= 0;
         }
 
         public override void Reset()
@@ -78,15 +78,10 @@ namespace DyingAndMore.Game.Weapons
             base.Reset();
         }
 
-        protected virtual void DoCharge()
-        {
-            base.Charge();
-        }
-
         public override void Charge()
         {
             if (_class.MaxBursts == 0 || burstCount < _class.MaxBursts)
-                DoCharge();
+                base.Charge();
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -94,7 +89,7 @@ namespace DyingAndMore.Game.Weapons
             if (currentBurstShotCount > 0)
             {
                 if (currentBurstShotCount < _class.ShotsPerBurst)
-                    DoCharge();
+                    base.Charge();
                 else
                 {
                     currentBurstShotCount = 0;
@@ -127,7 +122,7 @@ namespace DyingAndMore.Game.Weapons
                 Actor.Map.Spawn(projectile);
             }
 
-            --CurrentAmmo;
+            --AmmoCount;
             ++currentBurstShotCount;
 
             base.Discharge();
