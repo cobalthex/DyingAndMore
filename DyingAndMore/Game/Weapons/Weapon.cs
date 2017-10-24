@@ -26,16 +26,15 @@ namespace DyingAndMore.Game.Weapons
         [Takai.Data.Serializer.Ignored]
         public string File { get; set; } = null;
 
-        /// <summary>
-        /// How long to delay between each shot (random)
-        /// </summary>
-        public Takai.Game.Range<TimeSpan> Delay { get; set; } = TimeSpan.FromMilliseconds(100);
-
         public UnderchargeAction UnderchargeAction { get; set; } = UnderchargeAction.Dissipate; //todo: cooldown?
 
         public OverchargeAction OverchargeAction { get; set; } = OverchargeAction.Discharge;
 
         public Takai.Game.EffectsClass DischargeEffect { get; set; }
+
+        public TimeSpan ChargeTime { get; set; }
+
+        public TimeSpan DischargeTime { get; set; }
 
         public abstract WeaponInstance Create();
 
@@ -59,6 +58,7 @@ namespace DyingAndMore.Game.Weapons
         /// When the next shot can be taken (calculated as shot time + random shot delay)
         /// </summary>
         public TimeSpan NextShot { get; set; } = TimeSpan.Zero;
+        protected TimeSpan chargeTime;
 
         /// <summary>
         /// The number of consecutive shots taken
@@ -73,10 +73,10 @@ namespace DyingAndMore.Game.Weapons
 
         public virtual void Think(TimeSpan deltaTime)
         {
-            //todo: maybe move to weapon base
+            //remove reliance on state machine? (or augment to allow multiple states for this)
 
             if (Actor.State.State == Takai.Game.EntStateId.ChargeWeapon &&
-                Actor.State.Instance.HasFinished())
+                Actor.Map.ElapsedTime > chargeTime + Class.ChargeTime)
             {
                 switch (Class.OverchargeAction)
                 {
@@ -103,7 +103,10 @@ namespace DyingAndMore.Game.Weapons
                 return;
 
             if (CanUse(Actor.Map.ElapsedTime))
+            {
                 Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, "ChargeWeapon");
+                chargeTime = Actor.Map.ElapsedTime;
+            }
         }
 
         /// <summary>
@@ -112,7 +115,7 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         public virtual void Discharge()
         {
-            SetNextShotTime(Takai.Game.RandomRange.Next(Class.Delay));
+            SetNextShotTime(Class.DischargeTime);
 
             Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, Takai.Game.EntStateId.DischargeWeapon, "DischargeWeapon");
             Actor.State.TransitionTo(Takai.Game.EntStateId.DischargeWeapon, Takai.Game.EntStateId.Idle, "Idle");

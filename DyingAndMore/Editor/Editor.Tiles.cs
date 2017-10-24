@@ -71,13 +71,6 @@ namespace DyingAndMore.Editor
             lastWorldPos = currentWorldPos;
             currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
-            if (InputState.IsButtonDown(Keys.Z) && InputState.IsPress(MouseButtons.Left))
-            {
-                var tilePos = (currentWorldPos / editor.Map.Class.TileSize).ToPoint();
-                editor.Map.Class.BuildHeuristic(tilePos);
-                return false;
-            }
-
             if (InputState.IsPress(Keys.LeftControl) || InputState.IsPress(Keys.RightControl))
             {
                 isPosSaved = true;

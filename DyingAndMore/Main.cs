@@ -241,8 +241,9 @@ namespace DyingAndMore
                 {
                     if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
                     {
-                        var sz = debugFont.MeasureString(row.text);
-                        debugFont.Draw(sbatch, row.text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.MediumSeaGreen);
+                        var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
+                        var sz = debugFont.MeasureString(text);
+                        debugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.MediumSeaGreen);
                     }
                     y -= debugFont.MaxCharHeight;
                 }

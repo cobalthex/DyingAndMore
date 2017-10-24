@@ -4,6 +4,7 @@ GunClass {
     MaxBursts: 0;
 	Delay: [0 0];
     Projectile: @"Weapons/Projectiles/Missile.ent.tk";
+    ErrorAngle: [-3deg 3deg];
 
     DischargeEffect: { #move to spawn effect on projectile?
         Effects: [

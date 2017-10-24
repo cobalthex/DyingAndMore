@@ -172,6 +172,11 @@ namespace DyingAndMore.Game
                 Takai.Data.Cache.CleanupStaleReferences(); //todo: find better place for this (editor needs to be fully out of scope)
             }
 
+            if (player != null)
+            {
+                Map.Class.BuildHeuristic((player.Position / Map.Class.TileSize).ToPoint(), Map.ActiveCamera.VisibleRegion);
+            }
+
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 

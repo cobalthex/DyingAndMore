@@ -9,10 +9,12 @@ namespace Takai.Game
         public struct PathTile
         {
             public uint heuristic;
+            internal uint generation;
         }
+        internal uint pathGeneration = 0;
 
         [Data.Serializer.Ignored]
-        public PathTile[,] PathInfo { get; set; }
+        public PathTile[,] PathInfo { get; set; } = new PathTile[0, 0];
 
         public struct HeuristicScore
         {
@@ -32,14 +34,14 @@ namespace Takai.Game
 
         public static readonly Point[] NavigationDirections =
         {
-            new Point(-1, -1),
+            //new Point(-1, -1),
             new Point( 0, -1),
-            new Point( 1, -1),
+            //new Point( 1, -1),
             new Point(-1,  0),
             new Point( 1,  0),
-            new Point(-1,  1),
+            //new Point(-1,  1),
             new Point( 0,  1),
-            new Point( 1,  1),
+            //new Point( 1,  1),
         };
 
         public bool CanPath(Point tile)
@@ -56,19 +58,27 @@ namespace Takai.Game
         /// Only overwrites areas that can be reached from start
         /// </summary>
         /// <param name="start">Where to start the fill</param>
-        public void BuildHeuristic(Point start)
+        /// <param name="region">The area to update (in tiles)</param>
+        public void BuildHeuristic(Point start, Rectangle region)
         {
-            PathInfo = new PathTile[Height, Width];
-            for (int y = 0; y < Height; ++y)
-                for (int x = 0; x < Width; ++x)
-                    PathInfo[y, x] = new PathTile { heuristic = uint.MaxValue };
-
             if (!CanPath(start))
                 return;
 
-            PathInfo[start.Y, start.X] = new PathTile { heuristic = 0 };
+            var visibleTiles = Rectangle.Intersect(Bounds, new Rectangle(
+                region.X / TileSize,
+                region.Y / TileSize,
+                Util.CeilDiv(region.Width, TileSize),
+                Util.CeilDiv(region.Height, TileSize)
+            ));
 
-            var queue = new Queue<HeuristicScore>();
+            ++pathGeneration;
+            PathInfo[start.Y, start.X] = new PathTile
+            {
+                heuristic = 0,
+                generation = pathGeneration
+            };
+
+            var queue = new Queue<HeuristicScore>(); //static?
             queue.Enqueue(new HeuristicScore { tile = start, value = 1 });
             while (queue.Count > 0)
             {
@@ -79,10 +89,20 @@ namespace Takai.Game
                 foreach (var i in HeuristicDirections)
                 {
                     var pos = first.tile + i;
-                    if (CanPath(pos) && PathInfo[pos.Y, pos.X].heuristic == uint.MaxValue)
+                    if (CanPath(pos) &&
+                        visibleTiles.Contains(pos) &&
+                        PathInfo[pos.Y, pos.X].generation != pathGeneration)
                     {
-                        PathInfo[pos.Y, pos.X] = new PathTile { heuristic = first.value };
-                        queue.Enqueue(new HeuristicScore { tile = pos, value = first.value + 1 });
+                        PathInfo[pos.Y, pos.X] = new PathTile
+                        {
+                            heuristic = first.value,
+                            generation = pathGeneration
+                        };
+                        queue.Enqueue(new HeuristicScore
+                        {
+                            tile = pos,
+                            value = first.value + 1
+                        });
                     }
                 }
             }
