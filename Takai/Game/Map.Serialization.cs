@@ -98,7 +98,10 @@ namespace Takai.Game
 
             BuildTileMask(TilesImage, true);
 
-            BuildHeuristic(new Point(3)); //todo: proper heuristic
+            PathInfo = new PathTile[Height, Width];
+            for (int y = 0; y < Height; ++y)
+                for (int x = 0; x < Width; ++x)
+                    PathInfo[y, x] = new PathTile { heuristic = uint.MaxValue, generation = 0 };
         }
     }
 

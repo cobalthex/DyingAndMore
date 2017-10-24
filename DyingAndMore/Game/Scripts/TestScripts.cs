@@ -37,6 +37,8 @@ namespace DyingAndMore.Game.Scripts
             foreach (var dir in MapClass.NavigationDirections)
             {
                 var pos = epos + dir;
+                if (!Map.Class.TileBounds.Contains(pos))
+                    continue;
                 var h = (uint)Math.Abs(Map.Class.PathInfo[pos.Y, pos.X].heuristic - ph);
                 if (h < min)
                 {
@@ -49,7 +51,7 @@ namespace DyingAndMore.Game.Scripts
             }
 
             var next = minimums[RandomRange.RandomGenerator.Next(minimums.Count)];
-            Entity.Velocity = next.ToVector2() * 50; //move force
+            Entity.Velocity = next.ToVector2() * 100; //move force
         }
     }
 }

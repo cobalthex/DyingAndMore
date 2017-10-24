@@ -47,7 +47,10 @@ ProjectileClass {
         ]
     }
 
-    Range: 300;
+    ChargeTime: 1000msec;
+    DischargeTime: 0msec;
+
+    Range: 0;
     States: {
         Idle: {
             Sprite: {

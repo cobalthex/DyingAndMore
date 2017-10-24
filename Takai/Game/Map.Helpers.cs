@@ -8,8 +8,12 @@ namespace Takai.Game
     {
         internal void Resize(int newWidth, int newHeight)
         {
+            PathInfo.Resize(newHeight, newWidth);
+            for (int y = Height; y < newHeight; ++y)
+                for (int x = Height; x < newWidth; ++x)
+                    PathInfo[y, x] = new PathTile { heuristic = uint.MaxValue, generation = 0 };
+
             Tiles = Tiles.Resize(newHeight, newWidth);
-            BuildHeuristic(new Point(3)); //todo: correct start
         }
     }
 
