@@ -47,7 +47,7 @@ ProjectileClass {
         ]
     }
 
-    ChargeTime: 1000msec;
+    ChargeTime: 100msec;
     DischargeTime: 0msec;
 
     Range: 0;

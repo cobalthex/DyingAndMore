@@ -141,7 +141,7 @@ namespace Takai.Game
                 var lifetime = RandomRange.Next(Class.Lifetime);
 
                 var dir = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(angle));
-                var initAngle = (float)Math.Atan2(dir.Y, dir.X);
+                var initAngle = dir.Angle();
 
                 var position = instance.Position;
                 if (Radius != 0)

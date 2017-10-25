@@ -1,0 +1,144 @@
+%YAML 1.2
+---
+name: Takai Definition
+
+file_extensions:
+  - tk
+
+scope: source.tk
+
+variables:
+  ident: '[A-Za-z_][A-Za-z_0-9]*'
+
+contexts:
+  main:
+    - match: \#\*
+      push:
+        # todo: may be able to be 
+        - meta_scope: comment.block
+        - match: \*\#
+          pop: true
+
+    - match: \#.*$\n
+      scope: comment.line
+    # - match: (\#)(.*$\n)
+    #   captures:
+    #     1: punctuation.definition.comment
+    #     2: comment.line
+
+    - match: ;
+      scope: punctuation.terminator
+
+    - match: (?i)(null|true|false)
+      scope: constant.language
+
+      #hex?
+    - match: '-?[0-9]+'
+      push: number
+
+    - match: '(@)(".*?")'
+      comment: external reference
+      captures:
+        1: punctuation.definition.keyword
+        2: string
+
+    - include: string
+      
+    - match: '({{ident}})\s*(:)'
+      comment: property
+      captures:
+        1: variable
+        2: punctuation.separator
+
+    - match: '{{ident}}'
+      scope: entity.name.class
+      push:
+        - match: '\.\s*{{ident}}'
+          scope: entity.name.enum
+          pop: true
+        - match: (?=\{)
+          set: dictionary
+          pop: true
+        - match: \[
+          scope: punctuation.section.brackets.begin
+          set:
+            - match: '{{ident}}'
+              scope: entity.name.enum
+            - match: \]
+              scope: punctuation.section.brackets.end
+              pop: true
+        - match: ;
+          scope: invalid.illegal.terminator
+          pop: true
+        
+
+    - include: array
+    - include: dictionary
+
+    - match: \]
+      scope: invalid.illegal.stray-bracket-end
+
+    - match: \}
+      scope: invalid.illegal.stray-block-end
+
+    - match: '[,.]'
+      scope: invalid.illegal
+
+  string:
+    - match: \"
+      scope: punctuation.definition.string.begin
+      push:
+        - meta_scope: string.quoted.double
+        - match: \"
+          scope: punctuation.definition.string.end
+          pop: true
+        - include: string_escape
+    - match: \'
+      scope: punctuation.definition.string.begin
+      push:
+        - meta_scope: string.quoted.single
+        - match: \'
+          scope: punctuation.definition.string.end
+          pop: true
+        - include: string_escape
+
+  number:
+    - meta_scope: constant.numeric.integer
+    - match: \.
+      scope: constant.numeric.float
+    - match: '[a-zA-Z_]+' #todo: no newlines
+      scope: constant.other
+    # todo: hexadecimal support
+    - match: \b
+      pop: true
+
+  string_escape:
+    - match: '(\\)$\n'
+      captures:
+        1: punctuation.separator.continuation
+    - match: \\(?:\\|[abefnrtv\'"?]|[0-3][0-9]{0,2}|[4-7][0-9]?|x[a-fA-F0-9]+|u[a-fA-F0-9]{4}|U[a-fA-F0-9]{8})
+      scope: constant.character.escape
+    - match: \\.
+      scope: invalid.illegal.unknown-escape.c
+
+  array:
+    - match: \[
+      scope: punctuation.section.array.begin
+      push:
+        - match: \]
+          scope: punctuation.section.array.end
+          pop: true
+        - include: main
+
+  dictionary:
+    - match: \{
+      scope: punctuation.section.block.begin
+      push:
+        - match: \}
+          scope: punctuation.section.block.end
+          pop: true
+        - include: main
+
+# todo: meta scopes
+# todo: move singles to own context and include instead of main?
+#       -- no properties in array, only expects properties in object

@@ -36,6 +36,8 @@ namespace DyingAndMore.Game.Weapons
 
         public TimeSpan DischargeTime { get; set; }
 
+        //todo: shot delay, burst delay in gun
+
         public abstract WeaponInstance Create();
 
         /*possible animations:
@@ -121,7 +123,11 @@ namespace DyingAndMore.Game.Weapons
             Actor.State.TransitionTo(Takai.Game.EntStateId.DischargeWeapon, Takai.Game.EntStateId.Idle, "Idle");
 
             if (Class.DischargeEffect != null)
-                Actor.Map.Spawn(Class.DischargeEffect.Create(Actor));
+            {
+                var fx = Class.DischargeEffect.Create(Actor);
+                fx.Position += (Actor.Forward * (Actor.Radius));
+                Actor.Map.Spawn(fx);
+            }
         }
 
         /// <summary>
