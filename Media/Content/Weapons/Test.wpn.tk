@@ -11,37 +11,17 @@ GunClass {
             ParticleEffect {
                 Class: {
                     Graphic: {
-                        Texture: "Effects/trail.png"
-                        width:8;
-                        height:8;
-                        frameLength:100msec;
+                        Texture: @"./MuzzleFlash.png"
+                        width: 48;
+                        height: 48;
+                        frameLength: 100msec;
+                        frameCount: 4;
                         Center: true;
                     };
-                    Blend: BlendState.Additive;
-                    ColorOverTime: {
-                        Curve: {
-                            Keys: [
-                                CurveKey {
-                                    Position: 0;
-                                    Value: 0;
-                                }
-                                CurveKey {
-                                    Position: 0.5;
-                                    Value: 0;
-                                }
-                                CurveKey {
-                                    Position: 1;
-                                    Value: 1;
-                                }
-                            ]
-                        }
-                        start: Color.White;
-                        end: [127 0 0 0];
-                    }
-                    AngleOverTime: {start:0 end:6pi};
-                    InitialSpeed: [30 120];
+                    Blend: BlendState.AlphaBlend;
+                    InitialSpeed: [0 0];
                     Drag: 1.3;
-                    lifetime: [2sec 3sec];
+                    lifetime: [400msec 400msec];
                 }
                 Count: [10 20];
                 Spread: [-30deg 30deg];
