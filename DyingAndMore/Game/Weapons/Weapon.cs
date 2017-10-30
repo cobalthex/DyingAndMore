@@ -26,41 +26,63 @@ namespace DyingAndMore.Game.Weapons
         [Takai.Data.Serializer.Ignored]
         public string File { get; set; } = null;
 
+        /// <summary>
+        /// The prefix for selecting animations to play for a specific animation state:
+        /// E.g. 'TestClass' would play animation "TestClass ChargeWeapon|DischargeWeapon"
+        /// </summary>
+        public string AnimationClass { get; set; } = null;
+
         public UnderchargeAction UnderchargeAction { get; set; } = UnderchargeAction.Dissipate; //todo: cooldown?
 
         public OverchargeAction OverchargeAction { get; set; } = OverchargeAction.Discharge;
 
         public Takai.Game.EffectsClass DischargeEffect { get; set; }
 
+        /// <summary>
+        /// how long charging takes
+        /// </summary>
         public TimeSpan ChargeTime { get; set; }
 
+        /// <summary>
+        /// how long to wait after discharging
+        /// </summary>
         public TimeSpan DischargeTime { get; set; }
 
         //todo: shot delay, burst delay in gun
 
         public abstract WeaponInstance Create();
-
-        /*possible animations:
-            charge, [weapon fires], discharge
-            rechamber
-            reload
-
-            ** firing speeds tied to animation length
-        */
     }
 
     abstract class WeaponInstance : Takai.IObjectInstance<WeaponClass>
     {
+        public enum WeaponState
+        {
+            Idle,
+            Charging,
+            Discharging,
+            //relaading, rechambering
+        }
+
         [Takai.Data.Serializer.Ignored]
         public Entities.ActorInstance Actor { get; set; }
 
         public virtual WeaponClass Class { get; set; }
 
         /// <summary>
-        /// When the next shot can be taken (calculated as shot time + random shot delay)
+        /// When the current state was entered
         /// </summary>
-        public TimeSpan NextShot { get; set; } = TimeSpan.Zero;
-        protected TimeSpan chargeTime;
+        protected TimeSpan StateTime { get; set; } = TimeSpan.Zero;
+        public WeaponState State
+        {
+            get => _state;
+            protected set
+            {
+                _state = value;
+                StateTime = Actor.Map?.ElapsedTime ?? TimeSpan.Zero;
+                Takai.LogBuffer.Append(value.ToString());
+            }
+        }
+        WeaponState _state;
 
         /// <summary>
         /// The number of consecutive shots taken
@@ -77,37 +99,59 @@ namespace DyingAndMore.Game.Weapons
         {
             //remove reliance on state machine? (or augment to allow multiple states for this)
 
-            if (Actor.State.State == Takai.Game.EntStateId.ChargeWeapon &&
-                Actor.Map.ElapsedTime > chargeTime + Class.ChargeTime)
+            switch (State)
             {
-                switch (Class.OverchargeAction)
-                {
-                    case OverchargeAction.Discharge:
-                        Discharge();
-                        return;
-                    case OverchargeAction.Explode:
-                        return; //todo
-                }
-            }
-        }
+                case WeaponState.Charging:
+                    if (Actor.Map.ElapsedTime >= StateTime + Class.ChargeTime)
+                    {
+                        switch (Class.OverchargeAction)
+                        {
+                            case OverchargeAction.Discharge:
+                                State = WeaponState.Discharging;
+                                OnDischarge();
+                                break;
+                            case OverchargeAction.Explode:
+                                throw new NotImplementedException("todo");
+                        }
+                    }
+                    break;
+                case WeaponState.Discharging:
+                    if (Actor.Map.ElapsedTime >= StateTime + Class.DischargeTime)
+                        State = WeaponState.Idle;
+                    break;
 
-        protected void SetNextShotTime(TimeSpan delay)
-        {
-            NextShot = Actor.Map.ElapsedTime + delay;
+            }
         }
 
         /// <summary>
         /// Begin charging the weapon
         /// </summary>
-        public virtual void Charge()
+        public virtual void TryFire()
         {
-            if (Actor?.Map == null)
-                return;
-
             if (CanUse(Actor.Map.ElapsedTime))
             {
-                Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, "ChargeWeapon");
-                chargeTime = Actor.Map.ElapsedTime;
+                //todo: if charge time is zero, skip to discharge
+
+                State = WeaponState.Charging;
+                Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, $"{Class.AnimationClass} ChargeWeapon"); //todo; animation classes in state machine?
+            }
+        }
+        /// <summary>
+        /// Reset the firing state. For example, should reset burst counter
+        /// Called whenever player depresses fire button
+        /// Should not reset the gun entirely (create a new instance for that)
+        /// </summary>
+        public virtual void Reset()
+        {
+            switch (Class.UnderchargeAction)
+            {
+                case UnderchargeAction.Discharge:
+                    State = WeaponState.Discharging; //?
+                    OnDischarge();
+                    break;
+                case UnderchargeAction.Dissipate:
+                    State = WeaponState.Idle;
+                    break;
             }
         }
 
@@ -115,12 +159,9 @@ namespace DyingAndMore.Game.Weapons
         /// Discharge the active charge. Behavior is implementation defined
         /// Called automatically by Think()
         /// </summary>
-        public virtual void Discharge()
+        protected virtual void OnDischarge()
         {
-            SetNextShotTime(Class.DischargeTime);
-
-            Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, Takai.Game.EntStateId.DischargeWeapon, "DischargeWeapon");
-            Actor.State.TransitionTo(Takai.Game.EntStateId.DischargeWeapon, Takai.Game.EntStateId.Idle, "Idle");
+            Actor.State.TransitionTo(Takai.Game.EntStateId.DischargeWeapon, $"{Class.AnimationClass} DischargeWeapon");
 
             if (Class.DischargeEffect != null)
             {
@@ -130,18 +171,10 @@ namespace DyingAndMore.Game.Weapons
             }
         }
 
-        /// <summary>
-        /// Reset the firing state. For example, should reset burst counter
-        /// Called whenever player depresses fire button
-        /// Should not reset the gun entirely (create a new instance for that)
-        /// </summary>
-        public virtual void Reset() { }
 
         public virtual bool CanUse(TimeSpan totalTime)
         {
-            return !IsDepleted() &&
-                Actor.State.State != Takai.Game.EntStateId.ChargeWeapon &&
-                Actor.State .State != Takai.Game.EntStateId.DischargeWeapon;
+            return !IsDepleted() && State == WeaponState.Idle;
         }
 
         /// <summary>
@@ -156,3 +189,5 @@ namespace DyingAndMore.Game.Weapons
         }
     }
 }
+
+//todo: return to default state?

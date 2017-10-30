@@ -84,14 +84,11 @@ namespace DyingAndMore.Game.Weapons
             return SpawnQueue == null || SpawnQueue.Count <= 0; //todo: handle deserializing spawn queue better
         }
 
-        public override void Discharge()
+        protected override void OnDischarge()
         {
-            if (IsDepleted())
-                return;
-
             var next = SpawnQueue.Dequeue();
             Actor.Map.Spawn(next, Actor.Position + Actor.Forward * (Actor.Radius + 10), Actor.Forward, Actor. Forward * 100);
-            base.Discharge();
+            base.OnDischarge();
         }
     }
 }

@@ -135,7 +135,7 @@ namespace Takai.Game
                 }
 
                 if (!Class.Bounds.Intersects(ent.AxisAlignedBounds) || //outside of the map
-                    ent.State.Instance == null) //no state
+                    ent.State.instance.Id == EntStateId.Invalid) //no state
                         Destroy(ent);
 
                 else if (!visibleRegion.Intersects(ent.AxisAlignedBounds))
@@ -143,7 +143,7 @@ namespace Takai.Game
                     //todo: reorganize
 
                     if (ent.Class.DestroyIfInactive ||
-                        (ent.Class.DestroyIfDeadAndInactive && ent.State.Instance.Id == EntStateId.Dead))
+                        (ent.Class.DestroyIfDeadAndInactive && ent.State.instance.Id == EntStateId.Dead))
                         Destroy(ent);
                 }
                 else
@@ -151,9 +151,9 @@ namespace Takai.Game
                     if (updateSettings.isAiEnabled)
                         ent.Think(deltaTime);
 
-                    if (ent.State.Instance.Class.Effect != null)
+                    if (ent.State.instance.Class.Effect != null)
                     {
-                        var fx = ent.State.Instance.Class.Effect.Create(ent);
+                        var fx = ent.State.instance.Class.Effect.Create(ent);
                         Spawn(fx);
                     }
 

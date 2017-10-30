@@ -26,7 +26,7 @@ namespace Takai.Graphics
     /// <summary>
     /// A graphic animation. Typically synchronized with a map's timer
     /// </summary>
-    public class Sprite : ICloneable, Data.ISerializeExternally, Data.IDerivedDeserialize
+    public class Sprite : Data.ISerializeExternally, Data.IDerivedDeserialize
     {
         /// <summary>
         /// The file that this sprite was loaded from
@@ -51,12 +51,17 @@ namespace Takai.Graphics
         public TimeSpan FrameLength { get; set; } = TimeSpan.FromTicks(1);
 
         /// <summary>
-        /// The total length of this animation (FrameCount * FrameLength)
+        /// The total length of a single iteration of this sprite (FrameCount * FrameLength)
         /// </summary>
-        public TimeSpan TotalLength => TimeSpan.FromTicks(FrameLength.Ticks * FrameCount);
+        [Data.Serializer.ReadOnly]
+        public TimeSpan TotalLength
+        {
+            get => TimeSpan.FromTicks(FrameLength.Ticks * FrameCount);
+            set => FrameLength = TimeSpan.FromTicks(value.Ticks / FrameCount);
+        }
 
         /// <summary>
-        /// Is the graphic looping?
+        /// Should the sprite loop
         /// </summary>
         public bool IsLooping { get; set; } = false;
 
@@ -254,11 +259,6 @@ namespace Takai.Graphics
             IsLooping = shouldLoop;
         }
 
-        public virtual object Clone()
-        {
-            return MemberwiseClone();
-        }
-
         /// <summary>
         /// Is the animation finished playing?
         /// </summary>
@@ -400,9 +400,10 @@ namespace Takai.Graphics
             if (!hasSize && !props.ContainsKey("Height"))
                 Height = Texture?.Height ?? 1;
 
-            if (props.TryGetValue("Center", out var center) &&
-                center is bool doCenter && doCenter)
-                CenterOrigin(); //maybe default this to true
+            //center sprite by default
+            if (!(props.TryGetValue("Center", out var center) &&
+                center is bool doCenter && !doCenter))
+                CenterOrigin();
         }
     }
 }
