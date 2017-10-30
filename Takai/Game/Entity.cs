@@ -87,7 +87,7 @@ namespace Takai.Game
         public int Id { get; private set; } = (nextId++); //todo: map-specific id
 
         [Data.Serializer.Ignored]
-        public float Radius => State.Instance?.Class?.Radius ?? 1; //todo: aggregate all sprites + cache
+        public float Radius => State.instance.Class?.Radius ?? 1; //todo: aggregate all sprites + cache
         [Data.Serializer.Ignored]
         public float RadiusSq => Radius * Radius; //todo: cache
 
@@ -209,7 +209,7 @@ namespace Takai.Game
         /// </summary>
         public float Mass { get; set; } = 1;
 
-        public StateMachine State
+        public EntityStateMachine State
         {
             get => _state;
             set
@@ -235,7 +235,7 @@ namespace Takai.Game
                 }
             }
         }
-        private StateMachine _state = null;
+        private EntityStateMachine _state = null;
 
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
@@ -258,7 +258,7 @@ namespace Takai.Game
         {
             Class = @class;
 
-            State = new StateMachine();
+            State = new EntityStateMachine();
             State.TransitionTo(EntStateId.Idle, "Idle");
         }
 
@@ -279,7 +279,7 @@ namespace Takai.Game
         /// <returns>The calculated extent</returns>
         public Point GetVisibleSize()
         {
-            return State?.Instance?.Class?.Sprite?.Size ?? new Point(1);
+            return State?.instance.Class?.Sprite?.Size ?? new Point(1);
         }
         Point lastVisibleSize;
 

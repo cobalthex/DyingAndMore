@@ -253,7 +253,7 @@ namespace Takai.Game
 
                 foreach (var ent in EnumerateEntitiesInSectors(visibleSectors))
                 {
-                    if (ent.State.Instance?.Class?.Sprite?.Texture != null)
+                    if (ent.State.instance.Class?.Sprite?.Texture != null)
                     {
                         if (ent.OutlineColor.A > 0)
                             _drawEntsOutlined.Add(ent);
@@ -261,13 +261,13 @@ namespace Takai.Game
                         {
                             var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
-                            ent.State.Instance.Class.Sprite.Draw(
+                            ent.State.instance.Class.Sprite.Draw(
                                 Class.spriteBatch,
                                 ent.Position,
                                 angle,
                                 Color.White,
                                 1,
-                                ent.State.Instance.ElapsedTime
+                                ent.State.instance.ElapsedTime
                             );
                         }
                         ++profilingInfo.visibleEnts;
@@ -323,13 +323,13 @@ namespace Takai.Game
                     var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
                     var entPos = ent.Position + (ent.Parent != null ? ent.Parent.Position : Vector2.Zero);
-                    ent.State.Instance.Class.Sprite.Draw(
+                    ent.State.instance.Class.Sprite.Draw(
                         Class.spriteBatch,
                         ent.Position,
                         angle,
                         Color.White,
                         1,
-                        ent.State.Instance.ElapsedTime
+                        ent.State.instance.ElapsedTime
                     );
                 }
 

@@ -67,21 +67,21 @@ namespace DyingAndMore.Game.Weapons
             AmmoCount = @class.MaxAmmo;
         }
 
-        public override bool IsDepleted()
-        {
-            return _class.MaxAmmo > 0 && AmmoCount <= 0;
-        }
-
         public override void Reset()
         {
             burstCount = 0;
             base.Reset();
         }
 
-        public override void Charge()
+        public override bool IsDepleted()
         {
-            if (_class.MaxBursts == 0 || burstCount < _class.MaxBursts)
-                base.Charge();
+            return _class.MaxAmmo > 0 && AmmoCount <= 0;
+        }
+
+        public override bool CanUse(TimeSpan totalTime)
+        {
+            return (_class.MaxBursts == 0 || burstCount < _class.MaxBursts)
+                    && base.CanUse(totalTime);
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -89,7 +89,7 @@ namespace DyingAndMore.Game.Weapons
             if (currentBurstShotCount > 0)
             {
                 if (currentBurstShotCount < _class.ShotsPerBurst)
-                    base.Charge();
+                    base.TryFire();
                 else
                 {
                     currentBurstShotCount = 0;
@@ -100,18 +100,8 @@ namespace DyingAndMore.Game.Weapons
             base.Think(deltaTime);
         }
 
-        public override void Discharge()
+        protected override void OnDischarge()
         {
-            //todo: optimize for cases with no charging (no need to use state machine)
-
-            if (Actor.Map == null || Actor.State.State != Takai.Game.EntStateId.ChargeWeapon)
-                return;
-
-            //undercharged
-            if (Actor.Map.ElapsedTime < chargeTime + Class.ChargeTime &&
-                _class.UnderchargeAction == UnderchargeAction.Dissipate)
-                return;
-
             if (_class.Projectile != null)
             {
                 var projectile = (Entities.ProjectileInstance)_class.Projectile.Create();
@@ -127,7 +117,7 @@ namespace DyingAndMore.Game.Weapons
             --AmmoCount;
             ++currentBurstShotCount;
 
-            base.Discharge();
+            base.OnDischarge();
         }
     }
 }

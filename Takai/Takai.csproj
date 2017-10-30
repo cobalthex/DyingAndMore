@@ -58,6 +58,7 @@
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Effects.cs" />
     <Compile Include="Game\Entity.cs" />
+    <Compile Include="Game\EntityStateMachine.cs" />
     <Compile Include="Game\Fluid.cs" />
     <Compile Include="Game\Map.cs" />
     <Compile Include="Game\Map.Drawing.cs">
@@ -85,7 +86,6 @@
     <Compile Include="Game\Script.cs" />
     <Compile Include="Game\Trigger.cs" />
     <Compile Include="Runtime.cs" />
-    <Compile Include="Game\StateMachine.cs" />
     <Compile Include="Graphics\BitmapFont.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\Primitives2D.cs" />

@@ -48,7 +48,7 @@ namespace DyingAndMore.Game.Entities
                     //todo: maybe shoot w/ lead (shoot out in front of target's velocity)
                     if (CanRotate)
                         Actor.Forward = Vector2.Normalize(trackedActor.Position - Actor.Position); //todo: slerp
-                    Actor.Weapon?.Charge();
+                    Actor.Weapon?.TryFire();
                     Actor.Map.DrawLine(Actor.Position, Actor.Position + Actor.Forward * MaxRange, Color.Orange);
                 }
                 else

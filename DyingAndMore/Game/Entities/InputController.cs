@@ -95,7 +95,7 @@ namespace DyingAndMore.Game.Entities
                 d += Vector2.UnitX;
 
             if (InputState.IsButtonDown(MouseButtons.Left))
-                Actor.Weapon?.Charge();
+                Actor.Weapon?.TryFire();
             if (InputState.IsClick(MouseButtons.Left))
                 Actor.Weapon?.Reset();
 

@@ -76,7 +76,7 @@ namespace Takai.Game
         }
     }
 
-    public class EntStateInstance : IObjectInstance<EntStateClass>
+    public struct EntStateInstance : IObjectInstance<EntStateClass>
     {
         /// <summary>
         /// The state that this instance was created with. May be different from the current state
@@ -153,8 +153,7 @@ namespace Takai.Game
     /// <summary>
     /// The state machine for entities. Allows blending, transitions, and events
     /// </summary>
-    /// <typeparam name="EntStateId">The Identifier identifying each state</typeparam>
-    public class StateMachine
+    public class EntityStateMachine
     {
         /// <summary>
         /// All of the available states
@@ -176,8 +175,8 @@ namespace Takai.Game
                         state.Value.Name = state.Key;
                 }
 
-                if (Instance != null && Instance.Class.Name != null)
-                    Instance.Class = _states[Instance.Class.Name];
+                if (instance.Class?.Name != null)
+                    instance.Class = _states[instance.Class.Name];
             }
         }
         private Dictionary<string, EntStateClass> _states;
@@ -191,7 +190,13 @@ namespace Takai.Game
         /// <summary>
         /// The currently active state instance. <see cref="State"/> for notes
         /// </summary>
-        public EntStateInstance Instance { get; set; }
+        [Data.CustomSerialize("SerializeInstance")]
+        public EntStateInstance instance;
+
+        private object SerializeInstance()
+        {
+            return instance.Class.Name;
+        }
 
         /// <summary>
         /// All of the current transitions
@@ -205,17 +210,23 @@ namespace Takai.Game
         public event EventHandler<TransitionEventArgs> Transition;
         protected virtual void OnTransition(TransitionEventArgs e) { }
 
+        /// <summary>
+        /// Transition to a state immediately
+        /// </summary>
+        /// <param name="nextState">The state key</param>
+        /// <param name="nextClass">The animation to use</param>
+        /// <returns></returns>
         public EntStateInstance TransitionTo(EntStateId nextState, string nextClass)
         {
             State = nextState;
             if (States != null && States.TryGetValue(nextClass, out var stateClass))
             {
-                Instance?.Sound.Instance?.Dispose();
-                Instance = stateClass.Create();
-                Instance.Id = nextState;
-                return Instance;
+                instance.Sound.Instance?.Dispose();
+                instance = stateClass.Create();
+                instance.Id = nextState;
+                return instance;
             }
-            return null;
+            return default(EntStateInstance);
         }
 
         /// <summary>
@@ -236,24 +247,24 @@ namespace Takai.Game
         /// <param name="deltaTime">How much time has passed since the last update</param>
         public virtual void Update(TimeSpan deltaTime)
         {
-            bool wasNotFinished = !Instance.HasFinished();
+            bool wasNotFinished = !instance.HasFinished();
 
-            Instance.ElapsedTime += deltaTime;
-            Instance.Update(deltaTime);
+            instance.ElapsedTime += deltaTime;
+            instance.Update(deltaTime);
 
-            bool hasFinished = !wasNotFinished && Instance.HasFinished();
+            bool hasFinished = !wasNotFinished && instance.HasFinished();
             if (hasFinished)
             {
                 var completed = new StateCompleteEventArgs()
                 {
                     State = State,
-                    Instance = Instance
+                    Instance = instance
                 };
                 OnStateComplete(completed);
                 StateComplete?.Invoke(this, completed);
             }
 
-            if ((Instance.Id != State || hasFinished) &&
+            if ((instance.Id != State || hasFinished) &&
                 Transitions.TryGetValue(State, out var next))
             {
                 Transitions.Remove(State);
@@ -261,14 +272,14 @@ namespace Takai.Game
                 var evArgs = new TransitionEventArgs()
                 {
                     PreviousState = State,
-                    PreviousInstance = Instance
+                    PreviousInstance = instance
                 };
 
                 evArgs.NextState = State = next.Id;
                 if (States.TryGetValue(next.name, out var stateClass))
                 {
-                    evArgs.NextInstance = Instance = stateClass.Create();
-                    Instance.Id = next.Id;
+                    evArgs.NextInstance = instance = stateClass.Create();
+                    instance.Id = next.Id;
                 }
                 OnTransition(evArgs);
                 Transition?.Invoke(this, evArgs);
@@ -277,7 +288,7 @@ namespace Takai.Game
 
         public override string ToString()
         {
-            return $"{State} ({Instance.Class.Name ?? Instance.Id.ToString()})";
+            return $"{State} ({instance.Class.Name ?? instance.Id.ToString()})";
         }
     }
 }

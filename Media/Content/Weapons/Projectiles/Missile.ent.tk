@@ -47,9 +47,6 @@ ProjectileClass {
         ]
     }
 
-    ChargeTime: 100msec;
-    DischargeTime: 0msec;
-
     Range: 0;
     States: {
         Idle: {
