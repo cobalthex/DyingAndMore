@@ -4,11 +4,10 @@ ActorClass {
     DefaultFaction: Factions [ Enemy; Common ];
     DefaultController: ArtilleryController {
         CanRotate: false;
-    }
+    };
     FieldOfView: 45deg;
 
-    #launch force?
-
+}
     States: {
         Idle: {
             Sprite: {
@@ -45,7 +44,7 @@ ActorClass {
                 IsLooping: False;
             };
         };
-        Spawner ChargeWeapon: {
+        SpawnerChargeWeapon: {
             Sprite: {
                 texture: "Actors/Spawner.png";
                 width: 64;
@@ -53,7 +52,7 @@ ActorClass {
                 origin: [32 32];
                 ClipRect: [0 64 320 64];
                 FrameCount: 5;
-                FrameLength: 20;
+                FrameLength: 100;
                 Tween: TweenStyle.Overlap;
                 IsLooping: False;
             };
@@ -67,7 +66,7 @@ ActorClass {
 
     DefaultWeapon: SpawnerClass {
         AnimationClass: "Spawner";
-        ChargeTime: 1sec;
+        ChargeTime: 500msec;
         Spawns: [
             [@"Actors/InfectedCell.ent.tk" [3 5]]
         ]

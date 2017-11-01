@@ -133,7 +133,7 @@ namespace DyingAndMore.Game.Weapons
                 //todo: if charge time is zero, skip to discharge
 
                 State = WeaponState.Charging;
-                Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, $"{Class.AnimationClass} ChargeWeapon"); //todo; animation classes in state machine?
+                Actor.State.TransitionTo(Takai.Game.EntStateId.ChargeWeapon, $"{Class.AnimationClass}ChargeWeapon"); //todo; animation classes in state machine?
             }
         }
         /// <summary>
@@ -161,7 +161,7 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         protected virtual void OnDischarge()
         {
-            Actor.State.TransitionTo(Takai.Game.EntStateId.DischargeWeapon, $"{Class.AnimationClass} DischargeWeapon");
+            Actor.State.TransitionTo(Takai.Game.EntStateId.DischargeWeapon, $"{Class.AnimationClass}DischargeWeapon");
 
             if (Class.DischargeEffect != null)
             {
