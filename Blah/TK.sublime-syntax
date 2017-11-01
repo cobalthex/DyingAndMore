@@ -9,9 +9,27 @@ scope: source.tk
 
 variables:
   ident: '[A-Za-z_][A-Za-z_0-9]*'
+  property: '.*?\s*(?=:)'
 
 contexts:
   main:
+    - include: comments
+    - include: termiantors
+    - include: particles
+      
+    - match: \]
+      scope: invalid.illegal.stray-bracket-end
+
+    - match: \}
+      scope: invalid.illegal.stray-block-end
+
+    - match: '[,.]'
+      scope: invalid.illegal
+
+    - match: \*#
+      scope: invalid.illegal.stray-comment-end
+
+  comments:
     - match: \#\*
       push:
         # todo: may be able to be 
@@ -26,9 +44,7 @@ contexts:
     #     1: punctuation.definition.comment
     #     2: comment.line
 
-    - match: ;
-      scope: punctuation.terminator
-
+  particles:
     - match: (?i)(null|true|false)
       scope: constant.language
 
@@ -42,47 +58,48 @@ contexts:
         1: punctuation.definition.keyword
         2: string
 
-    - include: string
-      
-    - match: '({{ident}})\s*(:)'
-      comment: property
-      captures:
-        1: variable
-        2: punctuation.separator
-
-    - match: '{{ident}}'
+    - match: '{{ident}}\s*\.' # todo: captures
       scope: entity.name.class
       push:
-        - match: '\.\s*{{ident}}'
+        - match: '\s*{{ident}}'
           scope: entity.name.enum
           pop: true
-        - match: (?=\{)
-          set: dictionary
+
+    - match: '{{ident}}\s*(?=\{)'
+      scope: entity.name.class
+      set: dictionary
+
+    - match: '({{ident}})\s*(\[)'
+      captures:
+        1: entity.name.class
+        2: punctuation.section.brackets.begin
+      set:
+        - match: '{{ident}}'
+          scope: entity.name.enum
+        - match: ';'
+          scope: punctuation.terminator
+        - match: \]
+          scope: punctuation.section.brackets.end
           pop: true
-        - match: \[
-          scope: punctuation.section.brackets.begin
-          set:
-            - match: '{{ident}}'
-              scope: entity.name.enum
-            - match: \]
-              scope: punctuation.section.brackets.end
-              pop: true
-        - match: ;
-          scope: invalid.illegal.terminator
-          pop: true
-        
 
-    - include: array
-    - include: dictionary
-
-    - match: \]
-      scope: invalid.illegal.stray-bracket-end
-
-    - match: \}
-      scope: invalid.illegal.stray-block-end
-
-    - match: '[,.]'
+    - match: '{{ident}}'
       scope: invalid.illegal
+
+    - match: '\]'
+      scope: invalid.illegal
+
+    - match: '\}'
+      scope: invalid.illegal
+
+    - match: '\.'
+      scope: invalid.illegal
+
+    - match: '{{property}}' #todo: not working (match properties outside of dict)
+      scope: invalid.illegal
+
+    - include: string
+    - include: list
+    - include: dictionary
 
   string:
     - match: \"
@@ -121,14 +138,16 @@ contexts:
     - match: \\.
       scope: invalid.illegal.unknown-escape.c
 
-  array:
+
+  list:
     - match: \[
       scope: punctuation.section.array.begin
       push:
         - match: \]
           scope: punctuation.section.array.end
           pop: true
-        - include: main
+        - include: comments
+        - include: particles
 
   dictionary:
     - match: \{
@@ -136,8 +155,23 @@ contexts:
       push:
         - match: \}
           scope: punctuation.section.block.end
-          pop: true
-        - include: main
+          pop: 2
+
+        - match: '({{property}})\s*(:)'
+          comment: property
+          captures:
+            1: variable
+            2: punctuation.separator
+          push:
+            - match: '{{property}}\s*(:)'
+              scope: illegal.invalid
+
+            - include: comments
+            - include: particles
+            - match: ';'
+              pop: true
+        
+        - include: comments
 
 # todo: meta scopes
 # todo: move singles to own context and include instead of main?

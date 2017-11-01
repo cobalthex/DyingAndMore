@@ -1,0 +1,34 @@
+Sprite: (graphic?)
+  Texture
+  ClipRect
+  FrameSize
+  Tween
+  Origin
+  ShrinkToFit
+
+SpriteSequence: (sprite?)
+  Sprite
+  FrameCount
+  IsLooping
+  CurrentFrame
+
+EntState:
+  Duration
+
+  Sprite
+  Sound
+
+  Replace/Add?
+
+
+StateMachine:
+  States: [Key: EntState]
+
+  ActiveStates: [Key: EntState]
+
+  TransitionImmediate()
+  TransitionTo(state)
+  TransitionAfterCurrent()
+
+  IsActive(state)
+
