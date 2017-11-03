@@ -757,7 +757,6 @@ namespace Takai.Data
         /// <summary>
         /// Assumes immediately at a comment (Post SkipWhitespace)
         /// </summary>
-        /// <param name="reader"></param>
         public static void SkipComments(TextReader reader)
         {
             var ch = reader.Peek();

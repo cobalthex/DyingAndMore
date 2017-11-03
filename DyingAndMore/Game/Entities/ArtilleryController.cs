@@ -30,10 +30,12 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
-            if (Actor.State.State != Takai.Game.EntStateId.Idle)
+            //todo: fix animations here
+
+            if (Actor.State.CurrentState != Takai.Game.EntStateId.Idle)
                 return; //todo: shoot with moving barrel?
 
-            if (Actor.State.State == Takai.Game.EntStateId.Idle && Actor.Weapon.IsDepleted())
+            if (Actor.State.CurrentState == Takai.Game.EntStateId.Idle && Actor.Weapon.IsDepleted())
             {
                 Actor.State.TransitionTo(Takai.Game.EntStateId.Idle, Takai.Game.EntStateId.Inactive, "Inactive");
                 return;

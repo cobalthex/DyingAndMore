@@ -183,14 +183,14 @@ namespace Takai.Game
                     sector.decals.Clear();
 
                 if (options.HasFlag(CleanupOptions.DeadEntities))
-                    sector.entities.RemoveWhere((ent) => ent.State.State == EntStateId.Dead);
+                    sector.entities.RemoveWhere((ent) => ent.State.CurrentState == EntStateId.Dead);
             }
 
             if (options.HasFlag(CleanupOptions.DeadEntities))
             {
                 foreach (var ent in _allEntities)
                 {
-                    if (ent.State.State == EntStateId.Dead)
+                    if (ent.State.CurrentState == EntStateId.Dead)
                         FinalDestroy(ent);
                 }
             }

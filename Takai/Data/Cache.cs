@@ -252,16 +252,16 @@ namespace Takai.Data
                 if (vorbis.SampleRate < 8000 || vorbis.SampleRate > 48000)
                     throw new FormatException($"Audio must be between 8kHz and 48kHz (provided: {vorbis.SampleRate}Hz");
 
-                //todo: 16bit pcm can maybe be retrieved direcltly from load
+                //todo: 16bit pcm can maybe be retrieved directly from load
 
                 var total = (int)(vorbis.TotalSamples * vorbis.Channels);
 
                 var buffer = new float[total]; //-1 to 1
                 if (vorbis.ReadSamples(buffer, 0, total) <= 0)
-                    throw new IOException("Error reading Ogg Vorbis samples"); //todo: better exception?
+                    throw new IOException("Error reading Ogg Vorbis samples");
 
                 //convert 32 bit float to 16 bit PCM
-                //todo: aliasing issues
+                //todo: aliasing issues?
                 var samples = new byte[total * 2];
                 for (int i = 0; i < buffer.Length; ++i)
                 {

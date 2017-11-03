@@ -30,6 +30,13 @@ GunClass {
                 Spread: [-30deg 30deg];
             }
 
+            FluidEffect {
+                Class: @"Fluids/SmallBLood.fluid.tk";
+                Speed: [100 200];
+                Spread: [-5deg 5deg];
+                Count: [3 6];
+            }
+
             SoundImpulse {
                 Permutations: [
                     SoundClass {
