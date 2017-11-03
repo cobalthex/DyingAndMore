@@ -22,7 +22,7 @@ namespace DyingAndMore.Editor.Selectors
                 try
                 {
                     var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(file);
-                    if (ent is Game.Entities.ActorClass) //+ other classes
+                    if (ent is Game.Entities.ActorClass && ent.States != null) //+ other classes
                         ents.Add(ent);
                 }
                 catch (System.Exception e)

@@ -7,7 +7,6 @@ ActorClass {
     };
     FieldOfView: 45deg;
 
-}
     States: {
         Idle: {
             Sprite: {

@@ -66,6 +66,12 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public TimeSpan TotalTime => Sprite?.TotalLength ?? TimeSpan.Zero;
 
+        /// <summary>
+        /// An optional animation to replace the current after it finishes, keeping the current state
+        /// Ignored if IsLooping is true
+        /// </summary>
+        public string NextAnimation { get; set; } = null;
+
         public EntStateInstance Create()
         {
             return new EntStateInstance()
@@ -138,16 +144,13 @@ namespace Takai.Game
 
     public class StateCompleteEventArgs : EventArgs
     {
-        public EntStateId State { get; set; }
-        public EntStateInstance Instance { get; set; }
+        public EntStateInstance State { get; set; }
     }
 
     public class TransitionEventArgs : EventArgs
     {
-        public EntStateId PreviousState { get; set; }
-        public EntStateInstance PreviousInstance { get; set; }
-        public EntStateId NextState { get; set; }
-        public EntStateInstance NextInstance { get; set; }
+        public EntStateInstance PreviousState { get; set; }
+        public EntStateInstance NextState { get; set; }
     }
 
     /// <summary>
@@ -175,27 +178,33 @@ namespace Takai.Game
                         state.Value.Name = state.Key;
                 }
 
-                if (instance.Class?.Name != null)
-                    instance.Class = _states[instance.Class.Name];
+                if (Current.Class?.Name != null)
+                    Current = GetInstance(Current.Id, Current.Class.Name);
             }
         }
         private Dictionary<string, EntStateClass> _states;
 
-        //todo: come up with better name for state/instance
-
-        /// <summary>
-        /// The actual state set. The current instance may not match if there was no accompanying class
-        /// </summary>
-        public EntStateId State { get; set; }
         /// <summary>
         /// The currently active state instance. <see cref="State"/> for notes
         /// </summary>
         [Data.CustomSerialize("SerializeInstance")]
-        public EntStateInstance instance;
+        public EntStateInstance Current
+        {
+            get => _current;
+            set
+            {
+                _current.Sound.Instance?.Dispose();
+                _current = value;
+            }
+        }
+        EntStateInstance _current;
+
+        [Data.Serializer.Ignored]
+        public EntStateId CurrentState => _current.Id;
 
         private object SerializeInstance()
         {
-            return instance.Class.Name;
+            return Current.Class.Name;
         }
 
         /// <summary>
@@ -210,6 +219,17 @@ namespace Takai.Game
         public event EventHandler<TransitionEventArgs> Transition;
         protected virtual void OnTransition(TransitionEventArgs e) { }
 
+        protected EntStateInstance GetInstance(EntStateId state, string @class)
+        {
+            if (States != null && States.TryGetValue(@class, out var stateClass))
+            {
+                var instance = stateClass.Create();
+                instance.Id = state;
+                return instance;
+            }
+            return default(EntStateInstance);
+        }
+
         /// <summary>
         /// Transition to a state immediately
         /// </summary>
@@ -218,15 +238,12 @@ namespace Takai.Game
         /// <returns></returns>
         public EntStateInstance TransitionTo(EntStateId nextState, string nextClass)
         {
-            State = nextState;
-            if (States != null && States.TryGetValue(nextClass, out var stateClass))
-            {
-                instance.Sound.Instance?.Dispose();
-                instance = stateClass.Create();
-                instance.Id = nextState;
-                return instance;
-            }
-            return default(EntStateInstance);
+            var instance = GetInstance(nextState, nextClass);
+            if (instance.Id != EntStateId.Invalid)
+                Current = instance;
+            return instance;
+
+            //todo: transition event
         }
 
         /// <summary>
@@ -247,48 +264,50 @@ namespace Takai.Game
         /// <param name="deltaTime">How much time has passed since the last update</param>
         public virtual void Update(TimeSpan deltaTime)
         {
-            bool wasNotFinished = !instance.HasFinished();
+            bool wasNotFinished = !Current.HasFinished();
 
-            instance.ElapsedTime += deltaTime;
-            instance.Update(deltaTime);
+            _current.ElapsedTime += deltaTime;
+            _current.Update(deltaTime);
 
-            bool hasFinished = !wasNotFinished && instance.HasFinished();
+            bool hasFinished = !wasNotFinished && Current.HasFinished();
             if (hasFinished)
             {
                 var completed = new StateCompleteEventArgs()
                 {
-                    State = State,
-                    Instance = instance
+                    State = Current,
                 };
                 OnStateComplete(completed);
                 StateComplete?.Invoke(this, completed);
-            }
 
-            if ((instance.Id != State || hasFinished) &&
-                Transitions.TryGetValue(State, out var next))
-            {
-                Transitions.Remove(State);
-
-                var evArgs = new TransitionEventArgs()
+                if (Transitions.TryGetValue(Current.Id, out var nextState))
                 {
-                    PreviousState = State,
-                    PreviousInstance = instance
-                };
+                    Transitions.Remove(Current.Id);
+                    var next = GetInstance(nextState.Id, nextState.name);
 
-                evArgs.NextState = State = next.Id;
-                if (States.TryGetValue(next.name, out var stateClass))
-                {
-                    evArgs.NextInstance = instance = stateClass.Create();
-                    instance.Id = next.Id;
+                    if (next.Id != EntStateId.Invalid)
+                    {
+                        var evArgs = new TransitionEventArgs()
+                        {
+                            PreviousState = Current,
+                            NextState = next
+                        };
+
+                        Current = next;
+                        OnTransition(evArgs);
+                        Transition?.Invoke(this, evArgs);
+                    }
                 }
-                OnTransition(evArgs);
-                Transition?.Invoke(this, evArgs);
+                else if (!Current.Class.IsLooping && Current.Class.NextAnimation != null)
+                {
+                    //todo: necessary?
+                    Current = GetInstance(CurrentState, Current.Class.NextAnimation);
+                }
             }
         }
 
         public override string ToString()
         {
-            return $"{State} ({instance.Class.Name ?? instance.Id.ToString()})";
+            return $"{Current.Class?.Name ?? Current.Id.ToString()}";
         }
     }
 }

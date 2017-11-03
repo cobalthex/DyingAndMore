@@ -38,6 +38,10 @@ namespace DyingAndMore.Game.Weapons
 
         public Takai.Game.EffectsClass DischargeEffect { get; set; }
 
+        //overcharge effect
+        //undercharge effect?
+        //misfire effect (empty/failure/etc)
+
         /// <summary>
         /// how long charging takes
         /// </summary>
