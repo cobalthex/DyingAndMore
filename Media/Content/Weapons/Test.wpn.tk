@@ -1,6 +1,7 @@
 GunClass {
     MaxAmmo: 100;
-	ShotsPerBurst: 1;
+	RoundsPerBurst: 1;
+    ShotsPerRound: 1;
     MaxBursts: 0;
 	Delay: [0 0];
     Projectile: @"Weapons/Projectiles/Missile.ent.tk";
@@ -28,13 +29,6 @@ GunClass {
                 }
                 Count: [10 20];
                 Spread: [-30deg 30deg];
-            }
-
-            FluidEffect {
-                Class: @"Fluids/SmallBLood.fluid.tk";
-                Speed: [100 200];
-                Spread: [-5deg 5deg];
-                Count: [3 6];
             }
 
             SoundImpulse {

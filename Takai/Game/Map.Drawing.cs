@@ -253,26 +253,31 @@ namespace Takai.Game
 
                 foreach (var ent in EnumerateEntitiesInSectors(visibleSectors))
                 {
-                    if (ent.State.Current.Class?.Sprite?.Texture != null)
+                    if (ent.OutlineColor.A > 0)
+                        _drawEntsOutlined.Add(ent);
+                    else
                     {
-                        if (ent.OutlineColor.A > 0)
-                            _drawEntsOutlined.Add(ent);
-                        else
-                        {
-                            var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
+                        var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
-                            ent.State.Current.Class.Sprite.Draw(
+                        foreach (var state in ent.ActiveStateLayers)
+                        {
+                            if (state.Id == EntStateId.Invalid || state.Class?.Sprite == null)
+                                continue;
+
+                            state.Class.Sprite.Draw(
                                 Class.spriteBatch,
                                 ent.Position,
                                 angle,
                                 Color.White,
                                 1,
-                                ent.State.Current.ElapsedTime
+                                state.ElapsedTime
                             );
                         }
+
                         ++profilingInfo.visibleEnts;
                     }
-                    else if (renderSettings.drawBordersAroundNonDrawingEntities)
+
+                    if (renderSettings.drawBordersAroundNonDrawingEntities)
                     {
                         Matrix transform = new Matrix(ent.Forward.X, ent.Forward.Y, 0, 0,
                                                      -ent.Forward.Y, ent.Forward.X, 0, 0,
@@ -315,22 +320,25 @@ namespace Takai.Game
 
                 foreach (var ent in _drawEntsOutlined)
                 {
-                    //all sprites should be valid
-
                     //Class.outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
                     //Class.outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
 
                     var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
-                    var entPos = ent.Position + (ent.Parent != null ? ent.Parent.Position : Vector2.Zero);
-                    ent.State.Current.Class.Sprite.Draw(
-                        Class.spriteBatch,
-                        ent.Position,
-                        angle,
-                        Color.White,
-                        1,
-                        ent.State.Current.ElapsedTime
-                    );
+                    foreach (var state in ent.ActiveStateLayers)
+                    {
+                        if (state.Id == EntStateId.Invalid || state.Class?.Sprite == null)
+                            continue;
+
+                        state.Class.Sprite.Draw(
+                            Class.spriteBatch,
+                            ent.Position,
+                            angle,
+                            Color.White,
+                            1,
+                            state.ElapsedTime
+                        );
+                    }
                 }
 
                 Class.spriteBatch.End();

@@ -32,7 +32,6 @@ namespace Takai.Data
 
         public static ReadOnlyDictionary<string, WeakReference> Objects { get; private set; }
         private static Dictionary<string, WeakReference> objects;
-        private static uint generation = 0;
 
         private static Dictionary<string, ZipArchive> openZips = new Dictionary<string, ZipArchive>(); //todo: load files into case-insensitive dictionary
 
