@@ -1,12 +1,16 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
 {
     class ProjectileClass : EntityClass
     {
+        /// <summary>
+        /// Initial speed of the projectile
+        /// </summary>
+        public float MuzzleVelocity { get; set; } = 400;
+
         /// <summary>
         /// The amount of power this projectile has. Determines speed and therefore damage
         /// </summary>
@@ -69,7 +73,7 @@ namespace DyingAndMore.Game.Entities
         {
             if (Velocity.LengthSquared() < 0.001f ||
                 (_class.Range != 0 && Vector2.DistanceSquared(origin, Position) > _class.Range * _class.Range))
-                DestroySelf();
+                KillSelf();
 
             base.Think(DeltaTime);
         }
@@ -81,12 +85,12 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime)
         {
-            DestroySelf();
+            KillSelf();
         }
 
         public override void OnEntityCollision(EntityInstance collider, Vector2 point, TimeSpan deltaTime)
         {
-            State.TransitionTo(EntStateId.Dead, "Dead"); //todo: transition immediate
+            KillSelf();
             Takai.LogBuffer.Append(ToString() + " " + collider.ToString());
 
             if (collider is ActorInstance actor &&

@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using static System.Math;
 
 namespace Takai.Game
 {
     /// <summary>
     /// Describes a single type of entity. Actors, etc. inherit from this
     /// </summary>
-    public abstract class EntityClass : IObjectClass<EntityInstance>
+    public abstract partial class EntityClass : IObjectClass<EntityInstance>
     {
         [Data.Serializer.Ignored]
         public string File { get; set; } = null;
@@ -28,10 +26,6 @@ namespace Takai.Game
         /// Trace (raycast) queries should ignore this entity
         /// </summary>
         public bool IgnoreTrace { get; set; } = false;
-
-        /// <summary>
-        /// All of this entity's available states
-        public Dictionary<string, EntStateClass> States { get; set; }
 
         /// <summary>
         /// Destroy the sprite if it is dead and the animation is finished
@@ -74,7 +68,7 @@ namespace Takai.Game
     /// <summary>
     /// A single instance of an entity in a map. Mostly logic handled through <see cref="EntityClass"/>
     /// </summary>
-    public abstract class EntityInstance : IObjectInstance<EntityClass>
+    public abstract partial class EntityInstance : IObjectInstance<EntityClass>
     {
         private static int nextId = 1; //generator for the unique (runtime) IDs
 
@@ -84,57 +78,37 @@ namespace Takai.Game
         /// Primarily used for debugging
         /// </summary>
         [Data.Serializer.Ignored]
-        public int Id { get; private set; } = (nextId++); //todo: map-specific id
+        public int Id { get; private set; } = (nextId++); //todo: serializable ID
 
         [Data.Serializer.Ignored]
-        public float Radius => State.Current.Class?.Radius ?? 1; //todo: aggregate all sprites + cache
+        public float Radius { get; private set; }
         [Data.Serializer.Ignored]
         public float RadiusSq => Radius * Radius; //todo: cache
 
         /// <summary>
         /// The class that this instance inherits from
         /// </summary>
-        public virtual EntityClass Class
-        {
-            get => _class;
-            set
-            {
-                _class = value;
-                if (_class != null && State != null)
-                    State.States = _class.States;
-            }
-        }
-        private EntityClass _class;
-
-        /// <summary>
-        /// An optional entity to attach to. This entity's position becomes relative while attached
-        /// Circular relationships are not safe heres
-        /// </summary>
-        public EntityInstance Parent
-        { //todo: serialize?
-            get => _parent;
-            set
-            {
-                if (_parent != null)
-                    _parent.Children.Remove(this);
-
-                _parent = value;
-                if (_parent != null)
-                    _parent.Children.Add(this);
-            }
-        }
-        private EntityInstance _parent;
-
-        /// <summary>
-        /// The cached list of children attached to this entity
-        /// </summary>
-        [Data.Serializer.Ignored]
-        public List<EntityInstance> Children { get; set; } = new List<EntityInstance>(); //use a hash set if more than ~20 items
+        public virtual EntityClass Class { get; set; }
 
         /// <summary>
         /// A name for this instance, should be unique
         /// </summary>
         public string Name { get; set; } = null;
+
+        public bool IsAlive
+        {
+            get => isAlive;
+            set
+            {
+                //play death animation
+                isAlive = value;
+                if (!isAlive)
+                    PlayAnimation("Dead", () => { if (Class.DestroyOnDeath) Map?.Destroy(this); });
+            }
+        }
+        private bool isAlive = true;
+
+        //todo: parent/child relationships
 
         /// <summary>
         /// The current position of the entity
@@ -151,21 +125,6 @@ namespace Takai.Game
             }
         }
         private Vector2 _position;
-
-        /// <summary>
-        /// This entity's position relative to its parent. Only used if there is a parent
-        /// </summary>
-        public Vector2 RelativePosition
-        {
-            get => _relativePosition;
-            set
-            {
-                _relativePosition = value;
-                if (Parent != null)
-                    Position = Parent.Position + _relativePosition;
-            }
-        }
-        private Vector2 _relativePosition;
 
         /// <summary>
         /// The (normalized) direction the entity is facing
@@ -209,34 +168,6 @@ namespace Takai.Game
         /// </summary>
         public float Mass { get; set; } = 1;
 
-        public EntityStateMachine State
-        {
-            get => _state;
-            set
-            {
-                if (_state != null)
-                {
-                    _state.StateComplete -= State_StateComplete;
-                    _state.Transition -= State_Transition;
-                }
-
-                //todo: custom serialize state?
-                _state = value;
-                if (_state != null)
-                {
-                    _state.States = Class?.States;
-
-                    _state.StateComplete += State_StateComplete;
-                    _state.Transition += State_Transition;
-
-                    lastTransform = GetTransform();
-                    lastVisibleSize = GetVisibleSize();
-                    UpdateAxisAlignedBounds();
-                }
-            }
-        }
-        private EntityStateMachine _state = null;
-
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
@@ -257,9 +188,6 @@ namespace Takai.Game
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
-
-            State = new EntityStateMachine();
-            State.TransitionTo(EntStateId.Idle, "Idle");
         }
 
         public Matrix GetTransform()
@@ -272,15 +200,6 @@ namespace Takai.Game
             );
         }
         Matrix lastTransform;
-
-        /// <summary>
-        /// Get the size of the visible sprites
-        /// </summary>
-        /// <returns>The calculated extent</returns>
-        public Point GetVisibleSize()
-        {
-            return State?.Current.Class?.Sprite?.Size ?? new Point(1);
-        }
         Point lastVisibleSize;
 
         /// <summary>
@@ -290,7 +209,6 @@ namespace Takai.Game
         {
             Position = Position;
             Forward = Forward;
-            lastVisibleSize = GetVisibleSize();
             UpdateAxisAlignedBounds();
         }
 
@@ -327,8 +245,9 @@ namespace Takai.Game
 
             r = new Rectangle(min.ToPoint(), (max - min).ToPoint());
 
-            foreach (var child in Children)
-                r = Rectangle.Union(r, child.AxisAlignedBounds);
+
+            //todo: parent/child relationships
+
             AxisAlignedBounds = r;
         }
 
@@ -353,19 +272,7 @@ namespace Takai.Game
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void Think(TimeSpan deltaTime)
         {
-            State.Update(deltaTime);
-        }
-
-        protected void State_Transition(object sender, TransitionEventArgs e)
-        {
-            lastVisibleSize = GetVisibleSize();
-            UpdateAxisAlignedBounds();
-        }
-
-        protected void State_StateComplete(object sender, StateCompleteEventArgs e)
-        {
-            if (e.State.Id == EntStateId.Dead && Class.DestroyOnDeath && Map != null)
-                Map.Destroy(this);
+            UpdateAnimations(deltaTime);
         }
 
         /// <summary>
@@ -397,21 +304,5 @@ namespace Takai.Game
         /// <param name="Type">The type of Fluid collided with</param>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void OnFluidCollision(FluidClass Type, TimeSpan DeltaTime) { }
-
-        /// <summary>
-        /// Destroy this entity
-        /// </summary>
-        /// <param name="destroyChildren">Destroy any of this entity's children (recursive)</param>
-        public void DestroySelf(bool destroyChildren = false)
-        {
-            if (destroyChildren)
-            {
-                foreach (var child in Children)
-                    child.DestroySelf(true);
-            }
-            Map?.Destroy(this);
-        }
     }
 }
-
-//todo: shorter instance/class names

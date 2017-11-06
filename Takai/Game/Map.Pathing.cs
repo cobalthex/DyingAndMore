@@ -165,8 +165,10 @@ namespace Takai.Game
             if (!Class.CanPath(pstart) || !Class.CanPath(pgoal))
                 return new List<Point> { pstart };
 
-            AStarPathNode goalNode = new AStarPathNode(pgoal, 0, 0);
-            goalNode.score = ManhattanDistance(pstart, pgoal);
+            AStarPathNode goalNode = new AStarPathNode(pgoal, 0, 0)
+            {
+                score = ManhattanDistance(pstart, pgoal)
+            };
 
             var open = new SortedList<int, HashSet<AStarPathNode>>(); //score: nodes -- //todo: use heap?
             var closed = new HashSet<Point>();

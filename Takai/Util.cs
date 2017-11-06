@@ -100,5 +100,13 @@ namespace Takai
                     return new Color(max, mid, min, alpha);
             }
         }
+
+        public static Point Max(Point a, Point b)
+        {
+            return new Point(
+                MathHelper.Max(a.X, b.X),
+                MathHelper.Max(a.Y, b.Y)
+            );
+        }
     }
 }

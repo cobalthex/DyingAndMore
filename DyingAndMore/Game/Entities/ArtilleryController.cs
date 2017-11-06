@@ -32,12 +32,11 @@ namespace DyingAndMore.Game.Entities
         {
             //todo: fix animations here
 
-            if (Actor.State.CurrentState != Takai.Game.EntStateId.Idle)
-                return; //todo: shoot with moving barrel?
+            //todo: one-time animation play, then die
 
-            if (Actor.State.CurrentState == Takai.Game.EntStateId.Idle && Actor.Weapon.IsDepleted())
+            if (Actor.Weapon.IsDepleted())
             {
-                Actor.State.TransitionTo(Takai.Game.EntStateId.Idle, Takai.Game.EntStateId.Inactive, "Inactive");
+                Actor.SetState(Takai.Game.EntStateId.Inactive, "Inactive");
                 return;
             }
 

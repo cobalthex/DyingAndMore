@@ -26,7 +26,7 @@ namespace DyingAndMore.Editor
                         + $"Name: {(string.IsNullOrWhiteSpace(_selectedEntity.Name) ? "(No Name)" : SelectedEntity.Name)}\n"
                         + $"ID: {_selectedEntity.Id}\n"
                         + $"Position: {_selectedEntity.Position}\n"
-                        + $"State: {_selectedEntity.State}\n";
+                        + $"State: {_selectedEntity.ActiveStateString}\n";
 
                     if (_selectedEntity is Game.Entities.ActorInstance actor &&
                         actor.Class is Game.Entities.ActorClass @class)

@@ -134,8 +134,8 @@ namespace Takai.Game
                     continue;
                 }
 
-                if (!Class.Bounds.Intersects(ent.AxisAlignedBounds) || //outside of the map
-                    ent.State.Current.Id == EntStateId.Invalid) //no state
+                //todo: no state (move to entity?)
+                if (!Class.Bounds.Intersects(ent.AxisAlignedBounds)) //outside of the map
                         Destroy(ent);
 
                 else if (!visibleRegion.Intersects(ent.AxisAlignedBounds))
@@ -143,19 +143,13 @@ namespace Takai.Game
                     //todo: reorganize
 
                     if (ent.Class.DestroyIfInactive ||
-                        (ent.Class.DestroyIfDeadAndInactive && ent.State.Current.Id == EntStateId.Dead))
+                        (ent.Class.DestroyIfDeadAndInactive && ent.IsStateActive(EntStateId.Dead)))
                         Destroy(ent);
                 }
                 else
                 {
                     if (updateSettings.isAiEnabled)
                         ent.Think(deltaTime);
-
-                    if (ent.State.Current.Class.Effect != null)
-                    {
-                        var fx = ent.State.Current.Class.Effect.Create(ent);
-                        Spawn(fx);
-                    }
 
                     if (updateSettings.isPhysicsEnabled && deltaTicks != 0)
                     {

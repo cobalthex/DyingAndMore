@@ -23,17 +23,24 @@ namespace DyingAndMore.Game.Weapons
         /// <summary>
         /// The number of shots in a single burst
         /// </summary>
-        public int ShotsPerBurst { get; set; } = 1;
+        public int RoundsPerBurst { get; set; } = 1;
+
+        /// <summary>
+        /// How many rounds/projectiles are fired per a single shot
+        /// Independent of ammo count, useful for weapons like shotguns
+        /// </summary>
+        public int ShotsPerRound { get; set; } = 1; //todo: better name
 
         //burst delay?
 
+        //zoom, zoom error?
         public Takai.Game.Range<float> ErrorAngle { get; set; }
 
         //bloom (error angle increases over time)
 
         //spew (how long continuous fire after overcharge)
 
-        //todo: give states names, instances use ids set to a specific state name in class
+        //discharged shells effects
 
         public override WeaponInstance Create()
         {
@@ -88,7 +95,7 @@ namespace DyingAndMore.Game.Weapons
         {
             if (currentBurstShotCount > 0)
             {
-                if (currentBurstShotCount < _class.ShotsPerBurst)
+                if (currentBurstShotCount < _class.RoundsPerBurst)
                     base.TryFire();
                 else
                 {
@@ -107,11 +114,14 @@ namespace DyingAndMore.Game.Weapons
                 var projectile = (Entities.ProjectileInstance)_class.Projectile.Create();
                 projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + 2));
 
-                var error = Takai.Game.RandomRange.Next(_class.ErrorAngle);
-                projectile.Forward = Vector2.TransformNormal(Actor.Forward, Matrix.CreateRotationZ(error));
-                projectile.Velocity = projectile.Forward * _class.Projectile.Power;
-                projectile.Source = Actor;
-                Actor.Map.Spawn(projectile);
+                for (int i = 0; i < _class.ShotsPerRound; ++i)
+                {
+                    var error = Takai.Game.RandomRange.Next(_class.ErrorAngle);
+                    projectile.Forward = Vector2.TransformNormal(Actor.Forward, Matrix.CreateRotationZ(error));
+                    projectile.Velocity = Actor.Velocity + projectile.Forward * _class.Projectile.MuzzleVelocity;
+                    projectile.Source = Actor;
+                    Actor.Map.Spawn(projectile);
+                }
             }
 
             --AmmoCount;

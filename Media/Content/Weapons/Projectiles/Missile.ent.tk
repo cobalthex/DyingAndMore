@@ -56,6 +56,7 @@ ProjectileClass {
                 Height: 24;
                 FrameLength: 100msec;
                 FrameCount: 8;
+                IsLooping: true;
                 Center: true;
             };
             Effect: @"./Test.fx.tk";
