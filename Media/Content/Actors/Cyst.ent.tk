@@ -7,7 +7,7 @@ ActorClass {
     };
     FieldOfView: 45deg;
 
-    States: {
+    Animations: {
         Idle: {
             Sprite: {
                 texture: "Actors/Spawner.png";

@@ -143,7 +143,7 @@ namespace Takai.Game
                     //todo: reorganize
 
                     if (ent.Class.DestroyIfInactive ||
-                        (ent.Class.DestroyIfDeadAndInactive && ent.IsStateActive(EntStateId.Dead)))
+                        (ent.Class.DestroyIfDeadAndInactive && !ent.IsAlive))
                         Destroy(ent);
                 }
                 else

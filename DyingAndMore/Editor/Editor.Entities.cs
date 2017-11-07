@@ -26,7 +26,7 @@ namespace DyingAndMore.Editor
                         + $"Name: {(string.IsNullOrWhiteSpace(_selectedEntity.Name) ? "(No Name)" : SelectedEntity.Name)}\n"
                         + $"ID: {_selectedEntity.Id}\n"
                         + $"Position: {_selectedEntity.Position}\n"
-                        + $"State: {_selectedEntity.ActiveStateString}\n";
+                        + $"State: {string.Join(",", _selectedEntity.ActiveAnimations)}\n";
 
                     if (_selectedEntity is Game.Entities.ActorInstance actor &&
                         actor.Class is Game.Entities.ActorClass @class)
@@ -77,11 +77,10 @@ namespace DyingAndMore.Editor
             };
             selector.SelectionChanged += delegate
             {
-                var state = selector.ents[selector.SelectedItem].States.GetEnumerator();
-                if (state.MoveNext())
+                if (selector.ents[selector.SelectedItem].Animations.TryGetValue("Idle", out var animation))
                 {
-                    preview.Sprite = state.Current.Value?.Sprite;
-                    preview.Size = Vector2.Max(new Vector2(32), preview.Sprite.Size.ToVector2());
+                    preview.Sprite = animation.Sprite;
+                    preview.Size = Vector2.Max(new Vector2(32), preview.Sprite?.Size.ToVector2() ?? new Vector2(32));
                 }
                 else
                 {

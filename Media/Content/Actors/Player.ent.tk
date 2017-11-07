@@ -3,7 +3,7 @@ ActorClass {
     MaxHealth: 500;
     DefaultFaction: Factions [Player];
 
-    States: {
+    Animations: {
         Idle: {
             Sprite: {
                 texture: @"./Player.png";

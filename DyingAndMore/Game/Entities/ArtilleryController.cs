@@ -35,10 +35,7 @@ namespace DyingAndMore.Game.Entities
             //todo: one-time animation play, then die
 
             if (Actor.Weapon.IsDepleted())
-            {
-                Actor.SetState(Takai.Game.EntStateId.Inactive, "Inactive");
                 return;
-            }
 
             if (trackedActor != null)
             {
@@ -110,6 +107,10 @@ namespace DyingAndMore.Game.Entities
                     }
                 }
             }
+
+            //todo: named animation
+            if (Actor.Weapon.IsDepleted())
+                Actor.PlayAnimation("Inactive");
         }
     }
 }

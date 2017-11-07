@@ -22,7 +22,7 @@ namespace DyingAndMore.Editor.Selectors
                 try
                 {
                     var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(file);
-                    if (ent is Game.Entities.ActorClass && ent.States != null) //+ other classes
+                    if (ent is Game.Entities.ActorClass && ent.Animations != null) //+ other classes
                         ents.Add(ent);
                 }
                 catch (System.Exception e)
@@ -44,7 +44,7 @@ namespace DyingAndMore.Editor.Selectors
         {
             var ent = ents[itemIndex];
 
-            if (ent.States.TryGetValue("Idle", out var state) && state.Sprite?.Texture != null)
+            if (ent.Animations.TryGetValue("Idle", out var state) && state.Sprite?.Texture != null)
                 state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, editor.Map.ElapsedTime);
             else
             {

@@ -101,9 +101,9 @@ namespace Takai.Game
             set
             {
                 //play death animation
-                isAlive = value;
-                if (!isAlive)
+                if (value == false && isAlive)
                     PlayAnimation("Dead", () => { if (Class.DestroyOnDeath) Map?.Destroy(this); });
+                isAlive = value;
             }
         }
         private bool isAlive = true;
@@ -188,6 +188,9 @@ namespace Takai.Game
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
+
+            //todo: default animation
+            PlayAnimation("Idle");
         }
 
         public Matrix GetTransform()

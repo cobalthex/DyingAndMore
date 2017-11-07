@@ -253,16 +253,19 @@ namespace Takai.Game
 
                 foreach (var ent in EnumerateEntitiesInSectors(visibleSectors))
                 {
+                    bool didDraw = false;
                     if (ent.OutlineColor.A > 0)
                         _drawEntsOutlined.Add(ent);
                     else
                     {
                         var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
-                        foreach (var state in ent.ActiveStateLayers)
+                        foreach (var state in ent.ActiveAnimations)
                         {
-                            if (state.Id == EntStateId.Invalid || state.Class?.Sprite == null)
+                            if (state.Class == null)
                                 continue;
+
+                            //todo: revisit (explicit base+overlay)
 
                             state.Class.Sprite.Draw(
                                 Class.spriteBatch,
@@ -272,12 +275,13 @@ namespace Takai.Game
                                 1,
                                 state.ElapsedTime
                             );
+                            didDraw = true;
                         }
 
                         ++profilingInfo.visibleEnts;
                     }
 
-                    if (renderSettings.drawBordersAroundNonDrawingEntities)
+                    if (!didDraw && renderSettings.drawBordersAroundNonDrawingEntities)
                     {
                         Matrix transform = new Matrix(ent.Forward.X, ent.Forward.Y, 0, 0,
                                                      -ent.Forward.Y, ent.Forward.X, 0, 0,
@@ -325,9 +329,9 @@ namespace Takai.Game
 
                     var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
-                    foreach (var state in ent.ActiveStateLayers)
+                    foreach (var state in ent.ActiveAnimations)
                     {
-                        if (state.Id == EntStateId.Invalid || state.Class?.Sprite == null)
+                        if (state.Class == null)
                             continue;
 
                         state.Class.Sprite.Draw(

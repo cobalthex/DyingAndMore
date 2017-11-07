@@ -5,7 +5,7 @@ ActorClass {
 
     DestructionEffect: @"Effects/Splatter.fx.tk";
 
-    States: {
+    Animations: {
         Idle: {
             Sprite: {
                 texture: @"./InfectedCell.png";
