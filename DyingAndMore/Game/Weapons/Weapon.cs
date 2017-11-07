@@ -121,7 +121,10 @@ namespace DyingAndMore.Game.Weapons
                     break;
                 case WeaponState.Discharging:
                     if (Actor.Map.ElapsedTime >= StateTime + Class.DischargeTime)
+                    {
+                        Actor.StopAnimation($"{Class.AnimationClass}DischargeWeapon");
                         State = WeaponState.Idle;
+                    }
                     break;
 
             }
@@ -137,7 +140,7 @@ namespace DyingAndMore.Game.Weapons
                 //todo: if charge time is zero, skip to discharge
 
                 State = WeaponState.Charging;
-                Actor.SetState(Takai.Game.EntStateId.ChargeWeapon, $"{Class.AnimationClass}ChargeWeapon"); //todo: actor state map?
+                Actor.PlayAnimation($"{Class.AnimationClass}ChargeWeapon");
             }
         }
         /// <summary>
@@ -165,7 +168,8 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         protected virtual void OnDischarge()
         {
-            Actor.SetState(Takai.Game.EntStateId.DischargeWeapon, $"{Class.AnimationClass}DischargeWeapon");
+            Actor.StopAnimation($"{Class.AnimationClass}ChargeWeapon");
+            Actor.PlayAnimation($"{Class.AnimationClass}DischargeWeapon");
 
             if (Class.DischargeEffect != null)
             {

@@ -73,7 +73,7 @@ namespace DyingAndMore.Game.Entities
         {
             if (Velocity.LengthSquared() < 0.001f ||
                 (_class.Range != 0 && Vector2.DistanceSquared(origin, Position) > _class.Range * _class.Range))
-                KillSelf();
+                IsAlive = false;
 
             base.Think(DeltaTime);
         }
@@ -85,12 +85,12 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime)
         {
-            KillSelf();
+            IsAlive = false;
         }
 
         public override void OnEntityCollision(EntityInstance collider, Vector2 point, TimeSpan deltaTime)
         {
-            KillSelf();
+            IsAlive = false;
             Takai.LogBuffer.Append(ToString() + " " + collider.ToString());
 
             if (collider is ActorInstance actor &&

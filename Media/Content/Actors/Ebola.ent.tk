@@ -3,7 +3,7 @@ ActorClass {
     MaxHealth: 500;
     DefaultFaction: Factions [Enemy];
 
-    States: {
+    Animations: {
         Idle: {
             Sprite: {
                 texture: "Actors/Ebola.png";

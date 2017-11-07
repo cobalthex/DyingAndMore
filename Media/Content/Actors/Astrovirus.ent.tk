@@ -3,7 +3,7 @@ ActorClass {
     MaxHealth: 40;
     DefaultFaction: Factions [Enemy Common];
 
-	States: {
+	Animations: {
         Idle: {
             Sprite: {
             	texture: @"Actors/Astrovirus.png";

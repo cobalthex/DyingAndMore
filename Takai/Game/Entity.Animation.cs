@@ -93,6 +93,11 @@ namespace Takai.Game
         {
             Sound.Instance?.Dispose();
         }
+
+        public override string ToString()
+        {
+            return $"{Class?.Name}";
+        }
     }
 
     public class StateCompleteEventArgs : EventArgs
@@ -108,7 +113,10 @@ namespace Takai.Game
 
     public abstract partial class EntityClass
     {
-        public Dictionary<string, AnimationClass> States { get; set; }
+        /// <summary>
+        /// All available animations
+        /// </summary>
+        public Dictionary<string, AnimationClass> Animations { get; set; }
 
         //entity state map (id to class name)
     }
@@ -145,14 +153,12 @@ namespace Takai.Game
         private EntityStateMachine _state = null;
         */
 
-        /// <summary>
-        /// All available animations
-        /// </summary>
-        public Dictionary<string, AnimationClass> Animations { get; set; }
-
         AnimationInstance baseAnimation;
         List<AnimationInstance> overlayAnimations = new List<AnimationInstance>();
 
+        /// <summary>
+        /// All of the active animations, base animatino first
+        /// </summary>
         public IEnumerable<AnimationInstance> ActiveAnimations
         {
             get
@@ -164,13 +170,41 @@ namespace Takai.Game
         }
 
         /// <summary>
+        /// Stop a playing animation. If the animation is a base animation,
+        /// </summary>
+        /// <param name="animation">the animation to stop</param>
+        /// <param name="callCallback">call the callback for the animation (if set)</param>
+        public void StopAnimation(string animation, bool callCallback = true)
+        {
+            if (Class.Animations == null || !Class.Animations.TryGetValue(animation, out var animClass))
+                return;
+
+            if (animClass.Type == AnimationType.Base && baseAnimation.Class == animClass)
+            {
+                if (callCallback && baseAnimation.CompletionCallback != null)
+                    baseAnimation.CompletionCallback();
+                baseAnimation.Dispose();
+                //todo: set default?
+            }
+            else if (animClass.Type == AnimationType.Overlay)
+            {
+                var index = overlayAnimations.FindIndex((a) => a.Class == animClass);
+
+                if (callCallback && overlayAnimations[index].CompletionCallback != null)
+                    overlayAnimations[index].CompletionCallback();
+                overlayAnimations[index].Dispose();
+                overlayAnimations.RemoveAt(index);
+            }
+        }
+
+        /// <summary>
         /// Play a new animation
         /// </summary>
         /// <param name="animation">The animation to play</param>
         /// <param name="completionCallback">An optional callback called on completion of this animation. If the animation doesn't exist, the callback is called immediately</param>
         public void PlayAnimation(string animation, Action completionCallback = null)
         {
-            if (Animations != null && Animations.TryGetValue(animation, out var animClass))
+            if (Class.Animations != null && Class.Animations.TryGetValue(animation, out var animClass))
             {
                 var instance = animClass.Create();
                 instance.CompletionCallback = completionCallback;
@@ -191,7 +225,22 @@ namespace Takai.Game
 
         public virtual void UpdateAnimations(TimeSpan deltaTime)
         {
+            Radius = 0;
+            lastVisibleSize = Point.Zero;
+
+            bool wasFinished = baseAnimation.ElapsedTime > baseAnimation.Class.TotalTime;
             baseAnimation.ElapsedTime += deltaTime;
+            if (!wasFinished && baseAnimation.ElapsedTime > baseAnimation.Class.TotalTime)
+            {
+                baseAnimation.CompletionCallback?.Invoke();
+                //return to default if not looping?
+            }
+            else
+            {
+                Radius = baseAnimation.Class.Radius;
+                if (baseAnimation.Class.Sprite != null)
+                    lastVisibleSize = baseAnimation.Class.Sprite.Size;
+            }
 
             for (int i = 0; i < overlayAnimations.Count; ++i)
             {
@@ -204,8 +253,15 @@ namespace Takai.Game
                     --i;
                 }
                 else
+                {
                     overlayAnimations[i] = animation;
+                    Radius = MathHelper.Max(Radius, baseAnimation.Class.Radius);
+                    if (baseAnimation.Class.Sprite != null)
+                        lastVisibleSize = Util.Max(lastVisibleSize, baseAnimation.Class.Sprite.Size);
+                }
             }
+
+            UpdateAxisAlignedBounds(); //todo: only needs to be called once per frame
         }
     }
 }

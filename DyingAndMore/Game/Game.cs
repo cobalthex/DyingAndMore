@@ -389,7 +389,7 @@ namespace DyingAndMore.Game
                 var pos = Vector2.Transform(actor.Position, Map.ActiveCamera.Transform)
                             - new Vector2(ent.Radius * 1.5f * Map.ActiveCamera.Scale);
 
-                tinyFont.Draw(spriteBatch, $"{actor.CurrentHealth} {actor.ActiveStateString}", pos, Color.Tomato);
+                tinyFont.Draw(spriteBatch, $"{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}", pos, Color.Tomato);
                 if (actor.Weapon is Weapons.GunInstance gun)
                 {
                     pos.Y += 10;

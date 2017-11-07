@@ -48,7 +48,7 @@ ProjectileClass {
     }
 
     Range: 0;
-    States: {
+    Animations: {
         Idle: {
             Sprite: {
                 Texture: "Weapons/Projectiles/Powerball.png";

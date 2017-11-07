@@ -287,7 +287,6 @@ namespace Takai.Game
             instance.OnDestroy();
             instance.SpawnTime = TimeSpan.Zero;
             instance.Map = null;
-            instance.Parent = null;
             activeEntities.Remove(instance);
             _allEntities.Remove(instance);
         }
