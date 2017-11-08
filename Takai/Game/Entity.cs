@@ -23,6 +23,19 @@ namespace Takai.Game
         public bool IsPhysical { get; set; } = true;
 
         /// <summary>
+        /// The mass of this object.
+        /// 0 for light objects
+        /// 1 for 'normal' mass objects
+        /// 10 for very heavy objects
+        /// </summary>
+        public float Mass { get; set; } = 1;
+
+        /// <summary>
+        /// The drag coefficient of this entity
+        /// </summary>
+        public float Drag { get; set; } = 0;
+
+        /// <summary>
         /// Trace (raycast) queries should ignore this entity
         /// </summary>
         public bool IgnoreTrace { get; set; } = false;
@@ -35,9 +48,9 @@ namespace Takai.Game
         /// <summary>
         /// Destroy this entity if it goes off screen (becomes inactive) and is dead
         /// </summary>
-        public bool DestroyIfDeadAndInactive { get; set; } = false;
+        public bool DestroyIfDeadAndOffscreen { get; set; } = false;
 
-        public bool DestroyIfInactive { get; set; } = false;
+        public bool DestroyIfOffscreen { get; set; } = false;
 
         /// <summary>
         /// Should the sprite always be drawn with the original sprite orientation?
@@ -159,14 +172,6 @@ namespace Takai.Game
         /// </summary>
         [Data.Serializer.Ignored]
         public Rectangle AxisAlignedBounds { get; private set; }
-
-        /// <summary>
-        /// The mass of this object.
-        /// 0 for light objects
-        /// 1 for 'normal' mass objects
-        /// 10 for very heavy objects
-        /// </summary>
-        public float Mass { get; set; } = 1;
 
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored

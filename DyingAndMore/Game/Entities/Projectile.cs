@@ -9,7 +9,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// Initial speed of the projectile
         /// </summary>
-        public float MuzzleVelocity { get; set; } = 400;
+        public Range<float> MuzzleVelocity { get; set; } = 100;
 
         /// <summary>
         /// The amount of power this projectile has. Determines speed and therefore damage
@@ -22,6 +22,8 @@ namespace DyingAndMore.Game.Entities
         /// <remarks>Use zero for infinity</remarks>
         public float Range { get; set; } = 0;
 
+        //lifespan
+
         /// <summary>
         /// Allow this projectile to damage the creator of this projectile
         /// </summary>
@@ -29,7 +31,7 @@ namespace DyingAndMore.Game.Entities
 
         public ProjectileClass()
         {
-            DestroyIfInactive = true;
+            DestroyIfOffscreen = true;
         }
 
         public override EntityInstance Create()

@@ -213,9 +213,14 @@ namespace Takai.Game
                 {
                     baseAnimation.Dispose();
                     baseAnimation = instance;
+
                 }
                 else
                     overlayAnimations.Add(instance);
+
+                Radius = MathHelper.Max(Radius, animClass.Radius);
+                if (animClass.Sprite != null)
+                    lastVisibleSize = Util.Max(lastVisibleSize, animClass.Sprite.Size);
             }
             else
                 completionCallback?.Invoke();
@@ -225,9 +230,6 @@ namespace Takai.Game
 
         public virtual void UpdateAnimations(TimeSpan deltaTime)
         {
-            Radius = 0;
-            lastVisibleSize = Point.Zero;
-
             bool wasFinished = baseAnimation.ElapsedTime > baseAnimation.Class.TotalTime;
             baseAnimation.ElapsedTime += deltaTime;
             if (!wasFinished && baseAnimation.ElapsedTime > baseAnimation.Class.TotalTime)
@@ -235,11 +237,18 @@ namespace Takai.Game
                 baseAnimation.CompletionCallback?.Invoke();
                 //return to default if not looping?
             }
-            else
+
+            Radius = 0;
+            lastVisibleSize = Point.Zero;
+            if (baseAnimation.Class != null)
             {
                 Radius = baseAnimation.Class.Radius;
+
                 if (baseAnimation.Class.Sprite != null)
                     lastVisibleSize = baseAnimation.Class.Sprite.Size;
+
+                if (baseAnimation.Class.Effect != null && Map != null)
+                    Map.Spawn(baseAnimation.Class.Effect.Create(this));
             }
 
             for (int i = 0; i < overlayAnimations.Count; ++i)
@@ -256,8 +265,14 @@ namespace Takai.Game
                 {
                     overlayAnimations[i] = animation;
                     Radius = MathHelper.Max(Radius, baseAnimation.Class.Radius);
-                    if (baseAnimation.Class.Sprite != null)
-                        lastVisibleSize = Util.Max(lastVisibleSize, baseAnimation.Class.Sprite.Size);
+                    if (baseAnimation.Class != null)
+                    {
+                        if (baseAnimation.Class.Sprite != null)
+                            lastVisibleSize = Util.Max(lastVisibleSize, baseAnimation.Class.Sprite.Size);
+
+                        if (baseAnimation.Class.Effect != null && Map != null)
+                            Map.Spawn(baseAnimation.Class.Effect.Create(this));
+                    }
                 }
             }
 

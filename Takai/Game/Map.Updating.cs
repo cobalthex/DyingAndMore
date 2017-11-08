@@ -142,8 +142,8 @@ namespace Takai.Game
                 {
                     //todo: reorganize
 
-                    if (ent.Class.DestroyIfInactive ||
-                        (ent.Class.DestroyIfDeadAndInactive && !ent.IsAlive))
+                    if (ent.Class.DestroyIfOffscreen ||
+                        (ent.Class.DestroyIfDeadAndOffscreen && !ent.IsAlive))
                         Destroy(ent);
                 }
                 else
@@ -203,10 +203,7 @@ namespace Takai.Game
                                     ent.Velocity += ((-fd * direction) * (deltaSeconds / TimeScale)); //todo: radius affects
                                 }
                             }
-                        }
 
-                        if (ent.Velocity != Vector2.Zero)
-                        {
                             var sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
 
                             //todo: optimize removal/additions to only remove if not currently inside
@@ -223,6 +220,8 @@ namespace Takai.Game
                                 for (int x = sectors.Left; x < sectors.Right; ++x)
                                     Sectors[y, x].entities.Add(ent);
                             }
+
+                            ent.Velocity -= ent.Velocity * (ent.Class.Drag * deltaSeconds);
                         }
                     }
                 }
