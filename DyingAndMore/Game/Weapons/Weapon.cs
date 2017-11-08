@@ -83,7 +83,6 @@ namespace DyingAndMore.Game.Weapons
             {
                 _state = value;
                 StateTime = Actor.Map?.ElapsedTime ?? TimeSpan.Zero;
-                Takai.LogBuffer.Append(value.ToString());
             }
         }
         WeaponState _state;
@@ -101,8 +100,6 @@ namespace DyingAndMore.Game.Weapons
 
         public virtual void Think(TimeSpan deltaTime)
         {
-            //remove reliance on state machine? (or augment to allow multiple states for this)
-
             switch (State)
             {
                 case WeaponState.Charging:

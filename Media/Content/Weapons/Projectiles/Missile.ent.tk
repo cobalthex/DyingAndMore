@@ -1,15 +1,17 @@
 ProjectileClass {
     Name: "Missile";
-    Power: 400;
-    DestroyIfInactive: True;
+    MuzzleVelocity: [6600 6800];
+    DestroyIfOffscreen: True;
     IgnoreTrace: True;
+    Range: 1000;
+    Drag: 8;
 
     DestructionEffect: {
         Effects: [
             ParticleEffect {
                 Class: {
                     Graphic: {
-                        Texture: "Effects/spark.png"
+                        Texture: "Effects/spark.png";
                         width: 6;
                         height: 1;
                         frameLength: 100msec;
@@ -22,27 +24,27 @@ ProjectileClass {
                                 CurveKey {
                                     Position: 0;
                                     Value: 0;
-                                }
+                                };
                                 CurveKey {
                                     Position: 0.5;
                                     Value: 0;
-                                }
+                                };
                                 CurveKey {
                                     Position: 1;
                                     Value: 1;
-                                }
+                                };
                             ]
                         }
                         start: Color.White;
                         end: Color.Red;
                     }
-                    #AngleOverTime: {start:0 end:2pi};
+                    #AngleOverTime: {start:0; end:2pi;};
                     InitialSpeed: [20 500];
                     Drag: 5;
                     lifetime: [0.5sec 1sec];
                     Radius: 10;
                 }
-                Count: [50 100]; #*test*#
+                Count: [5 10];
             }
         ]
     }
@@ -51,15 +53,9 @@ ProjectileClass {
     Animations: {
         Idle: {
             Sprite: {
-                Texture: "Weapons/Projectiles/Powerball.png";
-                Width: 24;
-                Height: 24;
-                FrameLength: 100msec;
-                FrameCount: 8;
-                IsLooping: true;
-                Center: true;
+                Texture: "Effects/spark.png";
             };
-            Effect: @"./Test.fx.tk";
+            #Effect: @"./Test.fx.tk";
         }
     }
 }

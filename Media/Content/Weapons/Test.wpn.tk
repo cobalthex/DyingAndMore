@@ -1,14 +1,13 @@
 GunClass {
     MaxAmmo: 100;
 	RoundsPerBurst: 1;
-    ShotsPerRound: 1;
+    ProjectilesPerRound: 10;
     MaxBursts: 0;
-	Delay: [0 0];
     Projectile: @"Weapons/Projectiles/Missile.ent.tk";
-    ErrorAngle: [-3deg 3deg];
+    ErrorAngle: [-8deg 8deg];
 
     ChargeTime: 0msec;
-    DischargeTime: 100msec;
+    DischargeTime: 300msec;
 
     DischargeEffect: { #move to spawn effect on projectile?
         Effects: [

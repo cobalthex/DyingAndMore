@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Takai.Game;
 
 namespace DyingAndMore.Game.Weapons
 {
@@ -21,15 +22,15 @@ namespace DyingAndMore.Game.Weapons
         public int MaxBursts { get; set; } = 0;
 
         /// <summary>
-        /// The number of shots in a single burst
+        /// The number of rounds fired in a single burst
         /// </summary>
         public int RoundsPerBurst { get; set; } = 1;
 
         /// <summary>
-        /// How many rounds/projectiles are fired per a single shot
+        /// How many projectiles are fired per a single shot
         /// Independent of ammo count, useful for weapons like shotguns
         /// </summary>
-        public int ShotsPerRound { get; set; } = 1; //todo: better name
+        public int ProjectilesPerRound { get; set; } = 1;
 
         //burst delay?
 
@@ -111,14 +112,14 @@ namespace DyingAndMore.Game.Weapons
         {
             if (_class.Projectile != null)
             {
-                var projectile = (Entities.ProjectileInstance)_class.Projectile.Create();
-                projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + 2));
-
-                for (int i = 0; i < _class.ShotsPerRound; ++i)
+                for (int i = 0; i < _class.ProjectilesPerRound; ++i)
                 {
-                    var error = Takai.Game.RandomRange.Next(_class.ErrorAngle);
+                    var projectile = (Entities.ProjectileInstance)_class.Projectile.Create();
+                    projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + 2));
+
+                    var error = RandomRange.Next(_class.ErrorAngle);
                     projectile.Forward = Vector2.TransformNormal(Actor.Forward, Matrix.CreateRotationZ(error));
-                    projectile.Velocity = Actor.Velocity + projectile.Forward * _class.Projectile.MuzzleVelocity;
+                    projectile.Velocity = Actor.Velocity + projectile.Forward * RandomRange.Next(_class.Projectile.MuzzleVelocity);
                     projectile.Source = Actor;
                     Actor.Map.Spawn(projectile);
                 }
