@@ -34,8 +34,12 @@ namespace DyingAndMore.Game.Entities
 
             //todo: one-time animation play, then die
 
+            //todo: named animation
             if (Actor.Weapon.IsDepleted())
+            {
+                Actor.PlayAnimation("Inactive"); //todo: one time?
                 return;
+            }
 
             if (trackedActor != null)
             {
@@ -107,10 +111,6 @@ namespace DyingAndMore.Game.Entities
                     }
                 }
             }
-
-            //todo: named animation
-            if (Actor.Weapon.IsDepleted())
-                Actor.PlayAnimation("Inactive");
         }
     }
 }

@@ -55,7 +55,7 @@ ProjectileClass {
             Sprite: {
                 Texture: "Effects/spark.png";
             };
-            #Effect: @"./Test.fx.tk";
+            #ActiveEffect: @"./Test.fx.tk";
         }
     }
 }

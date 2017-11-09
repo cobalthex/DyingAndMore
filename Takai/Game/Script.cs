@@ -58,5 +58,11 @@ namespace Takai.Game
         {
             Entity = entity;
         }
+
+        public override void Step(TimeSpan deltaTime)
+        {
+            if (!Entity.IsAlive)
+                return;
+        }
     }
 }

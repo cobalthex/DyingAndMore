@@ -66,8 +66,6 @@ namespace Takai.Game
         /// </summary>
         public EffectsClass DestructionEffect { get; set; }
 
-        //random idle audio
-
         public EntityClass() { }
 
         public abstract EntityInstance Create();

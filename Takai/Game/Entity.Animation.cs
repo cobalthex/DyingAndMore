@@ -34,11 +34,13 @@ namespace Takai.Game
         /// </summary>
         public SoundClass Sound { get; set; }
 
+        public EffectsClass EnterEffect { get; set; }
+        public EffectsClass ExitEffect { get; set; }
+
         /// <summary>
         /// An effect to play (repeatedly) while the state is active
         /// </summary>
-        public EffectsClass Effect { get; set; }
-        //todo: enter/exit effects?
+        public EffectsClass ActiveEffect { get; set; }
 
         public float Radius =>
             Sprite != null ? MathHelper.Max(Sprite.Width, Sprite.Height) / 2 : 1;
@@ -118,6 +120,12 @@ namespace Takai.Game
         /// </summary>
         public Dictionary<string, AnimationClass> Animations { get; set; }
 
+        /// <summary>
+        /// The default base animation set for when there is no other base state
+        /// Set to null to leave the previous state
+        /// </summary>
+        public string DefaultBaseAnimation { get; set; } = null;
+
         //entity state map (id to class name)
     }
 
@@ -170,21 +178,69 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Stop a playing animation. If the animation is a base animation,
+        /// Play a new animation. Does nothing if the animation is aleady being played
+        /// </summary>
+        /// <param name="animation">The animation to play</param>
+        /// <param name="completionCallback">An optional callback called on completion of this animation. If the animation doesn't exist, the callback is called immediately</param>
+        /// <returns>True if the animation was started, false if the animation was already playing or didn't exist</returns>
+        public bool PlayAnimation(string animation, Action completionCallback = null)
+        {
+            if (Class.Animations != null && Class.Animations.TryGetValue(animation, out var animClass))
+            {
+                var instance = animClass.Create();
+                instance.CompletionCallback = completionCallback;
+
+                if (animClass.Type == AnimationType.Base)
+                {
+                    if (baseAnimation.Class == animClass)
+                        return false;
+
+                    baseAnimation.CompletionCallback?.Invoke();
+                    baseAnimation.Dispose();
+                    baseAnimation = instance;
+                }
+                else
+                {
+                    if (overlayAnimations.FindIndex((a) => a.Class == animClass) >= 0)
+                        return false;
+
+                    overlayAnimations.Add(instance);
+                }
+
+                if (animClass.EnterEffect != null && Map != null)
+                    Map.Spawn(animClass.EnterEffect.Create(this));
+
+                Radius = MathHelper.Max(Radius, animClass.Radius);
+                if (animClass.Sprite != null)
+                    lastVisibleSize = Util.Max(lastVisibleSize, animClass.Sprite.Size);
+
+                return true;
+            }
+            else
+                completionCallback?.Invoke();
+            return false;
+        }
+
+        /// <summary>
+        /// Stop a playing animation
+        /// Base animations will continue playing but call their completion callback
         /// </summary>
         /// <param name="animation">the animation to stop</param>
         /// <param name="callCallback">call the callback for the animation (if set)</param>
-        public void StopAnimation(string animation, bool callCallback = true)
+        /// <returns>True if the animation was stopped, false if the animation didn't exist or wasn't playing</returns>
+        public bool StopAnimation(string animation, bool callCallback = true)
         {
             if (Class.Animations == null || !Class.Animations.TryGetValue(animation, out var animClass))
-                return;
+                return false;
 
             if (animClass.Type == AnimationType.Base && baseAnimation.Class == animClass)
             {
                 if (callCallback && baseAnimation.CompletionCallback != null)
                     baseAnimation.CompletionCallback();
-                baseAnimation.Dispose();
-                //todo: set default?
+                baseAnimation.CompletionCallback = null;
+
+                if (Class.DefaultBaseAnimation != null)
+                    PlayAnimation(Class.DefaultBaseAnimation);
             }
             else if (animClass.Type == AnimationType.Overlay)
             {
@@ -195,35 +251,12 @@ namespace Takai.Game
                 overlayAnimations[index].Dispose();
                 overlayAnimations.RemoveAt(index);
             }
-        }
-
-        /// <summary>
-        /// Play a new animation
-        /// </summary>
-        /// <param name="animation">The animation to play</param>
-        /// <param name="completionCallback">An optional callback called on completion of this animation. If the animation doesn't exist, the callback is called immediately</param>
-        public void PlayAnimation(string animation, Action completionCallback = null)
-        {
-            if (Class.Animations != null && Class.Animations.TryGetValue(animation, out var animClass))
-            {
-                var instance = animClass.Create();
-                instance.CompletionCallback = completionCallback;
-
-                if (animClass.Type == AnimationType.Base)
-                {
-                    baseAnimation.Dispose();
-                    baseAnimation = instance;
-
-                }
-                else
-                    overlayAnimations.Add(instance);
-
-                Radius = MathHelper.Max(Radius, animClass.Radius);
-                if (animClass.Sprite != null)
-                    lastVisibleSize = Util.Max(lastVisibleSize, animClass.Sprite.Size);
-            }
             else
-                completionCallback?.Invoke();
+                return false;
+
+            if (animClass.ExitEffect != null && Map != null)
+                Map.Spawn(animClass.ExitEffect.Create(this));
+            return true;
         }
 
         //todo: transition/completion events
@@ -235,7 +268,7 @@ namespace Takai.Game
             if (!wasFinished && baseAnimation.ElapsedTime > baseAnimation.Class.TotalTime)
             {
                 baseAnimation.CompletionCallback?.Invoke();
-                //return to default if not looping?
+                baseAnimation.CompletionCallback = null;
             }
 
             Radius = 0;
@@ -247,8 +280,8 @@ namespace Takai.Game
                 if (baseAnimation.Class.Sprite != null)
                     lastVisibleSize = baseAnimation.Class.Sprite.Size;
 
-                if (baseAnimation.Class.Effect != null && Map != null)
-                    Map.Spawn(baseAnimation.Class.Effect.Create(this));
+                if (baseAnimation.Class.ActiveEffect != null && Map != null)
+                    Map.Spawn(baseAnimation.Class.ActiveEffect.Create(this));
             }
 
             for (int i = 0; i < overlayAnimations.Count; ++i)
@@ -257,6 +290,9 @@ namespace Takai.Game
                 animation.ElapsedTime += deltaTime;
                 if (animation.ElapsedTime > animation.Class.TotalTime)
                 {
+                    if (animation.Class.ExitEffect != null && Map != null)
+                        Map.Spawn(animation.Class.ExitEffect.Create(this));
+                    animation.CompletionCallback?.Invoke();
                     animation.Dispose();
                     overlayAnimations.RemoveAt(i);
                     --i;
@@ -270,8 +306,8 @@ namespace Takai.Game
                         if (baseAnimation.Class.Sprite != null)
                             lastVisibleSize = Util.Max(lastVisibleSize, baseAnimation.Class.Sprite.Size);
 
-                        if (baseAnimation.Class.Effect != null && Map != null)
-                            Map.Spawn(baseAnimation.Class.Effect.Create(this));
+                        if (baseAnimation.Class.ActiveEffect != null && Map != null)
+                            Map.Spawn(baseAnimation.Class.ActiveEffect.Create(this));
                     }
                 }
             }
