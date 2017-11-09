@@ -21,6 +21,8 @@ namespace DyingAndMore.Game.Scripts
         List<Point> minimums = new List<Point>(8);
         public override void Step(TimeSpan deltaTime)
         {
+            base.Step(deltaTime);
+
             if (player == null)
                 return;
 

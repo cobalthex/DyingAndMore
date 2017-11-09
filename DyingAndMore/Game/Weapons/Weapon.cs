@@ -6,7 +6,7 @@ namespace DyingAndMore.Game.Weapons
     enum UnderchargeAction
     {
         Dissipate,
-        Discharge
+        Discharge, //will continue charging cycle
     }
 
     enum OverchargeAction
@@ -147,15 +147,16 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         public virtual void Reset()
         {
-            switch (Class.UnderchargeAction)
+            if (State == WeaponState.Charging)
             {
-                case UnderchargeAction.Discharge:
-                    State = WeaponState.Discharging; //?
-                    OnDischarge();
-                    break;
-                case UnderchargeAction.Dissipate:
-                    State = WeaponState.Idle;
-                    break;
+                switch (Class.UnderchargeAction)
+                {
+                    case UnderchargeAction.Dissipate:
+                        State = WeaponState.Idle;
+                        Actor.StopAnimation($"{Class.AnimationClass}ChargeWeapon");
+                        Actor.StopAnimation($"{Class.AnimationClass}DischargeWeapon");
+                        break;
+                }
             }
         }
 

@@ -146,8 +146,11 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
-            Controller?.Think(deltaTime);
-            Weapon?.Think(deltaTime);
+            if (IsAlive)
+            {
+                Controller?.Think(deltaTime);
+                Weapon?.Think(deltaTime);
+            }
 
             //todo: move to physics
             var vel = Velocity;
