@@ -77,7 +77,7 @@ namespace DyingAndMore.Editor
             };
             selector.SelectionChanged += delegate
             {
-                if (selector.ents[selector.SelectedItem].Animations.TryGetValue("Idle", out var animation))
+                if (selector.ents[selector.SelectedItem].Animations.TryGetValue(selector.ents[selector.SelectedItem].DefaultBaseAnimation, out var animation))
                 {
                     preview.Sprite = animation.Sprite;
                     preview.Size = Vector2.Max(new Vector2(32), preview.Sprite?.Size.ToVector2() ?? new Vector2(32));

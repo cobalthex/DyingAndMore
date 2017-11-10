@@ -26,7 +26,7 @@ ActorClass {
                 origin: [32 32];
                 ClipRect: [0 192 192 64];
                 FrameCount: 3;
-                FrameLength: 100;
+                FrameLength: 60;
                 Tween: TweenStyle.Overlap;
                 IsLooping: False;
             };

@@ -3,7 +3,7 @@ EffectsClass {
 		ParticleEffect {
             Class: {
                 Graphic: {
-                    Texture: @"./blood.png"
+                    Texture: @"./blood.png";
                     Width: 10;
                     Height: 10;
                     FrameCount: 6;
@@ -20,8 +20,9 @@ EffectsClass {
                     start: 0;
                     end: 4pi;
                 };
-                InitialSpeed: [20 40];
-                lifetime: [1sec 3sec];
+                InitialSpeed: [100 200];
+                lifetime: [0.25sec 1sec];
+                Drag: 3.8;
             }
             Count: [5 10];
         }

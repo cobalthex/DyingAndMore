@@ -93,7 +93,6 @@ namespace DyingAndMore.Game.Entities
         public override void OnEntityCollision(EntityInstance collider, Vector2 point, TimeSpan deltaTime)
         {
             IsAlive = false;
-            Takai.LogBuffer.Append(ToString() + " " + collider.ToString());
 
             if (collider is ActorInstance actor &&
                 (collider != Source || _class.CanDamageSource))

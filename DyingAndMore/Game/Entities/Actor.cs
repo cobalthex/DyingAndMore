@@ -200,8 +200,6 @@ namespace DyingAndMore.Game.Entities
                 return;
 
             CurrentHealth -= damage;
-
-            Takai.LogBuffer.Append($"{damage}dmg to {ToString()}");
         }
 
         #region Helpers

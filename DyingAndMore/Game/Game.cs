@@ -122,19 +122,17 @@ namespace DyingAndMore.Game
                 MapInstance.CleanupOptions.Particles
             );
 
-            Entities.ActorInstance enemy = null;
-
-            //create players
-
             var players = new System.Collections.Generic.List<Entities.ActorInstance>();
+            var enemies = new System.Collections.Generic.List<Entities.ActorInstance>();
+
             foreach (var ent in Map.AllEntities)
             {
                 if (ent is Entities.ActorInstance actor)
                 {
                     if (actor.Controller is Entities.InputController)
                         players.Add(actor);
-                    else if (enemy == null)
-                        enemy = actor;
+                    else if (actor.Controller == null)
+                        enemies.Add(actor);
                 }
             }
 
@@ -155,8 +153,8 @@ namespace DyingAndMore.Game
                 player = GameInstance.Current.players[0];
             }
 
-            if (enemy != null)
-                Map.Spawn(new Scripts.NavigateToPlayer(enemy));
+            foreach (var enemy in enemies)
+                Map.RunScript(new Scripts.NavigateToPlayer(enemy));
 
             Map.ActiveCamera = new Camera(player); //todo: resume control
             x = false;

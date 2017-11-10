@@ -124,7 +124,7 @@ namespace Takai.Game
         /// The default base animation set for when there is no other base state
         /// Set to null to leave the previous state
         /// </summary>
-        public string DefaultBaseAnimation { get; set; } = null;
+        public string DefaultBaseAnimation { get; set; } = "Idle";
 
         //entity state map (id to class name)
     }

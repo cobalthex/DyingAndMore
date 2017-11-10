@@ -202,7 +202,7 @@ namespace Takai.Game
         [Data.Serializer.Ignored] //particles are not serialized (maybe?)
         public Dictionary<ParticleClass, List<ParticleInstance>> Particles { get; protected set; } = new Dictionary<ParticleClass, List<ParticleInstance>>();
 
-        public Dictionary<string, Script> Scripts { get; set; } = new Dictionary<string, Script>();
+        public HashSet<Script> Scripts { get; set; } = new HashSet<Script>();
 
         /// <summary>
         /// The currently active camera. Determines what part of the map is active
@@ -391,17 +391,20 @@ namespace Takai.Game
                 effect.Spawn(effects);
         }
 
-        public void Spawn(Script script)
+        public void RunScript(Script script)
         {
+            if (script.Map != this && script.Map != null)
+                script.Map.Destroy(script);
+
             script.Map = this;
             script.StartTime = ElapsedTime;
             script.OnSpawn();
-            Scripts[script.Name] = script;
+            Scripts.Add(script);
         }
 
         public void Destroy(Script script)
         {
-            Scripts.Remove(script.Name); //todo: use hashset?
+            Scripts.Remove(script);
         }
 
         /// <summary>

@@ -21,9 +21,7 @@ namespace DyingAndMore.Game.Scripts
         List<Point> minimums = new List<Point>(8);
         public override void Step(TimeSpan deltaTime)
         {
-            base.Step(deltaTime);
-
-            if (player == null)
+            if (!Entity.IsAlive || player == null)
                 return;
 
             var ppos = (player.Position / Map.Class.TileSize).ToPoint();
