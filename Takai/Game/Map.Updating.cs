@@ -304,7 +304,7 @@ namespace Takai.Game
             #endregion
 
             foreach (var script in Scripts)
-                script.Value.Step(deltaTime);
+                script.Step(deltaTime);
         }
     }
 }

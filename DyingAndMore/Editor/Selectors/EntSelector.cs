@@ -44,7 +44,7 @@ namespace DyingAndMore.Editor.Selectors
         {
             var ent = ents[itemIndex];
 
-            if (ent.Animations.TryGetValue("Idle", out var state) && state.Sprite?.Texture != null)
+            if (ent.Animations.TryGetValue(ent.DefaultBaseAnimation, out var state) && state.Sprite?.Texture != null)
                 state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, editor.Map.ElapsedTime);
             else
             {
