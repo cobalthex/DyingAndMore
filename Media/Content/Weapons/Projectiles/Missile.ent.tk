@@ -1,10 +1,11 @@
 ProjectileClass {
     Name: "Missile";
-    MuzzleVelocity: [6600 6800];
+    MuzzleVelocity: [4600 6800];
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     Range: 1000;
-    Drag: 8;
+    Drag: 12;
+    KillSpeed: 1000;
 
     DestructionEffect: {
         Effects: [

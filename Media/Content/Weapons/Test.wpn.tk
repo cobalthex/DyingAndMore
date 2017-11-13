@@ -14,7 +14,7 @@ GunClass {
             ParticleEffect {
                 Class: {
                     Graphic: {
-                        Texture: @"./MuzzleFlash.png"
+                        Texture: @"./MuzzleFlash.png";
                         width: 48;
                         height: 48;
                         frameLength: 100msec;
@@ -28,7 +28,7 @@ GunClass {
                 }
                 Count: [10 20];
                 Spread: [-30deg 30deg];
-            }
+            };
 
             SoundImpulse {
                 Permutations: [

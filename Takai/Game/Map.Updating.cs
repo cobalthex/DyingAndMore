@@ -267,11 +267,12 @@ namespace Takai.Game
                     );
 
                     //todo: calculating angle may be slow (relative)
+                    /*
                     x.angle = x.velocity.Angle() + MathHelper.Lerp(
                         p.Key.AngleOverTime.start,
                         p.Key.AngleOverTime.end,
                         (p.Key.AngleOverTime.curve ?? ValueCurve<float>.Linear).Evaluate(life)
-                    );
+                    );*/
 
                     var deltaV = x.velocity * deltaSeconds;
                     x.velocity -= deltaV * p.Key.Drag;

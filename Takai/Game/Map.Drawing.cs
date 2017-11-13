@@ -253,7 +253,6 @@ namespace Takai.Game
 
                 foreach (var ent in EnumerateEntitiesInSectors(visibleSectors))
                 {
-                    bool didDraw = false;
                     if (ent.OutlineColor.A > 0)
                         _drawEntsOutlined.Add(ent);
                     else
@@ -275,13 +274,12 @@ namespace Takai.Game
                                 1,
                                 state.ElapsedTime
                             );
-                            didDraw = true;
                         }
 
                         ++profilingInfo.visibleEnts;
                     }
 
-                    if (!didDraw && renderSettings.drawBordersAroundNonDrawingEntities)
+                    if (renderSettings.drawBordersAroundNonDrawingEntities && !System.Linq.Enumerable.Any(ent.ActiveAnimations))
                     {
                         Matrix transform = new Matrix(ent.Forward.X, ent.Forward.Y, 0, 0,
                                                      -ent.Forward.Y, ent.Forward.X, 0, 0,

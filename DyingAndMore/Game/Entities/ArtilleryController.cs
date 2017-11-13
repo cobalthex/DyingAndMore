@@ -30,24 +30,26 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
-            //todo: fix animations here
-
             //todo: one-time animation play, then die
 
-            //todo: named animation
             if (Actor.Weapon.IsDepleted())
             {
-                Actor.PlayAnimation("Inactive"); //todo: one time?
+                Actor.PlayAnimation("Inactive"); //todo: call once?
                 return;
             }
 
             if (trackedActor != null)
             {
-                var hit = Actor.Map.Trace(Actor.Position, Vector2.Normalize(trackedActor.Position - Actor.Position), MaxRange, Actor);
+                Takai.Game.TraceHit hit;
+
+                if (Actor.IsFacing(trackedActor.Position))
+                    hit = Actor.Map.Trace(Actor.Position, Vector2.Normalize(trackedActor.Position - Actor.Position), MaxRange, Actor);
+                else
+                    hit = new Takai.Game.TraceHit();
 
                 if (hit.entity != null)
                 {
-                    //todo: maybe shoot w/ lead (shoot out in front of target's velocity)
+                    //todo: maybe shoot w/ lead (shoot towards target's next position)
                     if (CanRotate)
                         Actor.Forward = Vector2.Normalize(trackedActor.Position - Actor.Position); //todo: slerp
                     Actor.Weapon?.TryFire();

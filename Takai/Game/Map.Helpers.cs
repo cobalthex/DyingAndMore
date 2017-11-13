@@ -8,10 +8,15 @@ namespace Takai.Game
     {
         internal void Resize(int newWidth, int newHeight)
         {
-            PathInfo.Resize(newHeight, newWidth);
-            for (int y = Height; y < newHeight; ++y)
-                for (int x = Height; x < newWidth; ++x)
-                    PathInfo[y, x] = new PathTile { heuristic = uint.MaxValue, generation = 0 };
+            PathInfo = PathInfo.Resize(newHeight, newWidth);
+            for (int y = 0; y < newHeight; ++y)
+            {
+                for (int x = 0; x < newWidth; ++x)
+                {
+                    if (PathInfo[y, x].generation == 0)
+                        PathInfo[y, x] = new PathTile { heuristic = uint.MaxValue, generation = 0 };
+                }
+            }
 
             Tiles = Tiles.Resize(newHeight, newWidth);
         }
@@ -202,15 +207,6 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// The outcome of a trace
-        /// </summary>
-        public struct TraceHit
-        {
-            public float distance;
-            public EntityInstance entity; //null if collided with map
-        }
-
-        /// <summary>
         /// Test if a ray collides with a circle.
         /// If ray is inside of the circle, t0 and t1 = 0
         /// </summary>
@@ -377,4 +373,14 @@ namespace Takai.Game
             };
         }
     }
+
+    /// <summary>
+    /// The outcome of a trace
+    /// </summary>
+    public struct TraceHit
+    {
+        public float distance;
+        public EntityInstance entity; //null if collided with map
+    }
+
 }

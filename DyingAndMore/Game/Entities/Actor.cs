@@ -216,7 +216,7 @@ namespace DyingAndMore.Game.Entities
 
             var dot = Vector2.Dot(Forward, diff);
 
-            return (dot > (1 - (_class.FieldOfView / MathHelper.Pi)));
+            return (dot > (1 - (_class.FieldOfView / 2 / MathHelper.Pi)));
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace DyingAndMore.Game.Entities
             diff.Normalize();
 
             var dot = Vector2.Dot(diff, Ent.Forward);
-            return (dot > (_class.FieldOfView / MathHelper.Pi) - 1);
+            return (dot > (_class.FieldOfView / 2 / MathHelper.Pi) - 1);
         }
 
         #endregion
