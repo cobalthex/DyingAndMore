@@ -5,7 +5,7 @@ ActorClass {
     DefaultController: ArtilleryController {
         CanRotate: false;
     };
-    FieldOfView: 45deg;
+    FieldOfView: 60deg;
 
     DefaultBaseAnimation: "Idle";
     Animations: {

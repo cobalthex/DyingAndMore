@@ -310,5 +310,10 @@ namespace Takai.Game
         /// <param name="Type">The type of Fluid collided with</param>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void OnFluidCollision(FluidClass Type, TimeSpan DeltaTime) { }
+
+        public float ForwardSpeed()
+        {
+            return Vector2.Dot(Forward, Velocity);
+        }
     }
 }

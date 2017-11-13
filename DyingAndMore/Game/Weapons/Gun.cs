@@ -35,7 +35,7 @@ namespace DyingAndMore.Game.Weapons
         //burst delay?
 
         //zoom, zoom error?
-        public Takai.Game.Range<float> ErrorAngle { get; set; }
+        public Range<float> ErrorAngle { get; set; }
 
         //bloom (error angle increases over time)
 

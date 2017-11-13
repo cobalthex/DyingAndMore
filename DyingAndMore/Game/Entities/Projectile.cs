@@ -17,12 +17,21 @@ namespace DyingAndMore.Game.Entities
         public float Power { get; set; } = 100;
 
         /// <summary>
-        /// How far this shot will go before destroying itself
+        /// How far this shot will go before killing itself
         /// </summary>
         /// <remarks>Use zero for infinity</remarks>
         public float Range { get; set; } = 0;
 
-        //lifespan
+        /// <summary>
+        /// How slow this entity can go before killing itself. Can go negative
+        /// </summary>
+        public float KillSpeed { get; set; } = 0.01f;
+
+        /// <summary>
+        /// How long this projectile will last before killing itself
+        /// </summary>
+        /// <remarks>Use zero for infinity</remarks>
+        public TimeSpan LifeSpan { get; set; } = TimeSpan.Zero;
 
         /// <summary>
         /// Allow this projectile to damage the creator of this projectile
@@ -73,7 +82,8 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan DeltaTime)
         {
-            if (Velocity.LengthSquared() < 0.001f ||
+            if (ForwardSpeed() < _class.KillSpeed ||
+                (_class.LifeSpan > TimeSpan.Zero && Map.ElapsedTime > SpawnTime + _class.LifeSpan) ||
                 (_class.Range != 0 && Vector2.DistanceSquared(origin, Position) > _class.Range * _class.Range))
                 IsAlive = false;
 
