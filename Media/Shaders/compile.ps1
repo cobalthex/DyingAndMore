@@ -5,7 +5,7 @@ param
     [string]$Path = $PSScriptRoot
 )
 
-$Dir = get-childitem $Path -Recurse -Filter "*.fx"
+$Dir = Get-ChildItem $Path -Recurse -Filter "*.fx"
 
 $exe = 'C:\Program Files (x86)\MSBuild\MonoGame\v3.0\Tools\2MGFX.exe'
 
@@ -18,7 +18,7 @@ if ($DX11)
 }
 if ($OGL)
 {
-    # Requires SM3.0 or less
+    # Requires SM3.0 or less (in shader file technique)
     New-Item -Force -ItemType directory -Path (Join-Path $Path 'OGL') | Out-Null
     $Dir | % {& "$exe" "$($_.FullName)" "$([io.path]::Combine($_.DirectoryName, 'OGL', $([io.path]::ChangeExtension($_.Name, 'mgfx'))))" '/Profile:OpenGL' }
 }

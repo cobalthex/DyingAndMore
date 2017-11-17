@@ -240,11 +240,11 @@ namespace Takai.Game
                 {
                     var x = p.Value[i];
 
-                    if (ElapsedTime > x.time + x.lifetime + x.delay)
+                    if (ElapsedTime >= x.time + x.lifetime + x.delay)
                     {
                         p.Value[i] = p.Value[p.Value.Count - 1];
                         p.Value.RemoveAt(p.Value.Count - 1);
-                        i--;
+                        --i;
 
                         if (p.Key.DestructionFluid != null)
                             Spawn(p.Key.DestructionFluid, x.position, x.velocity / 10);

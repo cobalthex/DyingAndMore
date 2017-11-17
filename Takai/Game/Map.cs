@@ -139,6 +139,10 @@ namespace Takai.Game
         public List<FluidInstance> fluids = new List<FluidInstance>();
         public List<Decal> decals = new List<Decal>();
         public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
+
+        public List<BobInstance> bobs = new List<BobInstance>(); //bobs are deleted once they go off screen
+
+        //next/previous fluids/bobs (double buffer)
     }
 
     public partial class MapInstance : IObjectInstance<MapClass>

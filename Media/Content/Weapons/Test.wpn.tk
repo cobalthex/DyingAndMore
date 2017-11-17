@@ -1,7 +1,7 @@
 GunClass {
     MaxAmmo: 100;
 	RoundsPerBurst: 1;
-    ProjectilesPerRound: 10;
+    ProjectilesPerRound: 3;
     MaxBursts: 0;
     Projectile: @"Weapons/Projectiles/Missile.ent.tk";
     ErrorAngle: [-8deg 8deg];
@@ -17,16 +17,16 @@ GunClass {
                         Texture: @"./MuzzleFlash.png";
                         width: 48;
                         height: 48;
-                        frameLength: 100msec;
+                        frameLength: 40msec;
                         frameCount: 4;
                         Center: true;
                     };
                     Blend: BlendState.AlphaBlend;
                     InitialSpeed: [0 0];
                     Drag: 1.3;
-                    lifetime: [400msec 400msec];
+                    lifetime: [160msec 160msec];
                 }
-                Count: [10 20];
+                Count: [3 12];
                 Spread: [-30deg 30deg];
             };
 

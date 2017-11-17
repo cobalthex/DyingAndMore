@@ -116,4 +116,44 @@ namespace Takai.Game
         public float angle;
         public float scale;
     }
+
+    public class BobClass : IObjectClass<BobInstance>
+    {
+        [Data.Serializer.Ignored]
+        public string File { get; set; }
+
+        public string Name { get; set; }
+
+        public Graphics.Sprite Sprite { get; set; }
+
+        /// <summary>
+        /// A continuous effect played on the bob
+        /// </summary>
+        public EffectsClass Effect { get; set; }
+
+        public BobInstance Create()
+        {
+            return new BobInstance(this);
+        }
+    }
+
+    /// <summary>
+    /// Simple physical object for visual fx (gibs, etc)
+    /// </summary>
+    public struct BobInstance : IObjectInstance<BobClass>
+    {
+        public BobClass Class { get; set; }
+
+        public Vector2 position;
+        public float angle;
+        public Vector2 velocity; //vector3, z = angular velocity?
+
+        public BobInstance(BobClass @class)
+        {
+            Class = @class;
+            position = Vector2.Zero;
+            angle = 0;
+            velocity = Vector2.Zero;
+        }
+    }
 }
