@@ -141,8 +141,6 @@ namespace Takai.Game
         public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
 
         public List<BobInstance> bobs = new List<BobInstance>(); //bobs are deleted once they go off screen
-
-        //next/previous fluids/bobs (double buffer)
     }
 
     public partial class MapInstance : IObjectInstance<MapClass>
@@ -197,6 +195,7 @@ namespace Takai.Game
         /// </summary>
         [Data.Serializer.Ignored]
         public List<FluidInstance> LiveFluids { get; protected set; } = new List<FluidInstance>(128);
+        //double buffer fluids?
 
         /// <summary>
         /// Currently playing sounds
@@ -370,6 +369,16 @@ namespace Takai.Game
             }
             else
                 LiveFluids.Add(instance);
+        }
+
+        public void Spawn(BobInstance instance)
+        {
+            var size = instance.Class.Sprite.Size;
+            if (!Class.Bounds.Intersects(new Rectangle(instance.position.ToPoint() - new Point(size.X / 2, size.Y / 2), size)))
+                return;
+
+            var sector = GetOverlappingSector(instance.position);
+            Sectors[sector.Y, sector.X].bobs.Add(instance);
         }
 
         public void Spawn(SoundClass sound, Vector2 position, Vector2 forward, Vector2 velocity)
