@@ -194,15 +194,29 @@ namespace Takai.Game
 
     public class BobEffect : IGameEffect
     {
-        public BobClass Class { get; set; }
+        public BobClass Class { get; set; } //list of random bobs?
 
         public Range<int> Count { get; set; } = 0;
 
         public void Spawn(EffectsInstance instance)
         {
+            const float speed = 100;
+
             //speed based on mass?
             var count = RandomRange.Next(Count);
-            //instance.Map.LiveFluids.Capacity += count;
+
+            for (int i = 0; i < count; ++i)
+            {
+                var angle = RandomRange.Next(new Range<float>(0, MathHelper.TwoPi));
+
+                var bob = Class.Create();
+                bob.position = instance.Position;
+                var direction = Util.Direction(angle);
+                bob.velocity = speed * direction;
+                if (instance.Source != null)
+                    bob.position += instance.Source.Radius * direction;
+                instance.Map.Spawn(bob);
+            }
         }
     }
 

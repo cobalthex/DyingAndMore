@@ -41,7 +41,7 @@ namespace Takai
             return (float)Math.Atan2(v.Y, v.X);
         }
 
-        public static Vector2 Vector(float angle)
+        public static Vector2 Direction(float angle)
         {
             return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
         }

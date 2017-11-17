@@ -118,6 +118,7 @@ namespace Takai.Game
             public bool drawFluidReflectionMask;
             public bool drawDecals;
             public bool drawParticles;
+            public bool drawBobs;
             public bool drawTriggers;
             public bool drawLines;
             public bool drawGrids;
@@ -134,6 +135,7 @@ namespace Takai.Game
                 drawReflections = true,
                 drawDecals = true,
                 drawParticles = true,
+                drawBobs = true,
                 drawLines = true,
             };
         }
@@ -219,6 +221,8 @@ namespace Takai.Game
         {
             if (camera == null)
                 camera = ActiveCamera;
+
+            //todo: break out into separate functions
 
             profilingInfo = new MapProfilingInfo();
 
@@ -403,6 +407,29 @@ namespace Takai.Game
 
                     var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
                     Class.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, new Color(1, 1, 1, fluid.Class.Alpha), 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
+                }
+
+                Class.spriteBatch.End();
+            }
+
+            if (renderSettings.drawBobs)
+            {
+                Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, Class.reflectionEffect, cameraTransform);
+
+                for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
+                {
+                    for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
+                    {
+                        foreach (var bob in Sectors[y, x].bobs)
+                        {
+                            bob.Class.Sprite.Draw(
+                                Class.spriteBatch,
+                                bob.position,
+                                bob.angle,
+                                Color.White
+                            );
+                        }
+                    }
                 }
 
                 Class.spriteBatch.End();

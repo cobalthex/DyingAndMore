@@ -284,6 +284,29 @@ namespace Takai.Game
 
             #endregion
 
+            #region bobs
+
+            //bobs that go inactive are deleted (by sector)
+
+            for (int y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
+            {
+                for (int x = visibleSectors.Left; x < visibleSectors.Right; ++x)
+                {
+                    for (int i = 0; i < Sectors[y, x].bobs.Count; ++i)
+                    {
+                        var bob = Sectors[y, x].bobs[i];
+                        if (bob.velocity == Vector2.Zero)
+                            continue;
+                        var dv = bob.velocity * deltaSeconds;
+                        bob.velocity -= dv * 0.8f;
+                        bob.position += dv;
+                        Sectors[y, x].bobs[i] = bob;
+                    }
+                }
+            }
+
+            #endregion
+
             #region sounds
 
             if (updateSettings.isSoundEnabled)
