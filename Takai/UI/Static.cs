@@ -226,7 +226,7 @@ namespace Takai.UI
         /// </summary>
         public bool HasFocus
         {
-            get => _hasFocus;
+            get => _hasFocus && Runtime.HasFocus;
             set
             {
                 if (value == true)
@@ -844,9 +844,6 @@ namespace Takai.UI
         /// <param name="time">Game time</param>
         public virtual void Update(GameTime time)
         {
-            if (!Runtime.HasFocus)
-                return;
-
             /* update in the following order: H G F E D C B A
             A
                 B

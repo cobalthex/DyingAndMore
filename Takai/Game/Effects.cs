@@ -192,49 +192,21 @@ namespace Takai.Game
         }
     }
 
-    /*
-    public class ScreenFlashClass : IObjectClass<ScreenFlashInstance>
+    public class BobEffect : IGameEffect
     {
-        public string Name { get; set; }
+        public BobClass Class { get; set; }
 
-        [Data.Serializer.Ignored]
-        public string File { get; set; }
-
-        public BlendState blendState;
-        public ValueCurve<Color> color;
-
-        public ScreenFlashInstance Create()
-        {
-            return new ScreenFlashInstance(this);
-        }
-
-        //todo: convert to class/instance
-    }
-
-    public struct ScreenFlashInstance : IObjectInstance<ScreenFlashClass>
-    {
-        public ScreenFlashClass Class { get; set; }
-
-        public ScreenFlashInstance(ScreenFlashClass @class)
-        {
-            Class = @class;
-        }
-    }
-
-    public class ScreenEffect : IGameEffect
-    {
-        public ScreenFlashClass Flash { get; set; }
-
-        //Camera shake
-
-        //temporary camera rotation
-        //permanent camera rotation
+        public Range<int> Count { get; set; } = 0;
 
         public void Spawn(EffectsInstance instance)
         {
-
+            //speed based on mass?
+            var count = RandomRange.Next(Count);
+            //instance.Map.LiveFluids.Capacity += count;
         }
-    }*/
+    }
 
-    //floating text?
+    //screen effects/flashes
+
+    //floating text?/objects
 }

@@ -310,13 +310,17 @@ namespace Takai.Data
 
         private static void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
+            //this may be called multiple times: https://blogs.msdn.microsoft.com/oldnewthing/20140507-00/?p=1053/
             System.Threading.Thread.Sleep(500);
             try
             {
                 Load(e.FullPath, null, true);
                 LogBuffer.Append("Refreshed " + e.FullPath);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                LogBuffer.Append($"Failed to refresh {e.FullPath} ({ex.Message})");
+            }
         }
 
         #endregion
