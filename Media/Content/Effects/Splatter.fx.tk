@@ -11,7 +11,7 @@ EffectsClass {
                     Center: true;
                 };
                 DestructionFluid: @"Fluids/Blood.fluid.tk";
-                Blend: BlendState.Additive;
+                Blend: BlendState.NonPremultiplied;
                 ColorOverTime: {
                     start: Color.White;
                     end: Color.White;
@@ -21,8 +21,8 @@ EffectsClass {
                     end: 4pi;
                 };
                 InitialSpeed: [100 200];
-                lifetime: [0.25sec 1sec];
-                Drag: 3.8;
+                lifetime: [0.25sec 0.5sec];
+                Drag: 5;
             }
             Count: [5 10];
         }

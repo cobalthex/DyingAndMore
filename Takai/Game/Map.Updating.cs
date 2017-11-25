@@ -83,8 +83,15 @@ namespace Takai.Game
             var invTransform = Matrix.Invert(camera.Transform);
 
             var visibleRegion = camera.VisibleRegion;
-            var visibleSectors = GetOverlappingSectors(visibleRegion);
-            var mapBounds = Class.Bounds;
+
+            var activeRegion = new Rectangle(
+                visibleRegion.X - Class.SectorPixelSize,
+                visibleRegion.Y - Class.SectorPixelSize,
+                visibleRegion.Width + Class.SectorPixelSize * 2,
+                visibleRegion.Height + Class.SectorPixelSize * 2
+            );
+            activeRegion = Rectangle.Intersect(activeRegion, Class.Bounds);
+            var activeSectors = GetOverlappingSectors(activeRegion);
 
             #region moving/live Fluids
 
@@ -113,122 +120,115 @@ namespace Takai.Game
             #region entities
 
             //remove entities that have been destroyed
-            foreach (var ent in entsToDestroy)
+            foreach (var entity in entsToDestroy)
             {
-                FinalDestroy(ent);
-                RemoveFromSectors(ent);
+                FinalDestroy(entity);
+                RemoveFromSectors(entity);
             }
-
             entsToDestroy.Clear();
 
-            activeEntities.UnionWith(EnumerateEntitiesInSectors(visibleSectors));
+            activeEntities.Clear();
 
-            var exclusionZone = visibleRegion;
-            exclusionZone.Inflate(Class.SectorPixelSize, Class.SectorPixelSize);
-
-            foreach (var ent in activeEntities)
+            for (int y = activeSectors.Top; y < activeSectors.Bottom; ++y)
             {
-                if (!ent.AxisAlignedBounds.Intersects(exclusionZone))
+                for (int x = activeSectors.Top; x < activeSectors.Bottom; ++x)
                 {
-                    entsToRemoveFromActive.Add(ent);
-                    continue;
-                }
-
-                //todo: no state (move to entity?)
-                if (!Class.Bounds.Intersects(ent.AxisAlignedBounds)) //outside of the map
-                        Destroy(ent);
-
-                else if (!visibleRegion.Intersects(ent.AxisAlignedBounds))
-                {
-                    //todo: reorganize
-
-                    if (ent.Class.DestroyIfOffscreen ||
-                        (ent.Class.DestroyIfDeadAndOffscreen && !ent.IsAlive))
-                        Destroy(ent);
-                }
-                else
-                {
-                    if (updateSettings.isAiEnabled)
-                        ent.Think(deltaTime);
-
-                    if (updateSettings.isPhysicsEnabled && deltaTicks != 0)
+                    foreach (var entity in Sectors[y, x].entities)
                     {
-                        if (ent.Velocity != Vector2.Zero)
+                        if (activeEntities.Contains(entity))
+                            continue;
+
+                        activeEntities.Add(entity);
+
+                        if (entity.Velocity == Vector2.Zero)
+                            continue;
+
+                        var deltaV = entity.Velocity * deltaSeconds;
+                        var deltaVLen = deltaV.Length();
+                        var direction = deltaV / deltaVLen;
+
+                        var start = entity.Position + ((entity.Radius + 1) * direction);
+                        var hit = Trace(start, direction, deltaVLen, entity);
+                        var target = start + (direction * hit.distance);
+
+                        if (hit.entity == null) //map collision
                         {
-                            var deltaV = ent.Velocity * deltaSeconds;
-                            var deltaVLen = deltaV.Length();
-
-                            var direction = deltaV / deltaVLen;
-
-                            //entity collision
-                            var start = ent.Position + ((ent.Radius + 1) * direction);
-                            var hit = Trace(start, direction, deltaVLen, ent);
-                            var target = start + (direction * hit.distance);
-                            //DrawLine(start, target, Color.Yellow);
-
-                            if (hit.entity != null)
+                            if (Math.Abs(hit.distance - deltaVLen) > 0.5f)
                             {
-                                ent.OnEntityCollision(hit.entity, target, deltaTime);
-                                hit.entity.OnEntityCollision(ent, target, deltaTime);
-
-                                if (ent.Class.IsPhysical)
-                                    ent.Velocity = Vector2.Zero;
-                            }
-                            else if (Math.Abs(hit.distance - deltaVLen) > 0.5f)
-                            {
-                                ent.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
+                                entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
 
                                 //improve
-                                ent.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * ent.Velocity;
+                                entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;
                             }
-
-                            //Fluid collision
-                            if (!ent.Class.IgnoreTrace)
-                            {
-                                var drag = 0f;
-                                var dc = 0u;
-                                var targetSector = GetOverlappingSector(target);
-                                var sector = Sectors[targetSector.Y, targetSector.X];
-                                foreach (var fluid in sector.fluids)
-                                {
-                                    if (Vector2.DistanceSquared(fluid.position, target) <= (fluid.Class.Radius * fluid.Class.Radius) + ent.RadiusSq)
-                                    {
-                                        drag += fluid.Class.Drag;
-                                        ++dc;
-                                    }
-                                }
-                                if (dc > 0)
-                                {
-                                    var fd = (drag / dc / 7.5f) * ent.Velocity.LengthSquared();
-                                    ent.Velocity += ((-fd * direction) * (deltaSeconds / TimeScale)); //todo: radius affects
-                                }
-                            }
-
-                            var sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
-
-                            //todo: optimize removal/additions to only remove if not currently inside
-                            for (int y = sectors.Top; y < sectors.Bottom; ++y)
-                            {
-                                for (int x = sectors.Left; x < sectors.Right; ++x)
-                                    Sectors[y, x].entities.Remove(ent);
-                            }
-                            ent.Position += ent.Velocity * deltaSeconds;
-
-                            sectors = GetOverlappingSectors(ent.AxisAlignedBounds);
-                            for (int y = sectors.Top; y < sectors.Bottom; ++y)
-                            {
-                                for (int x = sectors.Left; x < sectors.Right; ++x)
-                                    Sectors[y, x].entities.Add(ent);
-                            }
-
-                            ent.Velocity -= ent.Velocity * (ent.Class.Drag * deltaSeconds);
                         }
+                        else //entity collision
+                        {
+                            entity.OnEntityCollision(hit.entity, target, deltaTime);
+                            hit.entity.OnEntityCollision(entity, target, deltaTime);
+
+                            if (entity.Class.IsPhysical)
+                                entity.Velocity = Vector2.Zero;
+                        }
+
+                        //Fluid collision
+                        if (!entity.Class.IgnoreTrace)
+                        {
+                            var drag = 0f;
+                            var dc = 0u;
+                            var targetSector = GetOverlappingSector(target);
+                            var sector = Sectors[targetSector.Y, targetSector.X];
+                            foreach (var fluid in sector.fluids)
+                            {
+                                if (Vector2.DistanceSquared(fluid.position, target) <= (fluid.Class.Radius * fluid.Class.Radius) + entity.RadiusSq)
+                                {
+                                    drag += fluid.Class.Drag;
+                                    ++dc;
+                                }
+                            }
+                            if (dc > 0)
+                            {
+                                var fd = (drag / dc / 7.5f) * entity.Velocity.LengthSquared();
+                                entity.Velocity += ((-fd * direction) * (deltaSeconds / TimeScale)); //todo: radius affects
+                            }
+                        }
+
+
+                        entity.Position += entity.Velocity * deltaSeconds;
+                        entity.Velocity -= entity.Velocity * entity.Class.Drag * deltaSeconds;
+                        entity.UpdateAxisAlignedBounds();
                     }
                 }
             }
 
-            activeEntities.ExceptWith(entsToRemoveFromActive);
-            entsToRemoveFromActive.Clear();
+            foreach (var entity in activeEntities)
+            {
+                var lastSectors = GetOverlappingSectors(entity.lastAABB);
+                var nextSectors = GetOverlappingSectors(entity.AxisAlignedBounds);
+
+                if (lastSectors != nextSectors)
+                {
+                    for (var y = lastSectors.Top; y < lastSectors.Bottom; ++y)
+                        for (var x = lastSectors.Left; x < lastSectors.Right; ++x)
+                            Sectors[y, x].entities.Remove(entity);
+
+                    if (!visibleRegion.Intersects(entity.AxisAlignedBounds) &&
+                        (entity.Class.DestroyIfOffscreen ||
+                        (entity.Class.DestroyIfDeadAndOffscreen && !entity.IsAlive)))
+                    {
+                        FinalDestroy(entity);
+                        continue;
+                    }
+
+                    for (var y = nextSectors.Top; y < nextSectors.Bottom; ++y)
+                        for (var x = nextSectors.Left; x < nextSectors.Right; ++x)
+                            Sectors[y, x].entities.Add(entity);
+                }
+                entity.lastAABB = entity.AxisAlignedBounds;
+
+                entity.UpdateAnimations(deltaTime);
+                if (updateSettings.isAiEnabled)
+                    entity.Think(deltaTime);
+            }
 
             #endregion
 
@@ -279,29 +279,6 @@ namespace Takai.Game
                     x.position += deltaV;
 
                     p.Value[i] = x;
-                }
-            }
-
-            #endregion
-
-            #region bobs
-
-            //bobs that go inactive are deleted (by sector)
-
-            for (int y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
-            {
-                for (int x = visibleSectors.Left; x < visibleSectors.Right; ++x)
-                {
-                    for (int i = 0; i < Sectors[y, x].bobs.Count; ++i)
-                    {
-                        var bob = Sectors[y, x].bobs[i];
-                        if (bob.velocity == Vector2.Zero)
-                            continue;
-                        var dv = bob.velocity * deltaSeconds;
-                        bob.velocity -= dv * 0.8f;
-                        bob.position += dv;
-                        Sectors[y, x].bobs[i] = bob;
-                    }
                 }
             }
 

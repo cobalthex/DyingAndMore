@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Takai.Data
 {
     /// <summary>
-    /// A store for all deserialized files
+    /// A cache to store previously loaded files
     /// </summary>
     public static class Cache
     {
@@ -23,6 +23,13 @@ namespace Takai.Data
             public long length;
         }
 
+        struct CachedFile
+        {
+            //file name?
+            public WeakReference reference;
+            public DateTime fileTime; //last modified time when file was loaded (in UTC)
+        }
+
         /// <summary>
         /// Custom loaders for specific file extensions (Do not include the first . in the extension)
         /// All other formats will be deserialized using the Serializer
@@ -30,15 +37,24 @@ namespace Takai.Data
         public static Dictionary<string, Func<CustomLoad, object>> CustomLoaders { get; private set; }
             = new Dictionary<string, Func<CustomLoad, object>>(StringComparer.OrdinalIgnoreCase);
 
-        public static ReadOnlyDictionary<string, WeakReference> Objects { get; private set; }
-        private static Dictionary<string, WeakReference> objects;
+        private static Dictionary<string, CachedFile> objects;
+        public static IEnumerable<KeyValuePair<string, object>> Objects
+        {
+            get
+            {
+                foreach (var obj in objects)
+                {
+                    if (obj.Value.reference.IsAlive)
+                        yield return new KeyValuePair<string, object>(obj.Key, obj.Value.reference.Target);
+                }
+            }
+        }
 
         private static Dictionary<string, ZipArchive> openZips = new Dictionary<string, ZipArchive>(); //todo: load files into case-insensitive dictionary
 
         static Cache()
         {
-            objects = new Dictionary<string, WeakReference>();
-            Objects = new ReadOnlyDictionary<string, WeakReference>(objects);
+            objects = new Dictionary<string, CachedFile>();
 
             CustomLoaders.Add("png", LoadTexture);
             CustomLoaders.Add("jpg", LoadTexture);
@@ -55,6 +71,18 @@ namespace Takai.Data
             CustomLoaders.Add("mp3", UnsuportedExtension);
 
             CustomLoaders.Add("mgfx", LoadEffect);
+        }
+
+        /// <summary>
+        /// Retrieve an item from the cache
+        /// </summary>
+        /// <param name="file">The file to find</param>
+        /// <returns>The cached object, or null if not found/deleted</returns>
+        public static object Get(string file)
+        {
+            if (objects.TryGetValue(file, out var cache))
+                return cache.reference.Target;
+            return null;
         }
 
         /// <summary>
@@ -98,7 +126,7 @@ namespace Takai.Data
             else
                 realFile = Normalize(Path.Combine(root, file));
 
-            bool exists = objects.TryGetValue(realFile, out var obj) && obj.IsAlive;
+            bool exists = objects.TryGetValue(realFile, out var obj) && obj.reference.IsAlive;
             if (forceLoad || !exists)
             {
                 var load = new CustomLoad { name = file, file = realFile };
@@ -117,17 +145,20 @@ namespace Takai.Data
 
                     memStream.Seek(0, SeekOrigin.Begin);
                     load.stream = memStream;
+
+                    obj.fileTime = entry.LastWriteTime.UtcDateTime;
                 }
                 else
                 {
                     var fi = new FileInfo(realFile);
+                    obj.fileTime = fi.LastWriteTimeUtc;
                     load.length = fi.Length;
                     load.stream = fi.OpenRead();
                 }
 
                 var ext = GetExtension(file);
                 if (CustomLoaders.TryGetValue(ext, out var loader))
-                    obj = new WeakReference(loader?.Invoke(load));
+                    obj.reference = new WeakReference(loader?.Invoke(load));
                 else
                 {
                     var context = new Serializer.DeserializationContext
@@ -136,8 +167,8 @@ namespace Takai.Data
                         file = file,
                         root = root,
                     };
-                    obj = new WeakReference(Serializer.TextDeserialize(context));
-                    if (obj.Target is ISerializeExternally sxt)
+                    obj.reference = new WeakReference(Serializer.TextDeserialize(context));
+                    if (obj.reference.Target is ISerializeExternally sxt)
                         sxt.File = file;
                 }
                 load.stream.Dispose();
@@ -145,14 +176,14 @@ namespace Takai.Data
 
             if (forceLoad && exists)
             {
-                //todo: specific option for applying rather than replacing (and maybe serializer.get dictionary)
-                Serializer.ApplyObject(objects[realFile].Target, Serializer.Cast(objects[realFile].Target.GetType(), obj.Target));
+                //todo: specific option for applying rather than replacing (and maybe serializer.get_dictionary)
+                Serializer.ApplyObject(objects[realFile].reference.Target, Serializer.Cast(objects[realFile].reference.Target.GetType(), obj.reference.Target));
                 obj = objects[realFile];
             }
             else
                 objects[realFile] = obj;
 
-            return obj.Target;
+            return obj.reference.Target;
         }
 
 
@@ -172,7 +203,7 @@ namespace Takai.Data
         public static void SaveAllToFile(string file)
         {
             using (var writer = new StreamWriter(file))
-                Serializer.TextSerialize(writer, Objects, 0, true);
+                Serializer.TextSerialize(writer, objects, 0, true);
         }
 
         public static string Normalize(string path)
@@ -210,14 +241,12 @@ namespace Takai.Data
 
             foreach (var obj in objects)
             {
-                if (!obj.Value.IsAlive)
+                if (!obj.Value.reference.IsAlive)
                     stale.Add(obj.Key);
             }
 
             foreach (var key in stale)
-            {
                 objects.Remove(key);
-            }
         }
 
         #region Custom Loaders
@@ -314,8 +343,12 @@ namespace Takai.Data
             System.Threading.Thread.Sleep(500);
             try
             {
-                Load(e.FullPath, null, true);
-                LogBuffer.Append("Refreshed " + e.FullPath);
+                var path = Normalize(e.FullPath);
+                if (objects.ContainsKey(path))
+                {
+                    Load(path, null, true);
+                    LogBuffer.Append("Refreshed " + e.FullPath);
+                }
             }
             catch (Exception ex)
             {

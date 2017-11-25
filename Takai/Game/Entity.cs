@@ -132,7 +132,10 @@ namespace Takai.Game
                 var diff = value - _position;
                 _position = value;
                 lastTransform.Translation = new Vector3(value, 0);
-                UpdateAxisAlignedBounds();
+                AxisAlignedBounds = new Rectangle(
+                    AxisAlignedBounds.Location + diff.ToPoint(),
+                    AxisAlignedBounds.Size
+                );
             }
         }
         private Vector2 _position;
@@ -171,6 +174,8 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public Rectangle AxisAlignedBounds { get; private set; }
 
+        internal Rectangle lastAABB; //used for tracking movement in spacial grid
+
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
@@ -196,32 +201,13 @@ namespace Takai.Game
             PlayAnimation("Idle");
         }
 
-        public Matrix GetTransform()
-        {
-            return new Matrix(
-                Forward.X, -Forward.Y, Position.X, 0,
-                Forward.Y, Forward.X, Position.Y, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1
-            );
-        }
-        Matrix lastTransform;
-        Point lastVisibleSize;
-
-        /// <summary>
-        /// Refresh the calculated bounds of this entity. usually called on spawn
-        /// </summary>
-        public void RefreshBounds()
-        {
-            Position = Position;
-            Forward = Forward;
-            UpdateAxisAlignedBounds();
-        }
+        Matrix lastTransform = Matrix.Identity;
+        Point lastVisibleSize = new Point(1);
 
         /// <summary>
         /// Update the axis aligned bounds
         /// </summary>
-        protected void UpdateAxisAlignedBounds()
+        internal void UpdateAxisAlignedBounds()
         {
             var r = new Rectangle(
                 lastVisibleSize.X / -2,
@@ -232,22 +218,24 @@ namespace Takai.Game
 
             //todo: handle origin
 
-            var transform = lastTransform;
-
             var min = new Vector2(float.MaxValue);
             var max = new Vector2(float.MinValue);
 
-            var v = Vector2.Transform(new Vector2(r.X, r.Y), transform);
-            min = Vector2.Min(min, v); max = Vector2.Max(max, v);
+            var v = Vector2.Transform(new Vector2(r.X, r.Y), lastTransform);
+            min = Vector2.Min(min, v);
+            max = Vector2.Max(max, v);
 
-            v = Vector2.Transform(new Vector2(r.X + r.Width, r.Y), transform);
-            min = Vector2.Min(min, v); max = Vector2.Max(max, v);
+            v = Vector2.Transform(new Vector2(r.X + r.Width, r.Y), lastTransform);
+            min = Vector2.Min(min, v);
+            max = Vector2.Max(max, v);
 
-            v = Vector2.Transform(new Vector2(r.X + r.Width, r.Y + r.Height), transform);
-            min = Vector2.Min(min, v); max = Vector2.Max(max, v);
+            v = Vector2.Transform(new Vector2(r.X + r.Width, r.Y + r.Height), lastTransform);
+            min = Vector2.Min(min, v);
+            max = Vector2.Max(max, v);
 
-            v = Vector2.Transform(new Vector2(r.X, r.Y + r.Height), transform);
-            min = Vector2.Min(min, v); max = Vector2.Max(max, v);
+            v = Vector2.Transform(new Vector2(r.X, r.Y + r.Height), lastTransform);
+            min = Vector2.Min(min, v);
+            max = Vector2.Max(max, v);
 
             r = new Rectangle(min.ToPoint(), (max - min).ToPoint());
 
@@ -276,10 +264,7 @@ namespace Takai.Game
         /// The basic think function for this entity, called once a frame
         /// </summary>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void Think(TimeSpan deltaTime)
-        {
-            UpdateAnimations(deltaTime);
-        }
+        public virtual void Think(TimeSpan deltaTime) { }
 
         /// <summary>
         /// Called when this instance is spawned. Also called on deserialization

@@ -139,8 +139,6 @@ namespace Takai.Game
         public List<FluidInstance> fluids = new List<FluidInstance>();
         public List<Decal> decals = new List<Decal>();
         public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
-
-        public List<BobInstance> bobs = new List<BobInstance>(); //bobs are deleted once they go off screen
     }
 
     public partial class MapInstance : IObjectInstance<MapClass>
@@ -195,7 +193,6 @@ namespace Takai.Game
         /// </summary>
         [Data.Serializer.Ignored]
         public List<FluidInstance> LiveFluids { get; protected set; } = new List<FluidInstance>(128);
-        //double buffer fluids?
 
         /// <summary>
         /// Currently playing sounds
@@ -255,7 +252,6 @@ namespace Takai.Game
 
             instance.Map = this;
             instance.SpawnTime = ElapsedTime;
-            instance.RefreshBounds();
             instance.OnSpawn();
 
             _allEntities.Add(instance);
@@ -266,6 +262,7 @@ namespace Takai.Game
                 for (int x = sectors.Left; x < sectors.Right; ++x)
                     Sectors[y, x].entities.Add(instance);
             }
+            instance.lastAABB = instance.AxisAlignedBounds;
 
             var fx = instance.Class?.SpawnEffect?.Create(instance);
             if (fx.HasValue)
@@ -290,7 +287,6 @@ namespace Takai.Game
             instance.OnDestroy();
             instance.SpawnTime = TimeSpan.Zero;
             instance.Map = null;
-            activeEntities.Remove(instance);
             _allEntities.Remove(instance);
         }
         /// <summary>
@@ -369,16 +365,6 @@ namespace Takai.Game
             }
             else
                 LiveFluids.Add(instance);
-        }
-
-        public void Spawn(BobInstance instance)
-        {
-            var size = instance.Class.Sprite.Size;
-            if (!Class.Bounds.Intersects(new Rectangle(instance.position.ToPoint() - new Point(size.X / 2, size.Y / 2), size)))
-                return;
-
-            var sector = GetOverlappingSector(instance.position);
-            Sectors[sector.Y, sector.X].bobs.Add(instance);
         }
 
         public void Spawn(SoundClass sound, Vector2 position, Vector2 forward, Vector2 velocity)

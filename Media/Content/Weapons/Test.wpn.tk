@@ -11,6 +11,13 @@ GunClass {
 
     DischargeEffect: { #move to spawn effect on projectile?
         Effects: [
+            EntityEffect {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Count: [1 2];
+                Spread: [-90deg 90deg];
+                Speed: [400 800];
+                Radius: 100;
+            }
             ParticleEffect {
                 Class: {
                     Graphic: {
@@ -31,12 +38,10 @@ GunClass {
             };
 
             SoundImpulse {
-                Permutations: [
-                    SoundClass {
-                        sound: "open_fx.ogg";
-                        gain: 0.1;
-                    }
-                ]
+                Class: {
+                    sound: "open_fx.ogg";
+                    gain: 0.1;
+                }
             }
         ]
     }

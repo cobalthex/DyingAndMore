@@ -29,7 +29,7 @@ namespace DyingAndMore
 
             foreach (var obj in Takai.Data.Cache.Objects)
             {
-                if (!(obj.Value.Target is IDisposable))
+                if (!(obj.Value is IDisposable))
                     continue;
 
                 var listItem = new Static()
@@ -52,7 +52,7 @@ namespace DyingAndMore
 
         private void ListItem_Click(object sender, ClickEventArgs e)
         {
-            var asset = Takai.Data.Cache.Objects[((Static)sender).Name].Target;
+            var asset = Takai.Data.Cache.Get(((Static)sender).Name);
 
             if (activeSound != null)
             {
