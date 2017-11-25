@@ -119,9 +119,7 @@
       powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File "$(SolutionDir)Media\Shaders\compile.ps1" -$(ShaderProfile)
 
       if '$(ConfigurationName)' == 'Debug' (
-        powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -Command "New-Item -Force -ItemType directory -Path '$(SolutionDir)Media\Content\Shaders' | Out-Null; Copy-Item -Recurse '$(SolutionDir)Media\Shaders\$(ShaderProfile)\*' '$(SolutionDir)Media\Content\Shaders'"
-
-        powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -Command "('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }"
+        powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -Command "New-Item -Force -ItemType directory -Path '$(SolutionDir)Media\Content\Shaders' | Out-Null; Copy-Item -Recurse '$(SolutionDir)Media\Shaders\$(ShaderProfile)\*' '$(SolutionDir)Media\Content\Shaders';    ('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }"
       )
 
 set rce=%25errorlevel%25

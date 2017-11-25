@@ -131,36 +131,6 @@ namespace Takai.Game
 
     public abstract partial class EntityInstance
     {
-        /*
-        public EntityStateMachine State
-        {
-            get => _state;
-            set
-            {
-                if (_state != null)
-                {
-                    _state.StateComplete -= State_StateComplete;
-                    _state.Transition -= State_Transition;
-                }
-
-                //todo: custom serialize state?
-                _state = value;
-                if (_state != null)
-                {
-                    _state.States = Class?.States;
-
-                    _state.StateComplete += State_StateComplete;
-                    _state.Transition += State_Transition;
-
-                    lastTransform = GetTransform();
-                    lastVisibleSize = GetVisibleSize();
-                    UpdateAxisAlignedBounds();
-                }
-            }
-        }
-        private EntityStateMachine _state = null;
-        */
-
         AnimationInstance baseAnimation;
         List<AnimationInstance> overlayAnimations = new List<AnimationInstance>();
 
@@ -212,7 +182,10 @@ namespace Takai.Game
 
                 Radius = MathHelper.Max(Radius, animClass.Radius);
                 if (animClass.Sprite != null)
+                {
                     lastVisibleSize = Util.Max(lastVisibleSize, animClass.Sprite.Size);
+                    UpdateAxisAlignedBounds();
+                }
 
                 return true;
             }
@@ -311,8 +284,6 @@ namespace Takai.Game
                     }
                 }
             }
-
-            UpdateAxisAlignedBounds(); //todo: only needs to be called once per frame
         }
     }
 }

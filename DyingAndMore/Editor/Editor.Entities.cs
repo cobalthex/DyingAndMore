@@ -161,7 +161,10 @@ namespace DyingAndMore.Editor
                         SelectedEntity = null;
                 }
                 else
+                {
                     SelectedEntity = selected[0];
+                    SelectedEntity.Velocity = Vector2.Zero;
+                }
 
                 return false;
             }

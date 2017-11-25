@@ -162,12 +162,12 @@ namespace Takai.Game
 
         public enum CleanupOptions
         {
-            None            = 0,
-            All             = ~0,
-            Fluids          = 0b0001,
-            Decals          = 0b0010,
-            Particles       = 0b0100,
-            DeadEntities    = 0b1000,
+            None = 0,
+            All = ~0,
+            Fluids = 0b0001,
+            Decals = 0b0010,
+            Particles = 0b0100,
+            DeadEntities = 0b1000,
             //non players
         }
 

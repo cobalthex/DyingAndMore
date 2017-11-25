@@ -51,7 +51,8 @@ namespace DyingAndMore.Game.Scripts
             }
 
             var next = minimums[RandomRange.RandomGenerator.Next(minimums.Count)];
-            Entity.Velocity = next.ToVector2() * 100; //move force
+            Entity.Forward = next.ToVector2();
+            Entity.Velocity = Entity.Forward * 200; //todo: move force
         }
     }
 }

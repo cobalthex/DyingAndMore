@@ -82,6 +82,27 @@ namespace Takai.Game
         }
     }
 
+    /// <summary>
+    /// Spawn <see cref="Count"/> random effects
+    /// </summary>
+    public class RandomEffect : IGameEffect
+    {
+        public List<IGameEffect> Effects { get; set; }
+        public Range<int> Count { get; set; } = 0;
+
+        public void Spawn(EffectsInstance instance)
+        {
+            if (Effects == null || Effects.Count < 1)
+                return;
+
+            for (int i = 0; i < RandomRange.Next(Count); ++i)
+            {
+                var which = RandomRange.RandomGenerator.Next(0, Effects.Count - 1);
+                Effects[which].Spawn(instance);
+            }
+        }
+    }
+
     //sound environments
     //(underwater, inside, outside, etc)
 
@@ -92,10 +113,7 @@ namespace Takai.Game
 
     public class SoundImpulse : IGameEffect
     {
-        /// <summary>
-        /// A list of possible sounds to play. One will be chosen at random
-        /// </summary>
-        public List<SoundClass> Permutations { get; set; }
+        SoundClass Class { get; set; }
 
         //pitch bend (amount, time)
         //strength (distance this sound can be heard) (+ minimum?)
@@ -103,11 +121,11 @@ namespace Takai.Game
 
         public void Spawn(EffectsInstance instance)
         {
-            if (Permutations == null)
+            if (Class == null)
                 return;
 
             instance.Map.Spawn(
-                Permutations[instance.Map.Random.Next(Permutations.Count)],
+                Class,
                 instance.Position,
                 instance.Direction,
                 instance.Velocity
@@ -192,30 +210,33 @@ namespace Takai.Game
         }
     }
 
-    public class BobEffect : IGameEffect
+    public class EntityEffect : IGameEffect
     {
-        public BobClass Class { get; set; } //list of random bobs?
+        public EntityClass Class { get; set; }
+
+        //todo: transform spread to instance direction
 
         public Range<int> Count { get; set; } = 0;
+        public Range<float> Spread { get; set; } = new Range<float>(0, MathHelper.TwoPi);
+        public Range<float> Speed { get; set; } = 0;
+        public float Radius { get; set; } //radius to spawn entities in around the origin
 
         public void Spawn(EffectsInstance instance)
         {
-            const float speed = 100;
-
-            //speed based on mass?
             var count = RandomRange.Next(Count);
-
             for (int i = 0; i < count; ++i)
             {
-                var angle = RandomRange.Next(new Range<float>(0, MathHelper.TwoPi));
+                //CanSpawn? (test objects around spawn point)
 
-                var bob = Class.Create();
-                bob.position = instance.Position;
-                var direction = Util.Direction(angle);
-                bob.velocity = speed * direction;
-                if (instance.Source != null)
-                    bob.position += instance.Source.Radius * direction;
-                instance.Map.Spawn(bob);
+                var angle = RandomRange.Next(Spread);
+                var direction = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(angle));
+                var entity = instance.Map.Spawn(
+                    Class,
+                    instance.Position,
+                    direction,
+                    direction * RandomRange.Next(Speed)
+                );
+                //entity.Source = instance.Source;
             }
         }
     }

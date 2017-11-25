@@ -5,10 +5,17 @@ MapClass {
     Height: 16;
     TileBounds: [0 0 16 16];
     InitialState: InitialMapState {
-        Entities: [];
+        Entities: [
+            EntitySpawn {
+                Class: @"Actors/Player.ent.tk";
+                Position: [267 259];
+                Forward: [1 0];
+                Name: Null;
+            }
+        ];
         Fluids: [];
         Decals: [];
     };
-    TilesImage: @"Tilesets/Tiles2.png";
+    TilesImage: "Tilesets/Tiles2.png";
     Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
 }
