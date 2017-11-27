@@ -84,14 +84,13 @@ namespace Takai.Game
 
             var visibleRegion = camera.VisibleRegion;
 
-            var activeRegion = new Rectangle(
+            var _activeRegion = new Rectangle(
                 visibleRegion.X - Class.SectorPixelSize,
                 visibleRegion.Y - Class.SectorPixelSize,
                 visibleRegion.Width + Class.SectorPixelSize * 2,
                 visibleRegion.Height + Class.SectorPixelSize * 2
             );
-            activeRegion = Rectangle.Intersect(activeRegion, Class.Bounds);
-            var activeSectors = GetOverlappingSectors(activeRegion);
+            var activeSectors = GetOverlappingSectors(_activeRegion);
 
             #region moving/live Fluids
 
@@ -131,7 +130,7 @@ namespace Takai.Game
 
             for (int y = activeSectors.Top; y < activeSectors.Bottom; ++y)
             {
-                for (int x = activeSectors.Top; x < activeSectors.Bottom; ++x)
+                for (int x = activeSectors.Left; x < activeSectors.Right; ++x)
                 {
                     foreach (var entity in Sectors[y, x].entities)
                     {

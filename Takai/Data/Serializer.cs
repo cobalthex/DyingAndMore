@@ -68,7 +68,7 @@ namespace Takai.Data
 
         static Serializer()
         {
-            RegisteredTypes = new Dictionary<string, Type>();
+            RegisteredTypes = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
             Serializers = new Dictionary<Type, CustomTypeSerializer>();
 
             LoadTypesFrom(Assembly.GetExecutingAssembly());

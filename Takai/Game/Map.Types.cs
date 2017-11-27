@@ -46,7 +46,7 @@ namespace Takai.Game
 
         public static int Next(Range<int> range)
         {
-            return RandomGenerator.Next(range.min, range.max);
+            return RandomGenerator.Next(range.min, range.max + 1);
         }
 
         public static float Next(Range<float> range)

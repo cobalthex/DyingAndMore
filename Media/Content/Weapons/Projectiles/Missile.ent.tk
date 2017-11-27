@@ -1,62 +1,25 @@
 ProjectileClass {
     Name: "Missile";
-    MuzzleVelocity: [4600 6800];
+    MuzzleVelocity: 500;
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
-    Range: 1000;
-    Drag: 12;
-    KillSpeed: 1000;
+    Range: 200;
 
     DestructionEffect: {
         Effects: [
-            ParticleEffect {
-                Class: {
-                    Graphic: {
-                        Texture: "Effects/spark.png";
-                        width: 6;
-                        height: 1;
-                        frameLength: 100msec;
-                        Center: true;
-                    };
-                    Blend: BlendState.AlphaBlend;
-                    ColorOverTime: {
-                        Curve: {
-                            Keys: [
-                                CurveKey {
-                                    Position: 0;
-                                    Value: 0;
-                                };
-                                CurveKey {
-                                    Position: 0.5;
-                                    Value: 0;
-                                };
-                                CurveKey {
-                                    Position: 1;
-                                    Value: 1;
-                                };
-                            ]
-                        }
-                        start: Color.White;
-                        end: Color.Red;
-                    }
-                    #AngleOverTime: {start:0; end:2pi;};
-                    InitialSpeed: [20 500];
-                    Drag: 5;
-                    lifetime: [0.5sec 1sec];
-                    Radius: 10;
-                }
-                Count: [5 10];
-            }
-        ]
+            EntityEffect {
+                Class: @"./Missile.ent.tk";
+                Count: 1;
+                Speed: 500;
+            };
+        ];
     }
 
-    Range: 0;
     Animations: {
         Idle: {
             Sprite: {
-                Texture: "Effects/spark.png";
+                Texture: @"./Antibody.png";
             };
-            #ActiveEffect: @"./Test.fx.tk";
         }
     }
 }
