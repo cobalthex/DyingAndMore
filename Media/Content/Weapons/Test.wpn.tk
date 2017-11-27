@@ -1,23 +1,16 @@
 GunClass {
-    MaxAmmo: 100;
-	RoundsPerBurst: 1;
-    ProjectilesPerRound: 3;
-    MaxBursts: 0;
     Projectile: @"Weapons/Projectiles/Missile.ent.tk";
-    ErrorAngle: [-8deg 8deg];
 
+    MaxAmmo: 1000;
+    RoundsPerBurst: 1;
+    #ProjectilesPerRound: 6;
+    MaxBursts: 1;
     ChargeTime: 0msec;
-    DischargeTime: 300msec;
+    DischargeTime: 100msec;
+    #ErrorAngle: [-8deg 8deg];
 
     DischargeEffect: { #move to spawn effect on projectile?
         Effects: [
-            EntityEffect {
-                Class: @"Actors/InfectedCell.ent.tk";
-                Count: [1 2];
-                Spread: [-90deg 90deg];
-                Speed: [400 800];
-                Radius: 100;
-            }
             ParticleEffect {
                 Class: {
                     Graphic: {

@@ -40,7 +40,7 @@ namespace Takai.Game
         /// <summary>
         /// An effect to play (repeatedly) while the state is active
         /// </summary>
-        public EffectsClass ActiveEffect { get; set; }
+        public EffectsClass Effect { get; set; }
 
         public float Radius =>
             Sprite != null ? MathHelper.Max(Sprite.Width, Sprite.Height) / 2 : 1;
@@ -253,8 +253,8 @@ namespace Takai.Game
                 if (baseAnimation.Class.Sprite != null)
                     lastVisibleSize = baseAnimation.Class.Sprite.Size;
 
-                if (baseAnimation.Class.ActiveEffect != null && Map != null)
-                    Map.Spawn(baseAnimation.Class.ActiveEffect.Create(this));
+                if (baseAnimation.Class.Effect != null && Map != null)
+                    Map.Spawn(baseAnimation.Class.Effect.Create(this));
             }
 
             for (int i = 0; i < overlayAnimations.Count; ++i)
@@ -279,8 +279,8 @@ namespace Takai.Game
                         if (baseAnimation.Class.Sprite != null)
                             lastVisibleSize = Util.Max(lastVisibleSize, baseAnimation.Class.Sprite.Size);
 
-                        if (baseAnimation.Class.ActiveEffect != null && Map != null)
-                            Map.Spawn(baseAnimation.Class.ActiveEffect.Create(this));
+                        if (baseAnimation.Class.Effect != null && Map != null)
+                            Map.Spawn(baseAnimation.Class.Effect.Create(this));
                     }
                 }
             }

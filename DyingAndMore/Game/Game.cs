@@ -299,15 +299,6 @@ namespace DyingAndMore.Game
                 //Takai.LogBuffer.Append(swatch.ElapsedMilliseconds.ToString());
             }*/
 
-            if (player != null && InputState.IsPress(MouseButtons.Left))
-            {
-                var fx = testEffect.Create();
-                fx.Position = worldMousePos;
-                fx.Direction = fx.Position - player.Position;
-                Map.Spawn(fx);
-                return false;
-            }
-
             if (InputState.IsPress(Keys.OemTilde))
             {
                 debugConsole.HasFocus = true;
