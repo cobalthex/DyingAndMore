@@ -71,7 +71,11 @@ namespace DyingAndMore
 
         void GdmDeviceCreated(object sender, System.EventArgs e)
         {
-            Takai.Data.Serializer.LoadTypesFrom(System.Reflection.Assembly.GetEntryAssembly());
+            Takai.Runtime.Game = this;
+
+            Takai.Data.Serializer.LoadRunningAssemblyTypes();
+
+            Takai.Data.Cache.Load("C:/users/matt/desktop/folp/test.tk");
 
             #region Mouse Cursor
 #if WINDOWS
@@ -88,8 +92,6 @@ namespace DyingAndMore
             #endregion
 
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
-
-            Takai.Runtime.Game = this;
 
             sbatch = new SpriteBatch(GraphicsDevice);
 

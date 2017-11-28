@@ -773,8 +773,8 @@ namespace Takai.Data
             if (ch == '*')
             {
                 //read until *#
-                while ((ch = reader.Read()) != -1 && ch != '*' &&
-                       (ch = reader.Read()) != -1 && ch != '#') ;
+                while (((ch = reader.Read()) != -1 && ch != '*') ||
+                       ((ch = reader.Read()) != -1 && ch != '#')) ;
             }
             else
                 while ((ch = reader.Read()) != -1 && ch != '\n') ;

@@ -7,11 +7,11 @@ ProjectileClass {
 
     DestructionEffect: {
         Effects: [
-            EntityEffect {
+            #*EntityEffect {
                 Class: @"./Missile.ent.tk";
                 Count: 1;
                 Speed: 500;
-            };
+            };*#
         ];
     }
 

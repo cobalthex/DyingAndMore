@@ -156,22 +156,29 @@ namespace Takai.Data
                     load.stream = fi.OpenRead();
                 }
 
-                var ext = GetExtension(file);
-                if (CustomLoaders.TryGetValue(ext, out var loader))
-                    obj.reference = new WeakReference(loader?.Invoke(load));
-                else
+                try
                 {
-                    var context = new Serializer.DeserializationContext
+                    var ext = GetExtension(file);
+                    if (CustomLoaders.TryGetValue(ext, out var loader))
+                        obj.reference = new WeakReference(loader?.Invoke(load));
+                    else
                     {
-                        reader = new StreamReader(load.stream),
-                        file = file,
-                        root = root,
-                    };
-                    obj.reference = new WeakReference(Serializer.TextDeserialize(context));
-                    if (obj.reference.Target is ISerializeExternally sxt)
-                        sxt.File = file;
+                        var context = new Serializer.DeserializationContext
+                        {
+                            reader = new StreamReader(load.stream),
+                            file = file,
+                            root = root,
+                        };
+
+                        obj.reference = new WeakReference(Serializer.TextDeserialize(context));
+                        if (obj.reference.Target is ISerializeExternally sxt)
+                            sxt.File = file;
+                    }
                 }
-                load.stream.Dispose();
+                finally
+                {
+                    load.stream.Dispose();
+                }
             }
 
             if (forceLoad && exists)
