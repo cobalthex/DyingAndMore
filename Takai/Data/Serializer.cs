@@ -197,6 +197,11 @@ namespace Takai.Data
             });
         }
 
+        public static void LoadRunningAssemblyTypes()
+        {
+            LoadTypesFrom(Assembly.GetEntryAssembly());
+        }
+
         /// <summary>
         /// Load types from an assembly
         /// </summary>
