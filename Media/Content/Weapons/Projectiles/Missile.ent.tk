@@ -7,18 +7,26 @@ ProjectileClass {
 
     DestructionEffect: {
         Effects: [
-            #*EntityEffect {
-                Class: @"./Missile.ent.tk";
+            EntityEffect {
+                Class: @"./Pellet.ent.tk";
                 Count: 1;
-                Speed: 500;
-            };*#
+                Speed: 1000;
+                Spread: 30deg;
+            };
+
+            EntityEffect {
+                Class: @"./Pellet.ent.tk";
+                Count: 1;
+                Speed: 1000;
+                Spread: -30deg;
+            };
         ];
     }
 
     Animations: {
         Idle: {
             Sprite: {
-                Texture: @"./Antibody.png";
+                Texture: @"./DeathMachine.png";
             };
         }
     }

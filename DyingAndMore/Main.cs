@@ -75,8 +75,6 @@ namespace DyingAndMore
 
             Takai.Data.Serializer.LoadRunningAssemblyTypes();
 
-            Takai.Data.Cache.Load("C:/users/matt/desktop/folp/test.tk");
-
             #region Mouse Cursor
 #if WINDOWS
             if (useCustomCursor)
