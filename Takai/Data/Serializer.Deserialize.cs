@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Globalization;
+using System.Linq.Expressions;
 
 using TFloat = System.Double;
 using TInt = System.Int64;
@@ -37,6 +38,8 @@ namespace Takai.Data
     {
         void DerivedDeserialize(Dictionary<string, object> props);
     }
+
+    delegate object ObjectActivator();
 
     public static partial class Serializer
     {
@@ -383,6 +386,27 @@ namespace Takai.Data
             return (T)ParseDictionary(typeof(T), dict, context);
         }
 
+        static void ParseMember(object dest, object value, MemberInfo member, Type memberType, Action<object, object> setter, bool canWrite, DeserializationContext context)
+        {
+            var customDeserial = member.GetCustomAttribute<CustomDeserializeAttribute>(true)?.deserialize;
+            if (customDeserial != null)
+            {
+                if (canWrite && customDeserial.IsStatic)
+                {
+                    var deserialed = customDeserial.Invoke(null, new[] { value });
+                    if (deserialed != DefaultAction)
+                        setter.Invoke(dest, deserialed);
+                }
+                else
+                    customDeserial.Invoke(dest, new[] { value });
+            }
+            else if (canWrite)
+            {
+                var cast = value == null ? null : Cast(memberType, value, context);
+                setter?.Invoke(dest, cast);
+            }
+        }
+
         public static object ParseDictionary(Type destType, Dictionary<string, object> dict, DeserializationContext context = default(DeserializationContext))
         {
             var deserial = destType.GetCustomAttribute<CustomDeserializeAttribute>()?.deserialize;
@@ -393,66 +417,39 @@ namespace Takai.Data
                     return deserialied;
             }
 
-            var obj = Activator.CreateInstance(destType); //todo: use lambda to create
-            //https://vagifabilov.wordpress.com/2010/04/02/dont-use-activator-createinstance-or-constructorinfo-invoke-use-compiled-lambda-expressions/
+            object obj;
+            if (destType.IsValueType)
+                obj = Activator.CreateInstance(destType);
+            else
+            {
+                NewExpression newExp = Expression.New(destType.GetConstructor(Type.EmptyTypes));
+                var lambda = Expression.Lambda(typeof(ObjectActivator), newExp);
+                obj = ((ObjectActivator)lambda.Compile()).Invoke();
+            }
 
             foreach (var pair in dict)
             {
+                var late = pair.Value as Cache.LateBindLoad;
+
                 try
                 {
                     var field = destType.GetField(pair.Key, DefaultBindingFlags);
-                    if (field != null)
+                    if (field != null && !Attribute.IsDefined(field, typeof(IgnoredAttribute)))
                     {
-                        if (!Attribute.IsDefined(field, typeof(IgnoredAttribute)))
-                        {
-                            var customDeserial = field.GetCustomAttribute<CustomDeserializeAttribute>(true)?.deserialize;
-                            if (customDeserial != null)
-                            {
-                                if (customDeserial.IsStatic)
-                                {
-                                    var deserialed = customDeserial.Invoke(null, new[] { pair.Value });
-                                    if (deserialed != DefaultAction)
-                                        field.SetValue(obj, deserialed);
-                                }
-                                else
-                                {
-                                    customDeserial.Invoke(obj, new[] { pair.Value });
-                                    return obj;
-                                }
-                            }
-
-                            var cast = pair.Value == null ? null : Cast(field.FieldType, pair.Value, context);
-                            field.SetValue(obj, cast);
-                        }
+                        if (late == null)
+                            ParseMember(obj, pair.Value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
+                        else
+                            late.setter = (target) => ParseMember(obj, target, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                     }
                     else
                     {
                         var prop = destType.GetProperty(pair.Key, DefaultBindingFlags);
-                        if (prop != null)
+                        if (prop != null && !Attribute.IsDefined(prop, typeof(IgnoredAttribute)))
                         {
-                            if (!Attribute.IsDefined(prop, typeof(IgnoredAttribute)))
-                            {
-                                var customDeserial = prop.GetCustomAttribute<CustomDeserializeAttribute>(true)?.deserialize;
-                                if (customDeserial != null)
-                                {
-                                    if (customDeserial.IsStatic)
-                                    {
-                                        var deserialed = customDeserial.Invoke(null, new[] { pair.Value });
-                                        if (deserialed != DefaultAction)
-                                            prop.SetValue(obj, deserialed);
-                                    }
-                                    else
-                                    {
-                                        customDeserial.Invoke(obj, new[] { pair.Value });
-                                        continue;
-                                    }
-                                }
-                                else if (prop.CanWrite)
-                                {
-                                    var cast = pair.Value == null ? null : Cast(prop.PropertyType, pair.Value, context);
-                                    prop.SetValue(obj, cast);
-                                }
-                            }
+                            if (late == null)
+                                ParseMember(obj, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
+                            else
+                                late.setter = (target) => ParseMember(obj, target, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                         }
                         else
                             System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in DestType:{destType.Name}"); //pass filename through?
