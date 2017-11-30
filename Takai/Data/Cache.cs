@@ -30,6 +30,16 @@ namespace Takai.Data
             public DateTime fileTime; //last modified time when file was loaded (in UTC)
         }
 
+        public class LateBindLoad
+        {
+            public Action<object> setter;
+        }
+
+        /// <summary>
+        /// Store a list of late bindings, per file
+        /// </summary>
+        private static Dictionary<string, List<LateBindLoad>> lateLoads = new Dictionary<string, List<LateBindLoad>>();
+
         /// <summary>
         /// Custom loaders for specific file extensions (Do not include the first . in the extension)
         /// All other formats will be deserialized using the Serializer
@@ -126,6 +136,21 @@ namespace Takai.Data
             else
                 realFile = Normalize(Path.Combine(root, file));
 
+            //this file is currently trying to be loaded elsewhere so it will have to be late bound
+            if (lateLoads.TryGetValue(realFile, out var lateLoad))
+            {
+                var late = new LateBindLoad();
+                if (lateLoad == null)
+                {
+                    lateLoad = new List<LateBindLoad>();
+                    lateLoads[realFile] = lateLoad;
+                }
+                lateLoad.Add(late);
+                return late;
+            }
+            else
+                lateLoads.Add(realFile, null);
+
             bool exists = objects.TryGetValue(realFile, out var obj) && obj.reference.IsAlive;
             if (forceLoad || !exists)
             {
@@ -170,7 +195,9 @@ namespace Takai.Data
                             root = root,
                         };
 
-                        obj.reference = new WeakReference(Serializer.TextDeserialize(context));
+                        var deserialized = Serializer.TextDeserialize(context);
+
+                        obj.reference = new WeakReference(deserialized);
                         if (obj.reference.Target is ISerializeExternally sxt)
                             sxt.File = file;
                     }
@@ -179,6 +206,17 @@ namespace Takai.Data
                 {
                     load.stream.Dispose();
                 }
+            }
+
+            //apply late bound values
+            if (lateLoads.TryGetValue(realFile, out lateLoad))
+            {
+                if (lateLoad != null)
+                {
+                    foreach (var late in lateLoad)
+                        late.setter.Invoke(obj.reference.Target);
+                }
+                lateLoads.Remove(realFile);
             }
 
             if (forceLoad && exists)

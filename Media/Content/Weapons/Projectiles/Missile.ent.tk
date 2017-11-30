@@ -8,7 +8,7 @@ ProjectileClass {
     DestructionEffect: {
         Effects: [
             EntityEffect {
-                Class: @"./Pellet.ent.tk";
+                Class: @"./Missile.ent.tk";
                 Count: 1;
                 Speed: 1000;
                 Spread: 30deg;
