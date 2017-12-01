@@ -38,6 +38,11 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public bool CanDamageSource { get; set; } = false;
 
+        /// <summary>
+        /// An effect spawned when the projectile goes out of <see cref="Range"/>, lives longer than <see cref="LifeSpan"/>, or below the <see cref="KillSpeed"/>
+        /// </summary>
+        public EffectsClass FadeEffect { get; set; }
+
         public ProjectileClass()
         {
             DestroyIfOffscreen = true;
@@ -82,10 +87,19 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan DeltaTime)
         {
-            if (ForwardSpeed() < _class.KillSpeed ||
+            if (IsAlive &&
+                (ForwardSpeed() < _class.KillSpeed ||
                 (_class.LifeSpan > TimeSpan.Zero && Map.ElapsedTime > SpawnTime + _class.LifeSpan) ||
-                (_class.Range != 0 && Vector2.DistanceSquared(origin, Position) > _class.Range * _class.Range))
+                (_class.Range != 0 && Vector2.DistanceSquared(origin, Position) > _class.Range * _class.Range)))
+            {
+                DisableNextDestructionEffect = true;
+                if (_class.FadeEffect != null)
+                {
+                    var fx = _class.FadeEffect.Create(this);
+                    Map.Spawn(fx);
+                }
                 IsAlive = false;
+            }
 
             base.Think(DeltaTime);
         }

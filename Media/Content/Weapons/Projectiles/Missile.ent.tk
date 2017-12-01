@@ -5,29 +5,32 @@ ProjectileClass {
     IgnoreTrace: True;
     Range: 200;
 
-    DestructionEffect: {
+    FadeEffect: {
         Effects: [
             EntityEffect {
-                Class: @"./Missile.ent.tk";
+                Class: @.;
                 Count: 1;
-                Speed: 1000;
-                Spread: 30deg;
+                Speed: 500;
+                Spread: -10deg;
             };
 
             EntityEffect {
-                Class: @"./Pellet.ent.tk";
+                Class: @.;
                 Count: 1;
-                Speed: 1000;
-                Spread: -30deg;
+                Speed: 500;
+                Spread: 10deg;
             };
         ];
     }
+
+    DestructionEffect: @"Effects/Splatter.fx.tk";
 
     Animations: {
         Idle: {
             Sprite: {
                 Texture: @"./DeathMachine.png";
             };
+            Effect: @"Effects/trail.fx.tk";
         }
     }
 }

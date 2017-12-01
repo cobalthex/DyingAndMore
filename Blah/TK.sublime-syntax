@@ -52,6 +52,12 @@ contexts:
     - match: '-?[0-9]+'
       push: number
 
+    - match: '(@)(\.)'
+      comment: recursive reference
+      captures:
+        1: punctuation.definition.keyword
+        2: string
+
     - match: '(@)(".*?")'
       comment: external reference
       captures:

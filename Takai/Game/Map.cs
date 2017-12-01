@@ -263,10 +263,6 @@ namespace Takai.Game
                     Sectors[y, x].entities.Add(instance);
             }
             instance.lastAABB = instance.AxisAlignedBounds;
-
-            var fx = instance.Class?.SpawnEffect?.Create(instance);
-            if (fx.HasValue)
-                Spawn(fx.Value);
         }
 
         public void Destroy(EntityInstance ent)
@@ -280,10 +276,6 @@ namespace Takai.Game
         /// <param name="instance">the ent to destroy</param>
         protected void FinalDestroy(EntityInstance instance)
         {
-            var fx = instance.Class?.DestructionEffect?.Create(instance);
-            if (fx.HasValue)
-                Spawn(fx.Value);
-
             instance.OnDestroy();
             instance.SpawnTime = TimeSpan.Zero;
             instance.Map = null;

@@ -139,10 +139,11 @@ namespace Takai.Game
 
                         activeEntities.Add(entity);
 
-                        if (entity.Velocity == Vector2.Zero)
+                        var deltaV = entity.Velocity * deltaSeconds;
+
+                        if (deltaV == Vector2.Zero)
                             continue;
 
-                        var deltaV = entity.Velocity * deltaSeconds;
                         var deltaVLen = deltaV.Length();
                         var direction = deltaV / deltaVLen;
 

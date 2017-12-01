@@ -32,7 +32,7 @@ GunClass {
 
             SoundImpulse {
                 Class: {
-                    sound: "open_fx.ogg";
+                    sound: @"open_fx.ogg";
                     gain: 0.1;
                 }
             }

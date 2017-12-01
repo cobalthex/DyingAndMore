@@ -189,12 +189,23 @@ namespace Takai.Data
             if (peek == '@')
             {
                 context.reader.Read();
-                var file = ReadString(context.reader);
 
-                if (context.file != null && (file.StartsWith("./") || file.StartsWith(".\\")))
-                    file = Path.Combine(Path.GetDirectoryName(context.file), file.Substring(2));
+                if (context.reader.Peek() == '.') //recursive reference
+                {
+                    context.reader.Read();
+                    return Cache.Load(context.file, context.root, false);
+                }
+                else
+                {
+                    var file = ReadString(context.reader);
 
-                return Cache.Load(file, context.root, false);
+                    if (context.file != null && (file.StartsWith("./") || file.StartsWith(".\\")))
+                        file = Path.Combine(Path.GetDirectoryName(context.file), file.Substring(2));
+
+                    return Cache.Load(file, context.root, false);
+
+                }
+
             }
 
             if (peek == '"' || peek == '\'')
