@@ -192,6 +192,13 @@ namespace Takai.Game
         /// </summary>
         public TimeSpan SpawnTime { get; set; } = TimeSpan.Zero;
 
+        /// <summary>
+        /// Disable the next destruction effect.
+        /// Useful for when playing custom effects/animations on destruction
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public bool DisableNextDestructionEffect { get; set; } = false;
+
         public EntityInstance() : this(null) { }
         public EntityInstance(EntityClass @class)
         {
@@ -269,11 +276,26 @@ namespace Takai.Game
         /// <summary>
         /// Called when this instance is spawned. Also called on deserialization
         /// </summary>
-        public virtual void OnSpawn() { }
+        public virtual void OnSpawn()
+        {
+            var fx = Class.SpawnEffect?.Create(this);
+            if (fx.HasValue)
+                Map.Spawn(fx.Value);
+        }
         /// <summary>
         /// Called when this instance is marked for deletion
         /// </summary>
-        public virtual void OnDestroy() { }
+        public virtual void OnDestroy()
+        {
+            if (!DisableNextDestructionEffect)
+            {
+                var fx = Class.DestructionEffect?.Create(this);
+                if (fx.HasValue)
+                    Map.Spawn(fx.Value);
+            }
+            else
+                DisableNextDestructionEffect = false;
+        }
 
         /// <summary>
         /// Called when there is a collision between this instance and another

@@ -1,0 +1,27 @@
+EffectsClass {
+	Effects: [
+		ParticleEffect {
+            Class: {
+                Graphic: {
+                    Texture: @"./trail.png";
+                    Width: 8;
+                    Height: 8;
+                };
+                Blend: BlendState.Additive;
+                ColorOverTime: {
+                    start: Color.Beige;
+                    end: Color.Teal;
+                }
+                AngleOverTime: {
+                    start: 0;
+                    end: 4pi;
+                };
+                InitialSpeed: [-100 -200];
+                lifetime: [0.25sec 0.5sec];
+                Drag: 5;
+            }
+            Count: [2 4];
+            Spread: [-30deg 30deg]
+        }
+	]
+}

@@ -214,6 +214,9 @@ namespace Takai.Game
     {
         public EntityClass Class { get; set; }
 
+        //some sort of generation
+        //separate destruction and burnout effect in entities
+
         //todo: transform spread to instance direction
 
         public Range<int> Count { get; set; } = 0;

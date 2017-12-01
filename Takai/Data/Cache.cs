@@ -214,7 +214,7 @@ namespace Takai.Data
                 if (lateLoad != null)
                 {
                     foreach (var late in lateLoad)
-                        late.setter.Invoke(obj.reference.Target);
+                        late.setter?.Invoke(obj.reference.Target); //todo: figure out why sometimes null (possibly due to 2 loads in file watcher)
                 }
                 lateLoads.Remove(realFile);
             }
