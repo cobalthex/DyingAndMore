@@ -368,7 +368,11 @@ namespace DyingAndMore.Game
         {
             base.DrawSelf(spriteBatch);
 
-            DefaultFont.Draw(spriteBatch, $"Total entities:{Map.AllEntities.Count()}", new Vector2(20), Color.Orange);
+            var particleCount = 0;
+            foreach (var ptype in Map.Particles)
+                particleCount += ptype.Value.Count;
+
+            DefaultFont.Draw(spriteBatch, $"Total entities:{Map.AllEntities.Count()}\nTotal Particles:{particleCount}", new Vector2(20), Color.Orange);
 
             foreach (var ent in Map.EnumerateVisibleEntities())
             {

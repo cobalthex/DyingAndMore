@@ -418,6 +418,20 @@ namespace Takai.Data
             }
         }
 
+        static object CreateType(Type type) //requires empty constructor
+        {
+            object obj;
+            if (type.IsValueType)
+                obj = Activator.CreateInstance(type);
+            else
+            {
+                NewExpression newExp = Expression.New(type.GetConstructor(Type.EmptyTypes));
+                var lambda = Expression.Lambda(typeof(ObjectActivator), newExp);
+                obj = ((ObjectActivator)lambda.Compile()).Invoke();
+            }
+            return obj;
+        }
+
         public static object ParseDictionary(Type destType, Dictionary<string, object> dict, DeserializationContext context = default(DeserializationContext))
         {
             var deserial = destType.GetCustomAttribute<CustomDeserializeAttribute>()?.deserialize;
@@ -428,15 +442,7 @@ namespace Takai.Data
                     return deserialied;
             }
 
-            object obj;
-            if (destType.IsValueType)
-                obj = Activator.CreateInstance(destType);
-            else
-            {
-                NewExpression newExp = Expression.New(destType.GetConstructor(Type.EmptyTypes));
-                var lambda = Expression.Lambda(typeof(ObjectActivator), newExp);
-                obj = ((ObjectActivator)lambda.Compile()).Invoke();
-            }
+            var obj = CreateType(destType);
 
             foreach (var pair in dict)
             {

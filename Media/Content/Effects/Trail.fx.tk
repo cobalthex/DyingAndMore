@@ -10,7 +10,7 @@ EffectsClass {
                 Blend: BlendState.Additive;
                 ColorOverTime: {
                     start: Color.Beige;
-                    end: Color.Teal;
+                    end: [32 0 96 32];
                 }
                 AngleOverTime: {
                     start: 0;
@@ -21,7 +21,7 @@ EffectsClass {
                 Drag: 5;
             }
             Count: [2 4];
-            Spread: [-30deg 30deg]
-        }
-	]
-}
+            Spread: [-30deg 30deg];
+        };
+	];
+};

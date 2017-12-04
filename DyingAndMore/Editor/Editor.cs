@@ -39,6 +39,35 @@ namespace DyingAndMore.Editor
 
         public EditorConfiguration config;
 
+        class SplineTest : Static
+        {
+            public Takai.Game.ColorCurve spline = new Takai.Game.ColorCurve();
+
+            public SplineTest()
+            {
+                spline.AddValue(-30, Color.Red);
+                spline.AddValue(0.25f, Color.Yellow);
+                spline.AddValue(0.25f, Color.Blue);
+                spline.AddValue(0.5f, Color.Indigo);
+                spline.AddValue(0.5f, Color.Orange);
+                spline.AddValue(0.75f, Color.GreenYellow);
+                spline.AddValue(0.75f, Color.Pink);
+                spline.AddValue(1, Color.LightBlue);
+            }
+
+            protected override void DrawSelf(SpriteBatch spriteBatch)
+            {
+                var n = spline.Count * 10;
+                var w = (int)Size.X / n;
+                for (int i = 0; i < n; ++i)
+                {
+                    var color = spline.Evaluate(i / (float)n);
+                    Takai.Graphics.Primitives2D.DrawFill(spriteBatch, color,
+                        new Rectangle(VisibleBounds.X + (i * w), VisibleBounds.Y, w, VisibleBounds.Height));
+                }
+            }
+        }
+
         public Editor(Takai.Game.MapInstance map)
         {
             config = Cache.Load<EditorConfiguration>("Editor.conf.tk", "Config");
@@ -57,12 +86,18 @@ namespace DyingAndMore.Editor
                 VerticalAlignment = Alignment.Stretch
             });
 
-            AddChild(fpsDisplay = new Static()
+            AddChild(fpsDisplay = new Static
             {
                 Position = new Vector2(20),
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.End,
                 Font = smallFont
+            });
+
+            AddChild(new SplineTest
+            {
+                Position = new Vector2(100),
+                Size = new Vector2(200, 100),
             });
 
             AddModes();
@@ -244,7 +279,7 @@ namespace DyingAndMore.Editor
                 if (InputState.IsPress(Keys.R))
                 {
                     var widthInput = (NumericInput)resizeDialog.FindChildByName("width");
-                    var heightInput  = (NumericInput)resizeDialog.FindChildByName("height");
+                    var heightInput = (NumericInput)resizeDialog.FindChildByName("height");
 
                     widthInput.Maximum = heightInput.Maximum = config.maxMapSize;
 

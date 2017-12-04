@@ -1,5 +1,3 @@
 - difficulty/configuration entity spawn settings
-- rewrite curves (custom struct on top)
-- gibs/bobs
 - customizable spawners
 - simplify class hierarchies. Projectile maybe into entity. Gun maybe into Weapon

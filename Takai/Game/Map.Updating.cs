@@ -254,17 +254,17 @@ namespace Takai.Game
 
                     var life = (float)((ElapsedTime - (x.time + x.delay)).TotalSeconds / x.lifetime.TotalSeconds);
 
-                    x.color = Color.Lerp(
-                        p.Key.ColorOverTime.start,
-                        p.Key.ColorOverTime.end,
-                        (p.Key.ColorOverTime.curve ?? ValueCurve<Color>.Linear).Evaluate(life)
-                    );
+                    //x.color = Color.Lerp(
+                    //    p.Key.ColorOverTime.start,
+                    //    p.Key.ColorOverTime.end,
+                    //    (p.Key.ColorOverTime.curve ?? ValueCurve<Color>.Linear).Evaluate(life)
+                    //);
 
-                    x.scale = MathHelper.Lerp(
-                        p.Key.ScaleOverTime.start,
-                        p.Key.ScaleOverTime.end,
-                        (p.Key.ScaleOverTime.curve ?? ValueCurve<float>.Linear).Evaluate(life)
-                    );
+                    //x.scale = MathHelper.Lerp(
+                    //    p.Key.ScaleOverTime.start,
+                    //    p.Key.ScaleOverTime.end,
+                    //    (p.Key.ScaleOverTime.curve ?? ValueCurve<float>.Linear).Evaluate(life)
+                    //);
 
                     //todo: calculating angle may be slow (relative)
                     /*

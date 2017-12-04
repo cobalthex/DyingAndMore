@@ -237,7 +237,7 @@ namespace Takai.Game
                     visibleRegion.Width / Class.TileSize + 2,
                     visibleRegion.Height / Class.TileSize + 2
                 ),
-                new Rectangle(0, 0, Class.Width, Class.Height)
+                Class.TileBounds
             );
             var visibleSectors = GetOverlappingSectors(visibleRegion);
 
@@ -250,7 +250,7 @@ namespace Takai.Game
             {
                 Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, null, cameraTransform);
 
-                foreach (var ent in EnumerateEntitiesInSectors(visibleSectors))
+                foreach (var ent in activeEntities)
                 {
                     if (ent.OutlineColor.A > 0)
                         _drawEntsOutlined.Add(ent);

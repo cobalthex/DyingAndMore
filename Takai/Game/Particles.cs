@@ -20,9 +20,9 @@ namespace Takai.Game
         /// </summary>
         public BlendState Blend { get; set; }
 
-        public ValueCurve<Color> ColorOverTime { get; set; } = Color.White;
-        public ValueCurve<float> ScaleOverTime { get; set; } = 1;
-        public ValueCurve<float> AngleOverTime { get; set; } = 0;
+        //public ValueCurve<Color> ColorOverTime { get; set; } = Color.White;
+        //public ValueCurve<float> ScaleOverTime { get; set; } = 1;
+        //public ValueCurve<float> AngleOverTime { get; set; } = 0;
 
         /// <summary>
         /// Spawn a fluid on the death of a particle

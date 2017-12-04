@@ -51,6 +51,57 @@ namespace Takai
             return (n / m) + ((n % m) > 0 ? 1 : 0);
         }
 
+        /// <summary>
+        /// Convert an RGB color to HSL
+        /// </summary>
+        /// <param name="color">the RGB color to convert</param>
+        /// <returns>The HSLA representation of the color</returns>
+        public static Vector4 ColorToHSL(Color color)
+        {
+            float r = (color.R / 255f);
+            float g = (color.G / 255f);
+            float b = (color.B / 255f);
+
+            float min = Math.Min(Math.Min(r, g), b);
+            float max = Math.Max(Math.Max(r, g), b);
+            float delta = max - min;
+
+            float h = 0;
+            float s = 0;
+            float L = (max + min) / 2f;
+
+            if (delta != 0)
+            {
+                if (L < 0.5f)
+                {
+                    s = delta / (max + min);
+                }
+                else
+                {
+                    s = delta / (2.0f - max - min);
+                }
+
+
+                if (r == max)
+                    h = (g - b) / delta;
+                else if (g == max)
+                    h = 2f + (b - r) / delta;
+                else if (b == max)
+                    h = 4f + (r - g) / delta;
+            }
+
+            h *= 60;
+            if (h < 0)
+                h += 360;
+
+            return new Vector4(h, s, L, color.A);
+        }
+
+        public static Color ColorFromHSL(Vector4 hsla)
+        {
+            return ColorFromHSL(hsla.X, hsla.Y, hsla.Z, hsla.W);
+        }
+
         public static Color ColorFromHSL(float hue, float saturation, float lightness, float alpha = 1f)
         {
             hue = MathHelper.Clamp(hue, 0, 360);
