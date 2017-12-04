@@ -170,7 +170,7 @@ namespace Takai.Game
 
                 var particle = new ParticleInstance()
                 {
-                    color = Class.ColorOverTime.start,
+                    color = Color.White, //TODO: Class.ColorOverTime.start,
                     delay = TimeSpan.Zero,
                     position = position,
                     velocity = speed * dir + instance.Velocity,

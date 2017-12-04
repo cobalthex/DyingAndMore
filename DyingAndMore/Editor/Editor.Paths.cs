@@ -10,6 +10,8 @@ namespace DyingAndMore.Editor
 
         Takai.UI.TrackBar trackBar;
 
+        Takai.Game.Spline<Vector2> spline;
+
         public PathsEditorMode(Editor editor)
             : base("Paths", editor)
         {
@@ -31,6 +33,13 @@ namespace DyingAndMore.Editor
             {
                 new Takai.Game.Path()
             };
+
+            spline.AddValue(0, new Vector2(100, 100));
+            spline.AddValue(0.1f, new Vector2(100, 600));
+            spline.AddValue(0.3f, new Vector2(600, 600));
+            spline.AddValue(0.6f, new Vector2(600, 100));
+            spline.AddValue(1, new Vector2(100, 100));
+            spline.CurveFn = Vector2.CatmullRom;
         }
 
         public override void Start()
@@ -52,6 +61,17 @@ namespace DyingAndMore.Editor
             return base.HandleInput(time);
         }
 
+        void DrawSpline()
+        {
+            var prev = spline.Evaluate(0);
+            int n = 50;
+            for (int i = 1; i < n; ++i)
+            {
+                var next = spline.Evaluate((float)i / n);
+                editor.Map.DrawLine(prev, next, Color.LightSeaGreen);
+                prev = next;
+            }
+        }
 
         void DrawPath(Takai.Game.Path path)
         {
@@ -184,6 +204,8 @@ namespace DyingAndMore.Editor
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
+            DrawSpline();
+
             foreach (var path in paths)
                 DrawPath(path);
         }

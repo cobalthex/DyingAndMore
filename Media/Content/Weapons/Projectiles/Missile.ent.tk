@@ -1,9 +1,9 @@
 ProjectileClass {
     Name: "Missile";
-    MuzzleVelocity: 500;
+    MuzzleVelocity: 200;
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
-    Range: 200;
+    Range: 50;
 
     FadeEffect: {
         Effects: [
@@ -11,14 +11,7 @@ ProjectileClass {
                 Class: @.;
                 Count: 1;
                 Speed: 500;
-                Spread: -10deg;
-            };
-
-            EntityEffect {
-                Class: @.;
-                Count: 1;
-                Speed: 500;
-                Spread: 10deg;
+                Spread: 0;
             };
         ];
     }

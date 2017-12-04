@@ -99,6 +99,8 @@ namespace DyingAndMore.Game.Entities
                     Map.Spawn(fx);
                 }
                 IsAlive = false;
+
+                //todo: move to collision fx and destruction fx?
             }
 
             base.Think(DeltaTime);
