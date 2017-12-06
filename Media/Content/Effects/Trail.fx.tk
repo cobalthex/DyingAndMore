@@ -9,18 +9,25 @@ EffectsClass {
                 };
                 Blend: BlendState.Additive;
                 ColorOverTime: {
-                    start: Color.Beige;
-                    end: [32 0 96 32];
-                }
-                AngleOverTime: {
-                    start: 0;
-                    end: 4pi;
+                    Values: [
+                        [0 Color.Beige];
+                        [0.5 [128 64 144 32]];
+                        [0.8 Color.Orange];
+                        [1 Color.Transparent];
+                    ];
+                };
+                ScaleOverTime: {
+                    values: [
+                        [0 1];
+                        [0.5 2];
+                        [1 0.5];
+                    ];
                 };
                 InitialSpeed: [-100 -200];
                 lifetime: [0.25sec 0.5sec];
                 Drag: 5;
             }
-            Count: [2 4];
+            Count: [0 2];
             Spread: [-30deg 30deg];
         };
 	];

@@ -64,7 +64,7 @@ namespace Takai.Data
 
         static Cache()
         {
-            objects = new Dictionary<string, CachedFile>();
+            objects = new Dictionary<string, CachedFile>(StringComparer.OrdinalIgnoreCase);
 
             CustomLoaders.Add("png", LoadTexture);
             CustomLoaders.Add("jpg", LoadTexture);
@@ -294,6 +294,25 @@ namespace Takai.Data
                 objects.Remove(key);
         }
 
+        private static void Watcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            //this may be called multiple times: https://blogs.msdn.microsoft.com/oldnewthing/20140507-00/?p=1053/
+            System.Threading.Thread.Sleep(500);
+            try
+            {
+                var path = Normalize(e.FullPath);
+                if (objects.ContainsKey(path))
+                {
+                    Load(path, null, true);
+                    LogBuffer.Append("Refreshed " + e.FullPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogBuffer.Append($"Failed to refresh {e.FullPath} ({ex.Message})");
+            }
+        }
+
         #region Custom Loaders
 
         internal static object UnsuportedExtension(CustomLoad load)
@@ -380,25 +399,6 @@ namespace Takai.Data
             };
             watcher.Changed += Watcher_Changed;
             fsWatchers[directory] = watcher;
-        }
-
-        private static void Watcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            //this may be called multiple times: https://blogs.msdn.microsoft.com/oldnewthing/20140507-00/?p=1053/
-            System.Threading.Thread.Sleep(500);
-            try
-            {
-                var path = Normalize(e.FullPath);
-                if (objects.ContainsKey(path))
-                {
-                    Load(path, null, true);
-                    LogBuffer.Append("Refreshed " + e.FullPath);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogBuffer.Append($"Failed to refresh {e.FullPath} ({ex.Message})");
-            }
         }
 
         #endregion

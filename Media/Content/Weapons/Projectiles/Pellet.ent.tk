@@ -19,27 +19,7 @@ ProjectileClass {
                         Center: true;
                     };
                     Blend: BlendState.AlphaBlend;
-                    ColorOverTime: {
-                        Curve: {
-                            Keys: [
-                                CurveKey {
-                                    Position: 0;
-                                    Value: 0;
-                                };
-                                CurveKey {
-                                    Position: 0.5;
-                                    Value: 0;
-                                };
-                                CurveKey {
-                                    Position: 1;
-                                    Value: 1;
-                                };
-                            ]
-                        }
-                        start: Color.White;
-                        end: [255 64 0 64];
-                    }
-                    #AngleOverTime: {start:0; end:2pi;};
+                    #ColorOverTime: Color.White;
                     InitialSpeed: [20 500];
                     Drag: 5;
                     lifetime: [0.2sec 0.5sec];

@@ -3,60 +3,55 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
-    /// <summary>
-    /// A 2D path calculated using splines
-    /// </summary>
-    public class Path
+    public class VectorCurve : CatmullCurve<Vector2>
     {
+        private List<float> sectionLengths = new List<float>();
+
         /// <summary>
-        /// The control points of this curve
+        /// Approximate sector lengths
         /// </summary>
-        public List<Vector2> ControlPoints { get; private set; } = new List<Vector2>();
-        public List<float> SegmentLengths { get; private set; } = new List<float>();
-        public float TotalLength { get; private set; } = 0;
+        public IReadOnlyList<float> SectionLengths => sectionLengths;
 
-        public void AddPoint(Vector2 Point)
+        public float ApproximateTotalLength { get; private set; } = 0;
+
+        protected override Vector2 Function(Vector2 a, Vector2 b, Vector2 c, Vector2 d, float t)
         {
-            ControlPoints.Add(Point);
-
-            if (ControlPoints.Count > 2)
-            {
-                var coarseLength = Vector2.Distance(ControlPoints[ControlPoints.Count - 2], Point);
-                coarseLength = MathHelper.Min(5, coarseLength / 10);
-                var length = 0f;
-
-                Vector2 GetPoint(float val)
-                {
-                    int c = ControlPoints.Count - 1;
-                    return Vector2.CatmullRom(
-                        ControlPoints[MathHelper.Clamp(ControlPoints.Count - 4, 0, c)],
-                        ControlPoints[MathHelper.Clamp(ControlPoints.Count - 3, 0, c)],
-                        ControlPoints[MathHelper.Clamp(ControlPoints.Count - 2, 0, c)],
-                        ControlPoints[MathHelper.Clamp(ControlPoints.Count - 1, 0, c)],
-                        val
-                    );
-                }
-
-                for (int i = 1; i < coarseLength; ++i)
-                    length += Vector2.Distance(GetPoint((i - 1) / coarseLength), GetPoint(i / coarseLength));
-
-                SegmentLengths.Add(length);
-                TotalLength += length;
-            }
+            return Vector2.CatmullRom(a, b, c, d, t);
         }
 
-        /// <summary>
-        /// Calculate the position on the curve given a specific T value
-        /// </summary>
-        /// <param name="percent">The T value to test. Clamped between 0 and 1</param>
-        /// <returns>The calculated point on the curve</returns>
-        /// <remarks>Requires at least one point</remarks>
-        public Vector2 Evaluate(float percent)
+        public void AddPoint(Vector2 point)
         {
-            throw new System.NotImplementedException("Todo");
+            AddValue(Values.Count, point);
+        }
+
+        public override void AddValue(float t, Vector2 value)
+        {
+            base.AddValue(t, value);
+            if (Values.Count > 1)
+            {
+                var last = Values[Values.Count - 2];
+                var coarseLength = Vector2.Distance(last.value, value);
+                coarseLength = MathHelper.Min(5, coarseLength / 10);
+
+                var tinc = (t - last.position) / coarseLength;
+
+                var length = 0f;
+                Vector2 lastP = last.value;
+                for (int i = 0; i < coarseLength; ++i)
+                {
+                    var p = Evaluate(last.position + (tinc * i));
+                    length += Vector2.DistanceSquared(lastP, p);
+                    lastP = p;
+                }
+
+                length = (float)System.Math.Sqrt(length);
+                sectionLengths.Add(length);
+                ApproximateTotalLength += length;
+            }
         }
     }
 
+    /*
     /// <summary>
     /// Follow along a path
     /// </summary>
@@ -151,4 +146,5 @@ namespace Takai.Game
             }
         }
     }
+    */
 }
