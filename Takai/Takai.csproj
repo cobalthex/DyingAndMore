@@ -47,6 +47,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Curves.cs" />
     <Compile Include="Data\Cache.cs" />
     <Compile Include="Data\Serializer.cs" />
     <Compile Include="Data\Serializer.Deserialize.cs">

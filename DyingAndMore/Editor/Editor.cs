@@ -41,7 +41,7 @@ namespace DyingAndMore.Editor
 
         class SplineTest : Static
         {
-            public Takai.Game.ColorCurve spline = new Takai.Game.ColorCurve();
+            public Takai.ColorCurve spline = new Takai.ColorCurve();
 
             public SplineTest()
             {

@@ -8,14 +8,6 @@ EffectsClass {
                     Tween: TweenStyle.Overlap;
                 };
                 Blend: BlendState.Additive;
-                ColorOverTime: {
-                    start: Color.White;
-                    end: Color.Magenta;
-                }
-                AngleOverTime: {
-                    start: 0;
-                    end: 4pi;
-                };
                 InitialSpeed: [50 100];
                 lifetime: [0.2sec 0.5sec];
             }
