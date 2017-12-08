@@ -1,8 +1,9 @@
 syntax: glob
 
-.vs/
+*.orig
 *.suo
 *.user
+.vs/
 obj/
 bin/
 packages/
