@@ -65,15 +65,17 @@ namespace DyingAndMore.Editor
                 var start = path.Values[i];
                 var delta = (path.Values[i + 1].position - start.position) / sl;
                 var last = start.value;
-                for (int t = 1; t < sl; ++t)
+
+                //draw X
+                editor.Map.DrawLine(last - new Vector2(3), last + new Vector2(3), Color.Cyan);
+                editor.Map.DrawLine(last + new Vector2(-3, 3), last + new Vector2(3, -3), Color.Cyan);
+
+                for (int t = 0; t <= sl; ++t)
                 {
                     var next = path.Evaluate(start.position + (t * delta));
                     editor.Map.DrawLine(last, next, Color.LightSeaGreen);
                     last = next;
                 }
-                //draw X
-                editor.Map.DrawLine(last - new Vector2(3), last + new Vector2(3), Color.Cyan);
-                editor.Map.DrawLine(last + new Vector2(-3, 3), last + new Vector2(3, -3), Color.Cyan);
             }
         }
 
