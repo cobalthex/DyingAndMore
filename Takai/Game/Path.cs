@@ -5,6 +5,8 @@ namespace Takai.Game
 {
     public class VectorCurve : CatmullCurve<Vector2>
     {
+        //todo: possibly have a custom curve that uses incremental T
+
         private List<float> sectionLengths = new List<float>();
 
         /// <summary>
