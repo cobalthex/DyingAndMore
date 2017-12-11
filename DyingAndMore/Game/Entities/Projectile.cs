@@ -25,7 +25,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// How slow this entity can go before killing itself. Can go negative
         /// </summary>
-        public float KillSpeed { get; set; } = 0.01f;
+        public float MinimumSpeed { get; set; } = 1;
 
         /// <summary>
         /// How long this projectile will last before killing itself
@@ -39,7 +39,7 @@ namespace DyingAndMore.Game.Entities
         public bool CanDamageSource { get; set; } = false;
 
         /// <summary>
-        /// An effect spawned when the projectile goes out of <see cref="Range"/>, lives longer than <see cref="LifeSpan"/>, or below the <see cref="KillSpeed"/>
+        /// An effect spawned when the projectile goes out of <see cref="Range"/>, lives longer than <see cref="LifeSpan"/>, or below the <see cref="MinimumSpeed"/>
         /// </summary>
         public EffectsClass FadeEffect { get; set; }
 
@@ -88,7 +88,7 @@ namespace DyingAndMore.Game.Entities
         public override void Think(TimeSpan DeltaTime)
         {
             if (IsAlive &&
-                (ForwardSpeed() < _class.KillSpeed ||
+                (ForwardSpeed() < _class.MinimumSpeed ||
                 (_class.LifeSpan > TimeSpan.Zero && Map.ElapsedTime > SpawnTime + _class.LifeSpan) ||
                 (_class.Range != 0 && Vector2.DistanceSquared(origin, Position) > _class.Range * _class.Range)))
             {

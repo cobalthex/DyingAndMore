@@ -4,10 +4,10 @@ GunClass {
     MaxAmmo: 1000;
     RoundsPerBurst: 1;
     #ProjectilesPerRound: 6;
-    MaxBursts: 1;
+    MaxBursts: 0;
     ChargeTime: 0msec;
-    DischargeTime: 100msec;
-    #ErrorAngle: [-8deg 8deg];
+    DischargeTime: 400msec;
+    ErrorAngle: [-2deg 2deg];
 
     DischargeEffect: { #move to spawn effect on projectile?
         Effects: [
