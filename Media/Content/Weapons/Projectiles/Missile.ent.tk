@@ -1,20 +1,9 @@
 ProjectileClass {
     Name: "Missile";
-    MuzzleVelocity: 200;
+    MuzzleVelocity: 500;
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
-    Range: 50;
-
-    FadeEffect: {
-        Effects: [
-            EntityEffect {
-                Class: @.;
-                Count: 1;
-                Speed: 500;
-                Spread: 0;
-            };
-        ];
-    }
+    Drag: 0.4;
 
     DestructionEffect: @"Effects/Splatter.fx.tk";
 
