@@ -84,27 +84,38 @@ namespace Takai.Game
             {
                 var first = queue.Dequeue();
 
-                MaxHeuristic = Math.Max(MaxHeuristic, first.value);
-
+                uint edge = 0;
                 foreach (var i in HeuristicDirections)
                 {
                     var pos = first.tile + i;
                     if (CanPath(pos) &&
-                        visibleTiles.Contains(pos) &&
-                        PathInfo[pos.Y, pos.X].generation != pathGeneration)
+                        visibleTiles.Contains(pos))
                     {
-                        PathInfo[pos.Y, pos.X] = new PathTile
+                        if (PathInfo[pos.Y, pos.X].generation != pathGeneration)
                         {
-                            heuristic = first.value,
-                            generation = pathGeneration
-                        };
-                        queue.Enqueue(new HeuristicScore
-                        {
-                            tile = pos,
-                            value = first.value + 1
-                        });
+                            PathInfo[pos.Y, pos.X] = new PathTile
+                            {
+                                heuristic = first.value,
+                                generation = pathGeneration
+                            };
+                            queue.Enqueue(new HeuristicScore
+                            {
+                                tile = pos,
+                                value = first.value + 1
+                            });
+                        }
                     }
+                    else
+                        ++edge;
                 }
+
+                if (edge > 0)
+                {
+                    var pi = PathInfo[first.tile.Y, first.tile.X];
+                    pi.heuristic += edge;
+                    PathInfo[first.tile.Y, first.tile.X] = pi;
+                }
+                MaxHeuristic = Math.Max(MaxHeuristic, first.value);
             }
         }
     }

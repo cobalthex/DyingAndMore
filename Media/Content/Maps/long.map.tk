@@ -1,0 +1,315 @@
+MapClass {
+    Name: "test";
+    TileSize: 48;
+    Width: 64;
+    Height: 16;
+    TileBounds: [0 0 64 16];
+    InitialState: InitialMapState {
+        Entities: [
+            EntitySpawn {
+                Class: @"Actors/Player.ent.tk";
+                Position: [193.4922 383.9543];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1357.183 379.486];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1454.158 256.402];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1390.751 125.8584];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1610.81 166.8864];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1297.506 252.6722];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1580.972 442.8929];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1692.866 431.7035];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1752.543 234.0231];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1804.761 189.2653];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1625.73 252.6722];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1644.379 342.1879];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1909.196 360.8369];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1994.982 401.8649];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1916.655 562.2471];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1640.649 662.9522];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1480.267 588.3558];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/InfectedCell.ent.tk";
+                Position: [1290.046 644.3031];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2435.1 148.2373];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2207.581 263.8617];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2259.799 349.6475];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2450.019 413.0544];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2554.454 364.5667];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2397.802 260.1319];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2315.746 267.5915];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2349.314 364.5667];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2341.854 431.7035];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2244.879 580.8962];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2267.258 633.1136];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2554.454 662.9522];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2614.131 603.2751];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2748.405 461.542];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2796.892 330.9984];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2703.647 260.1319];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2643.97 312.3493];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2670.079 386.9456];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2535.805 472.7315];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2390.342 483.9209];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2297.097 551.0576];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2140.444 469.0016];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2032.28 345.9177];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2088.227 181.8057];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2181.472 133.318];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2293.367 96.01987];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2487.317 81.10059];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2629.051 77.37077];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2740.945 178.0759];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2837.92 230.2933];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [2908.787 282.5108];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Huge.ent.tk";
+                Position: [2968.464 607.0049];
+                Forward: [1 0];
+                Name: Null;
+            }
+        ];
+        Fluids: [];
+        Decals: [];
+    };
+    TilesImage: "Tilesets/Tiles2.png";
+    Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+}

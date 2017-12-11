@@ -3,28 +3,27 @@ EffectsClass {
 		ParticleEffect {
             Class: {
                 Graphic: {
-                    Texture: @"./trail.png";
+                    Texture: @"./Decay.png";
                     Width: 8;
                     Height: 8;
                 };
-                Blend: BlendState.Additive;
+                Blend: BlendState.NonPremultiplied;
                 ColorOverTime: {
                     Values: [
-                        [0 Color.Beige];
-                        [0.5 [128 64 144 32]];
-                        [0.8 Color.Orange];
+                        [0 Color.Purple];
+                        [0.8 Color.Gray];
                         [1 Color.Transparent];
                     ];
                 };
                 ScaleOverTime: {
                     values: [
                         [0 1];
-                        [0.5 2];
-                        [1 0.5];
+                        [0.5 5];
+                        [1 0];
                     ];
                 };
                 InitialSpeed: [-100 -200];
-                lifetime: [0.25sec 0.5sec];
+                lifetime: [0.25sec 0.85sec];
                 Drag: 5;
             }
             Count: [0 2];
