@@ -10,6 +10,20 @@ namespace DyingAndMore.Game.Scripts
     {
         EntityInstance player;
 
+
+        public static readonly Point[] NavigationDirections =
+        {
+            new Point(-1, -1),
+            new Point( 0, -1),
+            new Point( 1, -1),
+            new Point(-1,  0),
+            new Point( 1,  0),
+            new Point(-1,  1),
+            new Point( 0,  1),
+            new Point( 1,  1),
+        };
+
+
         public NavigateToPlayer(EntityInstance entity)
             : base("NavigateToPlayer", entity) { }
 
@@ -34,7 +48,7 @@ namespace DyingAndMore.Game.Scripts
 
             var min = uint.MaxValue;
             minimums.Clear();
-            foreach (var dir in MapClass.NavigationDirections)
+            foreach (var dir in NavigationDirections)
             {
                 var pos = epos + dir;
                 if (!Map.Class.TileBounds.Contains(pos))

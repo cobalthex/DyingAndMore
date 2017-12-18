@@ -6,7 +6,7 @@ GunClass {
     #ProjectilesPerRound: 6;
     MaxBursts: 0;
     ChargeTime: 0msec;
-    DischargeTime: 400msec;
+    DischargeTime: 100msec;
     ErrorAngle: [-2deg 2deg];
 
     DischargeEffect: { #move to spawn effect on projectile?
