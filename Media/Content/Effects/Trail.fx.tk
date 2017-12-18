@@ -3,23 +3,23 @@ EffectsClass {
 		ParticleEffect {
             Class: {
                 Graphic: {
-                    Texture: @"./Decay.png";
-                    Width: 8;
-                    Height: 8;
+                    Texture: @"./Star.png";
+                    Width: 32;
+                    Height: 32;
+                    FrameCount: 4;
+                    FrameLength: 100msec;
                 };
-                Blend: BlendState.NonPremultiplied;
+                Blend: BlendState.AlphaBlend;
                 ColorOverTime: {
                     Values: [
                         [0 Color.Purple];
-                        [0.8 Color.Gray];
-                        [1 Color.Transparent];
+                        [1 [1 1 1 0]];
                     ];
                 };
                 ScaleOverTime: {
                     values: [
-                        [0 1];
-                        [0.5 5];
-                        [1 0];
+                        [0 0.2];
+                        [1 5];
                     ];
                 };
                 InitialSpeed: [-100 -200];

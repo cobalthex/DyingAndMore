@@ -112,7 +112,7 @@ namespace Takai.Game
                 if (edge > 0)
                 {
                     var pi = PathInfo[first.tile.Y, first.tile.X];
-                    pi.heuristic += edge;
+                    pi.heuristic += edge * 2;
                     PathInfo[first.tile.Y, first.tile.X] = pi;
                 }
                 MaxHeuristic = Math.Max(MaxHeuristic, first.value);
