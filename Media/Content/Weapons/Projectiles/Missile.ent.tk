@@ -10,7 +10,7 @@ ProjectileClass {
     Animations: {
         Idle: {
             Sprite: {
-                Texture: @"./DeathMachine.png";
+                Texture: @"./Antibody.png";
             };
             Effect: @"Effects/trail.fx.tk";
         }

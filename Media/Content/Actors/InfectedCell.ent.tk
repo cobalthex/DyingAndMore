@@ -3,6 +3,19 @@ ActorClass {
     MaxHealth: 20;
     DefaultFaction: Factions [Enemy Common];
 
+    DefaultController: AIController {
+        Behaviors: [
+            ChargeBehavior {
+
+            };
+            
+            KamikazeBehavior {
+                Radius: 80;
+                Effect: @"Effects/Damage.fx.tk";
+            };
+        ];
+    };
+
     DestructionEffect: @"Effects/Splatter.fx.tk";
 
     Animations: {

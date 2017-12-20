@@ -119,7 +119,9 @@ namespace DyingAndMore.Game.Weapons
 
                     var error = RandomRange.Next(_class.ErrorAngle);
                     projectile.Forward = Vector2.TransformNormal(Actor.Forward, Matrix.CreateRotationZ(error));
-                    projectile.Velocity = Actor.Velocity + projectile.Forward * RandomRange.Next(_class.Projectile.MuzzleVelocity);
+                    projectile.Velocity = projectile.Forward * RandomRange.Next(_class.Projectile.MuzzleVelocity);
+                    if (_class.Projectile.UseSourcePhysics)
+                        projectile.Velocity += Actor.Velocity;
                     projectile.Source = Actor;
                     Actor.Map.Spawn(projectile);
                 }

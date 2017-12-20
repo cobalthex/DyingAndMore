@@ -233,6 +233,11 @@ namespace DyingAndMore.Game.Entities
             return (dot > (_class.FieldOfView / 2 / MathHelper.Pi) - 1);
         }
 
+        public bool IsAlliedWith(Factions factions)
+        {
+            return (Faction & factions) != Factions.None;
+        }
+
         #endregion
     }
 }

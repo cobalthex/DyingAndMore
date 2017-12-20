@@ -9,7 +9,7 @@ EffectsClass {
                     FrameCount: 4;
                     FrameLength: 100msec;
                 };
-                Blend: BlendState.AlphaBlend;
+                Blend: BlendState.Additive;
                 ColorOverTime: {
                     Values: [
                         [0 Color.Purple];
@@ -18,15 +18,15 @@ EffectsClass {
                 };
                 ScaleOverTime: {
                     values: [
-                        [0 0.2];
-                        [1 5];
+                        [0 0.4];
+                        [1 0.1];
                     ];
                 };
                 InitialSpeed: [-100 -200];
                 lifetime: [0.25sec 0.85sec];
                 Drag: 5;
             }
-            Count: [0 2];
+            Count: [0 1];
             Spread: [-30deg 30deg];
         };
 	];

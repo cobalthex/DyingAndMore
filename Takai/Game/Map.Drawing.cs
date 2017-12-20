@@ -123,7 +123,8 @@ namespace Takai.Game
             public bool drawGrids;
             public bool drawSectorsOnGrid;
             public bool drawBordersAroundNonDrawingEntities;
-            public bool drawEntBoundingBoxes;
+            public bool drawEntityBoundingBoxes;
+            public bool drawEntityForwardVectors;
             public bool drawPathHeuristic;
 
             public static readonly RenderSettings Default = new RenderSettings
@@ -301,7 +302,7 @@ namespace Takai.Game
                         DrawLine(bl, tr, color);
                     }
 
-                    if (renderSettings.drawEntBoundingBoxes)
+                    if (renderSettings.drawEntityBoundingBoxes)
                     {
                         var rect = ent.AxisAlignedBounds;
                         var color = Color.LightBlue;
@@ -312,6 +313,9 @@ namespace Takai.Game
 
                         DrawCircle(ent.Position, ent.Radius, Color.Gold);
                     }
+
+                    if (renderSettings.drawEntityForwardVectors)
+                        DrawArrow(ent.Position, ent.Forward, ent.Radius * 1.3f, Color.Gold);
                 }
 
                 Class.spriteBatch.End();
