@@ -1,7 +1,7 @@
 EffectsClass {
 	Effects: [
 		DamageEffect {
-			MaxDamage: 20;
+			MaxDamage: 200;
 			Radius: 100;
 			CanDamageSource: false;
 		}

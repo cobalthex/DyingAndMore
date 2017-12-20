@@ -39,6 +39,11 @@ namespace DyingAndMore.Game.Entities
         public bool CanDamageSource { get; set; } = false;
 
         /// <summary>
+        /// When spawning this projectile, use the creator of this projectile's physics info (velocity/etc)
+        /// </summary>
+        public bool UseSourcePhysics { get; set; } = false;
+
+        /// <summary>
         /// An effect spawned when the projectile goes out of <see cref="Range"/>, lives longer than <see cref="LifeSpan"/>, or below the <see cref="MinimumSpeed"/>
         /// </summary>
         public EffectsClass FadeEffect { get; set; }

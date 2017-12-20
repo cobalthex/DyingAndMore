@@ -102,6 +102,7 @@ namespace DyingAndMore.Editor
         public override void Start()
         {
             lastWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            editor.Map.renderSettings.drawEntityForwardVectors = true;
         }
 
         public override void End()
@@ -111,6 +112,7 @@ namespace DyingAndMore.Editor
                 SelectedEntity.OutlineColor = Color.Transparent;
                 SelectedEntity = null;
             }
+            editor.Map.renderSettings.drawEntityForwardVectors = false;
         }
 
         protected override void OnPress(ClickEventArgs e)
@@ -228,13 +230,6 @@ namespace DyingAndMore.Editor
             }
 
             return base.HandleInput(time);
-        }
-
-        protected override void DrawSelf(SpriteBatch spriteBatch)
-        {
-            base.DrawSelf(spriteBatch);
-            foreach (var ent in editor.Map.EnumerateVisibleEntities())
-                editor.Map.DrawArrow(ent.Position, ent.Forward, ent.Radius * 1.3f, Color.Gold);
         }
 
         void MoveEnt(Takai.Game.EntityInstance ent, Vector2 newPosition)
