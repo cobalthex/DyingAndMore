@@ -4,6 +4,7 @@ ProjectileClass {
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     Drag: 0.4;
+    MinimumSpeed: 300;
 
     DestructionEffect: @"Effects/Splatter.fx.tk";
 

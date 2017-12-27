@@ -6,10 +6,36 @@ namespace DyingAndMore.Game.Entities
 {
     //behavior constraints (cant run while dead/etc)
 
-    abstract class Behavior
+    public enum BehaviorMask
+    {
+        Unknown,
+        Targeting,
+        Movement,
+        Weapons,
+
+        _Count_
+        //Exclusive option?
+        //bitmask?
+    }
+
+    public enum BehaviorPriority
+    {
+        Never,
+        Low,
+        Medium,
+        High,
+    }
+
+    public abstract class Behavior
     {
         [Takai.Data.Serializer.Ignored]
-        public ActorInstance Actor { get; set; }
+        public AIController AI { get; set; }
+
+        /// <summary>
+        /// Only one of each behavior mask can be executed at a time
+        /// </summary>
+        [Takai.Data.Serializer.Ignored]
+        public abstract BehaviorMask Mask { get; }
 
         /// <summary>
         /// Calculate the priority of this action. Return <see cref="int.MinValue"/> to disregard
@@ -20,52 +46,131 @@ namespace DyingAndMore.Game.Entities
         public abstract void Think(TimeSpan deltaTime);
     }
 
-    class AIController : Controller
+    public class AIController : Controller
     {
         public List<Behavior> Behaviors { get; set; }
 
-        List<(int cost, Behavior behavior)> behaviorCosts
-            = new List<(int, Behavior)>();
+        List<(int cost, Behavior behavior)>[] behaviorCosts
+            = new List<(int cost, Behavior behavior)>[(int)BehaviorMask._Count_];
 
         Random random = new Random();
 
+        public ActorInstance Target
+        {
+            get => _target;
+            set
+            {
+                _target = value;
+                TargetTime = _target?.Map?.ElapsedTime ?? TimeSpan.Zero;
+            }
+        }
+        private ActorInstance _target;
+        public TimeSpan TargetTime { get; set; }
+
+        public AIController()
+        {
+            for (int i = 0; i < behaviorCosts.Length; ++i)
+                behaviorCosts[i] = new List<(int cost, Behavior behavior)>();
+        }
+
         public override void Think(TimeSpan deltaTime)
         {
-            behaviorCosts.Clear();
             foreach (var behavior in Behaviors)
             {
-                behavior.Actor = Actor;
+                var mask = (int)behavior.Mask;
+
+                behavior.AI = this;
 
                 var cost = behavior.CalculatePriority();
                 if (cost == int.MinValue)
                     continue;
 
-                if (behaviorCosts.Count > 0)
+                if (behaviorCosts[mask].Count > 0)
                 {
-                    if (cost < behaviorCosts[0].cost)
+                    if (cost < behaviorCosts[mask][0].cost)
                         continue;
 
-                    if (cost > behaviorCosts[0].cost)
-                        behaviorCosts.Clear();
+                    if (cost > behaviorCosts[mask][0].cost)
+                        behaviorCosts[mask].Clear();
                 }
-                behaviorCosts.Add((cost, behavior));
+                behaviorCosts[mask].Add((cost, behavior));
             }
 
-            if (behaviorCosts.Count > 0)
+            foreach (var list in behaviorCosts)
             {
-                var choice = random.Next(0, behaviorCosts.Count);
-                behaviorCosts[choice].behavior.Think(deltaTime);
+                if (list.Count > 0)
+                {
+                    var choice = random.Next(0, list.Count);
+                    list[choice].behavior.Think(deltaTime);
+                    list.Clear();
+                }
             }
         }
     }
 
+    class TargetEnemyBehavior : Behavior
+    {
+        public override BehaviorMask Mask => BehaviorMask.Targeting;
 
+        public float SightDistance { get; set; } = 300;
+
+        public override int CalculatePriority()
+        {
+            return 1;
+        }
+
+        public override void Think(TimeSpan deltaTime)
+        {
+            if (AI.Target == null)
+            {
+                var ents = AI.Actor.Map.FindEntities(AI.Actor.Position, SightDistance);
+                var possibles = new List<ActorInstance>();
+                foreach (var ent in ents)
+                {
+                    if (ent != AI.Actor &&
+                        ent is ActorInstance actor &&
+                        !actor.IsAlliedWith(AI.Actor.Faction))
+                        possibles.Add(actor);
+                }
+                possibles.Sort(delegate (ActorInstance a, ActorInstance b)
+                {
+                    var afw = Vector2.Dot(a.Forward, AI.Actor.Forward);
+                    var bfw = Vector2.Dot(b.Forward, AI.Actor.Forward);
+                    return (afw == bfw ? 0 : (int)Math.Ceiling(bfw - afw));
+                });
+
+                if (possibles.Count > 0)
+                {
+                    AI.Target = possibles[0];
+                    AI.Target.OutlineColor = Color.Red;
+                }
+            }
+
+            //match targets by threat
+
+            //track shots for 5 seconds, most damage done new target
+
+            //enemies close by, if have melee weapon, higher threat
+
+            else if (Vector2.DistanceSquared(AI.Target.Position, AI.Actor.Position) >= SightDistance * SightDistance ||
+                AI.Actor.IsFacing(AI.Actor.Position))
+            {
+                AI.Target.OutlineColor = Color.Transparent;
+                AI.Target = null;
+            }
+        }
+    }
+
+    //panic behavior (shiver momentarily)
+    //flee behavior
 
     /// <summary>
     /// Commit suicide when close to an enemy (actor of a different faction)
     /// </summary>
     class KamikazeBehavior : Behavior
     {
+        public override BehaviorMask Mask => BehaviorMask.Unknown;
+
         public float Radius { get; set; } = 0;
 
         /// <summary>
@@ -75,12 +180,12 @@ namespace DyingAndMore.Game.Entities
 
         public override int CalculatePriority()
         {
-            var proximity = Actor.Map.FindEntities(Actor.Position, Radius);
+            var proximity = AI.Actor.Map.FindEntities(AI.Actor.Position, Radius);
             foreach (var proxy in proximity)
             {
                 if (proxy is ActorInstance proxactor
-                    && !proxactor.IsAlliedWith(Actor.Faction)
-                    && Vector2.DistanceSquared(proxy.Position, Actor.Position) <= Radius * Radius)
+                    && !proxactor.IsAlliedWith(AI.Actor.Faction)
+                    && Vector2.DistanceSquared(proxy.Position, AI.Actor.Position) <= Radius * Radius)
                     return 10;
             }
             return int.MinValue;
@@ -88,14 +193,16 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
-            Actor.IsAlive = false; //should this be handled by the effect?
+            AI.Actor.IsAlive = false; //should this be handled by the effect?
             if (Effect != null)
-                Actor.Map.Spawn(Effect.Create(Actor));
+                AI.Actor.Map.Spawn(Effect.Create(AI.Actor));
         }
     }
 
-    class ChargeBehavior : Behavior
+    class ChargePlayerBehavior : Behavior
     {
+        public override BehaviorMask Mask => BehaviorMask.Movement;
+
         public override int CalculatePriority()
         {
             return 1;
@@ -118,13 +225,13 @@ namespace DyingAndMore.Game.Entities
         {
             var min = uint.MaxValue;
             minimums.Clear();
-            var pos = (Actor.Position / Actor.Map.Class.TileSize).ToPoint();
+            var pos = (AI.Actor.Position / AI.Actor.Map.Class.TileSize).ToPoint();
             foreach (var dir in NavigationDirections)
             {
                 var target = pos + dir;
-                if (!Actor.Map.Class.TileBounds.Contains(target))
+                if (!AI.Actor.Map.Class.TileBounds.Contains(target))
                     continue;
-                var h = Actor.Map.Class.PathInfo[target.Y, target.X].heuristic;
+                var h = AI.Actor.Map.Class.PathInfo[target.Y, target.X].heuristic;
                 if (h < min)
                 {
                     minimums.Clear();
@@ -136,9 +243,27 @@ namespace DyingAndMore.Game.Entities
             }
 
             var next = minimums[0];
-            Actor.Forward = next.ToVector2();
-            Actor.Velocity = Actor.Forward * 300; //todo: move force
+            AI.Actor.Forward = next.ToVector2();
+            AI.Actor.Velocity = AI.Actor.Forward * 300; //todo: move force
         }
     }
 
+    class ShootBehavior : Behavior
+    {
+        public override BehaviorMask Mask => BehaviorMask.Weapons;
+
+        public override int CalculatePriority()
+        {
+            if (AI.Actor.Weapon == null)
+                return int.MinValue;
+
+            return 1;
+        }
+
+        public override void Think(TimeSpan deltaTime)
+        {
+            AI.Actor.Weapon.TryFire();
+            //AI.Actor.Weapon.Reset(); //todo: better place
+        }
+    }
 }

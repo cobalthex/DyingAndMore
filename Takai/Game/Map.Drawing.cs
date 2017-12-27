@@ -325,9 +325,6 @@ namespace Takai.Game
 
                 foreach (var ent in _drawEntsOutlined)
                 {
-                    //Class.outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
-                    //Class.outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
-
                     var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
                     foreach (var state in ent.ActiveAnimations)
@@ -335,11 +332,14 @@ namespace Takai.Game
                         if (state.Class == null)
                             continue;
 
-                        state.Class.Sprite.Draw(
+                        var sprite = state.Class.Sprite;
+                        Class.outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
+                        Class.outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
+                        sprite.Draw(
                             Class.spriteBatch,
                             ent.Position,
                             angle,
-                            Color.White,
+                            ent.OutlineColor,
                             1,
                             state.ElapsedTime
                         );
