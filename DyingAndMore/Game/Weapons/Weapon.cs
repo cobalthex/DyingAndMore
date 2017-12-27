@@ -3,13 +3,13 @@ using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Weapons
 {
-    enum UnderchargeAction
+    public enum UnderchargeAction
     {
         Dissipate,
         Discharge, //will continue charging cycle
     }
 
-    enum OverchargeAction
+    public enum OverchargeAction
     {
         None,
         Discharge,
@@ -19,7 +19,7 @@ namespace DyingAndMore.Game.Weapons
     /// <summary>
     /// The base for all weapons
     /// </summary>
-    abstract class WeaponClass : Takai.IObjectClass<WeaponInstance>
+    public abstract class WeaponClass : Takai.IObjectClass<WeaponInstance>
     {
         public string Name { get; set; }
 
@@ -57,7 +57,7 @@ namespace DyingAndMore.Game.Weapons
         public abstract WeaponInstance Create();
     }
 
-    abstract class WeaponInstance : Takai.IObjectInstance<WeaponClass>
+    public abstract class WeaponInstance : Takai.IObjectInstance<WeaponClass>
     {
         public enum WeaponState
         {

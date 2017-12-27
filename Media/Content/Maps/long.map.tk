@@ -301,7 +301,7 @@ MapClass {
                 Name: Null;
             }
             EntitySpawn {
-                Class: @"Actors/Huge.ent.tk";
+                Class: @"Actors/Rhinovirus.ent.tk";
                 Position: [2968.464 607.0049];
                 Forward: [1 0];
                 Name: Null;

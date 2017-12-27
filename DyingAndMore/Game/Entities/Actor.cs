@@ -8,7 +8,7 @@ namespace DyingAndMore.Game.Entities
     /// Available factions. Work as bit flags (one actor can have multiple factions)
     /// </summary>
     [Flags]
-    enum Factions
+    public enum Factions
     {
         None        = 0,
         Player      = (1 << 0),
@@ -26,7 +26,7 @@ namespace DyingAndMore.Game.Entities
         //max = 1 << 63
     }
 
-    class ActorClass : EntityClass
+    public class ActorClass : EntityClass
     {
         /// <summary>
         /// The default maximum allowed health of the entity (overhealing allowed)
@@ -56,7 +56,7 @@ namespace DyingAndMore.Game.Entities
         }
     }
 
-    class ActorInstance : EntityInstance
+    public class ActorInstance : EntityInstance
     {
         public override EntityClass Class
         {

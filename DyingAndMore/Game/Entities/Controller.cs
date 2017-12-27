@@ -3,7 +3,7 @@
     /// <summary>
     /// The base class for AI or player controllers
     /// </summary>
-    abstract class Controller : System.ICloneable
+    public abstract class Controller : System.ICloneable
     {
         [Takai.Data.Serializer.Ignored]
         public virtual ActorInstance Actor { get; set; }
