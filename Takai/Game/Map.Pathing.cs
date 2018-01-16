@@ -10,6 +10,8 @@ namespace Takai.Game
         {
             public uint heuristic;
             internal uint generation;
+            internal uint total;
+            internal uint count;
         }
         internal uint pathGeneration = 0;
 
@@ -59,7 +61,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="start">Where to start the fill</param>
         /// <param name="region">The area to update (in tiles)</param>
-        public void BuildHeuristic(Point start, Rectangle region)
+        public void BuildHeuristic(Point start, Rectangle region, bool blend = false)
         {
             if (!CanPath(start))
                 return;
@@ -93,11 +95,25 @@ namespace Takai.Game
                     {
                         if (PathInfo[pos.Y, pos.X].generation != pathGeneration)
                         {
-                            PathInfo[pos.Y, pos.X] = new PathTile
+                            if (blend)
                             {
-                                heuristic = first.value,
-                                generation = pathGeneration
-                            };
+                                var pi = PathInfo[pos.Y, pos.X];
+                                pi.generation = pathGeneration;
+                                pi.total += first.value;
+                                ++pi.count;
+                                pi.heuristic = pi.total / pi.count;
+                                PathInfo[pos.Y, pos.X] = pi;
+                            }
+                            else
+                            {
+                                PathInfo[pos.Y, pos.X] = new PathTile
+                                {
+                                    heuristic = first.value,
+                                    generation = pathGeneration,
+                                    count = 0,
+                                    total = first.value
+                                };
+                            }
                             queue.Enqueue(new HeuristicScore
                             {
                                 tile = pos,
