@@ -12,9 +12,9 @@ namespace Takai.Game
     public class ParticleClass
     {
         /// <summary>
-        /// The grahpic used for each particle of this type
+        /// The sprite used for each particle of this type
         /// </summary>
-        public Graphics.Sprite Graphic { get; set; }
+        public Graphics.Sprite Sprite { get; set; }
         /// <summary>
         /// The render blend state this particle
         /// </summary>

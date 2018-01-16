@@ -48,6 +48,8 @@ namespace Takai
         {
             if (Values.Count == 0)
                 return default(TValue);
+            if (Values.Count == 1)
+                return Values[0].value;
 
             var i1 = GetClosestIndex(t);
             var i0 = MathHelper.Clamp(i1 - 1, 0, Values.Count - 1);

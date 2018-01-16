@@ -1,0 +1,8 @@
+FluidClass {
+    Name: "Green Ooze";
+    Texture: @"Fluids/Ooze.png";
+    Reflection: @"Fluids/Ooze.r.png";
+    Radius: 54;
+    Scale: 1;
+    Drag: 0.2;
+}

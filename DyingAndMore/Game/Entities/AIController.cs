@@ -38,11 +38,11 @@ namespace DyingAndMore.Game.Entities
         public abstract BehaviorMask Mask { get; }
 
         /// <summary>
-        /// Calculate the priority of this action. Return <see cref="int.MinValue"/> to disregard
+        /// Calculate the priority of this action. Return <see cref="BehaviorPriority.Never"/> to disregard
         /// The behavior with the highest priority will be chosen
         /// </summary>
         /// <returns>The priority factor of this action</returns>
-        public abstract int CalculatePriority();
+        public abstract BehaviorPriority CalculatePriority();
         public abstract void Think(TimeSpan deltaTime);
     }
 
@@ -50,8 +50,8 @@ namespace DyingAndMore.Game.Entities
     {
         public List<Behavior> Behaviors { get; set; }
 
-        List<(int cost, Behavior behavior)>[] behaviorCosts
-            = new List<(int cost, Behavior behavior)>[(int)BehaviorMask._Count_];
+        List<(BehaviorPriority cost, Behavior behavior)>[] behaviorCosts
+            = new List<(BehaviorPriority cost, Behavior behavior)>[(int)BehaviorMask._Count_];
 
         Random random = new Random();
 
@@ -70,7 +70,7 @@ namespace DyingAndMore.Game.Entities
         public AIController()
         {
             for (int i = 0; i < behaviorCosts.Length; ++i)
-                behaviorCosts[i] = new List<(int cost, Behavior behavior)>();
+                behaviorCosts[i] = new List<(BehaviorPriority cost, Behavior behavior)>();
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -82,7 +82,7 @@ namespace DyingAndMore.Game.Entities
                 behavior.AI = this;
 
                 var cost = behavior.CalculatePriority();
-                if (cost == int.MinValue)
+                if (cost == BehaviorPriority.Never)
                     continue;
 
                 if (behaviorCosts[mask].Count > 0)
@@ -114,9 +114,9 @@ namespace DyingAndMore.Game.Entities
 
         public float SightDistance { get; set; } = 300;
 
-        public override int CalculatePriority()
+        public override BehaviorPriority CalculatePriority()
         {
-            return 1;
+            return BehaviorPriority.Low;
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -178,17 +178,15 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public Takai.Game.EffectsClass Effect { get; set; }
 
-        public override int CalculatePriority()
+        public override BehaviorPriority CalculatePriority()
         {
-            var proximity = AI.Actor.Map.FindEntities(AI.Actor.Position, Radius);
-            foreach (var proxy in proximity)
-            {
-                if (proxy is ActorInstance proxactor
-                    && !proxactor.IsAlliedWith(AI.Actor.Faction)
-                    && Vector2.DistanceSquared(proxy.Position, AI.Actor.Position) <= Radius * Radius)
-                    return 10;
-            }
-            return int.MinValue;
+            if (AI.Target == null)
+                return BehaviorPriority.Never;
+
+            var distance = Vector2.DistanceSquared(AI.Actor.Position, AI.Target.Position);
+            if (distance < Radius * Radius)
+                return BehaviorPriority.High;
+            return BehaviorPriority.Never;
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -199,13 +197,13 @@ namespace DyingAndMore.Game.Entities
         }
     }
 
-    class ChargePlayerBehavior : Behavior
+    class SeekBehavior : Behavior
     {
         public override BehaviorMask Mask => BehaviorMask.Movement;
 
-        public override int CalculatePriority()
+        public override BehaviorPriority CalculatePriority()
         {
-            return 1;
+            return BehaviorPriority.Low;
         }
 
         public static readonly Point[] NavigationDirections =
@@ -252,12 +250,12 @@ namespace DyingAndMore.Game.Entities
     {
         public override BehaviorMask Mask => BehaviorMask.Weapons;
 
-        public override int CalculatePriority()
+        public override BehaviorPriority CalculatePriority()
         {
             if (AI.Actor.Weapon == null)
-                return int.MinValue;
+                return BehaviorPriority.Never;
 
-            return 1;
+            return BehaviorPriority.Low;
         }
 
         public override void Think(TimeSpan deltaTime)

@@ -149,7 +149,7 @@ namespace Takai.Game
             if (!instance.Map.Particles.ContainsKey(Class))
                 instance.Map.Particles.Add(Class, new List<ParticleInstance>());
 
-            var numParticles = RandomRange.Next(Count);
+            var numParticles = Math.Max(0, RandomRange.Next(Count));
             instance.Map.Particles[Class].Capacity += numParticles;
             for (int i = 0; i < numParticles; ++i)
             {

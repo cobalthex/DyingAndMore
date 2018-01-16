@@ -4,55 +4,48 @@ ProjectileClass {
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     Range: 2000;
-    Drag: 10;
-    KillSpeed: 100;
-
-    DestructionEffect: {
-        Effects: [
-            ParticleEffect {
-                Class: {
-                    Graphic: {
-                        Texture: "Effects/spark.png";
-                        width: 6;
-                        height: 1;
-                        frameLength: 100msec;
-                        Center: true;
-                    };
-                    Blend: BlendState.AlphaBlend;
-                    #ColorOverTime: Color.White;
-                    InitialSpeed: [20 500];
-                    Drag: 5;
-                    lifetime: [0.2sec 0.5sec];
-                    Radius: 10;
-                }
-                Count: [5 10];
-            }
-        ]
-    }
+    Drag: 1.0;
+    MinimumSpeed: 100;
 
     Animations: {
         Idle: {
             Sprite: {
-                Texture: "Effects/spark.png";
+                Texture: @"./Pellet.png";
+                Height: 1;
+                FrameCount: 4;
+                FrameLength: 50msec;
+                IsLooping: true;
             };
             Effect: {
                 Effects: [
                     ParticleEffect {
                         Class: {
-                            Graphic: {
-                                Texture: @"Effects/smoke.png";
-                                width: 64;
-                                height: 4;
-                                frameCount: 2;
-                                frameLength: 1sec;
+                            Sprite: {
+                                Texture: @"Effects/smoke2.png";
+                                width: 16;
+                                height: 16;
+                                frameCount: 4;
+                                frameLength: 100msec;
                                 tween: TweenStyle.Sequential;
                             };
                             Blend: BlendState.Additive;
-                            InitialSpeed: -300;
+                            InitialSpeed: 300;
                             Drag: 50;
-                            lifetime: 2sec;
+                            lifetime: 400msec;
+                            ColorOverTime: {
+                                Values: [
+                                    [0 Color.White]
+                                    [1 Color.Transparent]
+                                ];
+                            }
+                            ScaleOverTime: {
+                                Values: [
+                                    [0 1]
+                                    [1 5]
+                                ];
+                            }
                         }
-                        Count: [0 1];
+                        Count: [-2 1];
                         Spread: 0;
                     };
                 ];
