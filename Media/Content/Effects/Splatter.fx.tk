@@ -2,7 +2,7 @@ EffectsClass {
 	Effects: [
 		ParticleEffect {
             Class: {
-                Graphic: {
+                Sprite: {
                     Texture: @"./blood.png";
                     Width: 10;
                     Height: 10;

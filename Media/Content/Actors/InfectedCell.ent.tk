@@ -5,10 +5,14 @@ ActorClass {
 
     DefaultController: AIController {
         Behaviors: [
-            ChargePlayerBehavior {
+            TargetEnemyBehavior {
 
             };
             
+            SeekBehavior {
+
+            };
+
             KamikazeBehavior {
                 Radius: 80;
                 Effect: @"Effects/Damage.fx.tk";

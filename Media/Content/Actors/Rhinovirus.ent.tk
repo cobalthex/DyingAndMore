@@ -3,10 +3,26 @@ ActorClass {
 	MaxHealth: 5000;
     DefaultFaction: Factions [Enemy Boss];
 
+<<<<<<< working copy
+    DefaultController: AIController {
+        Behaviors: [
+            ShootBehavior {};
+            TargetEnemyBehavior {};
+        ];
+    }
+
+    DefaultWeapon: @"Weapons/Boss.wpn.tk";
+
+    Animations: {
+    	Idle: {
+    		Sprite: {
+				Texture: "Actors/Rhinovirus.png";
+=======
     Animations: {
     	Idle: {
     		Sprite: {
 				Texture: @"./Rhinovirus.png";
+>>>>>>> merge rev
 				Origin: [64 64];
 				IsLooping: True;
     		};

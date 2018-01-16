@@ -61,6 +61,7 @@ namespace DyingAndMore
                 //PreferMultiSampling = true,
                 GraphicsProfile = GraphicsProfile.HiDef,
             };
+
             gdm.DeviceCreated += GdmDeviceCreated;
 
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps
@@ -75,6 +76,10 @@ namespace DyingAndMore
 
             Takai.Data.Serializer.LoadRunningAssemblyTypes();
 
+            GraphicsDevice.BlendState = BlendState.AlphaBlend;
+            GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
+            gdm.ApplyChanges();
+
             #region Mouse Cursor
 #if WINDOWS
             if (useCustomCursor)
@@ -88,8 +93,6 @@ namespace DyingAndMore
             }
 #endif
             #endregion
-
-            GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
             sbatch = new SpriteBatch(GraphicsDevice);
 

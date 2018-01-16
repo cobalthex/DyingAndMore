@@ -2,7 +2,7 @@ EffectsClass {
 	Effects: [
 		ParticleEffect {
             Class: {
-                Graphic: {
+                Sprite: {
                     Texture: @"Effects/Trail.png"
                     Center: true;
                     Tween: TweenStyle.Overlap;

@@ -116,7 +116,7 @@ namespace DyingAndMore.Game.Entities
 
         public override BehaviorPriority CalculatePriority()
         {
-            return BehaviorPriority.Normal;
+            return BehaviorPriority.Low;
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -180,14 +180,12 @@ namespace DyingAndMore.Game.Entities
 
         public override BehaviorPriority CalculatePriority()
         {
-            var proximity = AI.Actor.Map.FindEntities(AI.Actor.Position, Radius);
-            foreach (var proxy in proximity)
-            {
-                if (proxy is ActorInstance proxactor
-                    && !proxactor.IsAlliedWith(AI.Actor.Faction)
-                    && Vector2.DistanceSquared(proxy.Position, AI.Actor.Position) <= Radius * Radius)
-                    return BehaviorPriority.Normal;
-            }
+            if (AI.Target == null)
+                return BehaviorPriority.Never;
+
+            var distance = Vector2.DistanceSquared(AI.Actor.Position, AI.Target.Position);
+            if (distance < Radius * Radius)
+                return BehaviorPriority.High;
             return BehaviorPriority.Never;
         }
 
@@ -199,13 +197,13 @@ namespace DyingAndMore.Game.Entities
         }
     }
 
-    class ChargePlayerBehavior : Behavior
+    class SeekBehavior : Behavior
     {
         public override BehaviorMask Mask => BehaviorMask.Movement;
 
         public override BehaviorPriority CalculatePriority()
         {
-            return BehaviorPriority.Normal;
+            return BehaviorPriority.Low;
         }
 
         public static readonly Point[] NavigationDirections =
@@ -257,7 +255,7 @@ namespace DyingAndMore.Game.Entities
             if (AI.Actor.Weapon == null)
                 return BehaviorPriority.Never;
 
-            return BehaviorPriority.Normal;
+            return BehaviorPriority.Low;
         }
 
         public override void Think(TimeSpan deltaTime)

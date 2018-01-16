@@ -1,0 +1,45 @@
+ActorClass {
+    Name: "Allied NPC";
+    MaxHealth: 50;
+    DefaultFaction: Factions [Player];
+
+    DefaultController: AIController {
+        Behaviors: [
+            ShootBehavior {}
+        ];
+    };
+
+    Animations: {
+        Idle: {
+            Sprite: {
+                texture: @"./Player.png";
+                width: 48;
+                height: 48;
+                ClipRect: [0 48 96 48];
+                FrameCount: 2;
+                FrameLength: 100;
+                IsLooping: True;
+                Tween: TweenStyle [Overlap];
+            };
+        };
+        Dead: {
+            Sprite: {
+                texture: @"./Player.png";
+                width: 48;
+                height: 48;
+                ClipRect: [0 96 96 48];
+                FrameCount: 2;
+                FrameLength: 100;
+                IsLooping: True;
+                Tween: TweenStyle [Overlap];
+            };
+        };
+    };
+
+    FieldOfView: 2.356194;
+    MaxSpeed: [400 400];
+    MoveForce: 600;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: False;
+}
