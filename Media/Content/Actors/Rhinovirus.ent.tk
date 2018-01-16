@@ -1,7 +1,16 @@
 ActorClass {
-	Name: "Huge Boss";
+	Name: "Rhinovirus";
 	MaxHealth: 5000;
     DefaultFaction: Factions [Enemy Boss];
+
+    DefaultController: AIController {
+        Behaviors: [
+            ShootBehavior {};
+            TargetEnemyBehavior {};
+        ];
+    }
+
+    DefaultWeapon: @"Weapons/Boss.wpn.tk";
 
     Animations: {
     	Idle: {

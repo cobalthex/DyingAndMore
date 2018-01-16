@@ -1,0 +1,11 @@
+GunClass {
+    Projectile: @"Weapons/Projectiles/Pellet.ent.tk";
+
+    MaxAmmo: 1000;
+    RoundsPerBurst: 1;
+    ProjectilesPerRound: 6;
+    MaxBursts: 0;
+    ChargeTime: 0msec;
+    DischargeTime: 600msec;
+    ErrorAngle: [-6deg 6deg];
+}
