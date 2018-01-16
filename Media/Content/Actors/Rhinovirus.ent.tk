@@ -1,12 +1,12 @@
 ActorClass {
-	Name: "Huge Boss";
+	Name: "Rhinovirus";
 	MaxHealth: 5000;
     DefaultFaction: Factions [Enemy Boss];
 
     Animations: {
     	Idle: {
     		Sprite: {
-				Texture: "Actors/Rhinovirus.png";
+				Texture: @"./Rhinovirus.png";
 				Origin: [64 64];
 				IsLooping: True;
     		};
