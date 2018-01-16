@@ -18,12 +18,12 @@ namespace DyingAndMore.Game.Entities
         //bitmask?
     }
 
-    public enum BehaviorPriority
+    public enum BehaviorPriority : int
     {
-        Never,
-        Low,
-        Medium,
-        High,
+        Never = int.MinValue,
+        Low = -100,
+        Normal = 0,
+        High = 100,
     }
 
     public abstract class Behavior
@@ -50,8 +50,8 @@ namespace DyingAndMore.Game.Entities
     {
         public List<Behavior> Behaviors { get; set; }
 
-        List<(BehaviorPriority cost, Behavior behavior)>[] behaviorCosts
-            = new List<(BehaviorPriority cost, Behavior behavior)>[(int)BehaviorMask._Count_];
+        List<(BehaviorPriority priority, Behavior behavior)>[] behaviorCosts
+            = new List<(BehaviorPriority priority, Behavior behavior)>[(int)BehaviorMask._Count_];
 
         Random random = new Random();
 
@@ -70,7 +70,7 @@ namespace DyingAndMore.Game.Entities
         public AIController()
         {
             for (int i = 0; i < behaviorCosts.Length; ++i)
-                behaviorCosts[i] = new List<(BehaviorPriority cost, Behavior behavior)>();
+                behaviorCosts[i] = new List<(BehaviorPriority priority, Behavior behavior)>();
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -81,19 +81,19 @@ namespace DyingAndMore.Game.Entities
 
                 behavior.AI = this;
 
-                var cost = behavior.CalculatePriority();
-                if (cost == BehaviorPriority.Never)
+                var priority = behavior.CalculatePriority();
+                if (priority == BehaviorPriority.Never)
                     continue;
 
                 if (behaviorCosts[mask].Count > 0)
                 {
-                    if (cost < behaviorCosts[mask][0].cost)
+                    if (priority < behaviorCosts[mask][0].priority)
                         continue;
 
-                    if (cost > behaviorCosts[mask][0].cost)
+                    if (priority > behaviorCosts[mask][0].priority)
                         behaviorCosts[mask].Clear();
                 }
-                behaviorCosts[mask].Add((cost, behavior));
+                behaviorCosts[mask].Add((priority, behavior));
             }
 
             foreach (var list in behaviorCosts)

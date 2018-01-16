@@ -194,7 +194,8 @@ namespace DyingAndMore.Game.Entities
         /// <param name="source">The entity that is responsible for this damage</param>
         public void ReceiveDamage(int damage, EntityInstance source = null)
         {
-            if (!GameInstance.Current.allowFriendlyFire &&
+            if ((GameInstance.Current.configuration == null ||
+                !GameInstance.Current.configuration.AllowFriendlyFire) &&
                 source is ActorInstance actor &&
                 (actor.Faction & Faction) != 0)
                 return;

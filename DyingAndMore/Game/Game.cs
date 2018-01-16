@@ -12,23 +12,24 @@ namespace DyingAndMore.Game
 {
     //map spawn configurations? (akin to difficulty)
 
-    public enum GameDifficulty
+
+    public class GameConfiguration
     {
-        Trivial,
-        Easy,
-        Hard,
-        Impossible,
-        Custom
+        public string Name { get; set; }
+        //spawn settings
+        //aggressiveness
+        //ammo settings
+        public bool AllowFriendlyFire { get; set; }
     }
 
-    struct GameInstance
+    public class GameInstance
     {
         //move into Game?
 
         public static GameInstance Current;
 
-        public GameDifficulty difficulty;
-        public bool allowFriendlyFire;
+        //Game Campaign
+        public GameConfiguration configuration;
 
         public System.Collections.Generic.List<Entities.ActorInstance> players;
 
@@ -65,6 +66,8 @@ namespace DyingAndMore.Game
 
         public Game(MapInstance map)
         {
+            GameInstance.Current = new GameInstance();
+
             Map = map ?? throw new ArgumentNullException("There must be a map to play");
 
             HorizontalAlignment = Alignment.Stretch;
@@ -108,8 +111,6 @@ namespace DyingAndMore.Game
             tinyFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/UITiny.bfnt");
 
             testEffect = Takai.Data.Cache.Load<EffectsClass>("Effects/Damage.fx.tk");
-
-            GameInstance.Current = new GameInstance();
         }
 
         protected override void OnMapChanged(EventArgs e)
@@ -136,7 +137,7 @@ namespace DyingAndMore.Game
                 }
             }
 
-            int numPlayers = 1;
+            int numPlayers = 3;
 
             //create extra players if not enough
             for (int i = players.Count; i < numPlayers; ++i)
@@ -170,9 +171,9 @@ namespace DyingAndMore.Game
                 Takai.Data.Cache.CleanupStaleReferences(); //todo: find better place for this (editor needs to be fully out of scope)
             }
 
-            if (player != null)
+            for (int i = 0; i < (GameInstance.Current.players?.Count ?? 0); ++i)
             {
-                Map.Class.BuildHeuristic((player.Position / Map.Class.TileSize).ToPoint(), Map.ActiveCamera.VisibleRegion);
+                Map.Class.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), Map.ActiveCamera.VisibleRegion, i > 0);
             }
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
