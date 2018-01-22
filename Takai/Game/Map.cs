@@ -102,7 +102,7 @@ namespace Takai.Game
         /// </summary>
         public InitialMapState InitialState { get; set; } //todo: lazy
 
-        public MapInstance Create()
+        public MapInstance Instantiate()
         {
             var instance = new MapInstance(this);
 
@@ -215,6 +215,7 @@ namespace Takai.Game
         {
             System.Diagnostics.Contracts.Contract.Assert(@class != null);
             Class = @class;
+            Resize(Class.Width, Class.Height);
         }
 
         #region Spawning/Destroying
@@ -230,7 +231,7 @@ namespace Takai.Game
         /// <returns>The spawned entity</returns>
         public EntityInstance Spawn(EntityClass entity, Vector2 position, Vector2 forward, Vector2 velocity, string name = null)
         {
-            var instance = entity.Create();
+            var instance = entity.Instantiate();
 
             instance.Position = position;
             instance.Forward = forward;
@@ -338,7 +339,7 @@ namespace Takai.Game
         /// <param name="velocity">How fast the fluid should be moving</param>
         public void Spawn(FluidClass fluid, Vector2 position, Vector2 velocity)
         {
-            var instance = fluid.Create();
+            var instance = fluid.Instantiate();
             instance.position = position;
             instance.velocity = velocity;
             Spawn(instance);
@@ -364,7 +365,7 @@ namespace Takai.Game
             if (sound.Sound == null)
                 return;
 
-            var instance = sound.Create();
+            var instance = sound.Instantiate();
             instance.Position = position;
             instance.Forward = forward;
             instance.Velocity = velocity;

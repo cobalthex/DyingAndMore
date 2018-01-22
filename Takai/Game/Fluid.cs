@@ -45,7 +45,7 @@ namespace Takai.Game
 
         //todo: magnetism/cohesion, combinations (n small bloods group into one medium blood, etc)
 
-        public FluidInstance Create()
+        public FluidInstance Instantiate()
         {
             return new FluidInstance()
             {

@@ -137,7 +137,7 @@ namespace DyingAndMore.Game
                 }
             }
 
-            int numPlayers = 3;
+            int numPlayers = 1;
 
             //create extra players if not enough
             for (int i = players.Count; i < numPlayers; ++i)
@@ -153,9 +153,6 @@ namespace DyingAndMore.Game
 
                 player = GameInstance.Current.players[0];
             }
-
-            foreach (var enemy in enemies)
-                Map.RunScript(new Scripts.NavigateToPlayer(enemy));
 
             Map.ActiveCamera = new Camera(player); //todo: resume control
             x = false;
@@ -173,7 +170,9 @@ namespace DyingAndMore.Game
 
             for (int i = 0; i < (GameInstance.Current.players?.Count ?? 0); ++i)
             {
-                Map.Class.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), Map.ActiveCamera.VisibleRegion, i > 0);
+                var region = new Rectangle(GameInstance.Current.players[i].Position.ToPoint(), new Point(1));
+                region.Inflate(200, 200);
+                Map.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
             }
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";

@@ -5,18 +5,15 @@ ActorClass {
 
     DefaultController: AIController {
         Behaviors: [
-            TargetEnemyBehavior {
+            #FlowSeekBehavior { };
 
-            };
-            
-            SeekBehavior {
-
-            };
-
+            TargetEnemyBehavior { };
+            FocusBehavior { };
+            #*
             KamikazeBehavior {
                 Radius: 80;
                 Effect: @"Effects/Damage.fx.tk";
-            };
+            };*#
         ];
     };
 

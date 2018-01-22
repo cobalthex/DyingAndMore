@@ -51,6 +51,11 @@ namespace Takai
             return (n / m) + ((n % m) > 0 ? 1 : 0);
         }
 
+        public static float Determinant(Vector2 a, Vector2 b)
+        {
+            return (a.X * b.Y) - (a.Y * b.X);
+        }
+
         /// <summary>
         /// Convert an RGB color to HSL
         /// </summary>

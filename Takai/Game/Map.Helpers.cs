@@ -8,16 +8,6 @@ namespace Takai.Game
     {
         internal void Resize(int newWidth, int newHeight)
         {
-            PathInfo = PathInfo.Resize(newHeight, newWidth);
-            for (int y = 0; y < newHeight; ++y)
-            {
-                for (int x = 0; x < newWidth; ++x)
-                {
-                    if (PathInfo[y, x].generation == 0)
-                        PathInfo[y, x] = new PathTile { heuristic = uint.MaxValue, generation = 0 };
-                }
-            }
-
             Tiles = Tiles.Resize(newHeight, newWidth);
         }
     }
@@ -28,6 +18,9 @@ namespace Takai.Game
         public Random Random { get; private set; } = new Random(); //todo: may not be necessary
         private byte[] _r64b = new byte[8];
 
+        ///<summary>
+        ///Resize the map (in tiles)
+        ///</summary>
         public void Resize(int newWidth, int newHeight)
         {
             System.Diagnostics.Contracts.Contract.Requires(newWidth > 0);
@@ -43,6 +36,16 @@ namespace Takai.Game
                 {
                     if (Sectors[y, x] == null)
                         Sectors[y, x] = new MapSector();
+                }
+            }
+
+            PathInfo = PathInfo.Resize(newHeight, newWidth);
+            for (int y = 0; y < newHeight; ++y)
+            {
+                for (int x = 0; x < newWidth; ++x)
+                {
+                    if (PathInfo[y, x].generation == 0)
+                        PathInfo[y, x] = new PathTile { heuristic = uint.MaxValue, generation = 0 };
                 }
             }
         }

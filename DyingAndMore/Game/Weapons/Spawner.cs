@@ -46,7 +46,7 @@ namespace DyingAndMore.Game.Weapons
             return spawns;
         }
 
-        public override WeaponInstance Create()
+        public override WeaponInstance Instantiate()
         {
             return new SpawnerInstance(this);
         }

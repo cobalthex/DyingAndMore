@@ -103,6 +103,36 @@ namespace DyingAndMore
 
             debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/rct2.bfnt");
 
+            //parse command line args
+            var args = System.Environment.GetCommandLineArgs();
+            string presetMap = null;
+            string presetMode = null;
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("map="))
+                    presetMap = arg.Substring(4);
+                else if (arg.StartsWith("mode="))
+                    presetMode = arg.Substring(5).ToLowerInvariant();
+                //save =
+            }
+
+            //evaluate command line args
+            if (presetMap != null)
+            {
+                try
+                {
+                    var map = Takai.Data.Cache.Load<Takai.Game.MapClass>(presetMap);
+                    map.InitializeGraphics();
+                    var instance = map.Instantiate();
+                    if (presetMode == "game")
+                        ui = new Takai.UI.Static(new Game.Game(instance));
+                    else
+                        ui = new Takai.UI.Static(new Editor.Editor(instance));
+                }
+                catch (System.IO.FileNotFoundException) { }
+                return;
+            }
+
             //testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
 
             //var testAutoUi = Takai.UI.Static.GeneratePropSheet(
@@ -128,7 +158,7 @@ namespace DyingAndMore
                     var _file = ((Takai.UI.Static)_sender).Text;
                     var map = Takai.Data.Cache.Load<Takai.Game.MapClass>(_file);
                     map.InitializeGraphics();
-                    ui = new Takai.UI.Static(new Editor.Editor(map.Create()));
+                    ui = new Takai.UI.Static(new Editor.Editor(map.Instantiate()));
                 };
                 row.AutoSize(10);
                 mapList.AddChild(row);

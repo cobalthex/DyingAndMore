@@ -4,7 +4,7 @@
     {
         string Name { get; set; }
 
-        TInstance Create();
+        TInstance Instantiate();
     }
 
     public interface IObjectInstance<TClass>

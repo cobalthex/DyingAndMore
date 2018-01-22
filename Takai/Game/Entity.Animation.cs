@@ -48,7 +48,7 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public TimeSpan TotalTime => Sprite?.TotalLength ?? TimeSpan.Zero;
 
-        public AnimationInstance Create()
+        public AnimationInstance Instantiate()
         {
             return new AnimationInstance()
             {
@@ -71,7 +71,7 @@ namespace Takai.Game
                     Sound.Instance?.Dispose();
                     if (_class.Sound != null)
                     {
-                        Sound = _class.Sound.Create();
+                        Sound = _class.Sound.Instantiate();
                         if (Sound.Instance != null)
                         {
                             Sound.Instance.IsLooped = Class.Type == AnimationType.Base;
@@ -157,7 +157,7 @@ namespace Takai.Game
         {
             if (Class.Animations != null && Class.Animations.TryGetValue(animation, out var animClass))
             {
-                var instance = animClass.Create();
+                var instance = animClass.Instantiate();
                 instance.CompletionCallback = completionCallback;
 
                 if (animClass.Type == AnimationType.Base)

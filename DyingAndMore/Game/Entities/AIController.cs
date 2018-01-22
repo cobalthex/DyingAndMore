@@ -20,10 +20,16 @@ namespace DyingAndMore.Game.Entities
 
     public enum BehaviorPriority : int
     {
-        Never = int.MinValue,
-        Low = -100,
-        Normal = 0,
-        High = 100,
+        Never   = int.MinValue,
+        Low     = -100,
+        Normal  = 0,
+        High    = 100,
+    }
+
+    public enum BehaviorFilters : uint
+    {
+        None           = 0b0000,
+        RequiresTarget = 0b0001,
     }
 
     public abstract class Behavior
@@ -38,11 +44,18 @@ namespace DyingAndMore.Game.Entities
         public abstract BehaviorMask Mask { get; }
 
         /// <summary>
+        /// Automatically restrict this behavior's application
+        /// </summary>
+        [Takai.Data.Serializer.Ignored]
+        public virtual BehaviorFilters Filter => BehaviorFilters.None;
+
+        /// <summary>
         /// Calculate the priority of this action. Return <see cref="BehaviorPriority.Never"/> to disregard
         /// The behavior with the highest priority will be chosen
         /// </summary>
         /// <returns>The priority factor of this action</returns>
         public abstract BehaviorPriority CalculatePriority();
+
         public abstract void Think(TimeSpan deltaTime);
     }
 
@@ -55,17 +68,17 @@ namespace DyingAndMore.Game.Entities
 
         Random random = new Random();
 
-        public ActorInstance Target
-        {
-            get => _target;
-            set
-            {
-                _target = value;
-                TargetTime = _target?.Map?.ElapsedTime ?? TimeSpan.Zero;
-            }
-        }
-        private ActorInstance _target;
+        public ActorInstance Target => _target;
+
+        private ActorInstance _target, nextTarget;
+        private bool isNextTargetSet;
         public TimeSpan TargetTime { get; set; }
+
+        public void SetNextTarget(ActorInstance actor)
+        {
+            nextTarget = actor;
+            isNextTargetSet = true;
+        }
 
         public AIController()
         {
@@ -75,11 +88,26 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
+            if (isNextTargetSet)
+            {
+                _target = nextTarget;
+                TargetTime = Actor.Map?.ElapsedTime ?? TimeSpan.Zero;
+                isNextTargetSet = false;
+            }
+
+            var filters = BehaviorFilters.None;
+            if (Target != null)
+                filters |= BehaviorFilters.RequiresTarget;
+
             foreach (var behavior in Behaviors)
             {
+                behavior.AI = this;
+
                 var mask = (int)behavior.Mask;
 
-                behavior.AI = this;
+                var behaviorFilters = behavior.Filter;
+                if ((filters & behaviorFilters) != behaviorFilters)
+                    continue;
 
                 var priority = behavior.CalculatePriority();
                 if (priority == BehaviorPriority.Never)
@@ -141,8 +169,8 @@ namespace DyingAndMore.Game.Entities
 
                 if (possibles.Count > 0)
                 {
-                    AI.Target = possibles[0];
-                    AI.Target.OutlineColor = Color.Red;
+                    AI.SetNextTarget(possibles[0]);
+                    possibles[0].OutlineColor = Color.Red;
                 }
             }
 
@@ -156,7 +184,7 @@ namespace DyingAndMore.Game.Entities
                 AI.Actor.IsFacing(AI.Actor.Position))
             {
                 AI.Target.OutlineColor = Color.Transparent;
-                AI.Target = null;
+                AI.SetNextTarget(null);
             }
         }
     }
@@ -170,6 +198,7 @@ namespace DyingAndMore.Game.Entities
     class KamikazeBehavior : Behavior
     {
         public override BehaviorMask Mask => BehaviorMask.Unknown;
+        public override BehaviorFilters Filter => BehaviorFilters.RequiresTarget;
 
         public float Radius { get; set; } = 0;
 
@@ -178,11 +207,9 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public Takai.Game.EffectsClass Effect { get; set; }
 
+
         public override BehaviorPriority CalculatePriority()
         {
-            if (AI.Target == null)
-                return BehaviorPriority.Never;
-
             var distance = Vector2.DistanceSquared(AI.Actor.Position, AI.Target.Position);
             if (distance < Radius * Radius)
                 return BehaviorPriority.High;
@@ -197,13 +224,16 @@ namespace DyingAndMore.Game.Entities
         }
     }
 
-    class SeekBehavior : Behavior
+    /// <summary>
+    /// Move along the flow map towards one of the <see cref="Takai.Game.MapInstance.PathOrigins"/>
+    /// </summary>
+    class FlowSeekBehavior : Behavior
     {
         public override BehaviorMask Mask => BehaviorMask.Movement;
 
         public override BehaviorPriority CalculatePriority()
         {
-            return BehaviorPriority.Low;
+            return BehaviorPriority.Normal;
         }
 
         public static readonly Point[] NavigationDirections =
@@ -229,7 +259,7 @@ namespace DyingAndMore.Game.Entities
                 var target = pos + dir;
                 if (!AI.Actor.Map.Class.TileBounds.Contains(target))
                     continue;
-                var h = AI.Actor.Map.Class.PathInfo[target.Y, target.X].heuristic;
+                var h = AI.Actor.Map.PathInfo[target.Y, target.X].heuristic;
                 if (h < min)
                 {
                     minimums.Clear();
@@ -250,12 +280,14 @@ namespace DyingAndMore.Game.Entities
     {
         public override BehaviorMask Mask => BehaviorMask.Weapons;
 
+        public override BehaviorFilters Filter => BehaviorFilters.RequiresTarget;
+
         public override BehaviorPriority CalculatePriority()
         {
-            if (AI.Actor.Weapon == null)
+            if (AI.Actor.Weapon == null || !AI.Actor.IsFacing(AI.Target.Position))
                 return BehaviorPriority.Never;
 
-            return BehaviorPriority.Low;
+            return BehaviorPriority.Normal;
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -264,4 +296,45 @@ namespace DyingAndMore.Game.Entities
             //AI.Actor.Weapon.Reset(); //todo: better place
         }
     }
+
+    /// <summary>
+    /// Face a target
+    /// </summary>
+    class FocusBehavior : Behavior
+    {
+        public override BehaviorMask Mask => BehaviorMask.Movement;
+
+        public override BehaviorFilters Filter => BehaviorFilters.RequiresTarget;
+
+        /// <summary>
+        /// Max turn angle (in radians) per second
+        /// </summary>
+        public float MaxTurn { get; set; } = MathHelper.ToRadians(800);
+
+        public override BehaviorPriority CalculatePriority()
+        {
+            if (AI.Actor.Velocity == Vector2.Zero)
+                return BehaviorPriority.High;
+            return BehaviorPriority.Low;
+        }
+
+
+        public override void Think(TimeSpan deltaTime)
+        {
+            var diff = Vector2.Normalize(AI.Target.Position - AI.Actor.Position);
+            var det = Takai.Util.Determinant(AI.Actor.Forward, diff);
+            var angle = det * MaxTurn;
+
+            //angular velocity and influence (if already turning one direction and some threshhold, continue rotating in the same direction)
+
+            AI.Actor.Forward = Vector2.TransformNormal(AI.Actor.Forward, Matrix.CreateRotationZ(angle * (float)deltaTime.TotalSeconds));
+        }
+    }
 }
+
+
+/*
+ * target finding based on origins for flow field
+ * navigate using flow field
+ * navigate using A*
+*/

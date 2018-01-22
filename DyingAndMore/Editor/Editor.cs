@@ -39,35 +39,6 @@ namespace DyingAndMore.Editor
 
         public EditorConfiguration config;
 
-        class SplineTest : Static
-        {
-            public Takai.ColorCurve spline = new Takai.ColorCurve();
-
-            public SplineTest()
-            {
-                spline.AddValue(-30, Color.Red);
-                spline.AddValue(0.25f, Color.Yellow);
-                spline.AddValue(0.25f, Color.Blue);
-                spline.AddValue(0.5f, Color.Indigo);
-                spline.AddValue(0.5f, Color.Orange);
-                spline.AddValue(0.75f, Color.GreenYellow);
-                spline.AddValue(0.75f, Color.Pink);
-                spline.AddValue(1, Color.LightBlue);
-            }
-
-            protected override void DrawSelf(SpriteBatch spriteBatch)
-            {
-                var n = spline.Count * 10;
-                var w = (int)Size.X / n;
-                for (int i = 0; i < n; ++i)
-                {
-                    var color = spline.Evaluate(i / (float)n);
-                    Takai.Graphics.Primitives2D.DrawFill(spriteBatch, color,
-                        new Rectangle(VisibleBounds.X + (i * w), VisibleBounds.Y, w, VisibleBounds.Height));
-                }
-            }
-        }
-
         public Editor(Takai.Game.MapInstance map)
         {
             config = Cache.Load<EditorConfiguration>("Editor.conf.tk", "Config");
@@ -92,12 +63,6 @@ namespace DyingAndMore.Editor
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.End,
                 Font = smallFont
-            });
-
-            AddChild(new SplineTest
-            {
-                Position = new Vector2(100),
-                Size = new Vector2(200, 100),
             });
 
             AddModes();
@@ -193,6 +158,7 @@ namespace DyingAndMore.Editor
                         Filter = "Dying and More! Maps (*.map.tk)|*.map.tk",
                         RestoreDirectory = true,
                         SupportMultiDottedExtensions = true,
+                        FileName = System.IO.Path.GetFileName(Map.Class.File)
                     })
                     {
                         if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -236,7 +202,7 @@ namespace DyingAndMore.Editor
                                 {
                                     var mapClass = Cache.Load<Takai.Game.MapClass>(ofd.FileName);
                                     mapClass.InitializeGraphics();
-                                    Parent.ReplaceAllChildren(new Editor(mapClass.Create()));
+                                    Parent.ReplaceAllChildren(new Editor(mapClass.Instantiate()));
                                 }
 
                                 Cache.CleanupStaleReferences();
@@ -269,7 +235,7 @@ namespace DyingAndMore.Editor
                         };
                         map.BuildTileMask(map.TilesImage);
                         map.InitializeGraphics();
-                        Map = map.Create();
+                        Map = map.Instantiate();
                         resizeMap.RemoveFromParent();
                     };
 

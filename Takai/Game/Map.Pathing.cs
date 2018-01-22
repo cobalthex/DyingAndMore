@@ -6,133 +6,11 @@ namespace Takai.Game
 {
     public partial class MapClass
     {
-        public struct PathTile
-        {
-            public uint heuristic;
-            internal uint generation;
-            internal uint total;
-            internal uint count;
-        }
-        internal uint pathGeneration = 0;
-
-        [Data.Serializer.Ignored]
-        public PathTile[,] PathInfo { get; set; } = new PathTile[0, 0];
-
-        public struct HeuristicScore
-        {
-            public Point tile;
-            public uint value;
-        }
-
-        internal uint MaxHeuristic = 0;
-
-        internal static readonly Point[] HeuristicDirections =
-        {
-            new Point( 0, -1),
-            new Point(-1,  0),
-            new Point( 0,  1),
-            new Point( 1,  0),
-        };
-
-        public static readonly Point[] NavigationDirections =
-        {
-            //new Point(-1, -1),
-            new Point( 0, -1),
-            //new Point( 1, -1),
-            new Point(-1,  0),
-            new Point( 1,  0),
-            //new Point(-1,  1),
-            new Point( 0,  1),
-            //new Point( 1,  1),
-        };
-
         public bool CanPath(Point tile)
         {
             if (!TileBounds.Contains(tile))
                 return false;
             return Tiles[tile.Y, tile.X] >= 0;
-        }
-
-        //dynamic heuristic that only builds to visible region/entities
-
-        /// <summary>
-        /// Build the hueristic from a speicified start point.
-        /// Only overwrites areas that can be reached from start
-        /// </summary>
-        /// <param name="start">Where to start the fill</param>
-        /// <param name="region">The area to update (in tiles)</param>
-        public void BuildHeuristic(Point start, Rectangle region, bool blend = false)
-        {
-            if (!CanPath(start))
-                return;
-
-            var visibleTiles = Rectangle.Intersect(Bounds, new Rectangle(
-                region.X / TileSize,
-                region.Y / TileSize,
-                Util.CeilDiv(region.Width, TileSize),
-                Util.CeilDiv(region.Height, TileSize)
-            ));
-
-            ++pathGeneration;
-            PathInfo[start.Y, start.X] = new PathTile
-            {
-                heuristic = 0,
-                generation = pathGeneration
-            };
-
-            var queue = new Queue<HeuristicScore>(); //static?
-            queue.Enqueue(new HeuristicScore { tile = start, value = 1 });
-            while (queue.Count > 0)
-            {
-                var first = queue.Dequeue();
-
-                uint edge = 0;
-                foreach (var i in HeuristicDirections)
-                {
-                    var pos = first.tile + i;
-                    if (CanPath(pos) &&
-                        visibleTiles.Contains(pos))
-                    {
-                        if (PathInfo[pos.Y, pos.X].generation != pathGeneration)
-                        {
-                            if (blend)
-                            {
-                                var pi = PathInfo[pos.Y, pos.X];
-                                pi.generation = pathGeneration;
-                                pi.total += first.value;
-                                ++pi.count;
-                                pi.heuristic = pi.total / pi.count;
-                                PathInfo[pos.Y, pos.X] = pi;
-                            }
-                            else
-                            {
-                                PathInfo[pos.Y, pos.X] = new PathTile
-                                {
-                                    heuristic = first.value,
-                                    generation = pathGeneration,
-                                    count = 0,
-                                    total = first.value
-                                };
-                            }
-                            queue.Enqueue(new HeuristicScore
-                            {
-                                tile = pos,
-                                value = first.value + 1
-                            });
-                        }
-                    }
-                    else
-                        ++edge;
-                }
-
-                if (edge > 0)
-                {
-                    var pi = PathInfo[first.tile.Y, first.tile.X];
-                    pi.heuristic += edge * 2;
-                    PathInfo[first.tile.Y, first.tile.X] = pi;
-                }
-                MaxHeuristic = Math.Max(MaxHeuristic, first.value);
-            }
         }
     }
 
@@ -286,6 +164,139 @@ namespace Takai.Game
                 }
             }
             return new List<Point> { current.tile };
+        }
+
+        //namespace path info?
+
+        public struct PathTile
+        {
+            public uint heuristic;
+            internal uint generation;
+            internal uint total;
+            internal uint count;
+        }
+        internal uint pathGeneration = 0;
+
+        [Data.Serializer.Ignored]
+        public PathTile[,] PathInfo { get; set; } = new PathTile[0, 0];
+
+        [Data.Serializer.Ignored]
+        public List<Point> PathOrigins { get; set; } = new List<Point>();
+
+        internal uint MaxHeuristic = 0;
+
+        public struct HeuristicScore
+        {
+            public Point tile;
+            public uint value;
+        }
+
+        internal static readonly Point[] HeuristicDirections =
+        {
+            new Point( 0, -1),
+            new Point(-1,  0),
+            new Point( 0,  1),
+            new Point( 1,  0),
+        };
+
+        public static readonly Point[] NavigationDirections =
+        {
+            //new Point(-1, -1),
+            new Point( 0, -1),
+            //new Point( 1, -1),
+            new Point(-1,  0),
+            new Point( 1,  0),
+            //new Point(-1,  1),
+            new Point( 0,  1),
+            //new Point( 1,  1),
+        };
+
+        //dynamic heuristic that only builds to visible region/entities
+
+        /// <summary>
+        /// Build the hueristic from a speicified start point.
+        /// Only overwrites areas that can be reached from start
+        /// </summary>
+        /// <param name="start">Where to start the fill</param>
+        /// <param name="region">The area to update (in tiles)</param>
+        public void BuildHeuristic(Point start, Rectangle region, bool blend = false)
+        {
+            if (!Class.CanPath(start))
+                return;
+
+            if (!blend)
+                PathOrigins.Clear();
+            PathOrigins.Add(start);
+
+            var visibleTiles = Rectangle.Intersect(Class.Bounds, new Rectangle(
+                region.X / Class.TileSize,
+                region.Y / Class.TileSize,
+                Util.CeilDiv(region.Width, Class.TileSize),
+                Util.CeilDiv(region.Height, Class.TileSize)
+            ));
+
+            ++pathGeneration;
+            PathInfo[start.Y, start.X] = new PathTile
+            {
+                heuristic = 0,
+                generation = pathGeneration
+            };
+
+            var queue = new Queue<HeuristicScore>(); //static?
+            queue.Enqueue(new HeuristicScore { tile = start, value = 1 });
+            while (queue.Count > 0)
+            {
+                var first = queue.Dequeue();
+                var heuristic = first.value;
+
+                uint edge = 0;
+                foreach (var i in HeuristicDirections)
+                {
+                    var pos = first.tile + i;
+                    if (Class.CanPath(pos) &&
+                        visibleTiles.Contains(pos))
+                    {
+                        if (PathInfo[pos.Y, pos.X].generation != pathGeneration)
+                        {
+                            if (blend)
+                            {
+                                var pi = PathInfo[pos.Y, pos.X];
+                                pi.generation = pathGeneration;
+                                pi.total += heuristic;
+                                ++pi.count;
+                                pi.heuristic = Math.Min(heuristic, pi.heuristic + 1);
+                                heuristic = pi.heuristic;
+                                PathInfo[pos.Y, pos.X] = pi;
+                            }
+                            else
+                            {
+                                PathInfo[pos.Y, pos.X] = new PathTile
+                                {
+                                    heuristic = heuristic,
+                                    generation = pathGeneration,
+                                    count = 1,
+                                    total = first.value
+                                };
+                            }
+                            queue.Enqueue(new HeuristicScore
+                            {
+                                tile = pos,
+                                value = PathInfo[pos.Y, pos.X].heuristic + 1
+                            });
+                        }
+                    }
+                    else
+                        ++edge;
+                }
+
+                if (edge > 0)
+                {
+                    var pi = PathInfo[first.tile.Y, first.tile.X];
+                    pi.heuristic += edge * 2;
+                    PathInfo[first.tile.Y, first.tile.X] = pi;
+                }
+                MaxHeuristic = Math.Max(MaxHeuristic, heuristic);
+            }
         }
 
         //https://stackoverflow.com/questions/15114950/how-to-improve-the-perfomance-of-my-a-path-finder/15120213#15120213
