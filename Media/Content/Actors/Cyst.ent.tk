@@ -67,7 +67,7 @@ ActorClass {
     DefaultWeapon: SpawnerClass {
         AnimationClass: "Spawner";
         ChargeTime: 500msec;
-		DischargeTime: 2sec;
+		CooldownTime: 2sec;
 		UnderchargeAction: UnderchargeAction.Discharge;
         Spawns: [
             [@"Actors/InfectedCell.ent.tk" [3 5]]

@@ -32,7 +32,7 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         public int ProjectilesPerRound { get; set; } = 1;
 
-        //burst delay?
+        public TimeSpan BurstCooldownTime { get; set; } = TimeSpan.Zero;
 
         //zoom, zoom error?
         public Range<float> ErrorAngle { get; set; }
@@ -43,7 +43,7 @@ namespace DyingAndMore.Game.Weapons
 
         //discharged shells effects
 
-        public override WeaponInstance Create()
+        public override WeaponInstance Instantiate()
         {
             return new GunInstance(this);
         }
@@ -86,10 +86,11 @@ namespace DyingAndMore.Game.Weapons
             return _class.MaxAmmo > 0 && AmmoCount <= 0;
         }
 
-        public override bool CanUse(TimeSpan totalTime)
+        public override bool CanUse(TimeSpan elapsedTime)
         {
             return (_class.MaxBursts == 0 || burstCount < _class.MaxBursts)
-                    && base.CanUse(totalTime);
+                && (currentBurstShotCount > 0 || elapsedTime > StateTime + _class.BurstCooldownTime)
+                && base.CanUse(elapsedTime);
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -114,7 +115,7 @@ namespace DyingAndMore.Game.Weapons
             {
                 for (int i = 0; i < _class.ProjectilesPerRound; ++i)
                 {
-                    var projectile = (Entities.ProjectileInstance)_class.Projectile.Create();
+                    var projectile = (Entities.ProjectileInstance)_class.Projectile.Instantiate();
                     projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + 2));
 
                     var error = RandomRange.Next(_class.ErrorAngle);

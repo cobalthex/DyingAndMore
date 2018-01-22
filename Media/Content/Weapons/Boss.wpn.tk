@@ -6,6 +6,6 @@ GunClass {
     ProjectilesPerRound: 6;
     MaxBursts: 0;
     ChargeTime: 0msec;
-    DischargeTime: 600msec;
+    CooldownTime: 600msec;
     ErrorAngle: [-6deg 6deg];
 }

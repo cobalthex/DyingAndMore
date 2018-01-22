@@ -31,7 +31,7 @@ namespace Takai.Game
 
         public float Gain { get; set; } = 1;
 
-        public SoundInstance Create()
+        public SoundInstance Instantiate()
         {
             return new SoundInstance(this);
         }

@@ -339,12 +339,12 @@ namespace Takai.Game
         {
             Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilWrite, null, null, c.cameraTransform);
 
-            var mult = 360f / Class.MaxHeuristic;
+            var mult = 360f / MaxHeuristic;
             for (var y = c.visibleTiles.Top; y < c.visibleTiles.Bottom; ++y)
             {
                 for (var x = c.visibleTiles.Left; x < c.visibleTiles.Right; ++x)
                 {
-                    var path = Class.PathInfo[y, x];
+                    var path = PathInfo[y, x];
                     if (path.heuristic == uint.MaxValue)
                         continue;
 

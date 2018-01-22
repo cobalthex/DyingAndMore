@@ -68,7 +68,7 @@ namespace Takai.Game
 
         public EntityClass() { }
 
-        public abstract EntityInstance Create();
+        public abstract EntityInstance Instantiate();
 
         public override string ToString()
         {

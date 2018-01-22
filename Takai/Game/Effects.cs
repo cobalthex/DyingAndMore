@@ -30,7 +30,7 @@ namespace Takai.Game
 
         public List<IGameEffect> Effects { get; set; }
 
-        public EffectsInstance Create()
+        public EffectsInstance Instantiate()
         {
             return new EffectsInstance(this);
         }
@@ -43,7 +43,7 @@ namespace Takai.Game
         public EffectsInstance Create(EntityInstance source)
         {
             if (source == null)
-                return Create();
+                return Instantiate();
 
             return new EffectsInstance(this)
             {

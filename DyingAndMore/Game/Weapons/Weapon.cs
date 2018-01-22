@@ -50,11 +50,9 @@ namespace DyingAndMore.Game.Weapons
         /// <summary>
         /// how long to wait after discharging
         /// </summary>
-        public TimeSpan DischargeTime { get; set; }
+        public TimeSpan CooldownTime { get; set; }
 
-        //todo: shot delay, burst delay in gun
-
-        public abstract WeaponInstance Create();
+        public abstract WeaponInstance Instantiate();
     }
 
     public abstract class WeaponInstance : Takai.IObjectInstance<WeaponClass>
@@ -63,7 +61,7 @@ namespace DyingAndMore.Game.Weapons
         {
             Idle,
             Charging,
-            Discharging,
+            Discharging, //aka cooldown
             //relaading, rechambering
         }
 
@@ -117,7 +115,7 @@ namespace DyingAndMore.Game.Weapons
                     }
                     break;
                 case WeaponState.Discharging:
-                    if (Actor.Map.ElapsedTime >= StateTime + Class.DischargeTime)
+                    if (Actor.Map.ElapsedTime >= StateTime + Class.CooldownTime)
                     {
                         Actor.StopAnimation($"{Class.AnimationClass}DischargeWeapon");
                         State = WeaponState.Idle;

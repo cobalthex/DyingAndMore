@@ -29,8 +29,8 @@ ProjectileClass {
                                 tween: TweenStyle.Sequential;
                             };
                             Blend: BlendState.Additive;
-                            InitialSpeed: 300;
-                            Drag: 50;
+                            InitialSpeed: -3000;
+                            Drag: 15;
                             lifetime: 400msec;
                             ColorOverTime: {
                                 Values: [

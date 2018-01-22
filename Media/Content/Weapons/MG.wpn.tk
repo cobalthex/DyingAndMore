@@ -1,14 +1,13 @@
 GunClass {
-    Projectile: @"Weapons/Projectiles/Missile.ent.tk";
+    Projectile: @"Weapons/Projectiles/Pellet.ent.tk";
 
     MaxAmmo: 1000;
-    RoundsPerBurst: 4;
+    RoundsPerBurst: 1;
     #ProjectilesPerRound: 6;
     MaxBursts: 0;
-    BurstCooldownTime: 300msec;
     ChargeTime: 0msec;
-    CooldownTime: 50msec;
-    ErrorAngle: [-2deg 2deg];
+    CooldownTime: 30msec;
+    ErrorAngle: [-4deg 4deg];
 
     DischargeEffect: { #move to spawn effect on projectile?
         Effects: [

@@ -50,7 +50,7 @@ namespace DyingAndMore.Game.Entities
         public Factions DefaultFaction { get; set; } = Factions.None;
         public Controller DefaultController { get; set; } = null;
 
-        public override EntityInstance Create()
+        public override EntityInstance Instantiate()
         {
             return new ActorInstance(this);
         }
@@ -133,7 +133,7 @@ namespace DyingAndMore.Game.Entities
             {
                 MaxSpeed      = RandomRange.Next(_class.MaxSpeed);
                 CurrentHealth = _class.MaxHealth;
-                Weapon        = _class.DefaultWeapon?.Create();
+                Weapon        = _class.DefaultWeapon?.Instantiate();
                 Faction       = _class.DefaultFaction;
 
                 if (_class.DefaultController != null)

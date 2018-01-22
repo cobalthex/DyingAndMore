@@ -53,7 +53,7 @@ namespace DyingAndMore.Game.Entities
             DestroyIfOffscreen = true;
         }
 
-        public override EntityInstance Create()
+        public override EntityInstance Instantiate()
         {
             return new ProjectileInstance(this);
         }
