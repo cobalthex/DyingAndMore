@@ -75,10 +75,10 @@ namespace DyingAndMore.Game.Weapons
             AmmoCount = @class.MaxAmmo;
         }
 
-        public override void Reset()
+        protected override void OnEndUse()
         {
             burstCount = 0;
-            base.Reset();
+            base.OnEndUse();
         }
 
         public override bool IsDepleted()
@@ -89,7 +89,7 @@ namespace DyingAndMore.Game.Weapons
         public override bool CanUse(TimeSpan elapsedTime)
         {
             return (_class.MaxBursts == 0 || burstCount < _class.MaxBursts)
-                && (currentBurstShotCount > 0 || elapsedTime > StateTime + _class.BurstCooldownTime)
+                && (burstCount == 0 || currentBurstShotCount > 0 || elapsedTime > StateTime + _class.BurstCooldownTime)
                 && base.CanUse(elapsedTime);
         }
 
@@ -97,7 +97,7 @@ namespace DyingAndMore.Game.Weapons
         {
             if (currentBurstShotCount > 0)
             {
-                if (currentBurstShotCount < _class.RoundsPerBurst)
+                if (currentBurstShotCount < _class.RoundsPerBurst && !IsDepleted())
                     base.TryUse();
                 else
                 {
@@ -108,8 +108,6 @@ namespace DyingAndMore.Game.Weapons
 
             base.Think(deltaTime);
         }
-
-        //todo: burst count, if TryFire is called every frame, continue, otherwise auto reset
 
         protected override void OnDischarge()
         {

@@ -43,7 +43,7 @@ namespace DyingAndMore.Game.Weapons
         //misfire effect (empty/failure/etc)
 
         /// <summary>
-        /// how long charging takes
+        /// how long charging takes (Charging only occurs if the weapon is cold)
         /// </summary>
         public TimeSpan ChargeTime { get; set; }
 
@@ -52,8 +52,20 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         public TimeSpan DischargeTime { get; set; }
 
-        public TimeSpan WarmupTime { get; set; }
+        /// <summary>
+        /// How long it takes the weapon to fully cool down
+        /// </summary>
         public TimeSpan CooldownTime { get; set; }
+
+        /// <summary>
+        /// Can charge, even when <see cref="WeaponInstance.CanUse(TimeSpan)"/> returns false
+        /// Useful for things like spinning gatling barrels
+        /// </summary>
+        public bool CanAlwaysCharge { get; set; } = false;
+
+        //charge percentage (for things like chaingun)
+
+        //overheating
 
         public abstract WeaponInstance Instantiate();
     }
@@ -63,11 +75,12 @@ namespace DyingAndMore.Game.Weapons
         public enum WeaponState
         {
             Idle,
-            Warming,
-            Cooling,
+
             Charging,
             Discharging,
-            //relaading, rechambering
+
+            //Loading,
+            //chambering,
         }
 
         //rate of fire curve
@@ -95,10 +108,11 @@ namespace DyingAndMore.Game.Weapons
         }
         WeaponState _state;
 
-        /// <summary>
-        /// How warm the weapon is (warmup/cooldown)
-        /// </summary>
-        public float Warmth { get; set; } = 0;
+        public float Charge { get; set; } = 0;
+
+
+        protected bool isUsing = false;
+        protected bool wasUsing = false;
 
         public WeaponInstance() { }
         public WeaponInstance(WeaponClass @class)
@@ -108,14 +122,28 @@ namespace DyingAndMore.Game.Weapons
 
         public virtual void Think(TimeSpan deltaTime)
         {
+            if (wasUsing && !isUsing)
+                OnEndUse();
+
+            if (isUsing)
+            {
+                if (Class.ChargeTime <= TimeSpan.Zero)
+                    Charge = 1;
+                else if (Charge < 1)
+                    Charge += (float)(deltaTime.TotalSeconds / Class.ChargeTime.TotalSeconds);
+            }
+            else
+            {
+                if (Class.CooldownTime <= TimeSpan.Zero)
+                    Charge = 0;
+                else if (Charge > 0)
+                    Charge -= (float)(deltaTime.TotalSeconds / Class.CooldownTime.TotalSeconds);
+            }
+
             switch (State)
             {
-                case WeaponState.Warming:
-                    Warmth += (float)(deltaTime.TotalSeconds * Class.WarmupTime.TotalSeconds);
-                    break;
-
                 case WeaponState.Charging:
-                    if (Actor.Map.ElapsedTime >= StateTime + Class.ChargeTime)
+                    if (Charge >= 1 && CanUse(Actor.Map.ElapsedTime))
                     {
                         switch (Class.OverchargeAction)
                         {
@@ -133,21 +161,13 @@ namespace DyingAndMore.Game.Weapons
                     if (Actor.Map.ElapsedTime >= StateTime + Class.DischargeTime)
                     {
                         Actor.StopAnimation($"{Class.AnimationClass}DischargeWeapon");
-                        State = WeaponState.Cooling;
-                        Actor.PlayAnimation($"{Class.AnimationClass}CoolWeapon");
-                    }
-                    break;
-
-                case WeaponState.Cooling:
-                    Warmth -= (float)(deltaTime.TotalSeconds * Class.CooldownTime.TotalSeconds);
-                    if (Warmth <= 0)
-                    {
-                        Warmth = 0;
                         State = WeaponState.Idle;
-                        Actor.StopAnimation($"{Class.AnimationClass}CoolWeapon");
                     }
                     break;
             }
+
+            wasUsing = isUsing;
+            isUsing = false;
         }
 
         /// <summary>
@@ -155,44 +175,31 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         public virtual void TryUse()
         {
-            if (CanUse(Actor.Map.ElapsedTime))
+            if (Class.CanAlwaysCharge)
             {
-                if (Warmth < 1 && Class.WarmupTime > TimeSpan.Zero)
+                isUsing = true;
+                if (State == WeaponState.Idle)
                 {
-                    State = WeaponState.Warming;
-                    Actor.PlayAnimation($"{Class.AnimationClass}WarmWeapon");
-                }
-                else
-                {
-                    Warmth = 1;
-                    Actor.StopAnimation($"{Class.AnimationClass}WarmWeapon");
-                    //todo: if charge time is zero, skip to discharge
-
                     State = WeaponState.Charging;
                     Actor.PlayAnimation($"{Class.AnimationClass}ChargeWeapon");
                 }
             }
         }
-        /// <summary>
-        /// Reset the firing state. For example, should reset burst counter
-        /// Called whenever player depresses fire button
-        /// Should not reset the gun entirely (create a new instance for that)
-        /// </summary>
-        public virtual void Reset()
+
+        protected virtual void OnEndUse()
         {
             if (State == WeaponState.Charging)
             {
                 switch (Class.UnderchargeAction)
                 {
                     case UnderchargeAction.Dissipate:
-                        State = WeaponState.Cooling;
+                        State = WeaponState.Idle;
                         Actor.StopAnimation($"{Class.AnimationClass}ChargeWeapon");
                         Actor.StopAnimation($"{Class.AnimationClass}DischargeWeapon");
-                        Actor.StopAnimation($"{Class.AnimationClass}WarmWeapon");
-                        Actor.PlayAnimation($"{Class.AnimationClass}CoolWeapon");
                         break;
                 }
             }
+
         }
 
         /// <summary>
@@ -215,7 +222,7 @@ namespace DyingAndMore.Game.Weapons
 
         public virtual bool CanUse(TimeSpan totalTime)
         {
-            return !IsDepleted() && State == WeaponState.Idle;
+            return !IsDepleted();
         }
 
         /// <summary>
@@ -230,3 +237,5 @@ namespace DyingAndMore.Game.Weapons
         }
     }
 }
+
+//todo: improve animation code here

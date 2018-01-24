@@ -209,6 +209,12 @@ namespace Takai.Game
             throw new NotImplementedException();
         }
 
+        public void RemoveAllEntities()
+        {
+            foreach (var sector in Sectors)
+                sector.entities.Clear();
+        }
+
         /// <summary>
         /// Test if a ray collides with a circle.
         /// If ray is inside of the circle, t0 and t1 = 0

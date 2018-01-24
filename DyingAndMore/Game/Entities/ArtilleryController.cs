@@ -56,10 +56,7 @@ namespace DyingAndMore.Game.Entities
                     Actor.Map.DrawLine(Actor.Position, hit.entity.Position, Color.Orange);
                 }
                 else
-                {
                     trackedActor = null;
-                    Actor.Weapon?.Reset();
-                }
             }
             else
             {
