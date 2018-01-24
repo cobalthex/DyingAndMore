@@ -50,6 +50,9 @@ namespace DyingAndMore.Game.Weapons
         /// <summary>
         /// how long to wait after discharging
         /// </summary>
+        public TimeSpan DischargeTime { get; set; }
+
+        public TimeSpan WarmupTime { get; set; }
         public TimeSpan CooldownTime { get; set; }
 
         public abstract WeaponInstance Instantiate();
@@ -60,10 +63,17 @@ namespace DyingAndMore.Game.Weapons
         public enum WeaponState
         {
             Idle,
+            Warming,
+            Cooling,
             Charging,
-            Discharging, //aka cooldown
+            Discharging,
             //relaading, rechambering
         }
+
+        //rate of fire curve
+        //maybe warmup requires certain rate of fire
+        //speedup/down times (separate)
+        //tracer effect (every n shots)
 
         [Takai.Data.Serializer.Ignored]
         public Entities.ActorInstance Actor { get; set; }
@@ -86,9 +96,9 @@ namespace DyingAndMore.Game.Weapons
         WeaponState _state;
 
         /// <summary>
-        /// The number of consecutive shots taken
+        /// How warm the weapon is (warmup/cooldown)
         /// </summary>
-        //public int burstCount = 0;
+        public float Warmth { get; set; } = 0;
 
         public WeaponInstance() { }
         public WeaponInstance(WeaponClass @class)
@@ -100,6 +110,10 @@ namespace DyingAndMore.Game.Weapons
         {
             switch (State)
             {
+                case WeaponState.Warming:
+                    Warmth += (float)(deltaTime.TotalSeconds * Class.WarmupTime.TotalSeconds);
+                    break;
+
                 case WeaponState.Charging:
                     if (Actor.Map.ElapsedTime >= StateTime + Class.ChargeTime)
                     {
@@ -114,28 +128,49 @@ namespace DyingAndMore.Game.Weapons
                         }
                     }
                     break;
+
                 case WeaponState.Discharging:
-                    if (Actor.Map.ElapsedTime >= StateTime + Class.CooldownTime)
+                    if (Actor.Map.ElapsedTime >= StateTime + Class.DischargeTime)
                     {
                         Actor.StopAnimation($"{Class.AnimationClass}DischargeWeapon");
-                        State = WeaponState.Idle;
+                        State = WeaponState.Cooling;
+                        Actor.PlayAnimation($"{Class.AnimationClass}CoolWeapon");
                     }
                     break;
 
+                case WeaponState.Cooling:
+                    Warmth -= (float)(deltaTime.TotalSeconds * Class.CooldownTime.TotalSeconds);
+                    if (Warmth <= 0)
+                    {
+                        Warmth = 0;
+                        State = WeaponState.Idle;
+                        Actor.StopAnimation($"{Class.AnimationClass}CoolWeapon");
+                    }
+                    break;
             }
         }
 
         /// <summary>
         /// Begin charging the weapon
         /// </summary>
-        public virtual void TryFire()
+        public virtual void TryUse()
         {
             if (CanUse(Actor.Map.ElapsedTime))
             {
-                //todo: if charge time is zero, skip to discharge
+                if (Warmth < 1 && Class.WarmupTime > TimeSpan.Zero)
+                {
+                    State = WeaponState.Warming;
+                    Actor.PlayAnimation($"{Class.AnimationClass}WarmWeapon");
+                }
+                else
+                {
+                    Warmth = 1;
+                    Actor.StopAnimation($"{Class.AnimationClass}WarmWeapon");
+                    //todo: if charge time is zero, skip to discharge
 
-                State = WeaponState.Charging;
-                Actor.PlayAnimation($"{Class.AnimationClass}ChargeWeapon");
+                    State = WeaponState.Charging;
+                    Actor.PlayAnimation($"{Class.AnimationClass}ChargeWeapon");
+                }
             }
         }
         /// <summary>
@@ -150,9 +185,11 @@ namespace DyingAndMore.Game.Weapons
                 switch (Class.UnderchargeAction)
                 {
                     case UnderchargeAction.Dissipate:
-                        State = WeaponState.Idle;
+                        State = WeaponState.Cooling;
                         Actor.StopAnimation($"{Class.AnimationClass}ChargeWeapon");
                         Actor.StopAnimation($"{Class.AnimationClass}DischargeWeapon");
+                        Actor.StopAnimation($"{Class.AnimationClass}WarmWeapon");
+                        Actor.PlayAnimation($"{Class.AnimationClass}CoolWeapon");
                         break;
                 }
             }

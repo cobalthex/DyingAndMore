@@ -52,7 +52,7 @@ namespace DyingAndMore.Game.Entities
                     //todo: maybe shoot w/ lead (shoot towards target's next position)
                     if (CanRotate)
                         Actor.Forward = Vector2.Normalize(trackedActor.Position - Actor.Position); //todo: slerp
-                    Actor.Weapon?.TryFire();
+                    Actor.Weapon?.TryUse();
                     Actor.Map.DrawLine(Actor.Position, hit.entity.Position, Color.Orange);
                 }
                 else

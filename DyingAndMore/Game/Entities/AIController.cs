@@ -195,7 +195,7 @@ namespace DyingAndMore.Game.Entities
     /// <summary>
     /// Commit suicide when close to an enemy (actor of a different faction)
     /// </summary>
-    class KamikazeBehavior : Behavior
+    class SuicideBehavior : Behavior
     {
         public override BehaviorMask Mask => BehaviorMask.Unknown;
         public override BehaviorFilters Filter => BehaviorFilters.RequiresTarget;
@@ -206,7 +206,6 @@ namespace DyingAndMore.Game.Entities
         /// An optional effect to play when committing seppeku
         /// </summary>
         public Takai.Game.EffectsClass Effect { get; set; }
-
 
         public override BehaviorPriority CalculatePriority()
         {
@@ -292,8 +291,10 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
-            AI.Actor.Weapon.TryFire();
+            AI.Actor.Weapon.TryUse();
             //AI.Actor.Weapon.Reset(); //todo: better place
+
+            //high prioirty while shooting for certain amount of time (certain conditions?)
         }
     }
 

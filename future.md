@@ -1,14 +1,8 @@
+
 Features to add in the future
 =============================
 
 0. Tkz format that uses gzip. Add serializer helpers to check for compression (based on header) and automatically run correct handlers
-
-0. Rewrite asset manager to provide mark and sweep ability and to simply design.
-	- Provide ability to pass in folder to search to have for eg. map relative files
-
-0. DefManager that can load/cache defs
-
-0. Unique/aggregate definitions - All Entities of type Foo reference Foo
 
 0. Invisibility
 
@@ -31,3 +25,5 @@ Features to add in the future
 0. Gases
 	0. Damage effects
 	0. Behavior changing
+
+0. exportable values (floats) from objects (export rate of fire of weapon for use with animation, etc)
