@@ -25,6 +25,7 @@ namespace DyingAndMore.Game
     public class GameInstance
     {
         //move into Game?
+        public TimeSpan ElapsedTime { get; set; }
 
         public static GameInstance Current;
 
@@ -115,6 +116,8 @@ namespace DyingAndMore.Game
 
         protected override void OnMapChanged(EventArgs e)
         {
+            GameInstance.Current.ElapsedTime = TimeSpan.Zero;
+
             Map.updateSettings = MapInstance.UpdateSettings.Game;
             Map.renderSettings = MapInstance.RenderSettings.Default;
 
@@ -162,6 +165,8 @@ namespace DyingAndMore.Game
         bool x = false;
         protected override void UpdateSelf(GameTime time)
         {
+            GameInstance.Current.ElapsedTime += time.ElapsedGameTime;
+
             if(!x)
             {
                 x = true;
@@ -217,6 +222,36 @@ namespace DyingAndMore.Game
                             }
                         }
                         Map.CleanupAll(cleans);
+                    }
+                    break;
+
+                case "refresh":
+                    for (int i = 1; i < words.Length; ++i)
+                    {
+                        switch (words[i])
+                        {
+                            case "entities":
+                                EntityInstance camFollow = null;
+                                var newEnts = new System.Collections.Generic.List<EntityInstance>();
+                                foreach (var entity in Map.AllEntities)
+                                {
+                                    var newInst = entity.Class.Instantiate();
+                                    newInst.Position = entity.Position;
+                                    newInst.Forward = entity.Forward;
+                                    newEnts.Add(newInst);
+
+                                    if (Map.ActiveCamera.Follow == entity)
+                                        camFollow = newInst;
+                                }
+
+                                Map.RemoveAllEntities();
+                                foreach (var ent in newEnts)
+                                    Map.Spawn(ent);
+
+                                Map.ActiveCamera.Follow = camFollow;
+
+                                break;
+                        }
                     }
                     break;
 
@@ -382,13 +417,16 @@ namespace DyingAndMore.Game
                 var pos = Vector2.Transform(actor.Position, Map.ActiveCamera.Transform)
                             - new Vector2(ent.Radius * 1.5f * Map.ActiveCamera.Scale);
 
-                tinyFont.Draw(spriteBatch, $"{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}", pos, Color.Tomato);
+                DefaultFont.Draw(spriteBatch, $"{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}", pos, Color.Tomato);
                 if (actor.Weapon is Weapons.GunInstance gun)
                 {
-                    pos.Y += 10;
-                    tinyFont.Draw(spriteBatch, $"{gun.AmmoCount} {gun.State}", pos, Color.LightSteelBlue);
+                    pos.Y += 15;
+                    DefaultFont.Draw(spriteBatch, $"{gun.AmmoCount} {gun.State} {gun.Charge:N2}", pos, Color.LightSteelBlue);
                 }
             }
+
+            var t = GameInstance.Current.ElapsedTime;
+            DefaultFont.Draw(spriteBatch, $"{(int)t.TotalMinutes:D2}:{t.Seconds:D2}.{t.Milliseconds:D3}", new Vector2(500, 20), Color.Gray);
         }
     }
 }

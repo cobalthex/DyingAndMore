@@ -96,8 +96,6 @@ namespace DyingAndMore.Game.Entities
 
             if (InputState.IsButtonDown(MouseButtons.Left))
                 Actor.Weapon?.TryUse();
-            if (InputState.IsClick(MouseButtons.Left))
-                Actor.Weapon?.Reset();
 
             Actor.Accelerate(d);
 
