@@ -98,7 +98,7 @@ namespace DyingAndMore.Game.Weapons
             if (currentBurstShotCount > 0)
             {
                 if (currentBurstShotCount < _class.RoundsPerBurst)
-                    base.TryFire();
+                    base.TryUse();
                 else
                 {
                     currentBurstShotCount = 0;
@@ -108,6 +108,8 @@ namespace DyingAndMore.Game.Weapons
 
             base.Think(deltaTime);
         }
+
+        //todo: burst count, if TryFire is called every frame, continue, otherwise auto reset
 
         protected override void OnDischarge()
         {
