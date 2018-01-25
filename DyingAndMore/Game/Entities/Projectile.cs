@@ -4,7 +4,7 @@ using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
 {
-    class ProjectileClass : EntityClass
+    public class ProjectileClass : EntityClass
     {
         /// <summary>
         /// Initial speed of the projectile
@@ -59,7 +59,7 @@ namespace DyingAndMore.Game.Entities
         }
     }
 
-    class ProjectileInstance : EntityInstance
+    public class ProjectileInstance : EntityInstance
     {
         public override EntityClass Class
         {

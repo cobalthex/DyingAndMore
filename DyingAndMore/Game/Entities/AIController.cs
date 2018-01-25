@@ -292,9 +292,6 @@ namespace DyingAndMore.Game.Entities
         public override void Think(TimeSpan deltaTime)
         {
             AI.Actor.Weapon.TryUse();
-            //AI.Actor.Weapon.Reset(); //todo: better place
-
-            //high prioirty while shooting for certain amount of time (certain conditions?)
         }
     }
 

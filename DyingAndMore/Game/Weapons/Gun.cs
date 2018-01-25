@@ -4,7 +4,7 @@ using Takai.Game;
 
 namespace DyingAndMore.Game.Weapons
 {
-    class GunClass : WeaponClass
+    public class GunClass : WeaponClass
     {
         public Entities.ProjectileClass Projectile { get; set; }
 
@@ -39,17 +39,13 @@ namespace DyingAndMore.Game.Weapons
 
         //bloom (error angle increases over time)
 
-        //spew (how long continuous fire after overcharge)
-
-        //discharged shells effects
-
         public override WeaponInstance Instantiate()
         {
             return new GunInstance(this);
         }
     }
 
-    class GunInstance : WeaponInstance
+    public class GunInstance : WeaponInstance
     {
         public override WeaponClass Class
         {

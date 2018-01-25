@@ -75,6 +75,9 @@ namespace DyingAndMore
             Takai.Runtime.Game = this;
 
             Takai.Data.Serializer.LoadRunningAssemblyTypes();
+#if DEBUG
+            Takai.Data.Cache.WatchDirectory(Takai.Data.Cache.DefaultRoot);
+#endif
 
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
             GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
