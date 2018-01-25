@@ -1,14 +1,14 @@
 GunClass {
     Projectile: @"Weapons/Projectiles/Missile.ent.tk";
 
-    MaxAmmo: 10;
-    RoundsPerBurst: 4;
+    MaxAmmo: 200;
+    #RoundsPerBurst: 3;
     #ProjectilesPerRound: 6;
     MaxBursts: 0;
-    BurstCooldownTime: 400msec;
-    ChargeTime: 0sec;
+    #BurstCooldownTime: 400msec;
+    ChargeTime: 500msec;
     DischargeTime: 50msec;
-    CooldownTime: 0sec;
+    CooldownTime: 2sec;
     CanAlwaysCharge: true;
     ErrorAngle: [-2deg 2deg];
 
@@ -31,6 +31,38 @@ GunClass {
                 }
                 Count: [3 12];
                 Spread: [-30deg 30deg];
+            };
+            ParticleEffect {
+                Class: {
+                    Sprite: {
+                        Texture: @"./ejection.png";
+                        width: 8;
+                        height: 8;
+                        frameLength: 20msec;
+                        frameCount: 4;
+                        Center: true;
+                        IsLooping: true;
+                    };
+                    Blend: BlendState.NonPremultiplied;
+                    InitialSpeed: 300;
+                    Drag: 0.6;
+                    lifetime: 800msec;
+                    ColorOverTime: {
+                        Values: [
+                            [0 Color.White]
+                            [1 Color.Transparent]
+                        ]
+                    };
+
+                    ScaleOverTime: {
+                        Values: [
+                            [0 1]
+                            [1 0.5]
+                        ]
+                    };
+                }
+                Count: 1;
+                Spread: [-100deg -80deg];
             };
 
             SoundImpulse {

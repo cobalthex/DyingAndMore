@@ -70,19 +70,19 @@ namespace DyingAndMore.Game.Weapons
         public abstract WeaponInstance Instantiate();
     }
 
+    public enum WeaponState
+    {
+        Idle,
+
+        Charging,
+        Discharging,
+
+        //Loading,
+        //chambering,
+    }
+
     public abstract class WeaponInstance : Takai.IObjectInstance<WeaponClass>
     {
-        public enum WeaponState
-        {
-            Idle,
-
-            Charging,
-            Discharging,
-
-            //Loading,
-            //chambering,
-        }
-
         //rate of fire curve
         //maybe warmup requires certain rate of fire
         //speedup/down times (separate)

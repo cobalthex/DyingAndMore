@@ -44,6 +44,7 @@ namespace DyingAndMore.Game
 
         Static fpsDisplay;
         Static crapDisplay;
+        Static clockDisplay;
 
         TextInput debugConsole;
 
@@ -92,6 +93,13 @@ namespace DyingAndMore.Game
                 VerticalAlignment = Alignment.Start,
                 HorizontalAlignment = Alignment.End,
                 Color = Color.PaleGreen
+            });
+            AddChild(clockDisplay = new Static()
+            {
+                Position = new Vector2(0, 20),
+                VerticalAlignment = Alignment.Start,
+                HorizontalAlignment = Alignment.Middle,
+                Color = new Color(1, 1, 1, 0.5f),
             });
 
             debugConsole = new TextInput()
@@ -166,6 +174,11 @@ namespace DyingAndMore.Game
         protected override void UpdateSelf(GameTime time)
         {
             GameInstance.Current.ElapsedTime += time.ElapsedGameTime;
+            clockDisplay.Text = $"{(int)GameInstance.Current.ElapsedTime.TotalHours:D2}:"
+                              + $"{GameInstance.Current.ElapsedTime.Minutes:D2}:"
+                              + $"{GameInstance.Current.ElapsedTime.Seconds:D2}."
+                              + $"{GameInstance.Current.ElapsedTime.Milliseconds:D3}";
+            clockDisplay.AutoSize();
 
             if(!x)
             {
@@ -424,9 +437,6 @@ namespace DyingAndMore.Game
                     DefaultFont.Draw(spriteBatch, $"{gun.AmmoCount} {gun.State} {gun.Charge:N2}", pos, Color.LightSteelBlue);
                 }
             }
-
-            var t = GameInstance.Current.ElapsedTime;
-            DefaultFont.Draw(spriteBatch, $"{(int)t.TotalMinutes:D2}:{t.Seconds:D2}.{t.Milliseconds:D3}", new Vector2(500, 20), Color.Gray);
         }
     }
 }

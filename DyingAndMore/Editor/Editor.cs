@@ -73,8 +73,6 @@ namespace DyingAndMore.Editor
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;
 
             resizeDialog = Cache.Load<Static>("UI/Editor/ResizeMap.ui.tk");
-
-            Cache.WatchDirectory(Cache.DefaultRoot);
         }
 
         void AddModes()
