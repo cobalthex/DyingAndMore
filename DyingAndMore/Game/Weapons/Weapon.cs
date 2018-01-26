@@ -93,10 +93,8 @@ namespace DyingAndMore.Game.Weapons
 
         public virtual WeaponClass Class { get; set; }
 
-        /// <summary>
-        /// When the current state was entered
-        /// </summary>
-        protected TimeSpan StateTime { get; set; } = TimeSpan.Zero;
+        public TimeSpan StateTime { get; set; } = TimeSpan.Zero;
+
         public WeaponState State
         {
             get => _state;
@@ -109,7 +107,6 @@ namespace DyingAndMore.Game.Weapons
         WeaponState _state;
 
         public float Charge { get; set; } = 0;
-
 
         protected bool isUsing = false;
         protected bool wasUsing = false;
@@ -175,7 +172,7 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         public virtual void TryUse()
         {
-            if (Class.CanAlwaysCharge)
+            if (Class.CanAlwaysCharge || CanUse(Actor.Map.ElapsedTime))
             {
                 isUsing = true;
                 if (State == WeaponState.Idle)

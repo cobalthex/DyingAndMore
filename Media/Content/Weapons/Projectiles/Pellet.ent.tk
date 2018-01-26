@@ -1,6 +1,6 @@
 ProjectileClass {
     Name: "Pellet";
-    MuzzleVelocity: [4600 6800];
+    MuzzleVelocity: [400 680];
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     Range: 2000;

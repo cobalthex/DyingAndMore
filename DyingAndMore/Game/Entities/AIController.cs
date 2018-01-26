@@ -147,9 +147,11 @@ namespace DyingAndMore.Game.Entities
             return BehaviorPriority.Low;
         }
 
+        //sound+hearing
+
         public override void Think(TimeSpan deltaTime)
         {
-            if (AI.Target == null)
+            if (AI.Target == null || !AI.Target.IsAlive || AI.Target.Map != AI.Actor.Map)
             {
                 var ents = AI.Actor.Map.FindEntities(AI.Actor.Position, SightDistance);
                 var possibles = new List<ActorInstance>();
@@ -157,7 +159,8 @@ namespace DyingAndMore.Game.Entities
                 {
                     if (ent != AI.Actor &&
                         ent is ActorInstance actor &&
-                        !actor.IsAlliedWith(AI.Actor.Faction))
+                        !actor.IsAlliedWith(AI.Actor.Faction) &&
+                        AI.Actor.IsFacing(actor.Position))
                         possibles.Add(actor);
                 }
                 possibles.Sort(delegate (ActorInstance a, ActorInstance b)
@@ -172,6 +175,8 @@ namespace DyingAndMore.Game.Entities
                     AI.SetNextTarget(possibles[0]);
                     possibles[0].OutlineColor = Color.Red;
                 }
+                else
+                    AI.SetNextTarget(null);
             }
 
             //match targets by threat

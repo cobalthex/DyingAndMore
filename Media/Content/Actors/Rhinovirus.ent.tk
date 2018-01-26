@@ -6,6 +6,7 @@ ActorClass {
     DefaultController: AIController {
         Behaviors: [
             ShootBehavior {};
+            FocusBehavior {};
             TargetEnemyBehavior {};
         ];
     }
