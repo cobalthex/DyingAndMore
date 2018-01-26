@@ -9,18 +9,12 @@ MapClass {
             EntitySpawn {
                 Class: @"Actors/Player.ent.tk";
                 Position: [267 259];
-                Forward: [0.9928871 -0.1190591];
+                Forward: [0.9955281 0.09446617];
                 Name: Null;
             }
             EntitySpawn {
-                Class: @"Actors/Player.ent.tk";
-                Position: [331.2 2001.354];
-                Forward: [1 0];
-                Name: Null;
-            }
-            EntitySpawn {
-                Class: @"Actors/Player.ent.tk";
-                Position: [1978.708 285.9077];
+                Class: @"Actors/Rhinovirus.ent.tk";
+                Position: [1194.895 164.3975];
                 Forward: [1 0];
                 Name: Null;
             }

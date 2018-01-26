@@ -134,11 +134,13 @@ namespace Takai.Game
     {
         //dynamic
         public HashSet<EntityInstance> entities = new HashSet<EntityInstance>(); //todo: profile against list
+        public List<SoundInstance> sounds = new List<SoundInstance>(); //all sounds that can be hard from this sector
 
         //static
         public List<FluidInstance> fluids = new List<FluidInstance>();
         public List<Decal> decals = new List<Decal>();
         public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
+
     }
 
     public partial class MapInstance : IObjectInstance<MapClass>
@@ -197,7 +199,7 @@ namespace Takai.Game
         /// <summary>
         /// Currently playing sounds
         /// </summary>
-        public List<SoundInstance> Sounds { get; protected set; } = new List<SoundInstance>(16);
+        public List<SoundInstance> Sounds { get; protected set; } = new List<SoundInstance>(16); //todo: remove in favor of sector sounds
 
         [Data.Serializer.Ignored] //particles are not serialized (maybe?)
         public Dictionary<ParticleClass, List<ParticleInstance>> Particles { get; protected set; } = new Dictionary<ParticleClass, List<ParticleInstance>>();

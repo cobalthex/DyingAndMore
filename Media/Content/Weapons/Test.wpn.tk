@@ -12,7 +12,7 @@ GunClass {
     CanAlwaysCharge: true;
     ErrorAngle: [-2deg 2deg];
 
-    DischargeEffect: { #move to spawn effect on projectile?
+    DischargeEffect: {
         Effects: [
             ParticleEffect {
                 Class: {
@@ -44,8 +44,8 @@ GunClass {
                         IsLooping: true;
                     };
                     Blend: BlendState.NonPremultiplied;
-                    InitialSpeed: 300;
-                    Drag: 0.6;
+                    InitialSpeed: [300 400];
+                    Drag: 1.5;
                     lifetime: 800msec;
                     ColorOverTime: {
                         Values: [
