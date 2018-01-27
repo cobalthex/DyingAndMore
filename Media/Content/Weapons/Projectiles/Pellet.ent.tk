@@ -1,6 +1,6 @@
 ProjectileClass {
     Name: "Pellet";
-    MuzzleVelocity: [400 680];
+    MuzzleVelocity: [4000 6800];
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     Range: 2000;
@@ -10,46 +10,35 @@ ProjectileClass {
     Animations: {
         Idle: {
             Sprite: {
-                Texture: @"./Pellet.png";
+                Texture: @"./Tracer.png";
                 Height: 1;
-                FrameCount: 4;
-                FrameLength: 50msec;
+                #FrameCount: 4;
+                #FrameLength: 50msec;
                 IsLooping: true;
-            };
-            Effect: {
-                Effects: [
-                    ParticleEffect {
-                        Class: {
-                            Sprite: {
-                                Texture: @"Effects/smoke2.png";
-                                width: 16;
-                                height: 16;
-                                frameCount: 4;
-                                frameLength: 100msec;
-                                tween: TweenStyle.Sequential;
-                            };
-                            Blend: BlendState.Additive;
-                            InitialSpeed: -3000;
-                            Drag: 15;
-                            lifetime: 400msec;
-                            ColorOverTime: {
-                                Values: [
-                                    [0 Color.White]
-                                    [1 Color.Transparent]
-                                ];
-                            }
-                            ScaleOverTime: {
-                                Values: [
-                                    [0 1]
-                                    [1 5]
-                                ];
-                            }
-                        }
-                        Count: [-2 1];
-                        Spread: 0;
-                    };
-                ];
+                Origin: [0 0];
             };
         }
+    }
+
+    DestructionEffect: {
+        Effects: [
+            ParticleEffect {
+                Class: {
+                    Sprite: {
+                        Texture: @"./Pellet.png";
+                        height: 1;
+                        frameLength: 50msec;
+                        frameCount: 4;
+                        Center: true;
+                    };
+                    Blend: BlendState.AlphaBlend;
+                    InitialSpeed: [200 600];
+                    Drag: 10;
+                    Lifetime: [200msec 300msec];
+                }
+                Count: [3 12];
+                Spread: [120deg 230deg];
+            };
+        ]
     }
 }

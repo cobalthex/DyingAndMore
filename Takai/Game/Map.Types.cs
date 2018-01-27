@@ -75,4 +75,23 @@ namespace Takai.Game
         public float angle;
         public float scale;
     }
+
+    public class MaterialResponse
+    {
+        //response (overpenetrate, destroy, reflect, etc)
+
+        //friction, dampening
+
+        //refraction
+
+        public EffectsClass Effect { get; set; }
+    }
+
+    public class Material : INamedObject
+    {
+        public string Name { get; set; }
+        public string File { get; set; }
+
+        public Dictionary<Material, MaterialResponse> Responses { get; set; }
+    }
 }
