@@ -31,5 +31,5 @@ ActorClass {
 
     DefaultWeapon: @"Weapons/Test.wpn.tk";
 
-    DefaultController: InputController { }
+    DefaultController: InputController { };
 }
