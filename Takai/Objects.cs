@@ -1,9 +1,12 @@
 ﻿namespace Takai
 {
-    public interface IObjectClass<TInstance> : Data.ISerializeExternally
+    public interface INamedObject : Data.ISerializeExternally
     {
         string Name { get; set; }
+    }
 
+    public interface IObjectClass<TInstance> : INamedObject
+    {
         TInstance Instantiate();
     }
 

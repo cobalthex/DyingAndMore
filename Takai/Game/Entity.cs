@@ -322,5 +322,7 @@ namespace Takai.Game
         {
             return Vector2.Dot(Forward, Velocity);
         }
+
+        //collision material fx (all entities get a material, map gets its own)
     }
 }

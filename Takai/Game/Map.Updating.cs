@@ -155,6 +155,7 @@ namespace Takai.Game
                         {
                             if (Math.Abs(hit.distance - deltaVLen) > 0.5f)
                             {
+                                entity.Position = target;
                                 entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
 
                                 //improve
@@ -163,6 +164,7 @@ namespace Takai.Game
                         }
                         else //entity collision
                         {
+                            entity.Position = target;
                             entity.OnEntityCollision(hit.entity, target, deltaTime);
                             hit.entity.OnEntityCollision(entity, target, deltaTime);
 
