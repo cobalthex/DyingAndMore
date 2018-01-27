@@ -29,6 +29,9 @@ namespace Takai.Game
         /// </summary>
         public string Caption { get; set; }
 
+        /// <summary>
+        /// How loud the sound is, affects spacial placement
+        /// </summary>
         public float Gain { get; set; } = 1;
 
         public SoundInstance Instantiate()
@@ -45,7 +48,9 @@ namespace Takai.Game
 
         public Vector2 Position { get; set; }
         public Vector2 Forward { get; set; }
-        public Vector2 Velocity { get; set; } //this does not update position
+        public Vector2 Velocity { get; set; }
+
+        //attach to entity for movement?
 
         public SoundInstance(SoundClass @class)
         {

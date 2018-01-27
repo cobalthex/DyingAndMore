@@ -131,9 +131,9 @@ namespace DyingAndMore
                         ui = new Takai.UI.Static(new Game.Game(instance));
                     else
                         ui = new Takai.UI.Static(new Editor.Editor(instance));
+                   return;
                 }
                 catch (System.IO.FileNotFoundException) { }
-                return;
             }
 
             //testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };

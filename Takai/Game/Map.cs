@@ -109,9 +109,13 @@ namespace Takai.Game
             if (InitialState != null)
             {
                 if (InitialState.Entities != null)
+                {
                     foreach (var ent in InitialState.Entities)
-                        instance.Spawn(ent.Class, ent.Position, ent.Forward, Vector2.Zero, ent.Name);
-
+                    {
+                        if (ent.Class != null)
+                            instance.Spawn(ent.Class, ent.Position, ent.Forward, Vector2.Zero, ent.Name);
+                    }
+                }
                 if (InitialState.Fluids != null)
                     foreach (var fluid in InitialState.Fluids)
                         instance.Spawn(fluid);
@@ -196,13 +200,13 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public List<FluidInstance> LiveFluids { get; protected set; } = new List<FluidInstance>(128);
 
-        /// <summary>
-        /// Currently playing sounds
-        /// </summary>
-        public List<SoundInstance> Sounds { get; protected set; } = new List<SoundInstance>(16); //todo: remove in favor of sector sounds
-
         [Data.Serializer.Ignored] //particles are not serialized (maybe?)
         public Dictionary<ParticleClass, List<ParticleInstance>> Particles { get; protected set; } = new Dictionary<ParticleClass, List<ParticleInstance>>();
+
+        /// <summary>
+        /// All of the playing sounds
+        /// </summary>
+        public List<SoundInstance> Sounds { get; set; } = new List<SoundInstance>();
 
         public HashSet<Script> Scripts { get; set; } = new HashSet<Script>();
 
@@ -372,7 +376,14 @@ namespace Takai.Game
             instance.Forward = forward;
             instance.Velocity = velocity;
             instance.Instance.Play();
-            Sounds.Add(instance);
+
+            var range = Class.TileSize * 5 * sound.Gain;
+            var box = new Rectangle((position - new Vector2(range)).ToPoint(), new Point((int)(range * 2)));
+            var sectors = GetOverlappingSectors(box);
+
+            for (int y = sectors.Top; y < sectors.Bottom; ++y)
+                for (int x = sectors.Left; x < sectors.Right; ++x)
+                    Sectors[y, x].sounds.Add(instance);
         }
 
         public void Spawn(EffectsInstance effects)
