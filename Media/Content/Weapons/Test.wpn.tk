@@ -1,16 +1,16 @@
 GunClass {
-    Projectile: @"Weapons/Projectiles/Pellet.ent.tk";
+    Projectile: @"Weapons/Projectiles/Missile.ent.tk";
 
     MaxAmmo: 200;
-    #RoundsPerBurst: 3;
+    #\RoundsPerBurst: 3;
     #ProjectilesPerRound: 6;
-    MaxBursts: 0;
+    MaxBursts: 3;
     #BurstCooldownTime: 400msec;
-    ChargeTime: 500msec;
+    ChargeTime: 0msec;
     DischargeTime: 50msec;
     CooldownTime: 2sec;
     CanAlwaysCharge: true;
-    ErrorAngle: [-2deg 2deg];
+    ErrorAngle: [-20deg 20deg];
 
     DischargeEffect: {
         Effects: [

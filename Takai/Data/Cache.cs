@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Data
 {
+    //todo: configurable case-sensitivity
+
     /// <summary>
     /// A cache to store previously loaded files
     /// </summary>
@@ -38,7 +40,7 @@ namespace Takai.Data
         /// <summary>
         /// Store a list of late bindings, per file
         /// </summary>
-        private static Dictionary<string, List<LateBindLoad>> lateLoads = new Dictionary<string, List<LateBindLoad>>();
+        private static Dictionary<string, List<LateBindLoad>> lateLoads = new Dictionary<string, List<LateBindLoad>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Custom loaders for specific file extensions (Do not include the first . in the extension)
@@ -60,7 +62,7 @@ namespace Takai.Data
             }
         }
 
-        private static Dictionary<string, ZipArchive> openZips = new Dictionary<string, ZipArchive>(); //todo: load files into case-insensitive dictionary
+        private static Dictionary<string, ZipArchive> openZips = new Dictionary<string, ZipArchive>(StringComparer.OrdinalIgnoreCase);
 
         static Cache()
         {
@@ -242,7 +244,8 @@ namespace Takai.Data
         /// <returns>The loaded object, casted to <typeparamref name="T"/></returns>
         public static T Load<T>(string file, string root = null, bool forceLoad = false)
         {
-            return Serializer.Cast<T>(Load(file, root, forceLoad));
+            var loaded = Load(file, root, forceLoad);
+            return Serializer.Cast<T>(loaded);
         }
 
         public static void SaveAllToFile(string file)
