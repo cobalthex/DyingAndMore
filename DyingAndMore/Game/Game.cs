@@ -188,8 +188,9 @@ namespace DyingAndMore.Game
 
             for (int i = 0; i < (GameInstance.Current.players?.Count ?? 0); ++i)
             {
-                var region = new Rectangle(GameInstance.Current.players[i].Position.ToPoint(), new Point(1));
-                region.Inflate(200, 200);
+                //var region = new Rectangle(GameInstance.Current.players[i].Position.ToPoint(), new Point(1));
+                var region = Map.ActiveCamera.VisibleRegion;
+                region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
                 Map.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
             }
 
@@ -251,6 +252,7 @@ namespace DyingAndMore.Game
                                     var newInst = entity.Class.Instantiate();
                                     newInst.Position = entity.Position;
                                     newInst.Forward = entity.Forward;
+                                    newInst.Velocity = entity.Velocity;
                                     newEnts.Add(newInst);
 
                                     if (Map.ActiveCamera.Follow == entity)

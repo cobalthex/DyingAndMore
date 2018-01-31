@@ -74,6 +74,8 @@ namespace DyingAndMore.Game.Entities
         private bool isNextTargetSet;
         public TimeSpan TargetTime { get; set; }
 
+        public Vector2 LastKnownTargetPosition { get; set; }
+
         public void SetNextTarget(ActorInstance actor)
         {
             nextTarget = actor;
