@@ -13,7 +13,8 @@ EffectsClass {
                 ColorOverTime: {
                     Values: [
                         [0 Color.Green];
-                        [1 [1 1 1 0]];
+                        [0.8 [0 0 1 0.5]];
+                        [1 [1 0 0 0]];
                     ];
                 };
                 ScaleOverTime: {

@@ -4,7 +4,7 @@ GunClass {
     MaxAmmo: 200;
     #\RoundsPerBurst: 3;
     #ProjectilesPerRound: 6;
-    MaxBursts: 3;
+    #MaxBursts: 3;
     #BurstCooldownTime: 400msec;
     ChargeTime: 0msec;
     DischargeTime: 50msec;
