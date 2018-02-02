@@ -151,6 +151,7 @@ namespace Takai.Game
             else
                 LastPosition = Vector2.Lerp(LastPosition, Position, (1 / dist) * deltaS);
             */
+            actualRotation = MathHelper.Lerp(actualRotation, Rotation, (float)time.ElapsedGameTime.TotalSeconds * (MoveSpeed / 100));
             ActualPosition = Vector2.Lerp(ActualPosition, Position, (float)time.ElapsedGameTime.TotalSeconds * (MoveSpeed / 100));
         }
 

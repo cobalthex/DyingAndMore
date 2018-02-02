@@ -307,7 +307,7 @@ namespace Takai.Game
                     var soundPos = s.Position;
                     var cameraPos = camera.ActualPosition;
                     s.Instance.Volume = MathHelper.Clamp(1 / (Vector2.Distance(soundPos, cameraPos) / 100), 0, 1);
-                    s.Instance.Pan = Util.Determinant(Vector2.Normalize(soundPos - cameraPos), s.Forward) * s.Instance.Volume;
+                    s.Instance.Pan = Vector2.Dot(Vector2.Normalize(soundPos - cameraPos), Util.Direction(camera.Rotation)) * s.Instance.Volume;
                     Sounds[i] = s;
                 }
             }
