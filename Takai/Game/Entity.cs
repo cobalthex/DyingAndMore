@@ -203,8 +203,6 @@ namespace Takai.Game
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
-
-            //todo: default animation
             PlayAnimation("Idle");
         }
 
@@ -246,7 +244,6 @@ namespace Takai.Game
 
             r = new Rectangle(min.ToPoint(), (max - min).ToPoint());
 
-
             //todo: parent/child relationships
 
             AxisAlignedBounds = r;
@@ -278,6 +275,8 @@ namespace Takai.Game
         /// </summary>
         public virtual void OnSpawn()
         {
+            PlayAnimation("Idle");
+
             var fx = Class.SpawnEffect?.Create(this);
             if (fx.HasValue)
                 Map.Spawn(fx.Value);
@@ -321,6 +320,16 @@ namespace Takai.Game
         public float ForwardSpeed()
         {
             return Vector2.Dot(Forward, Velocity);
+        }
+
+        /// <summary>
+        /// Is this entity alive and owned by the specified map
+        /// </summary>
+        /// <param name="map">The map to check</param>
+        /// <returns>True if this entity is alive and in this map</returns>
+        public bool IsAliveIn(MapInstance map)
+        {
+            return IsAlive && Map == map;
         }
 
         //collision material fx (all entities get a material, map gets its own)

@@ -65,20 +65,6 @@ namespace Takai.Game
             set
             {
                 _class = value;
-
-                if (_class != null)
-                {
-                    Sound.Instance?.Dispose();
-                    if (_class.Sound != null)
-                    {
-                        Sound = _class.Sound.Instantiate();
-                        if (Sound.Instance != null)
-                        {
-                            Sound.Instance.IsLooped = Class.Type == AnimationType.Base;
-                            Sound.Instance.Play();
-                        }
-                    }
-                }
             }
         }
         private AnimationClass _class;
@@ -160,6 +146,14 @@ namespace Takai.Game
                 var instance = animClass.Instantiate();
                 instance.CompletionCallback = completionCallback;
 
+                if (Map != null)
+                {
+                    if (animClass.EnterEffect != null)
+                        Map.Spawn(animClass.EnterEffect.Create(this));
+
+                    if (animClass.Sound != null)
+                        Map.Spawn(animClass.Sound.Instantiate(this));
+                }
                 if (animClass.Type == AnimationType.Base)
                 {
                     if (baseAnimation.Class == animClass)
@@ -177,8 +171,6 @@ namespace Takai.Game
                     overlayAnimations.Add(instance);
                 }
 
-                if (animClass.EnterEffect != null && Map != null)
-                    Map.Spawn(animClass.EnterEffect.Create(this));
 
                 Radius = MathHelper.Max(Radius, animClass.Radius);
                 if (animClass.Sprite != null)

@@ -259,6 +259,8 @@ namespace Takai.Data
                             return @int * 1000;
                         if (unit.Equals("min", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
                             return @int * 1000 * 60;
+                        else if (unit.Equals("rpm", StringComparison.OrdinalIgnoreCase)) //convert from rounds per minute (rpm) to milliseconds
+                            return (60 * 1000) / @int;
 
                         //all others get converted to float
                     }
@@ -279,6 +281,8 @@ namespace Takai.Data
                             return @float * Math.PI;
                         else if (unit.Equals("%", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
                             return @float / 100;
+                        else if (unit.Equals("rpm", StringComparison.OrdinalIgnoreCase)) //convert from rounds per minute (rpm) to milliseconds
+                            return (60 * 1000) / @float;
 
                         else if (!unit.Equals("rad", StringComparison.OrdinalIgnoreCase) &&
                                  !unit.Equals("msec", StringComparison.OrdinalIgnoreCase))

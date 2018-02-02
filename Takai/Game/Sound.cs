@@ -19,7 +19,7 @@ namespace Takai.Game
         /// <summary>
         /// The audio to play
         /// </summary>
-        public SoundEffect Sound { get; set; }
+        public SoundEffect Source { get; set; }
         /// <summary>
         /// The dialogue-only subtitle
         /// </summary>
@@ -34,9 +34,16 @@ namespace Takai.Game
         /// </summary>
         public float Gain { get; set; } = 1;
 
+        public bool DestroyIfOwnerDies { get; set; } = true;
+
         public SoundInstance Instantiate()
         {
             return new SoundInstance(this);
+        }
+
+        public SoundInstance Instantiate(EntityInstance owner)
+        {
+            return new SoundInstance(this, owner);
         }
     }
 
@@ -45,6 +52,11 @@ namespace Takai.Game
         public SoundClass Class { get; set; }
 
         public SoundEffectInstance Instance { get; set; }
+
+        /// <summary>
+        /// The owner of this sound. This sound will follow its owner and may be destroyed if <see cref="SoundClass.DestroyIfOwnerDies"/> is true
+        /// </summary>
+        public EntityInstance Owner { get; set; }
 
         public Vector2 Position { get; set; }
         public Vector2 Forward { get; set; }
@@ -55,9 +67,10 @@ namespace Takai.Game
         public SoundInstance(SoundClass @class)
         {
             Class = @class;
+            Owner = null;
 
             if (Class != null)
-                Instance = Class.Sound?.CreateInstance();
+                Instance = Class.Source?.CreateInstance();
             else
                 Instance = null;
 
@@ -69,6 +82,26 @@ namespace Takai.Game
             Position = Vector2.Zero;
             Forward = Vector2.UnitX;
             Velocity = Vector2.Zero;
+        }
+
+        public SoundInstance(SoundClass @class, EntityInstance instance)
+        {
+            Class = @class;
+            Owner = instance;
+
+            if (Class != null)
+                Instance = Class.Source?.CreateInstance();
+            else
+                Instance = null;
+
+            if (Instance != null)
+            {
+                Instance.Volume = Class.Gain;
+            }
+
+            Position = instance.Position;
+            Forward = instance.Forward;
+            Velocity = instance.Velocity;
         }
     }
 }

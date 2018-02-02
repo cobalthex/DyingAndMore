@@ -1039,6 +1039,24 @@ namespace Takai.UI
         }
 
         /// <summary>
+        /// Enumerate through all children and their descendents recursively (including this)
+        /// </summary>
+        /// <returns>An enumerator to all elements</returns>
+        public IEnumerable<Static> EnumerateRecursive()
+        {
+            yield return this;
+
+            Stack<Static> children = new Stack<Static>(Children);
+            while (children.Count > 0)
+            {
+                var top = children.Pop();
+                yield return top;
+                foreach (var child in top.Children)
+                    children.Push(child);
+            }
+        }
+
+        /// <summary>
         /// Convert a member name to a more english-friendly name
         /// This includes adding spaces and correct capitalization
         /// </summary>

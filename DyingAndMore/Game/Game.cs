@@ -25,7 +25,7 @@ namespace DyingAndMore.Game
     public class GameInstance
     {
         //move into Game?
-        public TimeSpan ElapsedTime { get; set; }
+        public TimeSpan ElapsedRealTime { get; set; }
 
         public static GameInstance Current;
 
@@ -124,7 +124,7 @@ namespace DyingAndMore.Game
 
         protected override void OnMapChanged(EventArgs e)
         {
-            GameInstance.Current.ElapsedTime = TimeSpan.Zero;
+            GameInstance.Current.ElapsedRealTime = TimeSpan.Zero;
 
             Map.updateSettings = MapInstance.UpdateSettings.Game;
             Map.renderSettings = MapInstance.RenderSettings.Default;
@@ -169,15 +169,19 @@ namespace DyingAndMore.Game
             x = false;
         }
 
+        string GetClockText(TimeSpan time)
+        {
+            return $"{(int)time.TotalHours:D2}:"
+                    + $"{time.Minutes:D2}:"
+                    + $"{time.Seconds:D2}."
+                    + $"{time.Milliseconds:D3}";
+        }
 
         bool x = false;
         protected override void UpdateSelf(GameTime time)
         {
-            GameInstance.Current.ElapsedTime += time.ElapsedGameTime;
-            clockDisplay.Text = $"{(int)GameInstance.Current.ElapsedTime.TotalHours:D2}:"
-                              + $"{GameInstance.Current.ElapsedTime.Minutes:D2}:"
-                              + $"{GameInstance.Current.ElapsedTime.Seconds:D2}."
-                              + $"{GameInstance.Current.ElapsedTime.Milliseconds:D3}";
+            GameInstance.Current.ElapsedRealTime += time.ElapsedGameTime;
+            clockDisplay.Text = $"{GetClockText(GameInstance.Current.ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}";
             clockDisplay.AutoSize();
 
             if(!x)

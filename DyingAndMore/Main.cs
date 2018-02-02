@@ -55,8 +55,8 @@ namespace DyingAndMore
         {
             gdm = new GraphicsDeviceManager(this)
             {
-                PreferredBackBufferWidth = 1280,
-                PreferredBackBufferHeight = 800,
+                PreferredBackBufferWidth = 1600,
+                PreferredBackBufferHeight = 900,
                 PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
                 //PreferMultiSampling = true,
                 GraphicsProfile = GraphicsProfile.HiDef,
