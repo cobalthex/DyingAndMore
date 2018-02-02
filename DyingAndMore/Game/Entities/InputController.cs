@@ -76,14 +76,6 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(System.TimeSpan deltaTime)
         {
-            var color = Color.MediumAquamarine;
-
-            var trace = Actor.Map.Trace(Actor.Position, Actor.Forward, 0, Actor);
-            if (trace.entity != null)
-                color = Color.Tomato;
-
-            Actor.Map.DrawLine(Actor.Position, Actor.Position + Actor.Forward * trace.distance, color);
-
             var d = Vector2.Zero;
             if (InputState.IsButtonDown(Keys.W))
                 d -= Vector2.UnitY;

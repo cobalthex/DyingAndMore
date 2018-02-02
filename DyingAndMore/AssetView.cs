@@ -14,6 +14,8 @@ namespace DyingAndMore
 
         SoundEffectInstance activeSound;
 
+        public bool ShowNonPreviewableItems { get; set; } = true;
+
         public AssetView()
         {
             BackgroundColor = Xna.Color.Black;
@@ -29,7 +31,7 @@ namespace DyingAndMore
 
             foreach (var obj in Takai.Data.Cache.Objects)
             {
-                if (!(obj.Value is IDisposable))
+                if (!(obj.Value is IDisposable) && !ShowNonPreviewableItems)
                     continue;
 
                 var listItem = new Static()
@@ -135,6 +137,41 @@ namespace DyingAndMore
                 view.ReplaceAllChildren(list);
 
                 activeSound.Play();
+            }
+            else if (asset is Takai.Game.EntityClass ent)
+            {
+                var anim = System.Linq.Enumerable.FirstOrDefault(ent.Animations.Values);
+                if (anim != null && anim.Sprite != null)
+                {
+                    var gfx = new Graphic()
+                    {
+                        Sprite = anim.Sprite,
+                        HorizontalAlignment = Alignment.Middle,
+                        VerticalAlignment = Alignment.Middle,
+                    };
+                    gfx.AutoSize(10);
+                    view.ReplaceAllChildren(gfx);
+                }
+            }
+            else if (asset is Static ui)
+            {
+                //ui = ui.Clone();
+                //foreach (var child in ui.EnumerateRecursive())
+                //{
+                //}
+                view.ReplaceAllChildren(ui);
+            }
+            else
+            {
+                var text = new Static
+                {
+                    Text = "No Preview",
+                    Color = new Xna.Color(1, 1, 1, 0.5f),
+                    HorizontalAlignment = Alignment.Middle,
+                    VerticalAlignment = Alignment.Middle,
+                };
+                text.AutoSize(10);
+                view.ReplaceAllChildren(text);
             }
         }
 

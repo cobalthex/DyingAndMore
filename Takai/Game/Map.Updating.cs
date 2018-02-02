@@ -121,6 +121,8 @@ namespace Takai.Game
             //remove entities that have been destroyed
             foreach (var entity in entsToDestroy)
             {
+                if (entity.Map != this)
+                    continue; //delete may be being called twice?
                 FinalDestroy(entity);
                 RemoveFromSectors(entity);
             }
@@ -147,9 +149,10 @@ namespace Takai.Game
                         var deltaVLen = deltaV.Length();
                         var direction = deltaV / deltaVLen;
 
-                        var start = entity.Position + ((entity.Radius + 1) * direction);
+                        var offset = entity.Radius + 1;
+                        var start = entity.Position + (offset * direction);
                         var hit = Trace(start, direction, deltaVLen, entity);
-                        var target = start + (direction * hit.distance);
+                        var target = start + (direction * (hit.distance - offset));
 
                         if (hit.entity == null) //map collision
                         {
@@ -275,16 +278,43 @@ namespace Takai.Game
             {
                 for (int i = 0; i < Sounds.Count; ++i)
                 {
+                    var s = Sounds[i];
+                    s.Instance.Resume();
                     //handle sound positioning here (relative to camera)
 
-                    if (Sounds[i].Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Stopped)
+                    if (s.Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Stopped)
                     {
-                        Sounds[i].Instance.Dispose();
-                        Sounds[i] = Sounds[Sounds.Count - 1];
+                        s.Instance.Dispose();
+                        s = Sounds[Sounds.Count - 1];
                         Sounds.RemoveAt(Sounds.Count - 1);
                         --i;
+                        continue;
                     }
+
+                    if (s.Owner != null)
+                    {
+                        s.Position = s.Owner.Position;
+                        s.Forward = s.Owner.Forward;
+                        s.Velocity = s.Owner.Velocity;
+
+                        if (!s.Owner.IsAliveIn(this) && s.Class.DestroyIfOwnerDies)
+                        {
+                            s.Instance.Stop();
+                            continue;
+                        }
+                    }
+
+                    var soundPos = s.Position;
+                    var cameraPos = camera.ActualPosition;
+                    s.Instance.Volume = MathHelper.Clamp(1 / (Vector2.Distance(soundPos, cameraPos) / 100), 0, 1);
+                    s.Instance.Pan = Util.Determinant(Vector2.Normalize(soundPos - cameraPos), s.Forward) * s.Instance.Volume;
+                    Sounds[i] = s;
                 }
+            }
+            else
+            {
+                for (int i = 0; i < Sounds.Count; ++i)
+                    Sounds[i].Instance.Pause();
             }
 
             #endregion

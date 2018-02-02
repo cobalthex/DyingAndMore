@@ -224,6 +224,14 @@ namespace Takai.Game
             Resize(Class.Width, Class.Height);
         }
 
+        ~MapInstance()
+        {
+            foreach (var sound in Sounds)
+            {
+                sound.Instance.Dispose();
+            }
+        }
+
         #region Spawning/Destroying
 
         /// <summary>
@@ -368,22 +376,32 @@ namespace Takai.Game
 
         public void Spawn(SoundClass sound, Vector2 position, Vector2 forward, Vector2 velocity)
         {
-            if (sound.Sound == null)
+            if (sound.Source == null)
                 return;
 
             var instance = sound.Instantiate();
             instance.Position = position;
             instance.Forward = forward;
             instance.Velocity = velocity;
-            instance.Instance.Play();
+            Spawn(instance);
+        }
 
-            var range = Class.TileSize * 5 * sound.Gain;
-            var box = new Rectangle((position - new Vector2(range)).ToPoint(), new Point((int)(range * 2)));
+        public void Spawn(SoundInstance sound)
+        {
+            if (sound.Instance == null)
+                return; //logical sounds?
+
+            sound.Instance.Play();
+
+            var range = Class.TileSize * 5 * sound.Class.Gain;
+            var box = new Rectangle((sound.Position - new Vector2(range)).ToPoint(), new Point((int)(range * 2)));
             var sectors = GetOverlappingSectors(box);
+
+            Sounds.Add(sound);
 
             for (int y = sectors.Top; y < sectors.Bottom; ++y)
                 for (int x = sectors.Left; x < sectors.Right; ++x)
-                    Sectors[y, x].sounds.Add(instance);
+                    Sectors[y, x].sounds.Add(sound);
         }
 
         public void Spawn(EffectsInstance effects)

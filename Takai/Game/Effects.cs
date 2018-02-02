@@ -88,7 +88,7 @@ namespace Takai.Game
     public class RandomEffect : IGameEffect
     {
         public List<IGameEffect> Effects { get; set; }
-        public Range<int> Count { get; set; } = 0;
+        public Range<int> Count { get; set; } = 1;
 
         public void Spawn(EffectsInstance instance)
         {
@@ -97,7 +97,7 @@ namespace Takai.Game
 
             for (int i = 0; i < RandomRange.Next(Count); ++i)
             {
-                var which = RandomRange.RandomGenerator.Next(0, Effects.Count - 1);
+                var which = RandomRange.RandomGenerator.Next(0, Effects.Count);
                 Effects[which].Spawn(instance);
             }
         }
