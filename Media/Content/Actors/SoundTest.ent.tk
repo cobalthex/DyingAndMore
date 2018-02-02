@@ -1,0 +1,34 @@
+ActorClass {
+	Name: "Sound Test";
+	MaxHealth: 500;
+    DestroyOnDeath: false;
+
+    Animations: {
+    	Idle: {
+    		Sprite: {
+				Texture: @"./SoundTest.png";
+                FrameLength: 100msec;
+                FrameCount: 6;
+                Height: 48;
+                Width: 48;
+                IsLooping: true;
+                Tween: TweenStyle.Overlap;
+    		};
+            Sound: SoundClass {
+                Source: @"Mech8.ogg";
+            }
+    	};
+        Dead: {
+            Sprite: {
+                Texture: @"./SoundTest.png";
+                FrameLength: 0.5sec;
+                FrameCount: 2;
+                Height: 48;
+                Width: 48;
+                ClipRect: [0 48 96 48];
+                IsLooping: false;
+                Tween: TweenStyle.Overlap;
+            };
+        };
+    };
+};

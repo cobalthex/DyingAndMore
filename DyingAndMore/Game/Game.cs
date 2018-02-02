@@ -201,7 +201,7 @@ namespace DyingAndMore.Game
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
-            crapDisplay.Text = $"TimeScale:{Map.TimeScale}\nZoom:{Map.ActiveCamera.Scale}";
+            crapDisplay.Text = $"TimeScale:{Map.TimeScale:N1}\nZoom:{Map.ActiveCamera.Scale:N1}";
             crapDisplay.AutoSize();
 
             base.UpdateSelf(time);
@@ -377,6 +377,8 @@ namespace DyingAndMore.Game
             {
                 if (InputState.IsMod(KeyMod.Control))
                     Map.TimeScale += Math.Sign(scrollDelta) * 0.1f;
+                else if (InputState.IsMod(KeyMod.Alt))
+                    Map.ActiveCamera.Rotation += Math.Sign(scrollDelta) * MathHelper.PiOver4;
                 else
                     Map.ActiveCamera.Scale += Math.Sign(scrollDelta) * 0.1f;
             }
