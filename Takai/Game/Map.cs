@@ -392,6 +392,8 @@ namespace Takai.Game
                 return; //logical sounds?
 
             sound.Instance.Play();
+            if (!updateSettings.isSoundEnabled)
+                sound.Instance.Pause();
 
             var range = Class.TileSize * 5 * sound.Class.Gain;
             var box = new Rectangle((sound.Position - new Vector2(range)).ToPoint(), new Point((int)(range * 2)));

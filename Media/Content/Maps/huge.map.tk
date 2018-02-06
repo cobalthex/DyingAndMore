@@ -36,6 +36,12 @@ MapClass {
                 Forward: [1 0];
                 Name: Null;
             }
+            EntitySpawn {
+                Class: @"Actors/SoundTest.ent.tk";
+                Position: [283.5273 996.1091];
+                Forward: [1 0];
+                Name: Null;
+            }
         ];
         Fluids: [];
         Decals: [];

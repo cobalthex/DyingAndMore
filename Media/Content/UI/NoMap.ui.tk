@@ -5,6 +5,17 @@ List {
     VerticalAlignment: Alignment.Middle;
 
     Children: [
+        Graphic {
+            Sprite: {
+                Texture: @"Promo/YoureAllDiseased.png";
+            }
+            AutoSize: true;
+            HorizontalAlignment: Alignment.Middle;
+        };
+        Static {
+            Height: 50px;
+        }
+
         Static {
             Text: "No map loaded";
             Font: @"UI/Fonts/UILarge.bfnt";

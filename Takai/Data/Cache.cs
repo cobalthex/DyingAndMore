@@ -8,6 +8,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Data
 {
+    /// <summary>
+    /// a hacky workaround to the awkwardness that is SoundEffect/instance
+    /// </summary>
+    public interface ISoundSource : IDisposable
+    {
+        SoundEffectInstance Instantiate();
+    }
+
     //todo: configurable case-sensitivity
 
     /// <summary>
@@ -42,12 +50,18 @@ namespace Takai.Data
         /// </summary>
         private static Dictionary<string, List<LateBindLoad>> lateLoads = new Dictionary<string, List<LateBindLoad>>(StringComparer.OrdinalIgnoreCase);
 
+        public abstract class CustomLoader
+        {
+            public virtual bool PreserveStream { get; protected set; } = false; //useful for streaming contexts
+            public abstract object Load(CustomLoad load);
+        }
+
         /// <summary>
         /// Custom loaders for specific file extensions (Do not include the first . in the extension)
         /// All other formats will be deserialized using the Serializer
         /// </summary>
-        public static Dictionary<string, Func<CustomLoad, object>> CustomLoaders { get; private set; }
-            = new Dictionary<string, Func<CustomLoad, object>>(StringComparer.OrdinalIgnoreCase);
+        public static Dictionary<string, CustomLoader> CustomLoaders { get; private set; }
+            = new Dictionary<string, CustomLoader>(StringComparer.OrdinalIgnoreCase);
 
         private static Dictionary<string, CachedFile> objects;
         public static IEnumerable<KeyValuePair<string, object>> Objects
@@ -68,21 +82,23 @@ namespace Takai.Data
         {
             objects = new Dictionary<string, CachedFile>(StringComparer.OrdinalIgnoreCase);
 
-            CustomLoaders.Add("png", LoadTexture);
-            CustomLoaders.Add("jpg", LoadTexture);
-            CustomLoaders.Add("jpeg", LoadTexture);
-            CustomLoaders.Add("tga", LoadTexture);
-            CustomLoaders.Add("tiff", LoadTexture);
-            CustomLoaders.Add("bmp", LoadTexture);
-            CustomLoaders.Add("gif", LoadTexture);
+            var loadTex = new TextureLoader();
+            CustomLoaders.Add("png",  loadTex);
+            CustomLoaders.Add("jpg",  loadTex);
+            CustomLoaders.Add("jpeg", loadTex);
+            CustomLoaders.Add("tga",  loadTex);
+            CustomLoaders.Add("tiff", loadTex);
+            CustomLoaders.Add("bmp",  loadTex);
+            CustomLoaders.Add("gif",  loadTex);
 
-            CustomLoaders.Add("bfnt", LoadBitmapFont);
+            CustomLoaders.Add("bfnt", new BitmapFontLoader());
 
-            CustomLoaders.Add("ogg", LoadOgg);
-            CustomLoaders.Add("wav", LoadSound);
-            CustomLoaders.Add("mp3", UnsuportedExtension);
+            CustomLoaders.Add("ogg", new OggLoader());
+            CustomLoaders.Add("wav", new SoundLoader());
+            CustomLoaders.Add("mp3", new UnsupportedLoader());
 
-            CustomLoaders.Add("mgfx", LoadEffect);
+            CustomLoaders.Add("mgfx", new EffectLoader());
+            CustomLoaders.Add("fx", new UnsupportedLoader());
         }
 
         /// <summary>
@@ -126,6 +142,8 @@ namespace Takai.Data
 
             root = root ?? DefaultRoot;
             file = Normalize(file);
+
+            //var swatch = System.Diagnostics.Stopwatch.StartNew();
 
             string realFile;
             if (PathStartsWith(file, DefaultRoot) && root == DefaultRoot)
@@ -183,11 +201,17 @@ namespace Takai.Data
                     load.stream = fi.OpenRead();
                 }
 
+                //System.Diagnostics.Debug.WriteLine($"Cache: Loading {load.name} (Size: {(load.length / 1024f):N1} KiB)");
+
                 try
                 {
                     var ext = GetExtension(file);
                     if (CustomLoaders.TryGetValue(ext, out var loader))
-                        obj.reference = new WeakReference(loader?.Invoke(load));
+                    {
+                        obj.reference = new WeakReference(loader.Load(load));
+                        if (!loader.PreserveStream)
+                            load.stream.Dispose();
+                    }
                     else
                     {
                         var context = new Serializer.DeserializationContext
@@ -202,9 +226,10 @@ namespace Takai.Data
                         obj.reference = new WeakReference(deserialized);
                         if (obj.reference.Target is ISerializeExternally sxt)
                             sxt.File = file;
+                        load.stream.Dispose();
                     }
                 }
-                finally
+                catch
                 {
                     load.stream.Dispose();
                 }
@@ -229,6 +254,9 @@ namespace Takai.Data
             }
             else
                 objects[realFile] = obj;
+
+            //swatch.Stop();
+            //System.Diagnostics.Debug.WriteLine($"Cache: loaded {file} in {swatch.ElapsedMilliseconds} msec");
 
             return obj.reference.Target;
         }
@@ -318,77 +346,155 @@ namespace Takai.Data
 
         #region Custom Loaders
 
-        internal static object UnsuportedExtension(CustomLoad load)
+        class UnsupportedLoader : CustomLoader
         {
-            throw new NotSupportedException($"Reading from {Path.GetExtension(load.file)} is not supported");
-        }
-
-        internal static object LoadTexture(CustomLoad load)
-        {
-            var loaded = Texture2D.FromStream(Runtime.GraphicsDevice, load.stream);
-            loaded.Name = load.name;
-            return loaded;
-        }
-
-        internal static object LoadBitmapFont(CustomLoad load)
-        {
-            var loaded = Graphics.BitmapFont.FromStream(Runtime.GraphicsDevice, load.stream);
-            //loaded.Name = load.name; //todo
-            return loaded;
-        }
-
-        internal static object LoadOgg(CustomLoad load)
-        {
-            using (var vorbis = new NVorbis.VorbisReader(load.stream, false))
+            public override object Load(CustomLoad load)
             {
-                if (vorbis.Channels < 1 || vorbis.Channels > 2)
-                    throw new FormatException($"Audio must be in mono or stero (provided: {vorbis.Channels})");
+                throw new NotSupportedException($"Reading from {Path.GetExtension(load.file)} is not supported");
+            }
+        }
 
-                if (vorbis.SampleRate < 8000 || vorbis.SampleRate > 48000)
-                    throw new FormatException($"Audio must be between 8kHz and 48kHz (provided: {vorbis.SampleRate}Hz");
+        class TextureLoader : CustomLoader
+        {
+            public override object Load(CustomLoad load)
+            {
+                var loaded = Texture2D.FromStream(Runtime.GraphicsDevice, load.stream);
+                loaded.Name = load.name;
+                return loaded;
+            }
+        }
 
-                //todo: 16bit pcm can maybe be retrieved directly from load
+        class BitmapFontLoader : CustomLoader
+        {
+            public override object Load(CustomLoad load)
+            {
+                var loaded = Graphics.BitmapFont.FromStream(Runtime.GraphicsDevice, load.stream);
+                //loaded.Name = load.name; //todo
+                return loaded;
+            }
+        }
+        public class SoundEffectSoundSource : ISoundSource
+        {
+            public SoundEffect sound;
 
-                var total = (int)(vorbis.TotalSamples * vorbis.Channels);
+            public SoundEffectInstance Instantiate()
+            {
+                return sound.CreateInstance();
+            }
 
-                var buffer = new float[total]; //-1 to 1
-                if (vorbis.ReadSamples(buffer, 0, total) <= 0)
+            public void Dispose()
+            {
+                sound.Dispose();
+            }
+        }
+
+        public class OggSoundSource : ISoundSource
+        {
+            public NVorbis.VorbisReader vorbis;
+
+            //assumes single threaded
+            float[] intermediate; //might be able to get directly from ogg
+            byte[] samples;
+            long readOffset;
+
+            //nvorbis logical streams?
+
+            public OggSoundSource(NVorbis.VorbisReader vorbis)
+            {
+                this.vorbis = vorbis;
+                var sampleCount = Math.Min(vorbis.TotalSamples, 128 * 1024);
+                intermediate = new float[sampleCount];
+                samples = new byte[sampleCount * 2]; //16 bit PCM
+            }
+
+            public SoundEffectInstance Instantiate()
+            {
+                var instance = new DynamicSoundEffectInstance(vorbis.SampleRate, (AudioChannels)vorbis.Channels);
+                instance.BufferNeeded += Instance_BufferNeeded;
+                Instance_BufferNeeded(instance, EventArgs.Empty); //preload first buffer
+                return instance;
+            }
+
+            private void Instance_BufferNeeded(object sender, EventArgs e)
+            {
+                var instance = (DynamicSoundEffectInstance)sender;
+
+                var read = vorbis.ReadSamples(intermediate, 0, intermediate.Length);
+                if (read <= 0)
                     throw new IOException("Error reading Ogg Vorbis samples");
+                readOffset += read;
 
-                //convert 32 bit float to 16 bit PCM
-                //todo: aliasing issues?
-                var samples = new byte[total * 2];
-                for (int i = 0; i < buffer.Length; ++i)
+                if (readOffset > vorbis.TotalSamples)
                 {
-                    var n = (short)(buffer[i] * 0x8000);
+                    readOffset = 0;
+                    vorbis.DecodedPosition = 0;
+                }
+
+                //multithread?
+
+                //convert to 16 bit PCM
+                for (int i = 0; i < read; ++i)
+                {
+                    var n = (short)(intermediate[i] * 0x8000);
                     samples[i * 2] = (byte)(n & 0xff);
                     samples[i * 2 + 1] = (byte)((n >> 8) & 0xff);
                 }
 
-                return new SoundEffect(samples, vorbis.SampleRate, (AudioChannels)vorbis.Channels)
+                instance.SubmitBuffer(samples);
+            }
+
+            public void Dispose()
+            {
+                vorbis.Dispose();
+            }
+        }
+
+        class OggLoader : CustomLoader
+        {
+            public override bool PreserveStream => true;
+
+            //todo: use https://github.com/flibitijibibo/Vorbisfile-CS/blob/24e9ece0239da6b03890d47f6118df85d52cf179/Vorbisfile.cs
+
+            public override object Load(CustomLoad load)
+            {
+                var vorbis = new NVorbis.VorbisReader(load.stream, true);
+                if (vorbis.Channels < 1 || vorbis.Channels > 2)
+                    throw new FormatException($"Audio must be in mono or stero (provided: {vorbis.Channels})");
+
+                if (vorbis.SampleRate < 8000 || vorbis.SampleRate > 48000)
+                    throw new FormatException($"Audio must be between 8KHz and 48KHz (provided: {vorbis.SampleRate / 1024:N1}KHz");
+
+                return new OggSoundSource(vorbis);
+            }
+        }
+
+
+        class SoundLoader : CustomLoader
+        {
+            public override object Load(CustomLoad load)
+            {
+                var sound = new SoundEffectSoundSource
+                {
+                    sound = SoundEffect.FromStream(load.stream)
+                };
+                sound.sound.Name = load.name;
+                return sound;
+            }
+        }
+
+        class EffectLoader : CustomLoader
+        {
+            public override object Load(CustomLoad load)
+            {
+                var bytes = new byte[load.length];
+                load.stream.Read(bytes, 0, bytes.Length);
+
+                //load = TransformPath(file, DataFolder, "Shaders", "DX11");
+                return new Effect(Runtime.GraphicsDevice, bytes)
                 {
                     Name = load.name
                 };
             }
-        }
-
-        internal static object LoadSound(CustomLoad load)
-        {
-            var loaded = SoundEffect.FromStream(load.stream);
-            loaded.Name = load.name;
-            return loaded;
-        }
-
-        internal static object LoadEffect(CustomLoad load)
-        {
-            var bytes = new byte[load.length];
-            load.stream.Read(bytes, 0, bytes.Length);
-
-            //load = TransformPath(file, DataFolder, "Shaders", "DX11");
-            return new Effect(Runtime.GraphicsDevice, bytes)
-            {
-                Name = load.name
-            };
         }
 
         internal static Dictionary<string, FileSystemWatcher> fsWatchers = new Dictionary<string, FileSystemWatcher>(StringComparer.OrdinalIgnoreCase);

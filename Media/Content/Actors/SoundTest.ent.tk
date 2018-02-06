@@ -15,7 +15,7 @@ ActorClass {
                 Tween: TweenStyle.Overlap;
     		};
             Sound: SoundClass {
-                Source: @"Mech8.ogg";
+                Source: @"Sounds/open_fx.ogg";
             }
     	};
         Dead: {
