@@ -285,7 +285,8 @@ namespace Takai.Data
                             return (60 * 1000) / @float;
 
                         else if (!unit.Equals("rad", StringComparison.OrdinalIgnoreCase) &&
-                                 !unit.Equals("msec", StringComparison.OrdinalIgnoreCase))
+                                 !unit.Equals("msec", StringComparison.OrdinalIgnoreCase) &&
+                                 !unit.Equals("px", StringComparison.OrdinalIgnoreCase))
                             throw new ArgumentOutOfRangeException($"{unit} is an unknown numeric suffix");
                     }
                     return @float;

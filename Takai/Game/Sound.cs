@@ -8,10 +8,6 @@ namespace Takai.Game
     /// </summary>
     public class SoundClass : IObjectClass<SoundInstance>
     {
-        //todo: use Xact? Audio.Cue/etc
-
-        //todo: streaming audio support (probably will need to use DynamicSoundEffectInstance
-
         public string Name { get; set; }
         [Data.Serializer.Ignored]
         public string File { get; set; }
@@ -19,7 +15,7 @@ namespace Takai.Game
         /// <summary>
         /// The audio to play
         /// </summary>
-        public SoundEffect Source { get; set; }
+        public Takai.Data.ISoundSource Source { get; set; }
         /// <summary>
         /// The dialogue-only subtitle
         /// </summary>
@@ -70,7 +66,7 @@ namespace Takai.Game
             Owner = null;
 
             if (Class != null)
-                Instance = Class.Source?.CreateInstance();
+                Instance = Class.Source?.Instantiate();
             else
                 Instance = null;
 
@@ -90,7 +86,7 @@ namespace Takai.Game
             Owner = instance;
 
             if (Class != null)
-                Instance = Class.Source?.CreateInstance();
+                Instance = Class.Source?.Instantiate();
             else
                 Instance = null;
 

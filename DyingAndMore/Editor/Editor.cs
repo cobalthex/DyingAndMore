@@ -41,6 +41,7 @@ namespace DyingAndMore.Editor
 
         public Editor(Takai.Game.MapInstance map)
         {
+            var swatch = System.Diagnostics.Stopwatch.StartNew();
             config = Cache.Load<EditorConfiguration>("Editor.conf.tk", "Config");
 
             Map = map ?? throw new System.ArgumentNullException("There must be a map to edit");
@@ -73,6 +74,9 @@ namespace DyingAndMore.Editor
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;
 
             resizeDialog = Cache.Load<Static>("UI/Editor/ResizeMap.ui.tk");
+
+            swatch.Stop();
+            Takai.LogBuffer.Append($"Loaded editor and map \"{map.Class.Name}\" ({map.Class.File}) in {swatch.ElapsedMilliseconds}msec");
         }
 
         void AddModes()

@@ -184,7 +184,7 @@ namespace DyingAndMore.Game
             clockDisplay.Text = $"{GetClockText(GameInstance.Current.ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}";
             clockDisplay.AutoSize();
 
-            if(!x)
+            if (!x)
             {
                 x = true;
                 Takai.Data.Cache.CleanupStaleReferences(); //todo: find better place for this (editor needs to be fully out of scope)
@@ -435,8 +435,7 @@ namespace DyingAndMore.Game
                 if (!(ent is Entities.ActorInstance actor))
                     continue;
 
-                var pos = Vector2.Transform(actor.Position, Map.ActiveCamera.Transform)
-                            - new Vector2(ent.Radius * 1.5f * Map.ActiveCamera.Scale);
+                var pos = Map.ActiveCamera.WorldToScreen(actor.Position) - new Vector2(ent.Radius * 1.5f * Map.ActiveCamera.Scale);
 
                 DefaultFont.Draw(spriteBatch, $"{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}", pos, Color.Tomato);
                 if (actor.Weapon is Weapons.GunInstance gun)
@@ -444,6 +443,16 @@ namespace DyingAndMore.Game
                     pos.Y += 15;
                     DefaultFont.Draw(spriteBatch, $"{gun.AmmoCount} {gun.State} {gun.Charge:N2}", pos, Color.LightSteelBlue);
                 }
+            }
+
+            foreach (var sound in Map.Sounds)
+            {
+                DefaultFont.Draw(
+                    spriteBatch,
+                    $"Vol:{sound.Instance.Volume:N2} Pan:{sound.Instance.Pan:N2} Pit:{sound.Instance.Pitch:N2}",
+                    Map.ActiveCamera.WorldToScreen(sound.Position) + new Vector2(0, 50),
+                    Color.Aquamarine
+                );
             }
         }
     }

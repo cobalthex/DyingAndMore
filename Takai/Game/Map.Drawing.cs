@@ -98,8 +98,7 @@ namespace Takai.Game
             public int visibleActiveFluids;
             public int visibleDecals;
         }
-        [Data.Serializer.Ignored]
-        public MapProfilingInfo ProfilingInfo { get { return profilingInfo; } }
+        public MapProfilingInfo ProfilingIngo => profilingInfo;
         protected MapProfilingInfo profilingInfo;
 
         //a collection of primatives to draw next frame (for one frame)
@@ -126,6 +125,7 @@ namespace Takai.Game
             public bool drawEntityBoundingBoxes;
             public bool drawEntityForwardVectors;
             public bool drawPathHeuristic;
+            public bool drawDebugInfo;
 
             public static readonly RenderSettings Default = new RenderSettings
             {
@@ -248,7 +248,7 @@ namespace Takai.Game
             };
 
             Runtime.GraphicsDevice.SetRenderTarget(Class.reflectedRenderTarget);
-            Runtime.GraphicsDevice.Clear(Color.TransparentBlack);
+            Runtime.GraphicsDevice.Clear(Color.Transparent);
 
             if (renderSettings.drawEntities)
                 DrawEntities(ref context);
@@ -257,7 +257,7 @@ namespace Takai.Game
                 DrawParticles(ref context);
 
             Runtime.GraphicsDevice.SetRenderTargets(Class.fluidsRenderTarget, Class.reflectionRenderTarget);
-            Runtime.GraphicsDevice.Clear(Color.TransparentBlack);
+            Runtime.GraphicsDevice.Clear(Color.Transparent);
 
             if (renderSettings.drawFluids ||
                 renderSettings.drawFluidReflectionMask)

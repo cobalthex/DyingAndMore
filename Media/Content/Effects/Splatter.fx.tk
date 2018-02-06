@@ -8,7 +8,6 @@ EffectsClass {
                     Height: 10;
                     FrameCount: 6;
                     FrameLength: 100msec;
-                    Center: true;
                 };
                 DestructionFluid: @"Fluids/Blood.fluid.tk";
                 Blend: BlendState.NonPremultiplied;

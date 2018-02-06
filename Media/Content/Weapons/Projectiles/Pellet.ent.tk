@@ -29,12 +29,17 @@ ProjectileClass {
                         height: 1;
                         frameLength: 50msec;
                         frameCount: 4;
-                        Center: true;
                     };
-                    Blend: BlendState.AlphaBlend;
+                    Blend: BlendState.NonPremultiplied;
                     InitialSpeed: [200 600];
                     Drag: 10;
                     Lifetime: [200msec 300msec];
+                    ColorOverTime: {
+                        Values: [
+                            [0 Color.White];
+                            [1 [127 127 127 0]];
+                        ];
+                    };
                 }
                 Count: [3 12];
                 Spread: [120deg 230deg];

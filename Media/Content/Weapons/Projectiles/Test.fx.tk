@@ -4,7 +4,6 @@ EffectsClass {
             Class: {
                 Sprite: {
                     Texture: @"Effects/Trail.png"
-                    Center: true;
                     Tween: TweenStyle.Overlap;
                 };
                 Blend: BlendState.Additive;

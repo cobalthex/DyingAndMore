@@ -24,7 +24,6 @@ GunClass {
                                 height: 48;
                                 frameLength: 20msec;
                                 frameCount: 4;
-                                Center: true;
                             };
                             Blend: BlendState.AlphaBlend;
                             InitialSpeed: [0 0];
@@ -42,7 +41,6 @@ GunClass {
                                 height: 48;
                                 frameLength: 20msec;
                                 frameCount: 4;
-                                Center: true;
                             };
                             Blend: BlendState.AlphaBlend;
                             InitialSpeed: [0 0];
@@ -62,7 +60,6 @@ GunClass {
                         height: 8;
                         frameLength: 20msec;
                         frameCount: 4;
-                        Center: true;
                         IsLooping: true;
                     };
                     Blend: BlendState.NonPremultiplied;
@@ -71,16 +68,16 @@ GunClass {
                     lifetime: 800msec;
                     ColorOverTime: {
                         Values: [
-                            [0 Color.White]
-                            [1 Color.Transparent]
-                        ]
+                            [0 Color.White];
+                            [1 [64 64 64 0]];
+                        ];
                     };
 
                     ScaleOverTime: {
                         Values: [
                             [0 1]
                             [1 0.5]
-                        ]
+                        ];
                     };
                 }
                 Count: 1;
@@ -89,7 +86,7 @@ GunClass {
 
             SoundImpulse {
                 Class: {
-                    sound: @"open_fx.ogg";
+                    sound: @"Sounds/open_fx.ogg";
                     gain: 0.1;
                 }
             }

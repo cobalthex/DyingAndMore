@@ -304,10 +304,17 @@ namespace Takai.Game
                         }
                     }
 
-                    var soundPos = s.Position;
                     var cameraPos = camera.ActualPosition;
-                    s.Instance.Volume = MathHelper.Clamp(1 / (Vector2.Distance(soundPos, cameraPos) / 100), 0, 1);
-                    s.Instance.Pan = Vector2.Dot(Vector2.Normalize(soundPos - cameraPos), Util.Direction(camera.Rotation)) * s.Instance.Volume;
+
+                    s.Instance.Volume = MathHelper.Clamp(1 / (Vector2.DistanceSquared(s.Position, cameraPos) / 5000), 0, 1);
+
+                    var pan = Vector2.Dot(Vector2.Normalize(s.Position - cameraPos), Util.Direction(camera.Rotation)) * s.Instance.Volume;
+                    s.Instance.Pan = (float)Math.Pow(pan, 2); //add some bias towards 1
+
+                    var sos = 200;
+                    var pitch = 1 - ((sos + camera.Follow.Velocity.LengthSquared()) / (sos + s.Velocity.LengthSquared()));
+                    s.Instance.Pitch = MathHelper.Clamp(pitch, -1, 1);
+
                     Sounds[i] = s;
                 }
             }

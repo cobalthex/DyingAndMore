@@ -19,7 +19,6 @@ GunClass {
                         height: 48;
                         frameLength: 40msec;
                         frameCount: 4;
-                        Center: true;
                     };
                     Blend: BlendState.AlphaBlend;
                     InitialSpeed: [0 0];
@@ -32,7 +31,7 @@ GunClass {
 
             SoundImpulse {
                 Class: {
-                    sound: @"open_fx.ogg";
+                    sound: @"Sounds/open_fx.ogg";
                     gain: 0.1;
                 }
             }
