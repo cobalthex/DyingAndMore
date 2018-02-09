@@ -69,13 +69,15 @@ namespace Takai.Data
         static Serializer()
         {
             RegisteredTypes = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+            LoadTypesFrom(typeof(Serializer).GetTypeInfo().Assembly);
+
             Serializers = new Dictionary<Type, CustomTypeSerializer>();
+            LoadXnaSerializers();
+        }
 
-            LoadTypesFrom(Assembly.GetExecutingAssembly());
-
-            //default custom serializers
-
-            Serializers.Add(typeof(Vector2), new CustomTypeSerializer
+        public static void LoadXnaSerializers()
+        {
+            Serializers[typeof(Vector2)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
                 Deserialize = (object value, DeserializationContext cxt) =>
@@ -85,9 +87,9 @@ namespace Takai.Data
                     var y = (float)Convert.ChangeType(v[1], typeof(float));
                     return new Vector2(x, y);
                 }
-            });
+            };
 
-            Serializers.Add(typeof(Vector3), new CustomTypeSerializer
+            Serializers[typeof(Vector3)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
                 Deserialize = (object value, DeserializationContext cxt) =>
@@ -98,9 +100,9 @@ namespace Takai.Data
                     var z = (float)Convert.ChangeType(v[2], typeof(float));
                     return new Vector3(x, y, z);
                 }
-            });
+            };
 
-            Serializers.Add(typeof(Vector4), new CustomTypeSerializer
+            Serializers[typeof(Vector4)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
                 Deserialize = (object value, DeserializationContext cxt) =>
@@ -112,9 +114,9 @@ namespace Takai.Data
                     var w = (float)Convert.ChangeType(v[3], typeof(float));
                     return new Vector4(x, y, z, w);
                 }
-            });
+            };
 
-            Serializers.Add(typeof(Point), new CustomTypeSerializer
+            Serializers[typeof(Point)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
                 Deserialize = (object value, DeserializationContext cxt) =>
@@ -124,9 +126,9 @@ namespace Takai.Data
                     var y = (int)Convert.ChangeType(v[1], typeof(int));
                     return new Point(x, y);
                 }
-            });
+            };
 
-            Serializers.Add(typeof(Rectangle), new CustomTypeSerializer
+            Serializers[typeof(Rectangle)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => { var r = (Rectangle)value; return new[] { r.X, r.Y, r.Width, r.Height }; },
                 Deserialize = (object value, DeserializationContext cxt) =>
@@ -138,9 +140,9 @@ namespace Takai.Data
                     var height = (int)Convert.ChangeType(v[3], typeof(int));
                     return new Rectangle(x, y, width, height);
                 }
-            });
+            };
 
-            Serializers.Add(typeof(Color), new CustomTypeSerializer
+            Serializers[typeof(Color)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => { var c = (Color)value; return new[] { c.R, c.G, c.B, c.A }; },
                 Deserialize = (object value, DeserializationContext cxt) =>
@@ -152,34 +154,35 @@ namespace Takai.Data
                     var a = v.Count > 3 ? (int)Convert.ChangeType(v[3], typeof(int)) : 255;
                     return new Color(r, g, b, a);
                 }
-            });
+            };
 
-            Serializers.Add(typeof(Curve), new CustomTypeSerializer
+            Serializers[typeof(Curve)] = new CustomTypeSerializer
             {
-                Deserialize = (object value, DeserializationContext cxt) => {
+                Deserialize = (object value, DeserializationContext cxt) =>
+                {
                     return null; //todo
-                },
-            });
+                }
+            };
 
-            Serializers.Add(typeof(Texture2D), new CustomTypeSerializer
+            Serializers[typeof(Texture2D)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((Texture2D)value).Name; },
                 Deserialize = (object value, DeserializationContext cxt) => { return Cache.Load<Texture2D>((string)value, cxt.root); } //todo: pass in serialization context
-            });
+            };
 
-            Serializers.Add(typeof(SoundEffect), new CustomTypeSerializer
+            Serializers[typeof(SoundEffect)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((SoundEffect)value).Name; },
                 Deserialize = (object value, DeserializationContext cxt) => { return Cache.Load<SoundEffect>((string)value, cxt.root); }
-            });
+            };
 
-            Serializers.Add(typeof(TimeSpan), new CustomTypeSerializer
+            Serializers[typeof(TimeSpan)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((TimeSpan)value).TotalMilliseconds; },
                 Deserialize = (object value, DeserializationContext cxt) => { return TimeSpan.FromMilliseconds((double)Convert.ChangeType(value, typeof(double))); }
-            });
+            };
 
-            Serializers.Add(typeof(BlendState), new CustomTypeSerializer
+            Serializers[typeof(BlendState)] = new CustomTypeSerializer
             {
                 Serialize = (object value) =>
                 {
@@ -193,13 +196,8 @@ namespace Takai.Data
                         return "BlendState.Opaque";
 
                     return DefaultAction;
-                },
-            });
-        }
-
-        public static void LoadRunningAssemblyTypes()
-        {
-            LoadTypesFrom(Assembly.GetEntryAssembly());
+                }
+            };
         }
 
         /// <summary>
@@ -214,9 +212,10 @@ namespace Takai.Data
             Type[] types = assembly.GetTypes();
             foreach (var type in types)
             {
-                if (!type.IsGenericType &&
-                    !Attribute.IsDefined(type, typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false) &&
-                    !Attribute.IsDefined(type, typeof(IgnoredAttribute), true))
+                var typeInfo = type.GetTypeInfo();
+                if (!type.GetTypeInfo().IsGenericType &&
+                    !typeInfo.IsDefined(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute)) &&
+                    !typeInfo.IsDefined(typeof(IgnoredAttribute), true))
                     RegisterType(type);
             }
 
@@ -249,14 +248,16 @@ namespace Takai.Data
             if (mtype == null)
                 return null;
 
+            var mTypeInfo = mtype.GetTypeInfo();
+
             string name;
-            if (mtype.IsEnum)
+            if (mTypeInfo.IsEnum)
             {
                 name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
-                bool isFlags = mtype.GetCustomAttribute(typeof(FlagsAttribute)) != null;
+                bool isFlags = mTypeInfo.IsDefined(typeof(FlagsAttribute));
                 return name + $"{(isFlags ? "[" : "(")}{string.Join(" ", Enum.GetNames(mtype))}{(isFlags ? "]" : ")")}"; //todo
             }
-            else if (mtype.IsGenericType)
+            else if (mTypeInfo.IsGenericType)
             {
                 name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
                 name = name.Substring(0, name.IndexOf('`')) + '<';
@@ -280,30 +281,23 @@ namespace Takai.Data
         {
             var dict = new Dictionary<string, object>();
 
-            if (type.IsEnum)
+            var typeInfo = type.GetTypeInfo();
+            if (typeInfo.IsEnum)
             {
-                foreach (var val in type.GetEnumValues())
-                    dict[type.GetEnumName(val)] = Convert.ToInt64(val);
+                foreach (var val in Enum.GetValues(type))
+                    dict[Enum.GetName(type, val)] = Convert.ToInt64(val);
                 return dict;
             }
 
             foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (Attribute.IsDefined(member, typeof(IgnoredAttribute)))
+                if (member.IsDefined(typeof(IgnoredAttribute)))
                     continue;
 
-                switch (member.MemberType)
-                {
-                    case MemberTypes.Field:
-                        dict[member.Name] = DescribeMemberType(((FieldInfo)member).FieldType);
-                        break;
-                    case MemberTypes.Property:
-                        if (((PropertyInfo)member).CanWrite)
-                            dict[member.Name] = DescribeMemberType(((PropertyInfo)member).PropertyType);
-                        break;
-                    default:
-                        break;
-                }
+                if (member is PropertyInfo p)
+                    dict[p.Name] = DescribeMemberType(p.PropertyType);
+                else if (member is FieldInfo f)
+                    dict[f.Name] = DescribeMemberType(f.FieldType);
             }
 
             //todo: handle derived +,custom *

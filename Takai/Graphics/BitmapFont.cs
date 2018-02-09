@@ -114,8 +114,6 @@ namespace Takai.Graphics
             ms.Seek(0, System.IO.SeekOrigin.Begin);
             font.Texture = Texture2D.FromStream(graphicsDevice, ms);
 
-            read.Close();
-
             return font;
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Reflection;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -900,7 +901,8 @@ namespace Takai.UI
             //todo: maybe move to pre-update (and have pre-update override updateSelf)
             if (HasFocus)
             {
-                if (!ignoreTabKey && Input.InputState.IsPress(Keys.Tab))
+                if ((!ignoreTabKey && Input.InputState.IsPress(Keys.Tab)) ||
+                    Input.InputState.IsAnyPress(Buttons.RightShoulder))
                 {
                     if (Input.InputState.IsMod(Input.KeyMod.Shift))
                         FocusPrevious();
@@ -908,8 +910,14 @@ namespace Takai.UI
                         FocusNext();
                     return false;
                 }
-                if ((!ignoreEnterKey && Input.InputState.IsPress(Keys.Enter)) ||
-                    (!ignoreSpaceKey && Input.InputState.IsPress(Keys.Space)))
+                else if (Input.InputState.IsAnyPress(Buttons.LeftShoulder))
+                {
+                    FocusPrevious();
+                    return false;
+                }
+                else if ((!ignoreEnterKey && Input.InputState.IsPress(Keys.Enter)) ||
+                    (!ignoreSpaceKey && Input.InputState.IsPress(Keys.Space)) ||
+                    Input.InputState.IsAnyPress(Buttons.A)) //optionally restrict input to player
                 {
                     var e = new ClickEventArgs { position = Vector2.Zero };
                     OnClick(e);
@@ -971,7 +979,7 @@ namespace Takai.UI
                 Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
                 toDraw.DrawSelf(spriteBatch);
                 //Graphics.Primitives2D.DrawRect(spriteBatch, Color.Tomato, toDraw.VirtualBounds);
-                Graphics.Primitives2D.DrawRect(spriteBatch, toDraw.HasFocus ? FocusedBorderColor : toDraw.BorderColor, toDraw.VisibleBounds);
+                Graphics.Primitives2D.DrawRect(spriteBatch, (toDraw.HasFocus && toDraw.CanFocus) ? FocusedBorderColor : toDraw.BorderColor, toDraw.VisibleBounds);
 
                 if (DebugFont != null && toDraw.VisibleBounds.Contains(Input.InputState.MousePoint))
                 {
@@ -1089,8 +1097,9 @@ namespace Takai.UI
             var maxWidth = 0f;
 
             var type = obj.GetType();
+            var typeInfo = type.GetTypeInfo();
 
-            if (type.IsEnum)
+            if (typeInfo.IsEnum)
             {
                 var @enum = obj as System.Enum;
                 var enumValues = System.Enum.GetNames(type);
@@ -1132,7 +1141,7 @@ namespace Takai.UI
 
             //todo: item spacing (can't use list margin without nesting)
 
-            var members = type.GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+            var members = type.GetMembers(BindingFlags.Instance | BindingFlags.Public);
 
             //todo: move these into type handlers
             foreach (var member in members)
@@ -1141,13 +1150,13 @@ namespace Takai.UI
                 object curValue;
                 System.Action<object, object> setValue;
 
-                if (member is System.Reflection.FieldInfo fInfo)
+                if (member is FieldInfo fInfo)
                 {
                     memberType = fInfo.FieldType;
                     curValue = fInfo.GetValue(obj);
                     setValue = fInfo.SetValue;
                 }
-                else if (member is System.Reflection.PropertyInfo pInfo)
+                else if (member is PropertyInfo pInfo)
                 {
                     if (!pInfo.CanWrite)
                         continue;

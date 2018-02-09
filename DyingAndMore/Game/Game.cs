@@ -8,6 +8,8 @@ using Takai.UI;
 using System;
 using Takai.Game;
 
+using System.Reflection;
+
 namespace DyingAndMore.Game
 {
     //map spawn configurations? (akin to difficulty)
@@ -63,6 +65,7 @@ namespace DyingAndMore.Game
                     ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
 
                 AddChild(renderSettingsConsole);
+                renderSettingsConsole.HasFocus = true;
             }
         }
 
@@ -327,7 +330,6 @@ namespace DyingAndMore.Game
                     break;
             }
         }
-        Vector2 lastClick;
 
         System.Diagnostics.Stopwatch swatch = new System.Diagnostics.Stopwatch();
         protected override bool HandleInput(GameTime time)
@@ -360,13 +362,15 @@ namespace DyingAndMore.Game
                 return false;
             }
 
-            if (InputState.IsPress(Keys.F1))
+            if (InputState.IsPress(Keys.F1) ||
+                InputState.IsAnyPress(Buttons.Start))
             {
                 Parent.ReplaceAllChildren(new Editor.Editor(Map));
                 return false;
             }
 
-            if (InputState.IsPress(Keys.F2))
+            if (InputState.IsPress(Keys.F2) ||
+                InputState.IsAnyPress(Buttons.Back))
             {
                 ToggleRenderSettingsConsole();
                 return false;

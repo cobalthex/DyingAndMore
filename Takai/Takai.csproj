@@ -30,6 +30,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>TakaiTech.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -90,7 +96,6 @@
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\Primitives2D.cs" />
     <Compile Include="Input\InputState.cs" />
-    <Compile Include="Locale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\CheckBox.cs" />
     <Compile Include="UI\DropdownSelect.cs" />
@@ -110,6 +115,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TakaiTech.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

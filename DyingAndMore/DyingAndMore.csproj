@@ -76,6 +76,9 @@
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <PropertyGroup>
+    <MediaDir>$(SolutionDir)Media\</MediaDir>
+  </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <Content Include="$(MediaDir)Content\**\*.*">
       <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -111,7 +114,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <PropertyGroup>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <ShaderProfile>DX11</ShaderProfile>
@@ -122,8 +124,8 @@
         powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -Command "New-Item -Force -ItemType directory -Path '$(SolutionDir)Media\Content\Shaders' | Out-Null; Copy-Item -Recurse '$(SolutionDir)Media\Shaders\$(ShaderProfile)\*' '$(SolutionDir)Media\Content\Shaders';    ('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }"
       )
 
-set rce=%25errorlevel%25
-if not %25rce%25==1 exit %25rce%25 else exit 0
-</PostBuildEvent>
+      set rce=%25errorlevel%25
+      if not %25rce%25==1 exit %25rce%25 else exit 0
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

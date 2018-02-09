@@ -61,10 +61,22 @@ namespace DyingAndMore.Game.Entities
 
     public class AIController : Controller
     {
+        public struct PrioritizedBehavior
+        {
+            public BehaviorPriority priority;
+            public Behavior behavior;
+
+            public PrioritizedBehavior(BehaviorPriority priority, Behavior behavior)
+            {
+                this.priority = priority;
+                this.behavior = behavior;
+            }
+        }
+
         public List<Behavior> Behaviors { get; set; }
 
-        List<(BehaviorPriority priority, Behavior behavior)>[] behaviorCosts
-            = new List<(BehaviorPriority priority, Behavior behavior)>[(int)BehaviorMask._Count_];
+        List<PrioritizedBehavior>[] behaviorCosts
+            = new List<PrioritizedBehavior>[(int)BehaviorMask._Count_];
 
         Random random = new Random();
 
@@ -85,7 +97,7 @@ namespace DyingAndMore.Game.Entities
         public AIController()
         {
             for (int i = 0; i < behaviorCosts.Length; ++i)
-                behaviorCosts[i] = new List<(BehaviorPriority priority, Behavior behavior)>();
+                behaviorCosts[i] = new List<PrioritizedBehavior>();
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -123,7 +135,7 @@ namespace DyingAndMore.Game.Entities
                     if (priority > behaviorCosts[mask][0].priority)
                         behaviorCosts[mask].Clear();
                 }
-                behaviorCosts[mask].Add((priority, behavior));
+                behaviorCosts[mask].Add(new PrioritizedBehavior(priority, behavior));
             }
 
             foreach (var list in behaviorCosts)
