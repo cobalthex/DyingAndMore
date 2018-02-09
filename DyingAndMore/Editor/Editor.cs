@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Reflection;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Data;
@@ -114,7 +115,8 @@ namespace DyingAndMore.Editor
 
         protected override bool HandleInput(GameTime time)
         {
-            if (InputState.IsPress(Keys.F1))
+            if (InputState.IsPress(Keys.F1) ||
+                InputState.IsAnyPress(Buttons.Start))
             {
                 modes.Mode?.End();
 
@@ -128,6 +130,7 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
+#if WINDOWS
             if (InputState.IsPress(Keys.F5))
             {
                 using (var sfd = new System.Windows.Forms.SaveFileDialog()
@@ -272,6 +275,8 @@ namespace DyingAndMore.Editor
                 }
             }
 
+#endif
+
             return base.HandleInput(time);
         }
 
@@ -281,6 +286,7 @@ namespace DyingAndMore.Editor
             {
                 //refresh individual render settings
                 var settings = typeof(Takai.Game.MapInstance.RenderSettings);
+                settings.GetTypeInfo();
                 foreach (var child in renderSettingsConsole.Children)
                     ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
 

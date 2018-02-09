@@ -28,12 +28,15 @@ namespace Takai.Input
     public static class InputState
     {
         private static KeyboardState keyState, lastKeyState;
+        private static GamePadState[] gamePadState, lastGamePadState;
         private static MouseState mouseState, lastMouseState;
         private static Vector2[] mouseDownPositions;
 
         static InputState()
         {
             mouseDownPositions = new Vector2[System.Enum.GetNames(typeof(MouseButtons)).Length];
+            gamePadState = new GamePadState[4];
+            lastGamePadState = new GamePadState[4];
         }
 
         /// <summary>
@@ -67,6 +70,12 @@ namespace Takai.Input
         {
             lastKeyState = keyState;
             keyState = Keyboard.GetState();
+
+            for (int i = 0; i < gamePadState.Length; ++i)
+            {
+                lastGamePadState[i] = gamePadState[i];
+                gamePadState[i] = GamePad.GetState((PlayerIndex)i);
+            }
 
             lastMouseState = mouseState;
             mouseState = Mouse.GetState();
@@ -192,34 +201,6 @@ namespace Takai.Input
         }
 
         /// <summary>
-        /// Is a key currently pressed?
-        /// </summary>
-        /// <param name="Key">The key to check</param>
-        /// <returns>True if the key is pressed</returns>
-        public static bool IsButtonDown(Keys Key)
-        {
-            return keyState.IsKeyDown(Key);
-        }
-        /// <summary>
-        /// Is a key currently released?
-        /// </summary>
-        /// <param name="Key">The key to check</param>
-        /// <returns>True if the key is released</returns>
-        public static bool IsButtonUp(Keys Key)
-        {
-            return keyState.IsKeyUp(Key);
-        }
-        /// <summary>
-        /// Is a key currently held down?
-        /// </summary>
-        /// <param name="Key">The key to check</param>
-        /// <returns>True if the key is held down</returns>
-        public static bool IsButtonHeld(Keys Key)
-        {
-            return (keyState.IsKeyDown(Key) && lastKeyState.IsKeyDown(Key));
-        }
-
-        /// <summary>
         /// Was a mouse button just pressed?
         /// </summary>
         /// <param name="Button">The mouse button to check</param>
@@ -228,15 +209,6 @@ namespace Takai.Input
         {
             return (GetButtonState(Button, ref mouseState) == ButtonState.Pressed &&
                     GetButtonState(Button, ref lastMouseState) == ButtonState.Released);
-        }
-        /// <summary>
-        /// Was a key was just pressed
-        /// </summary>
-        /// <param name="Key">The key to check</param>
-        /// <returns>True if the key was just pressed</returns>
-        public static bool IsPress(Keys Key)
-        {
-            return (keyState.IsKeyDown(Key) && lastKeyState.IsKeyUp(Key));
         }
 
         /// <summary>
@@ -249,14 +221,130 @@ namespace Takai.Input
             return (GetButtonState(Button, ref mouseState) == ButtonState.Released &&
                     GetButtonState(Button, ref lastMouseState) == ButtonState.Pressed);
         }
+
+        /// <summary>
+        /// Is a key currently pressed?
+        /// </summary>
+        /// <param name="key">The key to check</param>
+        /// <returns>True if the key is pressed</returns>
+        public static bool IsButtonDown(Keys key)
+        {
+            return keyState.IsKeyDown(key);
+        }
+
+        /// <summary>
+        /// Is a key currently released?
+        /// </summary>
+        /// <param name="key">The key to check</param>
+        /// <returns>True if the key is released</returns>
+        public static bool IsButtonUp(Keys key)
+        {
+            return keyState.IsKeyUp(key);
+        }
+
+        /// <summary>
+        /// Is a key currently held down?
+        /// </summary>
+        /// <param name="key">The key to check</param>
+        /// <returns>True if the key is held down</returns>
+        public static bool IsButtonHeld(Keys key)
+        {
+            return (keyState.IsKeyDown(key) && lastKeyState.IsKeyDown(key));
+        }
+
+        /// <summary>
+        /// Was a key was just pressed
+        /// </summary>
+        /// <param name="key">The key to check</param>
+        /// <returns>True if the key was just pressed</returns>
+        public static bool IsPress(Keys key)
+        {
+            return (keyState.IsKeyDown(key) && lastKeyState.IsKeyUp(key));
+        }
+
         /// <summary>
         /// Was a key was just released
         /// </summary>
-        /// <param name="Key">The key to check</param>
+        /// <param name="key">The key to check</param>
         /// <returns>True if the key was just clicked</returns>
-        public static bool IsClick(Keys Key)
+        public static bool IsClick(Keys key)
         {
-            return (keyState.IsKeyUp(Key) && lastKeyState.IsKeyDown(Key));
+            return (keyState.IsKeyUp(key) && lastKeyState.IsKeyDown(key));
+        }
+
+        /// <summary>
+        /// Is a button currently pressed?
+        /// </summary>
+        /// <param name="key">The button to check</param>
+        /// <returns>True if the button is pressed</returns>
+        public static bool IsButtonDown(Buttons button, PlayerIndex player = PlayerIndex.One)
+        {
+            return gamePadState[(int)player].IsButtonDown(button);
+        }
+
+        /// <summary>
+        /// Is a button currently released?
+        /// </summary>
+        /// <param name="key">The button to check</param>
+        /// <returns>True if the button is released</returns>
+        public static bool IsButtonUp(Buttons button, PlayerIndex player = PlayerIndex.One)
+        {
+            return gamePadState[(int)player].IsButtonUp(button);
+        }
+
+        /// <summary>
+        /// Is a button currently held down?
+        /// </summary>
+        /// <param name="key">The button to check</param>
+        /// <returns>True if the button is held down</returns>
+        public static bool IsButtonHeld(Buttons button, PlayerIndex player = PlayerIndex.One)
+        {
+            return (gamePadState[(int)player].IsButtonDown(button) && lastGamePadState[(int)player].IsButtonDown(button));
+        }
+
+        /// <summary>
+        /// Was a button was just pressed
+        /// </summary>
+        /// <param name="key">The button to check</param>
+        /// <returns>True if the button was just pressed</returns>
+        public static bool IsPress(Buttons button, PlayerIndex player = PlayerIndex.One)
+        {
+            return (gamePadState[(int)player].IsButtonDown(button) && lastGamePadState[(int)player].IsButtonUp(button));
+        }
+
+        /// <summary>
+        /// Was a button was just released
+        /// </summary>
+        /// <param name="key">The button to check</param>
+        /// <returns>True if the button was just clicked</returns>
+        public static bool IsClick(Buttons button, PlayerIndex player = PlayerIndex.One)
+        {
+            return (gamePadState[(int)player].IsButtonUp(button) && lastGamePadState[(int)player].IsButtonDown(button));
+        }
+
+        public static bool IsAnyPress(Buttons button)
+        {
+            for (int i = 0; i < gamePadState.Length; ++i)
+            {
+                if (IsPress(button, (PlayerIndex)i))
+                    return true;
+            }
+            return false;
+        }
+
+        public static bool IsAnyClick(Buttons button)
+        {
+            for (int i = 0; i < gamePadState.Length; ++i)
+            {
+                if (IsClick(button, (PlayerIndex)i))
+                    return true;
+            }
+            return false;
+        }
+
+        public static GamePadThumbSticks Thumbsticks(PlayerIndex player = PlayerIndex.One)
+        {
+            return gamePadState[(int)player].ThumbSticks;
         }
 
         /// <summary>

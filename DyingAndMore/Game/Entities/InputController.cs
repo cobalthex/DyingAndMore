@@ -65,14 +65,12 @@ namespace DyingAndMore.Game.Entities
         public Dictionary<Action, List<ActionInput>> ActionInputs { get; set; }
             = new Dictionary<Action, List<ActionInput>>();
 
-        //todo: unify scalar and button inputs
+        public PlayerIndex player = PlayerIndex.One;
 
         public InputController()
         {
             ActionInputs[Action.Fire] = new List<ActionInput> { new ActionInput(ActionInputType.MouseButton, (int)MouseButtons.Left) };
         }
-
-        public PlayerIndex player = PlayerIndex.One;
 
         public override void Think(System.TimeSpan deltaTime)
         {
@@ -86,14 +84,25 @@ namespace DyingAndMore.Game.Entities
             if (InputState.IsButtonDown(Keys.D))
                 d += Vector2.UnitX;
 
-            if (InputState.IsButtonDown(MouseButtons.Left))
+            var sticks = InputState.Thumbsticks(player);
+            if (sticks.Left != Vector2.Zero)
+                d = Vector2.Normalize(sticks.Left) * new Vector2(1, -1);
+
+            if (sticks.Right != Vector2.Zero)
+                Actor.Forward = Vector2.Normalize(sticks.Right) * new Vector2(1, -1);
+
+            if (InputState.IsButtonDown(MouseButtons.Left) ||
+                InputState.IsButtonDown(Buttons.RightTrigger, player))
                 Actor.Weapon?.TryUse();
 
             Actor.Accelerate(d);
 
-            var dir = InputState.PolarMouseVector;
-            dir.Normalize();
-            Actor.Forward = dir;
+            if (InputState.MouseDelta() != Vector2.Zero)
+            {
+                var dir = InputState.PolarMouseVector;
+                dir.Normalize();
+                Actor.Forward = dir;
+            }
         }
     }
 }

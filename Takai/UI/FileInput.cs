@@ -92,7 +92,8 @@ namespace Takai.UI
 
             pickerButton.Click += delegate
             {
-#if WINDOWS && DEBUG
+#if WINDOWS
+#if DEBUG
                 if (Takai.Input.InputState.IsMod(Input.KeyMod.Alt))
                 {
                     System.Diagnostics.Process.Start(System.IO.Path.GetDirectoryName(Text));
@@ -121,6 +122,9 @@ namespace Takai.UI
                         Text = dialog.FileName;
                     }
                 }
+#elif WINDOWS_UAP
+                //todo
+#endif
             };
 
             AddChildren(textInput, pickerButton);

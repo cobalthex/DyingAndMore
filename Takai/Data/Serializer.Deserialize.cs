@@ -65,6 +65,7 @@ namespace Takai.Data
             if (!(reader is StreamReader stream))
                 return 0;
 
+#if WINDOWS
             int charPos = (int)stream.GetType().InvokeMember("charPos",
                             BindingFlags.DeclaredOnly |
                             BindingFlags.Public | BindingFlags.NonPublic |
@@ -78,6 +79,9 @@ namespace Takai.Data
                             null, stream, null);
 
             return stream.BaseStream.Position - charLen + charPos;
+#elif WINDOWS_UAP
+            return 0; //todo
+#endif
         }
 
         internal static string GetExceptionMessage(string error, ref DeserializationContext context)
@@ -133,7 +137,12 @@ namespace Takai.Data
                         throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read object", ref context));
 
                     var value = TextDeserialize(context);
+
+#if WINDOWS //or .net core 2+
                     dict[String.Intern(key.ToString().TrimEnd())] = value; //todo: analyze interning
+#elif WINDOWS_UAP
+                    dict[key.ToString().TrimEnd()] = value;
+#endif
 
                     SkipIgnored(context.reader);
 
@@ -305,7 +314,9 @@ namespace Takai.Data
 
                 peek = context.reader.Peek();
 
-                if (type.IsEnum)
+                var typeInfo = type.GetTypeInfo();
+
+                if (typeInfo.IsEnum)
                 {
                     peek = context.reader.Read();
                     if (peek == '[')
@@ -344,7 +355,7 @@ namespace Takai.Data
                         if (valuesCount == 0)
                             throw new ArgumentOutOfRangeException(GetExceptionMessage($"Expected at least one enum value", ref context));
 
-                        if (valuesCount > 1 && !Attribute.IsDefined(type, typeof(FlagsAttribute), true))
+                        if (valuesCount > 1 && !typeInfo.IsDefined(typeof(FlagsAttribute), true))
                             throw new ArgumentOutOfRangeException(GetExceptionMessage($"{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", ref context));
 
                         return Enum.ToObject(type, values);
@@ -425,8 +436,9 @@ namespace Takai.Data
 
         static object CreateType(Type type) //requires empty constructor
         {
+            var typeInfo = type.GetTypeInfo();
             object obj;
-            if (type.IsValueType)
+            if (typeInfo.IsValueType)
                 obj = Activator.CreateInstance(type);
             else
             {
@@ -439,7 +451,9 @@ namespace Takai.Data
 
         public static object ParseDictionary(Type destType, Dictionary<string, object> dict, DeserializationContext context = default(DeserializationContext))
         {
-            var deserial = destType.GetCustomAttribute<CustomDeserializeAttribute>()?.deserialize;
+            var destTypeInfo = destType.GetTypeInfo();
+
+            var deserial = destTypeInfo.GetCustomAttribute<CustomDeserializeAttribute>()?.deserialize;
             if (deserial != null)
             {
                 var deserialied = deserial.Invoke(null, new[] { dict }); //must be static here
@@ -456,7 +470,7 @@ namespace Takai.Data
                 try
                 {
                     var field = destType.GetField(pair.Key, DefaultBindingFlags);
-                    if (field != null && !Attribute.IsDefined(field, typeof(IgnoredAttribute)))
+                    if (field != null && !field.IsDefined(typeof(IgnoredAttribute)))
                     {
                         if (late == null)
                             ParseMember(obj, pair.Value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
@@ -466,7 +480,7 @@ namespace Takai.Data
                     else
                     {
                         var prop = destType.GetProperty(pair.Key, DefaultBindingFlags);
-                        if (prop != null && !Attribute.IsDefined(prop, typeof(IgnoredAttribute)))
+                        if (prop != null && !prop.IsDefined(typeof(IgnoredAttribute)))
                         {
                             if (late == null)
                                 ParseMember(obj, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
@@ -493,46 +507,56 @@ namespace Takai.Data
             return obj;
         }
 
-        public static bool IsIntType(Type SourceType)
+        public static bool IsInt(object o)
         {
-            switch (Type.GetTypeCode(SourceType))
+            if (o is IConvertible c)
             {
-                case TypeCode.SByte:
-                case TypeCode.Byte:
-                case TypeCode.Int16:
-                case TypeCode.UInt16:
-                case TypeCode.Int32:
-                case TypeCode.UInt32:
-                case TypeCode.Int64:
-                case TypeCode.UInt64:
-                case TypeCode.Char:
-                    return true;
-
-                case TypeCode.Object:
-                    if (SourceType.IsGenericType && SourceType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                        return IsIntType(Nullable.GetUnderlyingType(SourceType));
-                    return false;
-
-                default:
-                    return false;
+                switch (Convert.GetTypeCode(c))
+                {
+                    case TypeCode.SByte:
+                    case TypeCode.Byte:
+                    case TypeCode.Int16:
+                    case TypeCode.UInt16:
+                    case TypeCode.Int32:
+                    case TypeCode.UInt32:
+                    case TypeCode.Int64:
+                    case TypeCode.UInt64:
+                    case TypeCode.Char:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            else
+            {
+                var ty = o.GetType();
+                var tyi = ty.GetTypeInfo();
+                if (tyi.IsGenericType && tyi.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    return IsInt(Nullable.GetUnderlyingType(ty));
+                return false;
             }
         }
 
-        public static bool IsFloatType(Type SourceType)
+        public static bool IsFloat(object o)
         {
-            switch (Type.GetTypeCode(SourceType))
+            if (o is IConvertible c)
             {
-                case TypeCode.Single:
-                case TypeCode.Double:
-                    return true;
-
-                case TypeCode.Object:
-                    if (SourceType.IsGenericType && SourceType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                        return IsFloatType(Nullable.GetUnderlyingType(SourceType));
-                    return false;
-
-                default:
-                    return false;
+                switch (Convert.GetTypeCode(c))
+                {
+                    case TypeCode.Single:
+                    case TypeCode.Double:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            else
+            {
+                var ty = o.GetType();
+                var tyi = ty.GetTypeInfo();
+                if (tyi.IsGenericType && tyi.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    return IsFloat(Nullable.GetUnderlyingType(ty));
+                return false;
             }
         }
 
@@ -549,66 +573,68 @@ namespace Takai.Data
         /// Convert <see cref="Source"/> to type <see cref="DestType"/>
         /// Utilizes CustomDeserializer
         /// </summary>
-        /// <param name="DestType">The type to cast to</param>
-        /// <param name="Source">The source object</param>
+        /// <param name="destType">The type to cast to</param>
+        /// <param name="source">The source object</param>
         /// <param name="isStrict">Should only cast between equivelent types (If true, casting int to bool would fail)</param>
         /// <returns>The correctly casted object</returns>
-        public static object Cast(Type DestType, object Source, DeserializationContext context = default(DeserializationContext))
+        public static object Cast(Type destType, object source, DeserializationContext context = default(DeserializationContext))
         {
-            if (Source == null)
+            if (source == null)
                 return null;
 
-            var sourceType = Source.GetType();
+            var destTypeInfo = destType.GetTypeInfo();
+            var sourceType = source.GetType();
+            var sourceTypeInfo = sourceType.GetTypeInfo();
 
-            if (DestType.IsAssignableFrom(sourceType))
-                return Source;
+            if (destType.IsAssignableFrom(sourceType))
+                return source;
 
-            if (Serializers.TryGetValue(DestType, out var deserial) && deserial.Deserialize != null)
-                return deserial.Deserialize(Source, context);
+            if (Serializers.TryGetValue(destType, out var deserial) && deserial.Deserialize != null)
+                return deserial.Deserialize(source, context);
 
-            var customDeserial = DestType.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
+            var customDeserial = destTypeInfo.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
             if (customDeserial != null)
             {
-                var deserialed = customDeserial.Invoke(null, new[] { Source }); //must be static here
+                var deserialed = customDeserial.Invoke(null, new[] { source }); //must be static here
                 if (deserialed != DefaultAction)
                     return deserialed;
             }
 
             //GetConstructor ?
 
-            if (Source is string sourceString)
+            if (source is string sourceString)
             {
                 //chars can be represented as numbers (or as strings if object key)
-                if (DestType == typeof(char))
+                if (destType == typeof(char))
                 {
                     if (TInt.TryParse(sourceString, out var @int))
                         return (char)@int;
                 }
 
-                if (DestType.IsEnum)
-                    return Enum.Parse(DestType, sourceString);
+                if (destTypeInfo.IsEnum)
+                    return Enum.Parse(destType, sourceString);
             }
 
-            if (Source == null && DestType.IsPrimitive)
-                throw new InvalidCastException($"Type:{DestType} is primative and cannot be null");
+            if (source == null && destTypeInfo.IsPrimitive)
+                throw new InvalidCastException($"Type:{destType} is primative and cannot be null");
 
-            if (DestType.IsArray)
+            if (destTypeInfo.IsArray)
             {
-                var list = Source as List<object>;
+                var list = source as List<object>;
                 if (list == null)
-                    throw new InvalidCastException($"Type:{DestType.Name} is an array but '{Source}' is of type:{sourceType.Name}");
+                    throw new InvalidCastException($"Type:{destType.Name} is an array but '{source}' is of type:{sourceType.Name}");
 
-                var elType = DestType.GetElementType();
-                list = list.ConvertAll(i => Cast(elType, i, context));
+                var elType = destType.GetElementType();
+                list = list.Select(i => Cast(elType, i, context)).ToList(); //todo: List.ConvertAll (doesn't work on .net core)
                 var casted = CastMethod.MakeGenericMethod(elType).Invoke(null, new[] { list });
                 return ToArrayMethod.MakeGenericMethod(elType).Invoke(null, new[] { casted });
             }
 
-            var sourceList = Source as List<object>;
-            if (DestType.IsGenericType)
+            var sourceList = source as List<object>;
+            if (destTypeInfo.IsGenericType)
             {
-                var genericType = DestType.GetGenericTypeDefinition();
-                var genericArgs = DestType.GetGenericArguments();
+                var genericType = destType.GetGenericTypeDefinition();
+                var genericArgs = destType.GetGenericArguments();
 
                 //if (genericType is typeof(Lazy<>))
 
@@ -616,16 +642,16 @@ namespace Takai.Data
                 if (genericType == typeof(Tuple<,>))
                 {
                     if (sourceList == null)
-                        throw new InvalidCastException($"Type:{DestType.Name} is a Tuple but '{Source}' is of type:{sourceType.Name}");
+                        throw new InvalidCastException($"Type:{destType.Name} is a Tuple but '{source}' is of type:{sourceType.Name}");
 
                     for (int i = 0; i < sourceList.Count; ++i)
                         sourceList[i] = Cast(genericArgs[i], sourceList[i], context);
-                    return Activator.CreateInstance(DestType, sourceList.ToArray());
+                    return Activator.CreateInstance(destType, sourceList.ToArray());
                 }
 
                 if (genericType == typeof(List<>))
                 {
-                    sourceList = sourceList.ConvertAll(i => Cast(genericArgs[0], i, context));
+                    sourceList = sourceList.Select(i => Cast(genericArgs[0], i, context)).ToList(); //todo: List.ConvertAll (doesn't work on .net core)
                     var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
                     return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
                 }
@@ -634,11 +660,11 @@ namespace Takai.Data
                 if (genericType == typeof(HashSet<>) || genericType == typeof(Queue<>) || genericType == typeof(Stack<>))
                 {
                     if (sourceList == null)
-                        throw new InvalidCastException($"Type:{DestType.Name} is a {genericType.Name} but '{Source}' is of type:{sourceType.Name}");
+                        throw new InvalidCastException($"Type:{destType.Name} is a {genericType.Name} but '{source}' is of type:{sourceType.Name}");
 
-                    sourceList = sourceList.ConvertAll(i => Cast(genericArgs[0], i, context));
+                    sourceList = sourceList.Select(i => Cast(genericArgs[0], i, context)).ToList(); //todo: List.ConvertAll (doesn't work on .net core)
                     var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
-                    return Activator.CreateInstance(DestType, new[] { casted });
+                    return Activator.CreateInstance(destType, new[] { casted });
                     //return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
                 }
 
@@ -646,12 +672,12 @@ namespace Takai.Data
                 {
                     //todo: revisit, may be able to convert srcDict more easily
 
-                    var srcDict = Source as Dictionary<string, object>;
+                    var srcDict = source as Dictionary<string, object>;
                     if (srcDict == null)
-                        throw new InvalidCastException($"Type:{DestType.Name} is a dictionary but '{Source}' is of type:{sourceType.Name}");
+                        throw new InvalidCastException($"Type:{destType.Name} is a dictionary but '{source}' is of type:{sourceType.Name}");
 
-                    var dict = Activator.CreateInstance(DestType, srcDict.Count);
-                    var add = DestType.GetMethod("Add");
+                    var dict = Activator.CreateInstance(destType, srcDict.Count);
+                    var add = destType.GetMethod("Add");
 
                     foreach (var pair in srcDict)
                         add.Invoke(dict, new[] { Cast(genericArgs[0], pair.Key, context), Cast(genericArgs[1], pair.Value, context) });
@@ -660,68 +686,63 @@ namespace Takai.Data
                 }
 
                 //implicit cast (limited support)
-                if (genericArgs.Length == 1 && !sourceType.IsGenericType)
+                if (genericArgs.Length == 1 && !sourceTypeInfo.IsGenericType)
                 {
-                    var implCast = DestType.GetMethod("op_Implicit", new[] { genericArgs[0] });
+                    var implCast = destType.GetMethod("op_Implicit", new[] { genericArgs[0] });
                     if (implCast != null)
                     {
-                        var genericCvt = Cast(genericArgs[0], Source, context);
+                        var genericCvt = Cast(genericArgs[0], source, context);
                         return implCast.Invoke(null, new[] { genericCvt });
                     }
                 }
             }
 
             //struct initialization using shorthand array syntax
-            if (DestType.IsValueType && sourceList != null)
+            if (destTypeInfo.IsValueType && sourceList != null)
             {
-                var obj = Activator.CreateInstance(DestType);
-                var members = DestType.GetMembers(BindingFlags.Instance | BindingFlags.Public);
+                var obj = Activator.CreateInstance(destType);
+                var members = destType.GetMembers(BindingFlags.Instance | BindingFlags.Public);
                 var memberEnumerator = members.GetEnumerator();
                 for (int i = 0; i < sourceList.Count; ++i)
                 {
                     if (!memberEnumerator.MoveNext())
-                        throw new ArgumentOutOfRangeException($"too many members when converting to {DestType.Name}");
+                        throw new ArgumentOutOfRangeException($"too many members when converting to {destType.Name}");
+
                     //parse dictionary (test if field or property and set accordingly)
-                    switch (((MemberInfo)memberEnumerator.Current).MemberType)
+                    if (memberEnumerator.Current is PropertyInfo p)
                     {
-                        case MemberTypes.Field:
-                            var field = (FieldInfo)memberEnumerator.Current;
-                            if (!field.IsInitOnly)
-                                field.SetValue(obj, Cast(field.FieldType, sourceList[i], context));
-                            break;
-                        case MemberTypes.Property:
-                            var prop = (PropertyInfo)memberEnumerator.Current;
-                            if (prop.CanWrite)
-                                prop.SetValue(obj, Cast(prop.PropertyType, sourceList[i], context));
-                            else
-                                goto default;
-                            break;
-                        default:
-                            --i; //does not seem to be built in way to filter out non-var members
-                            break;
+                        if (p.CanWrite)
+                            p.SetValue(obj, Cast(p.PropertyType, sourceList[i], context));
                     }
+                    else if (memberEnumerator.Current is FieldInfo f)
+                    {
+                        if (!f.IsInitOnly)
+                            f.SetValue(obj, Cast(f.FieldType, sourceList[i], context));
+                    }
+                    else
+                        --i; //does not seem to be built in way to filter out non-var members
                 }
                 return obj;
             }
 
             if (sourceType == typeof(Dictionary<string, object>))
-                return ParseDictionary(DestType, (Dictionary<string, object>)Source, context);
+                return ParseDictionary(destType, (Dictionary<string, object>)source, context);
 
             bool canConvert = false;
 
-            bool isSourceInt = IsIntType(sourceType);
-            bool isSourceFloat = IsFloatType(sourceType);
+            bool isSourceInt = IsInt(source);
+            bool isSourceFloat = IsFloat(source);
 
-            bool isDestInt = IsIntType(sourceType);
-            bool isDestFloat = IsFloatType(sourceType);
+            bool isDestInt = IsInt(source);
+            bool isDestFloat = IsFloat(source);
 
             canConvert |= (isDestInt && isSourceInt);
             canConvert |= (isDestFloat || isDestInt) && (isSourceFloat || isSourceInt);
 
             if (canConvert)
-                return Convert.ChangeType(Source, DestType);
+                return Convert.ChangeType(source, destType);
 
-            throw new InvalidCastException($"Error converting '{Source}' from type:{sourceType.Name} to type:{DestType.Name}");
+            throw new InvalidCastException($"Error converting '{source}' from type:{sourceType.Name} to type:{destType.Name}");
         }
 
         public static char FromLiteral(char escape)
@@ -759,7 +780,11 @@ namespace Takai.Data
                     builder.Append((char)ch);
             }
             reader.Read();
+#if WINDOWS
             return string.Intern(builder.ToString());
+#elif WINDOWS_UAP
+            return builder.ToString(); //todo: .net 2+ intern
+#endif
         }
 
         public static string ReadWord(TextReader reader)

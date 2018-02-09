@@ -604,16 +604,16 @@ namespace Takai.Game
                 var lineTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(c.camera.Viewport, 0, 1);
                 Class.lineEffect.Parameters["Transform"].SetValue(lineTransform);
 
-                var blackLines = renderedLines.ConvertAll(line =>
+                var blackLines = new VertexPositionColor[renderedLines.Count];
+                for (int i = 0; i < renderedLines.Count; ++i)
                 {
-                    line.Color = new Color(Color.Black, line.Color.A);
-                    line.Position += new Vector3(1, 1, 0);
-                    return line;
-                });
+                    blackLines[i].Color = new Color(Color.Black, renderedLines[i].Color.A);
+                    blackLines[i].Position = renderedLines[i].Position + new Vector3(1, 1, 0);
+                };
                 foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, blackLines.ToArray(), 0, blackLines.Count / 2);
+                    Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, blackLines, 0, blackLines.Length / 2);
                 }
 
                 foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)

@@ -54,7 +54,7 @@ namespace Takai.Data
             var dir = Path.GetDirectoryName(file);
             if (!string.IsNullOrEmpty(dir))
                 Directory.CreateDirectory(dir);
-            using (var writer = new StreamWriter(file))
+            using (var writer = new StreamWriter(File.OpenWrite(file)))
                 TextSerialize(writer, serializing);
         }
 
@@ -84,16 +84,18 @@ namespace Takai.Data
                 }
             }
 
-            var custSerial = ty.GetCustomAttribute<CustomSerializeAttribute>(true);
+            var typeInfo = ty.GetTypeInfo();
 
-            if (ty.IsPrimitive)
+            var custSerial = typeInfo.GetCustomAttribute<CustomSerializeAttribute>(true);
+
+            if (typeInfo.IsPrimitive)
                 writer.Write(serializing);
 
-            else if (ty.IsEnum)
+            else if (typeInfo.IsEnum)
             {
-                writer.Write(WriteFullTypeNames ? ty.FullName : ty.Name);
+                writer.Write(WriteFullTypeNames ? typeInfo.FullName : ty.Name);
 
-                if (Attribute.IsDefined(ty, typeof(FlagsAttribute)) && Convert.ToUInt64(serializing) != 0)
+                if (typeInfo.IsDefined(typeof(FlagsAttribute)) && Convert.ToUInt64(serializing) != 0)
                 {
                     writer.Write(" [");
                     var e = serializing as Enum;
@@ -168,7 +170,7 @@ namespace Takai.Data
                 foreach (var i in (IEnumerable)serializing)
                 {
                     lastWasSerializer = false;
-                    if (i == null || !i.GetType().IsPrimitive)
+                    if (i == null || !i.GetType().GetTypeInfo().IsPrimitive)
                     {
                         writer.WriteLine();
                         Indent(writer, indentLevel + 1);
@@ -220,7 +222,7 @@ namespace Takai.Data
 
         private static void SerializeMember(TextWriter writer, object parent, MemberInfo member, object value, int indentLevel, bool serializeExternals)
         {
-            if (member.GetCustomAttribute<IgnoredAttribute>(true) != null)
+            if (member.IsDefined(typeof(IgnoredAttribute)))
                 return;
 
             Indent(writer, indentLevel + 1);
@@ -252,20 +254,17 @@ namespace Takai.Data
             int n = 0;
             foreach (var member in ty.GetMembers(BindingFlags.Instance | BindingFlags.Public))
             {
-                switch (member.MemberType)
+                if (member is PropertyInfo p)
                 {
-                    case MemberTypes.Field:
-                        if (n++ > 0)
-                            writer.Write(' ');
-
-                        TextSerialize(writer, ((FieldInfo)member).GetValue(serializing), 0, serializeExternals);
-                        break;
-                    case MemberTypes.Property:
-                        if (n++ > 0)
-                            writer.Write(' ');
-
-                        TextSerialize(writer, ((PropertyInfo)member).GetValue(serializing), 0, serializeExternals);
-                        break;
+                    if (n++ > 0)
+                        writer.Write(' ');
+                    TextSerialize(writer, p.GetValue(serializing), 0, serializeExternals);
+                }
+                else if (member is FieldInfo f)
+                {
+                    if (n++ > 0)
+                        writer.Write(' ');
+                    TextSerialize(writer, f.GetValue(serializing), 0, serializeExternals);
                 }
             }
             writer.Write(']');

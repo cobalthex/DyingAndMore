@@ -278,7 +278,7 @@ namespace Takai.Data
 
         public static void SaveAllToFile(string file)
         {
-            using (var writer = new StreamWriter(file))
+            using (var writer = new StreamWriter(new FileStream(file, FileMode.Create)))
                 Serializer.TextSerialize(writer, objects, 0, true);
         }
 
@@ -325,6 +325,20 @@ namespace Takai.Data
                 objects.Remove(key);
         }
 
+#if WINDOWS
+        internal static Dictionary<string, FileSystemWatcher> fsWatchers = new Dictionary<string, FileSystemWatcher>(StringComparer.OrdinalIgnoreCase);
+        public static void WatchDirectory(string directory, string filter = "*.*")
+        {
+            var watcher = new FileSystemWatcher(directory, filter)
+            {
+                NotifyFilter = NotifyFilters.LastWrite,
+                EnableRaisingEvents = true,
+                IncludeSubdirectories = true
+            };
+            watcher.Changed += Watcher_Changed;
+            fsWatchers[directory] = watcher;
+        }
+
         private static void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             //this may be called multiple times: https://blogs.msdn.microsoft.com/oldnewthing/20140507-00/?p=1053/
@@ -343,6 +357,13 @@ namespace Takai.Data
                 LogBuffer.Append($"Failed to refresh {e.FullPath} ({ex.Message})");
             }
         }
+#elif WINDOWS_UAP
+        public static void WatchDirectory(string directory, string filter = "*.*")
+        {
+            //todo
+        }
+#endif
+
 
         #region Custom Loaders
 
@@ -402,6 +423,8 @@ namespace Takai.Data
             public OggSoundSource(NVorbis.VorbisReader vorbis)
             {
                 this.vorbis = vorbis;
+                if (vorbis == null)
+                    return; //todo
                 var sampleCount = Math.Min(vorbis.TotalSamples, 128 * 1024);
                 intermediate = new float[sampleCount];
                 samples = new byte[sampleCount * 2]; //16 bit PCM
@@ -409,6 +432,9 @@ namespace Takai.Data
 
             public SoundEffectInstance Instantiate()
             {
+                if (vorbis == null)
+                    return new DynamicSoundEffectInstance(41400, AudioChannels.Mono); //todo
+
                 var instance = new DynamicSoundEffectInstance(vorbis.SampleRate, (AudioChannels)vorbis.Channels);
                 instance.BufferNeeded += Instance_BufferNeeded;
                 Instance_BufferNeeded(instance, EventArgs.Empty); //preload first buffer
@@ -445,7 +471,7 @@ namespace Takai.Data
 
             public void Dispose()
             {
-                vorbis.Dispose();
+                vorbis?.Dispose();
             }
         }
 
@@ -457,6 +483,8 @@ namespace Takai.Data
 
             public override object Load(CustomLoad load)
             {
+                return new OggSoundSource(null); //todo
+
                 var vorbis = new NVorbis.VorbisReader(load.stream, true);
                 if (vorbis.Channels < 1 || vorbis.Channels > 2)
                     throw new FormatException($"Audio must be in mono or stero (provided: {vorbis.Channels})");
@@ -497,19 +525,6 @@ namespace Takai.Data
             }
         }
 
-        internal static Dictionary<string, FileSystemWatcher> fsWatchers = new Dictionary<string, FileSystemWatcher>(StringComparer.OrdinalIgnoreCase);
-        public static void WatchDirectory(string directory, string filter = "*.*")
-        {
-            var watcher = new FileSystemWatcher(directory, filter)
-            {
-                NotifyFilter = NotifyFilters.LastWrite,
-                EnableRaisingEvents = true,
-                IncludeSubdirectories = true
-            };
-            watcher.Changed += Watcher_Changed;
-            fsWatchers[directory] = watcher;
-        }
-
-        #endregion
+#endregion
     }
 }

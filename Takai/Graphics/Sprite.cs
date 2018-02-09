@@ -323,9 +323,9 @@ namespace Takai.Graphics
             var nf = IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount - 1);
             var fd = elapsed % 1;
 
-            var (curTween, nextTween) = GetTween(fd, Tween);
-            spriteBatch.Draw(Texture, position, GetFrameRect(cf), Color.Lerp(color, Color.Transparent, curTween), angle, Origin, scale, SpriteEffects.None, 0);
-            spriteBatch.Draw(Texture, position, GetFrameRect(nf), Color.Lerp(color, Color.Transparent, nextTween), angle, Origin, scale, SpriteEffects.None, 0);
+            var tween = GetTween(fd, Tween);
+            spriteBatch.Draw(Texture, position, GetFrameRect(cf), Color.Lerp(color, Color.Transparent, tween.current), angle, Origin, scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(Texture, position, GetFrameRect(nf), Color.Lerp(color, Color.Transparent, tween.next), angle, Origin, scale, SpriteEffects.None, 0);
         }
 
         public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle, Color color, TimeSpan elapsedTime)
@@ -341,22 +341,34 @@ namespace Takai.Graphics
             bounds.X += (int)(Origin.X / width * bounds.Width);
             bounds.Y += (int)(Origin.Y / height * bounds.Height);
 
-            var (curTween, nextTween) = GetTween(fd, Tween);
-            spriteBatch.Draw(Texture, bounds, GetFrameRect(cf), Color.Lerp(color, Color.Transparent, curTween), angle, Origin, SpriteEffects.None, 0);
-            spriteBatch.Draw(Texture, bounds, GetFrameRect(nf), Color.Lerp(color, Color.Transparent, nextTween), angle, Origin, SpriteEffects.None, 0);
+            var tween = GetTween(fd, Tween);
+            spriteBatch.Draw(Texture, bounds, GetFrameRect(cf), Color.Lerp(color, Color.Transparent, tween.current), angle, Origin, SpriteEffects.None, 0);
+            spriteBatch.Draw(Texture, bounds, GetFrameRect(nf), Color.Lerp(color, Color.Transparent, tween.next), angle, Origin, SpriteEffects.None, 0);
         }
 
-        public static (float, float) GetTween(float frameDelta, TweenStyle tween)
+        public struct TweenValues
+        {
+            public float current;
+            public float next;
+
+            public TweenValues(float previous, float next)
+            {
+                this.current = previous;
+                this.next = next;
+            }
+        }
+
+        public static TweenValues GetTween(float frameDelta, TweenStyle tween)
         {
             switch (tween)
             {
                 case TweenStyle.Overlap:
-                    return (MathHelper.Max((frameDelta * 2) - 1, 0),
-                            MathHelper.Max(1 - (frameDelta * 2), 0));
+                    return new TweenValues(MathHelper.Max((frameDelta * 2) - 1, 0),
+                                           MathHelper.Max(1 - (frameDelta * 2), 0));
                 case TweenStyle.Sequential:
-                    return (frameDelta, 1 - frameDelta);
+                    return new TweenValues(frameDelta, 1 - frameDelta);
                 default:
-                    return (1, 0);
+                    return new TweenValues(1, 0);
             }
         }
 

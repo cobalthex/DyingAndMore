@@ -1,19 +1,15 @@
-using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
+using System.Reflection;
 
 namespace DyingAndMore
 {
-    #region startup (Windows/Xbox/Zune)
+#if WINDOWS //win32 startup
     [Takai.Data.Serializer.Ignored]
     static class Program
     {
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool AttachConsole(int pid = -1);
-
         /// <summary>
         /// The main entry point for the game
         /// </summary>
@@ -22,14 +18,13 @@ namespace DyingAndMore
         {
             using (DyingAndMoreGame game = new DyingAndMoreGame())
             {
-#if WINDOWS
-                //System.Windows.Forms.Application.EnableVisualStyles();
-#endif
+                System.Windows.Forms.Application.EnableVisualStyles();
                 game.Run();
             }
         }
     }
-    #endregion
+
+#endif
 
     /// <summary>
     /// The game
@@ -74,7 +69,7 @@ namespace DyingAndMore
         {
             Takai.Runtime.Game = this;
 
-            Takai.Data.Serializer.LoadRunningAssemblyTypes();
+            Takai.Data.Serializer.LoadTypesFrom(typeof(DyingAndMoreGame).GetTypeInfo().Assembly);
 #if DEBUG
             Takai.Data.Cache.WatchDirectory(Takai.Data.Cache.DefaultRoot);
 #endif
@@ -106,6 +101,7 @@ namespace DyingAndMore
 
             debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/rct2.bfnt");
 
+#if WINDOWS //UWP launch activation parameters?
             //parse command line args
             var args = System.Environment.GetCommandLineArgs();
             string presetMap = null;
@@ -135,6 +131,7 @@ namespace DyingAndMore
                 }
                 catch (System.IO.FileNotFoundException) { }
             }
+#endif
 
             //testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
 
@@ -201,6 +198,8 @@ namespace DyingAndMore
 
             testTex = Takai.AssetManager.Load<Texture2D>("Textures/Background.png");
             */
+
+            ui.HasFocus = true;
             base.Initialize();
         }
 
@@ -225,7 +224,9 @@ namespace DyingAndMore
             if (InputState.IsPress(Keys.F6))
             {
                 Takai.Data.Cache.SaveAllToFile("all.tk");
+#if WINDOWS
                 System.Diagnostics.Process.Start("all.tk");
+#endif
             }
 
             if (InputState.IsPress(Keys.F7))

@@ -136,6 +136,7 @@ namespace DyingAndMore.Editor
 
             if (InputState.IsPress(MouseButtons.Left)/* || isTapping*/)
             {
+#if WINDOWS
                 //load entity from file
                 if (InputState.IsMod(KeyMod.Alt))
                 {
@@ -152,6 +153,7 @@ namespace DyingAndMore.Editor
 
                     return false;
                 }
+#endif
 
                 var searchRadius = /*isTapping*/ false ? 10 : 1;
                 var selected = editor.Map.FindEntities(currentWorldPos, searchRadius);

@@ -4,31 +4,36 @@ using Microsoft.Xna.Framework;
 
 namespace Takai
 {
+    public struct CurveValue<TValue> : IComparable
+    {
+        public float position;
+        public TValue value;
+
+        public CurveValue(float position, TValue value)
+        {
+            this.position = position;
+            this.value = value;
+        }
+
+        public int CompareTo(object obj)
+        {
+            return position.CompareTo(((CurveValue<TValue>)obj).position);
+        }
+    }
+
     /// <summary>
     /// The base for Catmull-Rom based curves/splines
     /// </summary>
     /// <typeparam name="TValue">The curvable values</typeparam>
     public abstract class CatmullCurve<TValue> : Data.IDerivedDeserialize
     {
-        struct KeyCompare : IComparer<(float position, TValue value)>
-        {
-            public int Compare((float position, TValue value) a, (float position, TValue value) b)
-            {
-                return a.position.CompareTo(b.position);
-            }
-
-            public static KeyCompare Instance = new KeyCompare();
-        }
-
-        public List<(float position, TValue value)> Values { get; set; }
-            = new List<(float, TValue)>();
+        public List<CurveValue<TValue>> Values { get; set; } = new List<CurveValue<TValue>>();
 
         public CatmullCurve() { }
 
         public virtual void AddValue(float t, TValue value)
         {
-            Values.Add((t, value));
-            Values.Sort(KeyCompare.Instance);
+            Values.Add(new CurveValue<TValue>(t, value));
         }
 
         int GetClosestIndex(float t)
@@ -78,7 +83,7 @@ namespace Takai
         public static implicit operator ScalarCurve(float value)
         {
             var curve = new ScalarCurve();
-            curve.Values.Add((0, value));
+            curve.Values.Add(new CurveValue<float>(0, value));
             return curve;
         }
     }
@@ -95,7 +100,7 @@ namespace Takai
         public static implicit operator HSLCurve(Vector4 hsla)
         {
             var curve = new HSLCurve();
-            curve.Values.Add((0, hsla));
+            curve.Values.Add(new CurveValue<Vector4>(0, hsla));
             return curve;
         }
     }
@@ -104,12 +109,12 @@ namespace Takai
     {
         protected HSLCurve curve = new HSLCurve();
 
-        public IEnumerable<(float position, Color value)> Values
+        public IEnumerable<CurveValue<Color>> Values
         {
             get
             {
                 foreach (var value in curve.Values)
-                    yield return (value.position, Util.ColorFromHSL(value.value));
+                    yield return new CurveValue<Color>(value.position, Util.ColorFromHSL(value.value));
             }
         }
 
@@ -139,9 +144,9 @@ namespace Takai
         {
             if (props.TryGetValue("Values", out var srcValues))
             {
-                var dstValues = Data.Serializer.Cast<List<(float position, Color value)>>(srcValues);
+                var dstValues = Data.Serializer.Cast<List<CurveValue<Color>>>(srcValues);
                 foreach (var v in dstValues)
-                    curve.Values.Add((v.position, Util.ColorToHSL(v.value)));
+                    curve.Values.Add(new CurveValue<Vector4>(v.position, Util.ColorToHSL(v.value)));
             }
         }
     }
