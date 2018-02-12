@@ -100,6 +100,7 @@
     <Compile Include="UI\CheckBox.cs" />
     <Compile Include="UI\DropdownSelect.cs" />
     <Compile Include="UI\FileInput.cs" />
+    <Compile Include="UI\FileList.cs" />
     <Compile Include="UI\Graphic.cs" />
     <Compile Include="UI\List.cs" />
     <Compile Include="UI\MapView.cs" />
@@ -110,9 +111,7 @@
     <Compile Include="UI\TrackBar.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Storage\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

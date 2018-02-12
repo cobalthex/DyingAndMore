@@ -144,26 +144,16 @@ namespace DyingAndMore
             //box.BorderColor = Color.LightBlue;
 
             ui = Takai.Data.Cache.Load<Takai.UI.Static>("UI/NoMap.ui.tk");
-            var mapList = (Takai.UI.List)ui.FindChildByName("maps");
-
-            foreach (var file in System.IO.Directory.EnumerateFiles(System.IO.Path.Combine(Takai.Data.Cache.DefaultRoot, "Maps"), "*.map.tk"))
+            var mapList = (Takai.UI.FileList)ui.FindChildByName("maps");
+            mapList.SelectionChanged += delegate
             {
-                var row = new Takai.UI.Static()
-                {
-                    Text = file,
-                    HorizontalAlignment = Takai.UI.Alignment.Stretch,
-                };
-                row.Click += delegate (object _sender, Takai.UI.ClickEventArgs _e)
-                {
-                    var _file = ((Takai.UI.Static)_sender).Text;
-                    var map = Takai.Data.Cache.Load<Takai.Game.MapClass>(_file);
-                    map.InitializeGraphics();
-                    ui = new Takai.UI.Static(new Editor.Editor(map.Instantiate()));
-                };
-                row.AutoSize(10);
-                mapList.AddChild(row);
-            }
-            mapList.AutoSize();
+                if (mapList.SelectedIndex < 0)
+                    return;
+
+                var map = Takai.Data.Cache.Load<Takai.Game.MapClass>(mapList.SelectedFile);
+                map.InitializeGraphics();
+                ui = new Takai.UI.Static(new Editor.Editor(map.Instantiate()));
+            };
 
             var newMap = ui.FindChildByName("new");
             newMap.Click += delegate (object _sender, Takai.UI.ClickEventArgs _e)

@@ -6,9 +6,15 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.UI
 {
+    public class SelectionChangedEventArgs : System.EventArgs
+    {
+        public int oldIndex;
+        public int newIndex;
+    }
+
     public class SelectionList<T> : List
     {
-        public ObservableCollection<T> Items { get; private set; } = new ObservableCollection<T>();
+        public ObservableCollection<T> Items { get; set; } = new ObservableCollection<T>();
 
         /// <summary>
         /// The currently selected item, can be null
@@ -24,32 +30,41 @@ namespace Takai.UI
         /// </summary>
         public int SelectedIndex
         {
-            get => selectedIndex;
+            get => _selectedIndex;
             set
             {
                 if (value < 0 || value >= Items.Count)
                     value = -1;
 
-                if (value != selectedIndex)
+                if (value != _selectedIndex)
                 {
-                    if (selectedIndex >= 0 && selectedIndex < Items.Count)
+                    if (_selectedIndex >= 0 && _selectedIndex < Items.Count)
                     {
-                        Children[selectedIndex].BorderColor = Color.Transparent;
+                        Children[_selectedIndex].BorderColor = Color.Transparent;
                     }
                     if (value >= 0 && value < Items.Count)
                     {
                         Children[value].BorderColor = Static.FocusedBorderColor;
                     }
-                    selectedIndex = value;
-                    OnSelectionChanged(System.EventArgs.Empty);
-                    SelectionChanged?.Invoke(this, System.EventArgs.Empty);
+
+                    var changed = new SelectionChangedEventArgs
+                    {
+                        oldIndex = _selectedIndex,
+                        newIndex = value
+                    };
+
+                    _selectedIndex = value;
+                    OnSelectionChanged(changed);
+                    SelectionChanged?.Invoke(this, changed);
                 }
             }
         }
-        private int selectedIndex = -1;
+        private int _selectedIndex = -1;
 
-        public System.EventHandler SelectionChanged { get; set; }
-        protected virtual void OnSelectionChanged(System.EventArgs e) { }
+        public float ItemPadding = 10;
+
+        public System.EventHandler<SelectionChangedEventArgs> SelectionChanged { get; set; }
+        protected virtual void OnSelectionChanged(SelectionChangedEventArgs e) { }
 
         public SelectionList()
         {
@@ -59,16 +74,25 @@ namespace Takai.UI
         protected void Items_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
                 RemoveAllChildren();
+                SelectedIndex = -1;
+            }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 for (int i = 0; i < e.OldItems.Count; ++i)
                     RemoveChildAt(e.OldStartingIndex + i);
+
+                if (SelectedIndex >= e.OldStartingIndex)
+                    SelectedIndex -= e.OldItems.Count;
             }
             else if (e.Action == NotifyCollectionChangedAction.Replace)
             {
+                if (SelectedIndex >= e.OldStartingIndex && SelectedIndex < e.NewStartingIndex + e.NewItems.Count)
+                    SelectedIndex = -1;
+
                 for (int i = 0; i < e.NewItems.Count; ++i)
-                   ReplaceChild(CreateItem((T)e.NewItems[i]), e.NewStartingIndex + i);
+                    ReplaceChild(CreateItem((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
             else if (e.Action == NotifyCollectionChangedAction.Move)
             {
@@ -90,7 +114,7 @@ namespace Takai.UI
                 Color = Color,
                 HorizontalAlignment = Alignment.Stretch
             };
-            item.AutoSize();
+            item.AutoSize(ItemPadding);
             item.Click += delegate (object sender, ClickEventArgs e)
             {
                 var which = (Static)sender;
