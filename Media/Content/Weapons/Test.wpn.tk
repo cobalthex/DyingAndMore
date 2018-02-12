@@ -1,7 +1,7 @@
 GunClass {
     Projectile: @"Weapons/Projectiles/Pellet.ent.tk";
 
-    MaxAmmo: 200;
+    MaxAmmo: 2000;
     #\RoundsPerBurst: 3;
     #ProjectilesPerRound: 6;
     #MaxBursts: 3;

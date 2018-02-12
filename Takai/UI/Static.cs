@@ -653,6 +653,38 @@ namespace Takai.UI
         }
 
         /// <summary>
+        /// Focus the closest element in a specific direction
+        /// If there are no elements in that direction, doesn't focus
+        /// </summary>
+        /// <param name="direction">The direction to search</param>
+        /// <param name="bias">How wide to make the search</param>
+        /// <returns>The focused element, or null if none</returns>
+        public Static FocusGeographically(Vector2 direction, float bias = 0.25f)
+        {
+            var prox = new SortedList<float, Static>();
+
+            var stack = new Stack<Static>(Children);
+            while (stack.Count > 0)
+            {
+                //todo: search up and down tree
+
+                //sort by combined score of dot and dist (length?)
+
+                var top = stack.Pop();
+                if (!top.CanFocus)
+                    continue;
+
+                var dot = Vector2.Dot(direction, Vector2.Normalize(top.Position - Position));
+                if (dot <= bias)
+                    prox.Add(Vector2.DistanceSquared(top.Position, Position), top);
+            }
+
+            if (prox.Count > 0)
+                return prox.Values[0];
+            return null;
+        }
+
+        /// <summary>
         /// Find the first element that can focus and focus it, starting at this element
         /// Only traverses down
         /// </summary>
