@@ -101,7 +101,7 @@ namespace Takai.UI
         /// <summary>
         /// The color to draw the outline with, by default, transparent
         /// </summary>
-        public virtual Color BorderColor { get; set; } = Color.Transparent;
+        public virtual Color BorderColor { get; set; } = Color.Red;
 
         /// <summary>
         /// An optional fill color for this element, by default, transparent
@@ -516,14 +516,28 @@ namespace Takai.UI
 
             var child = children[index];
             children.RemoveAt(index);
-            child._parent = null;
+            if (child._parent == this)
+                child._parent = null;
             return child;
         }
 
         public void RemoveAllChildren()
         {
             foreach (var child in children)
-                child._parent = null;
+            {
+                if (child._parent == this)
+                    child._parent = null;
+            }
+            children.Clear();
+        }
+
+        /// <summary>
+        /// Move all children from this element to another
+        /// </summary>
+        /// <param name="target">The target element to move them to</param>
+        public void MoveAllChildrenTo(Static target)
+        {
+            target.AddChildren(children);
             children.Clear();
         }
 
@@ -536,6 +550,14 @@ namespace Takai.UI
         {
             RemoveAllChildren();
             AddChildren(newChildren);
+        }
+
+        public Static GetRoot()
+        {
+            var current = this;
+            while (current.Parent != null)
+                current = current.Parent;
+            return current;
         }
 
         /// <summary>
@@ -661,9 +683,15 @@ namespace Takai.UI
         /// <returns>The focused element, or null if none</returns>
         public Static FocusGeographically(Vector2 direction, float bias = 0.25f)
         {
+            direction *= new Vector2(1, -1);
+            direction.Normalize();
+
+            //todo: search parents incrementally outward
+
             var prox = new SortedList<float, Static>();
 
-            var stack = new Stack<Static>(Children);
+            var stack = new Stack<Static>();
+            stack.Push(GetRoot());
             while (stack.Count > 0)
             {
                 //todo: search up and down tree
@@ -671,16 +699,27 @@ namespace Takai.UI
                 //sort by combined score of dot and dist (length?)
 
                 var top = stack.Pop();
-                if (!top.CanFocus)
-                    continue;
+                if (top != this && top.CanFocus)
+                {
+                    var diff = (top.VirtualBounds.Location - VirtualBounds.Location).ToVector2();
 
-                var dot = Vector2.Dot(direction, Vector2.Normalize(top.Position - Position));
-                if (dot <= bias)
-                    prox.Add(Vector2.DistanceSquared(top.Position, Position), top);
+                    var dot = Vector2.Dot(direction, Vector2.Normalize(diff));
+                    if (dot >= bias)
+                    {
+                        //todo: should be combination of dot and length
+                        var mag = diff.LengthSquared();
+                        prox[mag] = top;
+                    }
+                }
+                foreach (var child in top.Children)
+                    stack.Push(child);
             }
 
             if (prox.Count > 0)
+            {
+                prox.Values[0].HasFocus = true;
                 return prox.Values[0];
+            }
             return null;
         }
 
@@ -852,7 +891,7 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Automatically size this element. By default, will size based on text
+        /// Automatically size this element. By default, will size based on text and children
         /// This does not affect the position of the element
         /// Padding affects child positioning
         /// </summary>
@@ -942,12 +981,22 @@ namespace Takai.UI
                         FocusNext();
                     return false;
                 }
-                else if (Input.InputState.IsAnyPress(Buttons.LeftShoulder))
+
+                if (Input.InputState.IsAnyPress(Buttons.LeftShoulder))
                 {
                     FocusPrevious();
                     return false;
                 }
-                else if ((!ignoreEnterKey && Input.InputState.IsPress(Keys.Enter)) ||
+
+                var thumb = Input.InputState.Thumbsticks().Left;
+                var lastThumb = Input.InputState.LastThumbsticks().Left;
+                if (thumb != Vector2.Zero && lastThumb == Vector2.Zero)
+                {
+                    if (FocusGeographically(thumb) != null)
+                        return false;
+                }
+
+                if ((!ignoreEnterKey && Input.InputState.IsPress(Keys.Enter)) ||
                     (!ignoreSpaceKey && Input.InputState.IsPress(Keys.Space)) ||
                     Input.InputState.IsAnyPress(Buttons.A)) //optionally restrict input to player
                 {

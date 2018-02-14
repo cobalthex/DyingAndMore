@@ -4,7 +4,7 @@ using P = System.IO.Path;
 
 namespace Takai.UI
 {
-    public class FileList : SelectionList<string>
+    public class FileList : ItemList<string>
     {
         public string FilterRegex { get; set; }
 
@@ -44,7 +44,7 @@ namespace Takai.UI
             Items.Clear();
 
             if (Path != BasePath)
-            Items.Add("« Previous");
+                Items.Add("« Previous");
 
             //display folders first
             foreach (var entry in Directory.EnumerateDirectories(path))
@@ -54,7 +54,7 @@ namespace Takai.UI
             foreach (var entry in Directory.EnumerateFiles(path))
             {
                 if (regex.IsMatch(entry))
-                    Items.Add(P.GetFileName(entry));
+                    Items.Add("X");// P.GetFileName(entry));
             }
         }
 

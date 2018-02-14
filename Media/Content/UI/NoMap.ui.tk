@@ -31,7 +31,7 @@ List {
         }
 
         ScrollBox {
-            width: 600;
+            width: 400;
             height: 400;
             Direction: Direction.Vertical;
             HorizontalAlignment: Alignment.Middle;
@@ -41,6 +41,11 @@ List {
                     Direction: Direction.Vertical;
                     Path: 'Content/Maps';
                     HorizontalAlignment: Alignment.Stretch;
+                    VerticalAlignment: Alignment.Stretch;
+                    Container: RadialList {
+                        Size: [ 400 400];
+                        Radius: 100;
+                    };
                 }
             ]
         }

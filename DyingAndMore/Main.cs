@@ -133,16 +133,6 @@ namespace DyingAndMore
             }
 #endif
 
-            //testAutoObj = new Takai.Graphics.Sprite() { FrameLength = System.TimeSpan.FromMilliseconds(100) };
-
-            //var testAutoUi = Takai.UI.Static.GeneratePropSheet(
-            //    testAutoObj, Takai.UI.Static.DefaultFont, Color.White);
-
-            //var box = new Takai.UI.ScrollBox() { Position = new Vector2(100) };
-            //box.AddChild(testAutoUi);
-            //box.Size = new Vector2(300, 400);
-            //box.BorderColor = Color.LightBlue;
-
             ui = Takai.Data.Cache.Load<Takai.UI.Static>("UI/NoMap.ui.tk");
             var mapList = (Takai.UI.FileList)ui.FindChildByName("maps");
             mapList.SelectionChanged += delegate
@@ -167,27 +157,6 @@ namespace DyingAndMore
                 Bounds = new Rectangle(20, 20, 800, 100),
                 HorizontalAlignment = Takai.UI.Alignment.Middle
             };
-
-            /*
-            //var map = Takai.Data.Serializer.CastType<Takai.Game.Map>(
-            //    Takai.Data.Serializer.TextDeserialize("Data/Maps/playground.map.tk"));
-            var map = new Takai.Game.Map()
-            {
-                Tiles = new short[8, 8],
-                TilesImage = Takai.AssetManager.Load<Texture2D>("Textures/Tiles2.png"),
-                TileSize = 48,
-            };
-            map.BuildTileMask(map.TilesImage, true);
-            map.BuildSectors();
-            map.InitializeGraphics();
-            ui = new Takai.UI.Static(new Editor.Editor(map));
-
-            var klass = Takai.Data.Cache.Load<Takai.Game.EntityClass>("Defs/Entities/Player.ent.tk");
-            var inst = map.Spawn(klass, new Vector2(128), Vector2.UnitX, Vector2.Zero);
-            inst.Name = "Player";
-
-            testTex = Takai.AssetManager.Load<Texture2D>("Textures/Background.png");
-            */
 
             ui.HasFocus = true;
             base.Initialize();
