@@ -347,6 +347,11 @@ namespace Takai.Input
             return gamePadState[(int)player].ThumbSticks;
         }
 
+        public static GamePadThumbSticks LastThumbsticks(PlayerIndex player = PlayerIndex.One)
+        {
+            return lastGamePadState[(int)player].ThumbSticks;
+        }
+
         /// <summary>
         /// Checks if a modifier key is currently held down (both left or right)
         /// </summary>

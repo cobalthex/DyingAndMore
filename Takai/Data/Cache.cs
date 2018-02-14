@@ -483,8 +483,9 @@ namespace Takai.Data
 
             public override object Load(CustomLoad load)
             {
+#if WINDOWS_UAP
                 return new OggSoundSource(null); //todo
-
+#else
                 var vorbis = new NVorbis.VorbisReader(load.stream, true);
                 if (vorbis.Channels < 1 || vorbis.Channels > 2)
                     throw new FormatException($"Audio must be in mono or stero (provided: {vorbis.Channels})");
@@ -493,6 +494,7 @@ namespace Takai.Data
                     throw new FormatException($"Audio must be between 8KHz and 48KHz (provided: {vorbis.SampleRate / 1024:N1}KHz");
 
                 return new OggSoundSource(vorbis);
+#endif
             }
         }
 
