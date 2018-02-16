@@ -31,19 +31,18 @@ List {
         }
 
         ScrollBox {
-            width: 400;
-            height: 400;
-            Direction: Direction.Vertical;
+            Size: [400 400];
             HorizontalAlignment: Alignment.Middle;
             Children: [
                 FileList {
                     Name: "maps";
-                    Direction: Direction.Vertical;
                     Path: 'Content/Maps';
                     HorizontalAlignment: Alignment.Stretch;
                     VerticalAlignment: Alignment.Stretch;
                     Container: RadialList {
-                        Size: [ 400 400];
+                        name:"asdf";
+                        HorizontalAlignment: Alignment.Stretch;
+                        VerticalAlignment: Alignment.Stretch;
                         Radius: 100;
                     };
                 }

@@ -101,7 +101,7 @@ namespace Takai.UI
         /// <summary>
         /// The color to draw the outline with, by default, transparent
         /// </summary>
-        public virtual Color BorderColor { get; set; } = Color.Red;
+        public virtual Color BorderColor { get; set; } = Color.Transparent;
 
         /// <summary>
         /// An optional fill color for this element, by default, transparent
@@ -412,10 +412,10 @@ namespace Takai.UI
             return false;
         }
 
-        public virtual void AddChild(Static child)
+        public virtual Static AddChild(Static child)
         {
             if (child.Parent == this)
-                return;
+                return child;
 
             if (child.Parent != null)
                 child.RemoveFromParent();
@@ -426,6 +426,7 @@ namespace Takai.UI
             if (child.HasFocus)
                 child.HasFocus = true;
             Reflow();
+            return child;
         }
 
         /// <summary>
@@ -433,7 +434,8 @@ namespace Takai.UI
         /// </summary>
         /// <param name="child">the child to replace with</param>
         /// <param name="index">the index of the child to replace. Throws if out of range</param>
-        public virtual void ReplaceChild(Static child, int index)
+        /// <returns>The staticadded</returns>
+        public virtual Static ReplaceChild(Static child, int index)
         {
             if (children[index] != null)
                 children[index].Parent = null;
@@ -443,18 +445,22 @@ namespace Takai.UI
             if (child.HasFocus)
                 child.HasFocus = true;
             Reflow();
+
+            return child;
         }
 
-        public virtual void InsertChild(Static child, int index = 0)
+        public virtual Static InsertChild(Static child, int index = 0)
         {
             if (child.Parent == this)
-                return;
+                return child;
 
             child._parent = this;
             children.Insert(index, child);
             if (child.HasFocus) //re-apply throughout tree
                 child.HasFocus = true;
             Reflow();
+
+            return child;
         }
 
         public void AddChildren(params Static[] children)
@@ -504,9 +510,9 @@ namespace Takai.UI
         /// Remove an element from this element. Does not search children
         /// </summary>
         /// <param name="child"></param>
-        public void RemoveChild(Static child)
+        public Static RemoveChild(Static child)
         {
-            RemoveChildAt(children.IndexOf(child));
+            return RemoveChildAt(children.IndexOf(child));
         }
 
         public virtual Static RemoveChildAt(int index)

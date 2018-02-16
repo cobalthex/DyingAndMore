@@ -54,7 +54,7 @@ namespace Takai.UI
             foreach (var entry in Directory.EnumerateFiles(path))
             {
                 if (regex.IsMatch(entry))
-                    Items.Add("X");// P.GetFileName(entry));
+                    Items.Add(P.GetFileName(entry));
             }
         }
 
