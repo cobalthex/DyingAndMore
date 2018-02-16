@@ -235,10 +235,11 @@ namespace Takai.UI
         }
 
         //todo: unified method between all add modes?
-        public override void AddChild(Static child)
+        public override Static AddChild(Static child)
         {
-            contentArea.AddChild(child);
+            var added = contentArea.AddChild(child);
             ResizeContentArea();
+            return added;
         }
 
         protected override void OnResize(EventArgs e)

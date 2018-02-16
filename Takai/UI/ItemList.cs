@@ -42,6 +42,7 @@ namespace Takai.UI
                 _container = value;
                 _container.Resize += Container_Resize;
                 ReplaceAllChildren(_container);
+                Container.AutoSize();
             }
         }
         private Static _container;
@@ -140,12 +141,15 @@ namespace Takai.UI
                     Container.InsertChild(CreateItem((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
 
-            Container.AutoSize(2);
+            Container.AutoSize();
         }
 
         protected void Container_Resize(object sender, EventArgs e)
         {
-            Size = Container.Size;
+            Size = new Vector2(
+                HorizontalAlignment == Alignment.Stretch ? Size.X : Container.Size.X,
+                VerticalAlignment   == Alignment.Stretch ? Size.Y : Container.Size.Y
+            );
         }
 
         protected Static CreateItem(T value)

@@ -65,6 +65,52 @@ namespace DyingAndMore
             IsFixedTimeStep = false;
         }
 
+        class UiTree : Takai.UI.Static
+        {
+            public Takai.UI.Static Display
+            {
+                get => _display;
+                set
+                {
+                    if (value == _display)
+                        return;
+
+                    RemoveAllChildren();
+
+                    var stack = new System.Collections.Generic.Stack<(int, Takai.UI.Static)>();
+                    stack.Push((0, value));
+
+                    int y = 0;
+                    while (stack.Count > 0)
+                    {
+                        var top = stack.Pop();
+                        var elem = top.Item2;
+                        if (elem == this)
+                            continue;
+
+                        foreach (var child in elem.Children)
+                            stack.Push((top.Item1 + 1, child));
+
+                        var text = string.IsNullOrEmpty(elem.Name) ? "(No name)" : elem.Name;
+                        text += $" w:{elem.Size.X} h:{elem.Size.Y}";
+
+                        var disp = new Takai.UI.Static
+                        {
+                            Name = elem.Name,
+                            Text = text,
+                            Color = Color,
+                            Font = Font,
+                            Position = new Vector2(20 * top.Item1, y)
+                        };
+                        disp.AutoSize();
+                        y += (int)disp.Size.Y;
+                        AddChild(disp);
+                    }
+                }
+            }
+            private Takai.UI.Static _display;
+        }
+
         void GdmDeviceCreated(object sender, System.EventArgs e)
         {
             Takai.Runtime.Game = this;
