@@ -20,6 +20,8 @@ namespace Takai.UI
             set => list.SelectedIndex = value;
         }
 
+        public System.Collections.Generic.ICollection<T> Items => list.Items;
+
         public DropdownSelect()
         {
             dropdown.BorderColor = BorderColor = Color.White;

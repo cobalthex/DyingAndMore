@@ -264,7 +264,7 @@ namespace Takai.Game
                                 pi.generation = pathGeneration;
                                 pi.total += heuristic;
                                 ++pi.count;
-                                pi.heuristic = Math.Min(heuristic, pi.heuristic + 1);
+                                pi.heuristic = Math.Min(heuristic, pi.heuristic + 2);
                                 heuristic = pi.heuristic;
                                 PathInfo[pos.Y, pos.X] = pi;
                             }
@@ -281,7 +281,7 @@ namespace Takai.Game
                             queue.Enqueue(new HeuristicScore
                             {
                                 tile = pos,
-                                value = PathInfo[pos.Y, pos.X].heuristic + 1
+                                value = PathInfo[pos.Y, pos.X].heuristic + 2
                             });
                         }
                     }

@@ -201,6 +201,27 @@ namespace Takai.Game
                         entity.Position += entity.Velocity * deltaSeconds;
                         entity.Velocity -= entity.Velocity * entity.Class.Drag * deltaSeconds;
                         entity.UpdateAxisAlignedBounds();
+
+                        //place this entity into the pathing grid as an obstacle
+
+                        var tileBounds = entity.AxisAlignedBounds;
+                        tileBounds.X /= Class.TileSize;
+                        tileBounds.Y /= Class.TileSize;
+                        tileBounds.Width = (tileBounds.Width - 1) / Class.TileSize + 1;
+                        tileBounds.Height = (tileBounds.Height - 1) / Class.TileSize + 1;
+
+                        for (int tbY = Math.Max(0, tileBounds.Top); tbY < Math.Min(Class.Height, tileBounds.Bottom); ++tbY)
+                        {
+                            for (int tbX = Math.Max(0, tileBounds.Left); tbX < Math.Min(Class.Width, tileBounds.Right); ++tbX)
+                            {
+                                var pi = PathInfo[tbY, tbX];
+                                if (pi.heuristic < uint.MaxValue)
+                                {
+                                    ++pi.heuristic;
+                                    PathInfo[tbY, tbX] = pi;
+                                }
+                            }
+                        }
                     }
                 }
             }
