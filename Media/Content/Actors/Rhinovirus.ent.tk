@@ -7,7 +7,9 @@ ActorClass {
         Behaviors: [
             ShootBehavior {};
             FocusBehavior {};
-            TargetEnemyBehavior {};
+            TargetEnemyBehavior {
+                SightDistance: 1000;
+            };
         ];
     }
 

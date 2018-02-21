@@ -38,8 +38,6 @@ namespace DyingAndMore.Editor
         Static fpsDisplay;
         Static resizeDialog;
 
-        RadialList radialListTest;
-
         public EditorConfiguration config;
 
         public Editor(Takai.Game.MapInstance map)
@@ -81,20 +79,14 @@ namespace DyingAndMore.Editor
             swatch.Stop();
             Takai.LogBuffer.Append($"Loaded editor and map \"{map.Class.Name}\" ({map.Class.File}) in {swatch.ElapsedMilliseconds}msec");
 
-            radialListTest = new RadialList();
-            for (int i = 0; i < 16; ++i)
-            {
-                var item = new Static
-                {
-                    Text = ((char)('A' + i)).ToString(),
-                };
-                item.AutoSize();
-                radialListTest.AddChild(item);
-            }
-            radialListTest.AutoSize();
-            radialListTest.Position = new Vector2(200);
-            AddChild(radialListTest);
-
+            var sel = new DropdownSelect<string>();
+            sel.Items.Add("test 1");
+            sel.Items.Add("test 2");
+            sel.Items.Add("test 3");
+            sel.Items.Add("test 4");
+            sel.Position = new Vector2(200);
+            sel.Size = new Vector2(100, 20);
+            AddChild(sel);
         }
 
         void AddModes()

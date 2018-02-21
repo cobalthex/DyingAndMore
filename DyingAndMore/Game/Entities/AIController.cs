@@ -152,9 +152,11 @@ namespace DyingAndMore.Game.Entities
 
     class TargetEnemyBehavior : Behavior
     {
+        //break out into individual targets that get added to the behavior list
+
         public override BehaviorMask Mask => BehaviorMask.Targeting;
 
-        public float SightDistance { get; set; } = 300;
+        public float SightDistance { get; set; } = 500;
 
         public override BehaviorPriority CalculatePriority()
         {
@@ -288,9 +290,12 @@ namespace DyingAndMore.Game.Entities
                     minimums.Add(dir);
             }
 
-            var next = minimums[0];
-            AI.Actor.Forward = next.ToVector2();
-            AI.Actor.Velocity = AI.Actor.Forward * 300; //todo: move force
+            var next = Vector2.Normalize(minimums[0].ToVector2());
+
+            AI.Actor.Forward = Vector2.Lerp(AI.Actor.Forward, next, MathHelper.PiOver2 * (float)deltaTime.TotalSeconds); //factor in speed (tighter turns over speed)
+
+            //AI.Actor.Forward = next.ToVector2();
+            AI.Actor.Velocity = AI.Actor.Forward * ((ActorClass)AI.Actor.Class).MoveForce; //todo: move force
         }
     }
 

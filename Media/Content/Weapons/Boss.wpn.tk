@@ -1,5 +1,5 @@
 GunClass {
-    Projectile: @"Weapons/Projectiles/Pellet.ent.tk";
+    Projectile: @"Weapons/Projectiles/Missile.ent.tk";
 
     MaxAmmo: 1000;
     RoundsPerBurst: 1;

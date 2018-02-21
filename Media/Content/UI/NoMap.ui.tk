@@ -39,12 +39,9 @@ List {
                     Path: 'Content/Maps';
                     HorizontalAlignment: Alignment.Stretch;
                     VerticalAlignment: Alignment.Stretch;
-                    Container: RadialList {
-                        name:"asdf";
-                        HorizontalAlignment: Alignment.Stretch;
-                        VerticalAlignment: Alignment.Stretch;
-                        Radius: 100;
-                    };
+                    Container: List {
+                        HorizontalAlignment: Alignment.Middle;
+                    }
                 }
             ]
         }
