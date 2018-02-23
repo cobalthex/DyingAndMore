@@ -13,7 +13,7 @@ List {
     Children: [
         Static {
             Text: "Create a New Map";
-            Font: @"UI/Fonts/UILarge.bfnt";
+            Font: @"Fonts/UILarge.bfnt";
             Color: Color.White;
             HorizontalAlignment: Alignment.Middle;
         }
@@ -80,7 +80,7 @@ List {
         Static {
             Name: "create";
             Text: "Create";
-            Font: @"UI/Fonts/UILarge.bfnt";
+            Font: @"Fonts/UILarge.bfnt";
             Width: 200;
             HorizontalAlignment: Alignment.Middle;
         }

@@ -148,7 +148,16 @@ namespace Takai.Game
                 if (ent.Name == name)
                     return ent;
             }
+            return null;
+        }
 
+        public EntityInstance FindEntityById(int id)
+        {
+            foreach (var ent in AllEntities)
+            {
+                if (ent.Id == id)
+                    return ent;
+            }
             return null;
         }
 

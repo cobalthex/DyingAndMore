@@ -24,15 +24,24 @@ namespace DyingAndMore.Game
         public bool AllowFriendlyFire { get; set; }
     }
 
+    public struct GameDebugInfo
+    {
+        public bool drawActorInfo;
+        public bool drawSounds;
+    }
+
     public class GameInstance
     {
+        public static GameInstance Current;
+
         //move into Game?
         public TimeSpan ElapsedRealTime { get; set; }
 
-        public static GameInstance Current;
-
         //Game Campaign
-        public GameConfiguration configuration;
+        public GameConfiguration Configuration { get; set; }
+
+        [Takai.Data.Serializer.Ignored]
+        public GameDebugInfo debugInfo;
 
         public System.Collections.Generic.List<Entities.ActorInstance> players;
 
@@ -71,7 +80,13 @@ namespace DyingAndMore.Game
 
         public Game(MapInstance map)
         {
-            GameInstance.Current = new GameInstance();
+            GameInstance.Current = new GameInstance
+            {
+                debugInfo = new GameDebugInfo
+                {
+                    drawActorInfo = true,
+                }
+            };
 
             Map = map ?? throw new ArgumentNullException("There must be a map to play");
 
@@ -110,7 +125,7 @@ namespace DyingAndMore.Game
                 Position = new Vector2(20),
                 Size = new Vector2(400, 30),
                 VerticalAlignment = Alignment.End,
-                Font = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/xbox.bfnt"),
+                Font = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/xbox.bfnt"),
             };
             debugConsole.Submit += delegate (object sender, EventArgs e)
             {
@@ -120,7 +135,7 @@ namespace DyingAndMore.Game
                 inp.Text = String.Empty;
             };
 
-            tinyFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/UITiny.bfnt");
+            tinyFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
 
             testEffect = Takai.Data.Cache.Load<EffectsClass>("Effects/Damage.fx.tk");
         }
@@ -320,6 +335,48 @@ namespace DyingAndMore.Game
                     }
                     break;
 
+                case "entinfo":
+                    {
+                        if (words.Length < 2)
+                            break;
+
+                        ScrollBox s = new ScrollBox()
+                        {
+                            BackgroundColor = new Color(40, 40, 40),
+                            BorderColor = Color.Gray,
+                            Size = new Vector2(600),
+                            HorizontalAlignment = Alignment.Middle,
+                            VerticalAlignment = Alignment.Middle,
+                        };
+                        s.Click += delegate (object sender, ClickEventArgs e) { ((Static)sender).RemoveFromParent(); };
+
+                        string entInfo = string.Empty;
+                        try
+                        {
+                            var ent = Map.FindEntityById(int.Parse(words[1]));
+                            using (var writer = new System.IO.StringWriter())
+                            {
+                                Takai.Data.Serializer.TextSerialize(writer, ent);
+                                entInfo = writer.ToString();
+                            }
+                        }
+                        catch
+                        {
+                            break;
+                        }
+
+                        var info = new Static()
+                        {
+                            Text = entInfo,
+                            Font = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/Bahnschrift.fnt.tk")
+                        };
+                        info.AutoSize();
+                        s.AddChild(info);
+
+                        AddChild(s);
+                    }
+                    break;
+
                 case "exit":
                 case "quit":
                     Takai.Runtime.IsExiting = true;
@@ -376,6 +433,9 @@ namespace DyingAndMore.Game
                 return false;
             }
 
+            if (InputState.IsPress(Keys.Escape))
+                IsPaused = !IsPaused;
+
             var scrollDelta = InputState.ScrollDelta();
             if (scrollDelta != 0)
             {
@@ -386,6 +446,15 @@ namespace DyingAndMore.Game
                 else
                     Map.ActiveCamera.Scale += Math.Sign(scrollDelta) * 0.1f;
             }
+
+#if DEBUG
+            {
+                if (InputState.IsButtonDown(MouseButtons.Middle))
+                {
+                    Map.ActiveCamera._DebugSetTransform(true, -Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(Map.ActiveCamera.Transform)));
+                }
+            }
+#endif
 
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
@@ -428,35 +497,57 @@ namespace DyingAndMore.Game
         {
             base.DrawSelf(spriteBatch);
 
+            var debugInfo = GameInstance.Current.debugInfo;
+
             var particleCount = 0;
             foreach (var ptype in Map.Particles)
                 particleCount += ptype.Value.Count;
 
             DefaultFont.Draw(spriteBatch, $"Total entities:{Map.AllEntities.Count()}\nTotal Particles:{particleCount}", new Vector2(20), Color.Orange);
 
-            foreach (var ent in Map.EnumerateVisibleEntities())
+            if (debugInfo.drawActorInfo)
             {
-                if (!(ent is Entities.ActorInstance actor))
-                    continue;
-
-                var pos = Map.ActiveCamera.WorldToScreen(actor.Position) - new Vector2(ent.Radius * 1.5f * Map.ActiveCamera.Scale);
-
-                DefaultFont.Draw(spriteBatch, $"{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}", pos, Color.Tomato);
-                if (actor.Weapon is Weapons.GunInstance gun)
+                foreach (var ent in Map.EnumerateVisibleEntities())
                 {
-                    pos.Y += 15;
-                    DefaultFont.Draw(spriteBatch, $"{gun.AmmoCount} {gun.State} {gun.Charge:N2}", pos, Color.LightSteelBlue);
+                    if (!(ent is Entities.ActorInstance actor))
+                        continue;
+
+                    var pos = Map.ActiveCamera.WorldToScreen(actor.Position) + new Vector2(ent.Radius / 2 * Map.ActiveCamera.Scale);
+
+                    var sb = new System.Text.StringBuilder();
+                    sb.Append($"{actor.Id}: ");
+                    sb.Append($"`f76{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}`x\n");
+                    if (actor.Weapon is Weapons.GunInstance gun)
+                        sb.Append($"`bcf{gun.AmmoCount} {gun.State} {gun.Charge:N2}`x\n");
+                    if (actor.Controller is Entities.AIController ai)
+                    {
+                        sb.Append($"`ad4{ai.Target}");
+                        for (int i = 0; i < ai.ChosenBehaviors.Length; ++i)
+                        {
+                            if (ai.ChosenBehaviors[i] != null)
+                            {
+                                sb.Append("\n");
+                                sb.Append(ai.ChosenBehaviors[i].ToString());
+                            }
+                        }
+                        sb.Append("`x\n");
+                    }
+
+                    DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
                 }
             }
 
-            foreach (var sound in Map.Sounds)
+            if (debugInfo.drawSounds)
             {
-                DefaultFont.Draw(
-                    spriteBatch,
-                    $"Vol:{sound.Instance.Volume:N2} Pan:{sound.Instance.Pan:N2} Pit:{sound.Instance.Pitch:N2}",
-                    Map.ActiveCamera.WorldToScreen(sound.Position) + new Vector2(0, 50),
-                    Color.Aquamarine
-                );
+                foreach (var sound in Map.Sounds)
+                {
+                    DefaultFont.Draw(
+                        spriteBatch,
+                        $"Vol:{sound.Instance.Volume:N2} Pan:{sound.Instance.Pan:N2} Pit:{sound.Instance.Pitch:N2}",
+                        Map.ActiveCamera.WorldToScreen(sound.Position) + new Vector2(0, 50),
+                        Color.Aquamarine
+                    );
+                }
             }
         }
     }

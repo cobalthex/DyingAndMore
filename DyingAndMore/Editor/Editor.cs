@@ -50,8 +50,8 @@ namespace DyingAndMore.Editor
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
 
-            var smallFont = Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/UISmall.bfnt");
-            var largeFont = Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/UILarge.bfnt");
+            var smallFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UISmall.bfnt");
+            var largeFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UILarge.bfnt");
 
             AddChild(modes = new ModeSelector(largeFont, smallFont)
             {
