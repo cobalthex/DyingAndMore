@@ -8,6 +8,11 @@ namespace Takai.UI
     /// </summary>
     public class MapView : Static
     {
+        /// <summary>
+        /// Pause the update cycle of the map?
+        /// </summary>
+        public bool IsPaused { get; set; } = false;
+
         public Game.MapInstance Map
         {
             get => map;
@@ -36,7 +41,7 @@ namespace Takai.UI
 
         protected override void UpdateSelf(GameTime time)
         {
-            if (Map != null)
+            if (Map != null && !IsPaused)
             {
                 if (Map.ActiveCamera != null)
                     Map.ActiveCamera.Viewport = VisibleBounds;

@@ -143,9 +143,9 @@ namespace DyingAndMore
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            Takai.UI.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/UISmall.bfnt");
+            Takai.UI.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UISmall.bfnt");
 
-            debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("UI/Fonts/rct2.bfnt");
+            debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
 
 #if WINDOWS //UWP launch activation parameters?
             //parse command line args

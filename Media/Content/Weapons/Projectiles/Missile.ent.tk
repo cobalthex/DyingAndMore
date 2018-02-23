@@ -5,6 +5,7 @@ ProjectileClass {
     IgnoreTrace: True;
     Drag: 0.4;
     MinimumSpeed: 300;
+    CanDamageSource: true;
 
     DestructionEffect: @"Effects/Splatter.fx.tk";
 

@@ -7,7 +7,7 @@ List {
     Children: [
         Static {
             Text: "No map loaded";
-            Font: @"UI/Fonts/UILarge.bfnt";
+            Font: @"Fonts/UILarge.bfnt";
             Color: Color.White;
             HorizontalAlignment: Alignment.Middle;
         }

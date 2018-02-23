@@ -57,6 +57,11 @@ namespace DyingAndMore.Game.Entities
         public abstract BehaviorPriority CalculatePriority();
 
         public abstract void Think(TimeSpan deltaTime);
+
+        public override string ToString()
+        {
+            return GetType().Name;
+        }
     }
 
     public class AIController : Controller
@@ -77,6 +82,8 @@ namespace DyingAndMore.Game.Entities
 
         List<PrioritizedBehavior>[] behaviorCosts
             = new List<PrioritizedBehavior>[(int)BehaviorMask._Count_];
+
+        public Behavior[] ChosenBehaviors { get; set; } = new Behavior[(int)BehaviorMask._Count_];
 
         Random random = new Random();
 
@@ -138,13 +145,14 @@ namespace DyingAndMore.Game.Entities
                 behaviorCosts[mask].Add(new PrioritizedBehavior(priority, behavior));
             }
 
-            foreach (var list in behaviorCosts)
+            for (int i = 0; i < behaviorCosts.Length; ++i)
             {
-                if (list.Count > 0)
+                if (behaviorCosts[i].Count > 0)
                 {
-                    var choice = random.Next(0, list.Count);
-                    list[choice].behavior.Think(deltaTime);
-                    list.Clear();
+                    var choice = random.Next(0, behaviorCosts[i].Count);
+                    ChosenBehaviors[i] = behaviorCosts[i][choice].behavior;
+                    ChosenBehaviors[i].Think(deltaTime);
+                    behaviorCosts[i].Clear();
                 }
             }
         }
@@ -156,7 +164,7 @@ namespace DyingAndMore.Game.Entities
 
         public override BehaviorMask Mask => BehaviorMask.Targeting;
 
-        public float SightDistance { get; set; } = 500;
+        public float SightDistance { get; set; } = 1000;
 
         public override BehaviorPriority CalculatePriority()
         {
@@ -293,6 +301,7 @@ namespace DyingAndMore.Game.Entities
             var next = Vector2.Normalize(minimums[0].ToVector2());
 
             AI.Actor.Forward = Vector2.Lerp(AI.Actor.Forward, next, MathHelper.PiOver2 * (float)deltaTime.TotalSeconds); //factor in speed (tighter turns over speed)
+            AI.Actor.Forward.Normalize();
 
             //AI.Actor.Forward = next.ToVector2();
             AI.Actor.Velocity = AI.Actor.Forward * ((ActorClass)AI.Actor.Class).MoveForce; //todo: move force

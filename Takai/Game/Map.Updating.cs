@@ -165,15 +165,15 @@ namespace Takai.Game
                                 entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;
                             }
                         }
-                        else //entity collision
-                        {
-                            entity.Position = target;
-                            entity.OnEntityCollision(hit.entity, target, deltaTime);
-                            hit.entity.OnEntityCollision(entity, target, deltaTime);
+                        //else //entity collision
+                        //{
+                        //    entity.Position = target;
+                        //    entity.OnEntityCollision(hit.entity, target, deltaTime);
+                        //    hit.entity.OnEntityCollision(entity, target, deltaTime);
 
-                            if (entity.Class.IsPhysical)
-                                entity.Velocity = Vector2.Zero;
-                        }
+                        //    if (entity.Class.IsPhysical)
+                        //        entity.Velocity = Vector2.Zero;
+                        //}
 
                         //Fluid collision
                         if (!entity.Class.IgnoreTrace)
@@ -217,7 +217,7 @@ namespace Takai.Game
                                 var pi = PathInfo[tbY, tbX];
                                 if (pi.heuristic < uint.MaxValue)
                                 {
-                                    ++pi.heuristic;
+                                    pi.heuristic += 2;
                                     PathInfo[tbY, tbX] = pi;
                                 }
                             }

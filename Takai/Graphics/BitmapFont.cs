@@ -171,9 +171,9 @@ namespace Takai.Graphics
                     else if (i + 3 < text.Length)
                     {
                         int[] col = new int[3];
-                        for (int j = 0; j < 3; ++j)
+                        for (int j = 0; j < 3; ++j, i++)
                         {
-                            char cch = text[i + i];
+                            char cch = text[i + 1];
                             if (cch >= 'a' && cch <= 'f')
                                 col[j] = 10 + (cch - 'a');
                             else if (cch >= 'A' && cch <= 'F')
@@ -181,8 +181,7 @@ namespace Takai.Graphics
                             else if (cch >= '0' && cch <= '9')
                                 col[j] = (cch - '0');
                         }
-                        curColor = new Color(col[0] << 3, col[1] << 3, col[2] << 3);
-                        i += 3;
+                        curColor = new Color(col[0] << 4, col[1] << 4, col[2] << 4);
                         continue;
                     }
                 }

@@ -131,6 +131,18 @@ namespace Takai.Game
             ActualPosition = Position = position;
         }
 
+        public void _DebugSetTransform(bool relative, Vector2 position)
+        {
+            if (relative)
+            {
+                ActualPosition += position;
+            }
+            else
+            {
+                ActualPosition = position;
+            }
+        }
+
         /// <summary>
         /// Update the camera (and map)
         /// </summary>
