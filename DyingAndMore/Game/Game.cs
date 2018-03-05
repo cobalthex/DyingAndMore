@@ -24,12 +24,6 @@ namespace DyingAndMore.Game
         public bool AllowFriendlyFire { get; set; }
     }
 
-    public struct GameDebugInfo
-    {
-        public bool drawActorInfo;
-        public bool drawSounds;
-    }
-
     public class GameInstance
     {
         public static GameInstance Current;
@@ -39,9 +33,6 @@ namespace DyingAndMore.Game
 
         //Game Campaign
         public GameConfiguration Configuration { get; set; }
-
-        [Takai.Data.Serializer.Ignored]
-        public GameDebugInfo debugInfo;
 
         public System.Collections.Generic.List<Entities.ActorInstance> players;
 
@@ -64,29 +55,25 @@ namespace DyingAndMore.Game
         EffectsClass testEffect;
 
         Static renderSettingsConsole;
-        void ToggleRenderSettingsConsole()
+        Static updateSettingsConsole;
+
+        void ToggleUI(Static ui)
         {
-            if (!renderSettingsConsole.RemoveFromParent())
+            if (!ui.RemoveFromParent())
             {
                 //refresh individual render settings
-                var settings = typeof(MapInstance.RenderSettings);
-                foreach (var child in renderSettingsConsole.Children)
-                    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
+                var settings = ui.UserData.GetType();
+                foreach (var child in ui.Children)
+                    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(ui.UserData);
 
-                AddChild(renderSettingsConsole);
-                renderSettingsConsole.HasFocus = true;
+                AddChild(ui);
+                ui.HasFocus = true;
             }
         }
 
         public Game(MapInstance map)
         {
-            GameInstance.Current = new GameInstance
-            {
-                debugInfo = new GameDebugInfo
-                {
-                    drawActorInfo = true,
-                }
-            };
+            GameInstance.Current = new GameInstance();
 
             Map = map ?? throw new ArgumentNullException("There must be a map to play");
 
@@ -98,6 +85,12 @@ namespace DyingAndMore.Game
             renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
             renderSettingsConsole.Position = new Vector2(100, 0);
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;
+            renderSettingsConsole.UserData = map.renderSettings;
+
+            updateSettingsConsole = GeneratePropSheet(map.updateSettings, DefaultFont, DefaultColor);
+            updateSettingsConsole.Position = new Vector2(100, 0);
+            updateSettingsConsole.VerticalAlignment = Alignment.Middle;
+            updateSettingsConsole.UserData = map.updateSettings;
 
             AddChild(fpsDisplay = new Static()
             {
@@ -199,7 +192,7 @@ namespace DyingAndMore.Game
         protected override void UpdateSelf(GameTime time)
         {
             GameInstance.Current.ElapsedRealTime += time.ElapsedGameTime;
-            clockDisplay.Text = $"{GetClockText(GameInstance.Current.ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}";
+            clockDisplay.Text = $"{GetClockText(GameInstance.Current.ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}x{Map.TimeScale:N1}{(IsPaused ? "\n -- PAUSED --" : "")}";
             clockDisplay.AutoSize();
 
             if (!x)
@@ -208,18 +201,21 @@ namespace DyingAndMore.Game
                 Takai.Data.Cache.CleanupStaleReferences(); //todo: find better place for this (editor needs to be fully out of scope)
             }
 
-            for (int i = 0; i < (GameInstance.Current.players?.Count ?? 0); ++i)
+            if (!IsPaused)
             {
-                //var region = new Rectangle(GameInstance.Current.players[i].Position.ToPoint(), new Point(1));
-                var region = Map.ActiveCamera.VisibleRegion;
-                region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
-                Map.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
+                for (int i = 0; i < (GameInstance.Current.players?.Count ?? 0); ++i)
+                {
+                    //var region = new Rectangle(GameInstance.Current.players[i].Position.ToPoint(), new Point(1));
+                    var region = Map.ActiveCamera.VisibleRegion;
+                    region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
+                    Map.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
+                }
             }
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
-            crapDisplay.Text = $"TimeScale:{Map.TimeScale:N1}\nZoom:{Map.ActiveCamera.Scale:N1}";
+            crapDisplay.Text = $"Zoom:{Map.ActiveCamera.Scale:N1}";
             crapDisplay.AutoSize();
 
             base.UpdateSelf(time);
@@ -292,6 +288,10 @@ namespace DyingAndMore.Game
                     }
                     break;
 
+                case "reset":
+                    Map = Map.Class.Instantiate();
+                    break;
+
                 case "timescale":
                     if (words.Length == 1)
                         Takai.LogBuffer.Append("Time scale: " + Map.TimeScale);
@@ -340,6 +340,14 @@ namespace DyingAndMore.Game
                         if (words.Length < 2)
                             break;
 
+                        int nextIndex = 1;
+                        bool writeFile = false;
+                        if (words[1] == "-f")
+                        {
+                            writeFile = true;
+                            ++nextIndex;
+                        }
+
                         ScrollBox s = new ScrollBox()
                         {
                             BackgroundColor = new Color(40, 40, 40),
@@ -353,10 +361,15 @@ namespace DyingAndMore.Game
                         string entInfo = string.Empty;
                         try
                         {
-                            var ent = Map.FindEntityById(int.Parse(words[1]));
                             using (var writer = new System.IO.StringWriter())
                             {
-                                Takai.Data.Serializer.TextSerialize(writer, ent);
+                                for (int i = nextIndex; i < words.Length; ++i)
+                                {
+                                    if (i > nextIndex)
+                                        writer.WriteLine();
+                                    var ent = Map.FindEntityById(int.Parse(words[i]));
+                                    Takai.Data.Serializer.TextSerialize(writer, ent, 0, false, true);
+                                }
                                 entInfo = writer.ToString();
                             }
                         }
@@ -365,15 +378,25 @@ namespace DyingAndMore.Game
                             break;
                         }
 
-                        var info = new Static()
+                        if (writeFile)
                         {
-                            Text = entInfo,
-                            Font = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/Bahnschrift.fnt.tk")
-                        };
-                        info.AutoSize();
-                        s.AddChild(info);
+                            System.IO.Directory.CreateDirectory("debug");
+                            System.IO.File.WriteAllText("debug\\entinfo.tk", entInfo);
+#if WINDOWS
+                            System.Diagnostics.Process.Start("debug\\entinfo.tk");
+#endif
+                        }
+                        else
+                        {
+                            var info = new Static()
+                            {
+                                Text = entInfo,
+                            };
+                            info.AutoSize();
+                            s.AddChild(info);
 
-                        AddChild(s);
+                            AddChild(s);
+                        }
                     }
                     break;
 
@@ -429,7 +452,13 @@ namespace DyingAndMore.Game
             if (InputState.IsPress(Keys.F2) ||
                 InputState.IsAnyPress(Buttons.Back))
             {
-                ToggleRenderSettingsConsole();
+                ToggleUI(renderSettingsConsole);
+                return false;
+            }
+            if (InputState.IsPress(Keys.F3) ||
+                InputState.IsAnyPress(Buttons.Back))
+            {
+                ToggleUI(updateSettingsConsole);
                 return false;
             }
 
@@ -497,15 +526,13 @@ namespace DyingAndMore.Game
         {
             base.DrawSelf(spriteBatch);
 
-            var debugInfo = GameInstance.Current.debugInfo;
-
             var particleCount = 0;
             foreach (var ptype in Map.Particles)
                 particleCount += ptype.Value.Count;
 
             DefaultFont.Draw(spriteBatch, $"Total entities:{Map.AllEntities.Count()}\nTotal Particles:{particleCount}", new Vector2(20), Color.Orange);
 
-            if (debugInfo.drawActorInfo)
+            if (Map.renderSettings.drawDebugInfo)
             {
                 foreach (var ent in Map.EnumerateVisibleEntities())
                 {
@@ -535,10 +562,7 @@ namespace DyingAndMore.Game
 
                     DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
                 }
-            }
 
-            if (debugInfo.drawSounds)
-            {
                 foreach (var sound in Map.Sounds)
                 {
                     DefaultFont.Draw(

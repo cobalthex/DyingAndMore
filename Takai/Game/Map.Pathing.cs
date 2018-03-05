@@ -185,6 +185,15 @@ namespace Takai.Game
 
         internal uint MaxHeuristic = 0;
 
+        public PathTile PathInfoAt(Vector2 position)
+        {
+            if (!Class.Bounds.Contains(position))
+                return new PathTile { heuristic = uint.MaxValue };
+
+            var tile = (position / Class.TileSize).ToPoint();
+            return PathInfo[tile.Y, tile.X];
+        }
+
         public struct HeuristicScore
         {
             public Point tile;
@@ -210,6 +219,8 @@ namespace Takai.Game
             new Point( 0,  1),
             //new Point( 1,  1),
         };
+
+        public const uint WallPathingBias = 5;
 
         //dynamic heuristic that only builds to visible region/entities
 
@@ -264,7 +275,7 @@ namespace Takai.Game
                                 pi.generation = pathGeneration;
                                 pi.total += heuristic;
                                 ++pi.count;
-                                pi.heuristic = Math.Min(heuristic, pi.heuristic + 2);
+                                pi.heuristic = Math.Min(heuristic, pi.heuristic + 1);
                                 heuristic = pi.heuristic;
                                 PathInfo[pos.Y, pos.X] = pi;
                             }
@@ -281,7 +292,7 @@ namespace Takai.Game
                             queue.Enqueue(new HeuristicScore
                             {
                                 tile = pos,
-                                value = PathInfo[pos.Y, pos.X].heuristic + 2
+                                value = PathInfo[pos.Y, pos.X].heuristic + 1
                             });
                         }
                     }
@@ -289,10 +300,11 @@ namespace Takai.Game
                         ++edge;
                 }
 
+                //bias against walls
                 if (edge > 0)
                 {
                     var pi = PathInfo[first.tile.Y, first.tile.X];
-                    pi.heuristic += edge * 2;
+                    pi.heuristic += edge + WallPathingBias;
                     PathInfo[first.tile.Y, first.tile.X] = pi;
                 }
                 MaxHeuristic = Math.Max(MaxHeuristic, heuristic);

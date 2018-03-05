@@ -51,6 +51,9 @@ namespace Takai.UI
         /// </summary>
         public static Color FocusedBorderColor = Color.RoyalBlue;
 
+        [Data.Serializer.Ignored]
+        public object UserData { get; set; } = null;
+
         /// <summary>
         /// A unique name for this element. Can be null
         /// </summary>

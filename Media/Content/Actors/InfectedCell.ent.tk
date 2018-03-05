@@ -3,17 +3,25 @@ ActorClass {
     MaxHealth: 20;
     DefaultFaction: Factions [Enemy Common];
 
+    FieldOfView: 2.356194;
+    MaxSpeed: [200 400];
+    MoveForce: [300 500];
+    IsPhysical: true;
+    IgnoreTrace: false;
+    AlwaysDrawUpright: true;
+    DestroyOnDeath: true;
+
     DefaultController: AIController {
         Behaviors: [
             FlowSeekBehavior { };
 
             TargetEnemyBehavior { };
             FocusBehavior { };
-            #*
+         
             SuicideBehavior {
                 Radius: 80;
                 Effect: @"Effects/Damage.fx.tk";
-            };*#
+            };
         ];
     };
 
@@ -48,12 +56,4 @@ ActorClass {
             Sound: { };
         };
     };
-
-    FieldOfView: 2.356194;
-    MaxSpeed: [200 400];
-    MoveForce: 500;
-    IsPhysical: true;
-    IgnoreTrace: false;
-    AlwaysDrawUpright: true;
-    DestroyOnDeath: true;
 }
