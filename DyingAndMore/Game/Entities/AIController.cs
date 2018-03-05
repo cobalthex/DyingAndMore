@@ -261,6 +261,9 @@ namespace DyingAndMore.Game.Entities
 
         public override BehaviorPriority CalculatePriority()
         {
+            var curPI = AI.Actor.Map.PathInfoAt(AI.Actor.Position);
+            if (curPI.heuristic * AI.Actor.Map.Class.TileSize > 1000) //todo: sight range per actor
+                return BehaviorPriority.Never;
             return BehaviorPriority.Normal;
         }
 
@@ -304,7 +307,7 @@ namespace DyingAndMore.Game.Entities
             AI.Actor.Forward.Normalize();
 
             //AI.Actor.Forward = next.ToVector2();
-            AI.Actor.Velocity = AI.Actor.Forward * ((ActorClass)AI.Actor.Class).MoveForce; //todo: move force
+            AI.Actor.Accelerate(AI.Actor.Forward);
         }
     }
 
@@ -345,7 +348,7 @@ namespace DyingAndMore.Game.Entities
         public override BehaviorPriority CalculatePriority()
         {
             if (AI.Actor.Velocity == Vector2.Zero)
-                return BehaviorPriority.High;
+                return BehaviorPriority.Normal;
             return BehaviorPriority.Low;
         }
 
@@ -354,7 +357,8 @@ namespace DyingAndMore.Game.Entities
         {
             var diff = Vector2.Normalize(AI.Target.Position - AI.Actor.Position);
             var det = Takai.Util.Determinant(AI.Actor.Forward, diff);
-            var angle = det * MaxTurn;
+            var maxTurn = MathHelper.Clamp(MaxTurn / (AI.Actor.Velocity.Length() / 20), 0, MaxTurn);
+            var angle = det * maxTurn;
 
             //angular velocity and influence (if already turning one direction and some threshhold, continue rotating in the same direction)
 

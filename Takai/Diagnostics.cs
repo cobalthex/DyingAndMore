@@ -152,6 +152,8 @@ namespace Takai
                     continue;
 
                 y = bounds.Bottom - (entry.fps - min) / dy * bounds.Height;
+                P2D.DrawLine(sbatch, Color.Black, last, new Vector2(x, y + 1));
+                P2D.DrawLine(sbatch, Color.Black, new Vector2(x, y + 1), new Vector2(x + step, y + 1));
                 P2D.DrawLine(sbatch, Color.Yellow, last, new Vector2(x, y));
                 P2D.DrawLine(sbatch, Color.Yellow, new Vector2(x, y), new Vector2(x + step, y));
                 last = new Vector2(x + step, y);

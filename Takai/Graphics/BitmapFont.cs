@@ -362,7 +362,7 @@ namespace Takai.Graphics
 
                 if (Characters.TryGetValue(text[i], out var rgn))
                 {
-                    row.X += rgn.Width;
+                    row.X += rgn.Width + Tracking.X;
                     row.Y  = MathHelper.Max(row.Y, rgn.Height);
                 }
             }

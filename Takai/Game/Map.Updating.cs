@@ -12,7 +12,8 @@ namespace Takai.Game
             public bool isAiEnabled;
             public bool isInputEnabled;
             public bool isPhysicsEnabled;
-            public bool isCollisionEnabled;
+            public bool isMapCollisionEnabled;
+            public bool isEntityCollisionEnabled;
             public bool isSoundEnabled;
 
             public static readonly UpdateSettings Game = new UpdateSettings
@@ -20,7 +21,8 @@ namespace Takai.Game
                 isAiEnabled = true,
                 isInputEnabled = true,
                 isPhysicsEnabled = true,
-                isCollisionEnabled = true,
+                isMapCollisionEnabled = true,
+                isEntityCollisionEnabled = true,
                 isSoundEnabled = true,
             };
 
@@ -29,7 +31,8 @@ namespace Takai.Game
                 isAiEnabled = false,
                 isInputEnabled = false,
                 isPhysicsEnabled = false,
-                isCollisionEnabled = true,
+                isMapCollisionEnabled = true,
+                isEntityCollisionEnabled = true,
                 isSoundEnabled = false,
             };
         }
@@ -142,82 +145,90 @@ namespace Takai.Game
                         activeEntities.Add(entity);
 
                         var deltaV = entity.Velocity * deltaSeconds;
+                        var lastBounds = entity.AxisAlignedBounds;
 
-                        if (deltaV == Vector2.Zero)
-                            continue;
-
-                        var deltaVLen = deltaV.Length();
-                        var direction = deltaV / deltaVLen;
-
-                        var offset = entity.Radius + 1;
-                        var start = entity.Position + (offset * direction);
-                        var hit = Trace(start, direction, deltaVLen, entity);
-                        var target = start + (direction * (hit.distance - offset));
-
-                        if (hit.entity == null) //map collision
+                        if (deltaV != Vector2.Zero)
                         {
-                            if (Math.Abs(hit.distance - deltaVLen) > 0.5f)
+                            var deltaVLen = deltaV.Length();
+                            var direction = deltaV / deltaVLen;
+
+                            var offset = entity.Radius + 1;
+                            var start = entity.Position + (offset * direction);
+                            var hit = Trace(start, direction, deltaVLen, entity);
+                            var target = start + (direction * (hit.distance - offset));
+
+                            if (hit.entity == null) //map collision
                             {
-                                entity.Position = target;
-                                entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
-
-                                //improve
-                                entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;
-                            }
-                        }
-                        //else //entity collision
-                        //{
-                        //    entity.Position = target;
-                        //    entity.OnEntityCollision(hit.entity, target, deltaTime);
-                        //    hit.entity.OnEntityCollision(entity, target, deltaTime);
-
-                        //    if (entity.Class.IsPhysical)
-                        //        entity.Velocity = Vector2.Zero;
-                        //}
-
-                        //Fluid collision
-                        if (!entity.Class.IgnoreTrace)
-                        {
-                            var drag = 0f;
-                            var dc = 0u;
-                            var targetSector = GetOverlappingSector(target);
-                            var sector = Sectors[targetSector.Y, targetSector.X];
-                            foreach (var fluid in sector.fluids)
-                            {
-                                if (Vector2.DistanceSquared(fluid.position, target) <= (fluid.Class.Radius * fluid.Class.Radius) + entity.RadiusSq)
+                                if (updateSettings.isMapCollisionEnabled && Math.Abs(hit.distance - deltaVLen) > 0.5f)
                                 {
-                                    drag += fluid.Class.Drag;
-                                    ++dc;
+                                    entity.Position = target;
+                                    entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
+
+                                    //improve
+                                    entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;
                                 }
                             }
-                            if (dc > 0)
+                            else if (updateSettings.isEntityCollisionEnabled) //entity collision
                             {
-                                var fd = (drag / dc / 7.5f) * entity.Velocity.LengthSquared();
-                                entity.Velocity += ((-fd * direction) * (deltaSeconds / TimeScale)); //todo: radius affects
+                                entity.Position = target;
+                                entity.OnEntityCollision(hit.entity, target, deltaTime);
+                                hit.entity.OnEntityCollision(entity, target, deltaTime);
+
+                                if (entity.Class.IsPhysical)
+                                    entity.Velocity = Vector2.Zero;
                             }
+
+                            //Fluid collision
+                            if (!entity.Class.IgnoreTrace)
+                            {
+                                var drag = 0f;
+                                var dc = 0u;
+                                var targetSector = GetOverlappingSector(target);
+                                var sector = Sectors[targetSector.Y, targetSector.X];
+                                foreach (var fluid in sector.fluids)
+                                {
+                                    if (Vector2.DistanceSquared(fluid.position, target) <= (fluid.Class.Radius * fluid.Class.Radius) + entity.RadiusSq)
+                                    {
+                                        drag += fluid.Class.Drag;
+                                        ++dc;
+                                    }
+                                }
+                                if (dc > 0)
+                                {
+                                    var fd = (drag / dc / 7.5f) * entity.Velocity.LengthSquared();
+                                    entity.Velocity += ((-fd * direction) * (deltaSeconds / TimeScale)); //todo: radius affects
+                                }
+                            }
+
+                            entity.Position += entity.Velocity * deltaSeconds;
+                            entity.Velocity -= entity.Velocity * entity.Class.Drag * deltaSeconds;
+                            entity.UpdateAxisAlignedBounds();
                         }
-
-
-                        entity.Position += entity.Velocity * deltaSeconds;
-                        entity.Velocity -= entity.Velocity * entity.Class.Drag * deltaSeconds;
-                        entity.UpdateAxisAlignedBounds();
 
                         //place this entity into the pathing grid as an obstacle
 
-                        var tileBounds = entity.AxisAlignedBounds;
-                        tileBounds.X /= Class.TileSize;
-                        tileBounds.Y /= Class.TileSize;
-                        tileBounds.Width = (tileBounds.Width - 1) / Class.TileSize + 1;
-                        tileBounds.Height = (tileBounds.Height - 1) / Class.TileSize + 1;
-
-                        for (int tbY = Math.Max(0, tileBounds.Top); tbY < Math.Min(Class.Height, tileBounds.Bottom); ++tbY)
+                        if (entity.Class.IsPhysical && !entity.Class.IgnoreTrace)
                         {
-                            for (int tbX = Math.Max(0, tileBounds.Left); tbX < Math.Min(Class.Width, tileBounds.Right); ++tbX)
+                            var tileBounds = entity.AxisAlignedBounds;
+                            tileBounds = Rectangle.Union(tileBounds, lastBounds);
+                            tileBounds.X /= Class.TileSize;
+                            tileBounds.Y /= Class.TileSize;
+                            tileBounds.Width = (tileBounds.Width - 1) / Class.TileSize + 1;
+                            tileBounds.Height = (tileBounds.Height - 1) / Class.TileSize + 1;
+
+                            //falloff based on radius
+                            var tilePos = entity.Position / Class.TileSize;
+                            for (int tbY = Math.Max(0, tileBounds.Top); tbY < Math.Min(Class.Height, tileBounds.Bottom); ++tbY)
                             {
-                                var pi = PathInfo[tbY, tbX];
-                                if (pi.heuristic < uint.MaxValue)
+                                for (int tbX = Math.Max(0, tileBounds.Left); tbX < Math.Min(Class.Width, tileBounds.Right); ++tbX)
                                 {
-                                    pi.heuristic += 2;
+                                    if (PathInfo[tbY, tbX].heuristic == uint.MaxValue)
+                                        continue;
+
+                                    var dist = Vector2.DistanceSquared(tilePos, new Vector2(tbX, tbY));
+                                    var pi = PathInfo[tbY, tbX];
+                                    var entRad = 1 - Math.Min(1, (dist / entity.RadiusSq));
+                                    pi.heuristic = Math.Min(uint.MaxValue, pi.heuristic + (uint)(4 * entRad));
                                     PathInfo[tbY, tbX] = pi;
                                 }
                             }

@@ -42,7 +42,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// How quickly this actor accelerates
         /// </summary>
-        public float MoveForce { get; set; }
+        public Range<float> MoveForce { get; set; }
 
         //inherited
         public Range<float> MaxSpeed { get; set; }
@@ -178,7 +178,7 @@ namespace DyingAndMore.Game.Entities
 
         public void Accelerate(Vector2 direction)
         {
-            var vel = Velocity + (direction * _class.MoveForce);
+            var vel = Velocity + (direction * RandomRange.Next(_class.MoveForce));
             var lSq = vel.LengthSquared();
             if (lSq > MaxSpeed * MaxSpeed)
                 vel = (vel / (float)Math.Sqrt(lSq)) * MaxSpeed;

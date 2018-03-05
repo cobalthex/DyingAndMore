@@ -64,7 +64,7 @@ namespace Takai.Data
         /// <param name="writer">The stream to write to</param>
         /// <param name="serializing">The object to serialize</param>
         /// <remarks>Some data types (Takai/Xna) are custom serialized</remarks>
-        public static void TextSerialize(TextWriter writer, object serializing, int indentLevel = 0, bool serializeExternals = false)
+        public static void TextSerialize(TextWriter writer, object serializing, int indentLevel = 0, bool serializeExternals = false, bool serializeNonPublics = false)
         {
             if (serializing == null)
             {
@@ -134,7 +134,7 @@ namespace Takai.Data
             {
                 var serialized = Serializers[ty].Serialize(serializing);
                 if (serialized == LinearStruct)
-                    SerializeLinear(writer, serializing, serializeExternals);
+                    SerializeLinear(writer, serializing, serializeExternals, serializeNonPublics);
                 else
                     TextSerialize(writer, serialized, indentLevel, serializeExternals);
             }
@@ -194,11 +194,11 @@ namespace Takai.Data
             {
                 writer.WriteLine($"{(WriteFullTypeNames ? ty.FullName : ty.Name)} {{");
 
-                foreach (var prop in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                    SerializeMember(writer, serializing, prop, prop.GetValue(serializing), indentLevel, serializeExternals);
+                foreach (var prop in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance | (serializeNonPublics ? BindingFlags.NonPublic : 0)))
+                    SerializeMember(writer, serializing, prop, prop.GetValue(serializing), indentLevel, serializeExternals, serializeNonPublics);
 
-                foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance))
-                    SerializeMember(writer, serializing, field, field.GetValue(serializing), indentLevel, serializeExternals);
+                foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance | (serializeNonPublics ? BindingFlags.NonPublic : 0)))
+                    SerializeMember(writer, serializing, field, field.GetValue(serializing), indentLevel, serializeExternals, serializeNonPublics);
 
                 if (serializing is IDerivedSerialize derived)
                 {
@@ -209,7 +209,7 @@ namespace Takai.Data
                         {
                             Indent(writer, indentLevel + 1);
                             writer.Write("{0}: ", prop.Key);
-                            TextSerialize(writer, prop.Value, indentLevel + 1, serializeExternals);
+                            TextSerialize(writer, prop.Value, indentLevel + 1, serializeExternals, serializeNonPublics);
                             writer.WriteLine(";");
                         }
                     }
@@ -220,9 +220,12 @@ namespace Takai.Data
             }
         }
 
-        private static void SerializeMember(TextWriter writer, object parent, MemberInfo member, object value, int indentLevel, bool serializeExternals)
+        private static void SerializeMember(TextWriter writer, object parent, MemberInfo member, object value, int indentLevel, bool serializeExternals, bool serializeNonPublics)
         {
             if (member.IsDefined(typeof(IgnoredAttribute)))
+                return;
+
+            if (member.IsDefined(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), true))
                 return;
 
             Indent(writer, indentLevel + 1);
@@ -239,32 +242,32 @@ namespace Takai.Data
             if (custSerial?.methodName != null)
             {
                 var method = member.DeclaringType.GetMethod(custSerial.methodName, CustomSerializeAttribute.Flags);
-                TextSerialize(writer, method.Invoke(parent, null), indentLevel + 1, serializeExternals);
+                TextSerialize(writer, method.Invoke(parent, null), indentLevel + 1, serializeExternals, serializeNonPublics);
             }
             else
-                TextSerialize(writer, value, indentLevel + 1, serializeExternals);
+                TextSerialize(writer, value, indentLevel + 1, serializeExternals, serializeNonPublics);
 
             writer.WriteLine(";");
         }
 
-        private static void SerializeLinear(TextWriter writer, object serializing, bool serializeExternals)
+        private static void SerializeLinear(TextWriter writer, object serializing, bool serializeExternals, bool serializeNonPublics)
         {
             writer.Write('[');
             var ty = serializing.GetType();
             int n = 0;
-            foreach (var member in ty.GetMembers(BindingFlags.Instance | BindingFlags.Public))
+            foreach (var member in ty.GetMembers(BindingFlags.Instance | BindingFlags.Public | (serializeNonPublics ? BindingFlags.NonPublic : 0)))
             {
                 if (member is PropertyInfo p)
                 {
                     if (n++ > 0)
                         writer.Write(' ');
-                    TextSerialize(writer, p.GetValue(serializing), 0, serializeExternals);
+                    TextSerialize(writer, p.GetValue(serializing), 0, serializeExternals, serializeNonPublics);
                 }
                 else if (member is FieldInfo f)
                 {
                     if (n++ > 0)
                         writer.Write(' ');
-                    TextSerialize(writer, f.GetValue(serializing), 0, serializeExternals);
+                    TextSerialize(writer, f.GetValue(serializing), 0, serializeExternals, serializeNonPublics);
                 }
             }
             writer.Write(']');
