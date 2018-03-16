@@ -17,7 +17,7 @@ ActorClass {
 
             TargetEnemyBehavior { };
             FocusBehavior { };
-         
+
             SuicideBehavior {
                 Radius: 80;
                 Effect: @"Effects/Damage.fx.tk";

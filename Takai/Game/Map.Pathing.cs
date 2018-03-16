@@ -300,8 +300,8 @@ namespace Takai.Game
                         ++edge;
                 }
 
-                //bias against walls
-                if (edge > 0)
+                //bias against corners -walls-
+                if (edge > 1)
                 {
                     var pi = PathInfo[first.tile.Y, first.tile.X];
                     pi.heuristic += edge + WallPathingBias;

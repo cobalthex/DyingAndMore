@@ -1,6 +1,6 @@
 ActorClass {
     Name: "Player";
-    MaxHealth: 500;
+    MaxHealth: 5000;
     DefaultFaction: Factions [Player];
 
     Animations: {

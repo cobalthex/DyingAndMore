@@ -167,12 +167,12 @@ namespace Takai.Game
                         if (deltaV != Vector2.Zero)
                         {
                             var deltaVLen = deltaV.Length();
-                            var direction = deltaV / deltaVLen;
+                            var normV = deltaV / deltaVLen;
 
                             var offset = entity.Radius + 1;
-                            var start = entity.Position + (offset * direction);
-                            var hit = Trace(start, direction, deltaVLen, entity);
-                            var target = start + (direction * (hit.distance - offset));
+                            var start = entity.Position + (offset * normV);
+                            var hit = Trace(start, normV, deltaVLen, entity);
+                            var target = start + (normV * (hit.distance - offset));
 
                             if (hit.entity == null) //map collision
                             {
@@ -200,7 +200,10 @@ namespace Takai.Game
                                 hit.entity.OnEntityCollision(entity, cm.Reciprocal(), deltaTime);
 
                                 if (entity.Class.IsPhysical)
-                                    entity.Velocity = Vector2.Zero; //subtract directional velocity
+                                {
+                                    var diff = Vector2.Normalize(hit.entity.Position - entity.Position);
+                                    entity.Velocity -= entity.Velocity * Vector2.Dot(normV, diff);
+                                }
                             }
 
                             //Fluid collision
@@ -221,7 +224,7 @@ namespace Takai.Game
                                 if (dc > 0)
                                 {
                                     var fd = (drag / dc / 7.5f) * entity.Velocity.LengthSquared();
-                                    entity.Velocity += ((-fd * direction) * (deltaSeconds / TimeScale)); //todo: radius affects
+                                    entity.Velocity += ((-fd * normV) * (deltaSeconds / TimeScale)); //todo: radius affects
                                 }
                             }
 
