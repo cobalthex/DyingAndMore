@@ -1,9 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
 {
+    public class ProjectileResponse
+    {
+        /// <summary>
+        /// If the angle of collision is within this range, the projectile will reflect
+        /// </summary>
+        /// <remarks>0 to 2pi radians, NaN not to reflect</remarks>
+        public Range<float> ReflectAngle { get; set; } = float.NaN;
+        public Range<float> ReflectSpeed { get; set; } = 0;
+
+        //Overpenetrate (glass/breakable materials?) -- enemies
+        //attach
+
+        //friction, dampening
+
+        //refraction (reflection offset jitter?)
+    }
+
     public class ProjectileClass : EntityClass
     {
         /// <summary>
@@ -47,6 +65,8 @@ namespace DyingAndMore.Game.Entities
         /// An effect spawned when the projectile goes out of <see cref="Range"/>, lives longer than <see cref="LifeSpan"/>, or below the <see cref="MinimumSpeed"/>
         /// </summary>
         public EffectsClass FadeEffect { get; set; }
+
+        public Dictionary<Material, ProjectileResponse> MaterialResponses { get; set; } = new Dictionary<Material, ProjectileResponse>();
 
         public ProjectileClass()
         {
@@ -121,9 +141,14 @@ namespace DyingAndMore.Game.Entities
             IsAlive = false;
         }
 
-        public override void OnEntityCollision(EntityInstance collider, Vector2 point, TimeSpan deltaTime)
+        public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
         {
-            IsAlive = false;
+            if (collider.Material != null && _class.MaterialResponses.TryGetValue(collider.Material, out var mtl))
+            {
+                //collision angle, collision depth, etc
+            }
+            else
+                IsAlive = false;
 
             if (collider is ActorInstance actor &&
                 (collider != Source || _class.CanDamageSource))

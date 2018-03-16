@@ -131,7 +131,7 @@ namespace DyingAndMore.Game.Entities
         {
             if (Class != null)
             {
-                MaxSpeed      = RandomRange.Next(_class.MaxSpeed);
+                MaxSpeed      = _class.MaxSpeed.Random();
                 CurrentHealth = _class.MaxHealth;
                 Weapon        = _class.DefaultWeapon?.Instantiate();
                 Faction       = _class.DefaultFaction;
@@ -169,7 +169,7 @@ namespace DyingAndMore.Game.Entities
             base.Think(deltaTime);
         }
 
-        public override void OnEntityCollision(EntityInstance Collider, Vector2 Point, TimeSpan DeltaTime)
+        public override void OnEntityCollision(EntityInstance Collider, CollisionManifold collision, TimeSpan DeltaTime)
         {
             if (Collider is ActorInstance actor)
             {
@@ -178,7 +178,7 @@ namespace DyingAndMore.Game.Entities
 
         public void Accelerate(Vector2 direction)
         {
-            var vel = Velocity + (direction * RandomRange.Next(_class.MoveForce));
+            var vel = Velocity + (direction * _class.MoveForce.Random());
             var lSq = vel.LengthSquared();
             if (lSq > MaxSpeed * MaxSpeed)
                 vel = (vel / (float)Math.Sqrt(lSq)) * MaxSpeed;

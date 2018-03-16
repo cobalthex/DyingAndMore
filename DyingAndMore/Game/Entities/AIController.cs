@@ -257,6 +257,8 @@ namespace DyingAndMore.Game.Entities
     /// </summary>
     class FlowSeekBehavior : Behavior
     {
+        //stopping distance
+
         public override BehaviorMask Mask => BehaviorMask.Movement;
 
         public override BehaviorPriority CalculatePriority()

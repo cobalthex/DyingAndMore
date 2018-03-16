@@ -41,21 +41,21 @@ namespace Takai.Game
         }
     }
 
-    public static class RandomRange
+    public static class RangeUtil
     {
         public static readonly Random RandomGenerator = new Random();
 
-        public static int Next(Range<int> range)
+        public static int Random(this Range<int> range)
         {
             return RandomGenerator.Next(range.min, range.max + 1);
         }
 
-        public static float Next(Range<float> range)
+        public static float Random(this Range<float> range)
         {
             return (float)RandomGenerator.NextDouble() * (range.max - range.min) + range.min;
         }
 
-        public static TimeSpan Next(Range<TimeSpan> range)
+        public static TimeSpan Random(this Range<TimeSpan> range)
         {
             if (range.min == range.max)
                 return range.min;
@@ -66,25 +66,27 @@ namespace Takai.Game
 
             return TimeSpan.FromTicks(Math.Abs(longRand % (range.max.Ticks - range.min.Ticks)) + range.min.Ticks);
         }
+
+        public static bool Contains(this Range<float> range, float value)
+        {
+            return (value >= range.min && value <= range.max);
+        }
+        public static bool Contains(this Range<int> range, int value)
+        {
+            return (value >= range.min && value <= range.max);
+        }
+        public static bool Contains(this Range<TimeSpan> range, TimeSpan value)
+        {
+            return (value >= range.min && value <= range.max);
+        }
     }
 
-    public class Decal //todo: make struct
+    public class Decal
     {
-        public Texture2D texture;
+        public Texture2D texture; //todo: random section of texture
         public Vector2 position;
         public float angle;
         public float scale;
-    }
-
-    public class MaterialResponse
-    {
-        //response (overpenetrate, destroy, reflect, etc)
-
-        //friction, dampening
-
-        //refraction
-
-        public EffectsClass Effect { get; set; }
     }
 
     public class Material : INamedObject
@@ -92,6 +94,6 @@ namespace Takai.Game
         public string Name { get; set; }
         public string File { get; set; }
 
-        public Dictionary<Material, MaterialResponse> Responses { get; set; }
+        public Dictionary<Material, Effect> Responses { get; set; }
     }
 }

@@ -1,0 +1,41 @@
+# Line Comment
+#* Block Comment *#
+
+ClassName {
+    BoolTrue: True;
+    BoolFalse: False;
+    Null: Null;
+    
+    SQString: 'single-quoted\nstring';
+    DQString: "string";
+
+    RecursiveRef: @.;
+    SQExternalRef: @'test';
+    DQExternalRef: @"test";
+
+    Int: 10;
+    NegInt: -10;
+    Hex: 0xff400;
+    Float: 020.00;
+    Suffix: 10msec;
+
+    Enum: EnumType.Value;
+    SetEnum: EnumType [A B];
+
+    List: [
+        1;
+        2;
+        "test";
+
+        #A { };
+        #B { };
+    ];
+
+    Struct: [1 Color.White 3];
+
+    Dictionary: { asdf: 123; };
+};
+
+Foo {
+
+}

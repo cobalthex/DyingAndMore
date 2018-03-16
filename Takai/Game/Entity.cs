@@ -301,7 +301,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="Collider">The instance collided with</param>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void OnEntityCollision(EntityInstance Collider, Vector2 Point, TimeSpan DeltaTime) { }
+        public virtual void OnEntityCollision(EntityInstance Collider, CollisionManifold collision, TimeSpan DeltaTime) { }
 
         /// <summary>
         /// Called when there is a collision between this entity and the map
