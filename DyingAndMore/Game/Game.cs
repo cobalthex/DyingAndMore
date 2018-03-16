@@ -169,9 +169,10 @@ namespace DyingAndMore.Game
 
             if (players.Count > 0)
             {
-                GameInstance.Current.players = players.GetRange(0, numPlayers);
-                for (int i = numPlayers; i < players.Count; ++i)
-                    Map.Destroy(players[i]);
+                GameInstance.Current.players = players;
+                //GameInstance.Current.players = players.GetRange(0, numPlayers);
+                //for (int i = numPlayers; i < players.Count; ++i)
+                //    Map.Destroy(players[i]);
 
                 player = GameInstance.Current.players[0];
             }

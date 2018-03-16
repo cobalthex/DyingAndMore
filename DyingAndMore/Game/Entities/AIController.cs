@@ -264,7 +264,7 @@ namespace DyingAndMore.Game.Entities
         public override BehaviorPriority CalculatePriority()
         {
             var curPI = AI.Actor.Map.PathInfoAt(AI.Actor.Position);
-            if (curPI.heuristic * AI.Actor.Map.Class.TileSize > 1000) //todo: sight range per actor
+            if (curPI.heuristic * AI.Actor.Map.Class.TileSize > 10000) //todo: sight range per actor
                 return BehaviorPriority.Never;
             return BehaviorPriority.Normal;
         }
