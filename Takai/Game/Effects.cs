@@ -95,9 +95,9 @@ namespace Takai.Game
             if (Effects == null || Effects.Count < 1)
                 return;
 
-            for (int i = 0; i < RandomRange.Next(Count); ++i)
+            for (int i = 0; i < Count.Random(); ++i)
             {
-                var which = RandomRange.RandomGenerator.Next(0, Effects.Count);
+                var which = RangeUtil.RandomGenerator.Next(0, Effects.Count);
                 Effects[which].Spawn(instance);
             }
         }
@@ -149,13 +149,13 @@ namespace Takai.Game
             if (!instance.Map.Particles.ContainsKey(Class))
                 instance.Map.Particles.Add(Class, new List<ParticleInstance>());
 
-            var numParticles = Math.Max(0, RandomRange.Next(Count));
+            var numParticles = Math.Max(0, Count.Random());
             instance.Map.Particles[Class].Capacity += numParticles;
             for (int i = 0; i < numParticles; ++i)
             {
-                var angle = RandomRange.Next(Spread);
-                var speed = RandomRange.Next(Class.InitialSpeed);
-                var lifetime = RandomRange.Next(Class.Lifetime);
+                var angle = Spread.Random();
+                var speed = Class.InitialSpeed.Random();
+                var lifetime = Class.Lifetime.Random();
 
                 var dir = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(angle));
                 var initAngle = dir.Angle();
@@ -163,9 +163,9 @@ namespace Takai.Game
                 var position = instance.Position;
                 if (Radius != 0)
                 {
-                    var spawnRadiusAngle = RandomRange.RandomGenerator.NextDouble() * MathHelper.TwoPi;
+                    var spawnRadiusAngle = RangeUtil.RandomGenerator.NextDouble() * MathHelper.TwoPi;
                     position += new Vector2((float)Math.Cos(spawnRadiusAngle), (float)Math.Sin(spawnRadiusAngle))
-                        * (float)RandomRange.RandomGenerator.NextDouble() * Radius;
+                        * (float)RangeUtil.RandomGenerator.NextDouble() * Radius;
                 }
 
                 var particle = new ParticleInstance()
@@ -195,12 +195,12 @@ namespace Takai.Game
 
         public void Spawn(EffectsInstance instance)
         {
-            var count = RandomRange.Next(Count);
+            var count = Count.Random();
             instance.Map.LiveFluids.Capacity += count;
             for (int i = 0; i < count; ++i)
             {
-                var angle = RandomRange.Next(Spread);
-                var speed = RandomRange.Next(Speed);
+                var angle = Spread.Random();
+                var speed = Speed.Random();
                 instance.Map.Spawn(
                     Class,
                     instance.Position,
@@ -226,18 +226,18 @@ namespace Takai.Game
 
         public void Spawn(EffectsInstance instance)
         {
-            var count = RandomRange.Next(Count);
+            var count = Count.Random();
             for (int i = 0; i < count; ++i)
             {
                 //CanSpawn? (test objects around spawn point)
 
-                var angle = RandomRange.Next(Spread);
+                var angle = Spread.Random();
                 var direction = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(angle));
                 var entity = instance.Map.Spawn(
                     Class,
                     instance.Position,
                     direction,
-                    direction * RandomRange.Next(Speed)
+                    direction * Speed.Random()
                 );
                 //entity.Source = instance.Source;
             }

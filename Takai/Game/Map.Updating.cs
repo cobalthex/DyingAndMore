@@ -5,6 +5,23 @@ using System;
 
 namespace Takai.Game
 {
+    public struct CollisionManifold
+    {
+        public Vector2 point;
+        public Vector2 direction;
+        public float depth;
+
+        public CollisionManifold Reciprocal()
+        {
+            return new CollisionManifold
+            {
+                point = point,
+                direction = -direction,
+                depth = depth
+            };
+        }
+    }
+
     public partial class MapInstance
     {
         public class UpdateSettings
@@ -168,14 +185,22 @@ namespace Takai.Game
                                     entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;
                                 }
                             }
-                            else if (updateSettings.isEntityCollisionEnabled) //entity collision
+                            else if (updateSettings.isEntityCollisionEnabled)
                             {
                                 entity.Position = target;
-                                entity.OnEntityCollision(hit.entity, target, deltaTime);
-                                hit.entity.OnEntityCollision(entity, target, deltaTime);
+
+                                var cm = new CollisionManifold
+                                {
+                                    point = target,
+                                    direction = entity.Forward,
+                                    depth = deltaVLen - hit.distance //todo: distance between origins minus radii
+                                };
+
+                                entity.OnEntityCollision(hit.entity, cm, deltaTime);
+                                hit.entity.OnEntityCollision(entity, cm.Reciprocal(), deltaTime);
 
                                 if (entity.Class.IsPhysical)
-                                    entity.Velocity = Vector2.Zero;
+                                    entity.Velocity = Vector2.Zero; //subtract directional velocity
                             }
 
                             //Fluid collision

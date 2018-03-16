@@ -29,6 +29,8 @@ namespace Takai.Game
         //todo: sprite loop frame?
         public Graphics.Sprite Sprite { get; set; }
 
+        public Material Material { get; set; }
+
         /// <summary>
         /// Looping state sound
         /// </summary>
@@ -132,6 +134,8 @@ namespace Takai.Game
                     yield return overlayAnimations[i];
             }
         }
+
+        public Material Material => baseAnimation.Class?.Material;
 
         /// <summary>
         /// Play a new animation. Does nothing if the animation is aleady being played

@@ -8,88 +8,123 @@ file_extensions:
 scope: source.tk
 
 variables:
-  ident: '[A-Za-z_][A-Za-z_0-9]*'
-  property: '.*?\s*(?=:)'
+  ident_begin: '[[:alpha:]]'
+  ident_rest: '[[:alpha:]_0-9]'
+  ident_bad: '[^[:alpha:]_0-9]'
+  block_comment: '(#\*.*?\*#)'
 
 contexts:
-  main:
+  prototype:
     - include: comments
-    - include: termiantors
-    - include: particles
-      
-    - match: \]
-      scope: invalid.illegal.stray-bracket-end
 
-    - match: \}
-      scope: invalid.illegal.stray-block-end
-
-    - match: '[,.]'
-      scope: invalid.illegal
-
-    - match: \*#
-      scope: invalid.illegal.stray-comment-end
+  main:
+    - include: atoms
 
   comments:
-    - match: \#\*
+    - match: '#\*'
       push:
-        # todo: may be able to be 
         - meta_scope: comment.block
-        - match: \*\#
+        - match: '\*#'
           pop: true
 
-    - match: \#.*$\n
-      scope: comment.line
-    # - match: (\#)(.*$\n)
-    #   captures:
-    #     1: punctuation.definition.comment
-    #     2: comment.line
+    - match: (\#)(.*$\n)
+      captures:
+        1: comment.line # punctuation.definition.comment
+        2: comment.line
 
-  particles:
+
+  atoms:
+    - include: comments
+
     - match: (?i)(null|true|false)
       scope: constant.language
 
-      #hex?
-    - match: '-?[0-9]+'
-      push: number
+    - match: '@'
+      scope: punctuation.definition.keyword
+      push:
+        - match: '\.'
+          comment: recursive reference
+          scope: string
+          pop: true
+        # - match: '(?=["''])'
+        #   set: string
+        - match: '(".*?"|''.*?'')' # todo: string escaping, fuck this crap
+          scope: string
+          pop: true
 
-    - match: '(@)(\.)'
-      comment: recursive reference
-      captures:
-        1: punctuation.definition.keyword
-        2: string
 
-    - match: '(@)(".*?")'
-      comment: external reference
-      captures:
-        1: punctuation.definition.keyword
-        2: string
-
-    - match: '{{ident}}\s*\.' # todo: captures
+    - match: '{{ident_begin}}'
       scope: entity.name.class
       push:
-        - match: '\s*{{ident}}'
-          scope: entity.name.enum
-          pop: true
+        - meta_scope: meta.class
+        - match: '\.'
+          scope: punctuation.separator
+          set:
+            - meta_scope: entity.name.enum
+            - match: '[A-Za-z_]'
+            - match: '\.'
+              scope: invalid.illegal
+            - match: '\b'
+              pop: true
 
-    - match: '{{ident}}\s*(?=\{)'
-      scope: entity.name.class
-      set: dictionary
+        - match: '[A-Za-z_0-9]'
+          scope: entity.name.class
 
-    - match: '({{ident}})\s*(\[)'
-      captures:
-        1: entity.name.class
-        2: punctuation.section.brackets.begin
-      set:
-        - match: '{{ident}}'
-          scope: entity.name.enum
-        - match: ';'
-          scope: punctuation.terminator
-        - match: \]
-          scope: punctuation.section.brackets.end
-          pop: true
+        - match: '(?=\{)'
+          set: dictionary
 
-    - match: '{{ident}}'
-      scope: invalid.illegal
+        - match: '\['
+          scope: punctuation.section.brackets.begin
+          set:
+            - match: '\]'
+              scope: punctuation.set.brackets.end
+              pop: true
+
+            - match: '{{ident_begin}}'
+              push:
+                - meta_scope: entity.name.enum
+                - match: '(?=[\]\s;])'
+                  pop: true
+
+                - match: '{{ident_rest}}'
+
+                - match: '.'
+                  scope: invalid.illegal
+
+        - match: '\b[^\s]'
+          scope: invalid.illegal
+
+        - match: '\s'
+
+        - match: '{{ident_bad}}'
+          scope: invalid.illegal
+
+
+    # - match: '{{ident}}\s*\.'
+    #   comment: type
+    #   scope: entity.name.class
+    #   push:
+    #     - match: '\s*{{ident}}'
+    #       scope: entity.name.enum
+    #       pop: true
+
+    # - match: '{{ident}}\s*(?=\{)'
+    #   scope: entity.name.class
+    #   set: dictionary
+
+    # - match: '({{ident}})\s*(\[)'
+    #   comment: enum
+    #   captures:
+    #     1: entity.name.class
+    #     2: punctuation.section.brackets.begin
+    #   set:
+    #     - match: \]
+    #       scope: punctuation.section.brackets.end
+    #       pop: true
+    #     - match: '{{ident}}'
+    #       scope: entity.name.enum
+    #     - match: ';'
+    #       scope: punctuation.terminator
 
     - match: '\]'
       scope: invalid.illegal
@@ -100,14 +135,82 @@ contexts:
     - match: '\.'
       scope: invalid.illegal
 
-    - match: '{{property}}' #todo: not working (match properties outside of dict)
+    - match: ':'
       scope: invalid.illegal
 
+    - match: '[+-]\s*{{block_comment}}?\s*;'
+      scope: invalid.illegal
+
+    - include: number
     - include: string
     - include: list
     - include: dictionary
 
+  number:
+    - match: '[+-]'
+      scope: constant.numeric
+
+    - match: '0'
+      scope: constant.numeric
+      push:
+        - match: '[1-9]'
+          set: base10no
+
+        - match: 'x'
+          set: base16no
+
+        - match: '.'
+          scope: invalid.illegal
+
+    - match: '[1-9]'
+      push: base10no
+
+  base10no:
+    - meta_scope: constant.numeric.integer
+
+    - match: '[0-9]'
+
+    - match: '-'
+      scope: invalid.illegal
+
+    - match: '\.'
+      set:
+        - meta_scope: constant.numeric.float
+        - match: '[0-9]'
+        - match: '\b'
+          pop: true
+        - match: '.'
+          scope: invalid.illegal
+
+    # todo: exponents
+
+    - match: '[%[:alpha:]]'
+      comment: suffix
+      scope: constant.other
+
+    - match: '\b'
+      pop: true
+
+    - match: '.'
+      scope: invalid.illegal
+
+  base16no:
+    - meta_scope: constant.numeric.hex
+
+    - match: '[%[:alpha:]]' # broken on hex (maybe dont parse suffixes on hex, or start at any non a-f)
+      comment: suffix
+      scope: constant.other
+
+    - match: '[0-9a-fA-F]'
+
+    - match: '\b'
+      pop: true
+
+    - match: '.'
+      scope: invalid.illegal
+
   string:
+    - meta_include_prototype: false
     - match: \"
       scope: punctuation.definition.string.begin
       push:
@@ -125,16 +228,6 @@ contexts:
           pop: true
         - include: string_escape
 
-  number:
-    - meta_scope: constant.numeric.integer
-    - match: \.
-      scope: constant.numeric.float
-    - match: '[a-zA-Z_]+' #todo: no newlines
-      scope: constant.other
-    # todo: hexadecimal support
-    - match: \b
-      pop: true
-
   string_escape:
     - match: '(\\)$\n'
       captures:
@@ -144,41 +237,58 @@ contexts:
     - match: \\.
       scope: invalid.illegal.unknown-escape.c
 
-
   list:
-    - match: \[
+    - match: '\['
       scope: punctuation.section.array.begin
       push:
-        - match: \]
+        - meta_scope: meta.list
+
+        - match: '\]'
           scope: punctuation.section.array.end
           pop: true
-        - include: comments
-        - include: particles
+
+        - include: atoms
 
   dictionary:
-    - match: \{
+    - meta_scope: meta.dictionary
+    - match: '\{'
       scope: punctuation.section.block.begin
       push:
-        - match: \}
+        - match: '\}'
           scope: punctuation.section.block.end
-          pop: 2
+          pop: true
 
-        - match: '({{property}})\s*(:)'
-          comment: property
-          captures:
-            1: variable
-            2: punctuation.separator
-          push:
-            - match: '{{property}}\s*(:)'
-              scope: illegal.invalid
-
-            - include: comments
-            - include: particles
-            - match: ';'
-              pop: true
-        
         - include: comments
 
-# todo: meta scopes
-# todo: move singles to own context and include instead of main?
-#       -- no properties in array, only expects properties in object
+        - match: '\s*'
+
+        - match: ';'
+          scope: invalid.illegal
+
+        - match: '[^:]'
+          # meta_scope: meta.property
+          scope: variable
+
+        - match: ':\s*{{block_comment}}?\s*(;)'
+          comment: empty property
+          captures:
+            1: comment.block
+            2: invalid.illegal
+
+        - match: ':'
+          scope: punctuation.definition.keyword.separator
+          push:
+            - meta_scope: meta.property
+
+            - include: atoms
+
+            - match: '(?=\})'
+              scope: invalid
+              pop: true
+
+            - match: '[;\n]'
+              pop: true
+          
+            - match: '[^\s]'
+              comment: more than one value
+              scope: invalid.illegal

@@ -237,8 +237,10 @@ namespace Takai.Data
                 string unit = string.Empty;
 
                 //exponential form
-                if (word.EndsWith("E"))
+                if (word.EndsWith("E") || word.EndsWith("e"))
                 {
+                    if (context.reader.Peek() == '+')
+                        context.reader.Read();
                     if (context.reader.Peek() == '-')
                         word += (char)context.reader.Read();
                     word += ReadWord(context.reader);
