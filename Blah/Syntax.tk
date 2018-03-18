@@ -2,6 +2,7 @@
 #* Block Comment *#
 
 ClassName {
+    
     BoolTrue: True;
     BoolFalse: False;
     Null: Null;
@@ -22,7 +23,7 @@ ClassName {
     HexSuffix: 0x1fdrpm;
     Percent: 10%;
 
-    this should break
+    todo this should break
 
     Enum: EnumType.Value;
     SetEnum: EnumType [A B];
@@ -43,4 +44,4 @@ ClassName {
 
 Foo {
 
-}
+};
