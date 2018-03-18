@@ -35,8 +35,7 @@ namespace Takai.Game
 
         public class UpdateSettings
         {
-            public bool isAiEnabled;
-            public bool isInputEnabled;
+            public bool isEntityLogicEnabled;
             public bool isPhysicsEnabled;
             public bool isMapCollisionEnabled;
             public bool isEntityCollisionEnabled;
@@ -44,8 +43,7 @@ namespace Takai.Game
 
             public static readonly UpdateSettings Game = new UpdateSettings
             {
-                isAiEnabled = true,
-                isInputEnabled = true,
+                isEntityLogicEnabled = true,
                 isPhysicsEnabled = true,
                 isMapCollisionEnabled = true,
                 isEntityCollisionEnabled = true,
@@ -54,8 +52,7 @@ namespace Takai.Game
 
             public static readonly UpdateSettings Editor = new UpdateSettings
             {
-                isAiEnabled = false,
-                isInputEnabled = false,
+                isEntityLogicEnabled = false,
                 isPhysicsEnabled = false,
                 isMapCollisionEnabled = true,
                 isEntityCollisionEnabled = true,
@@ -123,7 +120,7 @@ namespace Takai.Game
             );
             var activeSectors = GetOverlappingSectors(_activeRegion);
 
-            #region moving/live Fluids
+            #region moving/live fluids
 
             for (int i = 0; i < LiveFluids.Count; ++i)
             {
@@ -160,6 +157,8 @@ namespace Takai.Game
             entsToDestroy.Clear();
 
             activeEntities.Clear();
+
+            #region entity physics
 
             for (int y = activeSectors.Top; y < activeSectors.Bottom; ++y)
             {
@@ -276,6 +275,8 @@ namespace Takai.Game
                 }
             }
 
+            #endregion
+
             foreach (var entity in activeEntities)
             {
                 var lastSectors = GetOverlappingSectors(entity.lastAABB);
@@ -302,7 +303,7 @@ namespace Takai.Game
                 entity.lastAABB = entity.AxisAlignedBounds;
 
                 entity.UpdateAnimations(deltaTime);
-                if (updateSettings.isAiEnabled)
+                if (updateSettings.isEntityLogicEnabled)
                     entity.Think(deltaTime);
             }
 
@@ -401,6 +402,11 @@ namespace Takai.Game
 
             foreach (var script in Scripts)
                 script.Step(deltaTime);
+        }
+
+        void UpdateEntityPhysics()
+        {
+
         }
     }
 }

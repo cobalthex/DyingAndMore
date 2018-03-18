@@ -74,6 +74,9 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(System.TimeSpan deltaTime)
         {
+            if (GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isPlayerInputEnabled)
+                return;
+
             var d = Vector2.Zero;
             if (InputState.IsButtonDown(Keys.W))
                 d -= Vector2.UnitY;

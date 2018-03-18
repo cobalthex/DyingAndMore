@@ -109,6 +109,9 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
+            if (GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isAiEnabled)
+                return;
+
             if (isNextTargetSet)
             {
                 _target = nextTarget;

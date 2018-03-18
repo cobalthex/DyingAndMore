@@ -99,33 +99,6 @@ contexts:
         - match: '{{ident_bad}}'
           scope: invalid.illegal
 
-
-    # - match: '{{ident}}\s*\.'
-    #   comment: type
-    #   scope: entity.name.class
-    #   push:
-    #     - match: '\s*{{ident}}'
-    #       scope: entity.name.enum
-    #       pop: true
-
-    # - match: '{{ident}}\s*(?=\{)'
-    #   scope: entity.name.class
-    #   set: dictionary
-
-    # - match: '({{ident}})\s*(\[)'
-    #   comment: enum
-    #   captures:
-    #     1: entity.name.class
-    #     2: punctuation.section.brackets.begin
-    #   set:
-    #     - match: \]
-    #       scope: punctuation.section.brackets.end
-    #       pop: true
-    #     - match: '{{ident}}'
-    #       scope: entity.name.enum
-    #     - match: ';'
-    #       scope: punctuation.terminator
-
     - match: '\]'
       scope: invalid.illegal
 
@@ -146,6 +119,19 @@ contexts:
     - include: list
     - include: dictionary
 
+  number_suffix:
+    - meta_scope: meta.number.suffix
+
+    - match: '%'
+      scope: constant.other.number.suffix.percent
+      pop: true
+
+    - match: '\b'
+      pop: true
+
+    - match: '.'
+      scope: constant.other.number.suffix
+
   number:
     - match: '[+-]'
       scope: constant.numeric
@@ -153,14 +139,23 @@ contexts:
     - match: '0'
       scope: constant.numeric
       push:
+        - match: '\.'
+          set: base10no
+
         - match: '[1-9]'
           set: base10no
 
         - match: 'x'
           set: base16no
 
+        - match: '(?=[%[:alpha:]])'
+          set: number_suffix
+
+        - match: '\b'
+          pop: true
+
         - match: '.'
-          scope: invalid.illegal
+          scope: invalid.illegal.unknown.digit
 
     - match: '[1-9]'
       push: base10no
@@ -168,10 +163,15 @@ contexts:
   base10no:
     - meta_scope: constant.numeric.integer
 
+    - match: '(?=[%[:alpha:]])'
+      comment: suffix
+      scope: constant.other
+      set: number_suffix
+
     - match: '[0-9]'
 
     - match: '-'
-      scope: invalid.illegal
+      scope: invalid.illegal.double-negative
 
     - match: '\.'
       set:
@@ -180,26 +180,23 @@ contexts:
         - match: '\b'
           pop: true
         - match: '.'
-          scope: invalid.illegal
+          scope: invalid.illegal.double-decimal
 
     # todo: exponents
-
-    - match: '[%[:alpha:]]'
-      comment: suffix
-      scope: constant.other
 
     - match: '\b'
       pop: true
 
     - match: '.'
-      scope: invalid.illegal
+      scope: invalid.illegal.unknown.digit.dec
 
   base16no:
     - meta_scope: constant.numeric.hex
 
-    - match: '[%[:alpha:]]' # broken on hex (maybe dont parse suffixes on hex, or start at any non a-f)
+    - match: '[%[g-zG-Z]]'
       comment: suffix
       scope: constant.other
+      set: number_suffix
 
     - match: '[0-9a-fA-F]'
 
@@ -207,7 +204,7 @@ contexts:
       pop: true
 
     - match: '.'
-      scope: invalid.illegal
+      scope: invalid.illegal.unknown.digit.hex
 
   string:
     - meta_include_prototype: false
@@ -273,7 +270,7 @@ contexts:
           comment: empty property
           captures:
             1: comment.block
-            2: invalid.illegal
+            2: invalid.illegal.semicolon
 
         - match: ':'
           scope: punctuation.definition.keyword.separator
@@ -283,7 +280,7 @@ contexts:
             - include: atoms
 
             - match: '(?=\})'
-              scope: invalid
+              #scope: invalid
               pop: true
 
             - match: '[;\n]'
@@ -291,4 +288,4 @@ contexts:
           
             - match: '[^\s]'
               comment: more than one value
-              scope: invalid.illegal
+              scope: invalid.illegal.double-property-value
