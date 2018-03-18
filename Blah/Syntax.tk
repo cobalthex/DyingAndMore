@@ -17,7 +17,12 @@ ClassName {
     NegInt: -10;
     Hex: 0xff400;
     Float: 020.00;
+    LeadingZero: 0.0;
     Suffix: 10msec;
+    HexSuffix: 0x1fdrpm;
+    Percent: 10%;
+
+    this should break
 
     Enum: EnumType.Value;
     SetEnum: EnumType [A B];

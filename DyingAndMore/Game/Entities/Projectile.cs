@@ -148,7 +148,10 @@ namespace DyingAndMore.Game.Entities
                 //collision angle, collision depth, etc
             }
             else
+            {
+                Velocity = Vector2.Zero; //todo: physics should handle this
                 IsAlive = false;
+            }
 
             if (collider is ActorInstance actor &&
                 (collider != Source || _class.CanDamageSource))

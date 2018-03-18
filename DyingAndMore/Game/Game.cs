@@ -14,14 +14,24 @@ namespace DyingAndMore.Game
 {
     //map spawn configurations? (akin to difficulty)
 
-
-    public class GameConfiguration
+    /// <summary>
+    /// A configuration for a game. Akin to a game mode
+    /// </summary>
+    public class GameConfiguration : Takai.INamedObject
     {
         public string Name { get; set; }
+        public string File { get; set; }
+
         //spawn settings
         //aggressiveness
         //ammo settings
         public bool AllowFriendlyFire { get; set; }
+    }
+
+    public class GameplaySettings
+    {
+        public bool isAiEnabled = true;
+        public bool isPlayerInputEnabled = true;
     }
 
     public class GameInstance
@@ -32,7 +42,10 @@ namespace DyingAndMore.Game
         public TimeSpan ElapsedRealTime { get; set; }
 
         //Game Campaign
-        public GameConfiguration Configuration { get; set; }
+        public GameConfiguration Configuration { get; set; } = new GameConfiguration();
+
+        [Takai.Data.Serializer.Ignored]
+        public GameplaySettings GameplaySettings { get; set; } = new GameplaySettings();
 
         public System.Collections.Generic.List<Entities.ActorInstance> players;
 
@@ -56,6 +69,7 @@ namespace DyingAndMore.Game
 
         Static renderSettingsConsole;
         Static updateSettingsConsole;
+        Static gameplaySettingsConsole;
 
         void ToggleUI(Static ui)
         {
@@ -91,6 +105,11 @@ namespace DyingAndMore.Game
             updateSettingsConsole.Position = new Vector2(100, 0);
             updateSettingsConsole.VerticalAlignment = Alignment.Middle;
             updateSettingsConsole.UserData = map.updateSettings;
+
+            gameplaySettingsConsole = GeneratePropSheet(GameInstance.Current.GameplaySettings, DefaultFont, DefaultColor);
+            gameplaySettingsConsole.Position = new Vector2(100, 0);
+            gameplaySettingsConsole.VerticalAlignment = Alignment.Middle;
+            gameplaySettingsConsole.UserData = GameInstance.Current.GameplaySettings;
 
             AddChild(fpsDisplay = new Static()
             {
@@ -460,6 +479,11 @@ namespace DyingAndMore.Game
                 InputState.IsAnyPress(Buttons.Back))
             {
                 ToggleUI(updateSettingsConsole);
+                return false;
+            }
+            if (InputState.IsPress(Keys.F4))
+            {
+                ToggleUI(gameplaySettingsConsole);
                 return false;
             }
 
