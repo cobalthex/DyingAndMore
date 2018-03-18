@@ -531,7 +531,7 @@ namespace DyingAndMore.Game
             foreach (var ptype in Map.Particles)
                 particleCount += ptype.Value.Count;
 
-            DefaultFont.Draw(spriteBatch, $"Total entities:{Map.AllEntities.Count()}\nTotal Particles:{particleCount}", new Vector2(20), Color.Orange);
+            DefaultFont.Draw(spriteBatch, $"Total entities:{Map.AllEntities.Count()}\nActive entities:{Map.UpdateStats.updatedEntities}\nTotal particles:{particleCount}", new Vector2(20), Color.Orange);
 
             if (Map.renderSettings.drawDebugInfo)
             {

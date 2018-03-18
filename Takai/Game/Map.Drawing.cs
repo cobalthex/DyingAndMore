@@ -91,15 +91,14 @@ namespace Takai.Game
 
     public partial class MapInstance
     {
-        public struct MapProfilingInfo
+        public struct MapRenderStats
         {
-            public int visibleEnts;
             public int visibleInactiveFluids;
             public int visibleActiveFluids;
             public int visibleDecals;
         }
-        public MapProfilingInfo ProfilingIngo => profilingInfo;
-        protected MapProfilingInfo profilingInfo;
+        public MapRenderStats RenderStats => _renderStats;
+        protected MapRenderStats _renderStats;
 
         //a collection of primatives to draw next frame (for one frame)
         protected List<VertexPositionColor> renderedLines = new List<VertexPositionColor>(32);
@@ -220,7 +219,7 @@ namespace Takai.Game
 
             //todo: break out into separate functions
 
-            profilingInfo = new MapProfilingInfo();
+            _renderStats = new MapRenderStats();
 
             _drawEntsOutlined.Clear();
 
@@ -398,7 +397,7 @@ namespace Takai.Game
                 {
                     foreach (var fluid in Sectors[y, x].fluids)
                     {
-                        ++profilingInfo.visibleInactiveFluids;
+                        ++_renderStats.visibleInactiveFluids;
                         Class.reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
 
                         var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
@@ -409,7 +408,7 @@ namespace Takai.Game
             //active fluids
             foreach (var fluid in LiveFluids)
             {
-                ++profilingInfo.visibleActiveFluids;
+                ++_renderStats.visibleActiveFluids;
                 Class.reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
 
                 var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
@@ -441,7 +440,7 @@ namespace Takai.Game
                             SpriteEffects.None,
                             0
                         );
-                        ++profilingInfo.visibleDecals;
+                        ++_renderStats.visibleDecals;
                     }
                 }
             }
@@ -477,8 +476,6 @@ namespace Takai.Game
                             state.ElapsedTime
                         );
                     }
-
-                    ++profilingInfo.visibleEnts;
                 }
 
                 if (renderSettings.drawBordersAroundNonDrawingEntities && !System.Linq.Enumerable.Any(ent.ActiveAnimations))
