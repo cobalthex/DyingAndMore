@@ -24,6 +24,15 @@ namespace Takai.Game
 
     public partial class MapInstance
     {
+        public struct MapUpdateStats
+        {
+            public int updatedEntities;
+        }
+
+        [Data.Serializer.Ignored]
+        public MapUpdateStats UpdateStats => _updateStats;
+        protected MapUpdateStats _updateStats;
+
         public class UpdateSettings
         {
             public bool isAiEnabled;
@@ -87,6 +96,8 @@ namespace Takai.Game
         /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
         public void Update(GameTime realTime, Camera camera = null)
         {
+            _updateStats = new MapUpdateStats();
+
             if (camera == null)
                 camera = ActiveCamera;
 
@@ -202,7 +213,7 @@ namespace Takai.Game
                                 if (entity.Class.IsPhysical)
                                 {
                                     var diff = Vector2.Normalize(hit.entity.Position - entity.Position);
-                                    entity.Velocity -= entity.Velocity * Vector2.Dot(normV, diff);
+                                    entity.Velocity -= diff * Vector2.Dot(entity.Velocity, diff);
                                 }
                             }
 
@@ -294,6 +305,8 @@ namespace Takai.Game
                 if (updateSettings.isAiEnabled)
                     entity.Think(deltaTime);
             }
+
+            _updateStats.updatedEntities = activeEntities.Count;
 
             #endregion
 
