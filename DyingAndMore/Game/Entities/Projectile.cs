@@ -120,7 +120,7 @@ namespace DyingAndMore.Game.Entities
                 DisableNextDestructionEffect = true;
                 if (_class.FadeEffect != null)
                 {
-                    var fx = _class.FadeEffect.Create(this);
+                    var fx = _class.FadeEffect.Instantiate(this);
                     Map.Spawn(fx);
                 }
                 IsAlive = false;
@@ -155,7 +155,7 @@ namespace DyingAndMore.Game.Entities
 
             if (collider is ActorInstance actor &&
                 (collider != Source || _class.CanDamageSource))
-                actor.ReceiveDamage((int)_class.Power, Source);
+                actor.ReceiveDamage(_class.Power, Source);
         }
     }
 }

@@ -165,6 +165,16 @@ namespace Takai
             );
         }
 
+        public static TimeSpan Max(TimeSpan a, TimeSpan b)
+        {
+            return TimeSpan.FromTicks(Math.Max(a.Ticks, b.Ticks));
+        }
+
+        public static TimeSpan Min(TimeSpan a, TimeSpan b)
+        {
+            return TimeSpan.FromTicks(Math.Min(a.Ticks, b.Ticks));
+        }
+
         public static string PrettyPrintMatrix(Matrix m)
         {
             return $"┌{m.M11,5} {m.M12,5} {m.M13,5} {m.M14,5}┐\n" +

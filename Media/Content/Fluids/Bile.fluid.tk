@@ -4,4 +4,30 @@ FluidClass {
     Reflection: @"Fluids/Bile.r.png";
     Radius: 54;
     Drag: 0.7;
+
+    CollisionEffect: EffectsClass {
+		Effects: [
+			ParticleEffect {
+	            Class: {
+	                Sprite: {
+	                    Texture: @"Effects/Trail.png"
+	                    Tween: TweenStyle.Overlap;
+	                };
+	                Blend: BlendState.Additive;
+	                InitialSpeed: [50 100];
+	                lifetime: [0.2sec 0.5sec];
+	            }
+	            Count: [0 1];
+	            Spread: [0 2pi];
+	            Radius: 6;
+	        };
+	        ConditionEffect {
+				Radius: 0;
+				Duration: 0.1sec;
+				Condition: Poison {
+					DamagePerSecond: 5;
+				}
+	        }
+		]
+	}
 }

@@ -48,7 +48,7 @@ namespace DyingAndMore.Game.Weapons
         public TimeSpan ChargeTime { get; set; }
 
         /// <summary>
-        /// how long to wait after discharging
+        /// how long to wait after discharging a single round
         /// </summary>
         public TimeSpan DischargeTime { get; set; }
 
@@ -66,6 +66,8 @@ namespace DyingAndMore.Game.Weapons
         //charge percentage (for things like chaingun)
 
         //overheating
+
+        //rate of fire over time, speed up time
 
         public abstract WeaponInstance Instantiate();
     }
@@ -210,7 +212,7 @@ namespace DyingAndMore.Game.Weapons
 
             if (Class.DischargeEffect != null)
             {
-                var fx = Class.DischargeEffect.Create(Actor);
+                var fx = Class.DischargeEffect.Instantiate(Actor);
                 fx.Position += (Actor.Forward * (Actor.Radius));
                 Actor.Map.Spawn(fx);
             }

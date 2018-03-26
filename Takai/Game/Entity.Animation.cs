@@ -153,7 +153,7 @@ namespace Takai.Game
                 if (Map != null)
                 {
                     if (animClass.EnterEffect != null)
-                        Map.Spawn(animClass.EnterEffect.Create(this));
+                        Map.Spawn(animClass.EnterEffect.Instantiate(this));
 
                     if (animClass.Sound != null)
                         Map.Spawn(animClass.Sound.Instantiate(this));
@@ -224,7 +224,7 @@ namespace Takai.Game
                 return false;
 
             if (animClass.ExitEffect != null && Map != null)
-                Map.Spawn(animClass.ExitEffect.Create(this));
+                Map.Spawn(animClass.ExitEffect.Instantiate(this));
             return true;
         }
 
@@ -250,7 +250,7 @@ namespace Takai.Game
                     lastVisibleSize = baseAnimation.Class.Sprite.Size;
 
                 if (baseAnimation.Class.Effect != null && Map != null)
-                    Map.Spawn(baseAnimation.Class.Effect.Create(this));
+                    Map.Spawn(baseAnimation.Class.Effect.Instantiate(this));
             }
 
             for (int i = 0; i < overlayAnimations.Count; ++i)
@@ -260,7 +260,7 @@ namespace Takai.Game
                 if (animation.ElapsedTime > animation.Class.TotalTime)
                 {
                     if (animation.Class.ExitEffect != null && Map != null)
-                        Map.Spawn(animation.Class.ExitEffect.Create(this));
+                        Map.Spawn(animation.Class.ExitEffect.Instantiate(this));
                     animation.CompletionCallback?.Invoke();
                     animation.Dispose();
                     overlayAnimations.RemoveAt(i);
@@ -276,7 +276,7 @@ namespace Takai.Game
                             lastVisibleSize = Util.Max(lastVisibleSize, baseAnimation.Class.Sprite.Size);
 
                         if (baseAnimation.Class.Effect != null && Map != null)
-                            Map.Spawn(baseAnimation.Class.Effect.Create(this));
+                            Map.Spawn(baseAnimation.Class.Effect.Instantiate(this));
                     }
                 }
             }

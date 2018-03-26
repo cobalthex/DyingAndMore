@@ -40,7 +40,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="source">The entity to spawn at</param>
         /// <returns>The effect instance created</returns>
-        public EffectsInstance Create(EntityInstance source)
+        public EffectsInstance Instantiate(EntityInstance source)
         {
             if (source == null)
                 return Instantiate();
@@ -154,9 +154,6 @@ namespace Takai.Game
             for (int i = 0; i < numParticles; ++i)
             {
                 var angle = Spread.Random();
-                var speed = Class.InitialSpeed.Random();
-                var lifetime = Class.Lifetime.Random();
-
                 var dir = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(angle));
                 var initAngle = dir.Angle();
 
@@ -173,8 +170,9 @@ namespace Takai.Game
                     color = Color.White, //TODO: Class.ColorOverTime.start,
                     delay = TimeSpan.Zero,
                     position = position,
-                    velocity = speed * dir + instance.Velocity,
-                    lifetime = lifetime,
+                    velocity = Class.InitialSpeed.Random() * dir + instance.Velocity,
+                    angularVelocity = Class.InitialAngularSpeed.Random(),
+                    lifetime = Class.Lifetime.Random(),
                     angle = initAngle,
                     scale = 1,
                     time = instance.Map.ElapsedTime

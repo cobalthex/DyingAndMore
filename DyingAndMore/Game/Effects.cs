@@ -14,7 +14,7 @@ namespace DyingAndMore.Game
         /// <summary>
         /// Can this effect damage the creator of this effect?
         /// </summary>
-        public bool CanDamageSource { get; set; }
+        public bool CanDamageSource { get; set; } //todo: should this be a setting in game settings? (and controlled via actor.ReceiveDamage())?
 
         //falloff curve?
 
@@ -33,10 +33,10 @@ namespace DyingAndMore.Game
 
                 var distSq = Vector2.DistanceSquared(instance.Position, ent.Position);
 
-                if (distSq == 0)
-                    actor.ReceiveDamage((int)MaxDamage, instance.Source);
-                if (distSq < rSq)
-                    actor.ReceiveDamage((int)(MaxDamage * (rSq - distSq) / rSq), instance.Source); //falloff curve?
+                if (rSq == 0)
+                    actor.ReceiveDamage(MaxDamage, instance.Source);
+                else if (distSq <= rSq)
+                    actor.ReceiveDamage(MaxDamage * (rSq - distSq) / rSq, instance.Source); //falloff curve?
 
                 instance.Map.DrawCircle(instance.Position, Radius, Color.Gold);
             }

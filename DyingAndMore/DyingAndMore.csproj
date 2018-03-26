@@ -64,6 +64,7 @@
     <Compile Include="Game\Effects.cs" />
     <Compile Include="Game\Entities\AIController.cs" />
     <Compile Include="Game\Entities\ArtilleryController.cs" />
+    <Compile Include="Game\Entities\Conditions.cs" />
     <Compile Include="Game\Entities\Controller.cs" />
     <Compile Include="Game\Entities\InputController.cs" />
     <Compile Include="Game\Entities\Projectile.cs" />

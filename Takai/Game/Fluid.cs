@@ -43,6 +43,11 @@ namespace Takai.Game
         /// </summary>
         public float Drag { get; set; }
 
+        /// <summary>
+        /// An effect played at the location of any entity currently colliding with this fluid
+        /// </summary>
+        public EffectsClass CollisionEffect { get; set; }
+
         //todo: magnetism/cohesion, combinations (n small bloods group into one medium blood, etc)
 
         public FluidInstance Instantiate()

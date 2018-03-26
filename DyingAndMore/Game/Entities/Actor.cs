@@ -98,7 +98,19 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The current health of the actor
         /// </summary>
-        public int CurrentHealth { get; set; }
+        public float CurrentHealth { get; set; }
+
+        public struct ActiveCondition
+        {
+            public Condition condition;
+            public TimeSpan timeLeft;
+        }
+
+        /// <summary>
+        /// All current conditions, and time remaining
+        /// </summary>
+        public System.Collections.Generic.List<ActiveCondition> Conditions { get; set; }
+            = new System.Collections.Generic.List<ActiveCondition>();
 
         private Vector2 lastVelocity;
 
@@ -150,6 +162,23 @@ namespace DyingAndMore.Game.Entities
                 Controller?.Think(deltaTime);
             Weapon?.Think(deltaTime); //weapon can still fire if actor is dead
 
+            for (int i = 0; i < Conditions.Count; ++i)
+            {
+                var cond = Conditions[i];
+                var dt = Takai.Util.Min(cond.timeLeft, deltaTime);
+
+                cond.condition.Apply(this, dt);
+                cond.timeLeft -= dt;
+
+                if (cond.timeLeft > TimeSpan.Zero)
+                    Conditions[i] = cond;
+                else
+                {
+                    Conditions[i] = Conditions[Conditions.Count - 1];
+                    Conditions.RemoveAt(Conditions.Count - 1);
+                }
+            }
+
             //todo: move to physics
             var vel = Velocity;
 
@@ -171,9 +200,9 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnEntityCollision(EntityInstance Collider, CollisionManifold collision, TimeSpan DeltaTime)
         {
-            if (Collider is ActorInstance actor)
-            {
-            }
+            //if (Collider is ActorInstance actor)
+            //{
+            //}
         }
 
         public void Accelerate(Vector2 direction)
@@ -190,9 +219,10 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         /// <param name="damage">the amount of damage to apply</param>
         /// <param name="source">The entity that is responsible for this damage</param>
-        public void ReceiveDamage(int damage, EntityInstance source = null)
+        public void ReceiveDamage(float damage, EntityInstance source = null)
         {
-            if ((GameInstance.Current != null && !GameInstance.Current.Configuration.AllowFriendlyFire) &&
+            if (source != this && //can damage self
+                (GameInstance.Current != null && !GameInstance.Current.Configuration.AllowFriendlyFire) &&
                 source is ActorInstance actor &&
                 (actor.Faction & Faction) != 0)
                 return;

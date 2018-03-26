@@ -60,11 +60,12 @@ GunClass {
                         width: 8;
                         height: 8;
                         frameLength: 20msec;
-                        frameCount: 4;
+                        frameCount: 1;
                         IsLooping: true;
                     };
                     Blend: BlendState.NonPremultiplied;
-                    InitialSpeed: [300 400];
+                    InitialSpeed: [200 400];
+                    InitialAngularSpeed: [20 60];
                     Drag: 1.5;
                     lifetime: 800msec;
                     ColorOverTime: {

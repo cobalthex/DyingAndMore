@@ -26,6 +26,8 @@ namespace DyingAndMore.Game
         //aggressiveness
         //ammo settings
         public bool AllowFriendlyFire { get; set; }
+
+        //fixed vs adaptive difficulty
     }
 
     public class GameplaySettings

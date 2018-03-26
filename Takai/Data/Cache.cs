@@ -301,6 +301,26 @@ namespace Takai.Data
             //return path.Substring(ext == 0 ? dir : ext);
         }
 
+        public static void ReloadAll(bool discardNotFound = false)
+        {
+            var removed = new List<string>();
+            foreach (var obj in objects)
+            {
+                //todo: parse path to extract root
+                try
+                {
+                    Load(obj.Key, null, true);
+                }
+                catch
+                {
+                    if (discardNotFound)
+                        removed.Add(obj.Key);
+                }
+            }
+            foreach (var remove in removed)
+                objects.Remove(remove);
+        }
+
         /// <summary>
         /// Remove any objects from the cache that are not used elsewhere
         /// </summary>
