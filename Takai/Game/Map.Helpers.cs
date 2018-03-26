@@ -109,7 +109,7 @@ namespace Takai.Game
 
             foreach (var ent in EnumerateEntitiesInSectors(sectors))
             {
-                if (Vector2.DistanceSquared(ent.Position, position) < ent.RadiusSq + radiusSq)
+                if (Vector2.DistanceSquared(ent.Position, position) <= ent.RadiusSq + radiusSq)
                     ents.Add(ent);
             }
 

@@ -39,7 +39,10 @@ namespace Takai.Game
         public Range<float> InitialSpeed { get; set; } = 1;
         public float Drag { get; set; } = 0.05f;
 
-        //angular velocity/drag?
+        public Range<float> InitialAngularSpeed { get; set; } = 0;
+        public float AngularDrag { get; set; } = 0;
+
+        //off center rotation?
     }
 
     /// <summary>
@@ -53,7 +56,7 @@ namespace Takai.Game
 
         public Vector2 position;
         public Vector2 velocity;
-        //angular velocity
+        public float angularVelocity;
 
         //cached properties
         public Color color;

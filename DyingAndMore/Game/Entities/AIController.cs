@@ -251,7 +251,7 @@ namespace DyingAndMore.Game.Entities
         {
             AI.Actor.IsAlive = false; //should this be handled by the effect?
             if (Effect != null)
-                AI.Actor.Map.Spawn(Effect.Create(AI.Actor));
+                AI.Actor.Map.Spawn(Effect.Instantiate(AI.Actor));
         }
     }
 

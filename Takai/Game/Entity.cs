@@ -277,7 +277,7 @@ namespace Takai.Game
         {
             PlayAnimation("Idle");
 
-            var fx = Class.SpawnEffect?.Create(this);
+            var fx = Class.SpawnEffect?.Instantiate(this);
             if (fx.HasValue)
                 Map.Spawn(fx.Value);
         }
@@ -288,7 +288,7 @@ namespace Takai.Game
         {
             if (!DisableNextDestructionEffect)
             {
-                var fx = Class.DestructionEffect?.Create(this);
+                var fx = Class.DestructionEffect?.Instantiate(this);
                 if (fx.HasValue)
                     Map.Spawn(fx.Value);
             }

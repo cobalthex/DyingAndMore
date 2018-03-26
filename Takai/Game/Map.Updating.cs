@@ -84,6 +84,8 @@ namespace Takai.Game
         /// </summary>
         protected HashSet<EntityInstance> activeEntities = new HashSet<EntityInstance>();
 
+        HashSet<FluidInstance> collidingFluids = new HashSet<FluidInstance>();
+
         /// <summary>
         /// Update the map state
         /// Updates the active set and then the contents of the active set
@@ -229,6 +231,9 @@ namespace Takai.Game
                                     {
                                         drag += fluid.Class.Drag;
                                         ++dc;
+
+                                        if (fluid.Class.CollisionEffect != null)
+                                            collidingFluids.Add(fluid);
                                     }
                                 }
                                 if (dc > 0)
@@ -236,6 +241,15 @@ namespace Takai.Game
                                     var fd = (drag / dc / 7.5f) * entity.Velocity.LengthSquared();
                                     entity.Velocity += ((-fd * normV) * (deltaSeconds / TimeScale)); //todo: radius affects
                                 }
+
+                                foreach (var fluid in collidingFluids)
+                                {
+                                    var fx = fluid.Class.CollisionEffect.Instantiate();
+                                    fx.Position = entity.Position;
+                                    fx.Direction = Vector2.Normalize(entity.Position - fluid.position);
+                                    Spawn(fx);
+                                }
+                                collidingFluids.Clear();
                             }
 
                             entity.Position += entity.Velocity * deltaSeconds;
@@ -336,6 +350,10 @@ namespace Takai.Game
                     x.color = p.Key.ColorOverTime.Evaluate(life);
                     x.scale = p.Key.ScaleOverTime.Evaluate(life);
 
+                    var deltaAV = x.angularVelocity * deltaSeconds;
+                    x.angularVelocity -= deltaAV * p.Key.AngularDrag;
+                    x.angle += deltaAV;
+
                     var deltaV = x.velocity * deltaSeconds;
                     x.velocity -= deltaV * p.Key.Drag;
                     x.position += deltaV;
@@ -402,11 +420,6 @@ namespace Takai.Game
 
             foreach (var script in Scripts)
                 script.Step(deltaTime);
-        }
-
-        void UpdateEntityPhysics()
-        {
-
         }
     }
 }
