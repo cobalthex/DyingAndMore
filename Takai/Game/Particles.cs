@@ -22,6 +22,7 @@ namespace Takai.Game
 
         public ColorCurve ColorOverTime { get; set; } = Color.White;
         public ScalarCurve ScaleOverTime { get; set; } = 1;
+        public ScalarCurve SpinOverTime { get; set; } = 0;
 
         /// <summary>
         /// Spawn a fluid on the death of a particle
@@ -39,7 +40,7 @@ namespace Takai.Game
         public Range<float> InitialSpeed { get; set; } = 1;
         public float Drag { get; set; } = 0.05f;
 
-        public Range<float> InitialAngularSpeed { get; set; } = 0;
+        public Range<float> InitialAngularSpeed { get; set; } = 0; //substitute for physics/gravity
         public float AngularDrag { get; set; } = 0;
 
         //off center rotation?
@@ -62,5 +63,6 @@ namespace Takai.Game
         public Color color;
         public float scale;
         public float angle;
+        public float spin;
     }
 }

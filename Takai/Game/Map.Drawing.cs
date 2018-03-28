@@ -187,17 +187,18 @@ namespace Takai.Game
         /// <summary>
         /// Draw an arrow facing away from a point
         /// </summary>
-        /// <param name="Position">The origin of the tail of the arrow</param>
-        /// <param name="Direction">The direction the arrow is facing</param>
-        /// <param name="Magnitude">How big the arrow should be</param>
-        public void DrawArrow(Vector2 Position, Vector2 Direction, float Magnitude, Color color)
+        /// <param name="position">The origin of the tail of the arrow</param>
+        /// <param name="direction">The direction the arrow is facing</param>
+        /// <param name="magnitude">How big the arrow should be</param>
+        public void DrawArrow(Vector2 position, Vector2 direction, float magnitude, Color color)
         {
-            var tip = Position + (Direction * Magnitude);
-            DrawLine(Position, tip, Color.Yellow);
+            magnitude = System.Math.Max(magnitude, 8);
+            var tip = position + (direction * magnitude);
+            DrawLine(position, tip, Color.Yellow);
 
-            Magnitude = MathHelper.Clamp(Magnitude * 0.333f, 5, 30);
-            DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, arrowWingTransform)), color);
-            DrawLine(tip, tip - (Magnitude * Vector2.Transform(Direction, Matrix.Invert(arrowWingTransform))), color);
+            magnitude = MathHelper.Clamp(magnitude * 0.333f, 5, 30);
+            DrawLine(tip, tip - (magnitude * Vector2.Transform(direction, arrowWingTransform)), color);
+            DrawLine(tip, tip - (magnitude * Vector2.Transform(direction, Matrix.Invert(arrowWingTransform))), color);
         }
 
 
@@ -462,12 +463,7 @@ namespace Takai.Game
 
                     foreach (var state in ent.ActiveAnimations)
                     {
-                        if (state.Class == null)
-                            continue;
-
-                        //todo: revisit (explicit base+overlay)
-
-                        state.Class.Sprite.Draw(
+                        state.Class?.Sprite?.Draw(
                             Class.spriteBatch,
                             ent.Position,
                             angle,
@@ -528,7 +524,7 @@ namespace Takai.Game
 
                 foreach (var state in ent.ActiveAnimations)
                 {
-                    if (state.Class == null)
+                    if (state.Class?.Sprite == null)
                         continue;
 
                     var sprite = state.Class.Sprite;

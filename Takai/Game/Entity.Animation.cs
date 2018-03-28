@@ -101,7 +101,7 @@ namespace Takai.Game
         public AnimationInstance NextState { get; set; }
     }
 
-    public abstract partial class EntityClass
+    public partial class EntityClass
     {
         /// <summary>
         /// All available animations
@@ -117,7 +117,7 @@ namespace Takai.Game
         //entity state map (id to class name)
     }
 
-    public abstract partial class EntityInstance
+    public partial class EntityInstance
     {
         AnimationInstance baseAnimation;
         List<AnimationInstance> overlayAnimations = new List<AnimationInstance>();
@@ -145,7 +145,7 @@ namespace Takai.Game
         /// <returns>True if the animation was started, false if the animation was already playing or didn't exist</returns>
         public bool PlayAnimation(string animation, Action completionCallback = null)
         {
-            if (Class.Animations != null && Class.Animations.TryGetValue(animation, out var animClass))
+            if (!string.IsNullOrEmpty(animation) && Class.Animations != null && Class.Animations.TryGetValue(animation, out var animClass))
             {
                 var instance = animClass.Instantiate();
                 instance.CompletionCallback = completionCallback;
@@ -232,19 +232,19 @@ namespace Takai.Game
 
         public virtual void UpdateAnimations(TimeSpan deltaTime)
         {
-            bool wasFinished = baseAnimation.ElapsedTime > baseAnimation.Class.TotalTime;
-            baseAnimation.ElapsedTime += deltaTime;
-            if (!wasFinished && baseAnimation.ElapsedTime > baseAnimation.Class.TotalTime)
-            {
-                baseAnimation.CompletionCallback?.Invoke();
-                baseAnimation.CompletionCallback = null;
-            }
-
             Radius = 0;
             lastVisibleSize = Point.Zero;
             if (baseAnimation.Class != null)
             {
                 Radius = baseAnimation.Class.Radius;
+
+                bool wasFinished = baseAnimation.ElapsedTime > baseAnimation.Class.TotalTime;
+                baseAnimation.ElapsedTime += deltaTime;
+                if (!wasFinished && baseAnimation.ElapsedTime > baseAnimation.Class.TotalTime)
+                {
+                    baseAnimation.CompletionCallback?.Invoke();
+                    baseAnimation.CompletionCallback = null;
+                }
 
                 if (baseAnimation.Class.Sprite != null)
                     lastVisibleSize = baseAnimation.Class.Sprite.Size;

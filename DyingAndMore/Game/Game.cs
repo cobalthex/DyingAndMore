@@ -8,8 +8,6 @@ using Takai.UI;
 using System;
 using Takai.Game;
 
-using System.Reflection;
-
 namespace DyingAndMore.Game
 {
     //map spawn configurations? (akin to difficulty)

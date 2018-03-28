@@ -154,7 +154,7 @@ namespace Takai.Game
             for (int i = 0; i < numParticles; ++i)
             {
                 var angle = Spread.Random();
-                var dir = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(angle));
+                var dir = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(-angle));
                 var initAngle = dir.Angle();
 
                 var position = instance.Position;
@@ -167,7 +167,7 @@ namespace Takai.Game
 
                 var particle = new ParticleInstance()
                 {
-                    color = Color.White, //TODO: Class.ColorOverTime.start,
+                    color = Class.ColorOverTime.Count > 0 ? Class.ColorOverTime.Evaluate(0) : Color.White,
                     delay = TimeSpan.Zero,
                     position = position,
                     velocity = Class.InitialSpeed.Random() * dir + instance.Velocity,

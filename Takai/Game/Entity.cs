@@ -6,7 +6,7 @@ namespace Takai.Game
     /// <summary>
     /// Describes a single type of entity. Actors, etc. inherit from this
     /// </summary>
-    public abstract partial class EntityClass : IObjectClass<EntityInstance>
+    public partial class EntityClass : IObjectClass<EntityInstance>
     {
         [Data.Serializer.Ignored]
         public string File { get; set; } = null;
@@ -68,7 +68,10 @@ namespace Takai.Game
 
         public EntityClass() { }
 
-        public abstract EntityInstance Instantiate();
+        public virtual EntityInstance Instantiate()
+        {
+            return new EntityInstance(this);
+        }
 
         public override string ToString()
         {
@@ -77,9 +80,9 @@ namespace Takai.Game
     }
 
     /// <summary>
-    /// A single instance of an entity in a map. Mostly logic handled through <see cref="EntityClass"/>
+    /// A single instance of an entity in a map.
     /// </summary>
-    public abstract partial class EntityInstance : IObjectInstance<EntityClass>
+    public partial class EntityInstance : IObjectInstance<EntityClass>
     {
         private static int nextId = 1; //generator for the unique (runtime) IDs
 
@@ -203,7 +206,7 @@ namespace Takai.Game
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
-            PlayAnimation("Idle");
+            PlayAnimation(Class.DefaultBaseAnimation);
         }
 
         Matrix lastTransform = Matrix.Identity;

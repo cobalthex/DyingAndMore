@@ -5,7 +5,7 @@ FluidClass {
     Radius: 54;
     Drag: 0.7;
 
-    CollisionEffect: EffectsClass {
+    EntityCollisionEffect: {
 		Effects: [
 			ParticleEffect {
 	            Class: {
