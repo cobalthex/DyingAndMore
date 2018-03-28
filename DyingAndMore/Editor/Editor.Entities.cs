@@ -155,7 +155,7 @@ namespace DyingAndMore.Editor
                 }
 #endif
 
-                var searchRadius = /*isTapping*/ false ? 10 : 1;
+                var searchRadius = /*isTapping*/ false ? 10 : 5;
                 var selected = editor.Map.FindEntities(currentWorldPos, searchRadius);
                 if (selected.Count < 1)
                 {

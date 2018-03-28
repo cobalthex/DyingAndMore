@@ -16,18 +16,23 @@ namespace DyingAndMore.Editor.Selectors
             ItemSize = new Point(64);
             Padding = 5;
 
-            var searchPath = Path.Combine(Takai.Data.Cache.DefaultRoot, "Actors");
-            foreach (var file in Directory.EnumerateFiles(searchPath, "*.ent.tk", SearchOption.AllDirectories))
+            var searchPaths = new[] { "Actors", "Scenery" };
+
+            foreach (var path in searchPaths)
             {
-                try
+                var searchPath = Path.Combine(Takai.Data.Cache.DefaultRoot, path);
+                foreach (var file in Directory.EnumerateFiles(searchPath, "*.ent.tk", SearchOption.AllDirectories))
                 {
-                    var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(file);
-                    if (ent is Game.Entities.ActorClass && ent.Animations != null) //+ other classes
-                        ents.Add(ent);
-                }
-                catch (System.Exception e)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Could not load Entity definitions from {file}:\n  {e}");
+                    try
+                    {
+                        var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(file);
+                        if (ent.Animations != null) //+ other classes
+                            ents.Add(ent);
+                    }
+                    catch (System.Exception e)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Could not load Entity definitions from {file}:\n  {e}");
+                    }
                 }
             }
 
@@ -44,7 +49,8 @@ namespace DyingAndMore.Editor.Selectors
         {
             var ent = ents[itemIndex];
 
-            if (ent.Animations.TryGetValue(ent.DefaultBaseAnimation, out var state) && state.Sprite?.Texture != null)
+            if ((ent.Animations.TryGetValue("EditorPreview", out var state) ||
+                ent.Animations.TryGetValue(ent.DefaultBaseAnimation, out state)) && state.Sprite?.Texture != null)
                 state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, editor.Map.ElapsedTime);
             else
             {

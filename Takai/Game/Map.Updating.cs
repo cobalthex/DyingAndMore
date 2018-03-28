@@ -232,7 +232,7 @@ namespace Takai.Game
                                         drag += fluid.Class.Drag;
                                         ++dc;
 
-                                        if (fluid.Class.CollisionEffect != null)
+                                        if (fluid.Class.EntityCollisionEffect != null)
                                             collidingFluids.Add(fluid);
                                     }
                                 }
@@ -244,7 +244,7 @@ namespace Takai.Game
 
                                 foreach (var fluid in collidingFluids)
                                 {
-                                    var fx = fluid.Class.CollisionEffect.Instantiate();
+                                    var fx = fluid.Class.EntityCollisionEffect.Instantiate();
                                     fx.Position = entity.Position;
                                     fx.Direction = Vector2.Normalize(entity.Position - fluid.position);
                                     Spawn(fx);
