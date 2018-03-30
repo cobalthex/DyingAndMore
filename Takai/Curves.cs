@@ -29,6 +29,9 @@ namespace Takai
     {
         public List<CurveValue<TValue>> Values { get; set; } = new List<CurveValue<TValue>>();
 
+        [Data.Serializer.Ignored]
+        public int Count => Values.Count;
+
         public CatmullCurve() { }
 
         public virtual void AddValue(float t, TValue value)

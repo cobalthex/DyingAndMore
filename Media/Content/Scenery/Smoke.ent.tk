@@ -3,40 +3,40 @@ EntityClass {
 
     DefaultBaseAnimation: "Smoke";
     Animations: {
-    	Smoke: {
-    		Effect: {
-    			Effects: [
-	    			ParticleEffect {
-			            Class: {
-			                Sprite: {
-			                    Texture: @"Effects/Smoke3.png"
-			                    Tween: TweenStyle.Overlap;
-			                    Width: 48;
-			                    Height: 48;
-			                };
-			                Blend: BlendState.Additive;
-			                InitialSpeed: [50 80];
-			                lifetime: [0.5sec 1.5sec];
-				            ScaleOverTime: {
-				            	Values: [
-					            	[0 0.2];
-					            	[1 1.0];
-			            		];
-			            	};
-				            ColorOverTime: {
-				            	Values: [
-				            		[0 Color.White];
-				            		[1 Color.Transparent];
-				            	];
-				            }
-			            }
-			            Count: [0 1];
-			            Spread: [0.5pi 0.5pi];
-			            Radius: 20;
-			        };
-    			];
-    		}
-    	}
+        Smoke: {
+            Effect: {
+                Effects: [
+                    ParticleEffect {
+                        Class: {
+                            Sprite: {
+                                Texture: @"Effects/Smoke3.png"
+                                Tween: TweenStyle.Overlap;
+                                Width: 48;
+                                Height: 48;
+                            };
+                            Blend: BlendState.Additive;
+                            InitialSpeed: 500;
+                            lifetime: [0.5sec 1.5sec];
+                            ScaleOverTime: {
+                                Values: [
+                                    [0 0.2];
+                                    [1 1.0];
+                                ];
+                            };
+                            ColorOverTime: {
+                                Values: [
+                                    [0 Color.White];
+                                    [1 Color.Transparent];
+                                ];
+                            }
+                        }
+                        Count: [0 1];
+                        Spread: [0.5pi 0.5pi];
+                        Radius: 00;
+                    };
+                ];
+            }
+        }
         EditorPreview: {
             Sprite: {
                 texture: @"Effects/Smoke3.png";

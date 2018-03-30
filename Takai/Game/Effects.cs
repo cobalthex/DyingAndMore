@@ -168,14 +168,14 @@ namespace Takai.Game
                 var particle = new ParticleInstance()
                 {
                     color = Class.ColorOverTime.Count > 0 ? Class.ColorOverTime.Evaluate(0) : Color.White,
-                    delay = TimeSpan.Zero,
                     position = position,
                     velocity = Class.InitialSpeed.Random() * dir + instance.Velocity,
-                    angularVelocity = Class.InitialAngularSpeed.Random(),
                     lifetime = Class.Lifetime.Random(),
-                    angle = initAngle,
-                    scale = 1,
-                    time = instance.Map.ElapsedTime
+                    spawnAngle = initAngle,
+                    spin = Class.SpinOverTime.Count > 0 ? Class.SpinOverTime.Evaluate(0) : 0,
+                    scale = Class.ScaleOverTime.Count > 0 ? Class.ScaleOverTime.Evaluate(0) : 1,
+                    angle = Class.AngleOverTime.Count > 0 ? Class.AngleOverTime.Evaluate(0) : 0,
+                    spawnTime = instance.Map.ElapsedTime
                 };
 
                 instance.Map.Particles[Class].Add(particle);

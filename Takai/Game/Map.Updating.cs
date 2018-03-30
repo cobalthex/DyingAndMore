@@ -333,7 +333,7 @@ namespace Takai.Game
                 {
                     var x = p.Value[i];
 
-                    if (ElapsedTime >= x.time + x.lifetime + x.delay)
+                    if (ElapsedTime >= x.spawnTime + x.lifetime)
                     {
                         p.Value[i] = p.Value[p.Value.Count - 1];
                         p.Value.RemoveAt(p.Value.Count - 1);
@@ -345,14 +345,16 @@ namespace Takai.Game
                         continue;
                     }
 
-                    var life = (float)((ElapsedTime - (x.time + x.delay)).TotalSeconds / x.lifetime.TotalSeconds);
+                    var life = (float)((ElapsedTime - (x.spawnTime)).TotalSeconds / x.lifetime.TotalSeconds);
 
                     x.color = p.Key.ColorOverTime.Evaluate(life);
                     x.scale = p.Key.ScaleOverTime.Evaluate(life);
+                    x.spin = p.Key.SpinOverTime.Evaluate(life);
+                    var angle = p.Key.AngleOverTime.Evaluate(life);
 
-                    var deltaAV = x.angularVelocity * deltaSeconds;
-                    x.angularVelocity -= deltaAV * p.Key.AngularDrag;
-                    x.angle += deltaAV;
+                    var xvl = x.velocity.Length();
+                    x.velocity = xvl * Vector2.TransformNormal(x.velocity / xvl, Matrix.CreateRotationZ(angle - x.angle));
+                    x.angle = angle;
 
                     var deltaV = x.velocity * deltaSeconds;
                     x.velocity -= deltaV * p.Key.Drag;
