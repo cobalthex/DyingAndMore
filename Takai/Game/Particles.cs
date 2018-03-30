@@ -22,7 +22,8 @@ namespace Takai.Game
 
         public ColorCurve ColorOverTime { get; set; } = Color.White;
         public ScalarCurve ScaleOverTime { get; set; } = 1;
-        public ScalarCurve SpinOverTime { get; set; } = 0;
+        public ScalarCurve SpinOverTime { get; set; } = 0; //relative to spawn angle
+        public ScalarCurve AngleOverTime { get; set; } = 0; //relative to spawn angle
 
         /// <summary>
         /// Spawn a fluid on the death of a particle
@@ -35,15 +36,8 @@ namespace Takai.Game
         /// </summary>
         public Range<TimeSpan> Lifetime { get; set; } = TimeSpan.FromSeconds(1);
 
-        //start delay
-
         public Range<float> InitialSpeed { get; set; } = 1;
         public float Drag { get; set; } = 0.05f;
-
-        public Range<float> InitialAngularSpeed { get; set; } = 0; //substitute for physics/gravity
-        public float AngularDrag { get; set; } = 0;
-
-        //off center rotation?
     }
 
     /// <summary>
@@ -51,18 +45,17 @@ namespace Takai.Game
     /// </summary>
     public struct ParticleInstance
     {
-        public TimeSpan time; //spawn time
+        public TimeSpan spawnTime;
         public TimeSpan lifetime;
-        public TimeSpan delay;
 
         public Vector2 position;
         public Vector2 velocity;
-        public float angularVelocity;
+        public float spawnAngle;
 
         //cached properties
         public Color color;
         public float scale;
-        public float angle;
         public float spin;
+        public float angle;
     }
 }

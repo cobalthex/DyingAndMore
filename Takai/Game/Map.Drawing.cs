@@ -552,17 +552,17 @@ namespace Takai.Game
 
                 for (int i = 0; i < p.Value.Count; ++i)
                 {
-                    if (p.Value[i].time == System.TimeSpan.Zero)
+                    if (p.Value[i].spawnTime == System.TimeSpan.Zero)
                         continue;
 
                     p.Key.Sprite.Draw
                     (
                         Class.spriteBatch,
                         p.Value[i].position,
-                        p.Value[i].angle,
+                        p.Value[i].angle + p.Value[i].spin + p.Value[i].spawnAngle,
                         p.Value[i].color,
                         p.Value[i].scale,
-                        ElapsedTime - p.Value[i].time
+                        ElapsedTime - p.Value[i].spawnTime
                     );
                 }
 

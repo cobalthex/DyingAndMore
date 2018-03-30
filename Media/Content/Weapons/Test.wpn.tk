@@ -65,7 +65,6 @@ GunClass {
                     };
                     Blend: BlendState.NonPremultiplied;
                     InitialSpeed: [200 400];
-                    InitialAngularSpeed: [20 60];
                     Drag: 1.5;
                     lifetime: 800msec;
                     ColorOverTime: {
@@ -81,9 +80,23 @@ GunClass {
                             [1 0.5]
                         ];
                     };
+
+                    SpinOverTime: {
+                        Values: [
+                            [0 0]
+                            [1 3pi]
+                        ];
+                    };
+
+                    AngleOverTime: {
+                        Values: [
+                            [0 0]
+                            [1 0.5pi]
+                        ];
+                    };
                 }
                 Count: 1;
-                Spread: [-100deg -80deg];
+                Spread: [-120deg -60deg];
             };
 
             SoundImpulse {

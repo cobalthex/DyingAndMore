@@ -12,9 +12,14 @@ EffectsClass {
                 DestructionFluid: @"Fluids/Blood.fluid.tk";
                 Blend: BlendState.NonPremultiplied;
                 InitialSpeed: [100 200];
-                InitialAngularSpeed: [1pi 4pi];
+                AngleOverTime: {
+                    Values: [
+                        [0 0];
+                        [1 0.5pi];
+                    ];
+                };
                 lifetime: [0.5sec 1.5sec];
-                Drag: 5;
+                Drag: 1;
             }
             Count: [5 10];
         }
