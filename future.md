@@ -6,8 +6,6 @@ Features to add in the future
 
 0. Invisibility
 
-0. Ambient sounds and sound scenery
-
 0. Game AI
 	0. Squads/Platoons
 	0. Cover
@@ -20,10 +18,11 @@ Features to add in the future
 
 0. Trails that use triangle strips
 
-0. Radial menus for editor
+0. Radial menus for editor (radial menus implemented)
 
 0. Gases
-	0. Damage effects
 	0. Behavior changing
 
 0. exportable values (floats) from objects (export rate of fire of weapon for use with animation, etc)
+
+0. Variations for enemy skins

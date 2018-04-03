@@ -107,6 +107,8 @@ namespace DyingAndMore.Game.Weapons
 
         protected override void OnDischarge()
         {
+            //todo: at high rates of fire, occasionally discharge effect doesnt play (or at least doesnt play correctly)
+
             if (_class.Projectile != null)
             {
                 for (int i = 0; i < _class.ProjectilesPerRound; ++i)

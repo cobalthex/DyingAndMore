@@ -3,14 +3,14 @@ GunClass {
 
     MaxAmmo: 2000;
     #RoundsPerBurst: 3;
-    #ProjectilesPerRound: 6;
+    ProjectilesPerRound: 6;
     #MaxBursts: 3;
     #BurstCooldownTime: 400msec;
     ChargeTime: 0msec;
-    DischargeTime: 900rpm;
+    DischargeTime: 1200rpm;
     CooldownTime: 2sec;
     CanAlwaysCharge: true;
-    ErrorAngle: [-4deg 4deg]; # test
+    ErrorAngle: [-6deg 6deg]; # test
 
     DischargeEffect: {
         Effects: [
@@ -91,7 +91,7 @@ GunClass {
                     AngleOverTime: {
                         Values: [
                             [0 0]
-                            [1 0.5pi]
+                            [1 0.25pi]
                         ];
                     };
                 }

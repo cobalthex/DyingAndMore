@@ -182,6 +182,8 @@ namespace Takai.Game
                 foreach (var trigger in Data.Serializer.Cast<List<Trigger>>(triggers))
                     AddTrigger(trigger);
             }
+
+            Resize(Class.Width, Class.Height); //builds spacial info, etc
         }
     }
 }

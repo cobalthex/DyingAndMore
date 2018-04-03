@@ -83,14 +83,21 @@ namespace DyingAndMore.Game.Entities
         List<PrioritizedBehavior>[] behaviorCosts
             = new List<PrioritizedBehavior>[(int)BehaviorMask._Count_];
 
+        [Takai.Data.Serializer.Ignored]
         public Behavior[] ChosenBehaviors { get; set; } = new Behavior[(int)BehaviorMask._Count_];
 
         Random random = new Random();
 
-        public ActorInstance Target => _target;
+        [Takai.Data.Serializer.AsReference]
+        public ActorInstance Target
+        {
+            get => _target;
+            set => SetNextTarget(value);
+        }
 
         private ActorInstance _target, nextTarget;
         private bool isNextTargetSet;
+
         public TimeSpan TargetTime { get; set; }
 
         public Vector2 LastKnownTargetPosition { get; set; }

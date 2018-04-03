@@ -140,9 +140,24 @@ namespace DyingAndMore
                 if (mapList.SelectedIndex < 0)
                     return;
 
-                var map = Takai.Data.Cache.Load<Takai.Game.MapClass>(mapList.SelectedFile);
+                Takai.Game.MapClass map = null;
+                Takai.Game.MapInstance inst = null;
+
+                var loaded = Takai.Data.Cache.Load(mapList.SelectedFile);
+                if (loaded is Takai.Game.MapInstance)
+                {
+                    inst = (Takai.Game.MapInstance)loaded;
+                    map = inst.Class;
+                }
+                else if (loaded is Takai.Game.MapClass)
+                {
+                    map = (Takai.Game.MapClass)loaded;
+                    inst = map.Instantiate();
+                }
+                else
+                    throw new System.ArgumentException("File loaded must be a MapClass or MapInstance");
                 map.InitializeGraphics();
-                ui = new Takai.UI.Static(new Editor.Editor(map.Instantiate()));
+                ui = new Takai.UI.Static(new Editor.Editor(inst));
             };
 
             var newMap = ui.FindChildByName("new");

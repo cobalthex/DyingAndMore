@@ -195,10 +195,10 @@ namespace Takai.Data
                 writer.WriteLine($"{(WriteFullTypeNames ? ty.FullName : ty.Name)} {{");
 
                 foreach (var prop in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance | (serializeNonPublics ? BindingFlags.NonPublic : 0)))
-                    SerializeMember(writer, serializing, prop, prop.GetValue(serializing), indentLevel, serializeExternals, serializeNonPublics);
+                    SerializeMember(writer, serializing, prop, prop.GetValue(serializing), prop.PropertyType, indentLevel, serializeExternals, serializeNonPublics);
 
                 foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance | (serializeNonPublics ? BindingFlags.NonPublic : 0)))
-                    SerializeMember(writer, serializing, field, field.GetValue(serializing), indentLevel, serializeExternals, serializeNonPublics);
+                    SerializeMember(writer, serializing, field, field.GetValue(serializing), field.FieldType, indentLevel, serializeExternals, serializeNonPublics);
 
                 if (serializing is IDerivedSerialize derived)
                 {
@@ -220,33 +220,31 @@ namespace Takai.Data
             }
         }
 
-        private static void SerializeMember(TextWriter writer, object parent, MemberInfo member, object value, int indentLevel, bool serializeExternals, bool serializeNonPublics)
+        private static void SerializeMember(TextWriter writer, object parent, MemberInfo member, object value, Type valueType, int indentLevel, bool serializeExternals, bool serializeNonPublics)
         {
-            if (member.IsDefined(typeof(IgnoredAttribute)))
-                return;
-
-            if (member.IsDefined(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), true))
+            if (member.IsDefined(typeof(IgnoredAttribute)) ||
+                member.IsDefined(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), true))
                 return;
 
             Indent(writer, indentLevel + 1);
             writer.Write("{0}: ", member.Name);
 
             if (value == null)
-            {
-                writer.WriteLine("Null;");
-                return;
-            }
-
-            //custom-defined serializer
-            var custSerial = member.GetCustomAttribute<CustomSerializeAttribute>(true);
-            if (custSerial?.methodName != null)
-            {
-                var method = member.DeclaringType.GetMethod(custSerial.methodName, CustomSerializeAttribute.Flags);
-                TextSerialize(writer, method.Invoke(parent, null), indentLevel + 1, serializeExternals, serializeNonPublics);
-            }
+                writer.Write("Null");
+            else if (member.IsDefined(typeof(AsReferenceAttribute)) && value is IReferenceable ir)
+                writer.Write($"*{(Serializer.WriteFullTypeNames ? valueType.FullName : valueType.Name)}.{ir.Id}"); //todo: serialize externals?
             else
-                TextSerialize(writer, value, indentLevel + 1, serializeExternals, serializeNonPublics);
-
+            {
+                //custom-defined serializer
+                var custSerial = member.GetCustomAttribute<CustomSerializeAttribute>(true);
+                if (custSerial?.methodName != null)
+                {
+                    var method = member.DeclaringType.GetMethod(custSerial.methodName, CustomSerializeAttribute.Flags);
+                    TextSerialize(writer, method.Invoke(parent, null), indentLevel + 1, serializeExternals, serializeNonPublics);
+                }
+                else
+                    TextSerialize(writer, value, indentLevel + 1, serializeExternals, serializeNonPublics);
+            }
             writer.WriteLine(";");
         }
 

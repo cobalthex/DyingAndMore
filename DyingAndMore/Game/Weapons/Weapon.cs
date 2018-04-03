@@ -103,7 +103,7 @@ namespace DyingAndMore.Game.Weapons
             protected set
             {
                 _state = value;
-                StateTime = Actor.Map?.ElapsedTime ?? TimeSpan.Zero;
+                StateTime = Actor?.Map?.ElapsedTime ?? TimeSpan.Zero;
             }
         }
         WeaponState _state;
