@@ -55,8 +55,21 @@ namespace Takai.Data
         [System.Runtime.InteropServices.ComVisible(true)]
         public class ReadOnlyAttribute : Attribute { }
 
+        /// <summary>
+        /// Store the value (or values if enumerable) as a reference to an object defined elsewhere
+        /// Must implement IReferenceable
+        /// </summary>
+        [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
+        [System.Runtime.InteropServices.ComVisible(true)]
+        public class AsReferenceAttribute : Attribute { }
+
+        public interface IReferenceable
+        {
+            int Id { get; set; }
+        }
+
         public const bool WriteFullTypeNames = false;
-        public const bool CaseSensitiveMembers = false;
+        public const bool CaseSensitiveIdentifiers = false;
 
         //cached types from assemblies
         public static Dictionary<string, Type> RegisteredTypes { get; set; }

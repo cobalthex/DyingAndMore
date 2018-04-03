@@ -205,6 +205,7 @@ namespace Takai.Game
 
             if (options.HasFlag(CleanupOptions.DeadEntities))
             {
+                //todo: this is crashy
                 foreach (var ent in _allEntities)
                 {
                     if (!ent.IsAlive)

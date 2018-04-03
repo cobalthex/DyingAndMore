@@ -52,12 +52,22 @@ namespace Takai.Data
         /// </summary>
         public static readonly object DefaultAction = new object();
 
-        public struct DeserializationContext
+        struct PendingResolution
+        {
+            public string reference;
+        }
+
+        public class DeserializationContext
         {
             internal TextReader reader; //public?
 
             public string file;
             public string root;
+
+            public Dictionary<string, object> resolverCache = new Dictionary<string, object>
+                (Serializer.CaseSensitiveIdentifiers ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+            public Dictionary<string, MemberInfo> pendingCache = new Dictionary<string, MemberInfo>
+                (Serializer.CaseSensitiveIdentifiers ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
         }
 
         public static long GetStreamOffset(TextReader reader)
@@ -84,7 +94,7 @@ namespace Takai.Data
 #endif
         }
 
-        internal static string GetExceptionMessage(string error, ref DeserializationContext context)
+        internal static string GetExceptionMessage(string error, DeserializationContext context)
         {
             return error; //todo
         }
@@ -114,7 +124,7 @@ namespace Takai.Data
                 context.reader.Read(); //skip {
                 SkipIgnored(context.reader);
 
-                var dict = new Dictionary<string, object>(CaseSensitiveMembers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
+                var dict = new Dictionary<string, object>(CaseSensitiveIdentifiers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
 
                 while ((peek = context.reader.Peek()) != -1 && peek != '}')
                 {
@@ -122,7 +132,7 @@ namespace Takai.Data
                     while ((peek = context.reader.Peek()) != ':')
                     {
                         if (peek == -1)
-                            throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected '}}' to close object", ref context));
+                            throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected '}}' to close object", context));
 
                         if (peek == ';' && key.Length == 0)
                         {
@@ -134,7 +144,7 @@ namespace Takai.Data
                     }
 
                     if (context.reader.Read() == -1)
-                        throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read object", ref context));
+                        throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read object", context));
 
                     var value = TextDeserialize(context);
 
@@ -147,7 +157,7 @@ namespace Takai.Data
                     SkipIgnored(context.reader);
 
                     if ((peek = context.reader.Peek()) == -1)
-                        throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected '}}' to close object", ref context));
+                        throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected '}}' to close object", context));
 
                     if (peek == ';')
                     {
@@ -177,20 +187,21 @@ namespace Takai.Data
                         SkipIgnored(context.reader);
 
                         if (context.reader.Peek() == ';')
-                            throw new InvalidDataException(GetExceptionMessage($"Unexpected ';' in list (missing value)", ref context));
+                            throw new InvalidDataException(GetExceptionMessage($"Unexpected ';' in list (missing value)", context));
 
                         continue;
                     }
 
                     if (peek == -1)
-                        throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read list", ref context));
+                        throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read list", context));
 
-                    values.Add(TextDeserialize(context));
+                    var value = TextDeserialize(context);
+                    values.Add(value);
                     SkipIgnored(context.reader);
                 }
 
                 if (context.reader.Read() == -1) //skip ]
-                    throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected ']' to close list", ref context));
+                    throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected ']' to close list", context));
 
                 return values;
             }
@@ -199,10 +210,11 @@ namespace Takai.Data
             {
                 context.reader.Read();
 
+                object loaded;
                 if (context.reader.Peek() == '.') //recursive reference
                 {
                     context.reader.Read();
-                    return Cache.Load(context.file, context.root, false);
+                    loaded = Cache.Load(context.file, context.root, false);
                 }
                 else
                 {
@@ -211,10 +223,29 @@ namespace Takai.Data
                     if (context.file != null && (file.StartsWith("./") || file.StartsWith(".\\")))
                         file = Path.Combine(Path.GetDirectoryName(context.file), file.Substring(2));
 
-                    return Cache.Load(file, context.root, false);
-
+                    loaded = Cache.Load(file, context.root, false);
                 }
 
+                if (loaded is IReferenceable ir)
+                    context.resolverCache[loaded.GetType().Name + "." + ir.Id] = loaded; //todo: better id naming and only allow one?
+                return loaded;
+            }
+
+            if (peek == '*')
+            {
+                context.reader.Read();
+                var sb = new StringBuilder();
+                do
+                {
+                    sb.Append((char)context.reader.Read());
+                    sb.Append(ReadWord(context.reader));
+                } while (context.reader.Peek() == '.');
+
+                var refname = sb.ToString();
+                if (context.resolverCache.TryGetValue(refname, out var resolved))
+                    return resolved;
+
+                return new PendingResolution { reference = refname };
             }
 
             if (peek == '"' || peek == '\'')
@@ -336,13 +367,13 @@ namespace Takai.Data
                                 SkipIgnored(context.reader);
 
                                 if (context.reader.Peek() == ';')
-                                    throw new InvalidDataException(GetExceptionMessage($"Unexpected ';' in enum (missing value)", ref context));
+                                    throw new InvalidDataException(GetExceptionMessage($"Unexpected ';' in enum (missing value)", context));
 
                                 continue;
                             }
 
                             if (peek == -1)
-                                throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read enum", ref context));
+                                throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read enum", context));
 
                             var value = ReadWord(context.reader);
                             values |= Convert.ToUInt64(Enum.Parse(type, value));
@@ -352,13 +383,13 @@ namespace Takai.Data
                         }
 
                         if (context.reader.Read() == -1) //skip ]
-                            throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected ']' to close enum", ref context));
+                            throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream. Expected ']' to close enum", context));
 
                         if (valuesCount == 0)
-                            throw new ArgumentOutOfRangeException(GetExceptionMessage($"Expected at least one enum value", ref context));
+                            throw new ArgumentOutOfRangeException(GetExceptionMessage($"Expected at least one enum value", context));
 
                         if (valuesCount > 1 && !typeInfo.IsDefined(typeof(FlagsAttribute), true))
-                            throw new ArgumentOutOfRangeException(GetExceptionMessage($"{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", ref context));
+                            throw new ArgumentOutOfRangeException(GetExceptionMessage($"{valuesCount} enum values were given, but type:{type.Name} is not a flags enum", context));
 
                         return Enum.ToObject(type, values);
                     }
@@ -366,7 +397,7 @@ namespace Takai.Data
                         return Enum.Parse(type, ReadWord(context.reader));
 
                     if (context.reader.Read() != '[')
-                        throw new InvalidDataException(GetExceptionMessage($"Expected a '[' when reading enum value (EnumType[Key1; Key2]) or '.' (EnumType.Key) while attempting to read '{word}'", ref context));
+                        throw new InvalidDataException(GetExceptionMessage($"Expected a '[' when reading enum value (EnumType[Key1; Key2]) or '.' (EnumType.Key) while attempting to read '{word}'", context));
                 }
 
                 //static/single enum value
@@ -376,29 +407,34 @@ namespace Takai.Data
                     SkipIgnored(context.reader);
                     var staticVal = ReadWord(context.reader);
 
-                    var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveMembers ? BindingFlags.IgnoreCase : 0));
+                    var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveIdentifiers ? BindingFlags.IgnoreCase : 0));
                     if (field != null)
                         return field.GetValue(null);
 
-                    var prop = type.GetProperty(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveMembers ? BindingFlags.IgnoreCase : 0));
+                    var prop = type.GetProperty(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveIdentifiers ? BindingFlags.IgnoreCase : 0));
                     if (prop != null)
                         return prop.GetValue(null);
 
-                    throw new InvalidDataException(GetExceptionMessage($"Expected static value when reading '{staticVal}' from type '{word}'", ref context));
+                    throw new InvalidDataException(GetExceptionMessage($"Expected static value when reading '{staticVal}' from type '{word}'", context));
                 }
 
                 //read object
                 if (peek != '{')
-                    throw new InvalidDataException(GetExceptionMessage($"Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", ref context));
+                    throw new InvalidDataException(GetExceptionMessage($"Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", context));
 
                 var dict = TextDeserialize(context) as Dictionary<string, object>;
                 if (dict == null)
-                    throw new InvalidDataException(GetExceptionMessage($"Expected an object definition when reading type '{word}' (Type {{ }})", ref context));
+                    throw new InvalidDataException(GetExceptionMessage($"Expected an object definition when reading type '{word}' (Type {{ }})", context));
 
                 try
                 {
-                    var obj = ParseDictionary(type, dict, context);
-                    return obj;
+                    var dest = CreateType(type);
+                    ParseDictionary(type, dest, dict, context);
+
+                    if (dest is IReferenceable ir)
+                        context.resolverCache[dest.GetType().Name + "." + ir.Id] = dest; //todo: better id naming and only allow one?
+
+                    return dest;
                 }
                 catch (Exception expt)
                 {
@@ -407,12 +443,7 @@ namespace Takai.Data
                 }
             }
 
-            throw new NotSupportedException(GetExceptionMessage($"Unknown identifier: '{word}'", ref context));
-        }
-
-        public static T ParseDictionary<T>(Dictionary<string, object> dict, DeserializationContext context = default(DeserializationContext))
-        {
-            return (T)ParseDictionary(typeof(T), dict, context);
+            throw new NotSupportedException(GetExceptionMessage($"Unknown identifier: '{word}'", context));
         }
 
         static void ParseMember(object dest, object value, MemberInfo member, Type memberType, Action<object, object> setter, bool canWrite, DeserializationContext context)
@@ -451,7 +482,12 @@ namespace Takai.Data
             return obj;
         }
 
-        public static object ParseDictionary(Type destType, Dictionary<string, object> dict, DeserializationContext context = default(DeserializationContext))
+        public static T ParseDictionary<T>(Dictionary<string, object> dict, object destObject, DeserializationContext context = default(DeserializationContext))
+        {
+            return (T)ParseDictionary(typeof(T), destObject, dict, context);
+        }
+
+        public static object ParseDictionary(Type destType, object destObject, Dictionary<string, object> dict, DeserializationContext context = default(DeserializationContext))
         {
             var destTypeInfo = destType.GetTypeInfo();
 
@@ -463,8 +499,6 @@ namespace Takai.Data
                     return deserialied;
             }
 
-            var obj = CreateType(destType);
-
             foreach (var pair in dict)
             {
                 var late = pair.Value as Cache.LateBindLoad;
@@ -475,9 +509,9 @@ namespace Takai.Data
                     if (field != null && !field.IsDefined(typeof(IgnoredAttribute)))
                     {
                         if (late == null)
-                            ParseMember(obj, pair.Value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
+                            ParseMember(destObject, pair.Value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                         else
-                            late.setter = (target) => ParseMember(obj, target, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
+                            late.setter = (target) => ParseMember(destObject, target, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                     }
                     else
                     {
@@ -485,9 +519,9 @@ namespace Takai.Data
                         if (prop != null && !prop.IsDefined(typeof(IgnoredAttribute)))
                         {
                             if (late == null)
-                                ParseMember(obj, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
+                                ParseMember(destObject, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                             else
-                                late.setter = (target) => ParseMember(obj, target, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
+                                late.setter = (target) => ParseMember(destObject, target, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                         }
                         else
                             System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in DestType:{destType.Name}"); //pass filename through?
@@ -503,10 +537,10 @@ namespace Takai.Data
                 }
             }
 
-            if (obj is IDerivedDeserialize derived)
+            if (destObject is IDerivedDeserialize derived)
                 derived.DerivedDeserialize(dict);
 
-            return obj;
+            return destObject;
         }
 
         public static bool IsInt(object o)
@@ -728,7 +762,10 @@ namespace Takai.Data
             }
 
             if (sourceType == typeof(Dictionary<string, object>))
-                return ParseDictionary(destType, (Dictionary<string, object>)source, context);
+            {
+                var dest = CreateType(destType);
+                return ParseDictionary(destType, dest, (Dictionary<string, object>)source, context);
+            }
 
             bool canConvert = false;
 

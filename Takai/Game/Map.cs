@@ -149,6 +149,8 @@ namespace Takai.Game
 
     public partial class MapInstance : IObjectInstance<MapClass>
     {
+        private int nextEntityID = 0;
+
         /// <summary>
         /// The map backing this instance. Cannot be null
         /// Changing the class will reset the map
@@ -213,6 +215,7 @@ namespace Takai.Game
         /// <summary>
         /// The currently active camera. Determines what part of the map is active
         /// </summary>
+        [Data.Serializer.Ignored] //maybe?
         public Camera ActiveCamera { get; set; } //todo: necessary?
 
         public MapInstance() { }
@@ -266,6 +269,13 @@ namespace Takai.Game
                 instance.Map.Destroy(instance);
 
             instance.Map = this;
+            if (instance.Id > 0)
+            {
+                if (instance.Id > nextEntityID)
+                    nextEntityID = instance.Id;
+            }
+            else
+                instance.Id = (++nextEntityID);
             instance.SpawnTime = ElapsedTime;
             instance.OnSpawn();
 
@@ -293,6 +303,7 @@ namespace Takai.Game
         {
             instance.OnDestroy();
             instance.SpawnTime = TimeSpan.Zero;
+            instance.Id = 0;
             instance.Map = null;
             _allEntities.Remove(instance);
         }

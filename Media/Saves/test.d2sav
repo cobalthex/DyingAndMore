@@ -1,18 +1,13 @@
 MapInstance {
-    Class: @"maps/huge.map.tk";
+    Class: @"B:/Code/DyingAndMore/DyingAndMore/bin/Debug/Content/Maps/huge.map.tk";
     Sounds: [];
     Scripts: [];
-    ActiveCamera: EditorCamera {
-        PostEffect: Null;
-        Viewport: [0 0 1280 800];
-        Position: [1104 1104];
-        Scale: 0.3532609;
-        Rotation: 0;
-        Shake: 0;
-        Follow: Null;
-        MoveSpeed: 1000;
+    RenderStats: MapRenderStats {
+        visibleInactiveFluids: 1;
+        visibleActiveFluids: 10;
+        visibleDecals: 0;
     };
-    ElapsedTime: 8079.6925;
+    ElapsedTime: 18456.0966;
     TimeScale: 1;
     Entities: [
         ActorInstance {
@@ -29,22 +24,24 @@ MapInstance {
                 };
                 player: PlayerIndex.One;
             };
-            CurrentHealth: 500;
+            CurrentHealth: 5000;
+            Conditions: [];
             MaxSpeed: 400;
             Weapon: GunInstance {
                 Class: @"Weapons/Test.wpn.tk";
-                AmmoCount: 200;
+                AmmoCount: 2000;
                 StateTime: 0;
                 State: WeaponState.Idle;
                 Charge: 0;
             };
+            Id: 1;
             Name: Null;
             IsAlive: True;
-            Position: [1118.293 439.9599];
-            Forward: [0.9852189 0.1713003];
-            Velocity: [53.2377 0];
+            Position: [267 259];
+            Forward: [0.9938837 0.1104315];
+            Velocity: [0 0];
             OutlineColor: [255 0 0 255];
-            SpawnTime: 0;
+            SpawnTime: 7375;
             ActiveAnimations: [
                 AnimationInstance {
                     Class: AnimationClass {
@@ -65,21 +62,24 @@ MapInstance {
                             Tween: TweenStyle.Overlap;
                             ShrinkToFit: True;
                         };
+                        Material: Null;
                         Sound: SoundClass {
                             Name: Null;
-                            Sound: Null;
+                            Source: Null;
                             Subtitle: Null;
                             Caption: Null;
                             Gain: 1;
+                            DestroyIfOwnerDies: True;
                         };
                         EnterEffect: Null;
                         ExitEffect: Null;
                         Effect: Null;
                         Radius: 24;
                     };
-                    ElapsedTime: 8079.6925;
+                    ElapsedTime: 10665.2825;
                 }
             ];
+            Material: Null;
         }
         ActorInstance {
             Class: @"Actors/Rhinovirus.ent.tk";
@@ -92,13 +92,15 @@ MapInstance {
                         MaxTurn: 13.96263;
                     }
                     TargetEnemyBehavior {
-                        SightDistance: 300;
+                        SightDistance: 1000;
                     }
                 ];
-                Target: Null;
-                TargetTime: 7880.5776;
+                Target: *ActorInstance.1;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
             };
             CurrentHealth: 5000;
+            Conditions: [];
             MaxSpeed: 0;
             Weapon: GunInstance {
                 Class: @"Weapons/Boss.wpn.tk";
@@ -107,42 +109,55 @@ MapInstance {
                 State: WeaponState.Idle;
                 Charge: 0;
             };
+            Id: 6;
             Name: Null;
             IsAlive: True;
-            Position: [1194.895 164.3975];
+            Position: [1119.67 181.846];
             Forward: [1 0];
             Velocity: [0 0];
-            OutlineColor: [0 0 0 0];
-            SpawnTime: 0;
+            OutlineColor: [154 205 50 255];
+            SpawnTime: 16601.7952;
             ActiveAnimations: [
                 AnimationInstance {
                     Class: AnimationClass {
                         Sprite: Sprite {
                             Texture: "Actors/Rhinovirus.png";
-                            Width: 128;
                             Height: 128;
-                            ClipRect: [0 0 128 128];
-                            FrameCount: 1;
                             FrameLength: 0.0001;
+                            FrameCount: 1;
                             IsLooping: True;
-                            Tween: TweenStyle.None;
                             Origin: [64 64];
-                            ElapsedTime: 0;
+                            Width: 128;
+                            ClipRect: [0 0 128 128];
+                            Tween: TweenStyle.None;
+                            ElapsedTime: 14224.5073;
                             TotalLength: 0.0001;
                             Size: [128 128];
                             ShrinkToFit: True;
                         };
                         Sound: Null;
+                        Effect: Null;
                         Name: Null;
                         Type: AnimationType.Base;
+                        Material: Null;
                         EnterEffect: Null;
                         ExitEffect: Null;
-                        Effect: Null;
                         Radius: 64;
                     };
-                    ElapsedTime: 8079.6925;
+                    ElapsedTime: 1854.3014;
                 }
             ];
+            Material: Null;
+        }
+    ];
+}                       ExitEffect: Null;
+                        Effect: Null;
+                        Radius: 16;
+                    };
+                    ElapsedTime: 7374.5145;
+                }
+            ];
+            Material: Null;
         }
         ActorInstance {
             Class: @"Actors/InfectedCell.ent.tk";
@@ -152,125 +167,70 @@ MapInstance {
                     FlowSeekBehavior {
                     }
                     TargetEnemyBehavior {
-                        SightDistance: 300;
+                        SightDistance: 1000;
                     }
                     FocusBehavior {
                         MaxTurn: 13.96263;
                     }
+                    SuicideBehavior {
+                        Radius: 80;
+                        Effect: @"Effects/Damage.fx.tk";
+                    }
                 ];
-                Target: ActorInstance {
-                    Class: @"Actors/Player.ent.tk";
-                    Faction: Factions [Player];
-                    Controller: InputController {
-                        ActionInputs: {
-                            Fire: [
-                                ActionInput {
-                                    type: ActionInputType.MouseButton;
-                                    which: 0;
-                                }
-                            ];
-                        };
-                        player: PlayerIndex.One;
-                    };
-                    CurrentHealth: 500;
-                    MaxSpeed: 400;
-                    Weapon: GunInstance {
-                        Class: @"Weapons/Test.wpn.tk";
-                        AmmoCount: 200;
-                        StateTime: 0;
-                        State: WeaponState.Idle;
-                        Charge: 0;
-                    };
-                    Name: Null;
-                    IsAlive: True;
-                    Position: [1118.293 439.9599];
-                    Forward: [0.9852189 0.1713003];
-                    Velocity: [53.2377 0];
-                    OutlineColor: [255 0 0 255];
-                    SpawnTime: 0;
-                    ActiveAnimations: [
-                        AnimationInstance {
-                            Class: AnimationClass {
-                                Sprite: Sprite {
-                                    Texture: "Actors/Player.png";
-                                    Width: 48;
-                                    Height: 48;
-                                    ClipRect: [0 0 96 48];
-                                    FrameCount: 2;
-                                    FrameLength: 100;
-                                    IsLooping: True;
-                                    Tween: TweenStyle.Overlap;
-                                    Origin: [24 24];
-                                    ElapsedTime: 0;
-                                    TotalLength: 200;
-                                    Size: [48 48];
-                                    ShrinkToFit: True;
-                                };
-                                Sound: SoundClass {
-                                    Name: Null;
-                                    Sound: Null;
-                                    Subtitle: Null;
-                                    Caption: Null;
-                                    Gain: 1;
-                                };
-                                Name: Null;
-                                Type: AnimationType.Base;
-                                EnterEffect: Null;
-                                ExitEffect: Null;
-                                Effect: Null;
-                                Radius: 24;
-                            };
-                            ElapsedTime: 8079.6925;
-                        }
-                    ];
-                };
-                TargetTime: 7762.3125;
+                Target: *ActorInstance.1;
+                TargetTime: 6222.2806;
+                LastKnownTargetPosition: [0 0];
             };
             CurrentHealth: 20;
-            MaxSpeed: 352.4771;
+            Conditions: [];
+            MaxSpeed: 222.5493;
             Weapon: Null;
+            Id: 4;
             Name: Null;
             IsAlive: True;
-            Position: [808.9846 435.0847];
-            Forward: [0.9998949 0.01450313];
-            Velocity: [0 0];
+            Position: [493.5478 280.6754];
+            Forward: [-0.5893852 -0.6892473];
+            Velocity: [-143.714 -169.925];
             OutlineColor: [0 0 0 0];
             SpawnTime: 0;
             ActiveAnimations: [
                 AnimationInstance {
                     Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
                         Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 8;
+                            FrameLength: 100;
+                            TotalLength: 800;
+                            IsLooping: True;
                             Texture: "Actors/InfectedCell.png";
                             Width: 32;
                             Height: 32;
-                            ClipRect: [0 0 256 96];
-                            FrameCount: 8;
-                            FrameLength: 100;
-                            IsLooping: True;
-                            Tween: TweenStyle.Overlap;
-                            Origin: [16 16];
-                            ElapsedTime: 0;
-                            TotalLength: 800;
                             Size: [32 32];
+                            ClipRect: [0 0 256 96];
+                            Origin: [16 16];
+                            Tween: TweenStyle.Overlap;
                             ShrinkToFit: True;
                         };
+                        Material: Null;
                         Sound: SoundClass {
                             Name: Null;
-                            Sound: Null;
+                            Source: Null;
                             Subtitle: Null;
                             Caption: Null;
                             Gain: 1;
+                            DestroyIfOwnerDies: True;
                         };
-                        Name: Null;
-                        Type: AnimationType.Base;
                         EnterEffect: Null;
                         ExitEffect: Null;
                         Effect: Null;
                         Radius: 16;
                     };
-                    ElapsedTime: 8079.6925;
+                    ElapsedTime: 7374.5145;
                 }
             ];
+            Material: Null;
         }
         ActorInstance {
             Class: @"Actors/InfectedCell.ent.tk";
@@ -280,188 +240,70 @@ MapInstance {
                     FlowSeekBehavior {
                     }
                     TargetEnemyBehavior {
-                        SightDistance: 300;
+                        SightDistance: 1000;
                     }
                     FocusBehavior {
                         MaxTurn: 13.96263;
                     }
+                    SuicideBehavior {
+                        Radius: 80;
+                        Effect: @"Effects/Damage.fx.tk";
+                    }
                 ];
-                Target: Null;
-                TargetTime: 7880.5776;
+                Target: *ActorInstance.1;
+                TargetTime: 7139.487;
+                LastKnownTargetPosition: [0 0];
             };
             CurrentHealth: 20;
-            MaxSpeed: 304.5103;
+            Conditions: [];
+            MaxSpeed: 397.8799;
             Weapon: Null;
+            Id: 5;
             Name: Null;
             IsAlive: True;
-            Position: [870.0914 435.1552];
-            Forward: [1 0];
-            Velocity: [244.1844 0];
+            Position: [779.3613 201.7089];
+            Forward: [-0.6635685 0.2422868];
+            Velocity: [-376.7484 127.9416];
             OutlineColor: [0 0 0 0];
             SpawnTime: 0;
             ActiveAnimations: [
                 AnimationInstance {
                     Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
                         Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 8;
+                            FrameLength: 100;
+                            TotalLength: 800;
+                            IsLooping: True;
                             Texture: "Actors/InfectedCell.png";
                             Width: 32;
                             Height: 32;
-                            ClipRect: [0 0 256 96];
-                            FrameCount: 8;
-                            FrameLength: 100;
-                            IsLooping: True;
-                            Tween: TweenStyle.Overlap;
-                            Origin: [16 16];
-                            ElapsedTime: 0;
-                            TotalLength: 800;
                             Size: [32 32];
+                            ClipRect: [0 0 256 96];
+                            Origin: [16 16];
+                            Tween: TweenStyle.Overlap;
                             ShrinkToFit: True;
                         };
+                        Material: Null;
                         Sound: SoundClass {
                             Name: Null;
-                            Sound: Null;
+                            Source: Null;
                             Subtitle: Null;
                             Caption: Null;
                             Gain: 1;
+                            DestroyIfOwnerDies: True;
                         };
-                        Name: Null;
-                        Type: AnimationType.Base;
                         EnterEffect: Null;
                         ExitEffect: Null;
                         Effect: Null;
                         Radius: 16;
                     };
-                    ElapsedTime: 8079.6925;
+                    ElapsedTime: 7374.5145;
                 }
             ];
-        }
-        ActorInstance {
-            Class: @"Actors/InfectedCell.ent.tk";
-            Faction: Factions [Enemy Virus Common];
-            Controller: AIController {
-                Behaviors: [
-                    FlowSeekBehavior {
-                    }
-                    TargetEnemyBehavior {
-                        SightDistance: 300;
-                    }
-                    FocusBehavior {
-                        MaxTurn: 13.96263;
-                    }
-                ];
-                Target: ActorInstance {
-                    Class: @"Actors/Player.ent.tk";
-                    Faction: Factions [Player];
-                    Controller: InputController {
-                        ActionInputs: {
-                            Fire: [
-                                ActionInput {
-                                    type: ActionInputType.MouseButton;
-                                    which: 0;
-                                }
-                            ];
-                        };
-                        player: PlayerIndex.One;
-                    };
-                    CurrentHealth: 500;
-                    MaxSpeed: 400;
-                    Weapon: GunInstance {
-                        Class: @"Weapons/Test.wpn.tk";
-                        AmmoCount: 200;
-                        StateTime: 0;
-                        State: WeaponState.Idle;
-                        Charge: 0;
-                    };
-                    Name: Null;
-                    IsAlive: True;
-                    Position: [1118.293 439.9599];
-                    Forward: [0.9852189 0.1713003];
-                    Velocity: [53.2377 0];
-                    OutlineColor: [255 0 0 255];
-                    SpawnTime: 0;
-                    ActiveAnimations: [
-                        AnimationInstance {
-                            Class: AnimationClass {
-                                Sprite: Sprite {
-                                    Texture: "Actors/Player.png";
-                                    Width: 48;
-                                    Height: 48;
-                                    ClipRect: [0 0 96 48];
-                                    FrameCount: 2;
-                                    FrameLength: 100;
-                                    IsLooping: True;
-                                    Tween: TweenStyle.Overlap;
-                                    Origin: [24 24];
-                                    ElapsedTime: 0;
-                                    TotalLength: 200;
-                                    Size: [48 48];
-                                    ShrinkToFit: True;
-                                };
-                                Sound: SoundClass {
-                                    Name: Null;
-                                    Sound: Null;
-                                    Subtitle: Null;
-                                    Caption: Null;
-                                    Gain: 1;
-                                };
-                                Name: Null;
-                                Type: AnimationType.Base;
-                                EnterEffect: Null;
-                                ExitEffect: Null;
-                                Effect: Null;
-                                Radius: 24;
-                            };
-                            ElapsedTime: 8079.6925;
-                        }
-                    ];
-                };
-                TargetTime: 7781.1916;
-            };
-            CurrentHealth: 20;
-            MaxSpeed: 214.6267;
-            Weapon: Null;
-            Name: Null;
-            IsAlive: True;
-            Position: [814.2948 437.0988];
-            Forward: [0.999965 0.008356228];
-            Velocity: [0 0];
-            OutlineColor: [0 0 0 0];
-            SpawnTime: 0;
-            ActiveAnimations: [
-                AnimationInstance {
-                    Class: AnimationClass {
-                        Sprite: Sprite {
-                            Texture: "Actors/InfectedCell.png";
-                            Width: 32;
-                            Height: 32;
-                            ClipRect: [0 0 256 96];
-                            FrameCount: 8;
-                            FrameLength: 100;
-                            IsLooping: True;
-                            Tween: TweenStyle.Overlap;
-                            Origin: [16 16];
-                            ElapsedTime: 0;
-                            TotalLength: 800;
-                            Size: [32 32];
-                            ShrinkToFit: True;
-                        };
-                        Sound: SoundClass {
-                            Name: Null;
-                            Sound: Null;
-                            Subtitle: Null;
-                            Caption: Null;
-                            Gain: 1;
-                        };
-                        Name: Null;
-                        Type: AnimationType.Base;
-                        EnterEffect: Null;
-                        ExitEffect: Null;
-                        Effect: Null;
-                        Radius: 16;
-                    };
-                    ElapsedTime: 8079.6925;
-                }
-            ];
+            Material: Null;
         }
     ];
 }

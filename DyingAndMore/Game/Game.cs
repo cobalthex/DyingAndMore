@@ -159,11 +159,6 @@ namespace DyingAndMore.Game
             Map.updateSettings = MapInstance.UpdateSettings.Game;
             Map.renderSettings = MapInstance.RenderSettings.Default;
 
-            Map.CleanupAll(
-                MapInstance.CleanupOptions.DeadEntities |
-                MapInstance.CleanupOptions.Particles
-            );
-
             var players = new System.Collections.Generic.List<Entities.ActorInstance>();
             var enemies = new System.Collections.Generic.List<Entities.ActorInstance>();
 
@@ -486,6 +481,31 @@ namespace DyingAndMore.Game
                 ToggleUI(gameplaySettingsConsole);
                 return false;
             }
+
+#if WINDOWS
+            if (InputState.IsPress(Keys.F5))
+            {
+                using (var sfd = new System.Windows.Forms.SaveFileDialog()
+                {
+                    Filter = "Dying and More! Saves (*.d2sav)|*.d2sav",
+                    RestoreDirectory = true,
+                })
+                {
+                    if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        try
+                        {
+                            Map.Save(sfd.FileName);
+                        }
+                        catch
+                        {
+                            //todo
+                        }
+                    }
+                }
+                return false;
+            }
+#endif
 
             if (InputState.IsPress(Keys.Escape))
                 IsPaused = !IsPaused;

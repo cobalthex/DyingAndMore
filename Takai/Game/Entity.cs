@@ -3,6 +3,10 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
+    [System.Runtime.InteropServices.ComVisible(true)]
+    public class EntityAsReferenceAttribute : Attribute { }
+
     /// <summary>
     /// Describes a single type of entity. Actors, etc. inherit from this
     /// </summary>
@@ -82,17 +86,12 @@ namespace Takai.Game
     /// <summary>
     /// A single instance of an entity in a map.
     /// </summary>
-    public partial class EntityInstance : IObjectInstance<EntityClass>
+    public partial class EntityInstance : IObjectInstance<EntityClass>, Data.Serializer.IReferenceable
     {
-        private static int nextId = 1; //generator for the unique (runtime) IDs
-
         /// <summary>
-        /// A unique ID for each entity
-        /// Generated at runtime
-        /// Primarily used for debugging
+        /// A unique ID for each entity in the map
         /// </summary>
-        [Data.Serializer.Ignored]
-        public int Id { get; private set; } = (nextId++); //todo: serializable ID
+        public int Id { get; set; } = 0;
 
         [Data.Serializer.Ignored]
         public float Radius { get; private set; }
@@ -206,7 +205,8 @@ namespace Takai.Game
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
-            PlayAnimation(Class.DefaultBaseAnimation);
+            if (Class != null)
+                PlayAnimation(Class.DefaultBaseAnimation);
         }
 
         Matrix lastTransform = Matrix.Identity;
@@ -252,16 +252,6 @@ namespace Takai.Game
             AxisAlignedBounds = r;
         }
 
-        public override bool Equals(object obj)
-        {
-            return obj is EntityInstance ent && ent.Id == Id;
-        }
-
-        public override int GetHashCode()
-        {
-            return Id;
-        }
-
         public override string ToString()
         {
             return (Class?.Name ?? base.ToString()) + $"({Id})";
@@ -278,7 +268,7 @@ namespace Takai.Game
         /// </summary>
         public virtual void OnSpawn()
         {
-            PlayAnimation("Idle");
+            PlayAnimation(Class.DefaultBaseAnimation);
 
             var fx = Class.SpawnEffect?.Instantiate(this);
             if (fx.HasValue)

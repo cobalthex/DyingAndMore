@@ -15,7 +15,7 @@ EntityClass {
                                 Height: 48;
                             };
                             Blend: BlendState.Additive;
-                            InitialSpeed: 500;
+                            InitialSpeed: [150 250];
                             lifetime: [0.5sec 1.5sec];
                             ScaleOverTime: {
                                 Values: [
@@ -31,8 +31,8 @@ EntityClass {
                             }
                         }
                         Count: [0 1];
-                        Spread: [0.5pi 0.5pi];
-                        Radius: 00;
+                        Spread: 0;
+                        Radius: 6;
                     };
                 ];
             }
