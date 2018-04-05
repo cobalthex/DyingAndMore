@@ -52,9 +52,11 @@ namespace Takai.Data
         /// </summary>
         public static readonly object DefaultAction = new object();
 
-        struct PendingResolution
+        public class PendingResolution
         {
-            public string reference;
+            public string refname;
+            public object target;
+            public MemberInfo member;
         }
 
         public class DeserializationContext
@@ -66,7 +68,7 @@ namespace Takai.Data
 
             public Dictionary<string, object> resolverCache = new Dictionary<string, object>
                 (Serializer.CaseSensitiveIdentifiers ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
-            public Dictionary<string, MemberInfo> pendingCache = new Dictionary<string, MemberInfo>
+            public Dictionary<string, List<PendingResolution>> pendingCache = new Dictionary<string, List<PendingResolution>>
                 (Serializer.CaseSensitiveIdentifiers ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
         }
 
@@ -245,7 +247,7 @@ namespace Takai.Data
                 if (context.resolverCache.TryGetValue(refname, out var resolved))
                     return resolved;
 
-                return new PendingResolution { reference = refname };
+                return new PendingResolution { refname = refname };
             }
 
             if (peek == '"' || peek == '\'')
@@ -432,7 +434,25 @@ namespace Takai.Data
                     ParseDictionary(type, dest, dict, context);
 
                     if (dest is IReferenceable ir)
-                        context.resolverCache[dest.GetType().Name + "." + ir.Id] = dest; //todo: better id naming and only allow one?
+                    {
+                        string id = dest.GetType().Name + "." + ir.Id;
+                        context.resolverCache[id] = dest; //todo: better id naming and only allow one?
+
+                        if (context.pendingCache.TryGetValue(id, out var pending))
+                        {
+                            foreach (var pend in pending)
+                            {
+                                if (pend.member is PropertyInfo pi)
+                                    ParseMember(pend.target, dest, pi, pi.PropertyType, pi.SetValue, true, context);
+                                else if (pend.member is FieldInfo fi)
+                                    ParseMember(pend.target, dest, fi, fi.FieldType, fi.SetValue, true, context);
+                            }
+                            context.pendingCache.Remove(id);
+                        }
+
+                        if (context.pendingCache.Count > 0)
+                            throw new ArgumentException($"Unresolved references: {string.Join(", ", context.pendingCache.Keys)}");
+                    }
 
                     return dest;
                 }
@@ -501,6 +521,9 @@ namespace Takai.Data
 
             foreach (var pair in dict)
             {
+                if (pair.Value is PendingResolution)
+                    continue;
+
                 var late = pair.Value as Cache.LateBindLoad;
 
                 try
