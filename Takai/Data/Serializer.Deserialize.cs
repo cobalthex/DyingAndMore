@@ -54,9 +54,13 @@ namespace Takai.Data
 
         public class PendingResolution
         {
-            public string refname;
+            public static readonly PendingResolution Placeholder = new PendingResolution();
+
             public object target;
-            public MemberInfo member;
+
+            public int listIndex;
+            public string dictionaryKey;
+            public MemberInfo objectMember;
         }
 
         public class DeserializationContext
@@ -247,7 +251,7 @@ namespace Takai.Data
                 if (context.resolverCache.TryGetValue(refname, out var resolved))
                     return resolved;
 
-                return new PendingResolution { refname = refname };
+                return PendingResolution.Placeholder;
             }
 
             if (peek == '"' || peek == '\'')
@@ -437,22 +441,9 @@ namespace Takai.Data
                     {
                         string id = dest.GetType().Name + "." + ir.Id;
                         context.resolverCache[id] = dest; //todo: better id naming and only allow one?
-
-                        if (context.pendingCache.TryGetValue(id, out var pending))
-                        {
-                            foreach (var pend in pending)
-                            {
-                                if (pend.member is PropertyInfo pi)
-                                    ParseMember(pend.target, dest, pi, pi.PropertyType, pi.SetValue, true, context);
-                                else if (pend.member is FieldInfo fi)
-                                    ParseMember(pend.target, dest, fi, fi.FieldType, fi.SetValue, true, context);
-                            }
-                            context.pendingCache.Remove(id);
-                        }
-
-                        if (context.pendingCache.Count > 0)
-                            throw new ArgumentException($"Unresolved references: {string.Join(", ", context.pendingCache.Keys)}");
                     }
+
+                    ApplyPending(context);
 
                     return dest;
                 }
@@ -464,6 +455,42 @@ namespace Takai.Data
             }
 
             throw new NotSupportedException(GetExceptionMessage($"Unknown identifier: '{word}'", context));
+        }
+
+        static void ApplyPending(DeserializationContext context) //move to class?
+        {
+            foreach (var resolver in context.resolverCache)
+            {
+                if (context.pendingCache.TryGetValue(resolver.Key, out var pending))
+                {
+                    foreach (var pend in pending)
+                    {
+                        if (pend.target is System.Collections.IList)
+                        {
+
+                        }
+                        else if (pend.target is System.Collections.IDictionary)
+                        {
+
+                        }
+                        //hash set, etc
+                        //array (emplace)
+                        else
+                        {
+                            //when parsing dict to obj, change target to obj and set member
+
+                            //if (pend.objectMember is PropertyInfo pi)
+                            //    ParseMember(pend.target, resolver.Value, pi, pi.PropertyType, pi.SetValue, true, context);
+                            //else if (pend.objectMember is FieldInfo fi)
+                            //    ParseMember(pend.target, resolver.Value, fi, fi.FieldType, fi.SetValue, true, context);
+                        }
+                    }
+                    context.pendingCache.Remove(resolver.Key);
+                }
+            }
+
+            if (context.pendingCache.Count > 0)
+                throw new ArgumentException($"Unresolved references: {string.Join(", ", context.pendingCache.Keys)}");
         }
 
         static void ParseMember(object dest, object value, MemberInfo member, Type memberType, Action<object, object> setter, bool canWrite, DeserializationContext context)
