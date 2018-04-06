@@ -174,7 +174,7 @@ namespace DyingAndMore.Game.Entities
 
         public override BehaviorMask Mask => BehaviorMask.Targeting;
 
-        public float SightDistance { get; set; } = 1000;
+        public float SightDistance { get; set; } = 100000;
 
         public override BehaviorPriority CalculatePriority()
         {

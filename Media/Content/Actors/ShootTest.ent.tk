@@ -1,0 +1,35 @@
+ActorClass {
+    Name: "Shooter Test";
+    MaxHealth: 50;
+    DefaultFaction: Factions [Enemy];
+
+    DefaultController: AIController {
+        Behaviors: [
+            TargetEnemyBehavior {};
+            ShootBehavior {};
+        ];
+    };
+
+    DefaultWeapon: @"Weapons/Test.wpn.tk";
+
+    Animations: {
+        Idle: {
+            Sprite: {
+                texture: @"./Test.png";
+                width: 96;
+                height: 96;
+                FrameCount: 6;
+                FrameLength: 100;
+                IsLooping: True;
+                Tween: TweenStyle [Overlap];
+            };
+        };
+    };
+
+    FieldOfView: 2.356194;
+    MaxSpeed: [400 400];
+    MoveForce: 600;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: False;
+}

@@ -156,6 +156,7 @@ namespace DyingAndMore
                 }
                 else
                     throw new System.ArgumentException("File loaded must be a MapClass or MapInstance");
+
                 map.InitializeGraphics();
                 ui = new Takai.UI.Static(new Editor.Editor(inst));
             };
