@@ -54,13 +54,11 @@ namespace Takai.Data
 
         public class PendingResolution
         {
-            public static readonly PendingResolution Placeholder = new PendingResolution();
-
             public object target;
 
             public int listIndex;
             public string dictionaryKey;
-            public MemberInfo objectMember;
+            public Action objectSetter;
         }
 
         public class DeserializationContext
@@ -152,13 +150,23 @@ namespace Takai.Data
                     if (context.reader.Read() == -1)
                         throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read object", context));
 
-                    var value = TextDeserialize(context);
-
-#if WINDOWS //or .net core 2+
-                    dict[String.Intern(key.ToString().TrimEnd())] = value; //todo: analyze interning
-#elif WINDOWS_UAP
-                    dict[key.ToString().TrimEnd()] = value;
+                    var keyStr = key.ToString().TrimEnd();
+#if WINDOWS
+                    String.Intern(keyStr); //todo: necessary?
 #endif
+
+                    var value = TextDeserialize(context);
+                    if (value is PendingResolution pr)
+                    {
+                        pr.dictionaryKey = keyStr;
+                        pr.target = dict;
+
+                        if (!context.pendingCache.TryGetValue(keyStr, out var prList))
+                            context.pendingCache[keyStr] = prList = new List<PendingResolution>();
+                        prList.Add(pr);
+                    }
+
+                    dict[keyStr] = value;
 
                     SkipIgnored(context.reader);
 
@@ -251,7 +259,7 @@ namespace Takai.Data
                 if (context.resolverCache.TryGetValue(refname, out var resolved))
                     return resolved;
 
-                return PendingResolution.Placeholder;
+                return new PendingResolution();
             }
 
             if (peek == '"' || peek == '\'')
@@ -548,30 +556,34 @@ namespace Takai.Data
 
             foreach (var pair in dict)
             {
-                if (pair.Value is PendingResolution)
-                    continue;
-
                 var late = pair.Value as Cache.LateBindLoad;
+                var pending = pair.Value as PendingResolution;
 
                 try
                 {
                     var field = destType.GetField(pair.Key, DefaultBindingFlags);
                     if (field != null && !field.IsDefined(typeof(IgnoredAttribute)))
                     {
-                        if (late == null)
-                            ParseMember(destObject, pair.Value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
+                        //todo: dynamic dest/target object in late bind load and references, yay or nay?
+
+                        if (pending != null)
+                            pending.objectSetter = () => ParseMember(destObject, destObject, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
+                        else if (late != null)
+                            late.setter = () => ParseMember(destObject, destObject, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                         else
-                            late.setter = (target) => ParseMember(destObject, target, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
+                            ParseMember(destObject, pair.Value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                     }
                     else
                     {
                         var prop = destType.GetProperty(pair.Key, DefaultBindingFlags);
                         if (prop != null && !prop.IsDefined(typeof(IgnoredAttribute)))
                         {
-                            if (late == null)
-                                ParseMember(destObject, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
+                            if (pending != null)
+                                pending.objectSetter = () => ParseMember(destObject, destObject, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
+                            else if (late != null)
+                                late.setter = () => ParseMember(destObject, destObject, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                             else
-                                late.setter = (target) => ParseMember(destObject, target, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
+                               ParseMember(destObject, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                         }
                         else
                             System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in DestType:{destType.Name}"); //pass filename through?
