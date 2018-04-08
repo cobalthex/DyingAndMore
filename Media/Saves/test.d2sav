@@ -149,18 +149,9 @@ MapInstance {
             ];
             Material: Null;
         }
-    ];
-}                       ExitEffect: Null;
-                        Effect: Null;
-                        Radius: 16;
-                    };
-                    ElapsedTime: 7374.5145;
-                }
-            ];
-            Material: Null;
-        }
+
         ActorInstance {
-            Class: @"Actors/InfectedCell.ent.tk";
+            Class: @"Actors/TestShooter.zip/ShootTest.ent.tk";
             Faction: Factions [Enemy Virus Common];
             Controller: AIController {
                 Behaviors: [
@@ -191,79 +182,6 @@ MapInstance {
             Position: [493.5478 280.6754];
             Forward: [-0.5893852 -0.6892473];
             Velocity: [-143.714 -169.925];
-            OutlineColor: [0 0 0 0];
-            SpawnTime: 0;
-            ActiveAnimations: [
-                AnimationInstance {
-                    Class: AnimationClass {
-                        Name: Null;
-                        Type: AnimationType.Base;
-                        Sprite: Sprite {
-                            ElapsedTime: 0;
-                            FrameCount: 8;
-                            FrameLength: 100;
-                            TotalLength: 800;
-                            IsLooping: True;
-                            Texture: "Actors/InfectedCell.png";
-                            Width: 32;
-                            Height: 32;
-                            Size: [32 32];
-                            ClipRect: [0 0 256 96];
-                            Origin: [16 16];
-                            Tween: TweenStyle.Overlap;
-                            ShrinkToFit: True;
-                        };
-                        Material: Null;
-                        Sound: SoundClass {
-                            Name: Null;
-                            Source: Null;
-                            Subtitle: Null;
-                            Caption: Null;
-                            Gain: 1;
-                            DestroyIfOwnerDies: True;
-                        };
-                        EnterEffect: Null;
-                        ExitEffect: Null;
-                        Effect: Null;
-                        Radius: 16;
-                    };
-                    ElapsedTime: 7374.5145;
-                }
-            ];
-            Material: Null;
-        }
-        ActorInstance {
-            Class: @"Actors/InfectedCell.ent.tk";
-            Faction: Factions [Enemy Virus Common];
-            Controller: AIController {
-                Behaviors: [
-                    FlowSeekBehavior {
-                    }
-                    TargetEnemyBehavior {
-                        SightDistance: 1000;
-                    }
-                    FocusBehavior {
-                        MaxTurn: 13.96263;
-                    }
-                    SuicideBehavior {
-                        Radius: 80;
-                        Effect: @"Effects/Damage.fx.tk";
-                    }
-                ];
-                Target: *ActorInstance.1;
-                TargetTime: 7139.487;
-                LastKnownTargetPosition: [0 0];
-            };
-            CurrentHealth: 20;
-            Conditions: [];
-            MaxSpeed: 397.8799;
-            Weapon: Null;
-            Id: 5;
-            Name: Null;
-            IsAlive: True;
-            Position: [779.3613 201.7089];
-            Forward: [-0.6635685 0.2422868];
-            Velocity: [-376.7484 127.9416];
             OutlineColor: [0 0 0 0];
             SpawnTime: 0;
             ActiveAnimations: [

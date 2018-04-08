@@ -54,8 +54,8 @@ namespace Takai.Data
 
         public class PendingResolution
         {
+            public string id;
             public object target;
-
             public int listIndex;
             public string dictionaryKey;
             public Action objectSetter;
@@ -72,6 +72,14 @@ namespace Takai.Data
                 (Serializer.CaseSensitiveIdentifiers ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
             public Dictionary<string, List<PendingResolution>> pendingCache = new Dictionary<string, List<PendingResolution>>
                 (Serializer.CaseSensitiveIdentifiers ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+
+            public void AddPending(PendingResolution pending)
+            {
+
+                if (!pendingCache.TryGetValue(pending.id, out var prList))
+                    pendingCache[pending.id] = prList = new List<PendingResolution>();
+                prList.Add(pending);
+            }
         }
 
         public static long GetStreamOffset(TextReader reader)
@@ -158,12 +166,9 @@ namespace Takai.Data
                     var value = TextDeserialize(context);
                     if (value is PendingResolution pr)
                     {
-                        pr.dictionaryKey = keyStr;
                         pr.target = dict;
-
-                        if (!context.pendingCache.TryGetValue(keyStr, out var prList))
-                            context.pendingCache[keyStr] = prList = new List<PendingResolution>();
-                        prList.Add(pr);
+                        pr.dictionaryKey = keyStr;
+                        context.AddPending(pr);
                     }
 
                     dict[keyStr] = value;
@@ -210,6 +215,13 @@ namespace Takai.Data
                         throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read list", context));
 
                     var value = TextDeserialize(context);
+                    if (value is PendingResolution pr)
+                    {
+                        pr.target = values;
+                        pr.listIndex = values.Count;
+                        context.AddPending(pr);
+                    }
+
                     values.Add(value);
                     SkipIgnored(context.reader);
                 }
@@ -256,10 +268,12 @@ namespace Takai.Data
                 } while (context.reader.Peek() == '.');
 
                 var refname = sb.ToString();
+
+                //reference already resolved
                 if (context.resolverCache.TryGetValue(refname, out var resolved))
                     return resolved;
 
-                return new PendingResolution();
+                return new PendingResolution { id = refname };
             }
 
             if (peek == '"' || peek == '\'')
@@ -485,12 +499,7 @@ namespace Takai.Data
                         //array (emplace)
                         else
                         {
-                            //when parsing dict to obj, change target to obj and set member
-
-                            //if (pend.objectMember is PropertyInfo pi)
-                            //    ParseMember(pend.target, resolver.Value, pi, pi.PropertyType, pi.SetValue, true, context);
-                            //else if (pend.objectMember is FieldInfo fi)
-                            //    ParseMember(pend.target, resolver.Value, fi, fi.FieldType, fi.SetValue, true, context);
+                            pend.objectSetter.Invoke();
                         }
                     }
                     context.pendingCache.Remove(resolver.Key);
@@ -566,19 +575,29 @@ namespace Takai.Data
                     {
                         //todo: dynamic dest/target object in late bind load and references, yay or nay?
 
-                        if (pending != null)
+                        if (pending != null) //convert pending dictionary to pending object
                             pending.objectSetter = () => ParseMember(destObject, destObject, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
-                        else if (late != null)
+                        else if (late != null) //////////////////////todo: value fix here~~~~~~~~~
                             late.setter = () => ParseMember(destObject, destObject, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                         else
                             ParseMember(destObject, pair.Value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                     }
                     else
                     {
-                        var prop = destType.GetProperty(pair.Key, DefaultBindingFlags);
+                        PropertyInfo prop;
+                        try
+                        {
+                            prop = destType.GetProperty(pair.Key, DefaultBindingFlags);
+                        }
+                        catch (AmbiguousMatchException)
+                        {
+                            //ugly hack (to correctly reference "new" properties)
+                            prop = destType.GetProperty(pair.Key, DefaultBindingFlags | BindingFlags.DeclaredOnly);
+                        }
+
                         if (prop != null && !prop.IsDefined(typeof(IgnoredAttribute)))
                         {
-                            if (pending != null)
+                            if (pending != null) //convert pending dictionary to pending object
                                 pending.objectSetter = () => ParseMember(destObject, destObject, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                             else if (late != null)
                                 late.setter = () => ParseMember(destObject, destObject, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);

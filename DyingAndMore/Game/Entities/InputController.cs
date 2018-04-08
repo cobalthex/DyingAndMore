@@ -92,7 +92,7 @@ namespace DyingAndMore.Game.Entities
                 d = Vector2.Normalize(sticks.Left) * new Vector2(1, -1);
 
             if (sticks.Right != Vector2.Zero)
-                Actor.Forward = Vector2.Normalize(sticks.Right) * new Vector2(1, -1);
+                Actor.TurnTowards(Vector2.Normalize(sticks.Right) * new Vector2(1, -1));
 
             if (InputState.IsButtonDown(MouseButtons.Left) ||
                 InputState.IsButtonDown(Buttons.RightTrigger, player))

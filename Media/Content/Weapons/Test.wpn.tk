@@ -10,7 +10,7 @@ GunClass {
     DischargeTime: 1200rpm;
     CooldownTime: 2sec;
     CanAlwaysCharge: true;
-    ErrorAngle: [-6deg 6deg]; # test
+    ErrorAngle: [-30deg 30deg]; # test
 
     DischargeEffect: {
         Effects: [

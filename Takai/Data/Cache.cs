@@ -83,13 +83,13 @@ namespace Takai.Data
             objects = new Dictionary<string, CachedFile>(StringComparer.OrdinalIgnoreCase);
 
             var loadTex = new TextureLoader();
-            CustomLoaders.Add("png",  loadTex);
-            CustomLoaders.Add("jpg",  loadTex);
+            CustomLoaders.Add("png", loadTex);
+            CustomLoaders.Add("jpg", loadTex);
             CustomLoaders.Add("jpeg", loadTex);
-            CustomLoaders.Add("tga",  loadTex);
+            CustomLoaders.Add("tga", loadTex);
             CustomLoaders.Add("tiff", loadTex);
-            CustomLoaders.Add("bmp",  loadTex);
-            CustomLoaders.Add("gif",  loadTex);
+            CustomLoaders.Add("bmp", loadTex);
+            CustomLoaders.Add("gif", loadTex);
 
             CustomLoaders.Add("bfnt", new BitmapFontLoader());
 
@@ -99,6 +99,7 @@ namespace Takai.Data
 
             CustomLoaders.Add("mgfx", new EffectLoader());
             CustomLoaders.Add("fx", new UnsupportedLoader());
+
         }
 
         /// <summary>
@@ -114,21 +115,6 @@ namespace Takai.Data
         }
 
         /// <summary>
-        /// Load all entries of a zip file into the cache
-        /// </summary>
-        /// <param name="file">The (absolute or working-directory relative) location of the zip</param>
-        public static IEnumerable<object> LoadZip(string file, bool forceLoad = false)
-        {
-            using (var zip = new ZipArchive(File.OpenRead(file), ZipArchiveMode.Read, false))
-            {
-                openZips.Add(file, zip);
-                foreach (var entry in zip.Entries)
-                    yield return Load(entry.FullName, file, forceLoad);
-                openZips.Remove(file);
-            }
-        }
-
-        /// <summary>
         /// Load a single file into the cache
         /// </summary>
         /// <param name="file">The relative location of file to load from</param>
@@ -140,10 +126,15 @@ namespace Takai.Data
             if (string.IsNullOrWhiteSpace(file))
                 throw new ArgumentException(nameof(file) + " cannot be null or empty");
 
-            root = root ?? DefaultRoot;
-            file = Normalize(file);
-
             //var swatch = System.Diagnostics.Stopwatch.StartNew();
+
+            if (root == null)
+                root = DefaultRoot;
+            else if (root == "")
+                root = Environment.CurrentDirectory;
+
+            root = Normalize(root);
+            file = Normalize(file);
 
             string realFile;
             if (PathStartsWith(file, DefaultRoot) && root == DefaultRoot)
@@ -174,8 +165,29 @@ namespace Takai.Data
             bool exists = objects.TryGetValue(realFile, out var obj) && obj.reference.IsAlive;
             if (forceLoad || !exists)
             {
+                string fileRefName = file;
+
+                int zipStrIndex = file.IndexOf(".zip");
+                //load a file from inside a zip (archive.zip/test.file)
+                if (zipStrIndex >= 0 && zipStrIndex < file.Length - 5 && file[zipStrIndex + 4] == '/')
+                {
+                    fileRefName = file;
+                    root = Path.Combine(root, file.Substring(0, zipStrIndex + 4));
+                    file = file.Substring(zipStrIndex + 5);
+                }
+
+                ZipArchive zip = null;
+                bool openedZip = false;
+                if (root.EndsWith(".zip") && !openZips.TryGetValue(root, out zip))
+                {
+                    //recursive zip loading not supported (yet)
+                    zip = new ZipArchive(File.OpenRead(root), ZipArchiveMode.Read, false);
+                    openZips[root] = zip;
+                    openedZip = true;
+                }
+
                 var load = new CustomLoad { name = file, file = realFile };
-                if (root != null && openZips.TryGetValue(root, out var zip))
+                if (zip != null)
                 {
                     var entry = zip.GetEntry(file);
                     if (entry == null)
@@ -184,7 +196,7 @@ namespace Takai.Data
                     load.length = entry.Length;
 
                     //zip streams do not support seeking
-                    var memStream = new MemoryStream();
+                    var memStream = new MemoryStream(); //lazy memory stream? (load only up to bytes requested)
                     using (var stream = entry.Open())
                         stream.CopyTo(memStream);
 
@@ -225,7 +237,7 @@ namespace Takai.Data
 
                         obj.reference = new WeakReference(deserialized);
                         if (obj.reference.Target is ISerializeExternally sxt)
-                            sxt.File = file;
+                            sxt.File = fileRefName;
                         load.stream.Dispose();
                     }
                 }
@@ -233,6 +245,9 @@ namespace Takai.Data
                 {
                     load.stream.Dispose();
                 }
+
+                if (openedZip)
+                    zip.Dispose();
             }
 
             //apply late bound values
@@ -257,6 +272,9 @@ namespace Takai.Data
 
             //swatch.Stop();
             //System.Diagnostics.Debug.WriteLine($"Cache: loaded {file} in {swatch.ElapsedMilliseconds} msec");
+
+            if (obj.reference == null && lateLoads.Count > 0)
+                throw new FileNotFoundException("Could not find referenced file(s): " + String.Join(", ", lateLoads.Keys));
 
             return obj.reference.Target;
         }
@@ -392,6 +410,33 @@ namespace Takai.Data
             public override object Load(CustomLoad load)
             {
                 throw new NotSupportedException($"Reading from {Path.GetExtension(load.file)} is not supported");
+            }
+        }
+
+        class ZipLoader : CustomLoader
+        {
+            public override object Load(CustomLoad load)
+            {
+                Dictionary<string, object> loadedObjects = new Dictionary<string, object>();
+
+                bool openedZip = false;
+                if (!openZips.TryGetValue(load.file, out var zip))
+                {
+                    openedZip = true;
+                    zip = new ZipArchive(load.stream, ZipArchiveMode.Read, false);
+                    openZips.Add(load.file, zip);
+                }
+
+                foreach (var entry in zip.Entries)
+                    loadedObjects[entry.FullName] = Cache.Load(entry.FullName, load.file, false);
+
+                if (openedZip)
+                {
+                    openZips.Remove(load.file);
+                    zip.Dispose();
+                }
+
+                return loadedObjects;
             }
         }
 
@@ -547,6 +592,6 @@ namespace Takai.Data
             }
         }
 
-#endregion
+        #endregion
     }
 }
