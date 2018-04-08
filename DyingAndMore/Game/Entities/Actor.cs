@@ -10,16 +10,16 @@ namespace DyingAndMore.Game.Entities
     [Flags]
     public enum Factions
     {
-        None        = 0,
-        Player      = (1 << 0),
-        Enemy       = (1 << 1),
-        Boss        = (1 << 2),
+        None = 0,
+        Player = (1 << 0),
+        Enemy = (1 << 1),
+        Boss = (1 << 2),
 
-        Powerup     = (1 << 4),
+        Powerup = (1 << 4),
 
-        Virus       = (1 << 24),
+        Virus = (1 << 24),
 
-        Common      = (1 << 56),
+        Common = (1 << 56),
         //auto-immune
         //cancerous
 
@@ -58,17 +58,11 @@ namespace DyingAndMore.Game.Entities
 
     public class ActorInstance : EntityInstance
     {
-        public override EntityClass Class
+        public new ActorClass Class
         {
-            get => base.Class;
-            set
-            {
-                System.Diagnostics.Contracts.Contract.Assert(value == null || value is ActorClass);
-                base.Class = value;
-                _class = value as ActorClass;
-            }
+            get => (ActorClass)base.Class;
+            set => base.Class = value;
         }
-        private ActorClass _class;
 
         /// <summary>
         /// The current faction. Typically used by the AI to determine enemies
@@ -143,14 +137,14 @@ namespace DyingAndMore.Game.Entities
         {
             if (Class != null)
             {
-                MaxSpeed      = _class.MaxSpeed.Random();
-                CurrentHealth = _class.MaxHealth;
-                Weapon        = _class.DefaultWeapon?.Instantiate();
-                Faction       = _class.DefaultFaction;
+                MaxSpeed = Class.MaxSpeed.Random();
+                CurrentHealth = Class.MaxHealth;
+                Weapon = Class.DefaultWeapon?.Instantiate();
+                Faction = Class.DefaultFaction;
 
-                if (_class.DefaultController != null)
+                if (Class.DefaultController != null)
                 {
-                    Controller = (Controller)_class.DefaultController.Clone();
+                    Controller = (Controller)Class.DefaultController.Clone();
                     Controller.Actor = this;
                 }
             }
@@ -205,9 +199,14 @@ namespace DyingAndMore.Game.Entities
             //}
         }
 
-        public void Accelerate(Vector2 direction)
+        public virtual void TurnTowards(Vector2 direction)
         {
-            var vel = Velocity + (direction * _class.MoveForce.Random());
+            Forward = direction;
+        }
+
+        public virtual void Accelerate(Vector2 direction)
+        {
+            var vel = Velocity + (direction * Class.MoveForce.Random());
             var lSq = vel.LengthSquared();
             if (lSq > MaxSpeed * MaxSpeed)
                 vel = (vel / (float)Math.Sqrt(lSq)) * MaxSpeed;
@@ -244,7 +243,7 @@ namespace DyingAndMore.Game.Entities
 
             var dot = Vector2.Dot(Forward, diff);
 
-            return (dot > (1 - (_class.FieldOfView / 2 / MathHelper.Pi)));
+            return (dot > (1 - (Class.FieldOfView / 2 / MathHelper.Pi)));
         }
 
         /// <summary>
@@ -258,7 +257,7 @@ namespace DyingAndMore.Game.Entities
             diff.Normalize();
 
             var dot = Vector2.Dot(diff, Ent.Forward);
-            return (dot > (_class.FieldOfView / 2 / MathHelper.Pi) - 1);
+            return (dot > (Class.FieldOfView / 2 / MathHelper.Pi) - 1);
         }
 
         public bool IsAlliedWith(Factions factions)
