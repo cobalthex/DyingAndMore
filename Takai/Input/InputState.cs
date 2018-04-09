@@ -31,6 +31,7 @@ namespace Takai.Input
         private static GamePadState[] gamePadState, lastGamePadState;
         private static MouseState mouseState, lastMouseState;
         private static Vector2[] mouseDownPositions;
+        private static TouchCollection touches, lastTouches;
 
         static InputState()
         {
@@ -66,10 +67,32 @@ namespace Takai.Input
         /// </summary>
         public static Vector2 LastPolarMouseVector { get; private set; }
 
+        public static GestureType EnabledGestures
+        {
+            get => TouchPanel.EnabledGestures;
+            set
+            {
+                TouchPanel.EnabledGestures = value;
+                TouchPanel.EnableMouseGestures = TouchPanel.EnabledGestures > 0;
+            }
+        }
+
+        public static System.Collections.Generic.Dictionary<GestureType, GestureSample> Gestures { get; set; }
+            = new System.Collections.Generic.Dictionary<GestureType, GestureSample>();
+
+        //todo: unify mouse and touch using gestures
+
         public static void Update(Rectangle Viewport)
         {
             lastKeyState = keyState;
             keyState = Keyboard.GetState();
+
+            Gestures.Clear();
+            while (TouchPanel.IsGestureAvailable)
+            {
+                var tg = TouchPanel.ReadGesture();
+                Gestures[tg.GestureType] = tg;
+            }
 
             for (int i = 0; i < gamePadState.Length; ++i)
             {
@@ -88,6 +111,9 @@ namespace Takai.Input
                 if (IsPress((MouseButtons)i))
                     mouseDownPositions[i] = MouseVector;
             }
+
+            lastTouches = touches;
+            touches = TouchPanel.GetState();
         }
 
         /// <summary>
@@ -220,6 +246,18 @@ namespace Takai.Input
         {
             return (GetButtonState(Button, ref mouseState) == ButtonState.Released &&
                     GetButtonState(Button, ref lastMouseState) == ButtonState.Pressed);
+        }
+
+        public static bool IsPress(int touchIndex)
+        {
+            return (touches.Count > touchIndex && touches[touchIndex].State == TouchLocationState.Pressed) &&
+                   (lastTouches.Count > touchIndex && lastTouches[touchIndex].State == TouchLocationState.Released);
+        }
+
+        public static bool IsClick(int touchIndex)
+        {
+            return (touches.Count > touchIndex && touches[touchIndex].State == TouchLocationState.Released) &&
+                   (lastTouches.Count > touchIndex && lastTouches[touchIndex].State == TouchLocationState.Pressed);
         }
 
         /// <summary>

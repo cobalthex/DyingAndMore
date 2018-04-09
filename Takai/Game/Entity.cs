@@ -209,6 +209,14 @@ namespace Takai.Game
                 PlayAnimation(Class.DefaultBaseAnimation);
         }
 
+        public virtual EntityInstance Clone()
+        {
+            var clone = (EntityInstance)MemberwiseClone();
+            clone.Id = 0;
+            clone.Map = null;
+            return clone;
+        }
+
         Matrix lastTransform = Matrix.Identity;
         Point lastVisibleSize = new Point(1);
 

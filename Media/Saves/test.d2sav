@@ -181,7 +181,7 @@ MapInstance {
             IsAlive: True;
             Position: [493.5478 280.6754];
             Forward: [-0.5893852 -0.6892473];
-            Velocity: [-143.714 -169.925];
+            Velocity: [0 0];
             OutlineColor: [0 0 0 0];
             SpawnTime: 0;
             ActiveAnimations: [

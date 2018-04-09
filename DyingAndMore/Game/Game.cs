@@ -1,12 +1,12 @@
-﻿using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System;
+using System.Linq;
+using System.Reflection;
+using Takai.Game;
 using Takai.Input;
 using Takai.UI;
-
-using System;
-using Takai.Game;
 
 namespace DyingAndMore.Game
 {
@@ -76,9 +76,9 @@ namespace DyingAndMore.Game
             if (!ui.RemoveFromParent())
             {
                 //refresh individual render settings
-                var settings = ui.UserData.GetType();
+                var settings = ui.UserData.GetType().GetTypeInfo();
                 foreach (var child in ui.Children)
-                    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(ui.UserData);
+                    ((CheckBox)child).IsChecked = (bool)settings.GetDeclaredField(child.Name).GetValue(ui.UserData);
 
                 AddChild(ui);
                 ui.HasFocus = true;
@@ -575,7 +575,14 @@ namespace DyingAndMore.Game
             foreach (var ptype in Map.Particles)
                 particleCount += ptype.Value.Count;
 
-            DefaultFont.Draw(spriteBatch, $"Total entities:{Map.AllEntities.Count()}\nActive entities:{Map.UpdateStats.updatedEntities}\nTotal particles:{particleCount}", new Vector2(20), Color.Orange);
+            DefaultFont.Draw(spriteBatch,
+                $"Total entities:{Map.AllEntities.Count()}" +
+                $"\nActive entities:{Map.UpdateStats.updatedEntities}" +
+                $"\nTotal particles:{particleCount}" +
+                $"\nVisible fluids:A={Map.RenderStats.visibleActiveFluids} I={Map.RenderStats.visibleInactiveFluids}",
+                new Vector2(20),
+                Color.Orange
+            );
 
             if (Map.renderSettings.drawDebugInfo)
             {

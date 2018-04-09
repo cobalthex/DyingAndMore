@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
@@ -1018,7 +1019,7 @@ namespace Takai.UI
 
             var mouse = Input.InputState.MousePoint;
 
-            if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mouse))
+            if (Input.InputState.IsPress(0) && VisibleBounds.Contains(mouse))
             {
                 var e = new ClickEventArgs { position = (mouse - VisibleBounds.Location).ToVector2() };
                 didPress = true;
@@ -1037,9 +1038,10 @@ namespace Takai.UI
             else if (DidPressInside())
                 return false;
 
-            else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
+            else if (Input.InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
-                if (didPress && VisibleBounds.Contains(mouse))
+                didPress = true;
+                if (didPress && VisibleBounds.Contains(gesture.Position))
                 {
                     var e = new ClickEventArgs { position = (mouse - VisibleBounds.Location).ToVector2() };
                     OnClick(e);

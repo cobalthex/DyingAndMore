@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using System.Reflection;
@@ -33,7 +34,9 @@ namespace DyingAndMore
     {
         GraphicsDeviceManager gdm;
 
+#if WINDOWS
         bool useCustomCursor = false;
+#endif
         bool takingScreenshot = false;
 
         SpriteBatch sbatch;
@@ -42,6 +45,8 @@ namespace DyingAndMore
         Takai.Graphics.BitmapFont debugFont;
 
         Takai.FpsGraph fpsGraph;
+
+        public Matrix uiMatrix;
 
         /// <summary>
         /// Create the game
@@ -55,6 +60,7 @@ namespace DyingAndMore
                 PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
                 //PreferMultiSampling = true,
                 GraphicsProfile = GraphicsProfile.HiDef,
+                IsFullScreen = true,
             };
 
             gdm.DeviceCreated += GdmDeviceCreated;
@@ -127,7 +133,7 @@ namespace DyingAndMore
                         ui = new Takai.UI.Static(new Game.Game(instance));
                     else
                         ui = new Takai.UI.Static(new Editor.Editor(instance));
-                   return;
+                    return;
                 }
                 catch (System.IO.FileNotFoundException) { }
             }
@@ -173,6 +179,14 @@ namespace DyingAndMore
                 Bounds = new Rectangle(20, 20, 800, 100),
                 HorizontalAlignment = Takai.UI.Alignment.Middle
             };
+
+            InputState.EnabledGestures =
+                GestureType.Tap
+                | GestureType.Flick
+                | GestureType.FreeDrag
+                | GestureType.Pinch;
+
+            uiMatrix = Matrix.Identity;// Matrix.CreateTranslation(-GraphicsDevice.DisplayMode.Width / 2, 0, 0) * Matrix.CreateScale(2);
 
             ui.HasFocus = true;
             base.Initialize();
@@ -245,7 +259,7 @@ namespace DyingAndMore
             }
             else
             {
-                sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+                sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, null, uiMatrix);
                 ui.Draw(sbatch);
 
                 int y = GraphicsDevice.Viewport.Height - 70;

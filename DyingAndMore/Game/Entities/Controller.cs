@@ -6,11 +6,14 @@
     public abstract class Controller
     {
         [Takai.Data.Serializer.Ignored]
-        public virtual ActorInstance Actor { get; set; }
+        public virtual ActorInstance Actor { get;
+            set; }
 
-        public virtual object Clone()
+        public virtual Controller Clone()
         {
-            return MemberwiseClone();
+            var clone = (Controller)MemberwiseClone();
+            clone.Actor = null;
+            return clone;
         }
 
         /// <summary>

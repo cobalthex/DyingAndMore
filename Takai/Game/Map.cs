@@ -231,7 +231,7 @@ namespace Takai.Game
         {
             foreach (var sound in Sounds)
             {
-                sound.Instance.Dispose();
+                sound.Instance?.Dispose();
             }
         }
 
