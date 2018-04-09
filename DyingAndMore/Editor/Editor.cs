@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Data;
 using Takai.Input;
@@ -37,6 +38,7 @@ namespace DyingAndMore.Editor
         Static renderSettingsConsole;
         Static fpsDisplay;
         Static resizeDialog;
+        Static playButton;
 
         public EditorConfiguration config;
 
@@ -66,6 +68,20 @@ namespace DyingAndMore.Editor
                 HorizontalAlignment = Alignment.End,
                 Font = smallFont
             });
+
+            AddChild(playButton = new Static
+            {
+                Position = new Vector2(20),
+                VerticalAlignment = Alignment.End,
+                HorizontalAlignment = Alignment.Start,
+                Font = smallFont,
+                Text = "> PLAY >"
+            });
+            playButton.AutoSize(20);
+            playButton.Click += delegate
+            {
+                SwitchToGame();
+            };
 
             AddModes();
             modes.ModeIndex = 0;
@@ -122,14 +138,18 @@ namespace DyingAndMore.Editor
             base.UpdateSelf(time);
         }
 
+        void SwitchToGame()
+        {
+            modes.Mode?.End();
+            Parent.ReplaceAllChildren(new Game.Game(Map));
+        }
+
         protected override bool HandleInput(GameTime time)
         {
             if (InputState.IsPress(Keys.F1) ||
                 InputState.IsAnyPress(Buttons.Start))
             {
-                modes.Mode?.End();
-
-                Parent.ReplaceAllChildren(new Game.Game(Map));
+                SwitchToGame();
                 return false;
             }
 
@@ -137,6 +157,26 @@ namespace DyingAndMore.Editor
             {
                 ToggleRenderSettingsConsole();
                 return false;
+            }
+
+            if (InputState.Gestures.TryGetValue(GestureType.Pinch, out var gesture))
+            {
+                if (Vector2.Dot(gesture.Delta, gesture.Delta2) > 0)
+                {
+                    //todo: maybe add velocity
+                    Map.ActiveCamera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(Map.ActiveCamera.Transform)) / 2;
+                }
+                //scale
+                else
+                {
+                    var lp1 = gesture.Position - gesture.Delta;
+                    var lp2 = gesture.Position2 - gesture.Delta2;
+                    var dist = Vector2.Distance(gesture.Position, gesture.Position2);
+                    var ld = Vector2.Distance(lp1, lp2);
+
+                    var scale = (dist / ld) / 100;
+                    Map.ActiveCamera.Scale += scale;
+                }
             }
 
 #if WINDOWS

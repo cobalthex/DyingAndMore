@@ -119,6 +119,14 @@ namespace DyingAndMore.Game.Weapons
             Class = @class;
         }
 
+        public virtual WeaponInstance Clone()
+        {
+            var clone = (WeaponInstance)MemberwiseClone();
+            clone.Actor = null;
+            clone.isUsing = false;
+            return clone;
+        }
+
         public virtual void Think(TimeSpan deltaTime)
         {
             if (wasUsing && !isUsing)

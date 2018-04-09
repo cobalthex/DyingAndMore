@@ -1,8 +1,6 @@
-﻿using System.IO;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.UI;
 
@@ -134,7 +132,7 @@ namespace DyingAndMore.Editor
             if (SelectedEntity != null)
                 SelectedEntity.OutlineColor = Color.Transparent;
 
-            if (InputState.IsPress(MouseButtons.Left)/* || isTapping*/)
+            if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
 #if WINDOWS
                 //load entity from file
@@ -168,6 +166,12 @@ namespace DyingAndMore.Editor
                 {
                     SelectedEntity = selected[0];
                     SelectedEntity.Velocity = Vector2.Zero;
+
+                    if (InputState.IsMod(KeyMod.Control))
+                    {
+                        SelectedEntity = SelectedEntity.Clone();
+                        editor.Map.Spawn(SelectedEntity);
+                    }
                 }
 
                 return false;

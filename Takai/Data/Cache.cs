@@ -131,7 +131,7 @@ namespace Takai.Data
             if (root == null)
                 root = DefaultRoot;
             else if (root == "")
-                root = Environment.CurrentDirectory;
+                root = Directory.GetCurrentDirectory();
 
             root = Normalize(root);
             file = Normalize(file);

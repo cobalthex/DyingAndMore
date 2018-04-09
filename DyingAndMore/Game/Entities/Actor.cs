@@ -76,18 +76,18 @@ namespace DyingAndMore.Game.Entities
         /// <remarks>The controller's actor is automatically updated when this is set</remarks>
         public Controller Controller
         {
-            get { return controller; }
+            get { return _controller; }
             set
             {
-                if (controller != null)
-                    controller.Actor = null;
+                if (_controller != null)
+                    _controller.Actor = null;
 
-                controller = value;
-                if (controller != null)
-                    controller.Actor = this;
+                _controller = value;
+                if (_controller != null)
+                    _controller.Actor = this;
             }
         }
-        private Controller controller;
+        private Controller _controller;
 
         /// <summary>
         /// The current health of the actor
@@ -108,8 +108,6 @@ namespace DyingAndMore.Game.Entities
 
         private Vector2 lastVelocity;
 
-        #region Inherited
-
         public float MaxSpeed { get; set; }
 
         public Weapons.WeaponInstance Weapon
@@ -129,8 +127,6 @@ namespace DyingAndMore.Game.Entities
         }
         private Weapons.WeaponInstance _weapon;
 
-        #endregion
-
         public ActorInstance() : this(null) { }
         public ActorInstance(ActorClass @class)
             : base(@class)
@@ -143,11 +139,21 @@ namespace DyingAndMore.Game.Entities
                 Faction = Class.DefaultFaction;
 
                 if (Class.DefaultController != null)
-                {
-                    Controller = (Controller)Class.DefaultController.Clone();
-                    Controller.Actor = this;
-                }
+                    Controller = Class.DefaultController.Clone();
             }
+        }
+
+        public override EntityInstance Clone()
+        {
+            var clone = (ActorInstance)base.Clone();
+
+            clone._controller = null;
+            clone.Controller = Controller?.Clone();
+
+            clone._weapon = null;
+            clone.Weapon = Weapon?.Clone();
+
+            return clone;
         }
 
         public override void Think(TimeSpan deltaTime)
