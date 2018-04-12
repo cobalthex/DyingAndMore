@@ -489,18 +489,20 @@ namespace Takai.Data
                     {
                         if (pend.target is System.Collections.IList)
                         {
-
+                            throw new NotImplementedException();
                         }
                         else if (pend.target is System.Collections.IDictionary)
                         {
-
+                            throw new NotImplementedException();
                         }
                         //hash set, etc
                         //array (emplace)
-                        else
+                        else if (pend.objectSetter != null)
                         {
                             pend.objectSetter.Invoke();
                         }
+                        else
+                            throw new ArgumentException();
                     }
                     context.pendingCache.Remove(resolver.Key);
                 }

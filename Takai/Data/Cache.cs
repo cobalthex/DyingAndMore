@@ -114,6 +114,8 @@ namespace Takai.Data
             return null;
         }
 
+        //todo: somehow provide ability to load files from zip without loading in as zip/...
+
         /// <summary>
         /// Load a single file into the cache
         /// </summary>

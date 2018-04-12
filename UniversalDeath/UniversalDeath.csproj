@@ -221,7 +221,7 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <ShaderProfile>DX11</ShaderProfile>
     <PostBuildEvent>
-      powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File "$(SolutionDir)Media\Shaders\compile.ps1" -$(ShaderProfile)
+      powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File "$(SolutionDir)Media\Shaders\compile.ps1" -$(ShaderProfile) -Configuration $(Configuration)
 
       set rce=%25errorlevel%25
       if not %25rce%25==1 exit %25rce%25 else exit 0

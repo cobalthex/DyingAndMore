@@ -35,6 +35,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <DebugType>full</DebugType>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
@@ -120,7 +121,7 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <ShaderProfile>DX11</ShaderProfile>
     <PostBuildEvent>
-      powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File "$(SolutionDir)Media\Shaders\compile.ps1" -$(ShaderProfile)
+      powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File "$(SolutionDir)Media\Shaders\compile.ps1" -$(ShaderProfile) -Configuration $(Configuration)
 
       if '$(ConfigurationName)' == 'Debug' (
         powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -Command "New-Item -Force -ItemType directory -Path '$(SolutionDir)Media\Content\Shaders' | Out-Null; Copy-Item -Recurse '$(SolutionDir)Media\Shaders\$(ShaderProfile)\*' '$(SolutionDir)Media\Content\Shaders';    ('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }"

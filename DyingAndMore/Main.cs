@@ -60,7 +60,9 @@ namespace DyingAndMore
                 PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
                 //PreferMultiSampling = true,
                 GraphicsProfile = GraphicsProfile.HiDef,
+#if WINDOWS_UAP
                 IsFullScreen = true,
+#endif
             };
 
             gdm.DeviceCreated += GdmDeviceCreated;
@@ -84,7 +86,7 @@ namespace DyingAndMore
             GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
             gdm.ApplyChanges();
 
-            #region Mouse Cursor
+#region Mouse Cursor
 #if WINDOWS
             if (useCustomCursor)
             {
@@ -96,7 +98,7 @@ namespace DyingAndMore
                 this.IsMouseVisible = true;
             }
 #endif
-            #endregion
+#endregion
 
             sbatch = new SpriteBatch(GraphicsDevice);
 

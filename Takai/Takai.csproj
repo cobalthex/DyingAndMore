@@ -21,6 +21,7 @@
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -105,6 +106,7 @@
     <Compile Include="UI\ItemList.cs" />
     <Compile Include="UI\List.cs" />
     <Compile Include="UI\MapView.cs" />
+    <Compile Include="UI\Meter.cs" />
     <Compile Include="UI\NumericInput.cs" />
     <Compile Include="UI\RadialList.cs" />
     <Compile Include="UI\ScrollBar.cs" />
