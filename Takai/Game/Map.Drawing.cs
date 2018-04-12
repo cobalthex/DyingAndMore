@@ -79,8 +79,6 @@ namespace Takai.Game
                 //todo: some of the render targets may be able to be combined
             }
 
-            //must be 'reloaded' or will be deleted if Cache.TrackReferences is called
-
             lineEffect = Data.Cache.Load<XnaEffect>("Shaders/Line.mgfx");
             circleEffect = Data.Cache.Load<XnaEffect>("Shaders/Circle.mgfx");
             outlineEffect = Data.Cache.Load<XnaEffect>("Shaders/Outline.mgfx");

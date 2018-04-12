@@ -3,6 +3,22 @@ ActorClass {
     MaxHealth: 500;
     DefaultFaction: Factions [Enemy];
 
+    FieldOfView: 1.0;
+    MaxSpeed: [200 300];
+    MoveForce: 300;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: False;
+
+    DefaultController: AIController {
+        Behaviors: [
+            FlowSeekBehavior { };
+
+            TargetEnemyBehavior { };
+            FocusBehavior { };
+        ];
+    };
+
     Animations: {
         Idle: {
             Sprite: {
@@ -17,11 +33,4 @@ ActorClass {
             };
         };
     };
-
-    FieldOfView: 1.0;
-    MaxSpeed: [200 300];
-    MoveForce: 300;
-    IsPhysical: True;
-    IgnoreTrace: False;
-    AlwaysDrawUpright: False;
 }

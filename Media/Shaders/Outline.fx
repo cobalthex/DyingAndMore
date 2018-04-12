@@ -1,14 +1,15 @@
-sampler2D Tex : register(S0);
+Texture2D Tex : register(S0);
+SamplerState Sampler;
 
 float2 TexNormSize; // 1 / size
 float2 FrameSize;
 
 float Adjacent(float2 uv, float2 distance)
 {
-	float4 nw = tex2D(Tex, uv + float2(-distance.x, -distance.y));
-	float4 se = tex2D(Tex, uv + float2(distance.x, distance.y));
-	float4 ne = tex2D(Tex, uv + float2(distance.x, -distance.y));
-	float4 sw = tex2D(Tex, uv + float2(-distance.x, distance.y));
+	float4 nw = Tex.Sample(Sampler, uv + float2(-distance.x, -distance.y));
+	float4 se = Tex.Sample(Sampler, uv + float2(distance.x, distance.y));
+	float4 ne = Tex.Sample(Sampler, uv + float2(distance.x, -distance.y));
+	float4 sw = Tex.Sample(Sampler, uv + float2(-distance.x, distance.y));
 
 	return ne.a * se.a * nw.a * sw.a;
 }
@@ -23,15 +24,15 @@ float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 uv : T
 
     for (int i = 1; i < 3; ++i)
     {
-        tex += tex2D(Tex, (uv + float2(0.0, offset[i])) / 1024.0) * weight[i];
-        tex += tex2D(Tex, (uv - float2(0.0, offset[i])) / 1024.0) * weight[i];
+        tex += Tex.Sample(Sampler, (uv + float2(0.0, offset[i])) / 1024.0) * weight[i];
+        tex += Tex.Sample(Sampler, (uv - float2(0.0, offset[i])) / 1024.0) * weight[i];
     }
 
     return tex;
 */
     //deprecated
 
-    float4 px = tex2D(Tex, uv);
+    float4 px = Tex.Sample(Sampler, uv);
     if (px.a == 0)
         return px;
 

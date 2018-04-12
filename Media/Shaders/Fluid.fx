@@ -1,17 +1,18 @@
-sampler2D Tex;
-sampler2D Mask; //the reflection mask that dictates how the reflection is to be drawn (distortion and reflectivity)
-sampler2D Reflection; //the texture to reflect
+Texture2D Tex;
+Texture2D Mask; //the reflection mask that dictates how the reflection is to be drawn (distortion and reflectivity)
+Texture2D Reflection; //the texture to reflect
+SamplerState Sampler;
 
 float Reflectivity = 0.25;
 float Depth = 0.03;
 
 float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0) : SV_Target
 {
-    float4 px = tex2D(Tex, uv);
-    float4 mask = tex2D(Mask, uv);
+    float4 px = Tex.Sample(Sampler, uv);
+    float4 mask = Mask.Sample(Sampler, uv);
     mask.x = (mask.x * 2) - 1;
 
-    float4 refl = tex2D(Reflection, uv + mask.xy * Depth);
+    float4 refl = Reflection.Sample(Sampler, uv + mask.xy * Depth);
     refl.a *= mask.a * Reflectivity;
 
     if (px.a > 0.5) //todo: replace with sdf

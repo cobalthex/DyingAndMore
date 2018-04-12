@@ -50,6 +50,11 @@ namespace DyingAndMore.Game.Entities
         public Factions DefaultFaction { get; set; } = Factions.None;
         public Controller DefaultController { get; set; } = null;
 
+        /// <summary>
+        /// The hud to display when controlling this actor
+        /// </summary>
+        public Takai.UI.Static Hud { get; set; } //todo: how to update?
+
         public override EntityInstance Instantiate()
         {
             return new ActorInstance(this);

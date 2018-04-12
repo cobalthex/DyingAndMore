@@ -377,7 +377,7 @@ namespace Takai.UI
         {
             var clone = CloneSelf();
             clone._parent = null;
-            Stack<Static> clones = new Stack<Static>(new []{ clone });
+            Stack<Static> clones = new Stack<Static>(new[] { clone });
             while (clones.Count > 0)
             {
                 var top = clones.Pop();
@@ -1019,7 +1019,7 @@ namespace Takai.UI
 
             var mouse = Input.InputState.MousePoint;
 
-            if (Input.InputState.IsPress(0) && VisibleBounds.Contains(mouse))
+            if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mouse))
             {
                 var e = new ClickEventArgs { position = (mouse - VisibleBounds.Location).ToVector2() };
                 didPress = true;
@@ -1038,10 +1038,10 @@ namespace Takai.UI
             else if (DidPressInside())
                 return false;
 
-            else if (Input.InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
+            else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
+            //else if (Input.InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
-                didPress = true;
-                if (didPress && VisibleBounds.Contains(gesture.Position))
+                if (didPress && VisibleBounds.Contains(mouse)) //gesture pos
                 {
                     var e = new ClickEventArgs { position = (mouse - VisibleBounds.Location).ToVector2() };
                     OnClick(e);

@@ -73,7 +73,7 @@ namespace DyingAndMore.Editor
             {
                 Position = new Vector2(20),
                 VerticalAlignment = Alignment.End,
-                HorizontalAlignment = Alignment.Start,
+                HorizontalAlignment = Alignment.Middle,
                 Font = smallFont,
                 Text = "> PLAY >"
             });
@@ -94,16 +94,8 @@ namespace DyingAndMore.Editor
 
             swatch.Stop();
             Takai.LogBuffer.Append($"Loaded editor and map \"{map.Class.Name}\" ({map.Class.File}) in {swatch.ElapsedMilliseconds}msec");
-
-            var sel = new DropdownSelect<string>();
-            sel.Items.Add("test 1");
-            sel.Items.Add("test 2");
-            sel.Items.Add("test 3");
-            sel.Items.Add("test 4");
-            sel.Position = new Vector2(200);
-            sel.Size = new Vector2(100, 20);
-            AddChild(sel);
         }
+        Meter meter;
 
         void AddModes()
         {
@@ -134,6 +126,8 @@ namespace DyingAndMore.Editor
         {
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
+
+            meter.MaskValue = (float)(time.TotalGameTime.TotalSeconds / 5 % 1);
 
             base.UpdateSelf(time);
         }

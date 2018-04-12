@@ -1,5 +1,6 @@
-sampler2D Tex;
-sampler2D Reflection;
+Texture2D Tex;
+Texture2D Reflection;
+SamplerState Sampler;
 
 struct PSOutput
 {
@@ -10,8 +11,8 @@ struct PSOutput
 PSOutput pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0)
 {
     PSOutput output;
-    output.color = tex2D(Tex, uv) * color;
-    output.reflection = tex2D(Reflection, uv);
+    output.color = Tex.Sample(Sampler, uv) * color;
+    output.reflection = Reflection.Sample(Sampler, uv);
     output.reflection.y = color.a;
     return output;
 }
