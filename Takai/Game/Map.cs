@@ -230,9 +230,8 @@ namespace Takai.Game
         ~MapInstance()
         {
             foreach (var sound in Sounds)
-            {
                 sound.Instance?.Dispose();
-            }
+            Sounds.Clear();
         }
 
         #region Spawning/Destroying

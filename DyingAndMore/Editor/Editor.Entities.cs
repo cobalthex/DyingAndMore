@@ -132,7 +132,7 @@ namespace DyingAndMore.Editor
             if (SelectedEntity != null)
                 SelectedEntity.OutlineColor = Color.Transparent;
 
-            if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
+            if (InputState.IsPress(MouseButtons.Left))
             {
 #if WINDOWS
                 //load entity from file
@@ -153,7 +153,7 @@ namespace DyingAndMore.Editor
                 }
 #endif
 
-                var searchRadius = /*isTapping*/ false ? 10 : 5;
+                var searchRadius = 30; //increase if touch
                 var selected = editor.Map.FindEntities(currentWorldPos, searchRadius);
                 if (selected.Count < 1)
                 {

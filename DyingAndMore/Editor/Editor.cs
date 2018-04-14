@@ -95,7 +95,6 @@ namespace DyingAndMore.Editor
             swatch.Stop();
             Takai.LogBuffer.Append($"Loaded editor and map \"{map.Class.Name}\" ({map.Class.File}) in {swatch.ElapsedMilliseconds}msec");
         }
-        Meter meter;
 
         void AddModes()
         {
@@ -126,8 +125,6 @@ namespace DyingAndMore.Editor
         {
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
-
-            meter.MaskValue = (float)(time.TotalGameTime.TotalSeconds / 5 % 1);
 
             base.UpdateSelf(time);
         }
