@@ -268,7 +268,7 @@ namespace Takai.Data
             {
                 name = WriteFullTypeNames ? mtype.FullName : mtype.Name;
                 bool isFlags = mTypeInfo.IsDefined(typeof(FlagsAttribute));
-                return name + $"{(isFlags ? "[" : "(")}{string.Join(" ", Enum.GetNames(mtype))}{(isFlags ? "]" : ")")}"; //todo
+                return name + $"{(isFlags ? "[" : "(")}{string.Join(" ", Enum.GetNames(mtype))}{(isFlags ? "]" : ")")}";
             }
             else if (mTypeInfo.IsGenericType)
             {

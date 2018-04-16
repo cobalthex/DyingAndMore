@@ -53,7 +53,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The hud to display when controlling this actor
         /// </summary>
-        public Takai.UI.Static Hud { get; set; } //todo: how to update?
+        public Hud Hud { get; set; }
 
         public override EntityInstance Instantiate()
         {
@@ -97,7 +97,16 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The current health of the actor
         /// </summary>
-        public float CurrentHealth { get; set; }
+        public float CurrentHealth
+        {
+            get => _currentHealth;
+            set
+            {
+                _currentHealth = value;
+                //broadcast property
+            }
+        }
+        private float _currentHealth;
 
         public struct ActiveCondition
         {

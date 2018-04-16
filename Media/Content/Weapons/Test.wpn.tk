@@ -7,7 +7,7 @@ GunClass {
     #MaxBursts: 3;
     #BurstCooldownTime: 400msec;
     ChargeTime: 0msec;
-    DischargeTime: 1200rpm;
+    DischargeTime: 1800rpm;
     CooldownTime: 2sec;
     CanAlwaysCharge: true;
     ErrorAngle: [-30deg 30deg]; # test
