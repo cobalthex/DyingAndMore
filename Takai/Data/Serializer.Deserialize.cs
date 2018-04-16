@@ -403,6 +403,8 @@ namespace Takai.Data
                             if (peek == -1)
                                 throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read enum", context));
 
+                            //todo: support either ~ or ! in front of value to negate?
+
                             var value = ReadWord(context.reader);
                             values |= Convert.ToUInt64(Enum.Parse(type, value));
                             ++valuesCount;

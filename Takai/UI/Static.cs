@@ -112,6 +112,8 @@ namespace Takai.UI
         /// </summary>
         public virtual Color BackgroundColor { get; set; } = Color.Transparent;
 
+        public virtual Graphics.Sprite BackgroundImage { get; set; }
+
         /// <summary>
         /// How this element is positioned in its container horizontally
         /// </summary>
@@ -351,6 +353,12 @@ namespace Takai.UI
                     AddChild(child);
             }
         }
+
+        /// <summary>
+        /// A binding to bind to this element with
+        /// Behavior is implementation defined
+        /// </summary>
+        public virtual string Binding { get; set; }
 
         public Static()
         {
@@ -924,7 +932,7 @@ namespace Takai.UI
         /// Update this element and all of its children
         /// </summary>
         /// <param name="time">Game time</param>
-        public virtual void Update(GameTime time)
+        public virtual void Update(GameTime time, Dictionary<string, object> bindings = null)
         {
             /* update in the following order: H G F E D C B A
             A
@@ -1069,7 +1077,11 @@ namespace Takai.UI
                 var toDraw = draws.Dequeue();
 
                 Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
+                if (BackgroundImage != null)
+                    BackgroundImage.Draw(spriteBatch, toDraw.VisibleBounds, 0);
+
                 toDraw.DrawSelf(spriteBatch);
+
                 //Graphics.Primitives2D.DrawRect(spriteBatch, Color.Tomato, toDraw.VirtualBounds);
                 Graphics.Primitives2D.DrawRect(spriteBatch, (toDraw.HasFocus && toDraw.CanFocus) ? FocusedBorderColor : toDraw.BorderColor, toDraw.VisibleBounds);
 

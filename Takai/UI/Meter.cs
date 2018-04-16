@@ -23,13 +23,7 @@ namespace Takai.UI
             }
         }
         private Graphics.Sprite _mask;
-        public float MaskValue { get; set; } = 1;
-
-        //clip (display part of image based on value) ?
-
-        public int RepeatCount { get; set; } = 1;
-        public Vector2 RepeatOffset { get; set; }
-        public float RepeatAngle { get; set; } = 0;
+        public float Value { get; set; } = 1;
 
         Effect maskEffect;
         SpriteBatch sbatch;
@@ -42,46 +36,18 @@ namespace Takai.UI
 
         public override void AutoSize(float padding = 0)
         {
-            Rectangle bounds = new Rectangle();
-            Point drawPos = VisibleBounds.Location;
-            for (int i = 0; i < RepeatCount; ++i)
-            {
-                bounds = Rectangle.Union(bounds, new Rectangle(drawPos.X, drawPos.Y, Sprite.Width, Sprite.Height));
-                var offset = RepeatOffset;
-                if (RepeatAngle != 0)
-                    offset = Vector2.TransformNormal(offset, Matrix.CreateRotationZ(RepeatAngle));
-                drawPos += offset.ToPoint();
-            }
-            bounds.Inflate((int)padding, (int)padding);
-
-            Size = bounds.Size.ToVector2();
+            Size = (_mask?.Size.ToVector2() ?? new Vector2(1)) + new Vector2(padding);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             base.DrawSelf(spriteBatch);
-            bool isMasking = (MaskValue < 1 && Mask != null);
+            bool isMasking = (Value < 1 && Mask != null);
 
-            if (isMasking)
-            {
-                maskEffect.Parameters["Cutoff"].SetValue(MaskValue);
-                sbatch.Begin(SpriteSortMode.Deferred, null, null, null, null, maskEffect);
-                spriteBatch = sbatch;
-            }
-
-            Point drawPos = VisibleBounds.Location;
-            for (int i = 0; i < RepeatCount; ++i)
-            {
-                Runtime.GraphicsDevice.Textures[1] = Mask.Texture;
-                Sprite.Draw(spriteBatch, Rectangle.Intersect(VisibleBounds, new Rectangle(drawPos.X, drawPos.Y, Sprite.Width, Sprite.Height)), 0);
-                var offset = RepeatOffset;
-                if (RepeatAngle != 0)
-                    offset = Vector2.TransformNormal(offset, Matrix.CreateRotationZ(RepeatAngle));
-                drawPos += offset.ToPoint();
-            }
-
-            if (isMasking)
-                sbatch.End();
+            maskEffect.Parameters["Cutoff"].SetValue(Value);
+            sbatch.Begin(SpriteSortMode.Deferred, null, null, null, null, maskEffect);
+            Sprite.Draw(spriteBatch, Rectangle.Intersect(VisibleBounds, new Rectangle((int)Position.X, (int)Position.Y, Sprite.Width, Sprite.Height)), 0, Color, Sprite.ElapsedTime);
+            sbatch.End();
         }
     }
 }
