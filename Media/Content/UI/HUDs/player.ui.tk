@@ -1,0 +1,29 @@
+Static {
+	Position: [100 100];
+	Children: [
+		Meter {
+			Position: [2 2];
+			Value: 0.5;
+			Sprite: Sprite {
+				Texture: @"./Player.png";
+				ClipRect: [0 88 84 88];
+				Width: 84;
+				Height: 88;
+			}
+			Mask: Sprite {
+				Texture: @"./Player.mask.png";
+				ClipRect: [0 88 84 88];
+				Width: 84;
+				Height: 88;
+			}
+		}
+		Graphic {
+			Sprite: Sprite {
+				Texture: @"./Player.png";
+				ClipRect: [88 77 86 92];
+				Width: 86;
+				Height: 92;
+			};
+		}
+	];
+}

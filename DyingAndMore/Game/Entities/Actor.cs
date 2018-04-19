@@ -53,7 +53,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The hud to display when controlling this actor
         /// </summary>
-        public Hud Hud { get; set; }
+        public Takai.UI.Static Hud { get; set; }
 
         public override EntityInstance Instantiate()
         {

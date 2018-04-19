@@ -30,6 +30,8 @@ List {
             HorizontalAlignment: Alignment.Middle;
         }
 
+        @"./HUDs/player.ui.tk";
+
         ScrollBox {
             Size: [400 400];
             HorizontalAlignment: Alignment.Middle;

@@ -13,16 +13,7 @@ namespace Takai.UI
         /// <summary>
         /// Mask the graphic with this
         /// </summary>
-        public Graphics.Sprite Mask
-        {
-            get => _mask;
-            set
-            {
-                _mask = value;
-                maskEffect.Parameters["Mask"].SetValue(_mask.Texture);
-            }
-        }
-        private Graphics.Sprite _mask;
+        public Graphics.Sprite Mask { get; set; }
         public float Value { get; set; } = 1;
 
         Effect maskEffect;
@@ -36,7 +27,7 @@ namespace Takai.UI
 
         public override void AutoSize(float padding = 0)
         {
-            Size = (_mask?.Size.ToVector2() ?? new Vector2(1)) + new Vector2(padding);
+            Size = (Sprite?.Size.ToVector2() ?? new Vector2(1)) + new Vector2(padding);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -44,9 +35,11 @@ namespace Takai.UI
             base.DrawSelf(spriteBatch);
             bool isMasking = (Value < 1 && Mask != null);
 
-            maskEffect.Parameters["Cutoff"].SetValue(Value);
             sbatch.Begin(SpriteSortMode.Deferred, null, null, null, null, maskEffect);
-            Sprite.Draw(spriteBatch, Rectangle.Intersect(VisibleBounds, new Rectangle((int)Position.X, (int)Position.Y, Sprite.Width, Sprite.Height)), 0, Color, Sprite.ElapsedTime);
+            maskEffect.Parameters["Cutoff"].SetValue(Value);
+            maskEffect.Parameters["Mask"].SetValue(Mask.Texture);
+            var bounds = VisibleBounds; // Rectangle.Intersect(VisibleBounds, new Rectangle( X, (int)Position.Y, Sprite.Width, Sprite.Height));
+            Sprite.Draw(spriteBatch, bounds, 0, Color, Sprite.ElapsedTime);
             sbatch.End();
         }
     }
