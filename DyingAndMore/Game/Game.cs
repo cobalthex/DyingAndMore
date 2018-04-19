@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Linq;
 using System.Reflection;
+using Takai.Data;
 using Takai.Game;
 using Takai.Input;
 using Takai.UI;
@@ -44,7 +45,7 @@ namespace DyingAndMore.Game
         //Game Campaign
         public GameConfiguration Configuration { get; set; } = new GameConfiguration();
 
-        [Takai.Data.Serializer.Ignored]
+        [Serializer.Ignored]
         public GameplaySettings GameplaySettings { get; set; } = new GameplaySettings();
 
         public System.Collections.Generic.List<Entities.ActorInstance> players;
@@ -70,6 +71,8 @@ namespace DyingAndMore.Game
         Static renderSettingsConsole;
         Static updateSettingsConsole;
         Static gameplaySettingsConsole;
+
+        Static testHud;
 
         void ToggleUI(Static ui)
         {
@@ -135,9 +138,8 @@ namespace DyingAndMore.Game
             debugConsole = new TextInput()
             {
                 Position = new Vector2(20),
-                Size = new Vector2(400, 30),
                 VerticalAlignment = Alignment.End,
-                Font = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/xbox.bfnt"),
+                Font = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/xbox.bfnt"),
             };
             debugConsole.Submit += delegate (object sender, EventArgs e)
             {
@@ -147,9 +149,16 @@ namespace DyingAndMore.Game
                 inp.Text = String.Empty;
             };
 
-            tinyFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
+            testHud = new Static
+            {
+                Size = new Vector2(300),
+            };
+            testHud.AddChild(Cache.Load<Static>("UI/HUDs/player.ui.tk"));
+            AddChild(testHud);
 
-            testEffect = Takai.Data.Cache.Load<EffectsClass>("Effects/Damage.fx.tk");
+            tinyFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
+
+            testEffect = Cache.Load<EffectsClass>("Effects/Damage.fx.tk");
         }
 
         protected override void OnMapChanged(EventArgs e)
@@ -213,7 +222,7 @@ namespace DyingAndMore.Game
             if (!x)
             {
                 x = true;
-                Takai.Data.Cache.CleanupStaleReferences(); //todo: find better place for this (editor needs to be fully out of scope)
+                Cache.CleanupStaleReferences(); //todo: find better place for this (editor needs to be fully out of scope)
             }
 
             if (!IsPaused)
@@ -332,7 +341,7 @@ namespace DyingAndMore.Game
                         System.Collections.Generic.Dictionary<string, object> type;
                         try
                         {
-                            type = Takai.Data.Serializer.DescribeType(Takai.Data.Serializer.RegisteredTypes[words[1]]);
+                            type = Serializer.DescribeType(Serializer.RegisteredTypes[words[1]]);
                         }
                         catch
                         {
@@ -383,7 +392,7 @@ namespace DyingAndMore.Game
                                     if (i > nextIndex)
                                         writer.WriteLine();
                                     var ent = Map.FindEntityById(int.Parse(words[i]));
-                                    Takai.Data.Serializer.TextSerialize(writer, ent, 0, false, true);
+                                    Serializer.TextSerialize(writer, ent, 0, false, true);
                                 }
                                 entInfo = writer.ToString();
                             }

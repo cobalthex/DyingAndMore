@@ -112,7 +112,7 @@ namespace Takai.UI
         /// </summary>
         public virtual Color BackgroundColor { get; set; } = Color.Transparent;
 
-        public virtual Graphics.Sprite BackgroundImage { get; set; }
+        public virtual Graphics.Sprite BackgroundSprite { get; set; }
 
         /// <summary>
         /// How this element is positioned in its container horizontally
@@ -1077,8 +1077,8 @@ namespace Takai.UI
                 var toDraw = draws.Dequeue();
 
                 Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
-                if (BackgroundImage != null)
-                    BackgroundImage.Draw(spriteBatch, toDraw.VisibleBounds, 0);
+                if (BackgroundSprite != null)
+                    BackgroundSprite.Draw(spriteBatch, toDraw.VisibleBounds, 0);
 
                 toDraw.DrawSelf(spriteBatch);
 
