@@ -141,6 +141,9 @@ namespace DyingAndMore.Game.Entities
         }
         private Weapons.WeaponInstance _weapon;
 
+        [Takai.Data.Serializer.Ignored]
+        public Takai.UI.Static Hud { get; set; }
+
         public ActorInstance() : this(null) { }
         public ActorInstance(ActorClass @class)
             : base(@class)
