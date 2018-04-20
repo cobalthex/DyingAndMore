@@ -72,8 +72,6 @@ namespace DyingAndMore.Game
         Static updateSettingsConsole;
         Static gameplaySettingsConsole;
 
-        Static testHud;
-
         void ToggleUI(Static ui)
         {
             if (!ui.RemoveFromParent())
@@ -148,13 +146,6 @@ namespace DyingAndMore.Game
                 inp.RemoveFromParent();
                 inp.Text = String.Empty;
             };
-
-            testHud = new Static
-            {
-                Size = new Vector2(300),
-            };
-            testHud.AddChild(Cache.Load<Static>("UI/HUDs/player.ui.tk"));
-            AddChild(testHud);
 
             tinyFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
 

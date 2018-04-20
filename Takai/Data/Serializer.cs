@@ -63,6 +63,8 @@ namespace Takai.Data
         [System.Runtime.InteropServices.ComVisible(true)]
         public class AsReferenceAttribute : Attribute { }
 
+        //todo: serialize if has value?
+
         public interface IReferenceable
         {
             int Id { get; set; }

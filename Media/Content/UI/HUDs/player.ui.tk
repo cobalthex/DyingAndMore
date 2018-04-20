@@ -2,28 +2,46 @@ Static {
 	Position: [100 100];
 	Children: [
 		Meter {
+			name: "asdf";
 			Position: [2 2];
 			Value: 0.5;
-			Sprite: Sprite {
-				Texture: @"./Player.png";
+			Sprite: {
+				Texture: @"./player.png";
 				ClipRect: [0 88 84 88];
 				Width: 84;
 				Height: 88;
 			}
-			Mask: Sprite {
-				Texture: @"./Player.mask.png";
+			Mask: {
+				Texture: @"./player.mask.png";
 				ClipRect: [0 88 84 88];
 				Width: 84;
 				Height: 88;
 			}
 		}
 		Graphic {
-			Sprite: Sprite {
+			Sprite: {
 				Texture: @"./Player.png";
 				ClipRect: [88 77 86 92];
 				Width: 86;
 				Height: 92;
 			};
+		}
+		Meter {
+			name: "donk";
+			position: [100 100];
+			value: 0.5;
+			Sprite: {
+				Texture: @"./player.png";
+				ClipRect: [0 0 84 84];
+				Width: 84;
+				Height: 84;
+			}
+			Mask: {
+				Texture: @"./player.mask.png";
+				ClipRect: [0 0 84 84];
+				Width: 84;
+				Height: 84;
+			}
 		}
 	];
 }

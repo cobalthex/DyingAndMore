@@ -33,13 +33,11 @@ namespace Takai.UI
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             base.DrawSelf(spriteBatch);
-            bool isMasking = (Value < 1 && Mask != null);
 
-            sbatch.Begin(SpriteSortMode.Deferred, null, null, null, null, maskEffect);
             maskEffect.Parameters["Cutoff"].SetValue(Value);
             maskEffect.Parameters["Mask"].SetValue(Mask.Texture);
-            var bounds = VisibleBounds; // Rectangle.Intersect(VisibleBounds, new Rectangle( X, (int)Position.Y, Sprite.Width, Sprite.Height));
-            Sprite.Draw(spriteBatch, bounds, 0, Color, Sprite.ElapsedTime);
+            sbatch.Begin(SpriteSortMode.Deferred, null, null, null, null, maskEffect);
+            Sprite.Draw(sbatch, VisibleBounds, 0, Color, Sprite.ElapsedTime);
             sbatch.End();
         }
     }

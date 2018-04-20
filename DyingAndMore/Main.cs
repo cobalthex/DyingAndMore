@@ -86,7 +86,7 @@ namespace DyingAndMore
             GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
             gdm.ApplyChanges();
 
-#region Mouse Cursor
+            #region Mouse Cursor
 #if WINDOWS
             if (useCustomCursor)
             {
@@ -98,7 +98,7 @@ namespace DyingAndMore
                 this.IsMouseVisible = true;
             }
 #endif
-#endregion
+            #endregion
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
@@ -192,10 +192,17 @@ namespace DyingAndMore
 
             ui.HasFocus = true;
             base.Initialize();
+
+            asdf = (Takai.UI.Meter)ui.FindChildByName("asdf");
+            donk = (Takai.UI.Meter)ui.FindChildByName("donk");
         }
+        Takai.UI.Meter asdf,donk;
 
         protected override void Update(GameTime gameTime)
         {
+            asdf.Value = 1 - (float)(gameTime.TotalGameTime.TotalSeconds / 3 % 1);
+            donk.Value = 1 - (float)(gameTime.TotalGameTime.TotalSeconds / 3 % 1);
+
             if (InputState.IsPress(Keys.Q)
             && InputState.IsMod(KeyMod.Control))
                 Takai.Runtime.IsExiting = true;

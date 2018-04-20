@@ -7,3 +7,7 @@ syntax: glob
 obj/
 bin/
 packages/
+
+media/shaders/DX11/
+media/shaders/OGL/
+media/content/shaders/
