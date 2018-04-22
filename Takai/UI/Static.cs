@@ -355,10 +355,9 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// A binding to bind to this element with
-        /// Behavior is implementation defined
+        /// A binding to bind a value to this element's text
         /// </summary>
-        public virtual string Binding { get; set; }
+        public virtual string TextBinding { get; set; }
 
         public Static()
         {
@@ -375,6 +374,8 @@ namespace Takai.UI
             foreach (var child in children)
                 AddChild(child);
         }
+
+        #region Children/cloning
 
         /// <summary>
         /// Create a clone of this static and all of its children
@@ -569,6 +570,10 @@ namespace Takai.UI
             RemoveAllChildren();
             AddChildren(newChildren);
         }
+
+        #endregion
+
+        #region navigation
 
         public Static GetRoot()
         {
@@ -821,6 +826,10 @@ namespace Takai.UI
             return null;
         }
 
+        #endregion
+
+        #region Sizing
+
         /// <summary>
         /// Reflow child elements relative to this element
         /// Called whenever this element's position or size is adjusted
@@ -928,6 +937,8 @@ namespace Takai.UI
             Size = bounds.Size.ToVector2() + new Vector2(padding);
         }
 
+        #endregion
+
         /// <summary>
         /// Update this element and all of its children
         /// </summary>
@@ -954,6 +965,9 @@ namespace Takai.UI
             {
                 if (handleInput)
                     handleInput = toUpdate.HandleInput(time) && !toUpdate.IsModal;
+
+                if (bindings.TryGetValue(TextBinding, out var bindValue))
+                    Text = bindValue.ToString();
 
                 toUpdate.UpdateSelf(time);
 
