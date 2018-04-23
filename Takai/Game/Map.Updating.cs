@@ -107,6 +107,9 @@ namespace Takai.Game
             var deltaSeconds = (float)deltaTime.TotalSeconds;
             ElapsedTime += deltaTime;
 
+            Data.DataModel.Values["map.time.seconds"] = ElapsedTime.TotalSeconds;
+            Data.DataModel.Values["map.time.milliseconds"] = ElapsedTime.TotalMilliseconds;
+
             //if (deltaTicks == 0)
             //    return;
 

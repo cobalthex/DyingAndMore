@@ -573,7 +573,7 @@ namespace Takai.UI
 
         #endregion
 
-        #region navigation
+        #region Navigation
 
         public Static GetRoot()
         {
@@ -939,12 +939,15 @@ namespace Takai.UI
 
         #endregion
 
+        #region Updating/Drawing
+
         /// <summary>
         /// Update this element and all of its children
         /// </summary>
         /// <param name="time">Game time</param>
         public virtual void Update(GameTime time, Dictionary<string, object> bindings = null)
         {
+            updateTimer.Restart();
             /* update in the following order: H G F E D C B A
             A
                 B
@@ -986,6 +989,7 @@ namespace Takai.UI
                 else
                     toUpdate = toUpdate._parent;
             }
+            updateTimer.Stop();
         }
 
         /// <summary>
@@ -1077,12 +1081,16 @@ namespace Takai.UI
             return true;
         }
 
+        private static System.Diagnostics.Stopwatch drawTimer = new System.Diagnostics.Stopwatch();
+        private static System.Diagnostics.Stopwatch updateTimer = new System.Diagnostics.Stopwatch();
+
         /// <summary>
         /// Draw this element, its decorators, and any children
         /// </summary>
         /// <param name="spriteBatch">The spritebatch to use</param>
         public virtual void Draw(SpriteBatch spriteBatch)
         {
+            drawTimer.Restart();
             var draws = new Queue<Static>(Children.Count + 1);
             draws.Enqueue(this);
 
@@ -1112,6 +1120,8 @@ namespace Takai.UI
                 foreach (var child in toDraw.Children)
                     draws.Enqueue(child);
             }
+            drawTimer.Stop();
+            DefaultFont?.Draw(spriteBatch, $"{updateTimer.Elapsed.TotalMilliseconds}\n{drawTimer.Elapsed.TotalMilliseconds}", new Vector2(300), Color.Gray);
         }
 
         /// <summary>
@@ -1158,6 +1168,8 @@ namespace Takai.UI
             if (props.TryGetValue("Height", out var height))
                 Size = new Vector2(_size.X, Data.Serializer.Cast<float>(height));
         }
+
+        #endregion
 
         public override string ToString()
         {
