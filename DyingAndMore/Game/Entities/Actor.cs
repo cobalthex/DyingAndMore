@@ -157,6 +157,9 @@ namespace DyingAndMore.Game.Entities
 
                 if (Class.DefaultController != null)
                     Controller = Class.DefaultController.Clone();
+
+                if (Class.Hud != null)
+                    Hud = Class.Hud.Clone();
             }
         }
 

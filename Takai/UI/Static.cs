@@ -27,6 +27,15 @@ namespace Takai.UI
 
     //todo: invalidation/dirty states, instead of reflow each time property is updated, mark dirty. On next update, reflow if dirty
 
+    public struct Binding
+    {
+        public string key;
+
+        public float scale;
+        public long min, max;
+        public bool wrap;
+    }
+
     /// <summary>
     /// The basic UI element
     /// </summary>
@@ -945,7 +954,7 @@ namespace Takai.UI
         /// Update this element and all of its children
         /// </summary>
         /// <param name="time">Game time</param>
-        public virtual void Update(GameTime time, Dictionary<string, object> bindings = null)
+        public virtual void Update(GameTime time)
         {
             updateTimer.Restart();
             /* update in the following order: H G F E D C B A
@@ -969,9 +978,6 @@ namespace Takai.UI
                 if (handleInput)
                     handleInput = toUpdate.HandleInput(time) && !toUpdate.IsModal;
 
-                if (bindings.TryGetValue(TextBinding, out var bindValue))
-                    Text = bindValue.ToString();
-
                 toUpdate.UpdateSelf(time);
 
                 //stop at this element
@@ -994,9 +1000,14 @@ namespace Takai.UI
 
         /// <summary>
         /// Update this UI's state here. Input should be handled in <see cref="HandleInput"/>
+        /// Bindings should be applied here
         /// </summary>
         /// <param name="time">game time</param>
-        protected virtual void UpdateSelf(GameTime time) { }
+        protected virtual void UpdateSelf(GameTime time)
+        {
+            if (TextBinding != null && Data.DataModel.Values.TryGetValue(TextBinding, out var bindValue))
+                Text = bindValue.ToString();
+        }
 
         /// <summary>
         /// React to user input here. Updating should be performed in <see cref="UpdateSelf"/>

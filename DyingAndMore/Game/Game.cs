@@ -193,6 +193,9 @@ namespace DyingAndMore.Game
 
             Map.ActiveCamera = new Camera(player); //todo: resume control
             x = false;
+
+            if (player?.Hud != null)
+                AddChild(player.Hud);
         }
 
         string GetClockText(TimeSpan time)
@@ -232,6 +235,8 @@ namespace DyingAndMore.Game
 
             crapDisplay.Text = $"Zoom:{Map.ActiveCamera.Scale:N1}";
             crapDisplay.AutoSize();
+
+            DataModel.Values["player.health"] = player.CurrentHealth / player.Class.MaxHealth;
 
             base.UpdateSelf(time);
         }
