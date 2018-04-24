@@ -32,4 +32,5 @@ ActorClass {
     DefaultWeapon: @"Weapons/Test.wpn.tk";
 
     DefaultController: InputController { };
+    Hud: @"UI/HUDs/player.ui.tk";
 }

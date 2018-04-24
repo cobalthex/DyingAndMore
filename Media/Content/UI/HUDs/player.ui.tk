@@ -3,8 +3,8 @@ Static {
 	Children: [
 		Meter {
 			name: "asdf";
-			Position: [2 2];
-			Value: 0.5;
+			Position: [2 82];
+			ValueBinding: "player.health";
 			Sprite: {
 				Texture: @"./player.png";
 				ClipRect: [0 88 84 88];
@@ -19,6 +19,7 @@ Static {
 			}
 		}
 		Graphic {
+			Position: [0 80];
 			Sprite: {
 				Texture: @"./Player.png";
 				ClipRect: [88 77 86 92];
@@ -28,8 +29,8 @@ Static {
 		}
 		Meter {
 			name: "donk";
-			position: [100 100];
-			value: 0.5;
+			Position: [40 0];
+			ValueBinding: "map.time.seconds";
 			Sprite: {
 				Texture: @"./player.png";
 				ClipRect: [0 0 84 84];

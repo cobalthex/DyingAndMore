@@ -567,6 +567,8 @@ namespace Takai.Data
                     return deserialied;
             }
 
+            var derived = destObject as IDerivedDeserialize;
+
             foreach (var pair in dict)
             {
                 var late = pair.Value as Cache.LateBindLoad;
@@ -608,6 +610,8 @@ namespace Takai.Data
                             else
                                ParseMember(destObject, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                         }
+                        else if (derived != null)
+                            System.Diagnostics.Debug.WriteLine($"Ignoring possible unknown field:{pair.Key} in DestType:{destType.Name} (May be derived)"); //pass filename through?
                         else
                             System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in DestType:{destType.Name}"); //pass filename through?
                     }
@@ -622,7 +626,7 @@ namespace Takai.Data
                 }
             }
 
-            if (destObject is IDerivedDeserialize derived)
+            if (derived != null)
                 derived.DerivedDeserialize(dict);
 
             return destObject;
