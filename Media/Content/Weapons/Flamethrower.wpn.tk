@@ -1,0 +1,49 @@
+GunClass {
+    MaxAmmo: 2000;
+
+    DischargeEffect: {
+        Effects: [
+            ParticleEffect {
+                Class: {
+                    Sprite: {
+                        Texture: @"Effects/fire.png";
+                        width: 96;
+                        height: 48;
+                    };
+                    Blend: BlendState.Additive;
+                    InitialSpeed: [200 800];
+                    Drag: 1.0;
+                    lifetime: 1000msec;
+                    ColorOverTime: {
+                        Values: [
+                            [0 Color.LightBlue];
+                            [0.05 Color.Magenta];
+                            [0.2 Color.White];
+                            [0.3 Color.Orange];
+                            [0.7 [127 32 0 1]];
+                            [1 [20 0 0 0]];
+                        ];
+                    };
+
+                    ScaleOverTime: {
+                        Values: [
+                            [0 0.25]
+                            [0.6 2]
+                            [1 0]
+                        ];
+                    };
+                    #*AngleOverTime: {
+                        Values: [
+                            [0 0];
+                            [0.1 45deg];
+                            [0.4 0deg];
+                            [1 -45deg];
+                        ];
+                    };*#
+                }
+                Count: 40;
+                Spread: [-10deg 10deg];
+            };
+        ]
+    }
+}

@@ -7,7 +7,7 @@ namespace Takai.Game
     {
         //todo: possibly have a custom curve that uses incremental T
 
-        private List<float> sectionLengths = new List<float>();
+        protected List<float> sectionLengths = new List<float>();
 
         /// <summary>
         /// Approximate sector lengths
@@ -50,6 +50,35 @@ namespace Takai.Game
                 sectionLengths.Add(length);
                 ApproximateTotalLength += length;
             }
+        }
+    }
+
+    public class Trail
+    {
+        public int MaxPoints { get; set; } = 10;
+
+        protected List<Vector2> points;
+        public IReadOnlyList<Vector2> Points => points;
+        int start = 0;
+
+        public void AddPoint(Vector2 point)
+        {
+            if (MaxPoints == 0)
+            {
+                points.Add(point);
+                ++start;
+                return;
+            }
+
+            if (points.Count <= start)
+            {
+                points.Capacity = MaxPoints;
+                points.Add(point);
+            }
+            else
+                points[start] = point;
+
+            start = (start + 1) % MaxPoints;
         }
     }
 

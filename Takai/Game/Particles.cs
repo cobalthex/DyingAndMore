@@ -20,6 +20,8 @@ namespace Takai.Game
         /// </summary>
         public BlendState Blend { get; set; }
 
+        //follow path? (angle oriented, faces direction, etc)?
+
         public ColorCurve ColorOverTime { get; set; } = Color.White;
         public ScalarCurve ScaleOverTime { get; set; } = 1;
         public ScalarCurve SpinOverTime { get; set; } = 0; //relative to spawn angle
