@@ -247,6 +247,10 @@ namespace Takai.Data
             RegisterType<Vector3>();
             RegisterType<Vector4>();
             RegisterType<Rectangle>();
+
+            RegisterType<BlendState>();
+            RegisterType<BlendFunction>();
+            RegisterType<Blend>();
         }
 
         public static void RegisterType<T>()

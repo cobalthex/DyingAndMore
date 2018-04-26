@@ -353,7 +353,7 @@ namespace Takai.Game
                     x.color = p.Key.ColorOverTime.Evaluate(life);
                     x.scale = p.Key.ScaleOverTime.Evaluate(life);
                     x.spin = p.Key.SpinOverTime.Evaluate(life);
-                    var angle = p.Key.AngleOverTime.Evaluate(life);
+                    var angle = x.angle + p.Key.AngleOverTime.Evaluate(life);
 
                     var xvl = x.velocity.Length();
                     x.velocity = xvl * Vector2.TransformNormal(x.velocity / xvl, Matrix.CreateRotationZ(angle - x.angle));

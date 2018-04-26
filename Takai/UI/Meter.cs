@@ -21,7 +21,7 @@ namespace Takai.UI
         /// </summary>
         public float Value { get; set; } = 1;
         /// <summary>
-        /// THe range to pad around the cutoff value. If 0, <see cref="Value"/> acts as a cutoff
+        /// THe range to pad around the cutoff value. If 0, <see cref="Value"/> acts as a cutoffio
         /// If != 0, it behaves as a range and this is a padding factor (*2 for above and below <see cref="Value"/>)
         /// </summary>
         public float Range { get; set; } = 0;
