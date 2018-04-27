@@ -9,26 +9,32 @@ GunClass {
                         Texture: @"Effects/fire.png";
                         width: 96;
                         height: 48;
+                        Origin: [24 24];
                     };
                     Blend: BlendState.Additive;
-                    InitialSpeed: [200 800];
+                    InitialSpeed: [600 1200];
                     Drag: 1.0;
-                    lifetime: 1000msec;
+                    lifetime: [600msec 1200msec];
                     ColorOverTime: {
+                        Reverse: false;
                         Values: [
-                            [0 Color.LightBlue];
-                            [0.05 Color.Magenta];
-                            [0.2 Color.White];
-                            [0.3 Color.Orange];
-                            [0.7 [127 32 0 1]];
-                            [1 [20 0 0 0]];
+                            [0 [32 64 128 64]];
+                            [0.1 Color.SteelBlue];
+                            #[0.5 Color.Orange];
+                            #[1 Color.Red];
+                            [0.25 Color.White];
+                            [0.3 Color.Yellow];
+                            [0.5 Color.Orange];
+                            [0.6 [127 16 0 1]];
+                            [1 [10 0 0 0]];
                         ];
                     };
 
                     ScaleOverTime: {
+                        IsLinear: true;
                         Values: [
                             [0 0.25]
-                            [0.6 2]
+                            [0.7 2]
                             [1 0]
                         ];
                     };
@@ -41,7 +47,7 @@ GunClass {
                         ];
                     };*#
                 }
-                Count: 40;
+                Count: 20;
                 Spread: [-10deg 10deg];
             };
         ]

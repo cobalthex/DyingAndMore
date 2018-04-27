@@ -4,13 +4,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Game
 {
-    //todo: use iobjectClass?
-
     /// <summary>
     /// A single type of particle
     /// </summary>
-    public class ParticleClass
+    public class ParticleClass : INamedObject
     {
+        public string File { get; set; }
+        public string Name { get; set; }
+
         /// <summary>
         /// The sprite used for each particle of this type
         /// </summary>
@@ -40,6 +41,12 @@ namespace Takai.Game
 
         public Range<float> InitialSpeed { get; set; } = 1;
         public float Drag { get; set; } = 0.05f;
+
+        /// <summary>
+        /// An optional collision effect for this particle. If null, no physics/collision is run
+        /// Can get expensive with lots of particles
+        /// </summary>
+        public EffectsClass CollisionEffect { get; set; }
     }
 
     /// <summary>

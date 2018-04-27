@@ -165,6 +165,18 @@ namespace Takai
             );
         }
 
+        public static Vector4 HSLReverseLerp(Vector4 a, Vector4 b, float t)
+        {
+            return new Vector4(
+                (a.X < b.X)
+                    ? MathHelper.Lerp(359 - a.X, b.X, t)
+                    : MathHelper.Lerp(a.X, 359 - b.X, t),
+                MathHelper.Lerp(a.Y, b.Y, t),
+                MathHelper.Lerp(a.Z, b.Z, t),
+                MathHelper.Lerp(a.W, b.W, t)
+            );
+        }
+
         public static TimeSpan Max(TimeSpan a, TimeSpan b)
         {
             return TimeSpan.FromTicks(Math.Max(a.Ticks, b.Ticks));
