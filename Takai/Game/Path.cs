@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
-    public class VectorCurve : CatmullCurve<Vector2>
+    public class VectorCurve : ValueCurve<Vector2>
     {
         //todo: possibly have a custom curve that uses incremental T
 

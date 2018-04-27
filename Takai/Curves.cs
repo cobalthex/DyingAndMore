@@ -25,14 +25,14 @@ namespace Takai
     /// The base for Catmull-Rom based curves/splines
     /// </summary>
     /// <typeparam name="TValue">The curvable values</typeparam>
-    public abstract class CatmullCurve<TValue> : Data.IDerivedDeserialize
+    public abstract class ValueCurve<TValue> : Data.IDerivedDeserialize
     {
         public List<CurveValue<TValue>> Values { get; set; } = new List<CurveValue<TValue>>();
 
         [Data.Serializer.Ignored]
         public int Count => Values.Count;
 
-        public CatmullCurve() { }
+        public ValueCurve() { }
 
         public virtual void AddValue(float t, TValue value)
         {
@@ -74,12 +74,16 @@ namespace Takai
         }
     }
 
-    public class ScalarCurve : CatmullCurve<float>
+    public class ScalarCurve : ValueCurve<float>
     {
+        public bool IsLinear { get; set; }
+
         public ScalarCurve() { }
 
         protected override float Function(float a, float b, float c, float d, float t)
         {
+            if (IsLinear)
+                return MathHelper.Lerp(b, c, t);
             return MathHelper.CatmullRom(a, b, c, d, t);
         }
 
@@ -91,12 +95,20 @@ namespace Takai
         }
     }
 
-    public class HSLCurve : CatmullCurve<Vector4>
+    public class HSLCurve : ValueCurve<Vector4>
     {
+        /// <summary>
+        /// Lerp the gradient counter-clockwise around the HSL hue circle as opposed to clockwise
+        /// (Blue to red would go blue->purple->red instead of blue->green->yellow->orange->red)
+        /// </summary>
+        public bool Reverse { get; set; }
+
         public HSLCurve() { }
 
         protected override Vector4 Function(Vector4 a, Vector4 b, Vector4 c, Vector4 d, float t)
         {
+            if (Reverse)
+                return Util.HSLReverseLerp(b, c, t);
             return Vector4.Lerp(b, c, t);
         }
 
@@ -111,6 +123,12 @@ namespace Takai
     public class ColorCurve : Data.IDerivedDeserialize
     {
         protected HSLCurve curve = new HSLCurve();
+
+        public bool Reverse
+        {
+            get => curve.Reverse;
+            set => curve.Reverse = value;
+        }
 
         public IEnumerable<CurveValue<Color>> Values
         {
