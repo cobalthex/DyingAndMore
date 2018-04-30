@@ -265,8 +265,20 @@ namespace Takai.Data
 
             if (forceLoad && exists)
             {
-                //todo: specific option for applying rather than replacing (and maybe serializer.get_dictionary)
-                Serializer.ApplyObject(objects[realFile].reference.Target, Serializer.Cast(objects[realFile].reference.Target.GetType(), obj.reference.Target));
+                var target = objects[realFile].reference.Target;
+                if (target is Texture2D texDst &&
+                    obj.reference.Target is Texture2D texSrc)
+                {
+                    UInt32[] texData = new UInt32[texSrc.Width * texSrc.Height];
+                    texSrc.GetData(texData);
+                    texDst.SetData(texData);
+                    texSrc.Dispose();
+                }
+                else
+                {
+                    //todo: specific option for applying rather than replacing (and maybe serializer.get_dictionary)
+                    Serializer.ApplyObject(target, Serializer.Cast(objects[realFile].reference.Target.GetType(), obj.reference.Target));
+                }
                 obj = objects[realFile];
             }
             else
@@ -381,11 +393,12 @@ namespace Takai.Data
 
         private static void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
+            var path = Normalize(e.FullPath);
+
             //this may be called multiple times: https://blogs.msdn.microsoft.com/oldnewthing/20140507-00/?p=1053/
             System.Threading.Thread.Sleep(500);
             try
             {
-                var path = Normalize(e.FullPath);
                 if (objects.ContainsKey(path))
                 {
                     Load(path, null, true);
@@ -394,6 +407,8 @@ namespace Takai.Data
             }
             catch (Exception ex)
             {
+                //todo: nested references?
+                lateLoads.Remove(path);
                 LogBuffer.Append($"Failed to refresh {e.FullPath} ({ex.Message})");
             }
         }

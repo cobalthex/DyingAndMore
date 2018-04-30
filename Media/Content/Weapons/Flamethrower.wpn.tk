@@ -1,5 +1,5 @@
 GunClass {
-    MaxAmmo: 2000;
+    MaxAmmo: 20000;
 
     DischargeEffect: {
         Effects: [
@@ -11,22 +11,40 @@ GunClass {
                         height: 48;
                         Origin: [24 24];
                     };
-                    Blend: BlendState.Additive;
+                    Blend: {
+                        # only draw on entities
+                        #ColorSourceBlend: Blend.DestinationColor;
+                        #ColorDestinationBlend: Blend.One;
+                        #AlphaSourceBlend: Blend.Zero;
+                        #AlphaDestinationBlend: Blend.DestinationAlpha;
+
+                        # dark fire
+                        ColorSourceBlend: Blend.SourceAlpha;
+                        ColorDestinationBlend: Blend.One;
+                        AlphaSourceBlend: Blend.InverseSourceAlpha;
+                        AlphaDestinationBlend: Blend.One;
+
+                        # ghost fire
+                        #ColorSourceBlend: Blend.SourceColor;
+                        #ColorDestinationBlend: Blend.BlendFactor;
+                        #AlphaSourceBlend: Blend.Zero;
+                        #AlphaDestinationBlend: Blend.One;
+                    };
                     InitialSpeed: [600 1200];
                     Drag: 1.0;
                     lifetime: [600msec 1200msec];
                     ColorOverTime: {
                         Reverse: false;
                         Values: [
-                            [0 [32 64 128 64]];
+                            [0 [32 64 128 255]];
                             [0.1 Color.SteelBlue];
                             #[0.5 Color.Orange];
                             #[1 Color.Red];
                             [0.25 Color.White];
                             [0.3 Color.Yellow];
                             [0.5 Color.Orange];
-                            [0.6 [127 16 0 1]];
-                            [1 [10 0 0 0]];
+                            [0.6 [100 0 0 255]];
+                            [1 [0 0 0 0]];
                         ];
                     };
 
