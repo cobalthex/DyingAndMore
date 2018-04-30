@@ -35,9 +35,8 @@ namespace DyingAndMore
         GraphicsDeviceManager gdm;
 
 #if WINDOWS
-        bool useCustomCursor = false;
+        bool useCustomCursor = true;
 #endif
-        bool takingScreenshot = false;
 
         SpriteBatch sbatch;
         Takai.UI.Static ui;
@@ -90,7 +89,7 @@ namespace DyingAndMore
 #if WINDOWS
             if (useCustomCursor)
             {
-                System.Drawing.Bitmap cur = new System.Drawing.Bitmap("Data/Textures/Pointer.png", true);
+                System.Drawing.Bitmap cur = new System.Drawing.Bitmap("Content/UI/Pointer.png", true);
                 System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(cur);
                 System.IntPtr ptr = cur.GetHicon();
                 System.Windows.Forms.Cursor c = new System.Windows.Forms.Cursor(ptr);
@@ -209,17 +208,6 @@ namespace DyingAndMore
             if (InputState.IsPress(Keys.F10))
                 Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? debugFont : null);
 
-            if (InputState.IsPress(Keys.F12))
-                takingScreenshot = true;
-
-            if (InputState.IsPress(Keys.F6))
-            {
-                Takai.Data.Cache.SaveAllToFile("all.tk");
-#if WINDOWS
-                System.Diagnostics.Process.Start("all.tk");
-#endif
-            }
-
             if (InputState.IsPress(Keys.F7))
             {
                 ui.ReplaceAllChildren(new AssetView());
@@ -243,41 +231,22 @@ namespace DyingAndMore
         {
             GraphicsDevice.Clear(Color.Black);
 
-            if (takingScreenshot)
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, null, uiMatrix);
+            ui.Draw(sbatch);
+
+            int y = GraphicsDevice.Viewport.Height - 70;
+            foreach (var row in Takai.LogBuffer.Entries)
             {
-                takingScreenshot = false;
-
-                using (var rt = new RenderTarget2D(GraphicsDevice,
-                    GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height))
+                if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
                 {
-                    GraphicsDevice.SetRenderTarget(rt);
-                    GraphicsDevice.SetRenderTarget(null);
-
-                    using (var fs = new System.IO.FileStream(System.DateTime.Now.ToString("dd_MMM_HH-mm-ss-fff") + ".png", System.IO.FileMode.Create))
-                    {
-                        rt.SaveAsPng(fs, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-                    }
+                    var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
+                    var sz = debugFont.MeasureString(text);
+                    debugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.MediumSeaGreen);
                 }
+                y -= debugFont.MaxCharHeight;
             }
-            else
-            {
-                sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, null, uiMatrix);
-                ui.Draw(sbatch);
 
-                int y = GraphicsDevice.Viewport.Height - 70;
-                foreach (var row in Takai.LogBuffer.Entries)
-                {
-                    if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
-                    {
-                        var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
-                        var sz = debugFont.MeasureString(text);
-                        debugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.MediumSeaGreen);
-                    }
-                    y -= debugFont.MaxCharHeight;
-                }
-
-                sbatch.End();
-            }
+            sbatch.End();
         }
     }
 }

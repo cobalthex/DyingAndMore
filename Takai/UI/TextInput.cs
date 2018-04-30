@@ -283,6 +283,8 @@ namespace Takai.UI
                     else if (AllowSpaces && key == Keys.Space)
                         InsertAtCaret(' '); //autocomplete when ctrl?
 
+                    //todo: use Window.TextInput event
+
                     else if (!isCtrl && AllowLetters && key >= Keys.A && key <= Keys.Z)
                     {
                         if (isShift)
