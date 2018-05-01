@@ -1005,7 +1005,7 @@ namespace Takai.UI
         /// <param name="time">game time</param>
         protected virtual void UpdateSelf(GameTime time)
         {
-            if (TextBinding != null && Data.DataModel.Values.TryGetValue(TextBinding, out var bindValue))
+            if (TextBinding != null && Data.DataModel.Globals.TryGetValue(TextBinding, out var bindValue))
                 Text = bindValue.ToString();
         }
 

@@ -95,7 +95,8 @@ namespace DyingAndMore.Game.Entities
                 Actor.TurnTowards(Vector2.Normalize(sticks.Right) * new Vector2(1, -1));
 
             if (InputState.IsButtonDown(MouseButtons.Left) ||
-                InputState.IsButtonDown(Buttons.RightTrigger, player))
+                InputState.IsButtonDown(Buttons.RightTrigger, player) ||
+                InputState.IsButtonDown(Keys.Space))
                 Actor.Weapon?.TryUse();
 
             Actor.Accelerate(d);

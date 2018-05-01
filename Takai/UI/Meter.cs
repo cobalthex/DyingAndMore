@@ -44,7 +44,7 @@ namespace Takai.UI
 
         protected override void UpdateSelf(GameTime time)
         {
-            if (ValueBinding != null && Data.DataModel.Values.TryGetValue(ValueBinding, out var bindValue))
+            if (ValueBinding != null && Data.DataModel.Globals.TryGetValue(ValueBinding, out var bindValue))
             {
                 Value = System.Convert.ToSingle(bindValue);
             }

@@ -7,8 +7,6 @@ ProjectileClass {
     MinimumSpeed: 300;
     CanDamageSource: true;
 
-    DestructionEffect: @"Effects/Splatter.fx.tk";
-
     Animations: {
         Idle: {
             Sprite: {

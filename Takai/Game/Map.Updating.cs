@@ -107,8 +107,8 @@ namespace Takai.Game
             var deltaSeconds = (float)deltaTime.TotalSeconds;
             ElapsedTime += deltaTime;
 
-            Data.DataModel.Values["map.time.seconds"] = ElapsedTime.TotalSeconds;
-            Data.DataModel.Values["map.time.milliseconds"] = ElapsedTime.TotalMilliseconds;
+            Data.DataModel.Globals["map.time.seconds"] = ElapsedTime.TotalSeconds;
+            Data.DataModel.Globals["map.time.milliseconds"] = ElapsedTime.TotalMilliseconds;
 
             //if (deltaTicks == 0)
             //    return;
@@ -336,7 +336,22 @@ namespace Takai.Game
                 {
                     var x = p.Value[i];
 
-                    if (ElapsedTime >= x.spawnTime + x.lifetime)
+                    bool isDead = ElapsedTime >= x.spawnTime + x.lifetime;
+
+                    if (p.Key.CollisionEffect != null)
+                    {
+                        var ent = FindEntity(x.position, p.Key.Radius * x.scale);
+                        if (ent != null)
+                        {
+                            isDead = true;
+                            var fx = p.Key.CollisionEffect.Instantiate();
+                            fx.Position = x.position;
+                            fx.Direction = Util.Direction(x.angle);
+                            Spawn(fx);
+                        }
+                    }
+
+                    if (isDead)
                     {
                         p.Value[i] = p.Value[p.Value.Count - 1];
                         p.Value.RemoveAt(p.Value.Count - 1);

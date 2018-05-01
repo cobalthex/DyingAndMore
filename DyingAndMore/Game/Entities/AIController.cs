@@ -207,7 +207,7 @@ namespace DyingAndMore.Game.Entities
                 if (possibles.Count > 0)
                 {
                     AI.SetNextTarget(possibles[0]);
-                    possibles[0].OutlineColor = Color.Red;
+                    //possibles[0].OutlineColor = Color.Red;
                 }
                 else
                     AI.SetNextTarget(null);
@@ -222,7 +222,7 @@ namespace DyingAndMore.Game.Entities
             else if (Vector2.DistanceSquared(AI.Target.Position, AI.Actor.Position) >= SightDistance * SightDistance ||
                 AI.Actor.IsFacing(AI.Actor.Position))
             {
-                AI.Target.OutlineColor = Color.Transparent;
+                //AI.Target.OutlineColor = Color.Transparent;
                 AI.SetNextTarget(null);
             }
         }

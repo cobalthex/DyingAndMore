@@ -15,7 +15,17 @@ namespace Takai.Game
         /// <summary>
         /// The sprite used for each particle of this type
         /// </summary>
-        public Graphics.Sprite Sprite { get; set; }
+        public Graphics.Sprite Sprite
+        {
+            get => _sprite;
+            set
+            {
+                _sprite = value;
+                Radius = Math.Max(_sprite.Width, _sprite.Height);
+            }
+        }
+        private Graphics.Sprite _sprite;
+
         /// <summary>
         /// The render blend state this particle
         /// </summary>
@@ -47,6 +57,9 @@ namespace Takai.Game
         /// Can get expensive with lots of particles
         /// </summary>
         public EffectsClass CollisionEffect { get; set; }
+
+        [Data.Serializer.Ignored]
+        public float Radius { get; private set; }
     }
 
     /// <summary>
