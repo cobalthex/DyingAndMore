@@ -236,7 +236,7 @@ namespace DyingAndMore.Game
             crapDisplay.Text = $"Zoom:{Map.ActiveCamera.Scale:N1}";
             crapDisplay.AutoSize();
 
-            DataModel.Values["player.health"] = player.CurrentHealth / player.Class.MaxHealth;
+            DataModel.Globals["player.health"] = player.CurrentHealth / player.Class.MaxHealth;
 
             base.UpdateSelf(time);
         }

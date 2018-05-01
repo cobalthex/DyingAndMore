@@ -110,16 +110,16 @@ namespace Takai.Game
 
         public bool IsAlive
         {
-            get => isAlive;
+            get => _isAlive;
             set
             {
                 //play death animation
-                if (value == false && isAlive)
+                if (value == false && _isAlive)
                     PlayAnimation("Dead", () => { if (Class.DestroyOnDeath) Map?.Destroy(this); });
-                isAlive = value;
+                _isAlive = value;
             }
         }
-        private bool isAlive = true;
+        private bool _isAlive = true;
 
         //todo: parent/child relationships
 
@@ -181,7 +181,7 @@ namespace Takai.Game
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
-        public Color OutlineColor { get; set; } = Color.Transparent;
+        public Color OutlineColor { get; set; } = Color.Black;
 
         /// <summary>
         /// The map the entity is in

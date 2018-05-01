@@ -37,6 +37,7 @@ namespace Takai.Game
 
         /// <summary>
         /// Spawn a set of effects at an entity's position in their map
+        /// with the entity as the source
         /// </summary>
         /// <param name="source">The entity to spawn at</param>
         /// <returns>The effect instance created</returns>

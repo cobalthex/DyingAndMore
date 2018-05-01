@@ -64,6 +64,17 @@ GunClass {
                             [1 -45deg];
                         ];
                     };*#
+
+
+                    #*CollisionEffect: {
+                        Effects: [
+                            DamageEffect {
+                                MaxDamage: 100;
+                                Radius: 1z0;
+                                CanDamageSource: false;
+                            }
+                        ];
+                    }*#
                 }
                 Count: 20;
                 Spread: [-10deg 10deg];

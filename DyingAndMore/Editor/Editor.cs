@@ -226,6 +226,7 @@ namespace DyingAndMore.Editor
                     using (var ofd = new System.Windows.Forms.OpenFileDialog()
                     {
                         Filter = "Dying and More! Maps (*.map.tk)|*.map.tk|Dying and More! Saves (*.d2sav)|*.d2sav",
+                        FileName = "",
                         InitialDirectory = System.IO.Path.Combine(Cache.DefaultRoot, "Maps"),
                         RestoreDirectory = true,
                         SupportMultiDottedExtensions = true,

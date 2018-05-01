@@ -136,6 +136,36 @@ namespace Takai.Game
         }
 
         /// <summary>
+        /// Find the closest entity to the point within the search radius
+        /// </summary>
+        /// <param name="position">the point to search from</param>
+        /// <param name="searchRadius">how far out to search before stopping. 0 for infinite</param>
+        /// <returns>The closest entity or null if none are found</returns>
+        public EntityInstance FindEntity(Vector2 position, float searchRadius = 0)
+        {
+            var radiusSq = searchRadius * searchRadius;
+
+            var ptr = new Point((int)(searchRadius * 2));
+            var rect = new Rectangle(position.ToPoint() - ptr, new Point(ptr.X * 2, ptr.Y * 2));
+            var sectors = GetOverlappingSectors(rect);
+
+            float minDist = float.MaxValue;
+            EntityInstance closest = null;
+
+            foreach (var ent in EnumerateEntitiesInSectors(sectors))
+            {
+                var dist = Vector2.DistanceSquared(ent.Position, position);
+                if ((searchRadius == 0 || dist <= radiusSq) && dist <= ent.RadiusSq + radiusSq)
+                {
+                    minDist = dist;
+                    closest = ent;
+                }
+            }
+
+            return closest;
+        }
+
+        /// <summary>
         /// Find an entity by its name
         /// </summary>
         /// <param name="name"></param>
