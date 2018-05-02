@@ -7,18 +7,39 @@ namespace DyingAndMore.Game.Entities
     /// <summary>
     /// A condition that affects actors, such as poison
     /// </summary>
-    public abstract class Condition : Takai.INamedObject
+    public class ConditionClass : Takai.IObjectClass<ConditionInstance>
     {
         public string Name { get; set; }
         public string File { get; set; }
 
-        //effect?
+        /// <summary>
+        /// How much health to add or remove per second (positive for boon, negative for poison)
+        /// </summary>
+        public float HealthPerSecond { get; set; }
 
         /// <summary>
-        /// Apply another condition to this one
+        /// An effect to play while this condition is active
         /// </summary>
-        /// <param name="condition">The condition to apply</param>
-        public abstract void Apply(ActorInstance actor, TimeSpan deltaTime);
+        public EffectsClass ActiveEffect { get; set; }
+
+        //taper?
+
+        public ConditionInstance Instantiate()
+        {
+            return new ConditionInstance();
+        }
+    }
+
+    public class ConditionInstance : Takai.IObjectInstance<ConditionClass>
+    {
+        public ConditionClass Class { get; set; }
+
+        public TimeSpan TimeRemaining { get; set; }
+
+        public void Merge(ConditionInstance other)
+        {
+            TimeRemaining = Takai.Util.Max(TimeRemaining, other.TimeRemaining);
+        }
     }
 
     /// <summary>
@@ -26,7 +47,7 @@ namespace DyingAndMore.Game.Entities
     /// </summary>
     public class ConditionEffect : IGameEffect
     {
-        public Condition Condition { get; set; }
+        public ConditionClass Condition { get; set; }
         public float Radius { get; set; }
         public TimeSpan Duration { get; set; }
 
@@ -38,27 +59,9 @@ namespace DyingAndMore.Game.Entities
             {
                 if (ent is ActorInstance actor)
                 {
-                    var ic = actor.Conditions.FindIndex(c => c.condition == Condition);
-                    if (ic < 0)
-                        actor.Conditions.Add(new ActorInstance.ActiveCondition { condition = Condition, timeLeft = Duration });
-                    else
-                    {
-                        var cond = actor.Conditions[ic];
-                        cond.timeLeft = Takai.Util.Max(actor.Conditions[ic].timeLeft, Duration);
-                        actor.Conditions[ic] = cond;
-                    }
+
                 }
             }
-        }
-    }
-
-    public class Poison : Condition
-    {
-        public float DamagePerSecond { get; set; }
-
-        public override void Apply(ActorInstance actor, TimeSpan deltaTime)
-        {
-            actor.ReceiveDamage(DamagePerSecond * (float)deltaTime.TotalSeconds, null);
         }
     }
 }

@@ -119,8 +119,8 @@ namespace Takai.Game
             public bool drawGrids;
             public bool drawSectorsOnGrid;
             public bool drawBordersAroundNonDrawingEntities;
-            public bool drawEntityBoundingBoxes;
             public bool drawEntityForwardVectors;
+            public bool drawColliders;
             public bool drawPathHeuristic;
             public bool drawDebugInfo;
 
@@ -495,7 +495,7 @@ namespace Takai.Game
                     DrawLine(bl, tr, color);
                 }
 
-                if (renderSettings.drawEntityBoundingBoxes)
+                if (renderSettings.drawColliders)
                 {
                     var rect = ent.AxisAlignedBounds;
                     var color = Color.LightBlue;
@@ -562,6 +562,9 @@ namespace Takai.Game
                         p.Value[i].scale,
                         ElapsedTime - p.Value[i].spawnTime
                     );
+
+                    if (renderSettings.drawColliders)
+                        DrawCircle(p.Value[i].position, p.Key.Radius * p.Value[i].scale, new Color(0.8f, 0.9f, 1, 0.5f));
                 }
 
                 Class.spriteBatch.End();

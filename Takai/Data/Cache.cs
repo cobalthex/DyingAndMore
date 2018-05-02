@@ -246,6 +246,7 @@ namespace Takai.Data
                 catch
                 {
                     load.stream.Dispose();
+                    throw;
                 }
 
                 if (openedZip)
@@ -287,8 +288,13 @@ namespace Takai.Data
             //swatch.Stop();
             //System.Diagnostics.Debug.WriteLine($"Cache: loaded {file} in {swatch.ElapsedMilliseconds} msec");
 
-            if (obj.reference == null && lateLoads.Count > 0)
-                throw new FileNotFoundException("Could not find referenced file(s): " + String.Join(", ", lateLoads.Keys));
+            if (obj.reference == null)
+            {
+                if (lateLoads.Count > 0)
+                    throw new FileNotFoundException("Could not find referenced file(s): " + String.Join(", ", lateLoads.Keys));
+                else
+                    throw new Exception("Wtf loading " + realFile);
+            }
 
             return obj.reference.Target;
         }

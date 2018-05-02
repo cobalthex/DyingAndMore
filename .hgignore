@@ -3,6 +3,7 @@ syntax: glob
 *.orig
 *.suo
 *.user
+*.mgfx
 .vs/
 obj/
 bin/

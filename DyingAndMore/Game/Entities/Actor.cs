@@ -108,17 +108,11 @@ namespace DyingAndMore.Game.Entities
         }
         private float _currentHealth;
 
-        public struct ActiveCondition
-        {
-            public Condition condition;
-            public TimeSpan timeLeft;
-        }
-
         /// <summary>
         /// All current conditions, and time remaining
         /// </summary>
-        public System.Collections.Generic.List<ActiveCondition> Conditions { get; set; }
-            = new System.Collections.Generic.List<ActiveCondition>();
+        public System.Collections.Generic.Dictionary<ConditionClass, ConditionInstance> Conditions { get; set; }
+            = new System.Collections.Generic.Dictionary<ConditionClass, ConditionInstance>();
 
         private Vector2 lastVelocity;
 
@@ -185,7 +179,7 @@ namespace DyingAndMore.Game.Entities
             for (int i = 0; i < Conditions.Count; ++i)
             {
                 var cond = Conditions[i];
-                var dt = Takai.Util.Min(cond.timeLeft, deltaTime);
+                var dt = Takai.Util.Min(cond.TimeRemaining, deltaTime);
 
                 cond.condition.Apply(this, dt);
                 cond.timeLeft -= dt;
