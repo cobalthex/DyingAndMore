@@ -41,7 +41,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="source">The entity to spawn at</param>
         /// <returns>The effect instance created</returns>
-        public EffectsInstance Instantiate(EntityInstance source)
+        public EffectsInstance Instantiate(EntityInstance source, EntityInstance target = null)
         {
             if (source == null)
                 return Instantiate();
@@ -52,7 +52,8 @@ namespace Takai.Game
                 Position = source.Position,
                 Direction = source.Forward,
                 Velocity = source.Velocity,
-                Source = source
+                Source = source,
+                Target = target
             };
         }
     }
@@ -71,6 +72,10 @@ namespace Takai.Game
         public Vector2 Direction { get; set; }
         public Vector2 Velocity { get; set; }
         public EntityInstance Source { get; set; }
+        /// <summary>
+        /// Contextual target for recieving any affects
+        /// </summary>
+        public EntityInstance Target { get; set; }
 
         public EffectsInstance(EffectsClass @class)
         {
@@ -80,6 +85,7 @@ namespace Takai.Game
             Direction = Vector2.UnitX;
             Velocity = Vector2.Zero;
             Source = null;
+            Target = null;
         }
     }
 

@@ -7,6 +7,7 @@ namespace DyingAndMore.Game
     /// An area of effect damge (for example, grenade)
     /// </summary>
     public class DamageEffect : IGameEffect
+        //todo: rename to health effect
     {
         public float MaxDamage { get; set; }
         public float Radius { get; set; }
@@ -23,22 +24,40 @@ namespace DyingAndMore.Game
 
         public void Spawn(EffectsInstance instance)
         {
-            var ents = instance.Map.FindEntities(instance.Position, Radius);
             var rSq = Radius * Radius;
-            foreach (var ent in ents)
+
+            if (instance.Target != null &&
+                (CanDamageSource || instance.Source != instance.Target) &&
+                instance.Target is Entities.ActorInstance targetActor)
             {
-                if ((ent == instance.Source && !CanDamageSource) ||
-                    !(ent is Entities.ActorInstance actor))
-                    continue;
-
-                var distSq = Vector2.DistanceSquared(instance.Position, ent.Position);
-
                 if (rSq == 0)
-                    actor.ReceiveDamage(MaxDamage, instance.Source);
-                else if (distSq <= rSq)
-                    actor.ReceiveDamage(MaxDamage * (rSq - distSq) / rSq, instance.Source); //falloff curve?
+                    targetActor.ReceiveDamage(MaxDamage, instance.Source);
+                else
+                {
+                    var distSq = Vector2.DistanceSquared(instance.Position, instance.Target.Position);
+                    if (distSq <= rSq)
+                        targetActor.ReceiveDamage(MaxDamage * (rSq - distSq) / rSq, instance.Source); //falloff curve?
 
-                instance.Map.DrawCircle(instance.Position, Radius, Color.Gold);
+                }
+            }
+            else
+            {
+                var ents = instance.Map.FindEntities(instance.Position, Radius);
+                foreach (var ent in ents)
+                {
+                    if ((ent == instance.Source && !CanDamageSource) ||
+                        !(ent is Entities.ActorInstance actor))
+                        continue;
+
+                    var distSq = Vector2.DistanceSquared(instance.Position, ent.Position);
+
+                    if (rSq == 0)
+                        actor.ReceiveDamage(MaxDamage, instance.Source);
+                    else if (distSq <= rSq)
+                        actor.ReceiveDamage(MaxDamage * (rSq - distSq) / rSq, instance.Source); //falloff curve?
+
+                    instance.Map.DrawCircle(instance.Position, Radius, Color.Gold);
+                }
             }
         }
     }

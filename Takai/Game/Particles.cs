@@ -21,7 +21,7 @@ namespace Takai.Game
             set
             {
                 _sprite = value;
-                Radius = Math.Max(_sprite.Width, _sprite.Height);
+                Radius = Math.Max(_sprite.Width, _sprite.Height) / 2;
             }
         }
         private Graphics.Sprite _sprite;

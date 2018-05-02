@@ -347,6 +347,7 @@ namespace Takai.Game
                             var fx = p.Key.CollisionEffect.Instantiate();
                             fx.Position = x.position;
                             fx.Direction = Util.Direction(x.angle);
+                            fx.Target = ent;
                             Spawn(fx);
                         }
                     }
