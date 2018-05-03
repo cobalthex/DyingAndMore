@@ -58,7 +58,7 @@ namespace Takai.Data
             public object target;
             public int listIndex;
             public string dictionaryKey;
-            public Action objectSetter;
+            public Action<object> objectSetter;
         }
 
         public class DeserializationContext
@@ -501,7 +501,7 @@ namespace Takai.Data
                         //array (emplace)
                         else if (pend.objectSetter != null)
                         {
-                            pend.objectSetter.Invoke();
+                            pend.objectSetter.Invoke(pend.target);
                         }
                         else
                             throw new ArgumentException();
@@ -582,9 +582,9 @@ namespace Takai.Data
                         //todo: dynamic dest/target object in late bind load and references, yay or nay?
 
                         if (pending != null) //convert pending dictionary to pending object
-                            pending.objectSetter = () => ParseMember(destObject, destObject, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
+                            pending.objectSetter = (value) => ParseMember(destObject, value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                         else if (late != null) //////////////////////todo: value fix here~~~~~~~~~
-                            late.setter = () => ParseMember(destObject, destObject, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
+                            late.setter = (value) => ParseMember(destObject, value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                         else
                             ParseMember(destObject, pair.Value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                     }
@@ -604,9 +604,9 @@ namespace Takai.Data
                         if (prop != null && !prop.IsDefined(typeof(IgnoredAttribute)))
                         {
                             if (pending != null) //convert pending dictionary to pending object
-                                pending.objectSetter = () => ParseMember(destObject, destObject, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
+                                pending.objectSetter = (value) => ParseMember(destObject, value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                             else if (late != null)
-                                late.setter = () => ParseMember(destObject, destObject, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
+                                late.setter = (value) => ParseMember(destObject, value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                             else
                                ParseMember(destObject, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                         }

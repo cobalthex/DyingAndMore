@@ -1,13 +1,12 @@
 MapInstance {
-    Class: @"B:/Code/DyingAndMore/DyingAndMore/bin/Debug/Content/Maps/huge.map.tk";
-    Sounds: [];
+    Class: @"Maps/huge.map.tk";
     Scripts: [];
     RenderStats: MapRenderStats {
-        visibleInactiveFluids: 1;
-        visibleActiveFluids: 10;
+        visibleInactiveFluids: 0;
+        visibleActiveFluids: 0;
         visibleDecals: 0;
     };
-    ElapsedTime: 18456.0966;
+    ElapsedTime: 7749.47;
     TimeScale: 1;
     Entities: [
         ActorInstance {
@@ -25,7 +24,8 @@ MapInstance {
                 player: PlayerIndex.One;
             };
             CurrentHealth: 5000;
-            Conditions: [];
+            Conditions: {
+            };
             MaxSpeed: 400;
             Weapon: GunInstance {
                 Class: @"Weapons/Test.wpn.tk";
@@ -35,13 +35,14 @@ MapInstance {
                 Charge: 0;
             };
             Id: 1;
+            Class: @"Actors/Player.ent.tk";
             Name: Null;
             IsAlive: True;
-            Position: [267 259];
-            Forward: [0.9938837 0.1104315];
-            Velocity: [0 0];
-            OutlineColor: [255 0 0 255];
-            SpawnTime: 7375;
+            Position: [1513.417 342.5029];
+            Forward: [0.9813556 0.192201];
+            Velocity: [1.389252 0];
+            OutlineColor: [0 0 0 255];
+            SpawnTime: 0;
             ActiveAnimations: [
                 AnimationInstance {
                     Class: AnimationClass {
@@ -76,7 +77,7 @@ MapInstance {
                         Effect: Null;
                         Radius: 24;
                     };
-                    ElapsedTime: 10665.2825;
+                    ElapsedTime: 7749.47;
                 }
             ];
             Material: Null;
@@ -96,93 +97,90 @@ MapInstance {
                     }
                 ];
                 Target: *ActorInstance.1;
-                TargetTime: 0;
+                TargetTime: 6881.9151;
                 LastKnownTargetPosition: [0 0];
             };
             CurrentHealth: 5000;
-            Conditions: [];
+            Conditions: {
+            };
             MaxSpeed: 0;
             Weapon: GunInstance {
                 Class: @"Weapons/Boss.wpn.tk";
-                AmmoCount: 1000;
-                StateTime: 0;
-                State: WeaponState.Idle;
-                Charge: 0;
+                AmmoCount: 997;
+                StateTime: 7566.1221;
+                State: WeaponState.Discharging;
+                Charge: 1;
             };
-            Id: 6;
+            Id: 2;
+            Class: @"Actors/Rhinovirus.ent.tk";
             Name: Null;
             IsAlive: True;
-            Position: [1119.67 181.846];
-            Forward: [1 0];
+            Position: [1194.895 164.3975];
+            Forward: [0.8726489 0.4883481];
             Velocity: [0 0];
-            OutlineColor: [154 205 50 255];
-            SpawnTime: 16601.7952;
+            OutlineColor: [0 0 0 255];
+            SpawnTime: 0;
             ActiveAnimations: [
                 AnimationInstance {
                     Class: AnimationClass {
-                        Sprite: Sprite {
-                            Texture: "Actors/Rhinovirus.png";
-                            Height: 128;
-                            FrameLength: 0.0001;
-                            FrameCount: 1;
-                            IsLooping: True;
-                            Origin: [64 64];
-                            Width: 128;
-                            ClipRect: [0 0 128 128];
-                            Tween: TweenStyle.None;
-                            ElapsedTime: 14224.5073;
-                            TotalLength: 0.0001;
-                            Size: [128 128];
-                            ShrinkToFit: True;
-                        };
-                        Sound: Null;
-                        Effect: Null;
                         Name: Null;
                         Type: AnimationType.Base;
+                        Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 1;
+                            FrameLength: 0.0001;
+                            TotalLength: 0.0001;
+                            IsLooping: True;
+                            Texture: "Actors/Rhinovirus.png";
+                            Width: 128;
+                            Height: 128;
+                            Size: [128 128];
+                            ClipRect: [0 0 128 128];
+                            Origin: [64 64];
+                            Tween: TweenStyle.None;
+                            ShrinkToFit: True;
+                        };
                         Material: Null;
+                        Sound: Null;
                         EnterEffect: Null;
                         ExitEffect: Null;
+                        Effect: Null;
                         Radius: 64;
                     };
-                    ElapsedTime: 1854.3014;
+                    ElapsedTime: 7749.47;
                 }
             ];
             Material: Null;
         }
-
         ActorInstance {
-            Class: @"Actors/TestShooter.zip/ShootTest.ent.tk";
+            Class: @"Actors/InfectedCell.ent.tk";
             Faction: Factions [Enemy Virus Common];
             Controller: AIController {
                 Behaviors: [
                     FlowSeekBehavior {
-                    }
-                    TargetEnemyBehavior {
-                        SightDistance: 1000;
-                    }
-                    FocusBehavior {
-                        MaxTurn: 13.96263;
                     }
                     SuicideBehavior {
                         Radius: 80;
                         Effect: @"Effects/Damage.fx.tk";
                     }
                 ];
-                Target: *ActorInstance.1;
-                TargetTime: 6222.2806;
+                Target: Null;
+                TargetTime: 0;
                 LastKnownTargetPosition: [0 0];
             };
             CurrentHealth: 20;
-            Conditions: [];
-            MaxSpeed: 222.5493;
+            Conditions: {
+            };
+            MaxSpeed: 388.9567;
             Weapon: Null;
-            Id: 4;
+            Id: 3;
+            Class: @"Actors/InfectedCell.ent.tk";
             Name: Null;
             IsAlive: True;
-            Position: [493.5478 280.6754];
-            Forward: [-0.5893852 -0.6892473];
-            Velocity: [0 0];
-            OutlineColor: [0 0 0 0];
+            Position: [1402.757 381.646];
+            Forward: [0.8756498 -0.03121626];
+            Velocity: [388.4344 -20.15042];
+            OutlineColor: [0 0 0 255];
             SpawnTime: 0;
             ActiveAnimations: [
                 AnimationInstance {
@@ -218,7 +216,765 @@ MapInstance {
                         Effect: Null;
                         Radius: 16;
                     };
-                    ElapsedTime: 7374.5145;
+                    ElapsedTime: 7749.47;
+                }
+            ];
+            Material: Null;
+        }
+        ActorInstance {
+            Class: @"Actors/InfectedCell.ent.tk";
+            Faction: Factions [Enemy Virus Common];
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    SuicideBehavior {
+                        Radius: 80;
+                        Effect: @"Effects/Damage.fx.tk";
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            CurrentHealth: 20;
+            Conditions: {
+            };
+            MaxSpeed: 326.1111;
+            Weapon: Null;
+            Id: 4;
+            Class: @"Actors/InfectedCell.ent.tk";
+            Name: Null;
+            IsAlive: True;
+            Position: [1272.863 355.7029];
+            Forward: [0.7778969 -0.1276156];
+            Velocity: [321.459 -54.88693];
+            OutlineColor: [0 0 0 255];
+            SpawnTime: 0;
+            ActiveAnimations: [
+                AnimationInstance {
+                    Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
+                        Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 8;
+                            FrameLength: 100;
+                            TotalLength: 800;
+                            IsLooping: True;
+                            Texture: "Actors/InfectedCell.png";
+                            Width: 32;
+                            Height: 32;
+                            Size: [32 32];
+                            ClipRect: [0 0 256 96];
+                            Origin: [16 16];
+                            Tween: TweenStyle.Overlap;
+                            ShrinkToFit: True;
+                        };
+                        Material: Null;
+                        Sound: SoundClass {
+                            Name: Null;
+                            Source: Null;
+                            Subtitle: Null;
+                            Caption: Null;
+                            Gain: 1;
+                            DestroyIfOwnerDies: True;
+                        };
+                        EnterEffect: Null;
+                        ExitEffect: Null;
+                        Effect: Null;
+                        Radius: 16;
+                    };
+                    ElapsedTime: 7749.47;
+                }
+            ];
+            Material: Null;
+        }
+        ActorInstance {
+            Class: @"Actors/InfectedCell.ent.tk";
+            Faction: Factions [Enemy Virus Common];
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    SuicideBehavior {
+                        Radius: 80;
+                        Effect: @"Effects/Damage.fx.tk";
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            CurrentHealth: 20;
+            Conditions: {
+            };
+            MaxSpeed: 371.6993;
+            Weapon: Null;
+            Id: 5;
+            Class: @"Actors/InfectedCell.ent.tk";
+            Name: Null;
+            IsAlive: True;
+            Position: [1259.464 382.0296];
+            Forward: [0.6700831 -0.4983538];
+            Velocity: [362.0255 -84.24928];
+            OutlineColor: [0 0 0 255];
+            SpawnTime: 0;
+            ActiveAnimations: [
+                AnimationInstance {
+                    Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
+                        Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 8;
+                            FrameLength: 100;
+                            TotalLength: 800;
+                            IsLooping: True;
+                            Texture: "Actors/InfectedCell.png";
+                            Width: 32;
+                            Height: 32;
+                            Size: [32 32];
+                            ClipRect: [0 0 256 96];
+                            Origin: [16 16];
+                            Tween: TweenStyle.Overlap;
+                            ShrinkToFit: True;
+                        };
+                        Material: Null;
+                        Sound: SoundClass {
+                            Name: Null;
+                            Source: Null;
+                            Subtitle: Null;
+                            Caption: Null;
+                            Gain: 1;
+                            DestroyIfOwnerDies: True;
+                        };
+                        EnterEffect: Null;
+                        ExitEffect: Null;
+                        Effect: Null;
+                        Radius: 16;
+                    };
+                    ElapsedTime: 7749.47;
+                }
+            ];
+            Material: Null;
+        }
+        ActorInstance {
+            Class: @"Actors/Astrovirus.ent.tk";
+            Faction: Factions [Enemy Virus Common];
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 7749.47;
+                LastKnownTargetPosition: [0 0];
+            };
+            CurrentHealth: 40;
+            Conditions: {
+            };
+            MaxSpeed: 179.5856;
+            Weapon: Null;
+            Id: 7;
+            Class: @"Actors/Astrovirus.ent.tk";
+            Name: Null;
+            IsAlive: True;
+            Position: [1242 1078.909];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            SpawnTime: 2200.8819;
+            ActiveAnimations: [
+                AnimationInstance {
+                    Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
+                        Sprite: Sprite {
+                            ElapsedTime: 7919.9409;
+                            FrameCount: 6;
+                            FrameLength: 50;
+                            TotalLength: 300;
+                            IsLooping: True;
+                            Texture: "Actors/Astrovirus.png";
+                            Width: 40;
+                            Height: 40;
+                            Size: [40 40];
+                            ClipRect: [0 0 240 120];
+                            Origin: [20 20];
+                            Tween: TweenStyle.Overlap;
+                            ShrinkToFit: True;
+                        };
+                        Material: Null;
+                        Sound: SoundClass {
+                            Name: Null;
+                            Source: Null;
+                            Subtitle: Null;
+                            Caption: Null;
+                            Gain: 1;
+                            DestroyIfOwnerDies: True;
+                        };
+                        EnterEffect: Null;
+                        ExitEffect: Null;
+                        Effect: Null;
+                        Radius: 20;
+                    };
+                    ElapsedTime: 3381.1351;
+                }
+            ];
+            Material: Null;
+        }
+        ActorInstance {
+            Class: @"Actors/Astrovirus.ent.tk";
+            Faction: Factions [Enemy Virus Common];
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            CurrentHealth: 40;
+            Conditions: {
+            };
+            MaxSpeed: 89.0891;
+            Weapon: Null;
+            Id: 8;
+            Class: @"Actors/Astrovirus.ent.tk";
+            Name: Null;
+            IsAlive: True;
+            Position: [732.6546 1264.582];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            SpawnTime: 2381.9416;
+            ActiveAnimations: [
+                AnimationInstance {
+                    Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
+                        Sprite: Sprite {
+                            ElapsedTime: 7919.9409;
+                            FrameCount: 6;
+                            FrameLength: 50;
+                            TotalLength: 300;
+                            IsLooping: True;
+                            Texture: "Actors/Astrovirus.png";
+                            Width: 40;
+                            Height: 40;
+                            Size: [40 40];
+                            ClipRect: [0 0 240 120];
+                            Origin: [20 20];
+                            Tween: TweenStyle.Overlap;
+                            ShrinkToFit: True;
+                        };
+                        Material: Null;
+                        Sound: SoundClass {
+                            Name: Null;
+                            Source: Null;
+                            Subtitle: Null;
+                            Caption: Null;
+                            Gain: 1;
+                            DestroyIfOwnerDies: True;
+                        };
+                        EnterEffect: Null;
+                        ExitEffect: Null;
+                        Effect: Null;
+                        Radius: 20;
+                    };
+                    ElapsedTime: 1315.6854;
+                }
+            ];
+            Material: Null;
+        }
+        ActorInstance {
+            Class: @"Actors/Astrovirus.ent.tk";
+            Faction: Factions [Enemy Virus Common];
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                ];
+                Target: *ActorInstance.1;
+                TargetTime: 6015.0101;
+                LastKnownTargetPosition: [0 0];
+            };
+            CurrentHealth: 40;
+            Conditions: {
+            };
+            MaxSpeed: 150.421;
+            Weapon: Null;
+            Id: 9;
+            Class: @"Actors/Astrovirus.ent.tk";
+            Name: Null;
+            IsAlive: True;
+            Position: [984.1929 806.8005];
+            Forward: [0.7161615 -0.6852466];
+            Velocity: [108.7328 -103.9406];
+            OutlineColor: [0 0 0 0];
+            SpawnTime: 2565.1757;
+            ActiveAnimations: [
+                AnimationInstance {
+                    Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
+                        Sprite: Sprite {
+                            ElapsedTime: 7919.9409;
+                            FrameCount: 6;
+                            FrameLength: 50;
+                            TotalLength: 300;
+                            IsLooping: True;
+                            Texture: "Actors/Astrovirus.png";
+                            Width: 40;
+                            Height: 40;
+                            Size: [40 40];
+                            ClipRect: [0 0 240 120];
+                            Origin: [20 20];
+                            Tween: TweenStyle.Overlap;
+                            ShrinkToFit: True;
+                        };
+                        Material: Null;
+                        Sound: SoundClass {
+                            Name: Null;
+                            Source: Null;
+                            Subtitle: Null;
+                            Caption: Null;
+                            Gain: 1;
+                            DestroyIfOwnerDies: True;
+                        };
+                        EnterEffect: Null;
+                        ExitEffect: Null;
+                        Effect: Null;
+                        Radius: 20;
+                    };
+                    ElapsedTime: 5184.2943;
+                }
+            ];
+            Material: Null;
+        }
+        ActorInstance {
+            Class: @"Actors/Astrovirus.ent.tk";
+            Faction: Factions [Enemy Virus Common];
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                ];
+                Target: *ActorInstance.1;
+                TargetTime: 4897.9888;
+                LastKnownTargetPosition: [0 0];
+            };
+            CurrentHealth: 40;
+            Conditions: {
+            };
+            MaxSpeed: 113.3748;
+            Weapon: Null;
+            Id: 10;
+            Class: @"Actors/Astrovirus.ent.tk";
+            Name: Null;
+            IsAlive: True;
+            Position: [1125.449 520.4882];
+            Forward: [0.5939047 -0.7102126];
+            Velocity: [72.58578 -87.09277];
+            OutlineColor: [0 0 0 0];
+            SpawnTime: 2782.0061;
+            ActiveAnimations: [
+                AnimationInstance {
+                    Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
+                        Sprite: Sprite {
+                            ElapsedTime: 7919.9409;
+                            FrameCount: 6;
+                            FrameLength: 50;
+                            TotalLength: 300;
+                            IsLooping: True;
+                            Texture: "Actors/Astrovirus.png";
+                            Width: 40;
+                            Height: 40;
+                            Size: [40 40];
+                            ClipRect: [0 0 240 120];
+                            Origin: [20 20];
+                            Tween: TweenStyle.Overlap;
+                            ShrinkToFit: True;
+                        };
+                        Material: Null;
+                        Sound: SoundClass {
+                            Name: Null;
+                            Source: Null;
+                            Subtitle: Null;
+                            Caption: Null;
+                            Gain: 1;
+                            DestroyIfOwnerDies: True;
+                        };
+                        EnterEffect: Null;
+                        ExitEffect: Null;
+                        Effect: Null;
+                        Radius: 20;
+                    };
+                    ElapsedTime: 4967.4639;
+                }
+            ];
+            Material: Null;
+        }
+        ProjectileInstance {
+            Class: @"Weapons/Projectiles/Missile.ent.tk";
+            Source: ActorInstance {
+                Class: @"Actors/Rhinovirus.ent.tk";
+                Faction: Factions [Enemy Boss];
+                Controller: AIController {
+                    Behaviors: [
+                        ShootBehavior {
+                        }
+                        FocusBehavior {
+                            MaxTurn: 13.96263;
+                        }
+                        TargetEnemyBehavior {
+                            SightDistance: 1000;
+                        }
+                    ];
+                    Target: *ActorInstance.1;
+                    TargetTime: 6881.9151;
+                    LastKnownTargetPosition: [0 0];
+                };
+                CurrentHealth: 5000;
+                Conditions: {
+                };
+                MaxSpeed: 0;
+                Weapon: GunInstance {
+                    Class: @"Weapons/Boss.wpn.tk";
+                    AmmoCount: 997;
+                    StateTime: 7566.1221;
+                    State: WeaponState.Discharging;
+                    Charge: 1;
+                };
+                Id: 2;
+                Class: @"Actors/Rhinovirus.ent.tk";
+                Name: Null;
+                IsAlive: True;
+                Position: [1194.895 164.3975];
+                Forward: [0.8726489 0.4883481];
+                Velocity: [0 0];
+                OutlineColor: [0 0 0 255];
+                SpawnTime: 0;
+                ActiveAnimations: [
+                    AnimationInstance {
+                        Class: AnimationClass {
+                            Name: Null;
+                            Type: AnimationType.Base;
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                TotalLength: 0.0001;
+                                IsLooping: True;
+                                Texture: "Actors/Rhinovirus.png";
+                                Width: 128;
+                                Height: 128;
+                                Size: [128 128];
+                                ClipRect: [0 0 128 128];
+                                Origin: [64 64];
+                                Tween: TweenStyle.None;
+                                ShrinkToFit: True;
+                            };
+                            Material: Null;
+                            Sound: Null;
+                            EnterEffect: Null;
+                            ExitEffect: Null;
+                            Effect: Null;
+                            Radius: 64;
+                        };
+                        ElapsedTime: 7749.47;
+                    }
+                ];
+                Material: Null;
+            };
+            Id: 11;
+            Name: Null;
+            IsAlive: True;
+            Position: [1629.921 233.7701];
+            Forward: [0.9881487 0.1534996];
+            Velocity: [348.8005 54.18288];
+            OutlineColor: [0 0 0 255];
+            SpawnTime: 6881.9151;
+            ActiveAnimations: [
+                AnimationInstance {
+                    Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
+                        Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 1;
+                            FrameLength: 0.0001;
+                            TotalLength: 0.0001;
+                            IsLooping: False;
+                            Texture: "Weapons/Projectiles/Antibody.png";
+                            Width: 14;
+                            Height: 12;
+                            Size: [14 12];
+                            ClipRect: [0 0 14 12];
+                            Origin: [7 6];
+                            Tween: TweenStyle.None;
+                            ShrinkToFit: True;
+                        };
+                        Material: Null;
+                        Sound: Null;
+                        EnterEffect: Null;
+                        ExitEffect: Null;
+                        Effect: @"Effects/trail.fx.tk";
+                        Radius: 7;
+                    };
+                    ElapsedTime: 867.5549;
+                }
+            ];
+            Material: Null;
+        }
+        ProjectileInstance {
+            Class: @"Weapons/Projectiles/Missile.ent.tk";
+            Source: ActorInstance {
+                Class: @"Actors/Rhinovirus.ent.tk";
+                Faction: Factions [Enemy Boss];
+                Controller: AIController {
+                    Behaviors: [
+                        ShootBehavior {
+                        }
+                        FocusBehavior {
+                            MaxTurn: 13.96263;
+                        }
+                        TargetEnemyBehavior {
+                            SightDistance: 1000;
+                        }
+                    ];
+                    Target: *ActorInstance.1;
+                    TargetTime: 6881.9151;
+                    LastKnownTargetPosition: [0 0];
+                };
+                CurrentHealth: 5000;
+                Conditions: {
+                };
+                MaxSpeed: 0;
+                Weapon: GunInstance {
+                    Class: @"Weapons/Boss.wpn.tk";
+                    AmmoCount: 997;
+                    StateTime: 7566.1221;
+                    State: WeaponState.Discharging;
+                    Charge: 1;
+                };
+                Id: 2;
+                Class: @"Actors/Rhinovirus.ent.tk";
+                Name: Null;
+                IsAlive: True;
+                Position: [1194.895 164.3975];
+                Forward: [0.8726489 0.4883481];
+                Velocity: [0 0];
+                OutlineColor: [0 0 0 255];
+                SpawnTime: 0;
+                ActiveAnimations: [
+                    AnimationInstance {
+                        Class: AnimationClass {
+                            Name: Null;
+                            Type: AnimationType.Base;
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                TotalLength: 0.0001;
+                                IsLooping: True;
+                                Texture: "Actors/Rhinovirus.png";
+                                Width: 128;
+                                Height: 128;
+                                Size: [128 128];
+                                ClipRect: [0 0 128 128];
+                                Origin: [64 64];
+                                Tween: TweenStyle.None;
+                                ShrinkToFit: True;
+                            };
+                            Material: Null;
+                            Sound: Null;
+                            EnterEffect: Null;
+                            ExitEffect: Null;
+                            Effect: Null;
+                            Radius: 64;
+                        };
+                        ElapsedTime: 7749.47;
+                    }
+                ];
+                Material: Null;
+            };
+            Id: 12;
+            Name: Null;
+            IsAlive: True;
+            Position: [1457.428 336.6785];
+            Forward: [0.8413161 0.5405438];
+            Velocity: [339.5343 218.1501];
+            OutlineColor: [0 0 0 255];
+            SpawnTime: 7215.6472;
+            ActiveAnimations: [
+                AnimationInstance {
+                    Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
+                        Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 1;
+                            FrameLength: 0.0001;
+                            TotalLength: 0.0001;
+                            IsLooping: False;
+                            Texture: "Weapons/Projectiles/Antibody.png";
+                            Width: 14;
+                            Height: 12;
+                            Size: [14 12];
+                            ClipRect: [0 0 14 12];
+                            Origin: [7 6];
+                            Tween: TweenStyle.None;
+                            ShrinkToFit: True;
+                        };
+                        Material: Null;
+                        Sound: Null;
+                        EnterEffect: Null;
+                        ExitEffect: Null;
+                        Effect: @"Effects/trail.fx.tk";
+                        Radius: 7;
+                    };
+                    ElapsedTime: 533.8228;
+                }
+            ];
+            Material: Null;
+        }
+        ProjectileInstance {
+            Class: @"Weapons/Projectiles/Missile.ent.tk";
+            Source: ActorInstance {
+                Class: @"Actors/Rhinovirus.ent.tk";
+                Faction: Factions [Enemy Boss];
+                Controller: AIController {
+                    Behaviors: [
+                        ShootBehavior {
+                        }
+                        FocusBehavior {
+                            MaxTurn: 13.96263;
+                        }
+                        TargetEnemyBehavior {
+                            SightDistance: 1000;
+                        }
+                    ];
+                    Target: *ActorInstance.1;
+                    TargetTime: 6881.9151;
+                    LastKnownTargetPosition: [0 0];
+                };
+                CurrentHealth: 5000;
+                Conditions: {
+                };
+                MaxSpeed: 0;
+                Weapon: GunInstance {
+                    Class: @"Weapons/Boss.wpn.tk";
+                    AmmoCount: 997;
+                    StateTime: 7566.1221;
+                    State: WeaponState.Discharging;
+                    Charge: 1;
+                };
+                Id: 2;
+                Class: @"Actors/Rhinovirus.ent.tk";
+                Name: Null;
+                IsAlive: True;
+                Position: [1194.895 164.3975];
+                Forward: [0.8726489 0.4883481];
+                Velocity: [0 0];
+                OutlineColor: [0 0 0 255];
+                SpawnTime: 0;
+                ActiveAnimations: [
+                    AnimationInstance {
+                        Class: AnimationClass {
+                            Name: Null;
+                            Type: AnimationType.Base;
+                            Sprite: Sprite {
+                                ElapsedTime: 0;
+                                FrameCount: 1;
+                                FrameLength: 0.0001;
+                                TotalLength: 0.0001;
+                                IsLooping: True;
+                                Texture: "Actors/Rhinovirus.png";
+                                Width: 128;
+                                Height: 128;
+                                Size: [128 128];
+                                ClipRect: [0 0 128 128];
+                                Origin: [64 64];
+                                Tween: TweenStyle.None;
+                                ShrinkToFit: True;
+                            };
+                            Material: Null;
+                            Sound: Null;
+                            EnterEffect: Null;
+                            ExitEffect: Null;
+                            Effect: Null;
+                            Radius: 64;
+                        };
+                        ElapsedTime: 7749.47;
+                    }
+                ];
+                Material: Null;
+            };
+            Id: 13;
+            Name: Null;
+            IsAlive: True;
+            Position: [1334.532 245.8631];
+            Forward: [0.8575975 0.5143213];
+            Velocity: [398.3786 238.917];
+            OutlineColor: [0 0 0 255];
+            SpawnTime: 7566.1221;
+            ActiveAnimations: [
+                AnimationInstance {
+                    Class: AnimationClass {
+                        Name: Null;
+                        Type: AnimationType.Base;
+                        Sprite: Sprite {
+                            ElapsedTime: 0;
+                            FrameCount: 1;
+                            FrameLength: 0.0001;
+                            TotalLength: 0.0001;
+                            IsLooping: False;
+                            Texture: "Weapons/Projectiles/Antibody.png";
+                            Width: 14;
+                            Height: 12;
+                            Size: [14 12];
+                            ClipRect: [0 0 14 12];
+                            Origin: [7 6];
+                            Tween: TweenStyle.None;
+                            ShrinkToFit: True;
+                        };
+                        Material: Null;
+                        Sound: Null;
+                        EnterEffect: Null;
+                        ExitEffect: Null;
+                        Effect: @"Effects/trail.fx.tk";
+                        Radius: 7;
+                    };
+                    ElapsedTime: 183.3479;
                 }
             ];
             Material: Null;

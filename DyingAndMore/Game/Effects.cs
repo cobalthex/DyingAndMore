@@ -4,18 +4,21 @@ using Takai.Game;
 namespace DyingAndMore.Game
 {
     /// <summary>
-    /// An area of effect damge (for example, grenade)
+    /// An area of effect damage/boon (for example, grenade)
     /// </summary>
-    public class DamageEffect : IGameEffect
+    public class AreaHealthEffect : IGameEffect
         //todo: rename to health effect
     {
         public float MaxDamage { get; set; }
+        /// <summary>
+        /// If radius is zero, has zero area of affect and only hits target or actor directly on point
+        /// </summary>
         public float Radius { get; set; }
 
         /// <summary>
-        /// Can this effect damage the creator of this effect?
+        /// Can this effect affect the creator of this effect?
         /// </summary>
-        public bool CanDamageSource { get; set; } //todo: should this be a setting in game settings? (and controlled via actor.ReceiveDamage())?
+        public bool CanAffectSource { get; set; } //todo: should this be a setting in game settings? (and controlled via actor.ReceiveDamage())?
 
         //falloff curve?
 
@@ -27,7 +30,7 @@ namespace DyingAndMore.Game
             var rSq = Radius * Radius;
 
             if (instance.Target != null &&
-                (CanDamageSource || instance.Source != instance.Target) &&
+                (CanAffectSource || instance.Source != instance.Target) &&
                 instance.Target is Entities.ActorInstance targetActor)
             {
                 if (rSq == 0)
@@ -45,14 +48,14 @@ namespace DyingAndMore.Game
                 var ents = instance.Map.FindEntities(instance.Position, Radius);
                 foreach (var ent in ents)
                 {
-                    if ((ent == instance.Source && !CanDamageSource) ||
+                    if ((ent == instance.Source && !CanAffectSource) ||
                         !(ent is Entities.ActorInstance actor))
                         continue;
 
                     var distSq = Vector2.DistanceSquared(instance.Position, ent.Position);
 
                     if (rSq == 0)
-                        actor.ReceiveDamage(MaxDamage, instance.Source);
+                        actor.ReceiveDamage(MaxDamage, instance.Source); //source?
                     else if (distSq <= rSq)
                         actor.ReceiveDamage(MaxDamage * (rSq - distSq) / rSq, instance.Source); //falloff curve?
 

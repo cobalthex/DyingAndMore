@@ -35,7 +35,7 @@ namespace DyingAndMore
         GraphicsDeviceManager gdm;
 
 #if WINDOWS
-        bool useCustomCursor = true;
+        bool useCustomCursor = false;
 #endif
 
         SpriteBatch sbatch;
