@@ -15,8 +15,8 @@ ActorClass {
         Behaviors: [
             FlowSeekBehavior { };
 
-            TargetEnemyBehavior { };
-            FocusBehavior { };
+            #TargetEnemyBehavior { };
+            #FocusBehavior { };
 
             SuicideBehavior {
                 Radius: 80;

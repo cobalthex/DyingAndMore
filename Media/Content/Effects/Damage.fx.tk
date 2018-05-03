@@ -1,9 +1,9 @@
 EffectsClass {
 	Effects: [
-		DamageEffect {
+		AreaHealthEffect {
 			MaxDamage: 200;
 			Radius: 100;
-			CanDamageSource: false;
+			CanAffectSource: false;
 		}
 	];
 }

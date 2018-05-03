@@ -1,17 +1,17 @@
-GunClass {
-    MaxAmmo: 20000;
-
-    DischargeEffect: {
-        Effects: [
-            ParticleEffect {
-                Count: 20;
-                Spread: [-10deg 10deg];
+ConditionClass {
+	HealthPerSecond: -4;
+	ActiveEffect: {
+		Effects: [
+			ParticleEffect {
+                Count: 1;
+                Spread: [80deg 100deg];
+                Radius: 16;
                 Class: {
                     Sprite: {
                         Texture: @"Effects/fire.png";
-                        width: 96;
+                        width: 64;
                         height: 48;
-                        Origin: [24 24];
+                        Origin: [48 24];
                     };
                     Blend: {
                         # only draw on entities
@@ -32,16 +32,12 @@ GunClass {
                         #AlphaSourceBlend: Blend.Zero;
                         #AlphaDestinationBlend: Blend.One;
                     };
-                    InitialSpeed: [600 1200];
+                    InitialSpeed: [60 180];
                     Drag: 1.0;
-                    lifetime: [600msec 1200msec];
+                    lifetime: [300msec 500msec];
                     ColorOverTime: {
                         Reverse: false;
                         Values: [
-                            [0 [32 64 128 255]];
-                            [0.1 Color.SteelBlue];
-                            #[0.5 Color.Orange];
-                            #[1 Color.Red];
                             [0.25 Color.White];
                             [0.3 Color.Yellow];
                             [0.5 Color.Orange];
@@ -53,37 +49,13 @@ GunClass {
                     ScaleOverTime: {
                         IsLinear: true;
                         Values: [
-                            [0 0.25]
-                            [0.7 2]
+                            [0 0.2]
+                            [0.7 1]
                             [1 0]
                         ];
                     };
-                    #*AngleOverTime: {
-                        Values: [
-                            [0 0];
-                            [0.1 45deg];
-                            [0.4 0deg];
-                            [1 -45deg];
-                        ];
-                    };*#
-
-
-                    CollisionEffect: {
-                        Effects: [
-                            #*AreaHealthEffect {
-                                MaxDamage: 3;
-                                Radius: 0;
-                                CanAffectSource: false;
-                            }*#
-                            ConditionEffect {
-                                Condition: @"Actors/Conditions/fire.cond.tk";
-                                Radius: 10;
-                                Duration: 5sec;
-                            }
-                        ];
-                    }
-                }
-            };
-        ]
-    }
+	            };
+	        };
+        ];
+	}
 }

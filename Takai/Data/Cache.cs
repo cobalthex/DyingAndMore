@@ -42,7 +42,7 @@ namespace Takai.Data
 
         public class LateBindLoad
         {
-            public Action setter;
+            public Action<object> setter;
         }
 
         /// <summary>
@@ -253,15 +253,12 @@ namespace Takai.Data
                     zip.Dispose();
             }
 
-            //apply late bound values
-            if (lateLoads.TryGetValue(realFile, out lateLoad))
+            if (obj.reference == null)
             {
-                if (lateLoad != null)
-                {
-                    foreach (var late in lateLoad)
-                        late.setter?.Invoke(); //todo: figure out why sometimes null (possibly due to 2 loads in file watcher)
-                }
-                lateLoads.Remove(realFile);
+                if (lateLoads.Count > 0)
+                    throw new FileNotFoundException("Could not find referenced file(s): " + String.Join(", ", lateLoads.Keys));
+                else
+                    throw new Exception("Wtf loading " + realFile);
             }
 
             if (forceLoad && exists)
@@ -285,16 +282,19 @@ namespace Takai.Data
             else
                 objects[realFile] = obj;
 
+            //apply late bound values
+            if (lateLoads.TryGetValue(realFile, out lateLoad))
+            {
+                if (lateLoad != null)
+                {
+                    foreach (var late in lateLoad)
+                        late.setter?.Invoke(obj.reference.Target); //todo: figure out why sometimes null (possibly due to 2 loads in file watcher)
+                }
+                lateLoads.Remove(realFile);
+            }
+
             //swatch.Stop();
             //System.Diagnostics.Debug.WriteLine($"Cache: loaded {file} in {swatch.ElapsedMilliseconds} msec");
-
-            if (obj.reference == null)
-            {
-                if (lateLoads.Count > 0)
-                    throw new FileNotFoundException("Could not find referenced file(s): " + String.Join(", ", lateLoads.Keys));
-                else
-                    throw new Exception("Wtf loading " + realFile);
-            }
 
             return obj.reference.Target;
         }

@@ -5,7 +5,25 @@ ProjectileClass {
     IgnoreTrace: True;
     Drag: 0.4;
     MinimumSpeed: 300;
-    CanDamageSource: true;
+    CanAffectSource: true;
+
+    Range: 400;
+    FadeEffect: {
+        Effects: [
+            EntityEffect {
+                Entity: @.;
+                Count: 1;
+                Spread: -30deg;
+                Speed: 500;
+            }
+            EntityEffect {
+                Entity: @.;
+                Count: 1;
+                Spread: 30deg;
+                Speed: 500;
+            }
+        ];
+    }
 
     Animations: {
         Idle: {

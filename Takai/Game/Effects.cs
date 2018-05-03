@@ -217,7 +217,7 @@ namespace Takai.Game
 
     public class EntityEffect : IGameEffect
     {
-        public EntityClass Class { get; set; }
+        public EntityClass Entity { get; set; }
 
         //some sort of generation
         //separate destruction and burnout effect in entities
@@ -239,13 +239,25 @@ namespace Takai.Game
                 var angle = Spread.Random();
                 var direction = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(angle));
                 var entity = instance.Map.Spawn(
-                    Class,
+                    Entity,
                     instance.Position,
                     direction,
                     direction * Speed.Random()
                 );
                 //entity.Source = instance.Source;
             }
+        }
+    }
+
+    public class ScreenFadeEffect : IGameEffect
+    {
+        public Color ScreenColor { get; set; }
+        public TimeSpan FadeTime { get; set; } //zero is instant
+        public bool FadeOut { get; set; } //fade back to transparent (2 x FadeTime)
+
+        public void Spawn(EffectsInstance instance)
+        {
+            throw new NotImplementedException();
         }
     }
 

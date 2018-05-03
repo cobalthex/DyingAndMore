@@ -172,26 +172,14 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
+            foreach (var condition in Conditions)
+                condition.Value.Update(this, deltaTime);
+            //todo: remove inactive conditions?
+
             if (IsAlive)
                 Controller?.Think(deltaTime);
+
             Weapon?.Think(deltaTime); //weapon can still fire if actor is dead
-
-            for (int i = 0; i < Conditions.Count; ++i)
-            {
-                var cond = Conditions[i];
-                var dt = Takai.Util.Min(cond.TimeRemaining, deltaTime);
-
-                cond.condition.Apply(this, dt);
-                cond.timeLeft -= dt;
-
-                if (cond.timeLeft > TimeSpan.Zero)
-                    Conditions[i] = cond;
-                else
-                {
-                    Conditions[i] = Conditions[Conditions.Count - 1];
-                    Conditions.RemoveAt(Conditions.Count - 1);
-                }
-            }
 
             //todo: move to physics
             var vel = Velocity;

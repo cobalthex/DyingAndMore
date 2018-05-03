@@ -13,20 +13,28 @@ namespace DyingAndMore.Game.Entities
         public string File { get; set; }
 
         /// <summary>
-        /// How much health to add or remove per second (positive for boon, negative for poison)
-        /// </summary>
-        public float HealthPerSecond { get; set; }
-
-        /// <summary>
         /// An effect to play while this condition is active
         /// </summary>
         public EffectsClass ActiveEffect { get; set; }
+
+        /// <summary>
+        /// How much health to add or remove per second (positive for boon, negative for poison)
+        /// </summary>
+        public float HealthPerSecond { get; set; } = 0;
+
+        /// <summary>
+        /// Affect actor speed
+        /// </summary>
+        public float SpeedScale { get; set; } = 1;
 
         //taper?
 
         public ConditionInstance Instantiate()
         {
-            return new ConditionInstance();
+            return new ConditionInstance
+            {
+                Class = this
+            };
         }
     }
 
@@ -36,11 +44,25 @@ namespace DyingAndMore.Game.Entities
 
         public TimeSpan TimeRemaining { get; set; }
 
-        public void Merge(ConditionInstance other)
+        public void Update(ActorInstance actor, TimeSpan deltaTime)
         {
-            TimeRemaining = Takai.Util.Max(TimeRemaining, other.TimeRemaining);
+            if (TimeRemaining <= TimeSpan.Zero)
+                return;
+
+            TimeRemaining -= deltaTime;
+
+            actor.CurrentHealth += (float)(Class.HealthPerSecond * deltaTime.TotalSeconds);
+            if (Class.ActiveEffect != null && actor.Map != null)
+            {
+                var fx = Class.ActiveEffect.Instantiate(actor, actor);
+                actor.Map.Spawn(fx);
+
+                //effect radius scaled by entity size?
+            }
         }
     }
+
+    //todo: condition protection (gas mask would protect against poison)
 
     /// <summary>
     /// Apply a condition (poison, etc) to any actor within the effect radius
@@ -59,7 +81,11 @@ namespace DyingAndMore.Game.Entities
             {
                 if (ent is ActorInstance actor)
                 {
+                    if (!actor.Conditions.TryGetValue(Condition, out var cond))
+                        actor.Conditions[Condition] = cond = Condition.Instantiate();
 
+                    cond.TimeRemaining = Takai.Util.Max(cond.TimeRemaining, Duration);
+                    //todo: refresh vars?
                 }
             }
         }

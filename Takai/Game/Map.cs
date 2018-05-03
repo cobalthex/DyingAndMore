@@ -418,7 +418,7 @@ namespace Takai.Game
 
         public void Spawn(EffectsInstance effects)
         {
-            if (effects.Class == null)
+            if (effects.Class?.Effects == null)
                 return;
 
             effects.Map = this;
