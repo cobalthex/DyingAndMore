@@ -205,13 +205,13 @@ namespace Takai.UI
         /// <seealso cref="VisibleBounds"/>
         public Rectangle Bounds
         {
-            get => new Rectangle(Position.ToPoint(), Size.ToPoint());
+            get => new Rectangle((int) Position.X, (int) Position.Y, (int) Size.X, (int) Size.Y);
             set
             {
                 if (Bounds != value)
                 {
-                    _position = value.Location.ToVector2();
-                    _size = value.Size.ToVector2();
+                    _position = new Vector2(value.X, value.Y);
+                    _size = new Vector2(value.Width, value.Height);
                     ResizeAndReflow();
                 }
             }
@@ -913,14 +913,14 @@ namespace Takai.UI
                     break;
             }
 
-            return new Rectangle(pos.ToPoint() + container.Location, Size.ToPoint());
+            return new Rectangle((int)pos.X + container.X, (int)pos.Y + container.Y, (int)Size.X, (int)Size.Y);
         }
 
         protected void CalculateBounds()
         {
             VirtualBounds = Parent != null
                 ? CalculateBounds(Parent.VirtualBounds)
-                : new Rectangle(Position.ToPoint(), Size.ToPoint());
+                : new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
             VisibleBounds = Parent != null
                 ? Rectangle.Intersect(Parent.VisibleBounds, VirtualBounds)
                 : VirtualBounds;
@@ -934,7 +934,7 @@ namespace Takai.UI
         public virtual void AutoSize(float padding = 0)
         {
             //todo: maybe make padding an actual property
-            var bounds = new Rectangle(Position.ToPoint(), textSize.ToPoint());
+            var bounds = new Rectangle((int)Position.X, (int)Position.Y, (int)textSize.X, (int)textSize.Y);
             foreach (var child in Children)
             {
                 if (child.HorizontalAlignment != Alignment.Middle)
@@ -943,7 +943,7 @@ namespace Takai.UI
                     child.Position += new Vector2(0, padding);
                 bounds = Rectangle.Union(bounds, child.Bounds);
             }
-            Size = bounds.Size.ToVector2() + new Vector2(padding);
+            Size = new Vector2(bounds.Width, bounds.Height) + new Vector2(padding);
         }
 
         #endregion
@@ -1125,7 +1125,7 @@ namespace Takai.UI
                     Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, rect);
 
                     string info = $"Name: {(Name ?? "(No name)")}\nBounds: {rect}";
-                    DebugFont.Draw(spriteBatch, info, (rect.Location + rect.Size).ToVector2(), Color.Gold);
+                    DebugFont.Draw(spriteBatch, info, (rect.Location + new Point(rect.Width, rect.Height)).ToVector2(), Color.Gold);
                 }
 
                 foreach (var child in toDraw.Children)
@@ -1272,7 +1272,7 @@ namespace Takai.UI
                         };
                         check.AutoSize();
                         root.AddChild(check);
-                        maxWidth = MathHelper.Max(maxWidth, check._size.X);
+                        maxWidth = System.Math.Max(maxWidth, check._size.X);
                     }
                 }
                 root._size = new Vector2(maxWidth, 1);
@@ -1322,7 +1322,7 @@ namespace Takai.UI
                     label.AutoSize();
                     root.AddChild(label);
 
-                    maxWidth = MathHelper.Max(maxWidth, label._size.X);
+                    maxWidth = System.Math.Max(maxWidth, label._size.X);
                 }
 
                 if (memberType == typeof(bool))
@@ -1340,7 +1340,7 @@ namespace Takai.UI
                     };
                     check.AutoSize();
                     root.AddChild(check);
-                    maxWidth = MathHelper.Max(maxWidth, check._size.X);
+                    maxWidth = System.Math.Max(maxWidth, check._size.X);
                 }
                 else if (memberType == typeof(int))
                 {

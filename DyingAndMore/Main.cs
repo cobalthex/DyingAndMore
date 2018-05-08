@@ -57,9 +57,10 @@ namespace DyingAndMore
                 PreferredBackBufferWidth = 1600,
                 PreferredBackBufferHeight = 900,
                 PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
-                //PreferMultiSampling = true,
                 GraphicsProfile = GraphicsProfile.HiDef,
+                PreferredBackBufferFormat = SurfaceFormat.Color,
 #if WINDOWS_UAP
+                PreferMultiSampling = true,
                 IsFullScreen = true,
 #endif
             };

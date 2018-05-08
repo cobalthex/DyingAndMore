@@ -86,7 +86,7 @@ namespace Takai.Game
                 Vector2 max = Vector2.Max(Vector2.Max(Vector2.Max(a, b), c), d);
 
                 var size = max - min;
-                return new Rectangle(min.ToPoint(), new Point((int)System.Math.Ceiling(size.X), (int)System.Math.Ceiling(size.Y)));
+                return new Rectangle((int)min.X, (int)min.Y, (int)System.Math.Ceiling(size.X), (int)System.Math.Ceiling(size.Y));
             }
         }
 

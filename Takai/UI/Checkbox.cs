@@ -22,7 +22,7 @@ namespace Takai.UI
         public override void AutoSize(float padding = 0)
         {
             base.AutoSize(padding);
-            var checkboxSize = MathHelper.Min(VirtualBounds.Width, VirtualBounds.Height);
+            var checkboxSize = System.Math.Min(VirtualBounds.Width, VirtualBounds.Height);
             Size += new Vector2(checkboxSize + dividerWidth, 0);
         }
 
@@ -34,7 +34,7 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var checkboxSize = MathHelper.Min(VirtualBounds.Width, VirtualBounds.Height);
+            var checkboxSize = System.Math.Min(VirtualBounds.Width, VirtualBounds.Height);
             var checkBounds = new Rectangle(VirtualBounds.X, VirtualBounds.Y, checkboxSize, checkboxSize);
             var checkboxBounds = Rectangle.Intersect(checkBounds, VisibleBounds);
             Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, checkboxBounds);

@@ -27,6 +27,11 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public float SpeedScale { get; set; } = 1;
 
+        /// <summary>
+        /// How likely is this condition to pass between actors on collision (as percent)
+        /// </summary>
+        public float ContagiousChance { get; set; } = 0; //todo
+
         //taper?
 
         public ConditionInstance Instantiate()
@@ -73,13 +78,18 @@ namespace DyingAndMore.Game.Entities
         public float Radius { get; set; }
         public TimeSpan Duration { get; set; }
 
+        /// <summary>
+        /// How likely actors in range acquire this condition
+        /// </summary>
+        public float AcquireChance { get; set; } = 1;
+
         public void Spawn(EffectsInstance instance)
         {
             var ents = instance.Map.FindEntities(instance.Position, Radius);
             var rSq = Radius * Radius;
             foreach (var ent in ents)
             {
-                if (ent is ActorInstance actor)
+                if (ent is ActorInstance actor && Takai.Util.PassChance(AcquireChance))
                 {
                     if (!actor.Conditions.TryGetValue(Condition, out var cond))
                         actor.Conditions[Condition] = cond = Condition.Instantiate();

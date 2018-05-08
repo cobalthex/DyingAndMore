@@ -296,7 +296,7 @@ namespace Takai.Game
 
             #region present entities (and any other reflected objects)
 
-            Class.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, Class.stencilRead);
+            Class.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, Class.stencilRead, null);
             Class.spriteBatch.Draw(Class.reflectedRenderTarget, Vector2.Zero, Color.White);
             Class.spriteBatch.End();
 
@@ -359,7 +359,14 @@ namespace Takai.Game
 
         public void DrawTiles(ref RenderContext c)
         {
-            var projection = Matrix.CreateOrthographicOffCenter(c.camera.Viewport, 0, 1);
+            var camViewport = c.camera.Viewport;
+            var projection = Matrix.CreateOrthographicOffCenter(
+                camViewport.X,
+                camViewport.Y,
+                camViewport.Width,
+                camViewport.Height,
+                0, 1
+            );
             Class.mapAlphaTest.Projection = projection;
             Class.mapAlphaTest.View = c.cameraTransform;
             Class.spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, Class.stencilWrite, null, Class.mapAlphaTest);
@@ -479,7 +486,8 @@ namespace Takai.Game
                                                     0, 0, 1, 0,
                                                     0, 0, 0, 1);
 
-                    Rectangle rect = new Rectangle(new Point(-(int)ent.Radius), new Point((int)ent.Radius * 2));
+                    var iEntRadius = (int)ent.Radius;
+                    Rectangle rect = new Rectangle(-iEntRadius, -iEntRadius, iEntRadius * 2, iEntRadius * 2);
                     var tl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Top), transform);
                     var tr = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Top), transform);
                     var bl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Bottom), transform);
@@ -573,12 +581,19 @@ namespace Takai.Game
 
         public void DrawLines(ref RenderContext c)
         {
+            var camViewport = c.camera.Viewport;
             if (renderedCircles.Count > 0)
             {
                 Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
                 Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                 Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
-                var circleTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(c.camera.Viewport, 0, 1);
+                var circleTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(
+                    camViewport.X,
+                    camViewport.Y,
+                    camViewport.Width,
+                    camViewport.Height,
+                    0, 1
+                );
                 Class.circleEffect.Parameters["Transform"].SetValue(circleTransform);
 
                 foreach (EffectPass pass in Class.circleEffect.CurrentTechnique.Passes)
@@ -595,7 +610,13 @@ namespace Takai.Game
                 Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
                 Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                 Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
-                var lineTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(c.camera.Viewport, 0, 1);
+                var lineTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(
+                    camViewport.X,
+                    camViewport.Y,
+                    camViewport.Width,
+                    camViewport.Height,
+                    0, 1
+                );
                 Class.lineEffect.Parameters["Transform"].SetValue(lineTransform);
 
                 var blackLines = new VertexPositionColor[renderedLines.Count];
@@ -621,10 +642,17 @@ namespace Takai.Game
 
         public void DrawGrids(ref RenderContext c)
         {
+            var camViewport = c.camera.Viewport;
             Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
             Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
-            var viewProjection = Matrix.CreateOrthographicOffCenter(c.camera.Viewport, 0, 1);
+            var viewProjection = Matrix.CreateOrthographicOffCenter(
+                camViewport.X,
+                camViewport.Y,
+                camViewport.Width,
+                camViewport.Height,
+                0, 1
+            );
             Class.lineEffect.Parameters["Transform"].SetValue(c.cameraTransform * viewProjection);
 
             var grids = new VertexPositionColor[c.visibleTiles.Width * 2 + c.visibleTiles.Height * 2 + 4];

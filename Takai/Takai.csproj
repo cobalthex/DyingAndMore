@@ -38,11 +38,10 @@
     <ApplicationIcon>TakaiTech.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
+    <Reference Include="FNA">
+      <HintPath>..\Tools\FNA.dll</HintPath>
     </Reference>
-    <Reference Include="NVorbis, Version=0.8.5.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NVorbis">
       <HintPath>..\packages\NVorbis.0.8.5.0\lib\NVorbis.dll</HintPath>
     </Reference>
     <Reference Include="Priority Queue, Version=4.1.1.0, Culture=neutral, processorArchitecture=MSIL">

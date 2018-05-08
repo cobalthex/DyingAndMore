@@ -104,7 +104,7 @@ namespace Takai.Game
 
             for (int i = 0; i < Count.Random(); ++i)
             {
-                var which = RangeUtil.RandomGenerator.Next(0, Effects.Count);
+                var which = Util.RandomGenerator.Next(0, Effects.Count);
                 Effects[which].Spawn(instance);
             }
         }
@@ -167,9 +167,9 @@ namespace Takai.Game
                 var position = instance.Position;
                 if (Radius != 0)
                 {
-                    var spawnRadiusAngle = RangeUtil.RandomGenerator.NextDouble() * MathHelper.TwoPi;
+                    var spawnRadiusAngle = Util.RandomGenerator.NextDouble() * MathHelper.TwoPi;
                     position += new Vector2((float)Math.Cos(spawnRadiusAngle), (float)Math.Sin(spawnRadiusAngle))
-                        * (float)RangeUtil.RandomGenerator.NextDouble() * Radius;
+                        * (float)Util.RandomGenerator.NextDouble() * Radius;
                 }
 
                 var particle = new ParticleInstance()

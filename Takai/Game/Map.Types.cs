@@ -43,16 +43,14 @@ namespace Takai.Game
 
     public static class RangeUtil
     {
-        public static readonly Random RandomGenerator = new Random();
-
         public static int Random(this Range<int> range)
         {
-            return RandomGenerator.Next(range.min, range.max + 1);
+            return Util.RandomGenerator.Next(range.min, range.max + 1);
         }
 
         public static float Random(this Range<float> range)
         {
-            return (float)RandomGenerator.NextDouble() * (range.max - range.min) + range.min;
+            return (float)Util.RandomGenerator.NextDouble() * (range.max - range.min) + range.min;
         }
 
         public static TimeSpan Random(this Range<TimeSpan> range)
@@ -61,7 +59,7 @@ namespace Takai.Game
                 return range.min;
 
             byte[] buf = new byte[8];
-            RandomGenerator.NextBytes(buf);
+            Util.RandomGenerator.NextBytes(buf);
             long longRand = BitConverter.ToInt64(buf, 0);
 
             return TimeSpan.FromTicks(Math.Abs(longRand % (range.max.Ticks - range.min.Ticks)) + range.min.Ticks);

@@ -371,8 +371,13 @@ namespace Takai.Game
 
         public void Spawn(FluidInstance instance)
         {
-            var sz = new Point((int)instance.Class.Radius);
-            if (!Class.Bounds.Intersects(new Rectangle(instance.position.ToPoint() - sz, sz)))
+            if (!Class.Bounds.Intersects(
+                new Rectangle(
+                    (int)(instance.position.X - instance.Class.Radius),
+                    (int)(instance.position.X - instance.Class.Radius),
+                    (int)(instance.Class.Radius * 2),
+                    (int)(instance.Class.Radius * 2)
+                )))
                 return;
 
             if (instance.velocity == Vector2.Zero)
@@ -405,8 +410,13 @@ namespace Takai.Game
             if (!updateSettings.isSoundEnabled)
                 sound.Instance.Pause();
 
-            var range = Class.TileSize * 5 * sound.Class.Gain;
-            var box = new Rectangle((sound.Position - new Vector2(range)).ToPoint(), new Point((int)(range * 2)));
+            var range = (int)(Class.TileSize * 5 * sound.Class.Gain);
+            var box = new Rectangle(
+                (int)sound.Position.X - range,
+                (int)sound.Position.Y - range,
+                range * 2,
+                range * 2
+            );
             var sectors = GetOverlappingSectors(box);
 
             Sounds.Add(sound);

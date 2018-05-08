@@ -8,6 +8,7 @@ using Takai.Data;
 using Takai.Game;
 using Takai.Input;
 using Takai.UI;
+using Takai;
 
 namespace DyingAndMore.Game
 {
@@ -16,7 +17,7 @@ namespace DyingAndMore.Game
     /// <summary>
     /// A configuration for a game. Akin to a game mode
     /// </summary>
-    public class GameConfiguration : Takai.INamedObject
+    public class GameConfiguration : INamedObject
     {
         public string Name { get; set; }
         public string File { get; set; }
@@ -33,6 +34,7 @@ namespace DyingAndMore.Game
     {
         public bool isAiEnabled = true;
         public bool isPlayerInputEnabled = true;
+        public bool canActorsDie = true;
     }
 
     public class GameInstance

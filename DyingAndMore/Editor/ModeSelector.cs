@@ -101,7 +101,7 @@ namespace DyingAndMore.Editor
 
         protected override bool HandleInput(GameTime time)
         {
-            for (int i = 0; i < MathHelper.Min(10, modes.Count); ++i)
+            for (int i = 0; i < Math.Min(10, modes.Count); ++i)
             {
                 //set editor mode
                 if (InputState.IsPress(Keys.D1 + i) || InputState.IsPress(Keys.NumPad1 + i))

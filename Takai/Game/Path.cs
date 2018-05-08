@@ -33,7 +33,7 @@ namespace Takai.Game
             {
                 var last = Values[Values.Count - 2];
                 var coarseLength = Vector2.Distance(last.value, value);
-                coarseLength = MathHelper.Min(5, coarseLength / 10);
+                coarseLength = System.Math.Min(5, coarseLength / 10);
 
                 var tinc = (t - last.position) / coarseLength;
 
@@ -134,10 +134,10 @@ namespace Takai.Game
             get
             {
                 return Vector2.CatmullRom(
-                    path.ControlPoints[MathHelper.Max(0, Segment - 1)],
+                    path.ControlPoints[Math.Max(0, Segment - 1)],
                     path.ControlPoints[Segment],
-                    path.ControlPoints[MathHelper.Min(Path.ControlPoints.Count - 1, Segment + 1)],
-                    path.ControlPoints[MathHelper.Min(Path.ControlPoints.Count - 1, Segment + 2)],
+                    path.ControlPoints[Math.Min(Path.ControlPoints.Count - 1, Segment + 1)],
+                    path.ControlPoints[Math.Min(Path.ControlPoints.Count - 1, Segment + 2)],
                     SegmentRelative / path.SegmentLengths[Segment]
                 );
             }
