@@ -41,7 +41,7 @@ namespace Takai.UI
             get => caret;
             set
             {
-                caret = MathHelper.Clamp(value, 0, Text.Length);
+                caret = Util.Clamp(value, 0, Text.Length);
                 UpdateScrollPosition();
                 lastInputTick = System.Environment.TickCount;
             }
@@ -355,8 +355,8 @@ namespace Takai.UI
             if (Font != null)
             {
                 var size = new Point(
-                    MathHelper.Min(VisibleBounds.Width - 4, (int)textSize.X),
-                    MathHelper.Min(VisibleBounds.Height, (int)textSize.Y)
+                    System.Math.Min(VisibleBounds.Width - 4, (int)textSize.X),
+                    System.Math.Min(VisibleBounds.Height, (int)textSize.Y)
                 );
 
                 DrawText(spriteBatch,

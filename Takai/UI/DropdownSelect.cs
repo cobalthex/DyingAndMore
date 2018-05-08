@@ -42,7 +42,7 @@ namespace Takai.UI
             isDropdownOpen = true;
 
             list.AutoSize();
-            dropdown.Size = new Vector2(Size.X, MathHelper.Min(list.Size.Y, 200));
+            dropdown.Size = new Vector2(Size.X, System.Math.Min(list.Size.Y, 200));
 
             var end = new Vector2(VisibleBounds.Right, VisibleBounds.Bottom) + dropdown.Size;
             if (end.X > Runtime.GraphicsDevice.Viewport.Width ||

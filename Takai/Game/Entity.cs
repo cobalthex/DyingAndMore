@@ -108,7 +108,7 @@ namespace Takai.Game
         /// </summary>
         public string Name { get; set; } = null;
 
-        public bool IsAlive
+        public virtual bool IsAlive
         {
             get => _isAlive;
             set
@@ -181,7 +181,7 @@ namespace Takai.Game
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
-        public Color OutlineColor { get; set; } = Color.Black;
+        public Color OutlineColor { get; set; }
 
         /// <summary>
         /// The map the entity is in
@@ -218,7 +218,7 @@ namespace Takai.Game
         }
 
         Matrix lastTransform = Matrix.Identity;
-        Point lastVisibleSize = new Point(1);
+        Point lastVisibleSize = new Point(1, 1);
 
         /// <summary>
         /// Update the axis aligned bounds
@@ -253,7 +253,8 @@ namespace Takai.Game
             min = Vector2.Min(min, v);
             max = Vector2.Max(max, v);
 
-            r = new Rectangle(min.ToPoint(), (max - min).ToPoint());
+            var size = max - min;
+            r = new Rectangle((int)min.X, (int)min.Y, (int)Math.Ceiling(size.X), (int)Math.Ceiling(size.Y));
 
             //todo: parent/child relationships
 

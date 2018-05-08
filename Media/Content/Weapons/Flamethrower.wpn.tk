@@ -4,7 +4,7 @@ GunClass {
     DischargeEffect: {
         Effects: [
             ParticleEffect {
-                Count: 20;
+                Count: 10;
                 Spread: [-10deg 10deg];
                 Class: {
                     Sprite: {
@@ -79,6 +79,7 @@ GunClass {
                                 Condition: @"Actors/Conditions/fire.cond.tk";
                                 Radius: 10;
                                 Duration: 5sec;
+                                AcquireChance: 80%;
                             }
                         ];
                     }

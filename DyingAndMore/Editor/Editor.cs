@@ -117,7 +117,7 @@ namespace DyingAndMore.Editor
             var mapSize = new Vector2(Map.Class.Width, Map.Class.Height) * Map.Class.TileSize;
             var xyScale = new Vector2(Takai.Runtime.GraphicsDevice.Viewport.Width - 20,
                                       Takai.Runtime.GraphicsDevice.Viewport.Height - 20) / mapSize;
-            Map.ActiveCamera.Scale = MathHelper.Clamp(MathHelper.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
+            Map.ActiveCamera.Scale = MathHelper.Clamp(System.Math.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
             Map.ActiveCamera.MoveTo(mapSize / 2);
         }
 

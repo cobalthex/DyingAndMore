@@ -107,8 +107,8 @@ namespace Takai
             var avg = (sum / n);
             if (Math.Abs(tick.fps - avg) < avg * 2)
             {
-                min = MathHelper.Min(min, tick.fps);
-                max = MathHelper.Max(max, tick.fps);
+                min = Math.Min(min, tick.fps);
+                max = Math.Max(max, tick.fps);
                 sum += tick.fps;
                 ++n;
             } //todo: normalizing over time

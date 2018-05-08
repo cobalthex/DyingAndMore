@@ -319,7 +319,10 @@ namespace Takai.Data
                 }
 
                 if (context.reader.Peek() == '%')
+                {
                     unit = "%";
+                    context.reader.Read();
+                }
 
                 if (TInt.TryParse(word, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out var @int))
                 {

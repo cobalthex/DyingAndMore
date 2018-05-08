@@ -45,7 +45,7 @@ namespace Takai.Game
         public EffectsClass Effect { get; set; }
 
         public float Radius =>
-            Sprite != null ? MathHelper.Max(Sprite.Width, Sprite.Height) / 2 : 1;
+            Sprite != null ? Math.Max(Sprite.Width, Sprite.Height) / 2 : 1;
 
         [Data.Serializer.Ignored]
         public TimeSpan TotalTime => Sprite?.TotalLength ?? TimeSpan.Zero;
@@ -176,7 +176,7 @@ namespace Takai.Game
                 }
 
 
-                Radius = MathHelper.Max(Radius, animClass.Radius);
+                Radius = Math.Max(Radius, animClass.Radius);
                 if (animClass.Sprite != null)
                 {
                     lastVisibleSize = Util.Max(lastVisibleSize, animClass.Sprite.Size);
@@ -269,7 +269,7 @@ namespace Takai.Game
                 else
                 {
                     overlayAnimations[i] = animation;
-                    Radius = MathHelper.Max(Radius, baseAnimation.Class.Radius);
+                    Radius = Math.Max(Radius, baseAnimation.Class.Radius);
                     if (baseAnimation.Class != null)
                     {
                         if (baseAnimation.Class.Sprite != null)

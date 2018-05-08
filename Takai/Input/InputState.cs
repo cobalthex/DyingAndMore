@@ -43,20 +43,20 @@ namespace Takai.Input
         /// <summary>
         /// Get a vector2 of the current mouse position
         /// </summary>
-        public static Vector2 MouseVector { get { return mouseState.Position.ToVector2(); } }
+        public static Vector2 MouseVector { get { return new Vector2(mouseState.X, mouseState.Y); } }
         /// <summary>
         /// Get a point of the current mouse position
         /// </summary>
-        public static Point MousePoint { get { return mouseState.Position; } }
+        public static Point MousePoint { get { return new Point(mouseState.X, mouseState.Y); } }
 
         /// <summary>
         /// Get a vector2 of the last mouse position
         /// </summary>
-        public static Vector2 LastMouseVector { get { return lastMouseState.Position.ToVector2(); } }
+        public static Vector2 LastMouseVector { get { return new Vector2(lastMouseState.X, lastMouseState.Y); } }
         /// <summary>
         /// Get a point of the last mouse position
         /// </summary>
-        public static Point LastMousePoint { get { return lastMouseState.Position; } }
+        public static Point LastMousePoint { get { return new Point(lastMouseState.X, lastMouseState.Y); } }
 
         /// <summary>
         /// Mouse position based on center screen
@@ -73,7 +73,7 @@ namespace Takai.Input
             set
             {
                 TouchPanel.EnabledGestures = value;
-                TouchPanel.EnableMouseGestures = TouchPanel.EnabledGestures > 0;
+                //TouchPanel.EnableMouseGestures = TouchPanel.EnabledGestures > 0;
             }
         }
 
@@ -140,7 +140,7 @@ namespace Takai.Input
         /// <returns>The change in position</returns>
         public static Vector2 MouseDelta()
         {
-            return (mouseState.Position - lastMouseState.Position).ToVector2();
+            return MouseVector - LastMouseVector;
         }
 
         /// <summary>

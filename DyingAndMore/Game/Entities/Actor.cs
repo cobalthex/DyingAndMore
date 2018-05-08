@@ -108,6 +108,16 @@ namespace DyingAndMore.Game.Entities
         }
         private float _currentHealth;
 
+        public override bool IsAlive
+        {
+            get => base.IsAlive;
+            set
+            {
+                if (GameInstance.Current == null || GameInstance.Current.GameplaySettings.canActorsDie)
+                    base.IsAlive = value;
+            }
+        }
+
         /// <summary>
         /// All current conditions, and time remaining
         /// </summary>

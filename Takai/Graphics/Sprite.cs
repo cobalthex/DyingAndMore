@@ -74,7 +74,7 @@ namespace Takai.Graphics
             get
             {
                 var frame = (int)(ElapsedTime.TotalSeconds / FrameLength.TotalSeconds);
-                return IsLooping ? (frame % FrameCount) : MathHelper.Clamp(frame, 0, FrameCount - 1);
+                return IsLooping ? (frame % FrameCount) : Util.Clamp(frame, 0, FrameCount - 1);
             }
         }
 
@@ -87,7 +87,7 @@ namespace Takai.Graphics
             get
             {
                 var frame = (int)(ElapsedTime.TotalSeconds / FrameLength.TotalSeconds) + 1;
-                return IsLooping ? (frame % FrameCount) : MathHelper.Clamp(frame, 0, FrameCount - 1);
+                return IsLooping ? (frame % FrameCount) : Util.Clamp(frame, 0, FrameCount - 1);
             }
         }
 
@@ -131,7 +131,7 @@ namespace Takai.Graphics
             set
             {
                 width = value;
-                framesPerRow = MathHelper.Max(1, ClipRect.Width / width);
+                framesPerRow = Math.Max(1, ClipRect.Width / width);
             }
         }
         private int width = 1;
@@ -172,7 +172,7 @@ namespace Takai.Graphics
             set
             {
                 clipRect = value;
-                framesPerRow = MathHelper.Max(1, value.Width / width);
+                framesPerRow = Math.Max(1, value.Width / width);
             }
         }
         private Rectangle clipRect = Rectangle.Empty;
@@ -319,8 +319,8 @@ namespace Takai.Graphics
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle, Color color, float scale, TimeSpan elapsedTime)
         {
             var elapsed = (float)(elapsedTime.TotalSeconds / FrameLength.TotalSeconds);
-            var cf = IsLooping ? ((int)elapsed % FrameCount) : MathHelper.Clamp((int)elapsed, 0, FrameCount - 1);
-            var nf = IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount - 1);
+            var cf = IsLooping ? ((int)elapsed % FrameCount) : Util.Clamp((int)elapsed, 0, FrameCount - 1);
+            var nf = IsLooping ? ((cf + 1) % FrameCount) : Util.Clamp(cf + 1, 0, FrameCount - 1);
             var fd = elapsed % 1;
 
             var tween = GetTween(fd, Tween);
@@ -331,8 +331,8 @@ namespace Takai.Graphics
         public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle, Color color, TimeSpan elapsedTime)
         {
             var elapsed = (float)(elapsedTime.TotalSeconds / FrameLength.TotalSeconds);
-            var cf = IsLooping ? ((int)elapsed % FrameCount) : MathHelper.Clamp((int)elapsed, 0, FrameCount - 1);
-            var nf = IsLooping ? ((cf + 1) % FrameCount) : MathHelper.Clamp(cf + 1, 0, FrameCount - 1);
+            var cf = IsLooping ? ((int)elapsed % FrameCount) : Util.Clamp((int)elapsed, 0, FrameCount - 1);
+            var nf = IsLooping ? ((cf + 1) % FrameCount) : Util.Clamp(cf + 1, 0, FrameCount - 1);
             var fd = elapsed % 1;
 
             if (ShrinkToFit) //todo: fit/contain
@@ -363,8 +363,8 @@ namespace Takai.Graphics
             switch (tween)
             {
                 case TweenStyle.Overlap:
-                    return new TweenValues(MathHelper.Max((frameDelta * 2) - 1, 0),
-                                           MathHelper.Max(1 - (frameDelta * 2), 0));
+                    return new TweenValues(Math.Max((frameDelta * 2) - 1, 0),
+                                           Math.Max(1 - (frameDelta * 2), 0));
                 case TweenStyle.Sequential:
                     return new TweenValues(frameDelta, 1 - frameDelta);
                 default:
@@ -382,9 +382,9 @@ namespace Takai.Graphics
         /// <returns>The fit rectangle</returns>
         public static Rectangle GetFitRect(int width, int height, Rectangle region)
         {
-            width = MathHelper.Min(width, region.Width);
-            height = MathHelper.Min(height, region.Height);
-            return new Rectangle(region.X + MathHelper.Max(0, (region.Width - width) / 2), region.Y + MathHelper.Max(0, (region.Height - height) / 2), width, height);
+            width = Math.Min(width, region.Width);
+            height = Math.Min(height, region.Height);
+            return new Rectangle(region.X + Math.Max(0, (region.Width - width) / 2), region.Y + Math.Max(0, (region.Height - height) / 2), width, height);
         }
         /// <summary>
         /// Calculate the dest rectangle to contain an image into a rectangle:
@@ -398,9 +398,9 @@ namespace Takai.Graphics
         public static Rectangle GetContainRect(int width, int height, Rectangle region)
         {
             //todo
-            width = MathHelper.Min(width, region.Width);
-            height = MathHelper.Min(height, region.Height);
-            return new Rectangle(region.X + MathHelper.Max(0, (region.Width - width) / 2), region.Y + MathHelper.Max(0, (region.Height - height) / 2), width, height);
+            width = Math.Min(width, region.Width);
+            height = Math.Min(height, region.Height);
+            return new Rectangle(region.X + Math.Max(0, (region.Width - width) / 2), region.Y + Math.Max(0, (region.Height - height) / 2), width, height);
         }
 
         public void DerivedDeserialize(System.Collections.Generic.Dictionary<string, object> props)

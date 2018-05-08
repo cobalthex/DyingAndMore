@@ -23,8 +23,8 @@ namespace Takai.Graphics
                 MaxCharHeight = 0;
                 foreach (var @char in characters)
                 {
-                    MaxCharWidth  = MathHelper.Max(MaxCharWidth, @char.Value.Width);
-                    MaxCharHeight = MathHelper.Max(MaxCharHeight, @char.Value.Height);
+                    MaxCharWidth  = Math.Max(MaxCharWidth, @char.Value.Width);
+                    MaxCharHeight = Math.Max(MaxCharHeight, @char.Value.Height);
                 }
             }
         }
@@ -92,8 +92,8 @@ namespace Takai.Graphics
                 read.Read(block, 0, 4); w = BitConverter.ToInt32(block, 0);
                 read.Read(block, 0, 4); h = BitConverter.ToInt32(block, 0);
 
-                font.MaxCharWidth = MathHelper.Max(font.MaxCharWidth, w);
-                font.MaxCharHeight = MathHelper.Max(font.MaxCharHeight, h);
+                font.MaxCharWidth = Math.Max(font.MaxCharWidth, w);
+                font.MaxCharHeight = Math.Max(font.MaxCharHeight, h);
 
                 font.characters.Add(c, new Rectangle(x, y, w, h));
             }
@@ -192,7 +192,7 @@ namespace Takai.Graphics
                 spriteBatch.Draw(Texture, pos, rgn, curColor);
 
                 pos.X += (monospace ? MaxCharWidth : rgn.Width) + Tracking.X;
-                maxH = MathHelper.Max(maxH, rgn.Height); //todo: maybe use MaxCharHeight
+                maxH = Math.Max(maxH, rgn.Height); //todo: maybe use MaxCharHeight
             }
 
             return pos - position;
@@ -234,7 +234,7 @@ namespace Takai.Graphics
             if (length == -1)
                 length = text.Length;
 
-            for (int i = start; i < MathHelper.Min(text.Length, start + length); ++i)
+            for (int i = start; i < Math.Min(text.Length, start + length); ++i)
             {
                 char ch = text[i];
 
@@ -299,7 +299,7 @@ namespace Takai.Graphics
                 }
 
                 pos.X += (monoSpace ? MaxCharWidth : rgn.Width) + Tracking.X;
-                lineHeight = MathHelper.Max(lineHeight, rgn.Height);
+                lineHeight = Math.Max(lineHeight, rgn.Height);
             }
         }
 
@@ -335,11 +335,11 @@ namespace Takai.Graphics
             if (length == -1)
                 length = text.Length;
 
-            for (int i = start; i < MathHelper.Min(text.Length, start + length); ++i)
+            for (int i = start; i < Math.Min(text.Length, start + length); ++i)
             {
                 if (text[i] == '\n')
                 {
-                    total.X = MathHelper.Max(total.X, row.X);
+                    total.X = Math.Max(total.X, row.X);
                     total.Y += row.Y + Tracking.Y;
                     row = Vector2.Zero;
                     continue;
@@ -363,11 +363,11 @@ namespace Takai.Graphics
                 if (Characters.TryGetValue(text[i], out var rgn))
                 {
                     row.X += rgn.Width + Tracking.X;
-                    row.Y  = MathHelper.Max(row.Y, rgn.Height);
+                    row.Y  = Math.Max(row.Y, rgn.Height);
                 }
             }
 
-            total.X = MathHelper.Max(total.X, row.X);
+            total.X = Math.Max(total.X, row.X);
             total.Y += row.Y;
             return total;
         }

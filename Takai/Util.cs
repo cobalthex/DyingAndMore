@@ -5,6 +5,8 @@ namespace Takai
 {
     public static class Util
     {
+        public static readonly Random RandomGenerator = new Random();
+
         /// <summary>
         /// Resize an array
         /// </summary>
@@ -160,9 +162,14 @@ namespace Takai
         public static Point Max(Point a, Point b)
         {
             return new Point(
-                MathHelper.Max(a.X, b.X),
-                MathHelper.Max(a.Y, b.Y)
+                Math.Max(a.X, b.X),
+                Math.Max(a.Y, b.Y)
             );
+        }
+
+        public static int Clamp(int value, int min, int max)
+        {
+            return (value < min ? min : (value > max ? max : value));
         }
 
         public static Vector4 HSLReverseLerp(Vector4 a, Vector4 b, float t)
@@ -193,6 +200,25 @@ namespace Takai
                    $"│{m.M21,5} {m.M22,5} {m.M23,5} {m.M24,5}│\n" +
                    $"│{m.M31,5} {m.M32,5} {m.M33,5} {m.M34,5}│\n" +
                    $"└{m.M41,5} {m.M42,5} {m.M43,5} {m.M44,5}┘\n";
+        }
+
+        public static bool PassChance(float passPercent)
+        {
+            return RandomGenerator.NextDouble() <= passPercent;
+        }
+
+        public static Point ToPoint(this Vector2 v)
+        {
+            return new Point((int)v.X, (int)v.Y);
+        }
+        public static Vector2 ToVector2(this Point p)
+        {
+            return new Vector2(p.X, p.Y);
+        }
+
+        public static bool Contains(this Rectangle r, Vector2 v)
+        {
+            return r.Contains((int)v.X, (int)v.Y);
         }
     }
 }

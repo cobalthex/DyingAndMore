@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.UI;
+using Takai;
 
 namespace DyingAndMore.Editor
 {
@@ -195,7 +196,7 @@ namespace DyingAndMore.Editor
         bool SelectDecal(Vector2 worldPosition)
         {
             //find closest decal
-            var sectors = editor.Map.GetOverlappingSectors(new Rectangle((worldPosition - new Vector2(5)).ToPoint(), new Point(10)));
+            var sectors = editor.Map.GetOverlappingSectors(new Rectangle((int)worldPosition.X - 5, (int)worldPosition.Y - 5, 10, 10)); //todo: fuzzing here should be global setting
 
             for (int y = sectors.Top; y < sectors.Bottom; ++y)
             {

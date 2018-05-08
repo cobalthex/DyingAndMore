@@ -103,8 +103,12 @@ namespace Takai.Game
 
             var radiusSq = searchRadius * searchRadius;
 
-            var ptr = new Point((int)(searchRadius * 2));
-            var rect = new Rectangle(position.ToPoint() - ptr, new Point(ptr.X * 2, ptr.Y * 2));
+            var rect = new Rectangle(
+                (int)(position.X - searchRadius),
+                (int)(position.Y - searchRadius),
+                (int)(searchRadius * 2),
+                (int)(searchRadius * 2)
+            );
             var sectors = GetOverlappingSectors(rect);
 
             foreach (var ent in EnumerateEntitiesInSectors(sectors))
@@ -145,8 +149,12 @@ namespace Takai.Game
         {
             var radiusSq = searchRadius * searchRadius;
 
-            var ptr = new Point((int)(searchRadius * 2));
-            var rect = new Rectangle(position.ToPoint() - ptr, new Point(ptr.X * 2, ptr.Y * 2));
+            var rect = new Rectangle(
+                (int)(position.X - searchRadius),
+                (int)(position.Y - searchRadius),
+                (int)(searchRadius * 2),
+                (int)(searchRadius * 2)
+            );
             var sectors = GetOverlappingSectors(rect);
 
             float minDist = float.MaxValue;
@@ -311,7 +319,7 @@ namespace Takai.Game
 
             var pos = start;
             var diff = (end - start);
-            var n = MathHelper.Max(Math.Abs(diff.X), Math.Abs(diff.Y)) / stepSize;
+            var n = Math.Max(Math.Abs(diff.X), Math.Abs(diff.Y)) / stepSize;
             var delta = Vector2.Normalize(diff) * stepSize;
 
             for (int i = 0; i < n; ++i)

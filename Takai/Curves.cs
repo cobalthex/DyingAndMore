@@ -60,9 +60,9 @@ namespace Takai
                 return Values[0].value;
 
             var i1 = GetClosestIndex(t);
-            var i0 = MathHelper.Clamp(i1 - 1, 0, Values.Count - 1);
-            var i2 = MathHelper.Clamp(i1 + 1, 0, Values.Count - 1);
-            var i3 = MathHelper.Clamp(i1 + 2, 0, Values.Count - 1);
+            var i0 = Util.Clamp(i1 - 1, 0, Values.Count - 1);
+            var i2 = Util.Clamp(i1 + 1, 0, Values.Count - 1);
+            var i3 = Util.Clamp(i1 + 2, 0, Values.Count - 1);
 
             t = (t - Values[i1].position) / (Values[i2].position - Values[i1].position);
             return Function(Values[i0].value, Values[i1].value, Values[i2].value, Values[i3].value, t);

@@ -27,7 +27,7 @@ namespace Takai.UI
             get => contentSize;
             set
             {
-                contentSize = MathHelper.Max(value, 0);
+                contentSize = Math.Max(value, 0);
                 ContentPosition = contentPosition;
             }
         }
@@ -50,9 +50,9 @@ namespace Takai.UI
             {
                 var newPosition = value;
                 if (Direction == Direction.Vertical)
-                    newPosition = MathHelper.Clamp(value, 0, ContentSize - (int)Size.Y);
+                    newPosition = Util.Clamp(value, 0, ContentSize - (int)Size.Y);
                 else if (Direction == Direction.Horizontal)
-                    newPosition = MathHelper.Clamp(value, 0, ContentSize - (int)Size.X);
+                    newPosition = Util.Clamp(value, 0, ContentSize - (int)Size.X);
 
                 if (newPosition != contentPosition)
                 {
@@ -163,7 +163,7 @@ namespace Takai.UI
             int containerSize = GetContainerSize();
             int size = GetThumbSize();
 
-            return ThumbMargin + MathHelper.Clamp((int)((ContentPosition / (float)ContentSize) * containerSize), 0, containerSize - size);
+            return ThumbMargin + Util.Clamp((int)((ContentPosition / (float)ContentSize) * containerSize), 0, containerSize - size);
         }
 
         protected Rectangle GetThumbBounds()
