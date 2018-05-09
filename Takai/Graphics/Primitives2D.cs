@@ -76,7 +76,7 @@ namespace Takai.Graphics
         public static void DrawX(SpriteBatch spriteBatch, Color color, Rectangle bounds)
         {
             var a = bounds.Location.ToVector2();
-            var b = (bounds.Location + bounds.Size).ToVector2();
+            var b = a + new Vector2(bounds.Width, bounds.Height);
             DrawLine(spriteBatch, color, a, b);
 
             var x = a.X;

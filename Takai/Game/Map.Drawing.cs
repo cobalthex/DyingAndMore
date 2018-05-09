@@ -203,6 +203,17 @@ namespace Takai.Game
         private List<EntityInstance> _drawEntsOutlined = new List<EntityInstance>();
         private HashSet<Trigger> _drawTriggers = new HashSet<Trigger>();
 
+        public struct RenderContext
+        {
+            public SpriteBatch spriteBatch;
+
+            public Camera camera;
+            public Matrix cameraTransform;
+            public Rectangle visibleSectors;
+            public Rectangle visibleRegion;
+            public Rectangle visibleTiles;
+        }
+
         /// <summary>
         /// Draw the map, centered around the Camera
         /// </summary>
@@ -238,6 +249,7 @@ namespace Takai.Game
 
             RenderContext context = new RenderContext
             {
+                spriteBatch = Class.spriteBatch,
                 camera = camera,
                 cameraTransform = camera.Transform,
                 visibleRegion = visibleRegion,
@@ -268,6 +280,8 @@ namespace Takai.Game
                 DrawPathHeuristic(ref context);
             else if (renderSettings.drawTiles)
                 DrawTiles(ref context);
+            else
+                Runtime.GraphicsDevice.Clear(ClearOptions.Stencil, Color.Transparent, 0, 1);
 
             if (renderSettings.drawDecals)
                 DrawDecals(ref context);
@@ -276,29 +290,29 @@ namespace Takai.Game
 
             if (renderSettings.drawFluidReflectionMask)
             {
-                Class.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-                Class.spriteBatch.Draw(Class.reflectionRenderTarget, Vector2.Zero, Color.White);
-                Class.spriteBatch.End();
+                context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+                context.spriteBatch.Draw(Class.reflectionRenderTarget, Vector2.Zero, Color.White);
+                context.spriteBatch.End();
             }
 
             if (renderSettings.drawFluids)
             {
                 //todo: transform correctly
 
-                Class.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, Class.stencilRead, null, Class.fluidEffect);
+                context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, Class.stencilRead, null, Class.fluidEffect);
                 Class.fluidEffect.Parameters["Mask"].SetValue(Class.reflectionRenderTarget);
                 Class.fluidEffect.Parameters["Reflection"].SetValue(renderSettings.drawReflections ? Class.reflectedRenderTarget : null);
-                Class.spriteBatch.Draw(Class.fluidsRenderTarget, Vector2.Zero, Color.White);
-                Class.spriteBatch.End();
+                context.spriteBatch.Draw(Class.fluidsRenderTarget, Vector2.Zero, Color.White);
+                context.spriteBatch.End();
             }
 
             #endregion
 
             #region present entities (and any other reflected objects)
 
-            Class.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, Class.stencilRead, null);
-            Class.spriteBatch.Draw(Class.reflectedRenderTarget, Vector2.Zero, Color.White);
-            Class.spriteBatch.End();
+            context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, Class.stencilRead, null);
+            context.spriteBatch.Draw(Class.reflectedRenderTarget, Vector2.Zero, Color.White);
+            context.spriteBatch.End();
 
             #endregion
 
@@ -311,31 +325,25 @@ namespace Takai.Game
             if (renderSettings.drawGrids)
                 DrawGrids(ref context);
 
+            renderedLines.Clear();
+            renderedCircles.Clear();
+
             #region present
 
             Runtime.GraphicsDevice.SetRenderTargets(originalRt);
 
-            Class.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, postEffect);
-            Class.spriteBatch.Draw(Class.preRenderTarget, Vector2.Zero, Color.White);
-            Class.spriteBatch.End();
+            context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, postEffect);
+            context.spriteBatch.Draw(Class.preRenderTarget, Vector2.Zero, Color.White);
+            context.spriteBatch.End();
 
             #endregion
-        }
-
-        public struct RenderContext
-        {
-            public Camera camera;
-            public Matrix cameraTransform;
-            public Rectangle visibleSectors;
-            public Rectangle visibleRegion;
-            public Rectangle visibleTiles;
         }
 
         //todo: many of these iterate over visible sectors in a loop. Possible opportunity to combine
 
         public void DrawPathHeuristic(ref RenderContext c)
         {
-            Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilWrite, null, null, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilWrite, null, null, c.cameraTransform);
 
             var mult = 360f / MaxHeuristic;
             for (var y = c.visibleTiles.Top; y < c.visibleTiles.Bottom; ++y)
@@ -347,29 +355,29 @@ namespace Takai.Game
                         continue;
 
                     Graphics.Primitives2D.DrawFill(
-                        Class.spriteBatch,
+                        c.spriteBatch,
                         Util.ColorFromHSL(path.heuristic * mult, 1, 0.8f, 1),
                         new Rectangle(x * Class.TileSize, y * Class.TileSize, Class.TileSize, Class.TileSize)
                     );
                 }
             }
 
-            Class.spriteBatch.End();
+            c.spriteBatch.End();
         }
 
         public void DrawTiles(ref RenderContext c)
         {
             var camViewport = c.camera.Viewport;
             var projection = Matrix.CreateOrthographicOffCenter(
-                camViewport.X,
-                camViewport.Y,
-                camViewport.Width,
-                camViewport.Height,
+                camViewport.Left,
+                camViewport.Right,
+                camViewport.Bottom,
+                camViewport.Top,
                 0, 1
             );
             Class.mapAlphaTest.Projection = projection;
             Class.mapAlphaTest.View = c.cameraTransform;
-            Class.spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, Class.stencilWrite, null, Class.mapAlphaTest);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, Class.stencilWrite, null, Class.mapAlphaTest);
 
             for (var y = c.visibleTiles.Top; y < c.visibleTiles.Bottom; ++y)
             {
@@ -379,7 +387,7 @@ namespace Takai.Game
                     if (tile < 0)
                         continue;
 
-                    Class.spriteBatch.Draw
+                    c.spriteBatch.Draw
                     (
                         Class.TilesImage,
                         new Vector2(x * Class.TileSize, y * Class.TileSize),
@@ -389,12 +397,12 @@ namespace Takai.Game
                 }
             }
 
-            Class.spriteBatch.End();
+            c.spriteBatch.End();
         }
 
         public void DrawFluids(ref RenderContext c)
         {
-            Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, Class.reflectionEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, Class.reflectionEffect, c.cameraTransform);
 
             //inactive fluids
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)
@@ -407,7 +415,7 @@ namespace Takai.Game
                         Class.reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
 
                         var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
-                        Class.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, new Color(1, 1, 1, fluid.Class.Alpha), 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
+                        c.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, new Color(1, 1, 1, fluid.Class.Alpha), 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
                     }
                 }
             }
@@ -418,15 +426,15 @@ namespace Takai.Game
                 Class.reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
 
                 var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
-                Class.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, new Color(1, 1, 1, fluid.Class.Alpha), 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
+                c.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, new Color(1, 1, 1, fluid.Class.Alpha), 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
             }
 
-            Class.spriteBatch.End();
+            c.spriteBatch.End();
         }
 
         public void DrawDecals(ref RenderContext c)
         {
-            Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, null, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, null, c.cameraTransform);
 
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)
             {
@@ -434,7 +442,7 @@ namespace Takai.Game
                 {
                     foreach (var decal in Sectors[y, x].decals)
                     {
-                        Class.spriteBatch.Draw
+                        c.spriteBatch.Draw
                         (
                             decal.texture,
                             decal.position,
@@ -451,12 +459,12 @@ namespace Takai.Game
                 }
             }
 
-            Class.spriteBatch.End();
+            c.spriteBatch.End();
         }
 
         public void DrawEntities(ref RenderContext c)
         {
-            Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, null, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, null, c.cameraTransform);
 
             foreach (var ent in activeEntities)
             {
@@ -469,7 +477,7 @@ namespace Takai.Game
                     foreach (var state in ent.ActiveAnimations)
                     {
                         state.Class?.Sprite?.Draw(
-                            Class.spriteBatch,
+                            c.spriteBatch,
                             ent.Position,
                             angle,
                             Color.White,
@@ -519,10 +527,10 @@ namespace Takai.Game
                     DrawArrow(ent.Position, ent.Forward, ent.Radius * 1.3f, Color.Gold);
             }
 
-            Class.spriteBatch.End();
+            c.spriteBatch.End();
 
             //outlined entities
-            Class.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, Class.outlineEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, Class.outlineEffect, c.cameraTransform);
 
             foreach (var ent in _drawEntsOutlined)
             {
@@ -537,7 +545,7 @@ namespace Takai.Game
                     Class.outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
                     Class.outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
                     sprite.Draw(
-                        Class.spriteBatch,
+                        c.spriteBatch,
                         ent.Position,
                         angle,
                         ent.OutlineColor,
@@ -547,14 +555,14 @@ namespace Takai.Game
                 }
             }
 
-            Class.spriteBatch.End();
+            c.spriteBatch.End();
         }
 
         public void DrawParticles(ref RenderContext c)
         {
             foreach (var p in Particles)
             {
-                Class.spriteBatch.Begin(SpriteSortMode.BackToFront, p.Key.Blend, null, Class.stencilRead, null, null, c.cameraTransform);
+                c.spriteBatch.Begin(SpriteSortMode.BackToFront, p.Key.Blend, null, Class.stencilRead, null, null, c.cameraTransform);
 
                 for (int i = 0; i < p.Value.Count; ++i)
                 {
@@ -563,7 +571,7 @@ namespace Takai.Game
 
                     p.Key.Sprite.Draw
                     (
-                        Class.spriteBatch,
+                        c.spriteBatch,
                         p.Value[i].position,
                         p.Value[i].angle + p.Value[i].spin + p.Value[i].spawnAngle,
                         p.Value[i].color,
@@ -575,7 +583,7 @@ namespace Takai.Game
                         DrawCircle(p.Value[i].position, p.Key.Radius * p.Value[i].scale, new Color(0.8f, 0.9f, 1, 0.5f));
                 }
 
-                Class.spriteBatch.End();
+                c.spriteBatch.End();
             }
         }
 
@@ -588,10 +596,10 @@ namespace Takai.Game
                 Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                 Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
                 var circleTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(
-                    camViewport.X,
-                    camViewport.Y,
-                    camViewport.Width,
-                    camViewport.Height,
+                    camViewport.Left,
+                    camViewport.Right,
+                    camViewport.Bottom,
+                    camViewport.Top,
                     0, 1
                 );
                 Class.circleEffect.Parameters["Transform"].SetValue(circleTransform);
@@ -601,8 +609,6 @@ namespace Takai.Game
                     pass.Apply();
                     Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, renderedCircles.ToArray(), 0, renderedCircles.Count / 3);
                 }
-
-                renderedCircles.Clear();
             }
 
             if (renderedLines.Count > 0)
@@ -611,10 +617,10 @@ namespace Takai.Game
                 Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                 Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
                 var lineTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(
-                    camViewport.X,
-                    camViewport.Y,
-                    camViewport.Width,
-                    camViewport.Height,
+                    camViewport.Left,
+                    camViewport.Right,
+                    camViewport.Bottom,
+                    camViewport.Top,
                     0, 1
                 );
                 Class.lineEffect.Parameters["Transform"].SetValue(lineTransform);
@@ -636,7 +642,6 @@ namespace Takai.Game
                     pass.Apply();
                     Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, renderedLines.ToArray(), 0, renderedLines.Count / 2);
                 }
-                renderedLines.Clear();
             }
         }
 
@@ -647,10 +652,10 @@ namespace Takai.Game
             Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
             var viewProjection = Matrix.CreateOrthographicOffCenter(
-                camViewport.X,
-                camViewport.Y,
-                camViewport.Width,
-                camViewport.Height,
+                camViewport.Left,
+                camViewport.Right,
+                camViewport.Bottom,
+                camViewport.Top,
                 0, 1
             );
             Class.lineEffect.Parameters["Transform"].SetValue(c.cameraTransform * viewProjection);
@@ -692,10 +697,10 @@ namespace Takai.Game
                     _drawTriggers.UnionWith(Sectors[y, x].triggers);
             }
 
-            Class.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, null, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, null, c.cameraTransform);
             foreach (var trigger in _drawTriggers)
-                Graphics.Primitives2D.DrawFill(Class.spriteBatch, new Color(Color.LimeGreen, 0.25f), trigger.Region);
-            Class.spriteBatch.End();
+                Graphics.Primitives2D.DrawFill(c.spriteBatch, new Color(Color.LimeGreen, 0.25f), trigger.Region);
+            c.spriteBatch.End();
         }
     }
 }

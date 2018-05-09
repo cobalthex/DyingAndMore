@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Takai.Input;
 using Takai.UI;
+using Takai;
 
 namespace DyingAndMore.Editor
 {

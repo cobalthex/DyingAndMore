@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
+using Takai;
 
 namespace DyingAndMore.Editor
 {
@@ -160,7 +161,7 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsMod(KeyMod.Shift))
                 {
-                    editor.Map.DrawRect(new Rectangle(savedWorldPos.ToPoint(), diff.ToPoint()), Color.GreenYellow);
+                    editor.Map.DrawRect(new Rectangle((int)savedWorldPos.X, (int)savedWorldPos.Y, (int)diff.X, (int)diff.Y), Color.GreenYellow);
 
                     var w = (System.Math.Abs((int)diff.X) - 1) / editor.Map.Class.TileSize + 1;
                     var h = (System.Math.Abs((int)diff.Y) - 1) / editor.Map.Class.TileSize + 1;
