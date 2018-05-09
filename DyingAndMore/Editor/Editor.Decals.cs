@@ -49,7 +49,7 @@ namespace DyingAndMore.Editor
                 var selectedDecal = selector.textures[selector.SelectedItem];
                 preview.Sprite.Texture = selectedDecal;
                 preview.Sprite.ClipRect = selectedDecal.Bounds;
-                preview.Sprite.Size = selectedDecal.Bounds.Size;
+                preview.Sprite.Size = new Point(selectedDecal.Bounds.Width, selectedDecal.Bounds.Height);
                 preview.Size = Vector2.Clamp(preview.Sprite.Size.ToVector2(),
                                              new Vector2(32), new Vector2(96));
             };

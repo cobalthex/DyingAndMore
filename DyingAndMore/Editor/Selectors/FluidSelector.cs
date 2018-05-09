@@ -28,7 +28,7 @@ namespace DyingAndMore.Editor.Selectors
             }
 
             ItemCount = fluids.Count;
-            ItemSize = new Point(64);
+            ItemSize = new Point(64, 64);
         }
 
         public override void DrawItem(SpriteBatch spriteBatch, int ItemIndex, Rectangle Bounds)

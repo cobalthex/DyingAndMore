@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
+using Takai;
 
 namespace DyingAndMore.Editor
 {
@@ -65,7 +66,7 @@ namespace DyingAndMore.Editor
                     }
 
                     var diff = end - start;
-                    activeTrigger.Region = new Rectangle(start, diff);
+                    activeTrigger.Region = new Rectangle(start.X, start.Y, diff.X, diff.Y);
                 }
             }
 
@@ -112,7 +113,7 @@ namespace DyingAndMore.Editor
 
             for (int i = sector.triggers.Count - 1; i >= 0; --i)
             {
-                if (sector.triggers[i].Region.Contains(Position))
+                if (sector.triggers[i].Region.Contains(Position.ToPoint()))
                 {
                     activeTrigger = sector.triggers[i];
                     return;

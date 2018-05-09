@@ -135,8 +135,10 @@ namespace Takai.Game
                 _position = value;
                 lastTransform.Translation = new Vector3(value, 0);
                 AxisAlignedBounds = new Rectangle(
-                    AxisAlignedBounds.Location + diff.ToPoint(),
-                    AxisAlignedBounds.Size
+                    AxisAlignedBounds.X + (int)diff.X,
+                    AxisAlignedBounds.Y + (int)diff.Y,
+                    AxisAlignedBounds.Width,
+                    AxisAlignedBounds.Height
                 );
             }
         }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Takai.Input;
+using Takai;
 
 namespace DyingAndMore.Editor
 {
@@ -42,7 +43,7 @@ namespace DyingAndMore.Editor
                 var selectedFluid = selector.fluids[selector.SelectedItem]; //todo: can go into selector
                 preview.Sprite.Texture = selectedFluid.Texture;
                 preview.Sprite.ClipRect = selectedFluid.Texture.Bounds;
-                preview.Sprite.Size = selectedFluid.Texture.Bounds.Size;
+                preview.Sprite.Size = new Point(selectedFluid.Texture.Bounds.Width, selectedFluid.Texture.Bounds.Height);
             };
             selector.SelectedItem = 0;
         }
@@ -63,7 +64,7 @@ namespace DyingAndMore.Editor
             {
                 lastFluidTime = time.TotalGameTime;
 
-                if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Class.Bounds.Contains(currentWorldPos))
+                if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Class.Bounds.Contains(currentWorldPos.ToPoint()))
                 {
                     editor.Map.Spawn(selectedFluid, currentWorldPos, Vector2.Zero);
                     return false;
@@ -71,7 +72,7 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsButtonDown(MouseButtons.Right))
                 {
-                    var sectors = editor.Map.GetOverlappingSectors(new Rectangle((currentWorldPos - Vector2.One).ToPoint(), new Point(2)));
+                    var sectors = editor.Map.GetOverlappingSectors(new Rectangle((int)currentWorldPos.X - 1, (int)currentWorldPos.Y - 1, 2, 2));
                     //get overlapping sectors
                     for (int y = sectors.Top; y < sectors.Bottom; ++y)
                     {

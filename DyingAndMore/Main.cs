@@ -60,14 +60,13 @@ namespace DyingAndMore
                 GraphicsProfile = GraphicsProfile.HiDef,
                 PreferredBackBufferFormat = SurfaceFormat.Color,
 #if WINDOWS_UAP
-                PreferMultiSampling = true,
-                IsFullScreen = true,
+                //IsFullScreen = true,
 #endif
             };
 
             gdm.DeviceCreated += GdmDeviceCreated;
 
-            TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f); //60 fps
+            //TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f);
             IsMouseVisible = true;
 
             IsFixedTimeStep = false;
@@ -192,7 +191,14 @@ namespace DyingAndMore
 
             ui.HasFocus = true;
             base.Initialize();
+
+            testMap = (new Takai.Game.MapClass
+            {
+
+            }).Instantiate();
         }
+
+        Takai.Game.MapInstance testMap;
 
         protected override void Update(GameTime gameTime)
         {
@@ -226,6 +232,9 @@ namespace DyingAndMore
 
             ui.Update(gameTime);
             ui.Bounds = GraphicsDevice.Viewport.Bounds;
+
+            testMap.DrawLine(new Vector2(100), new Vector2(1000), Color.Gold);
+            testMap.DrawLine(new Vector2(100, 1000), new Vector2(1000, 100), Color.SteelBlue);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -248,6 +257,13 @@ namespace DyingAndMore
             }
 
             sbatch.End();
+
+            var rc = new Takai.Game.MapInstance.RenderContext
+            {
+                spriteBatch = sbatch,
+                cameraTransform = Matrix.Identity
+            };
+            //testMap.DrawLines(ref rc);
         }
     }
 }

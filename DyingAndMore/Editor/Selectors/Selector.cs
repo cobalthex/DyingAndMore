@@ -21,7 +21,7 @@ namespace DyingAndMore.Editor.Selectors
                 OnResize(System.EventArgs.Empty);
             }
         }
-        private Point _itemSize = new Point(1);
+        private Point _itemSize = new Point(1, 1);
 
         public int ItemCount
         {
@@ -52,7 +52,7 @@ namespace DyingAndMore.Editor.Selectors
             get => _selectedItem;
             set
             {
-                _selectedItem = MathHelper.Clamp(value, 0, ItemCount - 1);
+                _selectedItem = Takai.Util.Clamp(value, 0, ItemCount - 1);
                 SelectionChanged?.Invoke(this, System.EventArgs.Empty);
             }
         }
@@ -124,7 +124,7 @@ namespace DyingAndMore.Editor.Selectors
             Takai.Graphics.Primitives2D.DrawFill(spriteBatch, new Color(1, 1, 1, 0.75f), VisibleBounds);
 
             int start = scrollBar.ContentPosition / (ItemSize.Y + Padding) * ItemsPerRow;
-            for (int i = start; i < Math.Min(start + (int)(Size.Y / (ItemSize.Y + Padding) + 2) * ItemsPerRow, ItemCount); ++i)
+            for (int i = start; i < System.Math.Min(start + (int)(Size.Y / (ItemSize.Y + Padding) + 2) * ItemsPerRow, ItemCount); ++i)
             {
                 var rect = new Rectangle(
                     Padding + (i % ItemsPerRow) * (ItemSize.X + Padding),

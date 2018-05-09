@@ -21,7 +21,7 @@ namespace DyingAndMore.Editor.Selectors
                     textures.Add(tex);
             }
             ItemCount = textures.Count;
-            ItemSize = new Point(64);
+            ItemSize = new Point(64, 64);
             Padding = 5;
         }
 

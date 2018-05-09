@@ -286,13 +286,15 @@ namespace Takai.Graphics
                 //outline each character's bounds
                 //Primitives2D.DrawRect(spriteBatch, Color.Coral, new Rectangle(bounds.Location + pos, rgn.Size));
 
-                var clip = Rectangle.Intersect(rgn, new Rectangle(rgn.Location - pos, bounds.Size));
+                var loc = rgn.Location - pos;
+                var clip = Rectangle.Intersect(rgn, new Rectangle(loc.X, loc.Y, bounds.Width, bounds.Height));
 
                 if (clip.Width > 0 && clip.Height > 0)
                 {
+                    loc = bounds.Location + pos + (clip.Location - rgn.Location);
                     spriteBatch.Draw(
                         Texture,
-                        new Rectangle(bounds.Location + pos + (clip.Location - rgn.Location), clip.Size),
+                        new Rectangle(loc.X, loc.Y, clip.Width, clip.Height),
                         clip,
                         curColor
                     );

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Linq;
 
 namespace DyingAndMore.Editor.Selectors
 {
@@ -13,7 +12,7 @@ namespace DyingAndMore.Editor.Selectors
         public EntSelector(Editor Editor)
             : base(Editor)
         {
-            ItemSize = new Point(64);
+            ItemSize = new Point(64, 64);
             Padding = 5;
 
             var searchPaths = new[] { "Actors", "Scenery" };

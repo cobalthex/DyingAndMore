@@ -10,7 +10,7 @@ namespace DyingAndMore.Editor.Selectors
             : base(editor)
         {
             var tileSz = editor.Map.Class.TileSize;
-            ItemSize = new Point(tileSz);
+            ItemSize = new Point(tileSz, tileSz);
             ItemCount = editor.Map.Class.TilesPerRow * (editor.Map.Class.TilesImage.Height / tileSz);
         }
 
