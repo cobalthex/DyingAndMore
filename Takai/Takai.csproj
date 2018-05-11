@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,8 +39,9 @@
     <ApplicationIcon>TakaiTech.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FNA">
-      <HintPath>..\Tools\FNA.dll</HintPath>
+    <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="NVorbis">
       <HintPath>..\packages\NVorbis.0.8.5.0\lib\NVorbis.dll</HintPath>
@@ -87,6 +89,7 @@
     <Compile Include="Game\Particles.cs" />
     <Compile Include="Game\Sound.cs" />
     <Compile Include="Diagnostics.cs" />
+    <Compile Include="Game\Trails.cs" />
     <Compile Include="Objects.cs" />
     <Compile Include="Game\Path.cs" />
     <Compile Include="Game\Script.cs" />
@@ -116,7 +119,6 @@
     <Compile Include="UI\UITree.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

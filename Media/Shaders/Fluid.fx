@@ -6,13 +6,13 @@ SamplerState Sampler;
 float Reflectivity = 0.25;
 float Depth = 0.03;
 
-float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0) : SV_Target
+float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoord : TEXCOORD0) : SV_Target
 {
-    float4 px = Tex.Sample(Sampler, uv);
-    float4 mask = Mask.Sample(Sampler, uv);
+    float4 px = Tex.Sample(Sampler, texcoord);
+    float4 mask = Mask.Sample(Sampler, texcoord);
     mask.x = (mask.x * 2) - 1;
 
-    float4 refl = Reflection.Sample(Sampler, uv + mask.xy * Depth);
+    float4 refl = Reflection.Sample(Sampler, texcoord + mask.xy * Depth);
     refl.a *= mask.a * Reflectivity;
 
     if (px.a > 0.5) //todo: replace with sdf

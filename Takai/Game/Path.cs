@@ -53,35 +53,6 @@ namespace Takai.Game
         }
     }
 
-    public class Trail
-    {
-        public int MaxPoints { get; set; } = 10;
-
-        protected List<Vector2> points;
-        public IReadOnlyList<Vector2> Points => points;
-        int start = 0;
-
-        public void AddPoint(Vector2 point)
-        {
-            if (MaxPoints == 0)
-            {
-                points.Add(point);
-                ++start;
-                return;
-            }
-
-            if (points.Count <= start)
-            {
-                points.Capacity = MaxPoints;
-                points.Add(point);
-            }
-            else
-                points[start] = point;
-
-            start = (start + 1) % MaxPoints;
-        }
-    }
-
     /*
     /// <summary>
     /// Follow along a path

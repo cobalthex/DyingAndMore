@@ -369,7 +369,7 @@ namespace DyingAndMore.Game.Entities
         public override void Think(TimeSpan deltaTime)
         {
             var diff = Vector2.Normalize(AI.Target.Position - AI.Actor.Position);
-            var det = Takai.Util.Determinant(AI.Actor.Forward, diff);
+            var det = Util.Determinant(AI.Actor.Forward, diff);
             var maxTurn = MathHelper.Clamp(MaxTurn / (AI.Actor.Velocity.Length() / 20), 0, MaxTurn);
             var angle = det * maxTurn;
 

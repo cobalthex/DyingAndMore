@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace DyingAndMore
 {
@@ -32,6 +33,61 @@ namespace DyingAndMore
     /// </summary>
     public class DyingAndMoreGame : Microsoft.Xna.Framework.Game
     {
+#if WINDOWS
+        public enum ScreenOrientation : int
+        {
+            Angle0 = 0,
+            Angle90 = 1,
+            Angle180 = 2,
+            Angle270 = 3
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct DEVMODE
+        {
+            private const int CCHDEVICENAME = 32;
+            private const int CCHFORMNAME = 32;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
+            public string dmDeviceName;
+
+            public short dmSpecVersion;
+            public short dmDriverVersion;
+            public short dmSize;
+            public short dmDriverExtra;
+            public int dmFields;
+            public int dmPositionX;
+            public int dmPositionY;
+            public ScreenOrientation dmDisplayOrientation;
+            public int dmDisplayFixedOutput;
+            public short dmColor;
+            public short dmDuplex;
+            public short dmYResolution;
+            public short dmTTOption;
+            public short dmCollate;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHFORMNAME)]
+            public string dmFormName;
+
+            public short dmLogPixels;
+            public int dmBitsPerPel;
+            public int dmPelsWidth;
+            public int dmPelsHeight;
+            public int dmDisplayFlags;
+            public int dmDisplayFrequency;
+            public int dmICMMethod;
+            public int dmICMIntent;
+            public int dmMediaType;
+            public int dmDitherType;
+            public int dmReserved1;
+            public int dmReserved2;
+            public int dmPanningWidth;
+            public int dmPanningHeight;
+        }
+
+        [DllImport("User32", CharSet = CharSet.Unicode)]
+        public static extern bool EnumDisplaySettings(string szDeviceName, int modeNum, ref DEVMODE devMode);
+#endif
         GraphicsDeviceManager gdm;
 
 #if WINDOWS
@@ -59,6 +115,8 @@ namespace DyingAndMore
                 PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
                 GraphicsProfile = GraphicsProfile.HiDef,
                 PreferredBackBufferFormat = SurfaceFormat.Color,
+                SynchronizeWithVerticalRetrace = false,
+                //PreferMultiSampling = true,
 #if WINDOWS_UAP
                 //IsFullScreen = true,
 #endif
@@ -66,14 +124,19 @@ namespace DyingAndMore
 
             gdm.DeviceCreated += GdmDeviceCreated;
 
-            //TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 60f);
             IsMouseVisible = true;
 
+            TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 144f);
             IsFixedTimeStep = false;
         }
 
         void GdmDeviceCreated(object sender, System.EventArgs e)
         {
+
+            DEVMODE d = new DEVMODE();
+            EnumDisplaySettings(null, 1, ref d);
+            System.Diagnostics.Debug.WriteLine($"Display {d.dmDeviceName} Hz: {d.dmDisplayFrequency}");
+
             Takai.Runtime.Game = this;
 
             Takai.Data.Serializer.LoadTypesFrom(typeof(DyingAndMoreGame).GetTypeInfo().Assembly);

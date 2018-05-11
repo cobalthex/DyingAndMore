@@ -38,7 +38,6 @@ namespace Takai.Game
     {
         [Data.Serializer.Ignored]
         public string File { get; set; }
-
         public string Name { get; set; }
 
         /// <summary>
@@ -144,7 +143,6 @@ namespace Takai.Game
         public List<FluidInstance> fluids = new List<FluidInstance>();
         public List<Decal> decals = new List<Decal>();
         public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
-
     }
 
     public partial class MapInstance : IObjectInstance<MapClass>
