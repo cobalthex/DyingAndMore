@@ -157,8 +157,9 @@ namespace DyingAndMore.Game
             {
                 Class = new TrailClass
                 {
-                    MaxPoints = 20,
+                    MaxPoints = 50,
                     AutoTaper = true,
+                    //Color = Color.Red,
                     Sprite = new Takai.Graphics.Sprite(Cache.Load<Texture2D>("Effects/laser.png")),
                 }
             };
@@ -244,8 +245,8 @@ namespace DyingAndMore.Game
                 }
 
                 ++n;
-                //if (n % 2 == 0)
-                    trail.AddPoint(Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 32);
+                if (n % 4 == 0)
+                    trail.AddPoint(Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 132);
             }
             Map.DrawTrail(trail);
 

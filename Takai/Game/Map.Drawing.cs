@@ -614,6 +614,10 @@ namespace Takai.Game
             }
         }
 
+        RasterizerState rz = new RasterizerState
+        {
+            FillMode = FillMode.WireFrame,
+        };
         public void DrawTrails(ref RenderContext c)
         {
             //auto taper widths?
@@ -640,12 +644,16 @@ namespace Takai.Game
                     if (trail.Class.AutoTaper)
                         w *= n / (float)trail.Points.Count;
 
-                    Class.trailVerts[n * 2 + 0] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location - norm * w, 0), Color.White, new Vector2(0, 0));
-                    Class.trailVerts[n * 2 + 1] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location + norm * w, 0), Color.White, new Vector2(0, 1));
+                    Class.trailVerts[n * 2 + 0] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location - norm * w, 0), trail.Class.Color, new Vector2(0, 0));
+                    Class.trailVerts[n * 2 + 1] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location + norm * w, 0), trail.Class.Color, new Vector2(0, 1));
 
                     //if (n < trail.Points.Count - 1)
                     //    DrawLine(trail.Points[i1].location, trail.Points[i2].location, Color.Orange);
                 }
+
+                //var v = Class.trailVerts[Class.trailVerts.Length - 2];
+                //Class.trailVerts[Class.trailVerts.Length - 2] = Class.trailVerts[Class.trailVerts.Length - 1];
+                //Class.trailVerts[Class.trailVerts.Length - 1] = v;
             }
 
             Class.trailVbuffer.SetData(Class.trailVerts);
@@ -671,11 +679,26 @@ namespace Takai.Game
                 int next = 0;
                 foreach (var trail in renderedTrails)
                 {
-                    Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture;
+                    Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture ?? Graphics.Primitives2D.Pixel;
                     Runtime.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, next, trail.Points.Count * 2 - 2);
                     next += trail.Points.Count * 2;
                 }
             }
+
+            //draw mesh
+            /*Class.lineEffect.Parameters["Transform"].SetValue(cameraTransform);
+            Runtime.GraphicsDevice.RasterizerState = rz;
+            foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                int next = 0;
+                foreach (var trail in renderedTrails)
+                {
+                    Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture;
+                    Runtime.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, next, trail.Points.Count * 2 - 2);
+                    next += trail.Points.Count * 2;
+                }
+            }*/
         }
 
         public void DrawLines(ref RenderContext c)

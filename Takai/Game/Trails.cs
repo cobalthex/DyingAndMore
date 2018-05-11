@@ -11,8 +11,11 @@ namespace Takai.Game
 
         public int MaxPoints { get; set; } = 10;
         public Graphics.Sprite Sprite { get; set; }
+        public Color Color { get; set; } = Color.White;
 
+        //fade?
         public bool AutoTaper { get; set; }
+        //taper middle (curve scalar?)
 
         public TrailInstance Instantiate()
         {

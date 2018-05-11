@@ -5,12 +5,15 @@ namespace Takai.Graphics
 {
     public static class Primitives2D
     {
-        private static Texture2D _pixel;
+        /// <summary>
+        /// A single white pixel texture
+        /// </summary>
+        public static Texture2D Pixel { get; private set; }
 
         private static void Init(GraphicsDevice device)
         {
-            _pixel = new Texture2D(device, 1, 1);
-            _pixel.SetData<Color>(new[] { Color.White });
+            Pixel = new Texture2D(device, 1, 1);
+            Pixel.SetData<Color>(new[] { Color.White });
         }
 
         /// <summary>
@@ -21,7 +24,7 @@ namespace Takai.Graphics
         /// <param name="points">The verticies of the line, if there are less than 2 points, no line is drawn</param>
         public static void DrawLine(SpriteBatch spriteBatch, Color color, params Vector2[] points)
         {
-            if (_pixel == null)
+            if (Pixel == null)
                 Init(spriteBatch.GraphicsDevice);
 
             for (int i = 0; i < points.Length - 1; ++i)
@@ -29,7 +32,7 @@ namespace Takai.Graphics
                 float angle = (float)System.Math.Atan2(points[i + 1].Y - points[i].Y, points[i + 1].X - points[i].X);
                 float length = (points[i + 1] - points[i]).Length();
 
-                spriteBatch.Draw(_pixel, points[i], null, color, angle, Vector2.Zero, new Vector2(length, 1), SpriteEffects.None, 0);
+                spriteBatch.Draw(Pixel, points[i], null, color, angle, Vector2.Zero, new Vector2(length, 1), SpriteEffects.None, 0);
             }
         }
 
@@ -41,10 +44,10 @@ namespace Takai.Graphics
         /// <param name="point">The point to draw the dot at</param>
         public static void DrawDot(SpriteBatch spriteBatch, Color color, Vector2 point)
         {
-            if (_pixel == null)
+            if (Pixel == null)
                 Init(spriteBatch.GraphicsDevice);
 
-            spriteBatch.Draw(_pixel, point, color);
+            spriteBatch.Draw(Pixel, point, color);
         }
 
         /// <summary>
@@ -67,10 +70,10 @@ namespace Takai.Graphics
         /// <param name="rectangle">The rectangle of the filled region</param>
         public static void DrawFill(SpriteBatch spriteBatch, Color color, Rectangle rectangle)
         {
-            if (_pixel == null)
+            if (Pixel == null)
                 Init(spriteBatch.GraphicsDevice);
 
-            spriteBatch.Draw(_pixel, rectangle, color);
+            spriteBatch.Draw(Pixel, rectangle, color);
         }
 
         public static void DrawX(SpriteBatch spriteBatch, Color color, Rectangle bounds)
