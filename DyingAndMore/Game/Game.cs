@@ -152,7 +152,18 @@ namespace DyingAndMore.Game
             tinyFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
 
             testEffect = Cache.Load<EffectsClass>("Effects/Damage.fx.tk");
+
+            trail = new TrailInstance
+            {
+                Class = new TrailClass
+                {
+                    MaxPoints = 20,
+                    AutoTaper = true,
+                    Sprite = new Takai.Graphics.Sprite(Cache.Load<Texture2D>("Effects/laser.png")),
+                }
+            };
         }
+        TrailInstance trail;
 
         protected override void OnMapChanged(EventArgs e)
         {
@@ -209,6 +220,7 @@ namespace DyingAndMore.Game
         }
 
         bool x = false;
+        int n = 0;
         protected override void UpdateSelf(GameTime time)
         {
             GameInstance.Current.ElapsedRealTime += time.ElapsedGameTime;
@@ -230,7 +242,12 @@ namespace DyingAndMore.Game
                     region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
                     Map.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
                 }
+
+                ++n;
+                //if (n % 2 == 0)
+                    trail.AddPoint(Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 32);
             }
+            Map.DrawTrail(trail);
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();

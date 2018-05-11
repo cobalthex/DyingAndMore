@@ -24,7 +24,11 @@ namespace Takai.Game
 
         internal XnaEffect lineEffect;
         internal XnaEffect circleEffect;
+        internal XnaEffect basicEffect;
         internal RasterizerState shapeRaster;
+
+        internal VertexPositionColorTexture[] trailVerts;
+        internal DynamicVertexBuffer trailVbuffer;
 
         public Texture2D TilesImage { get; set; }
 
@@ -72,18 +76,22 @@ namespace Takai.Game
                 {
                     ReferenceAlpha = 1
                 };
-                preRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 8, RenderTargetUsage.DiscardContents);
-                fluidsRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 8, RenderTargetUsage.DiscardContents);
-                reflectionRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 8, RenderTargetUsage.DiscardContents);
-                reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 8, RenderTargetUsage.DiscardContents);
+                preRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 1, RenderTargetUsage.DiscardContents);
+                fluidsRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
+                reflectionRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
+                reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
                 //todo: some of the render targets may be able to be combined
             }
 
             lineEffect = Data.Cache.Load<XnaEffect>("Shaders/Line.mgfx");
             circleEffect = Data.Cache.Load<XnaEffect>("Shaders/Circle.mgfx");
+            basicEffect = Data.Cache.Load<XnaEffect>("Shaders/Basic.mgfx");
             outlineEffect = Data.Cache.Load<XnaEffect>("Shaders/Outline.mgfx");
             fluidEffect = Data.Cache.Load<XnaEffect>("Shaders/Fluid.mgfx");
             reflectionEffect = Data.Cache.Load<XnaEffect>("Shaders/Reflection.mgfx");
+
+            trailVerts = new VertexPositionColorTexture[512];
+            trailVbuffer = new DynamicVertexBuffer(Runtime.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, trailVerts.Length, BufferUsage.WriteOnly);
         }
     }
 
@@ -102,6 +110,9 @@ namespace Takai.Game
         protected List<VertexPositionColor> renderedLines = new List<VertexPositionColor>(32);
         protected List<VertexPositionColorTexture> renderedCircles = new List<VertexPositionColorTexture>(32);
 
+        protected List<TrailInstance> renderedTrails = new List<TrailInstance>(32);
+        protected int renderedTrailPointCount = 0;
+
         /// <summary>
         /// All of the available render settings customizations
         /// </summary>
@@ -114,6 +125,7 @@ namespace Takai.Game
             public bool drawFluidReflectionMask;
             public bool drawDecals;
             public bool drawParticles;
+            public bool drawTrails;
             public bool drawTriggers;
             public bool drawLines;
             public bool drawGrids;
@@ -132,6 +144,7 @@ namespace Takai.Game
                 drawReflections = true,
                 drawDecals = true,
                 drawParticles = true,
+                drawTrails = true,
                 drawLines = true,
             };
         }
@@ -179,6 +192,15 @@ namespace Takai.Game
             renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius, radius), 0), color, new Vector2(0, 1)));
             renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius, -radius), 0), color, new Vector2(1, 0)));
             renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius), 0), color, new Vector2(1)));
+        }
+
+        public void DrawTrail(TrailInstance trail)
+        {
+            if (trail.Points.Count < 2)
+                return;
+
+            renderedTrails.Add(trail);
+            renderedTrailPointCount += trail.Points.Count;
         }
 
         static readonly Matrix arrowWingTransform = Matrix.CreateRotationZ(120);
@@ -263,6 +285,9 @@ namespace Takai.Game
             if (renderSettings.drawEntities)
                 DrawEntities(ref context);
 
+            if (renderSettings.drawTrails)
+                DrawTrails(ref context);
+
             if (renderSettings.drawParticles)
                 DrawParticles(ref context);
 
@@ -327,6 +352,8 @@ namespace Takai.Game
 
             renderedLines.Clear();
             renderedCircles.Clear();
+            renderedTrails.Clear();
+            renderedTrailPointCount = 0;
 
             #region present
 
@@ -402,7 +429,7 @@ namespace Takai.Game
 
         public void DrawFluids(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, Class.reflectionEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, Class.reflectionEffect, c.cameraTransform);
 
             //inactive fluids
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)
@@ -587,15 +614,76 @@ namespace Takai.Game
             }
         }
 
+        public void DrawTrails(ref RenderContext c)
+        {
+            //auto taper widths?
+            if (renderedTrailPointCount < 2)
+                return;
+
+            if (Class.trailVerts.Length < renderedTrailPointCount * 2)
+            {
+                Class.trailVerts = new VertexPositionColorTexture[renderedTrailPointCount * 2];
+                Class.trailVbuffer = new DynamicVertexBuffer(Runtime.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, Class.trailVerts.Length, BufferUsage.WriteOnly);
+            }
+
+            foreach (var trail in renderedTrails)
+            {
+                for (int n = 0; n < trail.Points.Count; ++n)
+                {
+                    var i1 = (n + trail.Start) % trail.Points.Count;
+                    var i2 = (n + 1 + trail.Start) % trail.Points.Count;
+
+                    var dir = Vector2.Normalize(trail.Points[i2].location - trail.Points[i1].location);
+                    var norm = new Vector2(dir.Y, -dir.X);
+
+                    float w = trail.Points[i1].width;
+                    if (trail.Class.AutoTaper)
+                        w *= n / (float)trail.Points.Count;
+
+                    Class.trailVerts[n * 2 + 0] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location - norm * w, 0), Color.White, new Vector2(0, 0));
+                    Class.trailVerts[n * 2 + 1] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location + norm * w, 0), Color.White, new Vector2(0, 1));
+
+                    //if (n < trail.Points.Count - 1)
+                    //    DrawLine(trail.Points[i1].location, trail.Points[i2].location, Color.Orange);
+                }
+            }
+
+            Class.trailVbuffer.SetData(Class.trailVerts);
+            Runtime.GraphicsDevice.SetVertexBuffer(Class.trailVbuffer);
+
+            Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
+            Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+            Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
+
+            var camViewport = c.camera.Viewport;
+            var cameraTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(
+                camViewport.Left,
+                camViewport.Right,
+                camViewport.Bottom,
+                camViewport.Top,
+                0, 1
+            );
+            Class.basicEffect.Parameters["Transform"].SetValue(cameraTransform);
+
+            foreach (EffectPass pass in Class.basicEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                int next = 0;
+                foreach (var trail in renderedTrails)
+                {
+                    Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture;
+                    Runtime.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, next, trail.Points.Count * 2 - 2);
+                    next += trail.Points.Count * 2;
+                }
+            }
+        }
+
         public void DrawLines(ref RenderContext c)
         {
             var camViewport = c.camera.Viewport;
             if (renderedCircles.Count > 0)
             {
-                Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
-                Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
-                Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
-                var circleTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(
+                var circleTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter( //todo: precalc
                     camViewport.Left,
                     camViewport.Right,
                     camViewport.Bottom,
@@ -603,6 +691,10 @@ namespace Takai.Game
                     0, 1
                 );
                 Class.circleEffect.Parameters["Transform"].SetValue(circleTransform);
+
+                Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
+                Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+                Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
 
                 foreach (EffectPass pass in Class.circleEffect.CurrentTechnique.Passes)
                 {

@@ -10,6 +10,7 @@
         DrawFluidReflectionMask: false;
         DrawDecals: true;
         DrawParticles: true;
+        DrawTrails: true;
         DrawTriggers: true;
         DrawLines: true;
         DrawGrids: true;

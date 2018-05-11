@@ -124,6 +124,7 @@ namespace DyingAndMore.Editor.Selectors
             Takai.Graphics.Primitives2D.DrawFill(spriteBatch, new Color(1, 1, 1, 0.75f), VisibleBounds);
 
             int start = scrollBar.ContentPosition / (ItemSize.Y + Padding) * ItemsPerRow;
+            start = System.Math.Max(start, 0);
             for (int i = start; i < System.Math.Min(start + (int)(Size.Y / (ItemSize.Y + Padding) + 2) * ItemsPerRow, ItemCount); ++i)
             {
                 var rect = new Rectangle(

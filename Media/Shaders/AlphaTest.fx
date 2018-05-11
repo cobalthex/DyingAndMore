@@ -6,12 +6,12 @@ float Cutoff;
 float Range; //if 0, cutoff is all values below
 //fade?
 
-float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 uv : TEXCOORD0) : SV_Target
+float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoord : TEXCOORD0) : SV_Target
 {
-    float4 mask = Mask.Sample(Sampler, uv);
+    float4 mask = Mask.Sample(Sampler, texcoord);
     if ((Range == 0 && mask.x <= Cutoff) || //todo: replace with sdf
     	(Cutoff - Range <= mask.x && Cutoff + Range >= mask.x))
-        return Tex.Sample(Sampler, uv) * color;
+        return Tex.Sample(Sampler, texcoord) * color;
     return 0;
 }
 
