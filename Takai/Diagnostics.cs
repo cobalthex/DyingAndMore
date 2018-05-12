@@ -1,25 +1,24 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using P2D = Takai.Graphics.Primitives2D;
 
 namespace Takai
 {
-    public class RingBuffer<T>
+    /// <summary>
+    /// An append-only ring buffer
+    /// </summary>
+    /// <typeparam name="T">The type of data to store</typeparam>
+    public class RingBuffer<T> : IReadOnlyList<T>
     {
         protected T[] entries = null;
         protected int next = 0;
 
         public int Count => entries.Length;
 
-        public System.Collections.Generic.IEnumerable<T> Entries
-        {
-            get
-            {
-                for (int i = 0; i < entries.Length; ++i)
-                    yield return entries[(i + next) % entries.Length];
-            }
-        }
+        public bool IsReadOnly => throw new NotImplementedException();
 
         public RingBuffer(int max)
         {
@@ -36,6 +35,21 @@ namespace Takai
         {
             entries[next] = entry;
             next = (next + 1) % entries.Length;
+        }
+
+        public T this[int index]
+        {
+            get => entries[index];
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return ((IReadOnlyList<T>)entries).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IReadOnlyList<T>)entries).GetEnumerator();
         }
     }
 
@@ -54,8 +68,13 @@ namespace Takai
         }
 
         private static RingBuffer<LogRow> buffer = new RingBuffer<LogRow>(8);
-        public static System.Collections.Generic.IEnumerable<LogRow> Entries
-        { get => buffer.Entries; }
+
+        public static int Count => buffer.Count;
+
+        public static IEnumerator<LogRow> GetEnumerator()
+        {
+            return buffer.GetEnumerator();
+        }
 
         public static void Clear()
         {
@@ -146,7 +165,7 @@ namespace Takai
 
             float x = bounds.Left;
             var last = new Vector2(x, bounds.Bottom - (average - min) / dy * bounds.Height);
-            foreach (var entry in buffer.Entries)
+            foreach (var entry in buffer)
             {
                 if (entry.time == TimeSpan.Zero || entry.time == TimeSpan.Zero)
                     continue;

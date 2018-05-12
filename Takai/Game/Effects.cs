@@ -148,6 +148,8 @@ namespace Takai.Game
         public Range<float> Spread { get; set; } = new Range<float>(0, MathHelper.TwoPi);
         public float Radius { get; set; } = 0; //spawn radius around the spawn point
 
+        public bool InheritParentVelocity { get; set; }
+
         public void Spawn(EffectsInstance instance)
         {
             if (Class == null)
@@ -176,7 +178,7 @@ namespace Takai.Game
                 {
                     color = Class.ColorOverTime.Count > 0 ? Class.ColorOverTime.Evaluate(0) : Color.White,
                     position = position,
-                    velocity = Class.InitialSpeed.Random() * dir + instance.Velocity,
+                    velocity = Class.InitialSpeed.Random() * dir + (InheritParentVelocity ? instance.Velocity : Vector2.Zero),
                     lifetime = Class.Lifetime.Random(),
                     spawnAngle = initAngle,
                     spin = Class.SpinOverTime.Count > 0 ? Class.SpinOverTime.Evaluate(0) : 0,

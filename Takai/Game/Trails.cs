@@ -47,7 +47,20 @@ namespace Takai.Game
 
     public class TrailInstance : IObjectInstance<TrailClass>
     {
-        public TrailClass Class { get; set; }
+        //todo: make class readonly across board
+        public TrailClass Class
+        {
+            get => _class;
+            set
+            {
+                _class = value;
+                if (_class != null && _class.MaxPoints > 0)
+                    points.Resize(Class.MaxPoints);
+                HeadIndex = TailIndex = Count = 0;
+                elapsedTime = TimeSpan.Zero;
+            }
+        }
+        private TrailClass _class;
 
         List<TrailPoint> points = new List<TrailPoint>();
 
@@ -58,13 +71,9 @@ namespace Takai.Game
 
         public int HeadIndex { get; private set; } = 0;
         public int TailIndex { get; private set; } = 0;
+        public int Count { get; private set; } = 0;
 
         protected TimeSpan elapsedTime;
-
-        public bool IsEmpty()
-        {
-            return HeadIndex == TailIndex;
-        }
 
         public void Update(TimeSpan deltaTime)
         {
@@ -73,7 +82,10 @@ namespace Takai.Game
             if (HeadIndex != TailIndex &&
                 Class.Lifetime > TimeSpan.Zero &&
                 elapsedTime - points[TailIndex].time > Class.Lifetime)
+            {
                 TailIndex = (TailIndex + 1) % Points.Count;
+                --Count;
+            }
         }
 
         public void AddPoint(Vector2 point, float width)
@@ -85,17 +97,14 @@ namespace Takai.Game
             }
             else
             {
-                if (points.Count <= HeadIndex)
-                {
-                    points.Capacity = Class.MaxPoints;
-                    points.Add(new TrailPoint(point, width, Class.Lifetime));
-                }
-                else
-                    points[HeadIndex] = new TrailPoint(point, width, Class.Lifetime);
+                points[HeadIndex] = new TrailPoint(point, width, Class.Lifetime);
 
                 HeadIndex = (HeadIndex + 1) % Class.MaxPoints;
-                if (HeadIndex >= TailIndex)
+                if (HeadIndex <= TailIndex)
+                {
                     TailIndex = (HeadIndex + 1) % points.Count;
+                    Count = 0;
+                }
             }
         }
     }
