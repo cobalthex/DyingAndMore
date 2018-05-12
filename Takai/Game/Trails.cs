@@ -17,6 +17,11 @@ namespace Takai.Game
         public bool AutoTaper { get; set; }
         //taper middle (curve scalar?)
 
+        /// <summary>
+        /// Zero for forever
+        /// </summary>
+        public TimeSpan Lifetime { get; set; }
+
         public TrailInstance Instantiate()
         {
             return new TrailInstance
@@ -30,11 +35,13 @@ namespace Takai.Game
     {
         public Vector2 location;
         public float width;
+        public TimeSpan time;
 
-        public TrailPoint(Vector2 location, float width)
+        public TrailPoint(Vector2 location, float width, TimeSpan time)
         {
             this.location = location;
             this.width = width;
+            this.time = time;
         }
     }
 
@@ -49,26 +56,46 @@ namespace Takai.Game
         /// </summary>
         public IReadOnlyList<TrailPoint> Points => points;
 
-        public int Start { get; private set; } = 0;
+        public int HeadIndex { get; private set; } = 0;
+        public int TailIndex { get; private set; } = 0;
+
+        protected TimeSpan elapsedTime;
+
+        public bool IsEmpty()
+        {
+            return HeadIndex == TailIndex;
+        }
+
+        public void Update(TimeSpan deltaTime)
+        {
+            elapsedTime += deltaTime;
+
+            if (HeadIndex != TailIndex &&
+                Class.Lifetime > TimeSpan.Zero &&
+                elapsedTime - points[TailIndex].time > Class.Lifetime)
+                TailIndex = (TailIndex + 1) % Points.Count;
+        }
 
         public void AddPoint(Vector2 point, float width)
         {
             if (Class.MaxPoints == 0)
             {
-                points.Add(new TrailPoint(point, width));
-                ++Start;
+                points.Add(new TrailPoint(point, width, Class.Lifetime));
+                ++HeadIndex;
             }
             else
             {
-                if (points.Count <= Start)
+                if (points.Count <= HeadIndex)
                 {
                     points.Capacity = Class.MaxPoints;
-                    points.Add(new TrailPoint(point, width));
+                    points.Add(new TrailPoint(point, width, Class.Lifetime));
                 }
                 else
-                    points[Start] = new TrailPoint(point, width);
+                    points[HeadIndex] = new TrailPoint(point, width, Class.Lifetime);
 
-                Start = (Start + 1) % Class.MaxPoints;
+                HeadIndex = (HeadIndex + 1) % Class.MaxPoints;
+                if (HeadIndex >= TailIndex)
+                    TailIndex = (HeadIndex + 1) % points.Count;
             }
         }
     }

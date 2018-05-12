@@ -160,6 +160,7 @@ namespace DyingAndMore.Game
                     MaxPoints = 50,
                     AutoTaper = true,
                     //Color = Color.Red,
+                    Lifetime = TimeSpan.FromSeconds(2),
                     Sprite = new Takai.Graphics.Sprite(Cache.Load<Texture2D>("Effects/laser.png")),
                 }
             };
@@ -245,9 +246,10 @@ namespace DyingAndMore.Game
                 }
 
                 ++n;
-                if (n % 4 == 0)
-                    trail.AddPoint(Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 132);
+                if (n % 8 == 0)
+                    trail.AddPoint(Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 30);
             }
+            trail.Update(time.ElapsedGameTime);
             Map.DrawTrail(trail);
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
@@ -284,7 +286,7 @@ namespace DyingAndMore.Game
                                 case "fluid":
                                 case "fluids":
                                     cleans |= MapInstance.CleanupOptions.Fluids;
-                                    Takai.LogBuffer.Append("Removing all fluids");
+                                    LogBuffer.Append("Removing all fluids");
                                     break;
 
                                 case "particles":
