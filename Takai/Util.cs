@@ -31,6 +31,21 @@ namespace Takai
             return newArray;
         }
 
+        /// <summary>
+        /// Resize a list
+        /// </summary>
+        /// <typeparam name="T">The type of values in the list</typeparam>
+        /// <param name="list">The list to resize</param>
+        /// <param name="newSize">The new size of the list</param>
+        /// <param name="defaultValue">A default value for any new items in the list. Existing items will be unchanged</param>
+        public static void Resize<T>(this System.Collections.Generic.List<T> list, int newSize, T defaultValue = default(T))
+        {
+            var oldSize = list.Count;
+            list.Capacity = newSize;
+            for (int i = oldSize; i < newSize; ++i)
+                list.Add(defaultValue);
+        }
+
         public static Vector2 Reject(this Vector2 a, Vector2 b)
         {
             var ab = Vector2.Dot(a, b);
