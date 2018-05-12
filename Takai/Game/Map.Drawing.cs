@@ -632,23 +632,23 @@ namespace Takai.Game
 
             foreach (var trail in renderedTrails)
             {
-                for (int n = 0; n < trail.Points.Count; ++n)
+                for (int i = trail.TailIndex, n = 0; i != trail.HeadIndex && n < trail.Points.Count; ++n)
                 {
-                    var i1 = (n + trail.Start) % trail.Points.Count;
-                    var i2 = (n + 1 + trail.Start) % trail.Points.Count;
+                    var i2 = (i + 1) % trail.Points.Count;
 
-                    var dir = Vector2.Normalize(trail.Points[i2].location - trail.Points[i1].location);
+                    var dir = Vector2.Normalize(trail.Points[i2].location - trail.Points[i].location);
                     var norm = new Vector2(dir.Y, -dir.X);
 
-                    float w = trail.Points[i1].width;
+                    float w = trail.Points[i].width;
                     if (trail.Class.AutoTaper)
                         w *= n / (float)trail.Points.Count;
 
-                    Class.trailVerts[n * 2 + 0] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location - norm * w, 0), trail.Class.Color, new Vector2(0, 0));
-                    Class.trailVerts[n * 2 + 1] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location + norm * w, 0), trail.Class.Color, new Vector2(0, 1));
+                    Class.trailVerts[n * 2 + 0] = new VertexPositionColorTexture(new Vector3(trail.Points[i].location - norm * w, 0), trail.Class.Color, new Vector2(0, 0));
+                    Class.trailVerts[n * 2 + 1] = new VertexPositionColorTexture(new Vector3(trail.Points[i].location + norm * w, 0), trail.Class.Color, new Vector2(0, 1));
 
                     //if (n < trail.Points.Count - 1)
                     //    DrawLine(trail.Points[i1].location, trail.Points[i2].location, Color.Orange);
+                    i = (i + 1) % trail.Points.Count;
                 }
 
                 //var v = Class.trailVerts[Class.trailVerts.Length - 2];
