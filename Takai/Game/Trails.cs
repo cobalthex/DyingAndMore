@@ -79,7 +79,7 @@ namespace Takai.Game
         {
             elapsedTime += deltaTime;
 
-            if (HeadIndex != TailIndex &&
+            if (Count > 0 &&
                 Class.Lifetime > TimeSpan.Zero &&
                 elapsedTime - points[TailIndex].time > Class.Lifetime)
             {
@@ -92,19 +92,22 @@ namespace Takai.Game
         {
             if (Class.MaxPoints == 0)
             {
-                points.Add(new TrailPoint(point, width, Class.Lifetime));
+                points.Add(new TrailPoint(point, width, elapsedTime));
                 ++HeadIndex;
+                ++Count;
             }
             else
             {
-                points[HeadIndex] = new TrailPoint(point, width, Class.Lifetime);
+                points[HeadIndex] = new TrailPoint(point, width, elapsedTime);
+                HeadIndex = (HeadIndex + 1) % points.Count;
 
-                HeadIndex = (HeadIndex + 1) % Class.MaxPoints;
-                if (HeadIndex <= TailIndex)
+                if (Count >= points.Count)
                 {
-                    TailIndex = (HeadIndex + 1) % points.Count;
-                    Count = 0;
+                    TailIndex = HeadIndex;
+                    Count = points.Count;
                 }
+                else
+                    ++Count;
             }
         }
     }

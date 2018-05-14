@@ -972,7 +972,7 @@ namespace Takai.UI
             while (toUpdate.children.Count > 0)
                 toUpdate = toUpdate.children[toUpdate.children.Count - 1];
 
-            bool handleInput = true;
+            bool handleInput = Runtime.HasFocus;
             while (true)
             {
                 if (handleInput)

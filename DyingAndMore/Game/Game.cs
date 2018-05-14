@@ -157,13 +157,15 @@ namespace DyingAndMore.Game
             {
                 Class = new TrailClass
                 {
-                    MaxPoints = 50,
+                    MaxPoints = 10,
                     AutoTaper = true,
                     //Color = Color.Red,
                     Lifetime = TimeSpan.FromSeconds(2),
                     Sprite = new Takai.Graphics.Sprite(Cache.Load<Texture2D>("Effects/laser.png")),
-                }
+                },
             };
+            trail.AddPoint(new Vector2(100, 100), 20);
+            trail.AddPoint(new Vector2(400, 100), 20);
         }
         TrailInstance trail;
 
@@ -222,7 +224,6 @@ namespace DyingAndMore.Game
         }
 
         bool x = false;
-        int n = 0;
         protected override void UpdateSelf(GameTime time)
         {
             GameInstance.Current.ElapsedRealTime += time.ElapsedGameTime;
@@ -244,10 +245,6 @@ namespace DyingAndMore.Game
                     region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
                     Map.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
                 }
-
-                ++n;
-                if (n % 8 == 0)
-                    trail.AddPoint(Map.ActiveCamera.ScreenToWorld(InputState.MouseVector), 30);
             }
             trail.Update(time.ElapsedGameTime);
             Map.DrawTrail(trail);
@@ -458,6 +455,9 @@ namespace DyingAndMore.Game
         {
             Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
+            if (InputState.IsPress(MouseButtons.Left))
+                trail.AddPoint(worldMousePos, 30);
+
             /*if (player != null)
             {
                 swatch.Restart();
@@ -610,6 +610,13 @@ namespace DyingAndMore.Game
                 new Vector2(20),
                 Color.Orange
             );
+
+            for (int i = 0; i < trail.Count; ++i)
+            {
+                var px = Map.ActiveCamera.WorldToScreen(trail.Points[(i + trail.TailIndex) % trail.Count].location);
+                DefaultFont.Draw(spriteBatch, $"{i} {((i + trail.TailIndex) % trail.Count)}", px + new Vector2(10), Color.Orange);
+                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Black, new Rectangle((int)px.X - 3, (int)px.Y - 3, 6, 6));
+            }
 
             if (Map.renderSettings.drawDebugInfo)
             {
