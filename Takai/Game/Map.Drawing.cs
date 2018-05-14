@@ -196,11 +196,11 @@ namespace Takai.Game
 
         public void DrawTrail(TrailInstance trail)
         {
-            if (trail.Points.Count < 2)
+            if (trail.Count < 2)
                 return;
 
             renderedTrails.Add(trail);
-            renderedTrailPointCount += trail.Points.Count;
+            renderedTrailPointCount += trail.Count;
         }
 
         static readonly Matrix arrowWingTransform = Matrix.CreateRotationZ(120);
@@ -617,6 +617,8 @@ namespace Takai.Game
         RasterizerState rz = new RasterizerState
         {
             FillMode = FillMode.WireFrame,
+            CullMode = CullMode.None,
+            MultiSampleAntiAlias = true,
         };
         public void DrawTrails(ref RenderContext c)
         {
@@ -632,34 +634,34 @@ namespace Takai.Game
 
             foreach (var trail in renderedTrails)
             {
-                for (int i = trail.TailIndex, n = 0; i != trail.HeadIndex && n < trail.Points.Count; ++n)
+                for (int n = 0; n < trail.Count; ++n)
                 {
-                    var i2 = (i + 1) % trail.Points.Count;
+                    var i = (n + trail.TailIndex) % trail.Points.Count;
+                    int i2 = (i + 1) % trail.Count;
 
                     var dir = Vector2.Normalize(trail.Points[i2].location - trail.Points[i].location);
                     var norm = new Vector2(dir.Y, -dir.X);
 
                     float w = trail.Points[i].width;
-                    if (trail.Class.AutoTaper)
-                        w *= n / (float)trail.Points.Count;
+                    //if (trail.Class.AutoTaper)
+                    //    w *= n / (float)trail.Points.Count;
 
                     Class.trailVerts[n * 2 + 0] = new VertexPositionColorTexture(new Vector3(trail.Points[i].location - norm * w, 0), trail.Class.Color, new Vector2(0, 0));
                     Class.trailVerts[n * 2 + 1] = new VertexPositionColorTexture(new Vector3(trail.Points[i].location + norm * w, 0), trail.Class.Color, new Vector2(0, 1));
 
                     //if (n < trail.Points.Count - 1)
                     //    DrawLine(trail.Points[i1].location, trail.Points[i2].location, Color.Orange);
-                    i = (i + 1) % trail.Points.Count;
                 }
-
-                //var v = Class.trailVerts[Class.trailVerts.Length - 2];
-                //Class.trailVerts[Class.trailVerts.Length - 2] = Class.trailVerts[Class.trailVerts.Length - 1];
-                //Class.trailVerts[Class.trailVerts.Length - 1] = v;
             }
 
-            Class.trailVbuffer.SetData(Class.trailVerts);
+            //var v = Class.trailVerts[0];
+            //Class.trailVerts[0] = Class.trailVerts[1];
+            //Class.trailVerts[1] = v;
+
+            Class.trailVbuffer.SetData(Class.trailVerts, 0, renderedTrailPointCount * 2);
             Runtime.GraphicsDevice.SetVertexBuffer(Class.trailVbuffer);
 
-            Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
+            Runtime.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
 
@@ -680,13 +682,13 @@ namespace Takai.Game
                 foreach (var trail in renderedTrails)
                 {
                     Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture ?? Graphics.Primitives2D.Pixel;
-                    Runtime.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, next, trail.Points.Count * 2 - 2);
-                    next += trail.Points.Count * 2;
+                    Runtime.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, next, trail.Count * 2 - 2);
+                    next += trail.Count * 2;
                 }
             }
 
             //draw mesh
-            /*Class.lineEffect.Parameters["Transform"].SetValue(cameraTransform);
+            Class.lineEffect.Parameters["Transform"].SetValue(cameraTransform);
             Runtime.GraphicsDevice.RasterizerState = rz;
             foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)
             {
@@ -695,10 +697,10 @@ namespace Takai.Game
                 foreach (var trail in renderedTrails)
                 {
                     Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture;
-                    Runtime.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, next, trail.Points.Count * 2 - 2);
-                    next += trail.Points.Count * 2;
+                    Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, Class.trailVerts, next, trail.Count * 2 - 2);
+                    next += trail.Count * 2;
                 }
-            }*/
+            }
         }
 
         public void DrawLines(ref RenderContext c)

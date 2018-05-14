@@ -71,10 +71,7 @@ namespace Takai
 
         public static int Count => buffer.Count;
 
-        public static IEnumerator<LogRow> GetEnumerator()
-        {
-            return buffer.GetEnumerator();
-        }
+        public static IEnumerable<LogRow> Entries => buffer;
 
         public static void Clear()
         {
