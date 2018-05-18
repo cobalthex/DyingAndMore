@@ -40,6 +40,9 @@ namespace DyingAndMore.Editor
             };
             selector.SelectionChanged += delegate
             {
+                if (selector.SelectedItem < 0)
+                    return;
+
                 var selectedFluid = selector.fluids[selector.SelectedItem]; //todo: can go into selector
                 preview.Sprite.Texture = selectedFluid.Texture;
                 preview.Sprite.ClipRect = selectedFluid.Texture.Bounds;
@@ -56,12 +59,11 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
-            var selectedFluid = selector.fluids[selector.SelectedItem];
-
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
 
-            if (time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
+            if (selector.SelectedItem >= 0 && time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
             {
+            var selectedFluid = selector.fluids[selector.SelectedItem];
                 lastFluidTime = time.TotalGameTime;
 
                 if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Class.Bounds.Contains(currentWorldPos.ToPoint()))

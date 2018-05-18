@@ -98,13 +98,6 @@ GunClass {
                 Count: 1;
                 Spread: [-120deg -60deg];
             };
-
-            SoundImpulse {
-                Class: {
-                    sound: @"Sounds/open_fx.ogg";
-                    gain: 0.1;
-                }
-            }
         ]
     }
 }

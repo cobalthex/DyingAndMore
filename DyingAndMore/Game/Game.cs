@@ -157,7 +157,7 @@ namespace DyingAndMore.Game
             {
                 Class = new TrailClass
                 {
-                    MaxPoints = 10,
+                    MaxPoints = 40,
                     AutoTaper = true,
                     //Color = Color.Red,
                     Lifetime = TimeSpan.FromSeconds(2),
@@ -224,6 +224,7 @@ namespace DyingAndMore.Game
         }
 
         bool x = false;
+        int fc = 0;
         protected override void UpdateSelf(GameTime time)
         {
             GameInstance.Current.ElapsedRealTime += time.ElapsedGameTime;
@@ -245,6 +246,9 @@ namespace DyingAndMore.Game
                     region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
                     Map.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
                 }
+
+                if (player != null && fc % 8 == 0)
+                    trail.AddPoint(player.Position, 20);
             }
             trail.Update(time.ElapsedGameTime);
             Map.DrawTrail(trail);
@@ -258,6 +262,7 @@ namespace DyingAndMore.Game
             DataModel.Globals["player.health"] = player.CurrentHealth / player.Class.MaxHealth;
 
             base.UpdateSelf(time);
+            ++fc;
         }
 
         void ParseCommand(string command)
@@ -610,13 +615,6 @@ namespace DyingAndMore.Game
                 new Vector2(20),
                 Color.Orange
             );
-
-            for (int i = 0; i < trail.Count; ++i)
-            {
-                var px = Map.ActiveCamera.WorldToScreen(trail.Points[(i + trail.TailIndex) % trail.Count].location);
-                DefaultFont.Draw(spriteBatch, $"{i} {((i + trail.TailIndex) % trail.Count)}", px + new Vector2(10), Color.Orange);
-                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Black, new Rectangle((int)px.X - 3, (int)px.Y - 3, 6, 6));
-            }
 
             if (Map.renderSettings.drawDebugInfo)
             {

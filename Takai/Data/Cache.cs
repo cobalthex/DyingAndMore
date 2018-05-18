@@ -93,7 +93,8 @@ namespace Takai.Data
 
             CustomLoaders.Add("bfnt", new BitmapFontLoader());
 
-            CustomLoaders.Add("ogg", new OggLoader());
+            CustomLoaders.Add("ogg", new UnsupportedLoader());
+            CustomLoaders.Add("opus", new OpusLoader());
             CustomLoaders.Add("wav", new SoundLoader());
             CustomLoaders.Add("mp3", new UnsupportedLoader());
 
@@ -482,6 +483,7 @@ namespace Takai.Data
                 return loaded;
             }
         }
+
         public class SoundEffectSoundSource : ISoundSource
         {
             public SoundEffect sound;
@@ -497,33 +499,39 @@ namespace Takai.Data
             }
         }
 
-        public class OggSoundSource : ISoundSource
+        public class OpusSoundSource : ISoundSource
         {
-            public NVorbis.VorbisReader vorbis;
+            Concentus.Structs.OpusDecoder decoder;
+            Concentus.Oggfile.OpusOggReadStream stream;
+
+            [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
+            struct UnionArray
+            {
+                [System.Runtime.InteropServices.FieldOffset(0)]
+                public Byte[] Bytes;
+
+                [System.Runtime.InteropServices.FieldOffset(0)]
+                public short[] Shorts;
+            }
 
             //assumes single threaded
-            float[] intermediate; //might be able to get directly from ogg
-            byte[] samples;
-            long readOffset;
+            UnionArray samples;
 
             //nvorbis logical streams?
 
-            public OggSoundSource(NVorbis.VorbisReader vorbis)
+            public OpusSoundSource(Concentus.Oggfile.OpusOggReadStream stream, Concentus.Structs.OpusDecoder decoder)
             {
-                this.vorbis = vorbis;
-                if (vorbis == null)
-                    return; //todo
-                var sampleCount = Math.Min(vorbis.TotalSamples, 128 * 1024);
-                intermediate = new float[sampleCount];
-                samples = new byte[sampleCount * 2]; //16 bit PCM
+                this.stream = stream;
+                this.decoder = decoder;
+                //todo: something is fucky here (leak)
             }
 
             public SoundEffectInstance Instantiate()
             {
-                if (vorbis == null)
-                    return new DynamicSoundEffectInstance(41400, AudioChannels.Mono); //todo
+                if (stream == null)
+                    return new DynamicSoundEffectInstance(22500, AudioChannels.Mono); //todo
 
-                var instance = new DynamicSoundEffectInstance(vorbis.SampleRate, (AudioChannels)vorbis.Channels);
+                var instance = new DynamicSoundEffectInstance(decoder.SampleRate, (AudioChannels)decoder.NumChannels);
                 instance.BufferNeeded += Instance_BufferNeeded;
                 Instance_BufferNeeded(instance, EventArgs.Empty); //preload first buffer
                 return instance;
@@ -533,59 +541,40 @@ namespace Takai.Data
             {
                 var instance = (DynamicSoundEffectInstance)sender;
 
-                var read = vorbis.ReadSamples(intermediate, 0, intermediate.Length);
-                if (read <= 0)
-                    throw new IOException("Error reading Ogg Vorbis samples");
-                readOffset += read;
-
-                if (readOffset > vorbis.TotalSamples)
+                if (stream.HasNextPacket)
                 {
-                    readOffset = 0;
-                    vorbis.DecodedPosition = 0;
+                    samples.Shorts = stream.DecodeNextPacket();
+                    if (samples.Shorts == null)
+                        return; //todo: end of stream or error
                 }
 
                 //multithread?
 
-                //convert to 16 bit PCM
-                for (int i = 0; i < read; ++i)
-                {
-                    var n = (short)(intermediate[i] * 0x8000);
-                    samples[i * 2] = (byte)(n & 0xff);
-                    samples[i * 2 + 1] = (byte)((n >> 8) & 0xff);
-                }
-
-                instance.SubmitBuffer(samples);
+                instance.SubmitBuffer(samples.Bytes);
             }
 
             public void Dispose()
             {
-                vorbis?.Dispose();
+                decoder.ResetState();
             }
         }
 
-        class OggLoader : CustomLoader
+        class OpusLoader : CustomLoader
         {
             public override bool PreserveStream => true;
 
-            //todo: use https://github.com/flibitijibibo/Vorbisfile-CS/blob/24e9ece0239da6b03890d47f6118df85d52cf179/Vorbisfile.cs
+            //todo: use for vorbis: https://github.com/flibitijibibo/Vorbisfile-CS/blob/24e9ece0239da6b03890d47f6118df85d52cf179/Vorbisfile.cs
+
+
+            //opus decoder (not vorbis)
 
             public override object Load(CustomLoad load)
             {
-#if WINDOWS_UAP
-                return new OggSoundSource(null); //todo
-#else
-                var vorbis = new NVorbis.VorbisReader(load.stream, true);
-                if (vorbis.Channels < 1 || vorbis.Channels > 2)
-                    throw new FormatException($"Audio must be in mono or stero (provided: {vorbis.Channels})");
-
-                if (vorbis.SampleRate < 8000 || vorbis.SampleRate > 48000)
-                    throw new FormatException($"Audio must be between 8KHz and 48KHz (provided: {vorbis.SampleRate / 1024:N1}KHz");
-
-                return new OggSoundSource(vorbis);
-#endif
+                var decoder = new Concentus.Structs.OpusDecoder(48000, 2); //todo: configurable quality?
+                var oggStream = new Concentus.Oggfile.OpusOggReadStream(decoder, load.stream);
+                return new OpusSoundSource(oggStream, decoder);
             }
         }
-
 
         class SoundLoader : CustomLoader
         {

@@ -956,7 +956,6 @@ namespace Takai.UI
         /// <param name="time">Game time</param>
         public virtual void Update(GameTime time)
         {
-            updateTimer.Restart();
             /* update in the following order: H G F E D C B A
             A
                 B
@@ -995,7 +994,6 @@ namespace Takai.UI
                 else
                     toUpdate = toUpdate._parent;
             }
-            updateTimer.Stop();
         }
 
         /// <summary>
@@ -1092,16 +1090,12 @@ namespace Takai.UI
             return true;
         }
 
-        private static System.Diagnostics.Stopwatch drawTimer = new System.Diagnostics.Stopwatch();
-        private static System.Diagnostics.Stopwatch updateTimer = new System.Diagnostics.Stopwatch();
-
         /// <summary>
         /// Draw this element, its decorators, and any children
         /// </summary>
         /// <param name="spriteBatch">The spritebatch to use</param>
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            drawTimer.Restart();
             var draws = new Queue<Static>(Children.Count + 1);
             draws.Enqueue(this);
 
@@ -1131,8 +1125,6 @@ namespace Takai.UI
                 foreach (var child in toDraw.Children)
                     draws.Enqueue(child);
             }
-            drawTimer.Stop();
-            DefaultFont?.Draw(spriteBatch, $"{updateTimer.Elapsed.TotalMilliseconds}\n{drawTimer.Elapsed.TotalMilliseconds}", new Vector2(300), Color.Gray);
         }
 
         /// <summary>

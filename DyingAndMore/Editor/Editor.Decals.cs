@@ -15,22 +15,22 @@ namespace DyingAndMore.Editor
         Vector2 currentWorldPos, lastWorldPos;
 
         Selectors.DecalSelector selector;
-        Takai.UI.Graphic preview;
+        Graphic preview;
 
         //todo: start,end to update selected
 
         public DecalsEditorMode(Editor editor)
             : base("Decals", editor)
         {
-            VerticalAlignment = Takai.UI.Alignment.Stretch;
-            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+            VerticalAlignment = Alignment.Stretch;
+            HorizontalAlignment = Alignment.Stretch;
 
-            AddChild(preview = new Takai.UI.Graphic()
+            AddChild(preview = new Graphic()
             {
                 Sprite = new Takai.Graphics.Sprite(),
                 Position = new Vector2(20),
-                HorizontalAlignment = Takai.UI.Alignment.End,
-                VerticalAlignment = Takai.UI.Alignment.Start,
+                HorizontalAlignment = Alignment.End,
+                VerticalAlignment = Alignment.Start,
                 BorderColor = Color.White
             });
             preview.Click += delegate
@@ -46,6 +46,9 @@ namespace DyingAndMore.Editor
             };
             selector.SelectionChanged += delegate
             {
+                if (selector.SelectedItem < 0)
+                    return;
+
                 var selectedDecal = selector.textures[selector.SelectedItem];
                 preview.Sprite.Texture = selectedDecal;
                 preview.Sprite.ClipRect = selectedDecal.Bounds;

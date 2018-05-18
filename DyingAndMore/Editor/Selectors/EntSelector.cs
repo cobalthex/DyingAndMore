@@ -20,6 +20,7 @@ namespace DyingAndMore.Editor.Selectors
             foreach (var path in searchPaths)
             {
                 var searchPath = Path.Combine(Takai.Data.Cache.DefaultRoot, path);
+                int i = 0;
                 foreach (var file in Directory.EnumerateFiles(searchPath, "*.ent.tk", SearchOption.AllDirectories))
                 {
                     try
@@ -30,7 +31,7 @@ namespace DyingAndMore.Editor.Selectors
                     }
                     catch (System.Exception e)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Could not load Entity definitions from {file}:\n  {e}");
+                        System.Diagnostics.Debug.WriteLine($"{i} Could not load Entity definitions from {file}:\n  {e}");
                     }
                 }
             }
