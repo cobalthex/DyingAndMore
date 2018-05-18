@@ -291,7 +291,7 @@ namespace Takai.Game
             if (renderSettings.drawParticles)
                 DrawParticles(ref context);
 
-            Runtime.GraphicsDevice.SetRenderTargets(Class.fluidsRenderTarget, Class.reflectionRenderTarget);
+            Runtime.GraphicsDevice.SetRenderTargets(Class.fluidsRenderTarget, Class.reflectionRenderTarget); //generates garbage?
             Runtime.GraphicsDevice.Clear(Color.Transparent);
 
             if (renderSettings.drawFluids ||
@@ -634,7 +634,7 @@ namespace Takai.Game
 
             foreach (var trail in renderedTrails)
             {
-                for (int n = 0; n < trail.Count; ++n)
+                for (int n = 0; n < trail.Count - 1; ++n)
                 {
                     var i = (n + trail.TailIndex) % trail.Points.Count;
                     int i2 = (i + 1) % trail.Count;
@@ -687,8 +687,8 @@ namespace Takai.Game
                 }
             }
 
-            //draw mesh
-            Class.lineEffect.Parameters["Transform"].SetValue(cameraTransform);
+            //draw (wireframed) mesh
+            /*Class.lineEffect.Parameters["Transform"].SetValue(cameraTransform);
             Runtime.GraphicsDevice.RasterizerState = rz;
             foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)
             {
@@ -700,7 +700,7 @@ namespace Takai.Game
                     Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, Class.trailVerts, next, trail.Count * 2 - 2);
                     next += trail.Count * 2;
                 }
-            }
+            }*/
         }
 
         public void DrawLines(ref RenderContext c)

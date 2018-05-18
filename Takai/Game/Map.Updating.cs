@@ -426,7 +426,7 @@ namespace Takai.Game
 
                     var sos = 200;
                     var pitch = 1 - ((sos + camera.Follow.Velocity.LengthSquared()) / (sos + s.Velocity.LengthSquared()));
-                    s.Instance.Pitch = MathHelper.Clamp(pitch, -1, 1);
+                    //s.Instance.Pitch = MathHelper.Clamp(pitch, -1, 1);
 
                     Sounds[i] = s;
                 }

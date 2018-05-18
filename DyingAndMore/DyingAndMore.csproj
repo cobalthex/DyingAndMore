@@ -46,7 +46,9 @@
   <ItemGroup>
     <Content Include="Game.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="AssetView.cs" />
     <Compile Include="Editor\Editor.Entities.cs" />

@@ -159,7 +159,7 @@ namespace Takai.Game
                 instance.Map.Particles.Add(Class, new List<ParticleInstance>());
 
             var numParticles = Math.Max(0, Count.Random());
-            instance.Map.Particles[Class].Capacity = System.Math.Max(instance.Map.Particles[Class].Capacity, numParticles);
+            instance.Map.Particles[Class].Capacity = Math.Max(instance.Map.Particles[Class].Capacity, numParticles);
             for (int i = 0; i < numParticles; ++i)
             {
                 var angle = Spread.Random();
