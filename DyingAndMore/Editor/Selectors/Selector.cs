@@ -128,12 +128,12 @@ namespace DyingAndMore.Editor.Selectors
             for (int i = start; i < System.Math.Min(start + (int)(Size.Y / (ItemSize.Y + Padding) + 2) * ItemsPerRow, ItemCount); ++i)
             {
                 var rect = new Rectangle(
-                    Padding + (i % ItemsPerRow) * (ItemSize.X + Padding),
-                    Padding + (i / ItemsPerRow) * (ItemSize.Y + Padding) - scrollBar.ContentPosition,
+                    VisibleBounds.X + Padding + (i % ItemsPerRow) * (ItemSize.X + Padding),
+                    VisibleBounds.Y + Padding + (i / ItemsPerRow) * (ItemSize.Y + Padding) - scrollBar.ContentPosition,
                     ItemSize.X,
                     ItemSize.Y
                 );
-                rect.Offset(VisibleBounds.Location);
+                rect = Rectangle.Intersect(rect, VisibleBounds);
 
                 //Takai.Graphics.Primitives2D.DrawFill(
                 //    spriteBatch,

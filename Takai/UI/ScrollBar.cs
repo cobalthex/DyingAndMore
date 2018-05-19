@@ -50,9 +50,9 @@ namespace Takai.UI
             {
                 var newPosition = value;
                 if (Direction == Direction.Vertical)
-                    newPosition = Util.Clamp(value, 0, ContentSize - (int)Size.Y);
+                    newPosition = Util.Clamp(value, 0, (int)Size.Y - ContentSize);
                 else if (Direction == Direction.Horizontal)
-                    newPosition = Util.Clamp(value, 0, ContentSize - (int)Size.X);
+                    newPosition = Util.Clamp(value, 0, (int)Size.X - ContentSize);
 
                 if (newPosition != contentPosition)
                 {

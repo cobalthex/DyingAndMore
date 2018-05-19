@@ -42,8 +42,8 @@ namespace DyingAndMore.Editor
 
             selector = new Selectors.TileSelector(editor)
             {
-                Size = new Vector2(48 * 9, 1),
-                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                Size = new Vector2(48 * 9, 400),
+                //VerticalAlignment = Takai.UI.Alignment.Stretch,
                 HorizontalAlignment = Takai.UI.Alignment.End
             };
             selector.SelectionChanged += delegate
