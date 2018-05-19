@@ -247,11 +247,14 @@ namespace Takai.Data
                 catch
                 {
                     load.stream.Dispose();
+                    lateLoads.Remove(realFile);
                     throw;
                 }
-
-                if (openedZip)
-                    zip.Dispose();
+                finally
+                {
+                    if (openedZip)
+                        zip.Dispose();
+                }
             }
 
             if (obj.reference == null)
@@ -259,7 +262,7 @@ namespace Takai.Data
                 if (lateLoads.Count > 0)
                     throw new FileNotFoundException("Could not find referenced file(s): " + String.Join(", ", lateLoads.Keys));
                 else
-                    throw new Exception("Wtf loading " + realFile);
+                    throw new Exception("Wtf loading " + realFile); //todo
             }
 
             if (forceLoad && exists)

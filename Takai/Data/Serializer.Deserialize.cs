@@ -692,9 +692,9 @@ namespace Takai.Data
                                                       | BindingFlags.Instance
                                                       | BindingFlags.Public;
 
-        public static T Cast<T>(object Source, DeserializationContext context = default(DeserializationContext))
+        public static T Cast<T>(object source, DeserializationContext context = default(DeserializationContext))
         {
-            return (T)Cast(typeof(T), Source, context);
+            return (T)Cast(typeof(T), source, context);
         }
 
         /// <summary>
