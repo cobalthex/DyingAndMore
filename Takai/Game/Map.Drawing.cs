@@ -30,6 +30,14 @@ namespace Takai.Game
         internal VertexPositionColorTexture[] trailVerts;
         internal DynamicVertexBuffer trailVbuffer;
 
+
+        internal static RasterizerState wireframeRaster = new RasterizerState
+        {
+            FillMode = FillMode.WireFrame,
+            CullMode = CullMode.None,
+            MultiSampleAntiAlias = true,
+        };
+
         public Texture2D TilesImage { get; set; }
 
         //todo: curves (and volumetric curves) (things like rivers/flows)
@@ -110,7 +118,6 @@ namespace Takai.Game
         protected List<VertexPositionColor> renderedLines = new List<VertexPositionColor>(32);
         protected List<VertexPositionColorTexture> renderedCircles = new List<VertexPositionColorTexture>(32);
 
-        protected List<TrailInstance> renderedTrails = new List<TrailInstance>(32);
         protected int renderedTrailPointCount = 0;
 
         /// <summary>
@@ -126,6 +133,7 @@ namespace Takai.Game
             public bool drawDecals;
             public bool drawParticles;
             public bool drawTrails;
+            public bool drawTrailMesh;
             public bool drawTriggers;
             public bool drawLines;
             public bool drawGrids;
@@ -192,15 +200,6 @@ namespace Takai.Game
             renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius, radius), 0), color, new Vector2(0, 1)));
             renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius, -radius), 0), color, new Vector2(1, 0)));
             renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius), 0), color, new Vector2(1)));
-        }
-
-        public void DrawTrail(TrailInstance trail)
-        {
-            if (trail.Count < 2)
-                return;
-
-            renderedTrails.Add(trail);
-            renderedTrailPointCount += trail.Count;
         }
 
         static readonly Matrix arrowWingTransform = Matrix.CreateRotationZ(120);
@@ -282,11 +281,11 @@ namespace Takai.Game
             Runtime.GraphicsDevice.SetRenderTarget(Class.reflectedRenderTarget);
             Runtime.GraphicsDevice.Clear(Color.Transparent);
 
-            if (renderSettings.drawEntities)
-                DrawEntities(ref context);
-
             if (renderSettings.drawTrails)
                 DrawTrails(ref context);
+
+            if (renderSettings.drawEntities)
+                DrawEntities(ref context);
 
             if (renderSettings.drawParticles)
                 DrawParticles(ref context);
@@ -352,8 +351,6 @@ namespace Takai.Game
 
             renderedLines.Clear();
             renderedCircles.Clear();
-            renderedTrails.Clear();
-            renderedTrailPointCount = 0;
 
             #region present
 
@@ -429,7 +426,7 @@ namespace Takai.Game
 
         public void DrawFluids(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, Class.reflectionEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, Class.reflectionEffect, c.cameraTransform);
 
             //inactive fluids
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)
@@ -614,51 +611,49 @@ namespace Takai.Game
             }
         }
 
-        RasterizerState rz = new RasterizerState
-        {
-            FillMode = FillMode.WireFrame,
-            CullMode = CullMode.None,
-            MultiSampleAntiAlias = true,
-        };
         public void DrawTrails(ref RenderContext c)
         {
             //auto taper widths?
             if (renderedTrailPointCount < 2)
                 return;
 
-            if (Class.trailVerts.Length < renderedTrailPointCount * 2)
+            var vertexCount = renderedTrailPointCount * 2;
+            if (Class.trailVerts.Length < vertexCount)
             {
-                Class.trailVerts = new VertexPositionColorTexture[renderedTrailPointCount * 2];
+                Class.trailVerts = new VertexPositionColorTexture[vertexCount];
                 Class.trailVbuffer = new DynamicVertexBuffer(Runtime.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, Class.trailVerts.Length, BufferUsage.WriteOnly);
             }
 
-            foreach (var trail in renderedTrails)
+            int next = 0;
+            foreach (var trail in Trails)
             {
-                for (int n = 0; n < trail.Count - 1; ++n)
+                for (int n = 0; n < trail.Count; ++n, next += 2)
                 {
-                    var i = (n + trail.TailIndex) % trail.Points.Count;
-                    int i2 = (i + 1) % trail.Count;
+                    var i1 = (n + trail.TailIndex) % trail.Points.Count;
+                    int i2 = (i1 + 1) % trail.Count;
 
-                    var dir = Vector2.Normalize(trail.Points[i2].location - trail.Points[i].location);
+                    var dir = Vector2.Normalize(trail.Points[i2].location - trail.Points[i1].location);
                     var norm = new Vector2(dir.Y, -dir.X);
 
-                    float w = trail.Points[i].width;
-                    //if (trail.Class.AutoTaper)
-                    //    w *= n / (float)trail.Points.Count;
+                    float w = trail.Points[i1].width;
+                    if (trail.Class.AutoTaper)
+                        w *= n / (float)trail.Count;
 
-                    Class.trailVerts[n * 2 + 0] = new VertexPositionColorTexture(new Vector3(trail.Points[i].location - norm * w, 0), trail.Class.Color, new Vector2(0, 0));
-                    Class.trailVerts[n * 2 + 1] = new VertexPositionColorTexture(new Vector3(trail.Points[i].location + norm * w, 0), trail.Class.Color, new Vector2(0, 1));
-
-                    //if (n < trail.Points.Count - 1)
-                    //    DrawLine(trail.Points[i1].location, trail.Points[i2].location, Color.Orange);
+                    Class.trailVerts[next + 0] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location - norm * w, 0), trail.Class.Color, new Vector2(0, 0));
+                    Class.trailVerts[next + 1] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location + norm * w, 0), trail.Class.Color, new Vector2(0, 1));
                 }
+                //Class.trailVerts[next] = new VertexPositionColorTexture(new Vector3(trail.Points[trail.Count - 1].location, 0), trail.Class.Color, new Vector2(1, 0.5f));
+                //++next;
+
+                var v = Class.trailVerts[next - 2];
+                Class.trailVerts[next - 2] = Class.trailVerts[next - 1];
+                Class.trailVerts[next - 1] = v;
+
+                Class.trailVerts[next - 2].TextureCoordinate = new Vector2(1, 0);
+                Class.trailVerts[next - 1].TextureCoordinate = new Vector2(1, 1);
             }
 
-            //var v = Class.trailVerts[0];
-            //Class.trailVerts[0] = Class.trailVerts[1];
-            //Class.trailVerts[1] = v;
-
-            Class.trailVbuffer.SetData(Class.trailVerts, 0, renderedTrailPointCount * 2);
+            Class.trailVbuffer.SetData(Class.trailVerts, 0, vertexCount);
             Runtime.GraphicsDevice.SetVertexBuffer(Class.trailVbuffer);
 
             Runtime.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
@@ -678,29 +673,31 @@ namespace Takai.Game
             foreach (EffectPass pass in Class.basicEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                int next = 0;
-                foreach (var trail in renderedTrails)
+                next = 0;
+                foreach (var trail in Trails)
                 {
                     Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture ?? Graphics.Primitives2D.Pixel;
                     Runtime.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, next, trail.Count * 2 - 2);
-                    next += trail.Count * 2;
+                    next += trail.Count * 2 - 2;
                 }
             }
 
-            //draw (wireframed) mesh
-            /*Class.lineEffect.Parameters["Transform"].SetValue(cameraTransform);
-            Runtime.GraphicsDevice.RasterizerState = rz;
-            foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)
+            if (renderSettings.drawTrailMesh)
             {
-                pass.Apply();
-                int next = 0;
-                foreach (var trail in renderedTrails)
+                Class.lineEffect.Parameters["Transform"].SetValue(cameraTransform);
+                Runtime.GraphicsDevice.RasterizerState = MapClass.wireframeRaster;
+                foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)
                 {
-                    Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture;
-                    Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, Class.trailVerts, next, trail.Count * 2 - 2);
-                    next += trail.Count * 2;
+                    pass.Apply();
+                    next = 0;
+                    foreach (var trail in Trails)
+                    {
+                        Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture;
+                        Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, Class.trailVerts, next, trail.Count * 2 - 2);
+                        next += trail.Count * 2 - 2;
+                    }
                 }
-            }*/
+            }
         }
 
         public void DrawLines(ref RenderContext c)

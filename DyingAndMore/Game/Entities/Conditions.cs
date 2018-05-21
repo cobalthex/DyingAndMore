@@ -67,7 +67,7 @@ namespace DyingAndMore.Game.Entities
         }
     }
 
-    //todo: condition protection (gas mask would protect against poison)
+    //todo: condition protection (gas mask would protect against poison) / resistance
 
     /// <summary>
     /// Apply a condition (poison, etc) to any actor within the effect radius

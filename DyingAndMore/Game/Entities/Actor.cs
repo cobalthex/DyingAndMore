@@ -210,11 +210,22 @@ namespace DyingAndMore.Game.Entities
             base.Think(deltaTime);
         }
 
-        public override void OnEntityCollision(EntityInstance Collider, CollisionManifold collision, TimeSpan DeltaTime)
+        public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
         {
+            Controller?.OnEntityCollision(collider, collision, deltaTime);
             //if (Collider is ActorInstance actor)
             //{
             //}
+        }
+
+        public override void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime)
+        {
+            Controller?.OnMapCollision(tile, point, deltaTime);
+        }
+
+        public override void OnFluidCollision(FluidClass fluid, TimeSpan deltaTime)
+        {
+            Controller?.OnFluidCollision(fluid, deltaTime);
         }
 
         public virtual void TurnTowards(Vector2 direction)

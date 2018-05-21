@@ -15,7 +15,7 @@ namespace DyingAndMore.Editor.Selectors
             ItemSize = new Point(64, 64);
             Padding = 5;
 
-            var searchPaths = new[] { "Actors", "Scenery" };
+            var searchPaths = new[] { "Actors", "Scenery", "Pickups" };
 
             foreach (var path in searchPaths)
             {

@@ -70,6 +70,7 @@
     <Compile Include="Game\Entities\ArtilleryController.cs" />
     <Compile Include="Game\Entities\Conditions.cs" />
     <Compile Include="Game\Entities\Controller.cs" />
+    <Compile Include="Game\Entities\Pickups.cs" />
     <Compile Include="Game\Entities\InputController.cs" />
     <Compile Include="Game\Entities\Projectile.cs" />
     <Compile Include="Game\Entities\Vehicle.cs" />

@@ -83,10 +83,34 @@ namespace Takai.Game
         }
     }
 
+    public interface ICollisionResolver
+    {
+        /// <summary>
+        /// Called when there is a collision between this instance and another
+        /// </summary>
+        /// <param name="collider">The instance collided with</param>
+        /// <param name="deltaTime">How long since the last frame (in map time)</param>
+        void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime);
+
+        /// <summary>
+        /// Called when there is a collision between this entity and the map
+        /// </summary>
+        /// <param name="tile">The tile on the map where the collision occurred</param>
+        /// <param name="deltaTime">How long since the last frame (in map time)</param>
+        void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime);
+
+        /// <summary>
+        /// Called when there is a collision between this entity and a Fluid
+        /// </summary>
+        /// <param name="fluid">The type of Fluid collided with</param>
+        /// <param name="deltaTime">How long since the last frame (in map time)</param>
+        void OnFluidCollision(FluidClass fluid, TimeSpan deltaTime);
+    }
+
     /// <summary>
     /// A single instance of an entity in a map.
     /// </summary>
-    public partial class EntityInstance : IObjectInstance<EntityClass>, Data.Serializer.IReferenceable
+    public partial class EntityInstance : IObjectInstance<EntityClass>, Data.Serializer.IReferenceable, ICollisionResolver
     {
         /// <summary>
         /// A unique ID for each entity in the map
@@ -275,6 +299,27 @@ namespace Takai.Game
         public virtual void Think(TimeSpan deltaTime) { }
 
         /// <summary>
+        /// Called when there is a collision between this instance and another
+        /// </summary>
+        /// <param name="collider">The instance collided with</param>
+        /// <param name="deltaTime">How long since the last frame (in map time)</param>
+        public virtual void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime) { }
+
+        /// <summary>
+        /// Called when there is a collision between this entity and the map
+        /// </summary>
+        /// <param name="tile">The tile on the map where the collision occurred</param>
+        /// <param name="deltaTime">How long since the last frame (in map time)</param>
+        public virtual void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime) { }
+
+        /// <summary>
+        /// Called when there is a collision between this entity and a Fluid
+        /// </summary>
+        /// <param name="fluid">The type of Fluid collided with</param>
+        /// <param name="deltaTime">How long since the last frame (in map time)</param>
+        public virtual void OnFluidCollision(FluidClass fluid, TimeSpan deltaTime) { }
+
+        /// <summary>
         /// Called when this instance is spawned. Also called on deserialization
         /// </summary>
         public virtual void OnSpawn()
@@ -299,27 +344,6 @@ namespace Takai.Game
             else
                 DisableNextDestructionEffect = false;
         }
-
-        /// <summary>
-        /// Called when there is a collision between this instance and another
-        /// </summary>
-        /// <param name="Collider">The instance collided with</param>
-        /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void OnEntityCollision(EntityInstance Collider, CollisionManifold collision, TimeSpan DeltaTime) { }
-
-        /// <summary>
-        /// Called when there is a collision between this entity and the map
-        /// </summary>
-        /// <param name="Tile">The tile on the map where the collision occurred</param>
-        /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void OnMapCollision(Point Tile, Vector2 Point, TimeSpan DeltaTime) { }
-
-        /// <summary>
-        /// Called when there is a collision between this entity and a Fluid
-        /// </summary>
-        /// <param name="Type">The type of Fluid collided with</param>
-        /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void OnFluidCollision(FluidClass Type, TimeSpan DeltaTime) { }
 
         public float ForwardSpeed()
         {

@@ -385,6 +385,26 @@ namespace Takai.Game
 
             #endregion
 
+            #region trails
+
+
+            renderedTrailPointCount = 0;
+            for (int i = 0; i < Trails.Count; ++i)
+            {
+                Trails[i].Update(deltaTime);
+                if (Trails[i].Count < 1)
+                {
+                    Trails[i] = Trails[Trails.Count - 1];
+                    Trails.RemoveAt(Trails.Count - 1);
+                    --i;
+                }
+                else
+                    renderedTrailPointCount += Trails[i].Count;
+            }
+
+
+            #endregion
+
             #region sounds
 
             if (updateSettings.isSoundEnabled)

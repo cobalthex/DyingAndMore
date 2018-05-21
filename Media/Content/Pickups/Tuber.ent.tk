@@ -1,0 +1,20 @@
+WeaponPickupClass {
+	Weapon: GunInstance {
+		Class: @"Weapons/Flamethrower.wpn.tk";
+		AmmoCount: 1000;
+	}
+
+    Animations: {
+        Idle: {
+        	Sprite: {
+                texture: @"./TuberPickup.png";
+                width: 48;
+                height: 48;
+                FrameCount: 6;
+                FrameLength: 100;
+                IsLooping: True;
+                Tween: TweenStyle [Sequential];
+            };
+        };
+    };
+}

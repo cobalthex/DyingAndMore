@@ -157,15 +157,15 @@ namespace DyingAndMore.Game
             {
                 Class = new TrailClass
                 {
-                    MaxPoints = 40,
+                    MaxPoints = 400,
                     AutoTaper = true,
                     //Color = Color.Red,
                     Lifetime = TimeSpan.FromSeconds(2),
                     Sprite = new Takai.Graphics.Sprite(Cache.Load<Texture2D>("Effects/laser.png")),
                 },
             };
-            trail.AddPoint(new Vector2(100, 100), 20);
-            trail.AddPoint(new Vector2(400, 100), 20);
+            trail.AddPoint(new Vector2(0), 0);
+            Map.AddTrail(trail);
         }
         TrailInstance trail;
 
@@ -224,7 +224,6 @@ namespace DyingAndMore.Game
         }
 
         bool x = false;
-        int fc = 0;
         protected override void UpdateSelf(GameTime time)
         {
             GameInstance.Current.ElapsedRealTime += time.ElapsedGameTime;
@@ -246,12 +245,7 @@ namespace DyingAndMore.Game
                     region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
                     Map.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
                 }
-
-                if (player != null && fc % 8 == 0)
-                    trail.AddPoint(player.Position, 20);
             }
-            trail.Update(time.ElapsedGameTime);
-            Map.DrawTrail(trail);
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
@@ -262,7 +256,6 @@ namespace DyingAndMore.Game
             DataModel.Globals["player.health"] = player.CurrentHealth / player.Class.MaxHealth;
 
             base.UpdateSelf(time);
-            ++fc;
         }
 
         void ParseCommand(string command)
@@ -459,9 +452,8 @@ namespace DyingAndMore.Game
         protected override bool HandleInput(GameTime time)
         {
             Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
-
-            if (InputState.IsPress(MouseButtons.Left))
-                trail.AddPoint(worldMousePos, 30);
+            if (!IsPaused)
+                trail.AddPoint(worldMousePos, 20);
 
             /*if (player != null)
             {

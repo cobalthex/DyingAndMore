@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Takai.Game;
 using Takai.Input;
 
 namespace DyingAndMore.Game.Entities
@@ -72,7 +74,7 @@ namespace DyingAndMore.Game.Entities
             ActionInputs[Action.Fire] = new List<ActionInput> { new ActionInput(ActionInputType.MouseButton, (int)MouseButtons.Left) };
         }
 
-        public override void Think(System.TimeSpan deltaTime)
+        public override void Think(TimeSpan deltaTime)
         {
             if (GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isPlayerInputEnabled)
                 return;
@@ -106,6 +108,19 @@ namespace DyingAndMore.Game.Entities
                 var dir = InputState.PolarMouseVector;
                 dir.Normalize();
                 Actor.Forward = dir;
+            }
+        }
+
+        public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
+        {
+            if (collider is WeaponPickupInstance wpi)
+            {
+                if (Actor.Weapon != null && Actor.Weapon.Class == wpi.Class.Weapon.Class)
+                    Actor.Weapon.Combine(wpi.Class.Weapon);
+                else
+                    Actor.Weapon = wpi.Class.Weapon.Clone();
+
+                collider.IsAlive = false;
             }
         }
     }
