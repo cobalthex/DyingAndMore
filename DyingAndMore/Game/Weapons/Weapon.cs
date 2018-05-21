@@ -238,6 +238,14 @@ namespace DyingAndMore.Game.Weapons
         /// <returns>True if the weapon is depleted, false otherwise</returns>
         public abstract bool IsDepleted();
 
+        /// <summary>
+        /// Combine another weapon into this one. Implementation defined
+        /// E.g. add ammo from other weapon to this one on pickup
+        /// </summary>
+        /// <param name="other">the other weapon to compare against</param>
+        /// <returns>Whether or not the weapon could be combined</returns>
+        public abstract bool Combine(WeaponInstance other);
+
         public override string ToString()
         {
             return GetType().Name;

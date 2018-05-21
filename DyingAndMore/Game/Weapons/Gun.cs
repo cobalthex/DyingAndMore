@@ -47,28 +47,25 @@ namespace DyingAndMore.Game.Weapons
 
     public class GunInstance : WeaponInstance
     {
-        public override WeaponClass Class
+        public new GunClass Class
         {
-            get => base.Class;
-            set
-            {
-                System.Diagnostics.Contracts.Contract.Assert(value == null || value is GunClass);
-                base.Class = value;
-                _class = value as GunClass;
-            }
+            get => (GunClass)base.Class;
+            set => base.Class = value;
         }
-        private GunClass _class;
 
         public int AmmoCount { get; set; }
 
         protected int currentBurstShotCount = 0;
         protected int burstCount = 0;
 
-        public GunInstance() { }
+        public GunInstance() : this(null) { }
         public GunInstance(GunClass @class)
             : base(@class)
         {
-            AmmoCount = @class.MaxAmmo;
+            if (@class != null)
+            {
+                AmmoCount = @class.MaxAmmo;
+            }
         }
 
         protected override void OnEndUse()
@@ -79,13 +76,13 @@ namespace DyingAndMore.Game.Weapons
 
         public override bool IsDepleted()
         {
-            return _class.MaxAmmo > 0 && AmmoCount <= 0;
+            return Class.MaxAmmo > 0 && AmmoCount <= 0;
         }
 
         public override bool CanUse(TimeSpan elapsedTime)
         {
-            return (_class.MaxBursts == 0 || burstCount < _class.MaxBursts)
-                && (burstCount == 0 || currentBurstShotCount > 0 || elapsedTime > StateTime + _class.BurstCooldownTime)
+            return (Class.MaxBursts == 0 || burstCount < Class.MaxBursts)
+                && (burstCount == 0 || currentBurstShotCount > 0 || elapsedTime > StateTime + Class.BurstCooldownTime)
                 && base.CanUse(elapsedTime);
         }
 
@@ -93,7 +90,7 @@ namespace DyingAndMore.Game.Weapons
         {
             if (currentBurstShotCount > 0)
             {
-                if (currentBurstShotCount < _class.RoundsPerBurst && !IsDepleted())
+                if (currentBurstShotCount < Class.RoundsPerBurst && !IsDepleted())
                     base.TryUse();
                 else
                 {
@@ -109,17 +106,17 @@ namespace DyingAndMore.Game.Weapons
         {
             //todo: at high rates of fire, occasionally discharge effect doesnt play (or at least doesnt play correctly)
 
-            if (_class.Projectile != null)
+            if (Class.Projectile != null)
             {
-                for (int i = 0; i < _class.ProjectilesPerRound; ++i)
+                for (int i = 0; i < Class.ProjectilesPerRound; ++i)
                 {
-                    var projectile = (Entities.ProjectileInstance)_class.Projectile.Instantiate();
+                    var projectile = (Entities.ProjectileInstance)Class.Projectile.Instantiate();
                     projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + 2));
 
-                    var error = _class.ErrorAngle.Random();
+                    var error = Class.ErrorAngle.Random();
                     projectile.Forward = Vector2.TransformNormal(Actor.Forward, Matrix.CreateRotationZ(error));
-                    projectile.Velocity = projectile.Forward * _class.Projectile.MuzzleVelocity.Random();
-                    if (_class.Projectile.UseSourcePhysics)
+                    projectile.Velocity = projectile.Forward * Class.Projectile.MuzzleVelocity.Random();
+                    if (Class.Projectile.UseSourcePhysics)
                         projectile.Velocity += Actor.Velocity;
                     projectile.Source = Actor;
                     Actor.Map.Spawn(projectile);
@@ -130,6 +127,15 @@ namespace DyingAndMore.Game.Weapons
             ++currentBurstShotCount;
 
             base.OnDischarge();
+        }
+
+        public override bool Combine(WeaponInstance other)
+        {
+            if (Class == null || other.Class != Class)
+                return false;
+
+            AmmoCount = Math.Min(Class.MaxAmmo, AmmoCount + ((GunInstance)other).AmmoCount);
+            return true;
         }
     }
 }

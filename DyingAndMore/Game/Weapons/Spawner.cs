@@ -90,5 +90,16 @@ namespace DyingAndMore.Game.Weapons
             Actor.Map.Spawn(next, Actor.Position + Actor.Forward * (Actor.Radius + 10), Actor.Forward, Actor. Forward * 100);
             base.OnDischarge();
         }
+
+        public override bool Combine(WeaponInstance other)
+        {
+            if (Class == null || other.Class == Class)
+                return false;
+
+            foreach (var ent in ((SpawnerInstance)other).SpawnQueue)
+                SpawnQueue.Enqueue(ent);
+
+            return true;
+        }
     }
 }

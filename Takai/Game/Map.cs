@@ -200,8 +200,13 @@ namespace Takai.Game
         [Data.Serializer.Ignored]
         public List<FluidInstance> LiveFluids { get; protected set; } = new List<FluidInstance>(128);
 
+        /// <summary>
+        /// All particles on the map, grouped by type
+        /// </summary>
         [Data.Serializer.Ignored] //particles are not serialized (maybe?)
-        public Dictionary<ParticleClass, List<ParticleInstance>> Particles { get; protected set; } = new Dictionary<ParticleClass, List<ParticleInstance>>();
+        public Dictionary<ParticleClass, List<ParticleInstance>> Particles { get; protected set; } = new Dictionary<ParticleClass, List<ParticleInstance>>(4);
+
+        public List<TrailInstance> Trails { get; protected set; } = new List<TrailInstance>();
 
         /// <summary>
         /// All of the playing sounds
@@ -474,6 +479,15 @@ namespace Takai.Game
 
             var sector = GetOverlappingSector(decal.position);
             Sectors[sector.Y, sector.X].decals.Add(decal);
+        }
+
+        /// <summary>
+        /// Add a trail to the map. Will continue to render until faded out completely
+        /// </summary>
+        /// <param name="trail">The trail to draw</param>
+        public void AddTrail(TrailInstance trail)
+        {
+            Trails.Add(trail);
         }
 
         #endregion
