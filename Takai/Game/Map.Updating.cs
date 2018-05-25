@@ -86,6 +86,8 @@ namespace Takai.Game
 
         HashSet<FluidInstance> collidingFluids = new HashSet<FluidInstance>();
 
+        protected List<TrailInstance> trailsToDestroy = new List<TrailInstance>();
+
         /// <summary>
         /// Update the map state
         /// Updates the active set and then the contents of the active set
@@ -387,21 +389,18 @@ namespace Takai.Game
 
             #region trails
 
+            Trails.ExceptWith(trailsToDestroy);
+            trailsToDestroy.Clear();
 
             renderedTrailPointCount = 0;
-            for (int i = 0; i < Trails.Count; ++i)
+            foreach (var trail in Trails)
             {
-                Trails[i].Update(deltaTime);
-                if (Trails[i].Count < 1)
-                {
-                    Trails[i] = Trails[Trails.Count - 1];
-                    Trails.RemoveAt(Trails.Count - 1);
-                    --i;
-                }
+                trail.Update(deltaTime);
+                if (trail.Count < 1)
+                    trailsToDestroy.Add(trail);
                 else
-                    renderedTrailPointCount += Trails[i].Count;
+                    renderedTrailPointCount += trail.Count;
             }
-
 
             #endregion
 

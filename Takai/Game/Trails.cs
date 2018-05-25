@@ -67,7 +67,16 @@ namespace Takai.Game
         /// <summary>
         /// All of the points in this list, position and width
         /// </summary>
-        public IReadOnlyList<TrailPoint> Points => points;
+        public IReadOnlyList<TrailPoint> AllPoints => points;
+
+        public IEnumerable<TrailPoint> Points
+        {
+            get
+            {
+                for (int i = 0; i < Count; ++i)
+                    yield return points[(i + TailIndex) % points.Count];
+            }
+        }
 
         public int HeadIndex { get; private set; } = 0;
         public int TailIndex { get; private set; } = 0;
@@ -83,22 +92,31 @@ namespace Takai.Game
                 Class.Lifetime > TimeSpan.Zero &&
                 elapsedTime - points[TailIndex].time > Class.Lifetime)
             {
-                TailIndex = (TailIndex + 1) % Points.Count;
+                TailIndex = (TailIndex + 1) % AllPoints.Count;
                 --Count;
             }
         }
 
-        public void AddPoint(Vector2 point, float width)
+        /// <summary>
+        /// Add a new point to the trail
+        /// </summary>
+        /// <param name="location">The next point of the trail</param>
+        /// <param name="width">How wide the point is</param>
+        /// <param name="collapse">Only add this point if its not on top of the last point</param>
+        public void AddPoint(Vector2 location, float width, bool collapse = true)
         {
+            if (collapse && Count > 0 && points[HeadIndex == 0 ? points.Count - 1 : HeadIndex - 1].location == location)
+                return;
+
             if (Class.MaxPoints == 0)
             {
-                points.Add(new TrailPoint(point, width, elapsedTime));
+                points.Add(new TrailPoint(location, width, elapsedTime));
                 ++HeadIndex;
                 ++Count;
             }
             else
             {
-                points[HeadIndex] = new TrailPoint(point, width, elapsedTime);
+                points[HeadIndex] = new TrailPoint(location, width, elapsedTime);
                 HeadIndex = (HeadIndex + 1) % points.Count;
 
                 if (Count >= points.Count)

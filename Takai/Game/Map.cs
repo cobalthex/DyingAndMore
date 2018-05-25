@@ -206,7 +206,7 @@ namespace Takai.Game
         [Data.Serializer.Ignored] //particles are not serialized (maybe?)
         public Dictionary<ParticleClass, List<ParticleInstance>> Particles { get; protected set; } = new Dictionary<ParticleClass, List<ParticleInstance>>(4);
 
-        public List<TrailInstance> Trails { get; protected set; } = new List<TrailInstance>();
+        public HashSet<TrailInstance> Trails { get; protected set; } = new HashSet<TrailInstance>();
 
         /// <summary>
         /// All of the playing sounds
