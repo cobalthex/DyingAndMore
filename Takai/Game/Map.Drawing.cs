@@ -627,20 +627,25 @@ namespace Takai.Game
             int next = 0;
             foreach (var trail in Trails)
             {
+                var lastNorm = new Vector2(1, 0);
                 for (int n = 0; n < trail.Count; ++n, next += 2)
                 {
-                    var i1 = (n + trail.TailIndex) % trail.Points.Count;
+                    var i1 = (n + trail.TailIndex) % trail.AllPoints.Count;
                     int i2 = (i1 + 1) % trail.Count;
 
-                    var dir = Vector2.Normalize(trail.Points[i2].location - trail.Points[i1].location);
+                    var dir = Vector2.Normalize(trail.AllPoints[i2].location - trail.AllPoints[i1].location);
                     var norm = new Vector2(dir.Y, -dir.X);
+                    //if (float.IsNaN(norm.X)) //two points are the same (tweak to allow disjoint trails)
+                    //    norm = lastNorm;
+                    //else
+                    //    lastNorm = norm;
 
-                    float w = trail.Points[i1].width;
+                    float w = trail.AllPoints[i1].width;
                     if (trail.Class.AutoTaper)
                         w *= n / (float)trail.Count;
 
-                    Class.trailVerts[next + 0] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location - norm * w, 0), trail.Class.Color, new Vector2(0, 0));
-                    Class.trailVerts[next + 1] = new VertexPositionColorTexture(new Vector3(trail.Points[i1].location + norm * w, 0), trail.Class.Color, new Vector2(0, 1));
+                    Class.trailVerts[next + 0] = new VertexPositionColorTexture(new Vector3(trail.AllPoints[i1].location - norm * w, 0), trail.Class.Color, new Vector2(0, 0));
+                    Class.trailVerts[next + 1] = new VertexPositionColorTexture(new Vector3(trail.AllPoints[i1].location + norm * w, 0), trail.Class.Color, new Vector2(0, 1));
                 }
                 //Class.trailVerts[next] = new VertexPositionColorTexture(new Vector3(trail.Points[trail.Count - 1].location, 0), trail.Class.Color, new Vector2(1, 0.5f));
                 //++next;

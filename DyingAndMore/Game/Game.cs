@@ -157,7 +157,7 @@ namespace DyingAndMore.Game
             {
                 Class = new TrailClass
                 {
-                    MaxPoints = 400,
+                    MaxPoints = 200,
                     AutoTaper = true,
                     //Color = Color.Red,
                     Lifetime = TimeSpan.FromSeconds(2),
