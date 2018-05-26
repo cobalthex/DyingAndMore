@@ -4,6 +4,24 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
+    public class ScalarFunction
+    {
+        public enum Type
+        {
+            Linear,
+            Exponential,
+            Logarithmic,
+            Sinusoidal,
+        }
+
+        public float Scale { get; set; } = 1;
+
+        public float Evaluate(float x)
+        {
+            return 0;
+        }
+    }
+
     public class TrailClass : IObjectClass<TrailInstance>
     {
         public string File { get; set; }
@@ -16,6 +34,11 @@ namespace Takai.Game
         //fade?
         public bool AutoTaper { get; set; }
         //taper middle (curve scalar?)
+
+        /// <summary>
+        /// Random jitter added to each point (e.g. for a lightning effect)
+        /// </summary>
+        public Range<float> Jitter { get; set; } = 0;
 
         /// <summary>
         /// Zero for forever
@@ -107,6 +130,14 @@ namespace Takai.Game
         {
             if (collapse && Count > 0 && points[HeadIndex == 0 ? points.Count - 1 : HeadIndex - 1].location == location)
                 return;
+
+            if (Class != null)
+            {
+                location += new Vector2(
+                    Class.Jitter.Random(),
+                    Class.Jitter.Random()
+                );
+            }
 
             if (Class.MaxPoints == 0)
             {

@@ -627,6 +627,9 @@ namespace Takai.Game
             int next = 0;
             foreach (var trail in Trails)
             {
+                if (trail.Count < 2)
+                    continue;
+
                 var lastNorm = new Vector2(1, 0);
                 for (int n = 0; n < trail.Count; ++n, next += 2)
                 {
@@ -681,9 +684,12 @@ namespace Takai.Game
                 next = 0;
                 foreach (var trail in Trails)
                 {
+                    if (trail.Count < 2)
+                        continue;
+
                     Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture ?? Graphics.Primitives2D.Pixel;
                     Runtime.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, next, trail.Count * 2 - 2);
-                    next += trail.Count * 2 - 2;
+                    next += trail.Count * 2;
                 }
             }
 

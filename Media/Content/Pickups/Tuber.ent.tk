@@ -1,6 +1,6 @@
 WeaponPickupClass {
 	Weapon: GunInstance {
-		Class: @"Weapons/Flamethrower.wpn.tk";
+		Class: @"Weapons/Test.wpn.tk";
 		AmmoCount: 1000;
 	}
 
