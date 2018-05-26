@@ -70,6 +70,8 @@ namespace Takai.Game
         /// </summary>
         public EffectsClass DestructionEffect { get; set; }
 
+        public TrailClass Trail { get; set; }
+
         public EntityClass() { }
 
         public virtual EntityInstance Instantiate()
@@ -125,7 +127,21 @@ namespace Takai.Game
         /// <summary>
         /// The class that this instance inherits from
         /// </summary>
-        public virtual EntityClass Class { get; set; }
+        public virtual EntityClass Class
+        {
+            get => _class;
+            set
+            {
+                _class = value;
+                if (Class != null)
+                {
+                    PlayAnimation(Class.DefaultBaseAnimation);
+                    if (Class.Trail != null)
+                        Trail = Class.Trail.Instantiate();
+                }
+            }
+        }
+        private EntityClass _class;
 
         /// <summary>
         /// A name for this instance, should be unique
@@ -209,6 +225,8 @@ namespace Takai.Game
         /// </summary>
         public Color OutlineColor { get; set; }
 
+        public TrailInstance Trail { get; set; }
+
         /// <summary>
         /// The map the entity is in
         /// </summary>
@@ -231,8 +249,6 @@ namespace Takai.Game
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
-            if (Class != null)
-                PlayAnimation(Class.DefaultBaseAnimation);
         }
 
         public virtual EntityInstance Clone()
@@ -296,7 +312,10 @@ namespace Takai.Game
         /// The basic think function for this entity, called once a frame
         /// </summary>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void Think(TimeSpan deltaTime) { }
+        public virtual void Think(TimeSpan deltaTime) {
+            if (Trail != null)
+                Trail.AddPoint(Position, Radius * 2); //todo: width?
+        }
 
         /// <summary>
         /// Called when there is a collision between this instance and another

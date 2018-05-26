@@ -152,22 +152,7 @@ namespace DyingAndMore.Game
             tinyFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
 
             testEffect = Cache.Load<EffectsClass>("Effects/Damage.fx.tk");
-
-            trail = new TrailInstance
-            {
-                Class = new TrailClass
-                {
-                    MaxPoints = 200,
-                    AutoTaper = true,
-                    //Color = Color.Red,
-                    Lifetime = TimeSpan.FromSeconds(2),
-                    Sprite = new Takai.Graphics.Sprite(Cache.Load<Texture2D>("Effects/laser.png")),
-                },
-            };
-            trail.AddPoint(new Vector2(0), 0);
-            Map.AddTrail(trail);
         }
-        TrailInstance trail;
 
         protected override void OnMapChanged(EventArgs e)
         {
@@ -452,8 +437,6 @@ namespace DyingAndMore.Game
         protected override bool HandleInput(GameTime time)
         {
             Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
-            if (!IsPaused)
-                trail.AddPoint(worldMousePos, 20);
 
             /*if (player != null)
             {

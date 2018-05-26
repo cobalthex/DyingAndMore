@@ -321,6 +321,8 @@ namespace Takai.Game
                 }
                 entity.lastAABB = entity.AxisAlignedBounds;
 
+                if (entity.Trail != null)
+                    Trails.Add(entity.Trail);
                 entity.UpdateAnimations(deltaTime);
                 if (updateSettings.isEntityLogicEnabled)
                     entity.Think(deltaTime);

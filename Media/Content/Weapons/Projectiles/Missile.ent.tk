@@ -8,7 +8,7 @@ ProjectileClass {
     CanAffectSource: true;
 
     Range: 400;
-    FadeEffect: {
+    #*FadeEffect: {
         Effects: [
             EntityEffect {
                 Entity: @.;
@@ -23,7 +23,7 @@ ProjectileClass {
                 Speed: 500;
             }
         ];
-    }
+    }*#
 
     Animations: {
         Idle: {
