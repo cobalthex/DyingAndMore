@@ -1,0 +1,60 @@
+ProjectileClass {
+    Name: "Grenade";
+    MuzzleVelocity: 500;
+    DestroyIfOffscreen: False;
+    IgnoreTrace: False;
+    Drag: 3;
+    CanDamageSource: true;
+
+    LifeSpan: 1sec;
+    MinimumSpeed: -1000;
+
+    FadeEffect: {
+        Effects: [
+            AreaHealthEffect {
+                MaxDamage: 100;
+                Radius: 20;
+            };
+
+            ForceEffect {
+                Force: 22000;
+            }
+
+            ParticleEffect {
+                Class: {
+                    Sprite: {
+                        Texture: @"Effects/spark.png";
+                    };
+                    Blend: BlendState.Additive;
+                    ColorOverTime: {
+                        Values: [
+                            [0 Color.Green];
+                            [0.8 [0 0 1 0.5]];
+                            [1 [1 0 0 0]];
+                        ];
+                    };
+                    ScaleOverTime: {
+                        values: [
+                            [0 2.4];
+                            [1 0.1];
+                        ];
+                    };
+                    InitialSpeed: [400 600];
+                    lifetime: [0.5sec 0.85sec];
+                    Drag: 5;
+                }
+                Count: [40 60];
+                Spread: [-1pi 1pi];
+            };
+        ];
+    }
+
+    Animations: {
+        Idle: {
+            Sprite: {
+                Texture: @"./grenade.png";
+            };
+            #Effect: @"Effects/trail.fx.tk";
+        }
+    }
+}

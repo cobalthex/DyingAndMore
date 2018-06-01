@@ -10,7 +10,7 @@ namespace Takai.UI
 
         protected override bool HandleInput(GameTime time)
         {
-            if (DidPressInside())
+            if (DidPressInside(Input.MouseButtons.Left))
             {
                 var relPos = Input.InputState.MousePoint - VisibleBounds.Location;
                 Value = (int)((relPos.X / Size.X) * (Maximum - Minimum)) + Minimum;

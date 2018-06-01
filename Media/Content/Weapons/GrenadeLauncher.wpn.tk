@@ -1,0 +1,8 @@
+GunClass {
+    Projectile: @"Weapons/Projectiles/Grenade.ent.tk";
+
+    MaxAmmo: 200;
+
+    ChargeTime: 0msec;
+    DischargeTime: 200msec;
+}

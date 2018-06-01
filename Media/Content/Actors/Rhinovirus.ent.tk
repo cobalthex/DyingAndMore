@@ -2,6 +2,8 @@ ActorClass {
 	Name: "Rhinovirus";
 	MaxHealth: 5000;
     DefaultFaction: Factions [Enemy Boss];
+    MaxSpeed: [100 200];
+    MoveForce: 20;
 
     DefaultController: AIController {
         Behaviors: [

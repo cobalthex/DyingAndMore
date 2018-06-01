@@ -409,24 +409,28 @@ namespace Takai.Game
                         return new TraceHit()
                         {
                             distance = shortestDist,
-                            entity = shortest
+                            entity = shortest,
+                            didHit = true
                         };
                     }
 
                     return new TraceHit()
                     {
                         distance = Vector2.Distance(start, trace),
-                        entity = null
+                        entity = null,
+                        didHit = true
                     };
                 }
 
                 sectorPos += sectorDelta;
             }
 
+            var dist = TraceTiles(start, end);
             return new TraceHit()
             {
-                distance = Vector2.Distance(start, TraceTiles(start, end)),
-                entity = null
+                distance = Vector2.Distance(start, dist),
+                entity = null,
+                didHit = dist != end
             };
         }
     }
@@ -436,6 +440,7 @@ namespace Takai.Game
     /// </summary>
     public struct TraceHit
     {
+        public bool didHit;
         public float distance;
         public EntityInstance entity; //null if collided with map
     }

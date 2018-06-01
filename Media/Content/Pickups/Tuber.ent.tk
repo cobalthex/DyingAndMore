@@ -17,4 +17,6 @@ WeaponPickupClass {
             };
         };
     };
+
+    DestructionEffect: @"./Pickup.fx.tk";
 }

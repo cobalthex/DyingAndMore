@@ -15,24 +15,25 @@ EntityClass {
                                 Height: 48;
                             };
                             Blend: BlendState.Additive;
-                            InitialSpeed: [50 100];
+                            InitialSpeed: [20 100];
                             lifetime: [0.5sec 1.5sec];
                             ScaleOverTime: {
                                 Values: [
-                                    [0 0.2];
-                                    [1 1.0];
+                                    [0 0];
+                                    [0.6 0.5];
+                                    [1 0];
                                 ];
                             };
                             ColorOverTime: {
                                 Values: [
-                                    [0 Color.White];
-                                    [1 Color.Transparent];
+                                    [0 Color.LightSteelBlue];
+                                    [1 Color.White];
                                 ];
                             }
                         }
-                        Count: [0 1];
-                        Spread: 0;
-                        Radius: 6;
+                        Count: [-5 1];
+                        Spread: [-5deg 5deg];
+                        Radius: 16;
                     };
                 ];
             }

@@ -150,7 +150,7 @@ namespace DyingAndMore.Game.Entities
             else
             {
                 Velocity = Vector2.Zero; //todo: physics should handle this
-                IsAlive = false;
+                //IsAlive = false;
             }
 
             if (collider is ActorInstance actor &&

@@ -23,6 +23,9 @@ namespace Takai.UI
         /// If activated via keyboard, this is Zero
         /// </summary>
         public Vector2 position;
+
+        public int inputIndex;
+        //input device
     }
 
     //todo: invalidation/dirty states, instead of reflow each time property is updated, mark dirty. On next update, reflow if dirty
@@ -325,8 +328,8 @@ namespace Takai.UI
         /// Was the mouse pressed inside this static (and is the mouse still down)
         /// </summary>
         /// <returns>True if the mouse is currently down and was pressed inside this static</returns>
-        protected bool DidPressInside() =>
-            didPress && Input.InputState.IsButtonDown(Input.MouseButtons.Left);
+        protected bool DidPressInside(Input.MouseButtons button) =>
+            didPress && Input.InputState.IsButtonDown(button);
 
         /// <summary>
         /// Who owns/contains this element
@@ -972,6 +975,7 @@ namespace Takai.UI
                 toUpdate = toUpdate.children[toUpdate.children.Count - 1];
 
             bool handleInput = Runtime.HasFocus;
+            int i = 0;
             while (true)
             {
                 if (handleInput)
@@ -993,6 +997,7 @@ namespace Takai.UI
                 }
                 else
                     toUpdate = toUpdate._parent;
+                ++i;
             }
         }
 
@@ -1054,9 +1059,14 @@ namespace Takai.UI
 
             var mouse = Input.InputState.MousePoint;
 
-            if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mouse))
+            return HandleMouseInput(mouse, Input.MouseButtons.Left);
+        }
+
+        bool HandleMouseInput(Point mousePosition, Input.MouseButtons button)
+        {
+            if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mousePosition))
             {
-                var e = new ClickEventArgs { position = (mouse - VisibleBounds.Location).ToVector2() };
+                var e = new ClickEventArgs { position = (mousePosition - VisibleBounds.Location).ToVector2() };
                 didPress = true;
                 OnPress(e);
                 Press?.Invoke(this, e);
@@ -1070,15 +1080,15 @@ namespace Takai.UI
 
             //input capture
             //todo: maybe add setting
-            else if (DidPressInside())
+            else if (DidPressInside(Input.MouseButtons.Left))
                 return false;
 
             else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
             //else if (Input.InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
-                if (didPress && VisibleBounds.Contains(mouse)) //gesture pos
+                if (didPress && VisibleBounds.Contains(mousePosition)) //gesture pos
                 {
-                    var e = new ClickEventArgs { position = (mouse - VisibleBounds.Location).ToVector2() };
+                    var e = new ClickEventArgs { position = (mousePosition - VisibleBounds.Location).ToVector2() };
                     OnClick(e);
                     Click?.Invoke(this, e);
                     didPress = false;

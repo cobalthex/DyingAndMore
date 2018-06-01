@@ -87,13 +87,6 @@ GunClass {
                             [1 3pi]
                         ];
                     };
-
-                    AngleOverTime: {
-                        Values: [
-                            [0 0]
-                            [1 0.25pi]
-                        ];
-                    };
                 }
                 Count: 1;
                 Spread: [-120deg -60deg];

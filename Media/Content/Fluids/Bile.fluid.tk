@@ -16,18 +16,19 @@ FluidClass {
 	                Blend: BlendState.Additive;
 	                InitialSpeed: [50 100];
 	                lifetime: [0.2sec 0.5sec];
+	                ScaleOverTime: [
+	                	[0 1];
+	                	[1 0];
+	                ]
 	            }
 	            Count: [0 1];
 	            Spread: [0 2pi];
 	            Radius: 6;
 	        };
-	        ConditionEffect {
+	        #*ConditionEffect {
 				Radius: 0;
 				Duration: 0.1sec;
-				Condition: Poison {
-					DamagePerSecond: 5;
-				}
-	        }
+	        }*#
 		]
 	}
 }

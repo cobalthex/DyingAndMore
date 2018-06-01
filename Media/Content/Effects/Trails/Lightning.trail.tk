@@ -2,7 +2,7 @@ TrailClass {
 	MaxPoints: 400;
 	AutoTaper: true;
 	LifeTime: 0.1sec;
-	Jitter: [-10 10];
+	Jitter: [0 10];
 	Sprite: {
 		Texture: @"./Lightning.png";
 	}

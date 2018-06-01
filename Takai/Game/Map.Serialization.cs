@@ -111,9 +111,9 @@ namespace Takai.Game
             Data.Serializer.TextSerialize(file, this);
         }
 
-        InitialMapState CreateInitialState()
+        public InitialMapState CreateInitialState()
         {
-            return new InitialMapState
+            var mapState = new InitialMapState
             {
                 Entities = Enumerable.Select(AllEntities, e => new InitialMapState.EntitySpawn()
                 {
@@ -125,6 +125,15 @@ namespace Takai.Game
                 Fluids = new List<FluidInstance>(),
                 Decals = new List<Decal>()
             };
+
+            mapState.Fluids.AddRange(LiveFluids);
+            foreach (var sector in Sectors)
+            {
+                mapState.Fluids.AddRange(sector.fluids);
+                mapState.Decals.AddRange(sector.decals);
+            }
+
+            return mapState;
         }
 
         /// <summary>

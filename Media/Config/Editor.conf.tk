@@ -11,11 +11,14 @@
         DrawDecals: true;
         DrawParticles: true;
         DrawTrails: true;
+        DrawTrailMesh: false;
+        DrawColliders: false;
         DrawTriggers: true;
         DrawLines: true;
         DrawGrids: true;
         DrawSectorsOnGrid: true;
         DrawBordersAroundNonDrawingEntities: true;
-        DrawEntBoundingBoxes: true;
+        DrawEntityForwardVectors: true;
+        DrawPathHeuristic: false;
     };
 }
