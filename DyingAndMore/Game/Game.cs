@@ -64,11 +64,9 @@ namespace DyingAndMore.Game
         Static crapDisplay;
         Static clockDisplay;
 
+        Static gameHuds;
+
         TextInput debugConsole;
-
-        Takai.Graphics.BitmapFont tinyFont;
-
-        EffectsClass testEffect;
 
         Static renderSettingsConsole;
         Static updateSettingsConsole;
@@ -90,14 +88,60 @@ namespace DyingAndMore.Game
 
         public Game(MapInstance map)
         {
-            GameInstance.Current = new GameInstance();
+            if (map == null)
+                throw new ArgumentNullException("There must be a map to play");
 
-            Map = map ?? throw new ArgumentNullException("There must be a map to play");
+            GameInstance.Current = new GameInstance();
 
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
 
-            map.renderSettings.drawBordersAroundNonDrawingEntities = true;
+            AddChild(gameHuds = new Static
+            {
+                Name = "HUD container",
+                VerticalAlignment = Alignment.Stretch,
+                HorizontalAlignment = Alignment.Stretch,
+            });
+
+            AddChild(fpsDisplay = new Static
+            {
+                Name = "FPS",
+                Position = new Vector2(20),
+                VerticalAlignment = Alignment.End,
+                HorizontalAlignment = Alignment.End,
+            });
+            AddChild(crapDisplay = new Static
+            {
+                Name = "blah",
+                Position = new Vector2(20),
+                VerticalAlignment = Alignment.Start,
+                HorizontalAlignment = Alignment.End,
+                Color = Color.PaleGreen
+            });
+            AddChild(clockDisplay = new Static
+            {
+                Name = "clocks",
+                Position = new Vector2(0, 20),
+                VerticalAlignment = Alignment.Start,
+                HorizontalAlignment = Alignment.Middle,
+                Color = new Color(1, 1, 1, 0.5f),
+            });
+
+            debugConsole = new TextInput
+            {
+                Name = "debug console",
+                Position = new Vector2(20),
+                Size = new Vector2(400, 30),
+                VerticalAlignment = Alignment.End,
+                Font = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/xbox.bfnt"),
+            };
+            debugConsole.Submit += delegate (object sender, EventArgs e)
+            {
+                var inp = (TextInput)sender;
+                ParseCommand(inp.Text);
+                inp.RemoveFromParent();
+                inp.Text = String.Empty;
+            };
 
             renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
             renderSettingsConsole.Position = new Vector2(100, 0);
@@ -114,44 +158,9 @@ namespace DyingAndMore.Game
             gameplaySettingsConsole.VerticalAlignment = Alignment.Middle;
             gameplaySettingsConsole.UserData = GameInstance.Current.GameplaySettings;
 
-            AddChild(fpsDisplay = new Static()
-            {
-                Position = new Vector2(20),
-                VerticalAlignment = Alignment.End,
-                HorizontalAlignment = Alignment.End,
-            });
-            AddChild(crapDisplay = new Static()
-            {
-                Position = new Vector2(20),
-                VerticalAlignment = Alignment.Start,
-                HorizontalAlignment = Alignment.End,
-                Color = Color.PaleGreen
-            });
-            AddChild(clockDisplay = new Static()
-            {
-                Position = new Vector2(0, 20),
-                VerticalAlignment = Alignment.Start,
-                HorizontalAlignment = Alignment.Middle,
-                Color = new Color(1, 1, 1, 0.5f),
-            });
+            Map = map;
 
-            debugConsole = new TextInput()
-            {
-                Position = new Vector2(20),
-                VerticalAlignment = Alignment.End,
-                Font = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/xbox.bfnt"),
-            };
-            debugConsole.Submit += delegate (object sender, EventArgs e)
-            {
-                var inp = (TextInput)sender;
-                ParseCommand(inp.Text);
-                inp.RemoveFromParent();
-                inp.Text = String.Empty;
-            };
-
-            tinyFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UITiny.bfnt");
-
-            testEffect = Cache.Load<EffectsClass>("Effects/Damage.fx.tk");
+            map.renderSettings.drawBordersAroundNonDrawingEntities = true;
         }
 
         protected override void OnMapChanged(EventArgs e)
@@ -196,8 +205,9 @@ namespace DyingAndMore.Game
             Map.ActiveCamera = new Camera(player); //todo: resume control
             x = false;
 
+            gameHuds.RemoveAllChildren();
             if (player?.Hud != null)
-                AddChild(player.Hud);
+                gameHuds.AddChild(player.Hud);
         }
 
         string GetClockText(TimeSpan time)

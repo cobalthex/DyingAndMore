@@ -1,0 +1,21 @@
+WeaponPickupClass {
+    Name: "Particle fx test gun";
+
+	Weapon: GunInstance {
+		Class: @"Weapons/Flamethrower.wpn.tk";
+		AmmoCount: 1000;
+	}
+
+    Animations: {
+        Idle: {
+        	Sprite: {
+                texture: @"./TestGuns.png";
+                width: 64;
+                height: 64;
+                ClipRect: [128 0 64 64];
+            };
+        };
+    };
+
+    DestructionEffect: @"./Pickup.fx.tk";
+}

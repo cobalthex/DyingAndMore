@@ -1,0 +1,353 @@
+MapClass {
+    Name: "playground";
+    TileSize: 48;
+    Width: 20;
+    Height: 20;
+    TileBounds: [0 0 20 20];
+    InitialState: InitialMapState {
+        Entities: [
+            EntitySpawn {
+                Class: @"Pickups/Tuber.ent.tk";
+                Position: [142.9091 142.9091];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Player.ent.tk";
+                Position: [46.37213 50.65625];
+                Forward: [0.7071068 0.7071068];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Scenery/Smoke.ent.tk";
+                Position: [452.8261 582.2051];
+                Forward: [-4.371139E-08 -1];
+                Name: Null;
+            }
+        ];
+        Fluids: [
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [87.27267 905.4545];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [87.27267 905.4545];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [65.4545 927.2726];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [82.90904 920.7272];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [119.9999 887.9999];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [113.4545 894.5454];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [95.99995 922.909];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [102.5454 925.0908];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [141.8181 903.2726];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [141.8181 907.6363];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [159.2727 949.0908];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [161.4545 949.0908];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [191.9999 907.6363];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [167.9999 916.3636];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [122.1818 951.2726];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [130.909 946.909];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [172.3636 918.5454];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [154.909 933.8181];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [183.2727 922.909];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [283.6363 885.8181];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [194.1818 907.6363];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [202.909 903.2726];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [222.5454 911.9999];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [218.1818 922.909];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [209.4545 933.8181];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [237.8181 922.909];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [272.7272 901.0908];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [270.5454 909.8181];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [255.2727 931.6363];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [266.1818 922.909];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [331.6363 898.909];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [329.4545 907.6363];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [301.0909 942.5454];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [296.7272 946.909];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [359.9999 922.909];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [368.7272 918.5454];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [353.4545 933.8181];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [353.4545 935.9999];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [394.909 920.7272];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [436.3636 920.7272];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [431.9999 933.8181];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Blood.fluid.tk";
+                position: [434.1817 933.8181];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [765.8185 946.9092];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [870.5458 907.6365];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [894.5458 905.4547];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [868.364 922.9092];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [853.0912 949.0911];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [881.4548 942.5456];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [918.5458 918.5456];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [922.9094 918.5456];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [905.4548 940.3638];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [872.7276 951.2728];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [864.0003 933.8183];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [844.364 927.2729];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [798.5458 944.7274];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [778.9094 953.4547];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [772.364 953.4547];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [912.0003 840.0001];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [918.5458 802.9092];
+                velocity: [0 0];
+            }
+            FluidInstance {
+                Class: @"Fluids/Mucus.fluid.tk";
+                position: [922.9094 774.5456];
+                velocity: [0 0];
+            }
+        ];
+        Decals: [
+            Decal {
+                texture: "Decals/Pimple.png";
+                position: [933.8185 104.727];
+                angle: 0;
+                scale: 1;
+            }
+            Decal {
+                texture: "Decals/crack.png";
+                position: [458.1821 586.9088];
+                angle: 0.5542923;
+                scale: 1;
+            }
+            Decal {
+                texture: "Decals/Pimple.png";
+                position: [388.364 733.0906];
+                angle: 0;
+                scale: 1;
+            }
+        ];
+    };
+    TilesImage: "B:/Code/DyingAndMore/Media/Content/Tilesets/Tiles2.png";
+    Tiles: [0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 22 0 0 0 23 0 0 0 22 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 24 25 0 0 50 0 0 0 -1 0 0 0 0 15 14 0 0 0 0 0 26 27 0 0 -1 14 0 0 13 -1 -1 -1 -1 -1 12 0 0 0 0 0 0 0 0 0 -1 -1 14 0 0 13 -1 -1 -1 -1 0 0 0 -1 -1 -1 0 -1 -1 -1 -1 -1 -1 14 0 0 -1 -1 -1 -1 0 0 0 -1 28 29 0 -1 -1 -1 -1 -1 -1 -1 14 0 13 -1 -1 -1 0 0 0 -1 30 31 0 -1 -1 -1 -1 8 0 9 -1 14 0 -1 -1 -1 0 0 0 -1 -1 -1 0 -1 -1 -1 -1 0 0 0 -1 -1 14 13 -1 -1 0 0 0 -1 -1 -1 0 -1 -1 -1 -1 0 0 0 13 -1 -1 14 13 -1 0 0 0 0 0 -1 0 0 -1 0 0 0 0 0 0 13 -1 -1 14 13 0 0 0 0 0 -1 -1 0 -1 0 0 0 0 0 0 0 -1 -1 -1 14 0 0 0 0 -1 -1 0 0 -1 0 0 0 0 0 0 0 13 4 4 12 0 0 0 0 0 -1 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 55 0 0 -1 14 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 47 -1 0 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 26 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+}

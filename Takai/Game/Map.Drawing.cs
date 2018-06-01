@@ -300,12 +300,13 @@ namespace Takai.Game
             //main render
             Runtime.GraphicsDevice.SetRenderTargets(Class.preRenderTarget);
 
-            if (renderSettings.drawPathHeuristic)
-                DrawPathHeuristic(ref context);
-            else if (renderSettings.drawTiles)
+            if (renderSettings.drawTiles)
                 DrawTiles(ref context);
             else
                 Runtime.GraphicsDevice.Clear(ClearOptions.Stencil, Color.Transparent, 0, 1);
+
+            if (renderSettings.drawPathHeuristic)
+                DrawPathHeuristic(ref context);
 
             if (renderSettings.drawDecals)
                 DrawDecals(ref context);
@@ -380,7 +381,7 @@ namespace Takai.Game
 
                     Graphics.Primitives2D.DrawFill(
                         c.spriteBatch,
-                        Util.ColorFromHSL(path.heuristic * mult, 1, 0.8f, 1),
+                        Util.ColorFromHSL(path.heuristic * mult, 1, 0.8f, 0.5f),
                         new Rectangle(x * Class.TileSize, y * Class.TileSize, Class.TileSize, Class.TileSize)
                     );
                 }
@@ -703,9 +704,12 @@ namespace Takai.Game
                     next = 0;
                     foreach (var trail in Trails)
                     {
+                        if (trail.Count < 2)
+                            continue;
+
                         Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture;
                         Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, Class.trailVerts, next, trail.Count * 2 - 2);
-                        next += trail.Count * 2 - 2;
+                        next += trail.Count * 2;
                     }
                 }
             }

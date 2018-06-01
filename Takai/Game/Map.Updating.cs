@@ -167,6 +167,10 @@ namespace Takai.Game
 
             #region entity physics
 
+            bool isPhysicsEnabled = updateSettings.isPhysicsEnabled;
+            bool isMapCollisionEnabled = updateSettings.isMapCollisionEnabled;
+            bool isEntityCollisionEnabled = updateSettings.isEntityCollisionEnabled;
+
             for (int y = activeSectors.Top; y < activeSectors.Bottom; ++y)
             {
                 for (int x = activeSectors.Left; x < activeSectors.Right; ++x)
@@ -181,7 +185,7 @@ namespace Takai.Game
                         var deltaV = entity.Velocity * deltaSeconds;
                         var lastBounds = entity.AxisAlignedBounds;
 
-                        if (deltaV != Vector2.Zero)
+                        if (isPhysicsEnabled && deltaV != Vector2.Zero)
                         {
                             var deltaVLen = deltaV.Length();
                             var normV = deltaV / deltaVLen;
@@ -191,35 +195,38 @@ namespace Takai.Game
                             var hit = Trace(start, normV, deltaVLen, entity);
                             var target = start + (normV * (hit.distance - offset));
 
-                            if (hit.entity == null) //map collision
+                            if (hit.didHit)
                             {
-                                if (updateSettings.isMapCollisionEnabled && Math.Abs(hit.distance - deltaVLen) > 0.5f)
+                                if (hit.entity == null) //map collision
+                                {
+                                    if (isMapCollisionEnabled) //cleanup
+                                    {
+                                        entity.Position = target;
+                                        entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
+
+                                        //improve
+                                        entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;
+                                    }
+                                }
+                                else if (isEntityCollisionEnabled)
                                 {
                                     entity.Position = target;
-                                    entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
 
-                                    //improve
-                                    entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;
-                                }
-                            }
-                            else if (updateSettings.isEntityCollisionEnabled)
-                            {
-                                entity.Position = target;
+                                    var cm = new CollisionManifold
+                                    {
+                                        point = target,
+                                        direction = entity.Forward,
+                                        depth = deltaVLen - hit.distance //todo: distance between origins minus radii
+                                    };
 
-                                var cm = new CollisionManifold
-                                {
-                                    point = target,
-                                    direction = entity.Forward,
-                                    depth = deltaVLen - hit.distance //todo: distance between origins minus radii
-                                };
+                                    entity.OnEntityCollision(hit.entity, cm, deltaTime);
+                                    hit.entity.OnEntityCollision(entity, cm.Reciprocal(), deltaTime);
 
-                                entity.OnEntityCollision(hit.entity, cm, deltaTime);
-                                hit.entity.OnEntityCollision(entity, cm.Reciprocal(), deltaTime);
-
-                                if (entity.Class.IsPhysical)
-                                {
-                                    var diff = Vector2.Normalize(hit.entity.Position - entity.Position);
-                                    entity.Velocity -= diff * Vector2.Dot(entity.Velocity, diff);
+                                    if (entity.Class.IsPhysical)
+                                    {
+                                        var diff = Vector2.Normalize(hit.entity.Position - entity.Position);
+                                        entity.Velocity -= diff * Vector2.Dot(entity.Velocity, diff);
+                                    }
                                 }
                             }
 

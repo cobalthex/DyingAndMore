@@ -9,7 +9,7 @@ MapClass {
             EntitySpawn {
                 Class: @"Actors/Player.ent.tk";
                 Position: [267 259];
-                Forward: [0.9955281 0.09446617];
+                Forward: [0.7585201 -0.6516496];
                 Name: Null;
             }
             EntitySpawn {
@@ -20,26 +20,50 @@ MapClass {
             }
             EntitySpawn {
                 Class: @"Actors/InfectedCell.ent.tk";
-                Position: [886.0308 418.9539];
-                Forward: [1 0];
+                Position: [999.1724 210.412];
+                Forward: [-0.2820824 -0.1929109];
                 Name: Null;
             }
             EntitySpawn {
                 Class: @"Actors/InfectedCell.ent.tk";
-                Position: [580.3077 673.7231];
-                Forward: [1 0];
+                Position: [674.5362 538.4624];
+                Forward: [-0.1286453 -0.5569001];
                 Name: Null;
             }
             EntitySpawn {
                 Class: @"Actors/InfectedCell.ent.tk";
-                Position: [993.6 738.8308];
-                Forward: [1 0];
+                Position: [1114.696 579.674];
+                Forward: [-0.08300813 -0.5758035];
                 Name: Null;
             }
             EntitySpawn {
                 Class: @"Actors/SoundTest.ent.tk";
                 Position: [283.5273 996.1091];
                 Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Pickups/Tuber.ent.tk";
+                Position: [378.8728 361.3378];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Cyst.ent.tk";
+                Position: [2195.455 170.6335];
+                Forward: [-1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Cyst.ent.tk";
+                Position: [2190.437 431.579];
+                Forward: [-1 -8.687705E-07];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Cyst.ent.tk";
+                Position: [2180.4 727.6517];
+                Forward: [-1 0];
                 Name: Null;
             }
         ];

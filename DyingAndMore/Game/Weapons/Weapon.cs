@@ -204,6 +204,11 @@ namespace DyingAndMore.Game.Weapons
                         Actor.StopAnimation($"{Class.AnimationClass}ChargeWeapon");
                         Actor.StopAnimation($"{Class.AnimationClass}DischargeWeapon");
                         break;
+
+                    case UnderchargeAction.Discharge:
+                        State = WeaponState.Discharging;
+                        OnDischarge();
+                        break;
                 }
             }
 

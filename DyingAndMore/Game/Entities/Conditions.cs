@@ -74,6 +74,7 @@ namespace DyingAndMore.Game.Entities
     /// </summary>
     public class ConditionEffect : IGameEffect
     {
+        [Takai.Data.Serializer.Required]
         public ConditionClass Condition { get; set; }
         public float Radius { get; set; }
         public TimeSpan Duration { get; set; }

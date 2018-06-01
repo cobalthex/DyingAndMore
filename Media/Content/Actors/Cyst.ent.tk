@@ -4,6 +4,7 @@ ActorClass {
     DefaultFaction: Factions [ Enemy; Common ];
     DefaultController: ArtilleryController {
         CanRotate: false;
+        MaxRange: 400;
     };
     FieldOfView: 60deg;
 
@@ -67,8 +68,8 @@ ActorClass {
     DefaultWeapon: SpawnerClass {
         AnimationClass: "Spawner";
         ChargeTime: 500msec;
-		CooldownTime: 2sec;
-		UnderchargeAction: UnderchargeAction.Discharge;
+		DischargeTime: 2sec;
+		UnderchargeAction: UnderchargeAction.Dissipate;
         Spawns: [
             [@"Actors/InfectedCell.ent.tk" [3 5]]
         ]

@@ -56,6 +56,13 @@ namespace Takai.Data
         public class ReadOnlyAttribute : Attribute { }
 
         /// <summary>
+        /// Throw an exception if this property is not set upon deserialization
+        /// </summary>
+        [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
+        [System.Runtime.InteropServices.ComVisible(true)]
+        public class RequiredAttribute : Attribute { public RequiredAttribute() { throw new NotImplementedException(); } } //todo
+
+        /// <summary>
         /// Store the value (or values if enumerable) as a reference to an object defined elsewhere
         /// Must implement IReferenceable
         /// </summary>
@@ -194,7 +201,7 @@ namespace Takai.Data
             Serializers[typeof(TimeSpan)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((TimeSpan)value).TotalMilliseconds; },
-                Deserialize = (object value, DeserializationContext cxt) => { return TimeSpan.FromMilliseconds((double)Convert.ChangeType(value, typeof(double))); }
+                Deserialize = (object value, DeserializationContext cxt) => { return TimeSpan.FromMilliseconds((double)Convert.ChangeType(value, typeof(double))); } //return suffix object?
             };
 
             Serializers[typeof(BlendState)] = new CustomTypeSerializer

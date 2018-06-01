@@ -41,18 +41,16 @@ namespace Takai.Game
         }
     }
 
-    public static class RangeUtil
+    public static class RangeHelpers
     {
         public static int Random(this Range<int> range)
         {
             return Util.RandomGenerator.Next(range.min, range.max + 1);
         }
-
         public static float Random(this Range<float> range)
         {
             return (float)Util.RandomGenerator.NextDouble() * (range.max - range.min) + range.min;
         }
-
         public static TimeSpan Random(this Range<TimeSpan> range)
         {
             if (range.min == range.max)
@@ -76,6 +74,19 @@ namespace Takai.Game
         public static bool Contains(this Range<TimeSpan> range, TimeSpan value)
         {
             return (value >= range.min && value <= range.max);
+        }
+
+        public static int TotalRange(this Range<int> range)
+        {
+            return range.max - range.min;
+        }
+        public static float TotalRange(this Range<float> range)
+        {
+            return range.max - range.min;
+        }
+        public static TimeSpan TotalRange(this Range<TimeSpan> range)
+        {
+            return range.max - range.min;
         }
     }
 

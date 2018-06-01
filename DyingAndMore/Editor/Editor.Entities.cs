@@ -7,6 +7,8 @@ using Takai;
 
 namespace DyingAndMore.Editor
 {
+    //todo: initial map state should be updated as entities are updated (created/moved/deleted, etc)
+
     class EntitiesEditorMode : EditorMode
     {
         public Takai.Game.EntityInstance SelectedEntity

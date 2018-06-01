@@ -263,6 +263,35 @@ namespace Takai.Game
         }
     }
 
+    /// <summary>
+    /// Apply an outward push force to nearby physical entities
+    /// </summary>
+    public class ForceEffect : IGameEffect
+    {
+        public float Force { get; set; } //range?
+        /// <summary>
+        /// The cone of effect for the force (-pi to pi for a full circle)
+        /// </summary>
+        public Range<float> Angle { get; set; } = new Range<float>(-MathHelper.Pi, MathHelper.Pi);
+
+        public void Spawn(EffectsInstance instance)
+        {
+            if (Force == 0 || Angle.TotalRange() == 0)
+                return;
+
+            var nearby = instance.Map.FindEntities(instance.Position, (float)Math.Sqrt(Force));
+            foreach (var ent in nearby)
+            {
+                if (!ent.Class.IsPhysical || ent == instance.Source)
+                    continue;
+
+                var d = ent.Position - instance.Position;
+                var l = d.Length();
+                ent.Velocity += (d / l) * (Force);
+            }
+        }
+    }
+
     //screen effects/flashes
 
     //floating text?/objects

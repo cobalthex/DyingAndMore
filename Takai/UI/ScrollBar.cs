@@ -49,10 +49,12 @@ namespace Takai.UI
             set
             {
                 var newPosition = value;
-                if (Direction == Direction.Vertical)
-                    newPosition = Util.Clamp(value, 0, (int)Size.Y - ContentSize);
-                else if (Direction == Direction.Horizontal)
-                    newPosition = Util.Clamp(value, 0, (int)Size.X - ContentSize);
+                int size = (int)(Direction == Direction.Horizontal ? Size.X : Size.Y);
+
+                if (size > contentSize)
+                    newPosition = 0;
+                else
+                    newPosition = Util.Clamp(value, 0, ContentSize - size);
 
                 if (newPosition != contentPosition)
                 {
@@ -86,7 +88,7 @@ namespace Takai.UI
         {
             if (IsThumbVisible)
             {
-                if (DidPressInside())
+                if (DidPressInside(Input.MouseButtons.Left))
                 {
                     var mouse = InputState.MousePoint - VisibleBounds.Location;
                     var deltaMouse = InputState.MouseDelta();
