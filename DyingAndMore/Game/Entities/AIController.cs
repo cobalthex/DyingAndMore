@@ -257,7 +257,7 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
-            AI.Actor.IsAlive = false; //should this be handled by the effect?
+            AI.Actor.Kill(); //todo: should this be handled by the effect?
             if (Effect != null)
                 AI.Actor.Map.Spawn(Effect.Instantiate(AI.Actor));
         }

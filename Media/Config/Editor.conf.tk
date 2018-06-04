@@ -3,22 +3,23 @@
     SnapAngle: 45deg;
 
     RenderSettings: {
-		DrawTiles: true;
-        DrawEntities: true;
-        DrawFluids: true;
-        DrawReflections: true;
-        DrawFluidReflectionMask: false;
-        DrawDecals: true;
-        DrawParticles: true;
-        DrawTrails: true;
-        DrawTrailMesh: false;
-        DrawColliders: false;
-        DrawTriggers: true;
-        DrawLines: true;
-        DrawGrids: true;
-        DrawSectorsOnGrid: true;
-        DrawBordersAroundNonDrawingEntities: true;
-        DrawEntityForwardVectors: true;
-        DrawPathHeuristic: false;
+		drawTiles: true;
+        drawEntities: true;
+        drawFluids: true;
+        drawReflections: true;
+        drawFluidReflectionMask: false;
+        drawDecals: true;
+        drawParticles: true;
+        drawTrails: true;
+        drawTrailMesh: false;
+        drawColliders: false;
+        drawTriggers: true;
+        drawLines: true;
+        drawGrids: true;
+        drawSectorsOnGrid: true;
+        drawBordersAroundNonDrawingEntities: true;
+        drawEntityForwardVectors: true;
+        drawPathHeuristic: false;
+        drawScreenEffects: true;
     };
 }

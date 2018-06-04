@@ -5,6 +5,7 @@ ProjectileClass {
     IgnoreTrace: False;
     Drag: 3;
     CanDamageSource: true;
+    Damage: 0;
 
     LifeSpan: 1sec;
     MinimumSpeed: -1000;
@@ -12,12 +13,12 @@ ProjectileClass {
     FadeEffect: {
         Effects: [
             AreaHealthEffect {
-                MaxDamage: 100;
+                MaxDamage: 1000;
                 Radius: 20;
             };
 
             ForceEffect {
-                Force: 22000;
+                Force: 8000;
             }
 
             ParticleEffect {
@@ -42,9 +43,30 @@ ProjectileClass {
                     InitialSpeed: [400 600];
                     lifetime: [0.5sec 0.85sec];
                     Drag: 5;
-                }
+                } 
                 Count: [40 60];
                 Spread: [-1pi 1pi];
+            };
+
+            ScreenFadeEffect {
+                Fade: {
+                    Colors: ColorCurve {
+                        Values: [
+                            #[0 Color.White];
+                            #[0.25 Color.White];
+                            #[1 [255 255 255 0]];
+                            [0 [64 0 144 192]];
+                            [0.4 [64 0 1 64]];
+                            [1 [32 0 1 0]];
+                        ];
+                    };
+                    Duration: 3sec;
+                    Blend: {
+                        ColorBlendFunction: BlendFunction.Subtract;
+                        ColorSourceBlend: Blend.DestinationColor;
+                        ColorDestinationBlend: Blend.One;
+                    }
+                };
             };
         ];
     }

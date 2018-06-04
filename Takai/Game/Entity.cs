@@ -148,18 +148,7 @@ namespace Takai.Game
         /// </summary>
         public string Name { get; set; } = null;
 
-        public virtual bool IsAlive
-        {
-            get => _isAlive;
-            set
-            {
-                //play death animation
-                if (value == false && _isAlive)
-                    PlayAnimation("Dead", () => { if (Class.DestroyOnDeath) Map?.Destroy(this); });
-                _isAlive = value;
-            }
-        }
-        private bool _isAlive = true;
+        public bool IsAlive { get; private set; } = true;
 
         //todo: parent/child relationships
 
@@ -315,6 +304,15 @@ namespace Takai.Game
         public virtual void Think(TimeSpan deltaTime) {
             if (Trail != null)
                 Trail.AddPoint(Position, Radius * 2); //todo: width?
+        }
+
+        public virtual void Kill()
+        {
+            if (!IsAlive)
+                return;
+
+            PlayAnimation("Dead", () => { if (Class.DestroyOnDeath) Map?.Destroy(this); });
+            IsAlive = false;
         }
 
         /// <summary>

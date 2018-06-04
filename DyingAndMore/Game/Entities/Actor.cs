@@ -108,16 +108,6 @@ namespace DyingAndMore.Game.Entities
         }
         private float _currentHealth;
 
-        public override bool IsAlive
-        {
-            get => base.IsAlive;
-            set
-            {
-                if (GameInstance.Current == null || GameInstance.Current.GameplaySettings.canActorsDie)
-                    base.IsAlive = value;
-            }
-        }
-
         /// <summary>
         /// All current conditions, and time remaining
         /// </summary>
@@ -205,9 +195,15 @@ namespace DyingAndMore.Game.Entities
             lastVelocity = Velocity;
 
             if (CurrentHealth <= 0)
-                IsAlive = false;
+                Kill();
 
             base.Think(deltaTime);
+        }
+
+        public override void Kill()
+        {
+            if (GameInstance.Current == null || GameInstance.Current.GameplaySettings.canActorsDie)
+                base.Kill();
         }
 
         public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)

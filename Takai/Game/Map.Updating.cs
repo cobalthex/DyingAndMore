@@ -467,6 +467,8 @@ namespace Takai.Game
 
             #endregion
 
+            currentScreenFadeElapsedTime += deltaTime;
+
             foreach (var script in Scripts)
                 script.Step(deltaTime);
         }
