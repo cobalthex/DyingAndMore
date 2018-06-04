@@ -9,6 +9,7 @@ namespace Takai.Game
     public partial class MapClass
     {
         //todo: should all of these gpu props be static?
+        //data below not thread safe
 
         internal SpriteBatch spriteBatch;
         internal RenderTarget2D preRenderTarget;
@@ -22,14 +23,21 @@ namespace Takai.Game
         internal XnaEffect fluidEffect;
         internal XnaEffect reflectionEffect; //writes color and reflection information to two render targets
 
-        internal XnaEffect lineEffect;
+        internal XnaEffect colorEffect;
         internal XnaEffect circleEffect;
         internal XnaEffect basicEffect;
         internal RasterizerState shapeRaster;
 
         internal VertexPositionColorTexture[] trailVerts;
-        internal DynamicVertexBuffer trailVbuffer;
+        internal DynamicVertexBuffer trailVBuffer;
 
+        internal VertexPositionColor[] fullScreenVerts = new[]
+        {
+            new VertexPositionColor(new Vector3(-1, -1, 0), Color.Transparent),
+            new VertexPositionColor(new Vector3( 1, -1, 0), Color.Transparent),
+            new VertexPositionColor(new Vector3(-1,  1, 0), Color.Transparent),
+            new VertexPositionColor(new Vector3( 1,  1, 0), Color.Transparent)
+        };
 
         internal static RasterizerState wireframeRaster = new RasterizerState
         {
@@ -91,7 +99,7 @@ namespace Takai.Game
                 //todo: some of the render targets may be able to be combined
             }
 
-            lineEffect = Data.Cache.Load<XnaEffect>("Shaders/Line.mgfx");
+            colorEffect = Data.Cache.Load<XnaEffect>("Shaders/color.mgfx");
             circleEffect = Data.Cache.Load<XnaEffect>("Shaders/Circle.mgfx");
             basicEffect = Data.Cache.Load<XnaEffect>("Shaders/Basic.mgfx");
             outlineEffect = Data.Cache.Load<XnaEffect>("Shaders/Outline.mgfx");
@@ -99,8 +107,15 @@ namespace Takai.Game
             reflectionEffect = Data.Cache.Load<XnaEffect>("Shaders/Reflection.mgfx");
 
             trailVerts = new VertexPositionColorTexture[512];
-            trailVbuffer = new DynamicVertexBuffer(Runtime.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, trailVerts.Length, BufferUsage.WriteOnly);
+            trailVBuffer = new DynamicVertexBuffer(Runtime.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, trailVerts.Length, BufferUsage.WriteOnly);
         }
+    }
+
+    public struct ScreenFade
+    {
+        public System.TimeSpan Duration { get; set; }
+        public ColorCurve Colors { get; set; }
+        public BlendState Blend { get; set; }
     }
 
     public partial class MapInstance
@@ -142,6 +157,7 @@ namespace Takai.Game
             public bool drawEntityForwardVectors;
             public bool drawColliders;
             public bool drawPathHeuristic;
+            public bool drawScreenEffects;
             public bool drawDebugInfo;
 
             public static readonly RenderSettings Default = new RenderSettings
@@ -154,11 +170,18 @@ namespace Takai.Game
                 drawParticles = true,
                 drawTrails = true,
                 drawLines = true,
+                drawScreenEffects = true,
             };
         }
 
         [Data.Serializer.Ignored]
         public RenderSettings renderSettings = RenderSettings.Default;
+
+        /// <summary>
+        /// The current fade. Ignored if duration <= 0 (counts down)
+        /// </summary>
+        public ScreenFade currentScreenFade;
+        public System.TimeSpan currentScreenFadeElapsedTime;
 
         /// <summary>
         /// Draw a line next frame
@@ -362,6 +385,9 @@ namespace Takai.Game
             context.spriteBatch.End();
 
             #endregion
+
+            if (renderSettings.drawScreenEffects)
+                DrawScreenEffects(ref context);
         }
 
         //todo: many of these iterate over visible sectors in a loop. Possible opportunity to combine
@@ -622,7 +648,7 @@ namespace Takai.Game
             if (Class.trailVerts.Length < vertexCount)
             {
                 Class.trailVerts = new VertexPositionColorTexture[vertexCount];
-                Class.trailVbuffer = new DynamicVertexBuffer(Runtime.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, Class.trailVerts.Length, BufferUsage.WriteOnly);
+                Class.trailVBuffer = new DynamicVertexBuffer(Runtime.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, Class.trailVerts.Length, BufferUsage.WriteOnly);
             }
 
             int next = 0;
@@ -662,8 +688,8 @@ namespace Takai.Game
                 Class.trailVerts[next - 1].TextureCoordinate = new Vector2(1, 1);
             }
 
-            Class.trailVbuffer.SetData(Class.trailVerts, 0, vertexCount);
-            Runtime.GraphicsDevice.SetVertexBuffer(Class.trailVbuffer);
+            Class.trailVBuffer.SetData(Class.trailVerts, 0, vertexCount);
+            Runtime.GraphicsDevice.SetVertexBuffer(Class.trailVBuffer);
 
             Runtime.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
@@ -696,9 +722,9 @@ namespace Takai.Game
 
             if (renderSettings.drawTrailMesh)
             {
-                Class.lineEffect.Parameters["Transform"].SetValue(cameraTransform);
+                Class.colorEffect.Parameters["Transform"].SetValue(cameraTransform);
                 Runtime.GraphicsDevice.RasterizerState = MapClass.wireframeRaster;
-                foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)
+                foreach (EffectPass pass in Class.colorEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
                     next = 0;
@@ -752,7 +778,7 @@ namespace Takai.Game
                     camViewport.Top,
                     0, 1
                 );
-                Class.lineEffect.Parameters["Transform"].SetValue(lineTransform);
+                Class.colorEffect.Parameters["Transform"].SetValue(lineTransform);
 
                 var blackLines = new VertexPositionColor[renderedLines.Count];
                 for (int i = 0; i < renderedLines.Count; ++i)
@@ -760,13 +786,13 @@ namespace Takai.Game
                     blackLines[i].Color = new Color(Color.Black, renderedLines[i].Color.A);
                     blackLines[i].Position = renderedLines[i].Position + new Vector3(1, 1, 0);
                 };
-                foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)
+                foreach (EffectPass pass in Class.colorEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
                     Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, blackLines, 0, blackLines.Length / 2);
                 }
 
-                foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)
+                foreach (EffectPass pass in Class.colorEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
                     Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, renderedLines.ToArray(), 0, renderedLines.Count / 2);
@@ -787,7 +813,7 @@ namespace Takai.Game
                 camViewport.Top,
                 0, 1
             );
-            Class.lineEffect.Parameters["Transform"].SetValue(c.cameraTransform * viewProjection);
+            Class.colorEffect.Parameters["Transform"].SetValue(c.cameraTransform * viewProjection);
 
             var grids = new VertexPositionColor[c.visibleTiles.Width * 2 + c.visibleTiles.Height * 2 + 4];
             var gridColor = new Color(Color.Gray, 0.3f);
@@ -810,7 +836,7 @@ namespace Takai.Game
                 grids[n + 1].Position.X += c.visibleRegion.Width;
             }
 
-            foreach (EffectPass pass in Class.lineEffect.CurrentTechnique.Passes)
+            foreach (EffectPass pass in Class.colorEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, grids, 0, grids.Length / 2);
@@ -831,6 +857,28 @@ namespace Takai.Game
                 Graphics.Primitives2D.DrawFill(c.spriteBatch, new Color(Color.LimeGreen, 0.25f), trigger.Region);
             c.spriteBatch.End();
         }
+
+        public void DrawScreenEffects(ref RenderContext c)
+        {
+            //fade effect
+            if (currentScreenFadeElapsedTime < currentScreenFade.Duration)
+            {
+                var t = (float)(currentScreenFadeElapsedTime.TotalMilliseconds / currentScreenFade.Duration.TotalMilliseconds);
+                var color = currentScreenFade.Colors.Evaluate(t);
+                for (int i = 0; i < Class.fullScreenVerts.Length; ++i)
+                    Class.fullScreenVerts[i].Color = color;
+
+                Runtime.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+                Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+                Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
+
+                Class.colorEffect.Parameters["Transform"].SetValue(Matrix.Identity);
+                foreach (EffectPass pass in Class.colorEffect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, Class.fullScreenVerts, 0, 2);
+                }
+            }
+        }
     }
 }
-;

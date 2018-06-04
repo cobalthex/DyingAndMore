@@ -124,11 +124,12 @@ namespace Takai
             return ColorFromHSL(hsla.X, hsla.Y, hsla.Z, hsla.W);
         }
 
-        public static Color ColorFromHSL(float hue, float saturation, float lightness, float alpha = 1f)
+        public static Color ColorFromHSL(float hue, float saturation, float lightness, float alpha = 255f)
         {
             hue = MathHelper.Clamp(hue, 0, 360);
             saturation = MathHelper.Clamp(saturation, 0, 1);
             lightness = MathHelper.Clamp(lightness, 0, 1);
+            alpha /= 255f;
 
             if (saturation == 0)
                 return new Color(lightness, lightness, lightness, alpha);

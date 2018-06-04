@@ -251,18 +251,6 @@ namespace Takai.Game
         }
     }
 
-    public class ScreenFadeEffect : IGameEffect
-    {
-        public Color ScreenColor { get; set; }
-        public TimeSpan FadeTime { get; set; } //zero is instant
-        public bool FadeOut { get; set; } //fade back to transparent (2 x FadeTime)
-
-        public void Spawn(EffectsInstance instance)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     /// <summary>
     /// Apply an outward push force to nearby physical entities
     /// </summary>
@@ -292,7 +280,21 @@ namespace Takai.Game
         }
     }
 
-    //screen effects/flashes
+    /// <summary>
+    /// A timed screen fade/flash effect
+    /// </summary>
+    public class ScreenFadeEffect : IGameEffect
+    {
+        public ScreenFade Fade { get; set; }
+
+        //effective radius, scale by radius
+
+        public void Spawn(EffectsInstance instance)
+        {
+            instance.Map.currentScreenFade = Fade;
+            instance.Map.currentScreenFadeElapsedTime = TimeSpan.Zero;
+        }
+    }
 
     //floating text?/objects
 }

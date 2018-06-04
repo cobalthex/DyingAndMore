@@ -30,9 +30,9 @@ namespace DyingAndMore.Game.Entities
         public Range<float> MuzzleVelocity { get; set; } = 100;
 
         /// <summary>
-        /// The amount of power this projectile has. Determines speed and therefore damage
+        /// How much damage this projectile will inflict upon an emeny
         /// </summary>
-        public float Power { get; set; } = 100;
+        public float Damage { get; set; } = 100;
 
         /// <summary>
         /// How far this shot will go before killing itself
@@ -123,7 +123,7 @@ namespace DyingAndMore.Game.Entities
                     var fx = _class.FadeEffect.Instantiate(this);
                     Map.Spawn(fx);
                 }
-                IsAlive = false;
+                Kill();
 
                 //todo: move to collision fx and destruction fx?
             }
@@ -138,7 +138,7 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime)
         {
-            IsAlive = false;
+            Kill();
         }
 
         public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
@@ -150,12 +150,12 @@ namespace DyingAndMore.Game.Entities
             else
             {
                 Velocity = Vector2.Zero; //todo: physics should handle this
-                //IsAlive = false;
+                //Kill();
             }
 
             if (collider is ActorInstance actor &&
                 (collider != Source || _class.CanDamageSource))
-                actor.ReceiveDamage(_class.Power, Source);
+                actor.ReceiveDamage(_class.Damage, Source);
         }
     }
 }

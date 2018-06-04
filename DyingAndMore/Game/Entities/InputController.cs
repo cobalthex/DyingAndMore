@@ -120,7 +120,7 @@ namespace DyingAndMore.Game.Entities
                 else
                     Actor.Weapon = wpi.Class.Weapon.Clone();
 
-                collider.IsAlive = false;
+                collider.Kill();
             }
         }
     }
