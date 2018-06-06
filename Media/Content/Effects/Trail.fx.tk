@@ -27,7 +27,7 @@ EffectsClass {
                 lifetime: [0.25sec 0.85sec];
                 Drag: 5;
             }
-            Count: [0 1];
+            Count: [-10 1];
             Spread: [-30deg 30deg];
         };
 	];
