@@ -10,6 +10,14 @@ ProjectileClass {
     LifeSpan: 1sec;
     MinimumSpeed: -1000;
 
+    Trail: {
+        MaxPoints: 200;
+        Color: Color.Cyan;
+        LifeTime: 0.5sec;
+        AutoTaper: true;
+        Width: 12;
+    }
+
     FadeEffect: {
         Effects: [
             AreaHealthEffect {
@@ -48,7 +56,7 @@ ProjectileClass {
                 Spread: [-1pi 1pi];
             };
 
-            ScreenFadeEffect {
+            #*ScreenFadeEffect {
                 Fade: {
                     Colors: ColorCurve {
                         Values: [
@@ -67,7 +75,7 @@ ProjectileClass {
                         ColorDestinationBlend: Blend.One;
                     }
                 };
-            };
+            };*#
         ];
     }
 

@@ -74,6 +74,16 @@ namespace Takai
         }
 
         /// <summary>
+        /// Return a vector orthagonal to this one
+        /// </summary>
+        /// <param name="v">The vector to use</param>
+        /// <returns>An orthagonal vector</returns>
+        public static Vector2 Ortho(this Vector2 v)
+        {
+            return new Vector2(v.Y, -v.X);
+        }
+
+        /// <summary>
         /// Convert an RGB color to HSL
         /// </summary>
         /// <param name="color">the RGB color to convert</param>

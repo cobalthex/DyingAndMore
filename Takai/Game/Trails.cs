@@ -31,12 +31,13 @@ namespace Takai.Game
         public Graphics.Sprite Sprite { get; set; }
         public Color Color { get; set; } = Color.White;
 
-        //fade?
+        public float Width { get; set; } = 1;
+
         public bool AutoTaper { get; set; }
-        //taper middle (curve scalar?)
+        //todo: width curve?
 
         /// <summary>
-        /// Random jitter added to each point (e.g. for a lightning effect)
+        /// Orthagonal jitter added to each point
         /// </summary>
         public Range<float> Jitter { get; set; } = 0;
 
@@ -45,25 +46,28 @@ namespace Takai.Game
         /// </summary>
         public TimeSpan Lifetime { get; set; }
 
+        /// <summary>
+        /// Minimum time between adding new points (as not to have insane jitter with high fps)
+        /// Zero for no delay
+        /// </summary>
+        public TimeSpan CaptureDelay { get; set; }
+
         public TrailInstance Instantiate()
         {
-            return new TrailInstance
-            {
-                Class = this
-            };
+            return new TrailInstance(this);
         }
     }
 
     public struct TrailPoint
     {
         public Vector2 location;
-        public float width;
+        public Vector2 direction;
         public TimeSpan time;
 
-        public TrailPoint(Vector2 location, float width, TimeSpan time)
+        public TrailPoint(Vector2 location, Vector2 direction, TimeSpan time)
         {
             this.location = location;
-            this.width = width;
+            this.direction = direction;
             this.time = time;
         }
     }
@@ -106,6 +110,13 @@ namespace Takai.Game
         public int Count { get; private set; } = 0;
 
         protected TimeSpan elapsedTime;
+        protected TimeSpan nextCapture;
+
+        public TrailInstance() : this(null) { }
+        public TrailInstance(TrailClass @class)
+        {
+            Class = @class;
+        }
 
         public void Update(TimeSpan deltaTime)
         {
@@ -126,28 +137,28 @@ namespace Takai.Game
         /// <param name="location">The next point of the trail</param>
         /// <param name="width">How wide the point is</param>
         /// <param name="collapse">Only add this point if its not on top of the last point</param>
-        public void AddPoint(Vector2 location, float width, bool collapse = true)
+        public void AddPoint(Vector2 location, Vector2 direction, bool collapse = true)
         {
-            if (collapse && Count > 0 && points[HeadIndex == 0 ? points.Count - 1 : HeadIndex - 1].location == location)
+            if ((collapse && Count > 0 && points[HeadIndex == 0 ? points.Count - 1 : HeadIndex - 1].location == location) ||
+                elapsedTime < nextCapture)
                 return;
 
             if (Class != null)
             {
-                location += new Vector2(
-                    Class.Jitter.Random(),
-                    Class.Jitter.Random()
-                );
+                //todo: tangential jitter?
+
+                location += direction.Ortho() * Class.Jitter.Random();
             }
 
             if (Class.MaxPoints == 0)
             {
-                points.Add(new TrailPoint(location, width, elapsedTime));
+                points.Add(new TrailPoint(location, direction, elapsedTime));
                 ++HeadIndex;
                 ++Count;
             }
             else
             {
-                points[HeadIndex] = new TrailPoint(location, width, elapsedTime);
+                points[HeadIndex] = new TrailPoint(location, direction, elapsedTime);
                 HeadIndex = (HeadIndex + 1) % points.Count;
 
                 if (Count >= points.Count)
@@ -158,6 +169,8 @@ namespace Takai.Game
                 else
                     ++Count;
             }
+
+            nextCapture = elapsedTime + Class.CaptureDelay;
         }
     }
 }

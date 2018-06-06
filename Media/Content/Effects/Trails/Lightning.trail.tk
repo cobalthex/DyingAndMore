@@ -1,11 +1,14 @@
 TrailClass {
-	MaxPoints: 400;
-	AutoTaper: true;
-	LifeTime: 0.1sec;
-	Jitter: [0 10];
-	Sprite: {
-		Texture: @"./Lightning.png";
-	}
+    MaxPoints: 400;
+    Color: Color.White;
+    Sprite: {
+        texture: @"Effects/Trails/lightning.png";
+    }
+    LifeTime: 1.5sec;
+    AutoTaper: true;
+    Width: 12;
+    Jitter: [-20 20];
+    CaptureDelay: 2msec;
 }
 
 Function {

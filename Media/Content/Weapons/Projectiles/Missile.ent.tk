@@ -25,6 +25,15 @@ ProjectileClass {
         ];
     }*#
 
+
+    Trail: {
+        MaxPoints: 200;
+        Color: Color.Aquamarine;
+        LifeTime: 0.5sec;
+        AutoTaper: true;
+        Width: 4;
+    }
+
     Animations: {
         Idle: {
             Sprite: {

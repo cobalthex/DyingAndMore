@@ -303,7 +303,7 @@ namespace Takai.Game
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void Think(TimeSpan deltaTime) {
             if (Trail != null)
-                Trail.AddPoint(Position, Radius * 2); //todo: width?
+                Trail.AddPoint(Position, Vector2.Normalize(Velocity)); //todo: width?
         }
 
         public virtual void Kill()
