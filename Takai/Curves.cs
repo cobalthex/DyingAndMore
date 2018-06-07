@@ -47,7 +47,7 @@ namespace Takai
                 if (t < Values[i].position)
                     return i - 1;
             }
-            return 0;
+            return Values.Count - 1;
         }
 
         protected abstract TValue Function(TValue a, TValue b, TValue c, TValue d, float t);
@@ -87,10 +87,17 @@ namespace Takai
             return MathHelper.CatmullRom(a, b, c, d, t);
         }
 
-        public static implicit operator ScalarCurve(float value)
+        //from deserializer
+        public static implicit operator ScalarCurve(double value)
         {
             var curve = new ScalarCurve();
-            curve.Values.Add(new CurveValue<float>(0, value));
+            curve.AddValue(0, (float)value);
+            return curve;
+        }
+        public static implicit operator ScalarCurve(Int64 value)
+        {
+            var curve = new ScalarCurve();
+            curve.AddValue(0, value);
             return curve;
         }
     }

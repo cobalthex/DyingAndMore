@@ -76,7 +76,8 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
-            if (GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isPlayerInputEnabled)
+            if ((GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isPlayerInputEnabled) ||
+                !Takai.Runtime.HasFocus)
                 return;
 
             var d = Vector2.Zero;
@@ -116,7 +117,10 @@ namespace DyingAndMore.Game.Entities
             if (collider is WeaponPickupInstance wpi)
             {
                 if (Actor.Weapon != null && Actor.Weapon.Class == wpi.Class.Weapon.Class)
+                {
                     Actor.Weapon.Combine(wpi.Class.Weapon);
+                    //if doesn't use all weapon ammo, store some?
+                }
                 else
                     Actor.Weapon = wpi.Class.Weapon.Clone();
 

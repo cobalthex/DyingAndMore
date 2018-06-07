@@ -4,7 +4,7 @@ TrailClass {
     Sprite: {
         texture: @"Effects/Trails/lightning.png";
     }
-    LifeTime: 1.5sec;
+    LifeSpan: 1.5sec;
     AutoTaper: true;
     Width: 12;
     Jitter: [-20 20];

@@ -7,8 +7,6 @@ ProjectileClass {
     Drag: 1.0;
     MinimumSpeed: 100;
 
-    Trail: @"Effects/Trails/Lightning.trail.tk";
-
     Animations: {
         Idle: {
             Sprite: {
@@ -35,7 +33,7 @@ ProjectileClass {
                     Blend: BlendState.NonPremultiplied;
                     InitialSpeed: [200 600];
                     Drag: 10;
-                    Lifetime: [200msec 300msec];
+                    LifeSpan: [200msec 300msec];
                     ColorOverTime: {
                         Values: [
                             [0 Color.White];

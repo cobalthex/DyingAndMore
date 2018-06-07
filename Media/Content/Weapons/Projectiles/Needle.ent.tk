@@ -1,0 +1,31 @@
+ProjectileClass {
+    Name: "Needle";
+    MuzzleVelocity: [800 980];
+    DestroyIfOffscreen: True;
+    IgnoreTrace: True;
+    Range: 2000;
+    Drag: 1.0;
+    MinimumSpeed: 10;
+
+    Trail: {
+        MaxPoints: 20;
+        Color: Color.Magenta;
+        LifeSpan: 0.5sec;
+        CaptureDelay: 10msec;
+        Width: 2;
+        MergeCollinear: true;
+    }
+
+    Animations: {
+        Idle: {
+            Sprite: {
+                Texture: @"./Tracer.png";
+                Height: 1;
+                #FrameCount: 4;
+                #FrameLength: 50msec;
+                IsLooping: true;
+                Origin: [30 0];
+            };
+        }
+    }
+}

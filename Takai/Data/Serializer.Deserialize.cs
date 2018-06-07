@@ -859,6 +859,13 @@ namespace Takai.Data
                 return ParseDictionary(destType, dest, (Dictionary<string, object>)source, context);
             }
 
+            //implicit cast (limited support)
+            {
+                var implCast = destType.GetMethod("op_Implicit", new[] { sourceType });
+                if (implCast != null)
+                    return implCast.Invoke(null, new[] { source });
+            }
+
             bool canConvert = false;
 
             bool isSourceInt = IsInt(source);

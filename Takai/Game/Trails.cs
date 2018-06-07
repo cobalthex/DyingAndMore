@@ -31,10 +31,10 @@ namespace Takai.Game
         public Graphics.Sprite Sprite { get; set; }
         public Color Color { get; set; } = Color.White;
 
-        public float Width { get; set; } = 1;
-
-        public bool AutoTaper { get; set; }
-        //todo: width curve?
+        /// <summary>
+        /// Width across the length of the curve. Position 0 is the start (tail) of the trail
+        /// </summary>
+        public ScalarCurve Width { get; set; } = 1;
 
         /// <summary>
         /// Orthagonal jitter added to each point
@@ -44,13 +44,18 @@ namespace Takai.Game
         /// <summary>
         /// Zero for forever
         /// </summary>
-        public TimeSpan Lifetime { get; set; }
+        public TimeSpan LifeSpan { get; set; }
 
         /// <summary>
         /// Minimum time between adding new points (as not to have insane jitter with high fps)
         /// Zero for no delay
         /// </summary>
         public TimeSpan CaptureDelay { get; set; }
+
+        /// <summary>
+        /// Merge points that are colinear (when adding new points)
+        /// </summary>
+        public bool MergeCollinear { get; set; } = false;
 
         public TrailInstance Instantiate()
         {
@@ -123,12 +128,18 @@ namespace Takai.Game
             elapsedTime += deltaTime;
 
             if (Count > 0 &&
-                Class.Lifetime > TimeSpan.Zero &&
-                elapsedTime - points[TailIndex].time > Class.Lifetime)
+                Class.LifeSpan > TimeSpan.Zero &&
+                elapsedTime - points[TailIndex].time > Class.LifeSpan)
             {
                 TailIndex = (TailIndex + 1) % AllPoints.Count;
                 --Count;
             }
+        }
+
+        bool IsCollinear(Vector2 a, Vector2 b, Vector2 c)
+        {
+            //test that slopes are the same
+            return ((c.Y - b.Y) * (b.X - a.X)) == ((b.Y - a.Y) * (c.X - b.X));
         }
 
         /// <summary>
@@ -150,7 +161,20 @@ namespace Takai.Game
                 location += direction.Ortho() * Class.Jitter.Random();
             }
 
-            if (Class.MaxPoints == 0)
+            var p2 = (TailIndex + Count - 2) % points.Count;
+            var p1 = (TailIndex + Count - 1) % points.Count;
+            if (Class.MergeCollinear && Count > 2 &&
+                IsCollinear(
+                    location,
+                    points[p1].location,
+                    points[p2].location
+                ))
+            {
+
+                points[p2] = new TrailPoint(points[p2].location, points[p2].direction, points[p1].time);
+                points[p1] = new TrailPoint(location, direction, elapsedTime);
+            }
+            else if (Class.MaxPoints == 0)
             {
                 points.Add(new TrailPoint(location, direction, elapsedTime));
                 ++HeadIndex;

@@ -69,7 +69,7 @@ ActorClass {
         AnimationClass: "Spawner";
         ChargeTime: 500msec;
 		DischargeTime: 2sec;
-		UnderchargeAction: UnderchargeAction.Dissipate;
+		UnderchargeAction: UnderchargeAction.Discharge;
         Spawns: [
             [@"Actors/InfectedCell.ent.tk" [3 5]]
         ]

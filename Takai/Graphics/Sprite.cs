@@ -259,6 +259,11 @@ namespace Takai.Graphics
             IsLooping = shouldLoop;
         }
 
+        public static implicit operator Sprite(Texture2D texture)
+        {
+            return new Sprite(texture);
+        }
+
         /// <summary>
         /// Is the animation finished playing?
         /// </summary>

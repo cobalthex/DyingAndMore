@@ -47,7 +47,7 @@ namespace Takai.Game
         /// <summary>
         /// How long each particle should last
         /// </summary>
-        public Range<TimeSpan> Lifetime { get; set; } = TimeSpan.FromSeconds(1);
+        public Range<TimeSpan> LifeSpan { get; set; } = TimeSpan.FromSeconds(1);
 
         public Range<float> InitialSpeed { get; set; } = 1;
         public float Drag { get; set; } = 0.05f;
@@ -68,7 +68,7 @@ namespace Takai.Game
     public struct ParticleInstance
     {
         public TimeSpan spawnTime;
-        public TimeSpan lifetime;
+        public TimeSpan lifeTime;
 
         public Vector2 position;
         public Vector2 velocity;

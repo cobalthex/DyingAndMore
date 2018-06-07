@@ -347,7 +347,7 @@ namespace Takai.Game
                 {
                     var x = p.Value[i];
 
-                    bool isDead = ElapsedTime >= x.spawnTime + x.lifetime;
+                    bool isDead = ElapsedTime >= x.spawnTime + x.lifeTime;
 
                     if (p.Key.CollisionEffect != null)
                     {
@@ -375,7 +375,7 @@ namespace Takai.Game
                         continue;
                     }
 
-                    var life = (float)((ElapsedTime - (x.spawnTime)).TotalSeconds / x.lifetime.TotalSeconds);
+                    var life = (float)((ElapsedTime - (x.spawnTime)).TotalSeconds / x.lifeTime.TotalSeconds);
 
                     x.color = p.Key.ColorOverTime.Evaluate(life);
                     x.scale = p.Key.ScaleOverTime.Evaluate(life);

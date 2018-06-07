@@ -8,7 +8,7 @@ EffectsClass {
                 };
                 Blend: BlendState.Additive;
                 InitialSpeed: [50 100];
-                lifetime: [0.2sec 1.5sec];
+                LifeSpan: [0.2sec 1.5sec];
                 ScaleOverTime: {
                     Values: [
                         [0 1];

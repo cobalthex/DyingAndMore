@@ -179,7 +179,7 @@ namespace Takai.Game
                     color = Class.ColorOverTime.Count > 0 ? Class.ColorOverTime.Evaluate(0) : Color.White,
                     position = position,
                     velocity = Class.InitialSpeed.Random() * dir + (InheritParentVelocity ? instance.Velocity : Vector2.Zero),
-                    lifetime = Class.Lifetime.Random(),
+                    lifeTime = Class.LifeSpan.Random(),
                     spawnAngle = initAngle,
                     spin = Class.SpinOverTime.Count > 0 ? Class.SpinOverTime.Evaluate(0) : 0,
                     scale = Class.ScaleOverTime.Count > 0 ? Class.ScaleOverTime.Evaluate(0) : 1,

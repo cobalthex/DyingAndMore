@@ -34,7 +34,7 @@ ConditionClass {
                     };
                     InitialSpeed: [60 180];
                     Drag: 1.0;
-                    lifetime: [300msec 500msec];
+                    LifeSpan: [300msec 500msec];
                     ColorOverTime: {
                         Reverse: false;
                         Values: [

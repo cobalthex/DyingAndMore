@@ -206,8 +206,8 @@ namespace DyingAndMore.Game.Weapons
                         break;
 
                     case UnderchargeAction.Discharge:
-                        State = WeaponState.Discharging;
-                        OnDischarge();
+                        //continue charging
+                        //needs to handle isUsing
                         break;
                 }
             }
