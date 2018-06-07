@@ -34,7 +34,7 @@ GunClass {
                     };
                     InitialSpeed: [600 1200];
                     Drag: 1.0;
-                    lifetime: [600msec 1200msec];
+                    LifeSpan: [600msec 1200msec];
                     ColorOverTime: {
                         Reverse: false;
                         Values: [

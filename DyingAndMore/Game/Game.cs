@@ -79,7 +79,7 @@ namespace DyingAndMore.Game
                 //refresh individual render settings
                 var settings = ui.UserData.GetType().GetTypeInfo();
                 foreach (var child in ui.Children)
-                    ((CheckBox)child).IsChecked = (bool)settings.GetDeclaredField(child.Name).GetValue(ui.UserData);
+                    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(ui.UserData);
 
                 AddChild(ui);
                 ui.HasFocus = true;

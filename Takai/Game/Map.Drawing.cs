@@ -660,13 +660,10 @@ namespace Takai.Game
                 var lastNorm = new Vector2(1, 0);
                 for (int n = 0; n < trail.Count; ++n, next += 2)
                 {
-
                     var i1 = (n + trail.TailIndex) % trail.AllPoints.Count;
                     int i2 = (i1 + 1) % trail.Count;
 
-                    float w = trail.Class.Width;
-                    if (trail.Class.AutoTaper)
-                        w *= n / (float)trail.Count;
+                    float w = trail.Class.Width.Evaluate(n / (float)trail.Count);
 
                     var p = trail.AllPoints[i1];
                     var norm = p.direction.Ortho();
@@ -681,16 +678,9 @@ namespace Takai.Game
                         trail.Class.Color,
                         new Vector2(0, 1)
                     );
+
+                    //DrawArrow(p.location, p.direction, 3, Color.Gold);
                 }
-                //Class.trailVerts[next] = new VertexPositionColorTexture(new Vector3(trail.Points[trail.Count - 1].location, 0), trail.Class.Color, new Vector2(1, 0.5f));
-                //++next;
-
-                var v = Class.trailVerts[next - 2];
-                Class.trailVerts[next - 2] = Class.trailVerts[next - 1];
-                Class.trailVerts[next - 1] = v;
-
-                Class.trailVerts[next - 2].TextureCoordinate = new Vector2(1, 0);
-                Class.trailVerts[next - 1].TextureCoordinate = new Vector2(1, 1);
             }
 
             Class.trailVBuffer.SetData(Class.trailVerts, 0, vertexCount);

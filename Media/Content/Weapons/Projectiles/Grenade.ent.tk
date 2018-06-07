@@ -13,9 +13,14 @@ ProjectileClass {
     Trail: {
         MaxPoints: 200;
         Color: Color.Cyan;
-        LifeTime: 0.5sec;
+        LifeSpan: 0.5sec;
         AutoTaper: true;
-        Width: 12;
+        Width: {
+            Values: [
+                [0 0];
+                [1 5];
+            ]
+        };
     }
 
     FadeEffect: {
@@ -49,7 +54,7 @@ ProjectileClass {
                         ];
                     };
                     InitialSpeed: [400 600];
-                    lifetime: [0.5sec 0.85sec];
+                    LifeSpan: [0.5sec 0.85sec];
                     Drag: 5;
                 } 
                 Count: [40 60];

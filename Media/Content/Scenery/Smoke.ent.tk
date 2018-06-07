@@ -16,7 +16,7 @@ EntityClass {
                             };
                             Blend: BlendState.Additive;
                             InitialSpeed: [20 100];
-                            lifetime: [0.5sec 1.5sec];
+                            LifeSpan: [0.5sec 1.5sec];
                             ScaleOverTime: {
                                 Values: [
                                     [0 0];

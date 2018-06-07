@@ -24,7 +24,7 @@ EffectsClass {
                     ];
                 };
                 InitialSpeed: [-100 -200];
-                lifetime: [0.25sec 0.85sec];
+                LifeSpan: [0.25sec 0.85sec];
                 Drag: 5;
             }
             Count: [-10 1];
