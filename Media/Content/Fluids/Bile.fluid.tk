@@ -16,11 +16,13 @@ FluidClass {
 	                Blend: BlendState.Additive;
 	                InitialSpeed: [50 100];
 	                LifeSpan: [0.2sec 0.5sec];
-	                ScaleOverTime: [
-	                	[0 1];
-	                	[1 0];
-	                ]
-	            }
+	                ScaleOverTime: {
+	                	Values: [
+		                	[0 1];
+		                	[1 0];
+		                ]
+		            };
+	            };
 	            Count: [0 1];
 	            Spread: [0 2pi];
 	            Radius: 6;
