@@ -22,23 +22,7 @@ ActorClass {
         };
     };
 
-    Trail: {
-        MaxPoints: 200;
-        Color: Color.Aqua;
-        Sprite: @"Effects/Trails/Lightning.png";
-        Width: {
-            Values: [
-                [0 0]
-                [0.3 10];
-                [0.7 40];
-                [1 20];
-            ];
-        };
-        MergeCollinear: false;
-        CaptureDelay: 20msec;
-        LifeSpan: 1sec;
-    }
-
+    Trail: @"Effects/Trails/Fire.trail.tk";
 
     FieldOfView: 2.356194;
     MaxSpeed: [400 400];

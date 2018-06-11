@@ -143,24 +143,24 @@ namespace DyingAndMore.Game
                 inp.Text = String.Empty;
             };
 
-            renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
+            Map = map;
+
+            renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor);
             renderSettingsConsole.Position = new Vector2(100, 0);
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;
-            renderSettingsConsole.UserData = map.renderSettings;
+            renderSettingsConsole.UserData = Map.renderSettings;
 
-            updateSettingsConsole = GeneratePropSheet(map.updateSettings, DefaultFont, DefaultColor);
+            updateSettingsConsole = GeneratePropSheet(Map.updateSettings, DefaultFont, DefaultColor);
             updateSettingsConsole.Position = new Vector2(100, 0);
             updateSettingsConsole.VerticalAlignment = Alignment.Middle;
-            updateSettingsConsole.UserData = map.updateSettings;
+            updateSettingsConsole.UserData = Map.updateSettings;
 
             gameplaySettingsConsole = GeneratePropSheet(GameInstance.Current.GameplaySettings, DefaultFont, DefaultColor);
             gameplaySettingsConsole.Position = new Vector2(100, 0);
             gameplaySettingsConsole.VerticalAlignment = Alignment.Middle;
             gameplaySettingsConsole.UserData = GameInstance.Current.GameplaySettings;
 
-            Map = map;
-
-            map.renderSettings.drawBordersAroundNonDrawingEntities = true;
+            Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
         }
 
         protected override void OnMapChanged(EventArgs e)
@@ -596,7 +596,8 @@ namespace DyingAndMore.Game
                 $"Total entities:{Map.AllEntities.Count()}" +
                 $"\nActive entities:{Map.UpdateStats.updatedEntities}" +
                 $"\nTotal particles:{particleCount}" +
-                $"\nVisible fluids:A={Map.RenderStats.visibleActiveFluids} I={Map.RenderStats.visibleInactiveFluids}",
+                $"\nVisible fluids:A={Map.RenderStats.visibleActiveFluids} I={Map.RenderStats.visibleInactiveFluids}" +
+                $"\nTrail points:{Map.RenderStats.trailPointCount}",
                 new Vector2(20),
                 Color.Orange
             );

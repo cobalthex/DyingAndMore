@@ -20,6 +20,7 @@ namespace DyingAndMore.Game.Entities
 
     public class WeaponPickupInstance : EntityInstance
     {
+        [Takai.Data.Serializer.ReadOnly]
         public new WeaponPickupClass Class
         {
             get => (WeaponPickupClass)base.Class;

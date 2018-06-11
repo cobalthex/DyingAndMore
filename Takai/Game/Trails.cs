@@ -42,6 +42,12 @@ namespace Takai.Game
         public Range<float> Jitter { get; set; } = 0;
 
         /// <summary>
+        /// How likely to skip adding a new point (for tangential jitter)
+        /// 0 = never, 1 = always
+        /// </summary>
+        public float SkipChance { get; set; } = 0;
+
+        /// <summary>
         /// Zero for forever
         /// </summary>
         public TimeSpan LifeSpan { get; set; }
@@ -117,6 +123,12 @@ namespace Takai.Game
         protected TimeSpan elapsedTime;
         protected TimeSpan nextCapture;
 
+        /// <summary>
+        /// The most recent direction this trail was facing, Vector2.Zero if there are no points
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public Vector2 CurrentDirection => (Count > 0 ? points[(TailIndex + Count - 1) % points.Count].direction : Vector2.Zero);
+
         public TrailInstance() : this(null) { }
         public TrailInstance(TrailClass @class)
         {
@@ -136,29 +148,36 @@ namespace Takai.Game
             }
         }
 
+        public void Clear()
+        {
+            HeadIndex = TailIndex = 0;
+        }
+
         bool IsCollinear(Vector2 a, Vector2 b, Vector2 c)
         {
-            //test that slopes are the same
-            return ((c.Y - b.Y) * (b.X - a.X)) == ((b.Y - a.Y) * (c.X - b.X));
+            //check that area of triangle ABC is zero
+            //account for floating point errors
+            return 0.001f > Math.Abs(a.X * (b.Y - c.Y) + b.X * (c.Y - a.Y) + c.X * (a.Y - b.Y));
         }
 
         /// <summary>
-        /// Add a new point to the trail
+        /// Move the trail forward using the conditions in the trail class
         /// </summary>
         /// <param name="location">The next point of the trail</param>
-        /// <param name="width">How wide the point is</param>
+        /// <param name="direction">Where the point is facing</param>
         /// <param name="collapse">Only add this point if its not on top of the last point</param>
-        public void AddPoint(Vector2 location, Vector2 direction, bool collapse = true)
+        public void Advance(Vector2 location, Vector2 direction, bool collapse = true)
         {
-            if ((collapse && Count > 0 && points[HeadIndex == 0 ? points.Count - 1 : HeadIndex - 1].location == location) ||
-                elapsedTime < nextCapture)
+            if (elapsedTime < nextCapture)
                 return;
 
-            if (Class != null)
+            if (Class != null && Count > 0)
             {
-                //todo: tangential jitter?
+                location += direction.Ortho() * Class.Jitter.Random(); //orthagonal jitter
 
-                location += direction.Ortho() * Class.Jitter.Random();
+                //tangential jitter
+                if (Class.SkipChance > 0 && Util.PassChance(Class.SkipChance))
+                    return;
             }
 
             var p2 = (TailIndex + Count - 2) % points.Count;
@@ -174,7 +193,24 @@ namespace Takai.Game
                 points[p2] = new TrailPoint(points[p2].location, points[p2].direction, points[p1].time);
                 points[p1] = new TrailPoint(location, direction, elapsedTime);
             }
-            else if (Class.MaxPoints == 0)
+            else
+                AddPoint(location, direction, collapse);
+
+            nextCapture = elapsedTime + Class.CaptureDelay;
+        }
+
+        /// <summary>
+        /// Add a new point to the trail, ignoring any delays/jitter settings
+        /// </summary>
+        /// <param name="location">The next point of the trail</param>
+        /// <param name="direction">Where the point is facing</param>
+        /// <param name="collapse">Only add this point if its not on top of the last point</param>
+        public void AddPoint(Vector2 location, Vector2 direction, bool collapse = true)
+        {
+            if (collapse && Count > 0 && points[HeadIndex == 0 ? points.Count - 1 : HeadIndex - 1].location == location)
+                return;
+
+            if (Class.MaxPoints == 0)
             {
                 points.Add(new TrailPoint(location, direction, elapsedTime));
                 ++HeadIndex;
@@ -193,8 +229,6 @@ namespace Takai.Game
                 else
                     ++Count;
             }
-
-            nextCapture = elapsedTime + Class.CaptureDelay;
         }
     }
 }

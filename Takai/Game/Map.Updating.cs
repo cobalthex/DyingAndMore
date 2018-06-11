@@ -204,7 +204,7 @@ namespace Takai.Game
                                         entity.Position = target;
                                         entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
 
-                                        //improve
+                                        //todo: improve
                                         entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;
                                     }
                                 }

@@ -334,6 +334,9 @@ namespace Takai.Data
                             return @int * 1000 * 60;
                         else if (unit.Equals("rpm", StringComparison.OrdinalIgnoreCase)) //convert from rounds per minute (rpm) to milliseconds
                             return (60 * 1000) / @int;
+                        else if (unit.Equals("fps", StringComparison.OrdinalIgnoreCase) ||
+                                 unit.Equals("Hz", StringComparison.OrdinalIgnoreCase)) //convert from frames per second or Hertz to milliseconds
+                            return 1000 / @int;
 
                         //all others get converted to float
                     }
@@ -356,6 +359,9 @@ namespace Takai.Data
                             return @float / 100;
                         else if (unit.Equals("rpm", StringComparison.OrdinalIgnoreCase)) //convert from rounds per minute (rpm) to milliseconds
                             return (60 * 1000) / @float;
+                        else if (unit.Equals("fps", StringComparison.OrdinalIgnoreCase) ||
+                                 unit.Equals("Hz", StringComparison.OrdinalIgnoreCase)) //convert from frames per second or Hertz to milliseconds
+                            return 1000 / @float;
 
                         else if (!unit.Equals("rad", StringComparison.OrdinalIgnoreCase) &&
                                  !unit.Equals("msec", StringComparison.OrdinalIgnoreCase) &&

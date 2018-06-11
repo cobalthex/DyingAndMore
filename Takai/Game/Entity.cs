@@ -195,7 +195,7 @@ namespace Takai.Game
         private Vector2 _forward = Vector2.UnitX;
 
         /// <summary>
-        /// The velocity of the entity, separate from the direction
+        /// The velocity of the entity, separate from <see cref="Forward"/>
         /// </summary>
         /// <remarks>This vector should always be normalized</remarks>
         public Vector2 Velocity { get; set; } = Vector2.Zero;
@@ -302,14 +302,17 @@ namespace Takai.Game
         /// </summary>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
         public virtual void Think(TimeSpan deltaTime) {
-            if (Trail != null)
-                Trail.AddPoint(Position, Vector2.Normalize(Velocity)); //todo: width?
+            if (Trail != null && Velocity != Vector2.Zero)
+                Trail.Advance(Position, Vector2.Normalize(Velocity)); //todo: width?
         }
 
         public virtual void Kill()
         {
             if (!IsAlive)
                 return;
+
+            if (Trail != null)
+                Trail.AddPoint(Position, Trail.CurrentDirection, true);
 
             PlayAnimation("Dead", () => { if (Class.DestroyOnDeath) Map?.Destroy(this); });
             IsAlive = false;
@@ -346,6 +349,9 @@ namespace Takai.Game
             var fx = Class.SpawnEffect?.Instantiate(this);
             if (fx.HasValue)
                 Map.Spawn(fx.Value);
+
+            if (Trail != null && Velocity != Vector2.Zero)
+                Trail.AddPoint(Position, Vector2.Normalize(Velocity));
         }
         /// <summary>
         /// Called when this instance is marked for deletion

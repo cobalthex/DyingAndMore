@@ -29,9 +29,16 @@ ProjectileClass {
     Trail: {
         MaxPoints: 200;
         Color: Color.Aquamarine;
+        Sprite: @"Effects/Trails/Missile.png";
         LifeSpan: 0.5sec;
-        AutoTaper: true;
-        Width: 4;
+        CaptureDelay: 30hz;
+        Width: {
+            Values: [
+                [0 0];
+                [0.8 12];
+                [1 4];
+            ]
+        };
     }
 
     Animations: {

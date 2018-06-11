@@ -10,6 +10,8 @@ namespace DyingAndMore.Editor
 
         Takai.UI.TrackBar trackBar;
 
+        Takai.Game.TrailInstance trail;
+
         public PathsEditorMode(Editor editor)
             : base("Paths", editor)
         {
@@ -31,6 +33,8 @@ namespace DyingAndMore.Editor
             {
                 new Takai.Game.VectorCurve()
             };
+
+            trail = Takai.Data.Cache.Load<Takai.Game.TrailClass>("Effects/Trails/Lightning.trail.tk").Instantiate();
         }
 
         public override void Start()
@@ -41,11 +45,34 @@ namespace DyingAndMore.Editor
         {
         }
 
+        void AddPathPoint(Vector2 position)
+        {
+            paths[0].AddPoint(position);
+            trail.Clear();
+            Vector2 lp = Vector2.UnitX;
+
+            var path = paths[0];
+            for (int i = 0; i < path.SectionLengths.Count; ++i)
+            {
+                var sl = (int)System.Math.Ceiling(path.SectionLengths[i] / 20);
+                var start = path.Values[i];
+                var delta = (path.Values[i + 1].position - start.position) / sl;
+                var last = start.value;
+
+                for (int t = 0; t <= sl; ++t)
+                {
+                    var next = path.Evaluate(start.position + (t * delta));
+                    trail.Advance(next, Vector2.Normalize(next - last));
+                    last = next;
+                }
+            }
+        }
+
         protected override bool HandleInput(GameTime time)
         {
             if (Takai.Input.InputState.IsPress(Takai.Input.MouseButtons.Left))
             {
-                paths[0].AddPoint(editor.Map.ActiveCamera.ScreenToWorld(Takai.Input.InputState.MouseVector));
+                AddPathPoint(editor.Map.ActiveCamera.ScreenToWorld(Takai.Input.InputState.MouseVector));
                 return false;
             }
 
@@ -81,6 +108,7 @@ namespace DyingAndMore.Editor
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
+            editor.Map.Spawn(trail);
             foreach (var path in paths)
                 DrawPath(path);
         }

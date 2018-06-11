@@ -14,7 +14,6 @@ ProjectileClass {
         MaxPoints: 200;
         Color: Color.Cyan;
         LifeSpan: 0.5sec;
-        AutoTaper: true;
         Width: {
             Values: [
                 [0 0];

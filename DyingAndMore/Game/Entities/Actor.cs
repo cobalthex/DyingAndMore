@@ -63,6 +63,7 @@ namespace DyingAndMore.Game.Entities
 
     public class ActorInstance : EntityInstance
     {
+        [Takai.Data.Serializer.ReadOnly]
         public new ActorClass Class
         {
             get => (ActorClass)base.Class;
