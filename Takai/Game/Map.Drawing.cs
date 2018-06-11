@@ -8,6 +8,29 @@ namespace Takai.Game
 {
     public partial class MapClass
     {
+        internal struct TrailVertex : IVertexType
+        {
+            public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(
+            new[] {
+            new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0),
+            new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+            new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.TextureCoordinate, 0)
+            });
+
+            public Vector2 position;
+            public Color color;
+            public Vector3 texcoord; //z is for texture scaling correction (fake depth)
+
+            public TrailVertex(Vector2 position, Color color, Vector3 texcoord)
+            {
+                this.position = position;
+                this.color = color;
+                this.texcoord = texcoord;
+            }
+
+            VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
+        }
+
         //todo: should all of these gpu props be static?
         //data below not thread safe
 
@@ -28,7 +51,7 @@ namespace Takai.Game
         internal XnaEffect basicEffect;
         internal RasterizerState shapeRaster;
 
-        internal VertexPositionColorTexture[] trailVerts;
+        internal TrailVertex[] trailVerts;
         internal DynamicVertexBuffer trailVBuffer;
 
         internal VertexPositionColor[] fullScreenVerts = new[]
@@ -106,8 +129,7 @@ namespace Takai.Game
             fluidEffect = Data.Cache.Load<XnaEffect>("Shaders/Fluid.mgfx");
             reflectionEffect = Data.Cache.Load<XnaEffect>("Shaders/Reflection.mgfx");
 
-            trailVerts = new VertexPositionColorTexture[512];
-            trailVBuffer = new DynamicVertexBuffer(Runtime.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, trailVerts.Length, BufferUsage.WriteOnly);
+            trailVerts = new TrailVertex[0];
         }
     }
 
@@ -125,6 +147,7 @@ namespace Takai.Game
             public int visibleInactiveFluids;
             public int visibleActiveFluids;
             public int visibleDecals;
+            public int trailPointCount;
         }
         public MapRenderStats RenderStats => _renderStats;
         protected MapRenderStats _renderStats;
@@ -273,7 +296,10 @@ namespace Takai.Game
 
             //todo: break out into separate functions
 
-            _renderStats = new MapRenderStats();
+            _renderStats = new MapRenderStats
+            {
+                trailPointCount = renderedTrailPointCount
+            };
 
             _drawEntsOutlined.Clear();
 
@@ -323,7 +349,7 @@ namespace Takai.Game
             //main render
             Runtime.GraphicsDevice.SetRenderTargets(Class.preRenderTarget);
 
-            if (renderSettings.drawTiles)
+            if (renderSettings.drawTiles && Class.TilesImage != null)
                 DrawTiles(ref context);
             else
                 Runtime.GraphicsDevice.Clear(ClearOptions.Stencil, Color.Transparent, 0, 1);
@@ -647,8 +673,14 @@ namespace Takai.Game
             var vertexCount = renderedTrailPointCount * 2;
             if (Class.trailVerts.Length < vertexCount)
             {
-                Class.trailVerts = new VertexPositionColorTexture[vertexCount];
-                Class.trailVBuffer = new DynamicVertexBuffer(Runtime.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, Class.trailVerts.Length, BufferUsage.WriteOnly);
+                Class.trailVerts = new MapClass.TrailVertex[vertexCount];
+                Class.trailVBuffer?.Dispose();
+                Class.trailVBuffer = new DynamicVertexBuffer(
+                    Runtime.GraphicsDevice,
+                    MapClass.TrailVertex.VertexDeclaration,
+                    Class.trailVerts.Length,
+                    BufferUsage.WriteOnly
+                );
             }
 
             int next = 0;
@@ -657,28 +689,40 @@ namespace Takai.Game
                 if (trail.Count < 2)
                     continue;
 
-                var lastNorm = new Vector2(1, 0);
-                for (int n = 0; n < trail.Count; ++n, next += 2)
+                float x = 0;
+                float spriteWidth = 1;
+                float spriteFrameHeight = 1;
+                Vector2 spriteFrame = new Vector2();
+                if (trail.Class.Sprite != null)
+                {
+                    spriteWidth = trail.Class.Sprite.Texture.Width;
+                    spriteFrameHeight = (float)trail.Class.Sprite.Height / trail.Class.Sprite.Texture.Height;
+                    spriteFrame = trail.Class.Sprite.GetFrameUV(trail.Class.Sprite.GetFrameIndex(ElapsedTime));
+                }
+
+                //(next < trailVerts.Length) a bit hacky, trails can be updated more often than the map is
+                for (int n = 0; n < trail.Count && next < Class.trailVerts.Length; ++n, next += 2)
                 {
                     var i1 = (n + trail.TailIndex) % trail.AllPoints.Count;
-                    int i2 = (i1 + 1) % trail.Count;
+                    int i2 = (i1 + 1) % trail.AllPoints.Count;
 
-                    float w = trail.Class.Width.Evaluate(n / (float)trail.Count);
+                    var t = n / (float)trail.Count;
+                    float w = trail.Class.Width.Evaluate(t);
 
                     var p = trail.AllPoints[i1];
                     var norm = p.direction.Ortho();
 
-                    Class.trailVerts[next + 0] = new VertexPositionColorTexture(
-                        new Vector3(p.location - norm * w, 0),
+                    Class.trailVerts[next + 0] = new MapClass.TrailVertex(
+                        p.location - norm * w,
                         trail.Class.Color,
-                        new Vector2(0, 0)
+                        new Vector3(x + spriteFrame.X, spriteFrame.Y, 0/*todo*/)
                     );
-                    Class.trailVerts[next + 1] = new VertexPositionColorTexture(
-                        new Vector3(p.location + norm * w, 0),
+                    Class.trailVerts[next + 1] = new MapClass.TrailVertex(
+                        p.location + norm * w,
                         trail.Class.Color,
-                        new Vector2(0, 1)
+                        new Vector3(x + spriteFrame.X, spriteFrame.Y + spriteFrameHeight, 0)
                     );
-
+                    x += Vector2.Distance(p.location, trail.AllPoints[i2].location) / spriteWidth;
                     //DrawArrow(p.location, p.direction, 3, Color.Gold);
                 }
             }
@@ -687,8 +731,9 @@ namespace Takai.Game
             Runtime.GraphicsDevice.SetVertexBuffer(Class.trailVBuffer);
 
             Runtime.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-            Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+            Runtime.GraphicsDevice.BlendState = BlendState.AlphaBlend;
             Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
+            Runtime.GraphicsDevice.SamplerStates[0] = SamplerState.AnisotropicWrap;
 
             var camViewport = c.camera.Viewport;
             var cameraTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(

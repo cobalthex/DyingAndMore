@@ -47,6 +47,7 @@ namespace DyingAndMore.Game.Weapons
 
     public class GunInstance : WeaponInstance
     {
+        [Takai.Data.Serializer.ReadOnly]
         public new GunClass Class
         {
             get => (GunClass)base.Class;

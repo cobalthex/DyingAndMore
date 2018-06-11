@@ -1,6 +1,6 @@
 
-Features to add in the future
-=============================
+Stuff to do in the future
+=========================
 
 0. Tkz format that uses gzip. Add serializer helpers to check for compression (based on header) and automatically run correct handlers
 
@@ -16,13 +16,15 @@ Features to add in the future
 	0. doors/devices
 	0. marquee
 
-0. Trails that use triangle strips
-
-0. Radial menus for editor (radial menus implemented)
-
 0. Gases
 	0. Behavior changing
 
-0. exportable values (floats) from objects (export rate of fire of weapon for use with animation, etc)
-
 0. Variations for enemy skins
+
+0. serializer configurations (save these props under this configuration, etc)
+
+0. Fix pathfinding for non-full tiles
+
+0. fill out AI more and create demo for game
+
+0. inputs/outputs

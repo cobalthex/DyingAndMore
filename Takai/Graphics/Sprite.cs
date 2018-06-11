@@ -71,10 +71,10 @@ namespace Takai.Graphics
         [Data.Serializer.Ignored]
         public int CurrentFrame
         {
-            get
+            get => GetFrameIndex(ElapsedTime);
+            set
             {
-                var frame = (int)(ElapsedTime.TotalSeconds / FrameLength.TotalSeconds);
-                return IsLooping ? (frame % FrameCount) : Util.Clamp(frame, 0, FrameCount - 1);
+                ElapsedTime = TimeSpan.FromTicks(Util.Clamp(value, 0, FrameCount - 1) * FrameLength.Ticks);
             }
         }
 
@@ -84,11 +84,7 @@ namespace Takai.Graphics
         [Data.Serializer.Ignored]
         public int NextFrame
         {
-            get
-            {
-                var frame = (int)(ElapsedTime.TotalSeconds / FrameLength.TotalSeconds) + 1;
-                return IsLooping ? (frame % FrameCount) : Util.Clamp(frame, 0, FrameCount - 1);
-            }
+            get => GetFrameIndex(ElapsedTime + FrameLength);
         }
 
         /// <summary>
@@ -292,6 +288,12 @@ namespace Takai.Graphics
             return Origin;
         }
 
+        public int GetFrameIndex(TimeSpan elapsedTime)
+        {
+            var elapsed = (int)(elapsedTime.Ticks / FrameLength.Ticks);
+            return IsLooping ? (elapsed % FrameCount) : Util.Clamp(elapsed, 0, FrameCount - 1);
+        }
+
         /// <summary>
         /// Get the clip rect for a single frame of the image
         /// </summary>
@@ -301,6 +303,17 @@ namespace Takai.Graphics
         {
             var src = new Rectangle(ClipRect.X + (frame % framesPerRow) * Width, ClipRect.Y + (frame / framesPerRow) * Height, Width, Height);
             return Rectangle.Intersect(src, ClipRect);
+        }
+
+        /// <summary>
+        /// Get the current frame in UV coordinates
+        /// </summary>
+        /// <param name="frame">the frame index</param>
+        /// <returns>Texture coordinates for the current frame</returns>
+        public Vector2 GetFrameUV(int frame)
+        {
+            return new Vector2(ClipRect.X + (frame % framesPerRow) * Width, ClipRect.Y + (frame / framesPerRow) * Height) /
+                   new Vector2(Texture.Width, Texture.Height);
         }
 
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle)

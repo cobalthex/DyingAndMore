@@ -171,6 +171,7 @@ namespace DyingAndMore
 
             debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
 
+
 #if WINDOWS //UWP launch activation parameters?
             //parse command line args
             var args = System.Environment.GetCommandLineArgs();

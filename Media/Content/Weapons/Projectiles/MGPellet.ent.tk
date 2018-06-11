@@ -1,0 +1,22 @@
+ProjectileClass {
+    Name: "Pellet";
+    MuzzleVelocity: [8000 9800];
+    DestroyIfOffscreen: True;
+    IgnoreTrace: True;
+    Range: 2000;
+    Drag: 1.0;
+    MinimumSpeed: 100;
+
+    Trail: @"Effects/Trails/Lightning.trail.tk";
+
+    Animations: {
+        Idle: {
+            Sprite: {
+                Texture: @"./Tracer.png";
+                Height: 1;
+                IsLooping: true;
+                Origin: [0 0];
+            };
+        }
+    }
+}

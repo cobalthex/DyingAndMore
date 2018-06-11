@@ -85,7 +85,7 @@ namespace Takai.Game
 
         public const int SectorSize = 4; //The number of tiles that a map sector spans
         [Data.Serializer.Ignored]
-        public int SectorPixelSize { get; private set; } = 0;
+        public int SectorPixelSize { get; private set; } = 1;
 
         /// <summary>
         /// The bounds of the map in pixels
@@ -439,6 +439,15 @@ namespace Takai.Game
                 effect.Spawn(effects);
         }
 
+        /// <summary>
+        /// Add a trail to the map. Will continue to render until faded out completely
+        /// </summary>
+        /// <param name="trail">The trail to draw</param>
+        public void Spawn(TrailInstance trail)
+        {
+            Trails.Add(trail);
+        }
+
         public void RunScript(Script script)
         {
             if (script.Map != this && script.Map != null)
@@ -479,15 +488,6 @@ namespace Takai.Game
 
             var sector = GetOverlappingSector(decal.position);
             Sectors[sector.Y, sector.X].decals.Add(decal);
-        }
-
-        /// <summary>
-        /// Add a trail to the map. Will continue to render until faded out completely
-        /// </summary>
-        /// <param name="trail">The trail to draw</param>
-        public void AddTrail(TrailInstance trail)
-        {
-            Trails.Add(trail);
         }
 
         #endregion

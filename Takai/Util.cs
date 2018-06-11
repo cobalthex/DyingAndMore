@@ -230,7 +230,7 @@ namespace Takai
 
         public static bool PassChance(float passPercent)
         {
-            return RandomGenerator.NextDouble() <= passPercent;
+            return passPercent > RandomGenerator.NextDouble();
         }
 
         public static Point ToPoint(this Vector2 v)

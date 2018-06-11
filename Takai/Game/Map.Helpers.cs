@@ -10,6 +10,25 @@ namespace Takai.Game
         {
             Tiles = Tiles.Resize(newHeight, newWidth);
         }
+
+        /// <summary>
+        /// Create a map that can be used as a canvas for showing things like particle systems
+        /// </summary>
+        /// <param name="size">The width and height of the map (in pixels)</param>
+        /// <param name="initializeGraphics">Call <see cref="InitializeGraphics"/></param>
+        /// <returns>the created map</returns>
+        public static MapInstance CreateCanvasMap(int size = 10000, bool initializeGraphics = true)
+        {
+            var map = new MapClass
+            {
+                TileSize = size,
+            };
+            if (initializeGraphics)
+                map.InitializeGraphics();
+            var inst = map.Instantiate();
+            inst.ActiveCamera = new Camera(new Vector2(size / 2));
+            return inst;
+        }
     }
 
     public partial class MapInstance

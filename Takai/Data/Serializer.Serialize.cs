@@ -54,7 +54,7 @@ namespace Takai.Data
             var dir = Path.GetDirectoryName(file);
             if (!string.IsNullOrEmpty(dir))
                 Directory.CreateDirectory(dir);
-            using (var writer = new StreamWriter(File.OpenWrite(file)))
+            using (var writer = new StreamWriter(file))
                 TextSerialize(writer, serializing);
         }
 
@@ -195,10 +195,16 @@ namespace Takai.Data
                 writer.WriteLine($"{(WriteFullTypeNames ? ty.FullName : ty.Name)} {{");
 
                 foreach (var prop in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance | (serializeNonPublics ? BindingFlags.NonPublic : 0)))
-                    SerializeMember(writer, serializing, prop, prop.GetValue(serializing), prop.PropertyType, indentLevel, serializeExternals, serializeNonPublics);
+                {
+                    if (prop.CanWrite)
+                        SerializeMember(writer, serializing, prop, prop.GetValue(serializing), prop.PropertyType, indentLevel, serializeExternals, serializeNonPublics);
+                }
 
                 foreach (var field in ty.GetFields(BindingFlags.Public | BindingFlags.Instance | (serializeNonPublics ? BindingFlags.NonPublic : 0)))
-                    SerializeMember(writer, serializing, field, field.GetValue(serializing), field.FieldType, indentLevel, serializeExternals, serializeNonPublics);
+                {
+                    if (!field.IsInitOnly)
+                        SerializeMember(writer, serializing, field, field.GetValue(serializing), field.FieldType, indentLevel, serializeExternals, serializeNonPublics);
+                }
 
                 if (serializing is IDerivedSerialize derived)
                 {
@@ -257,12 +263,18 @@ namespace Takai.Data
             {
                 if (member is PropertyInfo p)
                 {
+                    if (!p.CanWrite)
+                        continue;
+
                     if (n++ > 0)
                         writer.Write(' ');
                     TextSerialize(writer, p.GetValue(serializing), 0, serializeExternals, serializeNonPublics);
                 }
                 else if (member is FieldInfo f)
                 {
+                    if (f.IsInitOnly)
+                        continue;
+
                     if (n++ > 0)
                         writer.Write(' ');
                     TextSerialize(writer, f.GetValue(serializing), 0, serializeExternals, serializeNonPublics);
