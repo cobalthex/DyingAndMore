@@ -31,7 +31,7 @@ ProjectileClass {
         Color: Color.Aquamarine;
         Sprite: @"Effects/Trails/Missile.png";
         LifeSpan: 0.5sec;
-        CaptureDelay: 30hz;
+        CaptureDelay: 300hz;
         Width: {
             Values: [
                 [0 0];
@@ -39,6 +39,7 @@ ProjectileClass {
                 [1 4];
             ]
         };
+        Jitter: [-3 3];
     }
 
     Animations: {

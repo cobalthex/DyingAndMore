@@ -213,8 +213,6 @@ namespace Takai.Game
         /// </summary>
         public List<SoundInstance> Sounds { get; set; } = new List<SoundInstance>();
 
-        public HashSet<Script> Scripts { get; set; } = new HashSet<Script>();
-
         /// <summary>
         /// The currently active camera. Determines what part of the map is active
         /// </summary>
@@ -446,22 +444,6 @@ namespace Takai.Game
         public void Spawn(TrailInstance trail)
         {
             Trails.Add(trail);
-        }
-
-        public void RunScript(Script script)
-        {
-            if (script.Map != this && script.Map != null)
-                script.Map.Destroy(script);
-
-            script.Map = this;
-            script.StartTime = ElapsedTime;
-            script.OnSpawn();
-            Scripts.Add(script);
-        }
-
-        public void Destroy(Script script)
-        {
-            Scripts.Remove(script);
         }
 
         /// <summary>

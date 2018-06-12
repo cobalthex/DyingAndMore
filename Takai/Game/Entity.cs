@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace Takai.Game
@@ -71,6 +72,11 @@ namespace Takai.Game
         public EffectsClass DestructionEffect { get; set; }
 
         public TrailClass Trail { get; set; }
+
+        /// <summary>
+        /// Code defined events that this entity can trigger
+        /// </summary>
+        public virtual HashSet<string> Events { get; }
 
         public EntityClass() { }
 
