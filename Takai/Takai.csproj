@@ -90,7 +90,6 @@
     <Compile Include="Game\Trails.cs" />
     <Compile Include="Objects.cs" />
     <Compile Include="Game\Path.cs" />
-    <Compile Include="Game\Script.cs" />
     <Compile Include="Game\Trigger.cs" />
     <Compile Include="Runtime.cs" />
     <Compile Include="Graphics\BitmapFont.cs" />

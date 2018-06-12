@@ -74,7 +74,6 @@
     <Compile Include="Game\Entities\InputController.cs" />
     <Compile Include="Game\Entities\Projectile.cs" />
     <Compile Include="Game\Entities\Vehicle.cs" />
-    <Compile Include="Game\Scripts\TestScripts.cs" />
     <Compile Include="Game\Weapons\Gun.cs" />
     <Compile Include="Game\Weapons\Spawner.cs" />
     <Compile Include="Game\Weapons\Weapon.cs" />

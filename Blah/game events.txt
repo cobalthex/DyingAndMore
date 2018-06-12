@@ -1,0 +1,7 @@
+Entities,triggers have Events they can defined in code (OnTrigger, OnDeath, etc)
+Entities trigger events
+
+In editor, those events can be paired with commands (OnDeath->PlaySound())
+commands can be sent to entities or the game:
+	entity.kill()
+	game.addScore(10)
