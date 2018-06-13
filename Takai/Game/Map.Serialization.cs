@@ -188,7 +188,7 @@ namespace Takai.Game
 
             if (props.TryGetValue("Triggers", out var triggers)) //todo: load from class?
             {
-                foreach (var trigger in Data.Serializer.Cast<List<Trigger>>(triggers))
+                foreach (var trigger in Data.Serializer.Cast<List<TriggerInstance>>(triggers))
                     AddTrigger(trigger);
             }
 

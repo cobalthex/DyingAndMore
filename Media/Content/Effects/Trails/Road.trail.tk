@@ -1,0 +1,13 @@
+TrailClass {
+    MaxPoints: 200;
+    Sprite: @"./road.png";
+
+    Color: Color.White;
+
+    SpriteScale: 1;
+    SpriteRenderStyle: TrailSpriteRenderStyle.Tile;
+    Width: 40;
+
+    #CaptureDelay: 40Hz;
+    #LifeSpan: 0.5sec;
+}

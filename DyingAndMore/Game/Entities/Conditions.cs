@@ -7,7 +7,7 @@ namespace DyingAndMore.Game.Entities
     /// <summary>
     /// A condition that affects actors, such as poison
     /// </summary>
-    public class ConditionClass : Takai.IObjectClass<ConditionInstance>
+    public class ConditionClass : Takai.INamedClass<ConditionInstance>
     {
         public string Name { get; set; }
         public string File { get; set; }
@@ -43,7 +43,7 @@ namespace DyingAndMore.Game.Entities
         }
     }
 
-    public class ConditionInstance : Takai.IObjectInstance<ConditionClass>
+    public class ConditionInstance : Takai.IInstance<ConditionClass>
     {
         public ConditionClass Class { get; set; }
 

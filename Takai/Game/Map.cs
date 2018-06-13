@@ -34,7 +34,7 @@ namespace Takai.Game
     /// <summary>
     /// The (mostly) static properties of a single map
     /// </summary>
-    public partial class MapClass : IObjectClass<MapInstance>
+    public partial class MapClass : INamedClass<MapInstance>
     {
         [Data.Serializer.Ignored]
         public string File { get; set; }
@@ -142,10 +142,10 @@ namespace Takai.Game
         //static
         public List<FluidInstance> fluids = new List<FluidInstance>();
         public List<Decal> decals = new List<Decal>();
-        public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors
+        public List<TriggerInstance> triggers = new List<TriggerInstance>(); //triggers may be in one or more sectors, list as it shouldn't be modified during runtime
     }
 
-    public partial class MapInstance : IObjectInstance<MapClass>
+    public partial class MapInstance : IInstance<MapClass>
     {
         private int nextEntityID = 0;
 
@@ -322,41 +322,6 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Create a new trigger with the given region and add it to the map
-        /// </summary>
-        /// <param name="region">The region of the trigger to create</param>
-        /// <param name="name">An optional name for the trigger</param>
-        /// <returns>The trigger created</returns>
-        public Trigger AddTrigger(Rectangle region, string name = null)
-        {
-            var trigger = new Trigger(region, name);
-            AddTrigger(trigger);
-            return trigger;
-        }
-        /// <summary>
-        /// Add an existing trigger to the map
-        /// </summary>
-        /// <param name="trigger">The trigger to add</param>
-        public void AddTrigger(Trigger trigger)
-        {
-            var sectors = GetOverlappingSectors(trigger.Region);
-            for (var y = sectors.Top; y < sectors.Bottom; ++y)
-            {
-                for (var x = sectors.Left; x < sectors.Right; ++x)
-                    Sectors[y, x].triggers.Add(trigger);
-            }
-        }
-        public void Destroy(Trigger trigger)
-        {
-            var sectors = GetOverlappingSectors(trigger.Region);
-            for (var y = sectors.Top; y < sectors.Bottom; ++y)
-            {
-                for (var x = sectors.Left; x < sectors.Right; ++x)
-                    Sectors[y, x].triggers.Remove(trigger);
-            }
-        }
-
-        /// <summary>
         /// Spawn a single fluid onto the map
         /// </summary>
         /// <param name="fluid">The type of fluid to spawn</param>
@@ -470,6 +435,29 @@ namespace Takai.Game
 
             var sector = GetOverlappingSector(decal.position);
             Sectors[sector.Y, sector.X].decals.Add(decal);
+        }
+
+        /// <summary>
+        /// Add a trigger to the map
+        /// </summary>
+        /// <param name="trigger">The trigger to add</param>
+        public void AddTrigger(TriggerInstance trigger)
+        {
+            var sectors = GetOverlappingSectors(trigger.Class.Region);
+            for (var y = sectors.Top; y < sectors.Bottom; ++y)
+            {
+                for (var x = sectors.Left; x < sectors.Right; ++x)
+                    Sectors[y, x].triggers.Add(trigger);
+            }
+        }
+        public void Destroy(TriggerInstance trigger)
+        {
+            var sectors = GetOverlappingSectors(trigger.Class.Region);
+            for (var y = sectors.Top; y < sectors.Bottom; ++y)
+            {
+                for (var x = sectors.Left; x < sectors.Right; ++x)
+                    Sectors[y, x].triggers.Remove(trigger);
+            }
         }
 
         #endregion

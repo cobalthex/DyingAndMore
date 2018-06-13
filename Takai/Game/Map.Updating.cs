@@ -303,6 +303,8 @@ namespace Takai.Game
 
             #endregion
 
+            //todo: should movement be in physics phase?
+
             foreach (var entity in activeEntities)
             {
                 var lastSectors = GetOverlappingSectors(entity.lastAABB);
@@ -330,7 +332,24 @@ namespace Takai.Game
 
                 if (entity.Trail != null)
                     Trails.Add(entity.Trail);
+
                 entity.UpdateAnimations(deltaTime);
+
+                //if triggers enabled
+                for (var y = nextSectors.Top; y < nextSectors.Bottom; ++y)
+                {
+                    for (var x = nextSectors.Left; x < nextSectors.Right; ++x)
+                    {
+                        foreach (var trigger in Sectors[y, x].triggers)
+                        {
+                            if (trigger.Class.Region.Intersects(entity.AxisAlignedBounds)) //todo: real collision detection
+                                trigger.Enter(entity);
+
+                            //todo: trigger exit
+                        }
+                    }
+                }
+
                 if (updateSettings.isEntityLogicEnabled)
                     entity.Think(deltaTime);
             }

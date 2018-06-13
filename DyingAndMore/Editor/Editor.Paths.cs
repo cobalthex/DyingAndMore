@@ -34,7 +34,7 @@ namespace DyingAndMore.Editor
                 new Takai.Game.VectorCurve()
             };
 
-            trail = Takai.Data.Cache.Load<Takai.Game.TrailClass>("Effects/Trails/Lightning.trail.tk").Instantiate();
+            trail = Takai.Data.Cache.Load<Takai.Game.TrailClass>("Effects/Trails/road.trail.tk").Instantiate();
         }
 
         public override void Start()
@@ -52,6 +52,7 @@ namespace DyingAndMore.Editor
             Vector2 lp = Vector2.UnitX;
 
             var path = paths[0];
+
             for (int i = 0; i < path.SectionLengths.Count; ++i)
             {
                 var sl = (int)System.Math.Ceiling(path.SectionLengths[i] / 20);
@@ -59,10 +60,11 @@ namespace DyingAndMore.Editor
                 var delta = (path.Values[i + 1].position - start.position) / sl;
                 var last = start.value;
 
-                for (int t = 0; t <= sl; ++t)
+                for (int t = 1; t <= sl + 1; ++t)
                 {
                     var next = path.Evaluate(start.position + (t * delta));
-                    trail.Advance(next, Vector2.Normalize(next - last));
+                    var dir = Vector2.Normalize(next - last);
+                    trail.Advance(last, dir);
                     last = next;
                 }
             }
@@ -85,25 +87,31 @@ namespace DyingAndMore.Editor
             if (np < 2)
                 return;
 
+            Vector2 last = Vector2.Zero;
             //loop through each section for better accuracy
             for (int i = 0; i < path.SectionLengths.Count; ++i)
             {
                 var sl = (int)System.Math.Ceiling(path.SectionLengths[i] / 20);
                 var start = path.Values[i];
                 var delta = (path.Values[i + 1].position - start.position) / sl;
-                var last = start.value;
+                last = start.value;
 
                 //draw X
                 editor.Map.DrawLine(last - new Vector2(3), last + new Vector2(3), Color.Cyan);
                 editor.Map.DrawLine(last + new Vector2(-3, 3), last + new Vector2(3, -3), Color.Cyan);
 
-                for (int t = 0; t <= sl; ++t)
+                for (int t = 0; t < sl; ++t)
                 {
                     var next = path.Evaluate(start.position + (t * delta));
                     editor.Map.DrawLine(last, next, Color.LightSeaGreen);
+                    var p = Takai.Util.Ortho(Vector2.Normalize(next - last));
+                    editor.Map.DrawLine(last - p * 5, last + p * 5, Color.Cyan);
                     last = next;
                 }
             }
+
+            editor.Map.DrawLine(last - new Vector2(3), last + new Vector2(3), Color.Cyan);
+            editor.Map.DrawLine(last + new Vector2(-3, 3), last + new Vector2(3, -3), Color.Cyan);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

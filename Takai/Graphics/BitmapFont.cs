@@ -226,6 +226,9 @@ namespace Takai.Graphics
         /// <remarks>The escape sequence \n will create a new line (left alignment). You can also type `rgb as a 3 char number between 000 and fff to change the color. use `x to reset the color</remarks>
         public void Draw(SpriteBatch spriteBatch, string text, int start, int length, Rectangle bounds, Point offset, Color color, bool monoSpace = false)
         {
+            if (spriteBatch == null || text == null)
+                return;
+
             Point pos = offset;
             Color curColor = color;
 

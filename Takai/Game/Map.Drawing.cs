@@ -268,7 +268,7 @@ namespace Takai.Game
 
 
         private List<EntityInstance> _drawEntsOutlined = new List<EntityInstance>();
-        private HashSet<Trigger> _drawTriggers = new HashSet<Trigger>();
+        private HashSet<TriggerInstance> _drawTriggers = new HashSet<TriggerInstance>();
 
         public struct RenderContext
         {
@@ -683,6 +683,8 @@ namespace Takai.Game
                 );
             }
 
+            //todo: batch by texture/render state
+
             int next = 0;
             foreach (var trail in Trails)
             {
@@ -691,12 +693,12 @@ namespace Takai.Game
 
                 float x = 0;
                 float spriteWidth = 1;
-                float spriteFrameHeight = 1;
+                Vector2 spriteFrameSize = Vector2.One;
                 Vector2 spriteFrame = new Vector2();
                 if (trail.Class.Sprite != null)
                 {
                     spriteWidth = trail.Class.Sprite.Texture.Width;
-                    spriteFrameHeight = (float)trail.Class.Sprite.Height / trail.Class.Sprite.Texture.Height;
+                    spriteFrameSize = trail.Class.Sprite.GetSizeUV();
                     spriteFrame = trail.Class.Sprite.GetFrameUV(trail.Class.Sprite.GetFrameIndex(ElapsedTime));
                 }
 
@@ -707,22 +709,28 @@ namespace Takai.Game
                     int i2 = (i1 + 1) % trail.AllPoints.Count;
 
                     var t = n / (float)trail.Count;
-                    float w = trail.Class.Width.Evaluate(t);
+
+                    var wid = trail.Class.Width.Evaluate(t);
+                    var col = trail.Class.Color.Evaluate(t);
 
                     var p = trail.AllPoints[i1];
                     var norm = p.direction.Ortho();
 
                     Class.trailVerts[next + 0] = new MapClass.TrailVertex(
-                        p.location - norm * w,
-                        trail.Class.Color,
+                        p.location - norm * wid,
+                        col,
                         new Vector3(x + spriteFrame.X, spriteFrame.Y, 0/*todo*/)
                     );
                     Class.trailVerts[next + 1] = new MapClass.TrailVertex(
-                        p.location + norm * w,
-                        trail.Class.Color,
-                        new Vector3(x + spriteFrame.X, spriteFrame.Y + spriteFrameHeight, 0)
+                        p.location + norm * wid,
+                        col,
+                        new Vector3(x + spriteFrame.X, spriteFrame.Y + spriteFrameSize.Y, 0)
                     );
-                    x += Vector2.Distance(p.location, trail.AllPoints[i2].location) / spriteWidth;
+
+                    if (trail.Class.SpriteRenderStyle == TrailSpriteRenderStyle.Stretch)
+                        x = t * spriteFrameSize.X * trail.Class.SpriteScale;
+                    else
+                        x += Vector2.Distance(p.location, trail.AllPoints[i2].location) / spriteWidth * trail.Class.SpriteScale;
                     //DrawArrow(p.location, p.direction, 3, Color.Gold);
                 }
             }
@@ -731,7 +739,7 @@ namespace Takai.Game
             Runtime.GraphicsDevice.SetVertexBuffer(Class.trailVBuffer);
 
             Runtime.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-            Runtime.GraphicsDevice.BlendState = BlendState.AlphaBlend;
+            Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
             Runtime.GraphicsDevice.SamplerStates[0] = SamplerState.AnisotropicWrap;
 
@@ -894,7 +902,7 @@ namespace Takai.Game
 
             c.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, null, c.cameraTransform);
             foreach (var trigger in _drawTriggers)
-                Graphics.Primitives2D.DrawFill(c.spriteBatch, new Color(Color.LimeGreen, 0.25f), trigger.Region);
+                Graphics.Primitives2D.DrawFill(c.spriteBatch, new Color(Color.LimeGreen, 0.25f), trigger.Class.Region);
             c.spriteBatch.End();
         }
 

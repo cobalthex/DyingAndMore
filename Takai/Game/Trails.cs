@@ -22,14 +22,30 @@ namespace Takai.Game
         }
     }
 
-    public class TrailClass : IObjectClass<TrailInstance>
+    public enum TrailSpriteRenderStyle
+    {
+        Stretch,
+        Tile
+    };
+
+    public class TrailClass : INamedClass<TrailInstance>
     {
         public string File { get; set; }
         public string Name { get; set; }
 
         public int MaxPoints { get; set; } = 10;
+
         public Graphics.Sprite Sprite { get; set; }
-        public Color Color { get; set; } = Color.White;
+        public TrailSpriteRenderStyle SpriteRenderStyle { get; set; }
+        /// <summary>
+        /// A stretch factor in the t direction of the trail
+        /// </summary>
+        public float SpriteScale { get; set; } = 1;
+
+        /// <summary>
+        /// The color over the length of the curve. Position 0 is the start (tail) of the trail
+        /// </summary>
+        public ColorCurve Color { get; set; } = Microsoft.Xna.Framework.Color.White;
 
         /// <summary>
         /// Width across the length of the curve. Position 0 is the start (tail) of the trail
@@ -83,7 +99,7 @@ namespace Takai.Game
         }
     }
 
-    public class TrailInstance : IObjectInstance<TrailClass>
+    public class TrailInstance : IInstance<TrailClass>
     {
         //todo: make class readonly across board
         public TrailClass Class
@@ -150,7 +166,7 @@ namespace Takai.Game
 
         public void Clear()
         {
-            HeadIndex = TailIndex = 0;
+            HeadIndex = TailIndex = Count = 0;
         }
 
         bool IsCollinear(Vector2 a, Vector2 b, Vector2 c)
@@ -180,27 +196,31 @@ namespace Takai.Game
                     return;
             }
 
-            var p2 = (TailIndex + Count - 2) % points.Count;
-            var p1 = (TailIndex + Count - 1) % points.Count;
-            if (Class.MergeCollinear && Count > 2 &&
-                IsCollinear(
-                    location,
-                    points[p1].location,
-                    points[p2].location
-                ))
-            {
-
-                points[p2] = new TrailPoint(points[p2].location, points[p2].direction, points[p1].time);
-                points[p1] = new TrailPoint(location, direction, elapsedTime);
-            }
-            else
-                AddPoint(location, direction, collapse);
-
             nextCapture = elapsedTime + Class.CaptureDelay;
+
+            if (Count > 2)
+            {
+                var p2 = (TailIndex + Count - 2) % points.Count;
+                var p1 = (TailIndex + Count - 1) % points.Count;
+                if (Class.MergeCollinear &&
+                    IsCollinear(
+                        location,
+                        points[p1].location,
+                        points[p2].location
+                    ))
+                {
+
+                    points[p2] = new TrailPoint(points[p2].location, points[p2].direction, points[p1].time);
+                    points[p1] = new TrailPoint(location, direction, elapsedTime);
+                    return;
+                }
+            }
+
+            AddPoint(location, direction, collapse);
         }
 
         /// <summary>
-        /// Add a new point to the trail, ignoring any delays/jitter settings
+        /// Add a new point to the trail, ignoring any capture settings
         /// </summary>
         /// <param name="location">The next point of the trail</param>
         /// <param name="direction">Where the point is facing</param>

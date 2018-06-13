@@ -457,6 +457,13 @@ namespace Takai.Data
                     throw new InvalidDataException(GetExceptionMessage($"Expected static value when reading '{staticVal}' from type '{word}'", context));
                 }
 
+                //explicit type struct syntax
+                if (peek == '[')
+                {
+                    var list = TextDeserialize(context) as List<object>;
+                    return Cast(type, list, context);
+                }
+
                 //read object
                 if (peek != '{')
                     throw new InvalidDataException(GetExceptionMessage($"Expected an object definition ('{{') when reading type '{word}' (Type {{ }})", context));

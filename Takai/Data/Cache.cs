@@ -520,8 +520,6 @@ namespace Takai.Data
             //assumes single threaded
             UnionArray samples;
 
-            //nvorbis logical streams?
-
             public OpusSoundSource(Concentus.Oggfile.OpusOggReadStream stream, Concentus.Structs.OpusDecoder decoder)
             {
                 this.stream = stream;
