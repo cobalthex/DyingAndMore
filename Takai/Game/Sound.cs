@@ -6,7 +6,7 @@ namespace Takai.Game
     /// <summary>
     /// A sound in the game. Can be a sound effect, song, or other. Has information about captioning
     /// </summary>
-    public class SoundClass : IObjectClass<SoundInstance>
+    public class SoundClass : INamedClass<SoundInstance>
     {
         public string Name { get; set; }
         [Data.Serializer.Ignored]
@@ -43,7 +43,7 @@ namespace Takai.Game
         }
     }
 
-    public struct SoundInstance : IObjectInstance<SoundClass>
+    public struct SoundInstance : IInstance<SoundClass>
     {
         public SoundClass Class { get; set; }
 

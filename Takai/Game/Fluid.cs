@@ -7,7 +7,7 @@ namespace Takai.Game
     /// A single type of Fluid
     /// This struct defines the graphics for the Fluid and physical properties that can affect the game
     /// </summary>
-    public class FluidClass : IObjectClass<FluidInstance>
+    public class FluidClass : INamedClass<FluidInstance>
     {
         public string Name { get; set; }
 
@@ -64,7 +64,7 @@ namespace Takai.Game
     /// Fluids can have physics per their fluid type
     /// Fluids can be spawned with a velocity which is decreased by their drag over time. Once the velocity reaches zero, the fluid is considered inactive (permanently)
     /// </summary>
-    public struct FluidInstance : IObjectInstance<FluidClass>
+    public struct FluidInstance : IInstance<FluidClass>
     {
         public FluidClass Class { get; set; }
         public Vector2 position;

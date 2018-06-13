@@ -11,7 +11,7 @@ namespace Takai.Game
     /// <summary>
     /// Describes a single type of entity. Actors, etc. inherit from this
     /// </summary>
-    public partial class EntityClass : IObjectClass<EntityInstance>
+    public partial class EntityClass : INamedClass<EntityInstance>
     {
         [Data.Serializer.Ignored]
         public string File { get; set; } = null;
@@ -118,7 +118,7 @@ namespace Takai.Game
     /// <summary>
     /// A single instance of an entity in a map.
     /// </summary>
-    public partial class EntityInstance : IObjectInstance<EntityClass>, Data.Serializer.IReferenceable, ICollisionResolver
+    public partial class EntityInstance : IInstance<EntityClass>, Data.Serializer.IReferenceable, ICollisionResolver
     {
         /// <summary>
         /// A unique ID for each entity in the map
@@ -239,6 +239,16 @@ namespace Takai.Game
         /// </summary>
         [Data.Serializer.Ignored]
         public bool DisableNextDestructionEffect { get; set; } = false;
+
+        /// <summary>
+        /// Event handlers for this entity. Set by <see cref="EntityClass.Events"/>
+        /// </summary>
+        public Dictionary<string, List<Command>> EventHandlers { get; set; }
+
+        public virtual Dictionary<string, Action<object>> Actions => new Dictionary<string, Action<object>>
+        {
+            ["Kill"] = (ignored) => Kill(),
+        };
 
         public EntityInstance() : this(null) { }
         public EntityInstance(EntityClass @class)
@@ -387,6 +397,22 @@ namespace Takai.Game
         public bool IsAliveIn(MapInstance map)
         {
             return IsAlive && Map == map;
+        }
+
+        /// <summary>
+        /// Trigger an event
+        /// </summary>
+        /// <param name="eventName">The name of the event</param>
+        /// <returns>True if there are event handlers for the event</returns>
+        protected virtual bool TriggerEvent(string eventName)
+        {
+            if (EventHandlers == null || !EventHandlers.TryGetValue(eventName, out var commands))
+                return false;
+
+            foreach (var command in commands)
+                ;
+
+            return true;
         }
 
         //collision material fx (all entities get a material, map gets its own)

@@ -5,12 +5,14 @@
         string Name { get; set; }
     }
 
-    public interface IObjectClass<TInstance> : INamedObject
+    public interface IClass<TInstance>
     {
         TInstance Instantiate();
     }
 
-    public interface IObjectInstance<TClass>
+    public interface INamedClass<TInstance> : IClass<TInstance>, INamedObject { }
+
+    public interface IInstance<TClass>
     {
         TClass Class { get; set; }
     }

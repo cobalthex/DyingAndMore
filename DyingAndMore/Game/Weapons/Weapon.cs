@@ -19,7 +19,7 @@ namespace DyingAndMore.Game.Weapons
     /// <summary>
     /// The base for all weapons
     /// </summary>
-    public abstract class WeaponClass : Takai.IObjectClass<WeaponInstance>
+    public abstract class WeaponClass : Takai.INamedClass<WeaponInstance>
     {
         public string Name { get; set; }
 
@@ -83,7 +83,7 @@ namespace DyingAndMore.Game.Weapons
         //chambering,
     }
 
-    public abstract class WeaponInstance : Takai.IObjectInstance<WeaponClass>
+    public abstract class WeaponInstance : Takai.IInstance<WeaponClass>
     {
         //rate of fire curve
         //maybe warmup requires certain rate of fire

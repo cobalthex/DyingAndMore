@@ -316,6 +316,18 @@ namespace Takai.Graphics
                    new Vector2(Texture.Width, Texture.Height);
         }
 
+        /// <summary>
+        /// Get the size of this sprite (frame) in UV dimensions
+        /// </summary>
+        /// <returns>The size as a percent of the texture size</returns>
+        public Vector2 GetSizeUV()
+        {
+            return new Vector2(
+                (float)Width / Texture.Width,
+                (float)Height / Texture.Height
+            );
+        }
+
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle)
         {
             Draw(spriteBatch, new Rectangle(

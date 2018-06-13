@@ -94,11 +94,29 @@ namespace Takai.Data
             LoadTypesFrom(typeof(Serializer).GetTypeInfo().Assembly);
 
             Serializers = new Dictionary<Type, CustomTypeSerializer>();
-            LoadXnaSerializers();
+            LoadXnaTypes();
         }
 
-        public static void LoadXnaSerializers()
+        public static void LoadXnaTypes()
         {
+            RegisterType<PlayerIndex>();
+            RegisterType<BlendState>();
+
+            RegisterType<Curve>();
+            RegisterType<CurveKey>();
+            RegisterType<CurveContinuity>();
+            RegisterType<CurveLoopType>();
+
+            RegisterType<Color>();
+            RegisterType<Vector2>();
+            RegisterType<Vector3>();
+            RegisterType<Vector4>();
+            RegisterType<Rectangle>();
+
+            RegisterType<BlendState>();
+            RegisterType<BlendFunction>();
+            RegisterType<Blend>();
+
             Serializers[typeof(Vector2)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
@@ -241,23 +259,6 @@ namespace Takai.Data
                     RegisterType(type);
             }
 
-            RegisterType<PlayerIndex>();
-            RegisterType<BlendState>();
-
-            RegisterType<Curve>();
-            RegisterType<CurveKey>();
-            RegisterType<CurveContinuity>();
-            RegisterType<CurveLoopType>();
-
-            RegisterType<Color>();
-            RegisterType<Vector2>();
-            RegisterType<Vector3>();
-            RegisterType<Vector4>();
-            RegisterType<Rectangle>();
-
-            RegisterType<BlendState>();
-            RegisterType<BlendFunction>();
-            RegisterType<Blend>();
         }
 
         public static void RegisterType<T>()

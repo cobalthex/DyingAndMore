@@ -1,6 +1,11 @@
 TrailClass {
     MaxPoints: 400;
-    Color: [255 255 255 127];
+    Color: {
+        Values: [
+            [0 [255 0 0 255]];
+            [1 [255 0 1 255]];
+        ]
+    }
     Sprite: {
         texture: @"asdf.png";
         FrameCount: 30;
@@ -29,4 +34,6 @@ TrailClass {
     MergeCollinear: false;
     CaptureDelay: 30Hz;
     LifeSpan: 3sec;
+
+    SpriteRenderStyle: TrailSpriteRenderStyle.Tile;
 }

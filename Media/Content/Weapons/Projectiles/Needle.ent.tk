@@ -1,6 +1,6 @@
 ProjectileClass {
     Name: "Needle";
-    MuzzleVelocity: [800 980];
+    MuzzleVelocity: [8000 9800];
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     Range: 2000;
@@ -9,11 +9,13 @@ ProjectileClass {
 
     Trail: {
         MaxPoints: 20;
-        Color: Color.Magenta;
-        LifeSpan: 0.5sec;
+        LifeSpan: 2.5sec;
         CaptureDelay: 10msec;
-        Width: 2;
+        Width: 4;
         MergeCollinear: true;
+        Sprite: @"Effects/Trails/Needler.png";
+        SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
+        SpriteScale: 2;
     }
 
     Animations: {
