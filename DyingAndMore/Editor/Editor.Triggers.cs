@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
-using Takai;
+using Takai.UI;
 
 namespace DyingAndMore.Editor
 {
@@ -12,11 +12,40 @@ namespace DyingAndMore.Editor
 
         Takai.Game.TriggerInstance activeTrigger = null;
 
+        Static triggerSettings;
+        TextInput triggerSettingsNameInput = new TextInput();
+
         public TriggersEditorMode(Editor editor)
             : base("Triggers", editor)
         {
-            VerticalAlignment = Takai.UI.Alignment.Stretch;
-            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+            VerticalAlignment = Alignment.Stretch;
+            HorizontalAlignment = Alignment.Stretch;
+
+            triggerSettingsNameInput.TextChanged += ActiveTriggerTextChanged;
+            triggerSettingsNameInput.AutoSize();
+
+            var closeButton = new Static
+            {
+                Text = "Close",
+                HorizontalAlignment = Alignment.Stretch
+            };
+            closeButton.AutoSize(10);
+            closeButton.Click += delegate { triggerSettings.RemoveFromParent(); };
+
+            var label = new Static { Text = "Name" };
+            label.AutoSize();
+
+            triggerSettings = new List(
+                label,
+                triggerSettingsNameInput,
+                closeButton
+            )
+            {
+                BackgroundColor = Color.White,
+                HorizontalAlignment = Alignment.Middle,
+                VerticalAlignment = Alignment.Middle
+            };
+            triggerSettings.AutoSize(10);
         }
 
         public override void Start()
@@ -29,9 +58,24 @@ namespace DyingAndMore.Editor
             editor.Map.renderSettings.drawTriggers = false;
         }
 
+        void ActiveTriggerTextChanged(object sender, System.EventArgs e)
+        {
+            if (activeTrigger?.Class == null)
+                return;
+
+            activeTrigger.Class.Name = ((TextInput)sender).Text;
+        }
+
         protected override bool HandleInput(GameTime time)
         {
             var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+
+            if (activeTrigger != null && InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Space))
+            {
+                triggerSettingsNameInput.Text = activeTrigger.Class.Name;
+                AddChild(triggerSettings);
+                return false;
+            }
 
             if (InputState.IsPress(MouseButtons.Left))
             {
@@ -131,7 +175,7 @@ namespace DyingAndMore.Editor
             if (activeTrigger != null)
             {
                 editor.Map.DrawRect(activeTrigger.Class.Region, Color.GreenYellow);
-                var textPos = new Vector2(activeTrigger.Class.Region.X, activeTrigger.Class.Region.Y);
+                var textPos = new Vector2(activeTrigger.Class.Region.X + 5, activeTrigger.Class.Region.Y + 5);
                 DefaultFont?.Draw(spriteBatch, activeTrigger.Class.Name, editor.Map.ActiveCamera.WorldToScreen(textPos), Color.White);
             }
         }
