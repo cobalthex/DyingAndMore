@@ -208,20 +208,6 @@ namespace DyingAndMore.Game
             gameHuds.RemoveAllChildren();
             if (player?.Hud != null)
                 gameHuds.AddChild(player.Hud);
-
-            Map.AddTrigger(new TriggerClass
-            {
-                Name = "Dye",
-                Region = new Rectangle(600, 100, 200, 400),
-                OnEnterCommands = new System.Collections.Generic.List<Command>
-                {
-                    new EntityCommand
-                    {
-                        Target = player,
-                        ActionName = "Kill"
-                    }
-                }
-            }.Instantiate());
         }
 
         string GetClockText(TimeSpan time)
@@ -646,7 +632,7 @@ namespace DyingAndMore.Game
 
                     DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
 
-                    //draw triggers
+                    //draw trigger names
                 }
 
                 foreach (var sound in Map.Sounds)

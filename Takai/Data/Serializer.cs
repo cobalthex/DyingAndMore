@@ -63,8 +63,8 @@ namespace Takai.Data
         public class RequiredAttribute : Attribute { public RequiredAttribute() { throw new NotImplementedException(); } } //todo
 
         /// <summary>
-        /// Store the value (or values if enumerable) as a reference to an object defined elsewhere
-        /// Must implement IReferenceable
+        /// Store the value (or values if enumerable) as a reference to an object defined elsewhere.
+        /// Reference must implement IReferenceable
         /// </summary>
         [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
         [System.Runtime.InteropServices.ComVisible(true)]

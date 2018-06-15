@@ -110,6 +110,16 @@ namespace Takai.Game
             return EnumerateEntitiesInSectors(GetOverlappingSectors(ActiveCamera.VisibleRegion));
         }
 
+        public IEnumerable<MapSector> EnumeratateSectorsInRegion(Rectangle region)
+        {
+            var sectors = GetOverlappingSectors(region);
+            for (int y = sectors.Top; y < sectors.Bottom; ++y)
+            {
+                for (int x = sectors.Left; x < sectors.Right; ++x)
+                    yield return Sectors[y, x];
+            }
+        }
+
         /// <summary>
         /// Find all entities within a certain radius
         /// </summary>
@@ -451,6 +461,34 @@ namespace Takai.Game
                 entity = null,
                 didHit = dist != end
             };
+        }
+
+        public TriggerInstance FindTriggerByName(string name)
+        {
+            foreach (var sector in Sectors)
+            {
+                var found = sector.triggers.Find((t) => t.Class.Name == name);
+                if (found != null)
+                    return found;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Check if the region is currently in its top left sector
+        /// </summary>
+        /// <param name="sectorX">the sector X index</param>
+        /// <param name="sectorY">the sector Y index</param>
+        /// <param name="region">The region to check (in pixels)</param>
+        /// <returns>True if the sector contains the top left of the region</returns>
+        public bool IsInFirstSector(int sectorX, int sectorY, Rectangle region)
+        {
+            return new Rectangle(
+                sectorX * Class.SectorPixelSize,
+                sectorY * Class.SectorPixelSize,
+                Class.SectorPixelSize,
+                Class.SectorPixelSize
+            ).Contains(region.X, region.Y);
         }
     }
 

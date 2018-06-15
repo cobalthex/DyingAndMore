@@ -69,7 +69,7 @@ namespace Takai.Game
         {
             return new Dictionary<string, object>
             {
-                ["Tiles"] = Tiles
+                ["Tiles"] = Tiles,
             };
         }
 
@@ -126,12 +126,22 @@ namespace Takai.Game
                 Decals = new List<Decal>()
             };
 
+            var triggers = new HashSet<TriggerClass>();
+
             mapState.Fluids.AddRange(LiveFluids);
             foreach (var sector in Sectors)
             {
                 mapState.Fluids.AddRange(sector.fluids);
                 mapState.Decals.AddRange(sector.decals);
+
+                foreach (var trigger in sector.triggers)
+                {
+                    if (trigger.Class != null)
+                        triggers.Add(trigger.Class);
+                }
             }
+
+            mapState.Triggers = new List<TriggerClass>(triggers);
 
             return mapState;
         }
@@ -156,9 +166,17 @@ namespace Takai.Game
 
         public Dictionary<string, object> DerivedSerialize()
         {
+            var triggers = new HashSet<TriggerInstance>();
+
+            foreach (var sector in Sectors)
+            {
+                triggers.UnionWith(sector.triggers);
+            }
+
             return new Dictionary<string, object>
             {
-                ["Entities"] = AllEntities
+                ["Entities"] = AllEntities,
+                ["Triggers"] = triggers
             };
         }
 

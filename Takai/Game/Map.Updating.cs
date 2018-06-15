@@ -270,32 +270,11 @@ namespace Takai.Game
                         }
 
                         //place this entity into the pathing grid as an obstacle
-
                         if (entity.Class.IsPhysical && !entity.Class.IgnoreTrace)
                         {
-                            var tileBounds = entity.AxisAlignedBounds;
-                            tileBounds = Rectangle.Union(tileBounds, lastBounds);
-                            tileBounds.X /= Class.TileSize;
-                            tileBounds.Y /= Class.TileSize;
-                            tileBounds.Width = (tileBounds.Width - 1) / Class.TileSize + 1;
-                            tileBounds.Height = (tileBounds.Height - 1) / Class.TileSize + 1;
-
-                            //falloff based on radius
-                            var tilePos = entity.Position / Class.TileSize;
-                            for (int tbY = Math.Max(0, tileBounds.Top); tbY < Math.Min(Class.Height, tileBounds.Bottom); ++tbY)
-                            {
-                                for (int tbX = Math.Max(0, tileBounds.Left); tbX < Math.Min(Class.Width, tileBounds.Right); ++tbX)
-                                {
-                                    if (PathInfo[tbY, tbX].heuristic == uint.MaxValue)
-                                        continue;
-
-                                    var dist = Vector2.DistanceSquared(tilePos, new Vector2(tbX, tbY));
-                                    var pi = PathInfo[tbY, tbX];
-                                    var entRad = 1 - Math.Min(1, (dist / entity.RadiusSq));
-                                    pi.heuristic = Math.Min(uint.MaxValue, pi.heuristic + (uint)(4 * entRad));
-                                    PathInfo[tbY, tbX] = pi;
-                                }
-                            }
+                            var entBounds = entity.AxisAlignedBounds;
+                            entBounds = Rectangle.Union(entBounds, lastBounds);
+                            AddObstacle(entBounds, 4, entity.Radius);
                         }
                     }
                 }
@@ -310,45 +289,53 @@ namespace Takai.Game
                 var lastSectors = GetOverlappingSectors(entity.lastAABB);
                 var nextSectors = GetOverlappingSectors(entity.AxisAlignedBounds);
 
-                if (lastSectors != nextSectors)
+                var eaabb = entity.AxisAlignedBounds;
+
+                //if (lastSectors != nextSectors)
                 {
-                    for (var y = lastSectors.Top; y < lastSectors.Bottom; ++y)
-                        for (var x = lastSectors.Left; x < lastSectors.Right; ++x)
-                            Sectors[y, x].entities.Remove(entity);
-
-                    if (!visibleRegion.Intersects(entity.AxisAlignedBounds) &&
-                        (entity.Class.DestroyIfOffscreen ||
-                        (entity.Class.DestroyIfDeadAndOffscreen && !entity.IsAlive)))
+                    var diffSectors = Rectangle.Union(lastSectors, nextSectors);
+                    for (var y = diffSectors.Top; y < diffSectors.Bottom; ++y)
                     {
-                        FinalDestroy(entity);
-                        continue;
-                    }
+                        for (var x = diffSectors.Left; x < diffSectors.Right; ++x)
+                        {
+                            if (new Rectangle(
+                                x * Class.SectorPixelSize,
+                                y * Class.SectorPixelSize,
+                                Class.SectorPixelSize,
+                                Class.SectorPixelSize
+                            ).Intersects(eaabb))
+                            {
+                                Sectors[y, x].entities.Add(entity);
+                            }
+                            else
+                            {
+                                Sectors[y, x].entities.Remove(entity);
+                            }
 
-                    for (var y = nextSectors.Top; y < nextSectors.Bottom; ++y)
-                        for (var x = nextSectors.Left; x < nextSectors.Right; ++x)
-                            Sectors[y, x].entities.Add(entity);
+                            foreach (var trigger in Sectors[y, x].triggers)
+                            {
+                                if (trigger.Class.Region.Intersects(eaabb))
+                                    trigger.TryEnter(entity);
+                                else
+                                    trigger.TryExit(entity);
+                            }
+                        }
+                    }
                 }
-                entity.lastAABB = entity.AxisAlignedBounds;
+                entity.lastAABB = eaabb;
+
+                if (!visibleRegion.Intersects(eaabb) &&
+                    (entity.Class.DestroyIfOffscreen ||
+                    (entity.Class.DestroyIfDeadAndOffscreen && !entity.IsAlive)))
+                {
+                    Destroy(entity);
+                    continue;
+                }
 
                 if (entity.Trail != null)
                     Trails.Add(entity.Trail);
 
                 entity.UpdateAnimations(deltaTime);
-
-                //if triggers enabled
-                for (var y = nextSectors.Top; y < nextSectors.Bottom; ++y)
-                {
-                    for (var x = nextSectors.Left; x < nextSectors.Right; ++x)
-                    {
-                        foreach (var trigger in Sectors[y, x].triggers)
-                        {
-                            if (trigger.Class.Region.Intersects(entity.AxisAlignedBounds)) //todo: real collision detection
-                                trigger.Enter(entity);
-
-                            //todo: trigger exit
-                        }
-                    }
-                }
 
                 if (updateSettings.isEntityLogicEnabled)
                     entity.Think(deltaTime);

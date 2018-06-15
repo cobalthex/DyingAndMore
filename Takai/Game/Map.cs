@@ -20,6 +20,7 @@ namespace Takai.Game
         public List<EntitySpawn> Entities { get; set; }
         public List<FluidInstance> Fluids { get; set; }
         public List<Decal> Decals { get; set; }
+        public List<TriggerClass> Triggers { get; set; }
     }
 
     /// <summary>
@@ -115,13 +116,24 @@ namespace Takai.Game
                             instance.Spawn(ent.Class, ent.Position, ent.Forward, Vector2.Zero, ent.Name);
                     }
                 }
+
                 if (InitialState.Fluids != null)
+                {
                     foreach (var fluid in InitialState.Fluids)
                         instance.Spawn(fluid);
+                }
 
                 if (InitialState.Decals != null)
+                {
                     foreach (var decal in InitialState.Decals)
                         instance.AddDecal(decal);
+                }
+
+                if (InitialState.Triggers != null)
+                {
+                    foreach (var trigger in InitialState.Triggers)
+                        instance.AddTrigger(trigger.Instantiate());
+                }
             }
 
             return instance;
