@@ -6,8 +6,15 @@ namespace Takai.Game
     /// <summary>
     /// A region that can trigger commands when an entity enters the trigger region
     /// </summary>
-    public class TriggerClass : IClass<TriggerInstance>
+    public class TriggerClass : IClass<TriggerInstance>, Data.Serializer.IReferenceable
     {
+        private static int nextId = 1;
+
+        /// <summary>
+        /// A unique ID for serialization
+        /// </summary>
+        public int Id { get; set; } = nextId++;
+
         /// <summary>
         /// A name to identify this trigger
         /// </summary>
@@ -35,6 +42,7 @@ namespace Takai.Game
 
     public class TriggerInstance : IInstance<TriggerClass>
     {
+        [Data.Serializer.AsReference]
         public TriggerClass Class { get; set; }
 
         /// <summary>
@@ -55,8 +63,12 @@ namespace Takai.Game
             Class = @class;
         }
 
-        //Check to see if an entity can enter this trigger and do so. Does not check bounds
-        internal bool Enter(EntityInstance entity)
+        /// <summary>
+        /// Try and enter this trigger region. Trigger must be enabled. Does not check entity bounds
+        /// </summary>
+        /// <param name="entity">The entity to enter the trigger</param>
+        /// <returns>True if the entity entered the trigger region</returns>
+        public bool TryEnter(EntityInstance entity)
         {
             if ((Class.MaxUses > 0 && UseCount >= Class.MaxUses) || !ContainedEntities.Add(entity))
                 return false;
@@ -72,9 +84,20 @@ namespace Takai.Game
             System.Diagnostics.Debug.WriteLine($"{entity} entered trigger {Class.Name}");
             return true;
         }
-        internal bool Exit(EntityInstance entity)
+
+        /// <summary>
+        /// Try and leave a trigger. Does not check entity bounds
+        /// </summary>
+        /// <param name="entity">The entity that is leaving</param>
+        /// <returns>True if the entity was in the trigger</returns>
+        public bool TryExit(EntityInstance entity)
         {
-            return ContainedEntities.Remove(entity);
+            if (ContainedEntities.Remove(entity))
+            {
+                System.Diagnostics.Debug.WriteLine($"{entity} left trigger {Class.Name}");
+                return true;
+            }
+            return false;
             //todo: on exit
         }
 

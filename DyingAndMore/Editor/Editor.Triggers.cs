@@ -13,7 +13,7 @@ namespace DyingAndMore.Editor
         Takai.Game.TriggerInstance activeTrigger = null;
 
         Static triggerSettings;
-        TextInput triggerSettingsNameInput = new TextInput();
+        TextInput triggerSettingsNameInput;
 
         public TriggersEditorMode(Editor editor)
             : base("Triggers", editor)
@@ -21,13 +21,15 @@ namespace DyingAndMore.Editor
             VerticalAlignment = Alignment.Stretch;
             HorizontalAlignment = Alignment.Stretch;
 
+            triggerSettingsNameInput = new TextInput();
             triggerSettingsNameInput.TextChanged += ActiveTriggerTextChanged;
             triggerSettingsNameInput.AutoSize();
 
             var closeButton = new Static
             {
                 Text = "Close",
-                HorizontalAlignment = Alignment.Stretch
+                HorizontalAlignment = Alignment.Stretch,
+                BorderColor = Color.White
             };
             closeButton.AutoSize(10);
             closeButton.Click += delegate { triggerSettings.RemoveFromParent(); };
@@ -41,11 +43,12 @@ namespace DyingAndMore.Editor
                 closeButton
             )
             {
-                BackgroundColor = Color.White,
+                BackgroundColor = new Color(20, 20, 20, 255),
                 HorizontalAlignment = Alignment.Middle,
-                VerticalAlignment = Alignment.Middle
+                VerticalAlignment = Alignment.Middle,
+                Margin = 10
             };
-            triggerSettings.AutoSize(10);
+            triggerSettings.AutoSize();
         }
 
         public override void Start()
@@ -73,6 +76,7 @@ namespace DyingAndMore.Editor
             if (activeTrigger != null && InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Space))
             {
                 triggerSettingsNameInput.Text = activeTrigger.Class.Name;
+                triggerSettingsNameInput.HasFocus = true;
                 AddChild(triggerSettings);
                 return false;
             }

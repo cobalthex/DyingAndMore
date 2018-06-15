@@ -420,7 +420,7 @@ namespace Takai.Game
 
         public void DrawPathHeuristic(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilWrite, null, null, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, null, c.cameraTransform);
 
             var mult = 360f / MaxHeuristic;
             for (var y = c.visibleTiles.Top; y < c.visibleTiles.Bottom; ++y)
@@ -433,7 +433,7 @@ namespace Takai.Game
 
                     Graphics.Primitives2D.DrawFill(
                         c.spriteBatch,
-                        Util.ColorFromHSL(path.heuristic * mult, 1, 0.8f, 0.5f),
+                        Util.ColorFromHSL(path.heuristic * mult, 1, 0.8f, 1),
                         new Rectangle(x * Class.TileSize, y * Class.TileSize, Class.TileSize, Class.TileSize)
                     );
                 }

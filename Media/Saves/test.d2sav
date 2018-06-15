@@ -1,18 +1,25 @@
 MapInstance {
     Class: @"B:/Code/DyingAndMore/DyingAndMore/bin/Debug/Content/Maps/empty.map.tk";
-    Trails: [];
+    Trails: [
+        TrailInstance {
+            Class: @"Effects/Trails/road.trail.tk";
+            HeadIndex: 43;
+            TailIndex: 0;
+            Count: 43;
+        }
+    ];
     Sounds: [];
-    Scripts: [];
-    ElapsedTime: 4768.8914;
+    ElapsedTime: 9561.3313;
     TimeScale: 1;
     currentScreenFade: ScreenFade {
         Duration: 0;
         Colors: Null;
         Blend: Null;
     };
-    currentScreenFadeElapsedTime: 4768.8914;
+    currentScreenFadeElapsedTime: 9561.3313;
     Entities: [
         ActorInstance {
+            Class: @"Actors/Player.ent.tk";
             Faction: Factions [Player];
             Controller: InputController {
                 ActionInputs: {
@@ -34,22 +41,23 @@ MapInstance {
             Class: @"Actors/Player.ent.tk";
             Name: Null;
             Position: [267 259];
-            Forward: [0.2740114 -0.9617264];
+            Forward: [0.9955281 0.09446617];
             Velocity: [0 0];
             OutlineColor: [0 0 0 0];
-            Trail: Null;
+            Trail: TrailInstance {
+                Class: @"Effects/Trails/Fire.trail.tk";
+                HeadIndex: 0;
+                TailIndex: 0;
+                Count: 0;
+            };
             SpawnTime: 0;
+            EventHandlers: Null;
         }
-        WeaponPickupInstance {
-            Id: 2;
-            Class: @"Pickups/Tuber.ent.tk";
-            Name: Null;
-            Position: [323.6728 303.6];
-            Forward: [1 0];
-            Velocity: [0 0];
-            OutlineColor: [0 0 0 0];
-            Trail: Null;
-            SpawnTime: 3372.9983;
+    ];
+    Triggers: [
+        TriggerInstance {
+            Class: *TriggerClass.1;
+            UseCount: 0;
         }
     ];
 }

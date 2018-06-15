@@ -312,5 +312,36 @@ namespace Takai.Game
         }
 
         //https://stackoverflow.com/questions/15114950/how-to-improve-the-perfomance-of-my-a-path-finder/15120213#15120213
+
+        /// <summary>
+        /// Add an obstacle to the pathing grid
+        /// </summary>
+        /// <param name="region">The region to block out (in pixels)</param>
+        /// <param name="weight">How strong the block</param>
+        /// <param name="weightRadius">A falloff curve for the weight. 0 for constant</param>
+        public void AddObstacle(Rectangle region, float weight = 4, float weightRadius = 0)
+        {
+            region.X /= Class.TileSize;
+            region.Y /= Class.TileSize;
+            region.Width = (region.Width - 1) / Class.TileSize + 1;
+            region.Height = (region.Height - 1) / Class.TileSize + 1;
+
+            //falloff based on radius
+            var tilePos = region.Center.ToVector2();
+            for (int tbY = Math.Max(0, region.Top); tbY < Math.Min(Class.Height, region.Bottom); ++tbY)
+            {
+                for (int tbX = Math.Max(0, region.Left); tbX < Math.Min(Class.Width, region.Right); ++tbX)
+                {
+                    if (PathInfo[tbY, tbX].heuristic == uint.MaxValue)
+                        continue;
+
+                    var dist = Vector2.DistanceSquared(tilePos, new Vector2(tbX, tbY));
+                    var pi = PathInfo[tbY, tbX];
+                    var rad = 1 - Math.Min(1, dist / weightRadius);
+                    pi.heuristic = Math.Min(uint.MaxValue, pi.heuristic + (uint)(4 * rad));
+                    PathInfo[tbY, tbX] = pi;
+                }
+            }
+        }
     }
 }

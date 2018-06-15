@@ -296,5 +296,35 @@ namespace Takai.Game
         }
     }
 
+    /// <summary>
+    /// Shake the camera. May move the camera
+    /// </summary>
+    public class CameraJerkEffect : IGameEffect
+    {
+        /// <summary>
+        /// Positional jitter
+        /// </summary>
+        public Range<float> Jitter { get; set; }
+        /// <summary>
+        ///
+        /// </summary>
+        public Range<float> Tilt { get; set; }
+
+        Range<TimeSpan> Duration { get; set; }
+
+        public void Spawn(EffectsInstance instance)
+        {
+            if (instance.Map.ActiveCamera == null)
+                return;
+
+            instance.Map.ActiveCamera.Position += new Vector2(Jitter.Random(), Jitter.Random());
+            instance.Map.ActiveCamera.Rotation += Tilt.Random();
+
+            //todo: sustained rumble
+        }
+    }
+
     //floating text?/objects
 }
+
+//todo: effects with timers
