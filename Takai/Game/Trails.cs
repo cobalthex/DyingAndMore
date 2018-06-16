@@ -233,8 +233,7 @@ namespace Takai.Game
             if (Class.MaxPoints == 0)
             {
                 points.Add(new TrailPoint(location, direction, elapsedTime));
-                ++HeadIndex;
-                ++Count;
+                HeadIndex = ++Count;
             }
             else
             {

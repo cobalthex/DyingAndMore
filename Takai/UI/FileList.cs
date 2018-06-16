@@ -22,7 +22,8 @@ namespace Takai.UI
         private string _path;
 
         /// <summary>
-        /// The root directory allowed to search
+        /// The root most directory allowed to search
+        /// (cannot navigate below this directory)
         /// </summary>
         public string BasePath
         {

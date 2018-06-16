@@ -1,5 +1,5 @@
 MapInstance {
-    Class: @"B:/Code/DyingAndMore/DyingAndMore/bin/Debug/Content/Maps/empty.map.tk";
+    Class: @"Maps/empty.map.tk";
     Trails: [
         TrailInstance {
             Class: @"Effects/Trails/road.trail.tk";

@@ -1,5 +1,5 @@
 TrailClass {
-    MaxPoints: 200;
+    MaxPoints: 0;
     Sprite: @"./road.png";
 
     Color: Color.White;

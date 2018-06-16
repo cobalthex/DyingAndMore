@@ -23,6 +23,9 @@ namespace Takai.Data
     /// </summary>
     public static class Cache
     {
+        /// <summary>
+        /// Where all content lives
+        /// </summary>
         public static string DefaultRoot = "Content";
 
         public struct CustomLoad
@@ -146,7 +149,14 @@ namespace Takai.Data
                 file = file.Substring(DefaultRoot.Length + 1);
             }
             else if (Path.IsPathRooted(file) || PathStartsWith(file, root))
+            {
                 realFile = file;
+
+                //normalize full paths in the root directory
+                var rootFullPath = Normalize(Path.GetFullPath(root));
+                if (file.StartsWith(rootFullPath))
+                    file = file.Substring(rootFullPath.Length + (rootFullPath.EndsWith("/") ? 1 : 0));
+            }
             else
                 realFile = Normalize(Path.Combine(root, file));
 
