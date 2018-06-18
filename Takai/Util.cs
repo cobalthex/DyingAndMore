@@ -41,7 +41,8 @@ namespace Takai
         public static void Resize<T>(this System.Collections.Generic.List<T> list, int newSize, T defaultValue = default(T))
         {
             var oldSize = list.Count;
-            list.Capacity = newSize;
+            if (newSize < oldSize)
+                list.RemoveRange(newSize, oldSize - newSize);
             for (int i = oldSize; i < newSize; ++i)
                 list.Add(defaultValue);
         }

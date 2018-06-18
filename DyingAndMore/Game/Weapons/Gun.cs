@@ -135,7 +135,10 @@ namespace DyingAndMore.Game.Weapons
             if (Class == null || other.Class != Class)
                 return false;
 
-            AmmoCount = Math.Min(Class.MaxAmmo, AmmoCount + ((GunInstance)other).AmmoCount);
+            var gun = (GunInstance)other;
+            var lastAmmoCount = AmmoCount;
+            AmmoCount = Math.Min(Class.MaxAmmo, AmmoCount + (gun.AmmoCount));
+            gun.AmmoCount -= AmmoCount - lastAmmoCount;
             return true;
         }
     }

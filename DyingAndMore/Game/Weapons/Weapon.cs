@@ -246,6 +246,7 @@ namespace DyingAndMore.Game.Weapons
         /// <summary>
         /// Combine another weapon into this one. Implementation defined
         /// E.g. add ammo from other weapon to this one on pickup
+        /// Should remove ammo from original weapon
         /// </summary>
         /// <param name="other">the other weapon to compare against</param>
         /// <returns>Whether or not the weapon could be combined</returns>

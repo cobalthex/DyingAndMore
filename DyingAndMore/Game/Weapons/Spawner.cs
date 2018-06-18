@@ -96,8 +96,10 @@ namespace DyingAndMore.Game.Weapons
             if (Class == null || other.Class == Class)
                 return false;
 
-            foreach (var ent in ((SpawnerInstance)other).SpawnQueue)
+            var spawner = (SpawnerInstance)other;
+            foreach (var ent in spawner.SpawnQueue)
                 SpawnQueue.Enqueue(ent);
+            spawner.SpawnQueue.Clear();
 
             return true;
         }

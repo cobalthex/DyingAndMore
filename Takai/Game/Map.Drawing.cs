@@ -69,7 +69,16 @@ namespace Takai.Game
             MultiSampleAntiAlias = true,
         };
 
-        public Texture2D TilesImage { get; set; }
+        public Texture2D TilesImage
+        {
+            get => _tilesImage;
+            set
+            {
+                _tilesImage = value;
+                TileSize = TileSize;
+            }
+        }
+        private Texture2D _tilesImage;
 
         //todo: curves (and volumetric curves) (things like rivers/flows)
 
@@ -78,6 +87,9 @@ namespace Takai.Game
         /// </summary>
         public void InitializeGraphics()
         {
+            if (TilesImage != null && CollisionMask == null)
+                BuildTileMask(TilesImage);
+
             if (Runtime.GraphicsDevice == null)
                 return;
 
@@ -557,7 +569,7 @@ namespace Takai.Game
                             c.spriteBatch,
                             ent.Position,
                             angle,
-                            Color.White,
+                            ent.TintColor,
                             1,
                             state.ElapsedTime
                         );

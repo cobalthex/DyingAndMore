@@ -32,6 +32,8 @@ namespace Takai.Game
 
         public List<Command> OnEnterCommands { get; set; }
 
+        //effects?
+
         public TriggerInstance Instantiate()
         {
             return new TriggerInstance(this);

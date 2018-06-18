@@ -22,8 +22,6 @@ ActorClass {
         };
     };
 
-    Trail: @"Effects/Trails/Fire.trail.tk";
-
     FieldOfView: 2.356194;
     MaxSpeed: [400 400];
     MoveForce: 600;

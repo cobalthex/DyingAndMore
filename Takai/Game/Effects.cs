@@ -324,6 +324,24 @@ namespace Takai.Game
         }
     }
 
+    /// <summary>
+    /// Tint an entity temporarily
+    /// </summary>
+    public class EntityTintEffect : IGameEffect
+    {
+        public Color Tint { get; set; }
+        Range<TimeSpan> Duration { get; set; }
+
+        public void Spawn(EffectsInstance instance)
+        {
+            if (instance.Target == null)
+                return;
+
+            instance.Target.TintColor = Tint;
+            instance.Target.TintColorDuration = Duration.Random();
+        }
+    }
+
     //floating text?/objects
 }
 

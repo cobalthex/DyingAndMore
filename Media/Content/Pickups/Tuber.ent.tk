@@ -1,8 +1,5 @@
 WeaponPickupClass {
-	Weapon: GunInstance {
-		Class: @"Weapons/Test.wpn.tk";
-		AmmoCount: 1000;
-	}
+	Weapon: @"Weapons/Test.wpn.tk";
 
     Animations: {
         Idle: {

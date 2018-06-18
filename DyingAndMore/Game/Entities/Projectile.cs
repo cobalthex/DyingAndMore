@@ -5,6 +5,8 @@ using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
 {
+    //move projectiles to actors (behaviors for projectile specifics)
+
     public class ProjectileResponse
     {
         /// <summary>
@@ -32,7 +34,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// How much damage this projectile will inflict upon an emeny
         /// </summary>
-        public float Damage { get; set; } = 100;
+        public float Damage { get; set; } = 100; //todo: scale by speed?
 
         /// <summary>
         /// How far this shot will go before killing itself
@@ -66,7 +68,7 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public EffectsClass FadeEffect { get; set; }
 
-        public Dictionary<Material, ProjectileResponse> MaterialResponses { get; set; } = new Dictionary<Material, ProjectileResponse>();
+        public Dictionary<Material, ProjectileResponse> MaterialResponses { get; set; }
 
         public ProjectileClass()
         {
@@ -81,17 +83,12 @@ namespace DyingAndMore.Game.Entities
 
     public class ProjectileInstance : EntityInstance
     {
-        public override EntityClass Class
+        [Takai.Data.Serializer.ReadOnly]
+        public new ProjectileClass Class
         {
-            get => base.Class;
-            set
-            {
-                System.Diagnostics.Contracts.Contract.Assert(value == null || value is ProjectileClass);
-                base.Class = value;
-                _class = value as ProjectileClass;
-            }
+            get => (ProjectileClass)base.Class;
+            set => base.Class = value;
         }
-        private ProjectileClass _class;
 
         /// <summary>
         /// Who created this projectile
@@ -113,14 +110,14 @@ namespace DyingAndMore.Game.Entities
         public override void Think(TimeSpan DeltaTime)
         {
             if (IsAlive &&
-                (ForwardSpeed() < _class.MinimumSpeed ||
-                (_class.LifeSpan > TimeSpan.Zero && Map.ElapsedTime > SpawnTime + _class.LifeSpan) ||
-                (_class.Range != 0 && Vector2.DistanceSquared(origin, Position) > _class.Range * _class.Range)))
+                (ForwardSpeed() < Class.MinimumSpeed ||
+                (Class.LifeSpan > TimeSpan.Zero && Map.ElapsedTime > SpawnTime + Class.LifeSpan) ||
+                (Class.Range != 0 && Vector2.DistanceSquared(origin, Position) > Class.Range * Class.Range)))
             {
                 DisableNextDestructionEffect = true;
-                if (_class.FadeEffect != null)
+                if (Class.FadeEffect != null)
                 {
-                    var fx = _class.FadeEffect.Instantiate(this);
+                    var fx = Class.FadeEffect.Instantiate(this);
                     Map.Spawn(fx);
                 }
                 Kill();
@@ -143,9 +140,12 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
         {
-            if (collider.Material != null && _class.MaterialResponses.TryGetValue(collider.Material, out var mtl))
+            if (collider.Material != null &&
+                Material != null &&
+                Class.MaterialResponses != null && Class.MaterialResponses.TryGetValue(collider.Material, out var mtl))
             {
                 //collision angle, collision depth, etc
+                Map.Spawn(collider.Material.Responses[Material].Instantiate(this, collider));
             }
             else
             {
@@ -154,8 +154,8 @@ namespace DyingAndMore.Game.Entities
             }
 
             if (collider is ActorInstance actor &&
-                (collider != Source || _class.CanDamageSource))
-                actor.ReceiveDamage(_class.Damage, Source);
+                (collider != Source || Class.CanDamageSource))
+                actor.ReceiveDamage(Class.Damage, Source);
         }
     }
 }

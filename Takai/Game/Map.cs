@@ -313,6 +313,10 @@ namespace Takai.Game
         /// <param name="instance">the ent to destroy</param>
         protected void FinalDestroy(EntityInstance instance)
         {
+            foreach (var sector in EnumeratateSectorsInRegion(instance.AxisAlignedBounds))
+                foreach (var trigger in sector.triggers)
+                    trigger.TryExit(instance);
+
             instance.OnDestroy();
             instance.SpawnTime = TimeSpan.Zero;
             instance.Id = 0;

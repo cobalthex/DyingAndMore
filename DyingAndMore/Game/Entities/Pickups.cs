@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Takai.Game;
+﻿using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
 {
     public class WeaponPickupClass : EntityClass
     {
-        /// <summary>
-        /// The weapon to pick up. Actual instance as to store ammo, etc
-        /// </summary>
-        public Weapons.WeaponInstance Weapon { get; set; }
+        public Weapons.WeaponClass Weapon { get; set; }
 
         public override EntityInstance Instantiate()
         {
@@ -20,6 +14,17 @@ namespace DyingAndMore.Game.Entities
 
     public class WeaponPickupInstance : EntityInstance
     {
+        /// <summary>
+        /// The weapon to pick up.
+        /// Will instantiate a new one from the class if null
+        /// </summary>
+        public Weapons.WeaponInstance Weapon
+        {
+            get => _weapon ?? (_weapon = Class?.Weapon?.Instantiate()) ?? null;
+            set => _weapon = value;
+        }
+        private Weapons.WeaponInstance _weapon;
+
         [Takai.Data.Serializer.ReadOnly]
         public new WeaponPickupClass Class
         {

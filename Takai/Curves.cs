@@ -37,6 +37,7 @@ namespace Takai
         public virtual void AddValue(float t, TValue value)
         {
             Values.Add(new CurveValue<TValue>(t, value));
+            Values.Sort();
         }
 
         int GetClosestIndex(float t)

@@ -253,6 +253,9 @@ namespace DyingAndMore.Game.Entities
                 return;
 
             CurrentHealth -= damage;
+
+            TintColor = Color.Tomato;
+            TintColorDuration = TimeSpan.FromMilliseconds(20);
         }
 
         #region Helpers

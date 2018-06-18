@@ -1,10 +1,7 @@
 WeaponPickupClass {
     Name: "Big fucking test gun";
 
-	Weapon: GunInstance {
-		Class: @"Weapons/bfg.wpn.tk";
-		AmmoCount: 10000;
-	}
+	Weapon: @"Weapons/bfg.wpn.tk";
 
     Animations: {
         Idle: {

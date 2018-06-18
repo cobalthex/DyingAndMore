@@ -167,13 +167,14 @@ namespace Takai.Game
         public void Clear()
         {
             HeadIndex = TailIndex = Count = 0;
+            points.Resize(Class.MaxPoints);
         }
 
-        bool IsCollinear(Vector2 a, Vector2 b, Vector2 c)
+        public static bool IsCollinear(Vector2 a, Vector2 b, Vector2 c, float epsilon = 0.01f)
         {
             //check that area of triangle ABC is zero
             //account for floating point errors
-            return 0.001f > Math.Abs(a.X * (b.Y - c.Y) + b.X * (c.Y - a.Y) + c.X * (a.Y - b.Y));
+            return epsilon > Math.Abs(a.X * (b.Y - c.Y) + b.X * (c.Y - a.Y) + c.X * (a.Y - b.Y));
         }
 
         /// <summary>

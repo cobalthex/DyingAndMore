@@ -322,7 +322,6 @@ namespace Takai.UI
             return base.HandleInput(time); //todo: check for changes and return false if any
         }
 
-
         protected void UpdateVisibleText()
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
