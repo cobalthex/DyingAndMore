@@ -7,6 +7,7 @@ TrailClass {
     SpriteScale: 1;
     SpriteRenderStyle: TrailSpriteRenderStyle.Tile;
     Width: 40;
+    MergeCollinear: true;
 
     #CaptureDelay: 40Hz;
     #LifeSpan: 0.5sec;

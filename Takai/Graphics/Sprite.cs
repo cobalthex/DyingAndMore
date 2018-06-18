@@ -257,7 +257,9 @@ namespace Takai.Graphics
 
         public static implicit operator Sprite(Texture2D texture)
         {
-            return new Sprite(texture);
+            var sprite = new Sprite(texture);
+            sprite.CenterOrigin();
+            return sprite;
         }
 
         /// <summary>

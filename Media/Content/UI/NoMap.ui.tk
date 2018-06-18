@@ -6,9 +6,7 @@ List {
 
     Children: [
         Graphic {
-            Sprite: {
-                Texture: @"Promo/YoureAllDiseased.png";
-            }
+            Sprite: @"promo/dejitaru.png";
             AutoSize: true;
             HorizontalAlignment: Alignment.Middle;
         };

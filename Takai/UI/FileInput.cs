@@ -7,48 +7,60 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
-    public enum DialogMode
-    {
-        Open,
-        Save
-    }
-
     public class FileInputBase : List
     {
-        //todo: directory support
-
         /// <summary>
-        /// The mode of this file input, by default, open
+        /// The file, validated
         /// </summary>
-        public DialogMode Mode { get; set; } = DialogMode.Open;
+        public virtual string Value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                OnFileSelected(System.EventArgs.Empty);
+                FileSelected?.Invoke(this, System.EventArgs.Empty);
+            }
+        }
+        private string _value;
+
+        public bool IsFileValid => !VerifyFileExists || Value.Length == 0 || File.Exists(Value);
+
+        //todo: directory support
 
         /// <summary>
         /// On input, show a little marker whether or not the file exists
         /// </summary>
         public bool VerifyFileExists { get; set; } = true;
 
-        public virtual string InitialDirectory { get; set; } = "";
-        public virtual string Filter { get; set; } = null;
-
         /// <summary>
         /// Called whenever a valid file name is entered
         /// </summary>
-        public System.EventHandler FileSelected;
+        public event System.EventHandler FileSelected = null;
         protected virtual void OnFileSelected(System.EventArgs e) { }
+    }
+
+    public enum DialogMode
+    {
+        Open,
+        Save
     }
 
     public class FileInput : FileInputBase
     {
-
         public static Color InvalidFileOutlineColor = Color.Tomato;
 
-        public override string Text
+        public override string Value
         {
-            get => textInput.Text;
+            get => base.Value;
             set
             {
-                textInput.Text = value;
-                ValidateFile();
+                if (base.Value == value)
+                    return;
+
+                base.Value = value;
+                textInput.Text = base.Value;
+                DisplayValidation();
             }
         }
 
@@ -80,23 +92,32 @@ namespace Takai.UI
             Text = "..."
         };
 
-        private Color lastOutlineColor;
+        public virtual string InitialDirectory { get; set; } = "";
+        public virtual string Filter { get; set; } = null;
 
-        private bool fileWasInvalid = false;
+        /// <summary>
+        /// The mode of this file input, by default, open
+        /// </summary>
+        public DialogMode Mode { get; set; } = DialogMode.Open;
+
+        private Color lastBorderColor;
 
         public FileInput()
         {
             Direction = Direction.Horizontal;
 
-            textInput.TextChanged += delegate { ValidateFile(); };
+            textInput.TextChanged += delegate
+            {
+                Value = textInput.Text;
+            };
 
             pickerButton.Click += delegate
             {
 #if WINDOWS
 #if DEBUG
-                if (Takai.Input.InputState.IsMod(Input.KeyMod.Alt))
+                if (Input.InputState.IsMod(Input.KeyMod.Alt))
                 {
-                    System.Diagnostics.Process.Start(System.IO.Path.GetDirectoryName(Text));
+                    System.Diagnostics.Process.Start(Path.GetDirectoryName(Text));
                     return;
                 }
 #endif
@@ -118,9 +139,7 @@ namespace Takai.UI
                 using (dialog)
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
-                    {
-                        Text = dialog.FileName;
-                    }
+                        Value = dialog.FileName;
                 }
 #elif WINDOWS_UAP
                 //todo
@@ -130,6 +149,21 @@ namespace Takai.UI
             AddChildren(textInput, pickerButton);
 
             BorderColor = Color;
+        }
+
+        protected void DisplayValidation()
+        {
+            bool isValid = IsFileValid;
+            if (isValid)
+            {
+                BorderColor = lastBorderColor;
+                OnFileSelected(System.EventArgs.Empty);
+            }
+            else
+            {
+                lastBorderColor = BorderColor;
+                BorderColor = InvalidFileOutlineColor;
+            }
         }
 
         public override void AutoSize(float padding = 0)
@@ -149,63 +183,6 @@ namespace Takai.UI
             pickerButton.Size = new Vector2(btnSize);
             pickerButton.Position = new Vector2(Size.X - btnSize, 0);
             base.OnResize(e);
-        }
-
-        protected void ValidateFile()
-        {
-            bool isFileValid = !VerifyFileExists;
-            if (VerifyFileExists && Text.Length > 0 && !(isFileValid = System.IO.File.Exists(Text)))
-            {
-                lastOutlineColor = BorderColor;
-                BorderColor = InvalidFileOutlineColor;
-                fileWasInvalid = true;
-            }
-            else if (fileWasInvalid)
-                BorderColor = lastOutlineColor;
-
-            if (isFileValid)
-            {
-                OnFileSelected(System.EventArgs.Empty);
-                FileSelected?.Invoke(this, System.EventArgs.Empty);
-            }
-        }
-    }
-
-    public class FileSelect : FileInputBase
-    {
-        public override string InitialDirectory
-        {
-            get => base.InitialDirectory;
-            set
-            {
-                base.InitialDirectory = value;
-                RefreshList();
-            }
-        }
-
-        public override string Filter
-        {
-            get => base.Filter;
-            set
-            {
-                base.Filter = value;
-                RefreshList();
-            }
-        }
-
-        /// <summary>
-        /// Load files in subdirectories of the InitialDirectory (recursive)
-        /// </summary>
-        public bool LoadSubdirectories { get; set; } = true;
-
-        protected void RefreshList()
-        {
-            RemoveAllChildren();
-
-            foreach (var file in Directory.EnumerateFiles(InitialDirectory, Filter, LoadSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
-            {
-
-            }
         }
     }
 }

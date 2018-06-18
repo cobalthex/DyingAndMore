@@ -1,0 +1,4 @@
+EntityTintEffect {
+	Tint: Color.Tomato;
+	Duration: 50msec;
+}

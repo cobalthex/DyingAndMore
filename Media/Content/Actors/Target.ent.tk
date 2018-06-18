@@ -1,0 +1,17 @@
+ActorClass {
+    Name: "Practice Target";
+    MaxHealth: 50000;
+    DefaultFaction: Factions [Enemy];
+
+    Animations: {
+        Idle: {
+            Sprite: @"./target.png";
+            Material: @"Materials/Default.mtl.tk";
+        };
+    };
+
+    FieldOfView: 0.667pi;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: True;
+}

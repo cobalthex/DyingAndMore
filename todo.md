@@ -27,4 +27,13 @@ Stuff to do in the future
 
 0. fill out AI more and create demo for game
 
-0. inputs/outputs
+0. tile patches in sectors. allows for destructable/modifyable tiles
+
+0. non destroying/pickupable projectiles (arrows)
+
+0. overhaul physics system
+0. unified entity system? (basic entities)v - ecs esque design
+
+0. physics responses
+
+0. editorable commands

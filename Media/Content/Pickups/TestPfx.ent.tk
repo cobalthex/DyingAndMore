@@ -1,10 +1,7 @@
 WeaponPickupClass {
     Name: "Particle fx test gun";
 
-	Weapon: GunInstance {
-		Class: @"Weapons/Flamethrower.wpn.tk";
-		AmmoCount: 1000;
-	}
+	Weapon: @"Weapons/Flamethrower.wpn.tk";
 
     Animations: {
         Idle: {

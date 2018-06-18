@@ -1,33 +1,66 @@
 ProjectileClass {
     Name: "Needle";
-    MuzzleVelocity: [8000 9800];
+    MuzzleVelocity: [800 980];
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
-    Range: 2000;
-    Drag: 1.0;
+    Range: 100000;
+    Drag: 0.0;
     MinimumSpeed: 10;
 
     Trail: {
         MaxPoints: 20;
-        LifeSpan: 2.5sec;
+        LifeSpan: 0.5sec;
         CaptureDelay: 10msec;
-        Width: 4;
         MergeCollinear: true;
         Sprite: @"Effects/Trails/Needler.png";
         SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
         SpriteScale: 2;
+
+        width: {
+            values: [
+                [0 0]
+                [0.9 4]
+                [1 1]
+            ]
+        }
     }
 
     Animations: {
         Idle: {
             Sprite: {
-                Texture: @"./Tracer.png";
-                Height: 1;
-                #FrameCount: 4;
-                #FrameLength: 50msec;
-                IsLooping: true;
-                Origin: [30 0];
+                Texture: @"./needle.png";
+                Origin: [28 0];
             };
+
+            Effect: {
+                Effects: [
+                    ParticleEffect {
+                        Class: {
+                            Sprite: {
+                                Texture: @"Effects/trailglow.png";
+                            };
+                            Blend: BlendState.NonPremultiplied;
+                            ColorOverTime: {
+                                Values: [
+                                    [0 [255 0 255 255]];
+                                    [1 [255 0 255 0]];
+                                ];
+                            };
+                            ScaleOverTime: {
+                                values: [
+                                    [0 1];
+                                    [1 0.1];
+                                ];
+                            };
+                            InitialSpeed: [-50 -100];
+                            LifeSpan: [0.25sec 0.85sec];
+                            Drag: 5;
+                        }
+                        Count: [-10 1];
+                        Spread: [-30deg 30deg];
+                    };
+                ]
+            }
         }
     }
 }

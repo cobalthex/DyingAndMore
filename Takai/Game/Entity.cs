@@ -206,7 +206,7 @@ namespace Takai.Game
         /// <remarks>This vector should always be normalized</remarks>
         public Vector2 Velocity { get; set; } = Vector2.Zero;
 
-        /// <summary>
+        /// <summary>b
         /// the axis aligned bounding box of this entity
         /// updated whenever the state, position, or direction changes
         /// </summary>
@@ -219,6 +219,11 @@ namespace Takai.Game
         /// Draw an outline around the sprite. If A is 0, ignored
         /// </summary>
         public Color OutlineColor { get; set; }
+        /// <summary>
+        /// A color to tint the entity by. e.g. as a damage indicator
+        /// </summary>
+        public Color TintColor { get; set; } = Color.White;
+        public TimeSpan TintColorDuration { get; set; }
 
         public TrailInstance Trail { get; set; }
 
@@ -317,9 +322,17 @@ namespace Takai.Game
         /// The basic think function for this entity, called once a frame
         /// </summary>
         /// <param name="DeltaTime">How long since the last frame (in map time)</param>
-        public virtual void Think(TimeSpan deltaTime) {
+        public virtual void Think(TimeSpan deltaTime)
+        {
             if (Trail != null && Velocity != Vector2.Zero)
                 Trail.Advance(Position, Vector2.Normalize(Velocity)); //todo: width?
+
+            if (TintColorDuration > TimeSpan.Zero)
+            {
+                TintColorDuration -= deltaTime;
+                if (TintColorDuration <= TimeSpan.Zero)
+                    TintColor = Color.White;
+            }
         }
 
         public virtual void Kill()

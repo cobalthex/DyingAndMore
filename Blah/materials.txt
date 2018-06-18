@@ -1,0 +1,40 @@
+Materials:
+
+determine how object collides (bounce off, stick, etc)
+determine effects played on collision
+
+example:
+	Source entity (projectile), material A
+	Target entity (wall), material B
+
+	source collides with target:
+		source checks collision response table between material A and B
+		spawns effect with source and target
+
+		(should effects be mutual?)
+
+
+Materials.tk:
+	:MaterialResponse {
+		physics info (refraction, reflection, blah) -- how does this work mutually?
+		effects
+	}
+
+	Pairs of material responses, loaded into map, map creates bidi table of each material
+
+
+
+physics responses:
+	applies to both objects
+
+	Source would respond with material B (target) responses
+	Target would respond with material A (source) responses
+
+e.g:
+	Projectile: Material (brass)
+	Wall: Material (steel)
+
+	[brass steel] ->
+		reflect until 65deg angle
+		play sparks animation
+		effect should play on both sides?

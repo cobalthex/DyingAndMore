@@ -815,7 +815,7 @@ namespace Takai.UI
         /// </summary>
         /// <param name="name">The name of the UI to search for</param>
         /// <returns>The first child found or null if none found with the specified name</returns>
-        public Static FindChildByName(string name, bool caseSensitive = false)
+        public Static FindChildByName(string name, bool caseSensitive = false, System.Type elementType = null)
         {
             var parent = this;
             while (parent.Parent != null)
@@ -828,6 +828,7 @@ namespace Takai.UI
             {
                 var elem = next.Pop();
                 if (elem.Name != null &&
+                    (elementType == null || elementType.IsInstanceOfType(elem)) &&
                     elem.Name.Equals(name, caseSensitive ? System.StringComparison.Ordinal : System.StringComparison.OrdinalIgnoreCase))
                     return elem;
 
@@ -836,6 +837,11 @@ namespace Takai.UI
             }
 
             return null;
+        }
+
+        public T FindChildByName<T>(string name, bool caseSensitive = false) where T : Static
+        {
+            return (T)FindChildByName(name, caseSensitive, typeof(T));
         }
 
         #endregion

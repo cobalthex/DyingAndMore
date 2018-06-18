@@ -103,6 +103,6 @@ namespace Takai.Game
         public string Name { get; set; }
         public string File { get; set; }
 
-        public Dictionary<Material, Effect> Responses { get; set; }
+        public Dictionary<Material, EffectsClass> Responses { get; set; }
     }
 }

@@ -69,6 +69,8 @@ namespace Takai.Game
         {
             return new Dictionary<string, object>
             {
+                ["Width"] = Width,
+                ["Height"] = Height,
                 ["Tiles"] = Tiles,
             };
         }

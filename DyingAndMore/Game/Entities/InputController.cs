@@ -116,13 +116,14 @@ namespace DyingAndMore.Game.Entities
         {
             if (collider is WeaponPickupInstance wpi)
             {
-                if (Actor.Weapon != null && Actor.Weapon.Class == wpi.Class.Weapon.Class)
+                var weapon = wpi.Weapon;
+                if (Actor.Weapon != null && Actor.Weapon.Class == weapon.Class)
                 {
-                    Actor.Weapon.Combine(wpi.Class.Weapon);
+                    Actor.Weapon.Combine(weapon);
                     //if doesn't use all weapon ammo, store some?
                 }
                 else
-                    Actor.Weapon = wpi.Class.Weapon.Clone();
+                    Actor.Weapon = weapon.Clone();
 
                 collider.Kill();
             }

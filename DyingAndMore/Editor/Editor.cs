@@ -268,18 +268,18 @@ namespace DyingAndMore.Editor
 
                     resizeMap.FindChildByName("create").Click += delegate (object sender, ClickEventArgs e)
                     {
-                        var width = ((NumericBase)resizeMap.FindChildByName("width")).Value;
-                        var height = ((NumericBase)resizeMap.FindChildByName("height")).Value;
-                        var tileset = Cache.Load<Takai.Game.Tileset>(resizeMap.FindChildByName("tileset").Text);
+                        var name = resizeMap.FindChildByName("name").Text;
+                        var width = resizeMap.FindChildByName<NumericBase>("width").Value;
+                        var height = resizeMap.FindChildByName<NumericBase>("height").Value;
+                        var tileset = Cache.Load<Takai.Game.Tileset>(resizeMap.FindChildByName<FileInputBase>("tileset").Value);
 
                         var map = new Takai.Game.MapClass
                         {
-                            Name = resizeMap.FindChildByName("name").Text,
+                            Name = name,
                             Tiles = new short[height, width],
-                            TilesImage = tileset.texture,
                             TileSize = tileset.size,
+                            TilesImage = tileset.texture,
                         };
-                        map.BuildTileMask(map.TilesImage);
                         map.InitializeGraphics();
                         Map = map.Instantiate();
                         resizeMap.RemoveFromParent();

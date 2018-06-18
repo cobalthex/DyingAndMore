@@ -150,12 +150,15 @@ namespace Takai.Data
             }
             else if (Path.IsPathRooted(file) || PathStartsWith(file, root))
             {
-                realFile = file;
-
                 //normalize full paths in the root directory
                 var rootFullPath = Normalize(Path.GetFullPath(root));
                 if (file.StartsWith(rootFullPath))
-                    file = file.Substring(rootFullPath.Length + (rootFullPath.EndsWith("/") ? 1 : 0));
+                {
+                    file = file.Substring(rootFullPath.Length + (rootFullPath.EndsWith("/") ? 0 : 1));
+                    realFile = root + "/" + file;
+                }
+                else
+                    realFile = file;
             }
             else
                 realFile = Normalize(Path.Combine(root, file));

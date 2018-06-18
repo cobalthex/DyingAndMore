@@ -74,6 +74,9 @@ namespace Takai.Data
 
         public interface IReferenceable
         {
+            /// <summary>
+            /// A unique ID for every instance of the implementing type. No stipulations on how IDs are chosen
+            /// </summary>
             int Id { get; set; }
         }
 

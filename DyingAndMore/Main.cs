@@ -132,7 +132,6 @@ namespace DyingAndMore
 
         void GdmDeviceCreated(object sender, System.EventArgs e)
         {
-
             DEVMODE d = new DEVMODE();
             EnumDisplaySettings(null, 1, ref d);
             System.Diagnostics.Debug.WriteLine($"Display {d.dmDeviceName} Hz: {d.dmDisplayFrequency}");
@@ -205,7 +204,7 @@ namespace DyingAndMore
 #endif
 
             ui = Takai.Data.Cache.Load<Takai.UI.Static>("UI/NoMap.ui.tk");
-            var mapList = (Takai.UI.FileList)ui.FindChildByName("maps");
+            var mapList = ui.FindChildByName< Takai.UI.FileList>("maps");
             mapList.SelectionChanged += delegate
             {
                 if (mapList.SelectedIndex < 0)
@@ -233,10 +232,29 @@ namespace DyingAndMore
             };
 
             var newMap = ui.FindChildByName("new");
-            newMap.Click += delegate (object _sender, Takai.UI.ClickEventArgs _e)
+            newMap.Click += delegate
             {
-                ui.ReplaceAllChildren(Takai.Data.Cache.Load<Takai.UI.Static>("UI/Editor/NewMap.ui.tk"));
-                //todo: hook up
+                var newMapUi = Takai.Data.Cache.Load<Takai.UI.Static>("UI/Editor/NewMap.ui.tk");
+                var create = newMapUi.FindChildByName("create");
+                create.Click += delegate
+                {
+                    var name = newMapUi.FindChildByName("name").Text;
+                    var width = newMapUi.FindChildByName<Takai.UI.NumericBase>("width").Value;
+                    var height = newMapUi.FindChildByName<Takai.UI.NumericBase>("height").Value;
+                    var tileset = Takai.Data.Cache.Load<Takai.Game.Tileset>(newMapUi.FindChildByName<Takai.UI.FileInputBase>("tileset").Value);
+
+                    var map = new Takai.Game.MapClass
+                    {
+                        Name = name,
+                        Tiles = new short[height, width],
+                        TileSize = tileset.size,
+                        TilesImage = tileset.texture,
+                    };
+                    map.InitializeGraphics();
+                    ui.ReplaceAllChildren(new Editor.Editor(map.Instantiate()));
+                };
+
+                ui.ReplaceAllChildren(newMapUi);
             };
 
             fpsGraph = new Takai.FpsGraph()
@@ -305,7 +323,7 @@ namespace DyingAndMore
                 {
                     var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
                     var sz = debugFont.MeasureString(text);
-                    debugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.MediumSeaGreen);
+                    debugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
                 }
                 y -= debugFont.MaxCharHeight;
             }
