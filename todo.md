@@ -37,3 +37,7 @@ Stuff to do in the future
 0. physics responses
 
 0. editorable commands
+
+0. named reference objects from files? (necessary?)
+	`$taco Sprite { ... }`
+	visible from code, and deserializer as &var.taco
