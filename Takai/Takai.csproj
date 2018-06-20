@@ -85,6 +85,7 @@
     <Compile Include="Game\Map.Updating.cs">
       <DependentUpon>Map.cs</DependentUpon>
     </Compile>
+    <Compile Include="Game\Materials.cs" />
     <Compile Include="Game\Particles.cs" />
     <Compile Include="Game\Sound.cs" />
     <Compile Include="Diagnostics.cs" />

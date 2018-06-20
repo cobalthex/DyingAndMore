@@ -97,12 +97,4 @@ namespace Takai.Game
         public float angle;
         public float scale;
     }
-
-    public class Material : INamedObject
-    {
-        public string Name { get; set; }
-        public string File { get; set; }
-
-        public Dictionary<Material, EffectsClass> Responses { get; set; }
-    }
 }

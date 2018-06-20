@@ -9,19 +9,6 @@ namespace DyingAndMore.Game.Entities
 
     public class ProjectileResponse
     {
-        /// <summary>
-        /// If the angle of collision is within this range, the projectile will reflect
-        /// </summary>
-        /// <remarks>0 to 2pi radians, NaN not to reflect</remarks>
-        public Range<float> ReflectAngle { get; set; } = float.NaN;
-        public Range<float> ReflectSpeed { get; set; } = 0;
-
-        //Overpenetrate (glass/breakable materials?) -- enemies
-        //attach
-
-        //friction, dampening
-
-        //refraction (reflection offset jitter?)
     }
 
     public class ProjectileClass : EntityClass

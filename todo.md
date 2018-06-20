@@ -41,3 +41,5 @@ Stuff to do in the future
 0. named reference objects from files? (necessary?)
 	`$taco Sprite { ... }`
 	visible from code, and deserializer as &var.taco
+
+0. default button in UI (click enter in text box to submit)
