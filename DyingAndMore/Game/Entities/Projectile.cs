@@ -5,11 +5,7 @@ using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
 {
-    //move projectiles to actors (behaviors for projectile specifics)
-
-    public class ProjectileResponse
-    {
-    }
+    //move projectiles to actors or even generic entities (behaviors for projectile specifics) ?
 
     public class ProjectileClass : EntityClass
     {
@@ -48,14 +44,17 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// When spawning this projectile, use the creator of this projectile's physics info (velocity/etc)
         /// </summary>
-        public bool UseSourcePhysics { get; set; } = false;
+        public bool InheritSourcePhysics { get; set; } = false;
 
         /// <summary>
         /// An effect spawned when the projectile goes out of <see cref="Range"/>, lives longer than <see cref="LifeSpan"/>, or below the <see cref="MinimumSpeed"/>
         /// </summary>
         public EffectsClass FadeEffect { get; set; }
 
-        public Dictionary<Material, ProjectileResponse> MaterialResponses { get; set; }
+        /// <summary>
+        /// Magnetism towards actors
+        /// </summary>
+        public float MagnetismAnglePerSecond { get; set; }
 
         public ProjectileClass()
         {
@@ -81,6 +80,8 @@ namespace DyingAndMore.Game.Entities
         /// Who created this projectile
         /// </summary>
         public EntityInstance Source { get; set; }
+
+        public ActorInstance CurrentTarget { get; set; }
 
         /// <summary>
         /// Where the projectile was spawned
@@ -127,14 +128,13 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
         {
-            if (collider.Material != null &&
-                Material != null &&
-                Class.MaterialResponses != null && Class.MaterialResponses.TryGetValue(collider.Material, out var mtl))
-            {
-                //collision angle, collision depth, etc
-                Map.Spawn(collider.Material.Responses[Material].Instantiate(this, collider));
-            }
-            else
+            //if (collider.Material != null &&
+            //    Material != null &&
+            //    Class.MaterialResponses != null && Class.MaterialResponses.TryGetValue(collider.Material, out var mtl))
+            //{
+            //    //collision angle, collision depth, etc
+            //}
+            //else
             {
                 Velocity = Vector2.Zero; //todo: physics should handle this
                 //Kill();
