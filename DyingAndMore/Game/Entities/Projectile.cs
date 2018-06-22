@@ -81,7 +81,10 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public EntityInstance Source { get; set; }
 
-        public ActorInstance CurrentTarget { get; set; }
+        /// <summary>
+        /// The current actor for magnetism. Reset if the actor is destroyed or the projectile has passed the actor
+        /// </summary>
+        public ActorInstance CurrentMagnet { get; set; }
 
         /// <summary>
         /// Where the projectile was spawned
@@ -111,6 +114,19 @@ namespace DyingAndMore.Game.Entities
                 Kill();
 
                 //todo: move to collision fx and destruction fx?
+            }
+            else
+            {
+                if (CurrentMagnet != null)
+                {
+                    var diff = CurrentMagnet.Position - Position;
+                    var theta = Takai.Util.Angle(diff);
+                }
+                else if (Class.MagnetismAnglePerSecond != 0)
+                {
+                    //check source faction
+
+                }
             }
 
             base.Think(DeltaTime);

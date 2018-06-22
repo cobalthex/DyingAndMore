@@ -60,7 +60,7 @@ namespace DyingAndMore.Game.Entities
             }
             else
             {
-                var ents = Actor.Map.FindEntities(Actor.Position, MaxRange);
+                var ents = Actor.Map.FindEntitiesInRegion(Actor.Position, MaxRange);
                 foreach (var ent in ents)
                 {
                     if (ent != Actor && ent is ActorInstance nearbyActor && (nearbyActor.Faction & Actor.Faction) == 0 &&

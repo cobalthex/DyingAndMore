@@ -557,7 +557,7 @@ namespace DyingAndMore.Game
 #if DEBUG
             if (InputState.IsMod(KeyMod.Alt) && InputState.IsPress(MouseButtons.Left))
             {
-                var targets = Map.FindEntities(worldMousePos, 5);
+                var targets = Map.FindEntitiesInRegion(worldMousePos, 5);
 
                 foreach (var ent in targets)
                 {

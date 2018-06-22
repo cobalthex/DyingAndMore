@@ -157,7 +157,7 @@ namespace DyingAndMore.Editor
 #endif
 
                 var searchRadius = 30; //increase if touch
-                var selected = editor.Map.FindEntities(currentWorldPos, searchRadius);
+                var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, searchRadius);
                 if (selected.Count < 1)
                 {
                     if (editor.Map.Class.Bounds.Contains(currentWorldPos) && selector.ents.Count > 0)
@@ -181,7 +181,7 @@ namespace DyingAndMore.Editor
             }
             else if (InputState.IsPress(MouseButtons.Right))
             {
-                var selected = editor.Map.FindEntities(currentWorldPos, 1);
+                var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, 1);
                 SelectedEntity = selected.Count > 0 ? selected[0] : null;
 
                 return false;
@@ -189,7 +189,7 @@ namespace DyingAndMore.Editor
             else if (InputState.IsClick(MouseButtons.Right)/* || isDoubleTapping*/)
             {
                 var searchRadius = /*isTapping*/ false ? 10 : 1;
-                var selected = editor.Map.FindEntities(currentWorldPos, searchRadius);
+                var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, searchRadius);
                 if (selected.Count > 0 && selected[0] == SelectedEntity)
                 {
                     editor.Map.Destroy(SelectedEntity);
