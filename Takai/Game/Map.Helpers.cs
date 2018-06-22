@@ -377,6 +377,35 @@ namespace Takai.Game
             return end;
         }
 
+        public IEnumerable<MapSector> TraceSectors(Vector2 start, Vector2 direction, float maxDistance = 0)
+        {
+            var end = (start + direction * maxDistance);
+
+            var sectorPos = start / Class.SectorPixelSize;
+            var sectorEnd = end / Class.SectorPixelSize;
+            var sectorDiff = sectorEnd - sectorPos;
+
+            int n = 0;
+            if (Math.Abs(sectorDiff.X) > Math.Abs(sectorDiff.Y))
+                n = (int)Math.Ceiling(Math.Abs(sectorDiff.X));
+            else
+                n = (int)Math.Ceiling(Math.Abs(sectorDiff.Y));
+
+            var sectorDelta = sectorDiff / n;
+
+            //todo: visited ents?
+
+            for (int i = 0; i <= n; ++i) //todo: improve on number of sectors searching
+            {
+                if (!new Rectangle(0, 0, Sectors.GetLength(1), Sectors.GetLength(0)).Contains(sectorPos.ToPoint()))
+                    yield break;
+
+                var sector = Sectors[(int)sectorPos.Y, (int)sectorPos.X];
+                sectorPos += sectorDelta;
+                yield return sector;
+            }
+        }
+
         /// <summary>
         /// Cast a ray from start in direction (searching at most maxDistance)
         /// and check for entity and tile collisions.
@@ -386,9 +415,10 @@ namespace Takai.Game
         /// <param name="direction">What direction to search</param>
         /// <param name="maxDistance">The total distance to search (in the tilemap)</param>
         /// <param name="ignored">Any entities to ignore when searching</param>
-        /// <returns>The collision. Entity is null if tilemap collision</returns>
         public TraceHit Trace(Vector2 start, Vector2 direction, float maxDistance = 0, EntityInstance ignored = null)
         {
+            //todo: switch to using TraceSectors
+
             if (maxDistance <= 0) //support flipping?
                 maxDistance = 10000;
 

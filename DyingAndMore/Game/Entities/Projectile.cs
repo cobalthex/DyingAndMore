@@ -120,12 +120,71 @@ namespace DyingAndMore.Game.Entities
                 if (CurrentMagnet != null)
                 {
                     var diff = CurrentMagnet.Position - Position;
-                    var theta = Takai.Util.Angle(diff);
+
+                    if (CurrentMagnet.Map == Map && Vector2.Dot(diff, Forward) > 0)
+                    {
+
+                        var theta = Takai.Util.Angle(diff);
+
+                        //todo: pid controller
+
+                        var fwdAngle = Takai.Util.Angle(Forward);
+
+                        Forward = Takai.Util.Direction(MathHelper.Lerp(theta, fwdAngle, 0.05f));
+                        Velocity = Forward * Velocity.Length();
+
+                        //var diffAngle = MathHelper.Clamp(theta - fwdAngle, -Class.MagnetismAnglePerSecond, Class.MagnetismAnglePerSecond);
+                        //diffAngle *= (float)DeltaTime.TotalSeconds;
+                        //var mtx = Matrix.CreateRotationZ(diffAngle);
+                        //Forward = Vector2.TransformNormal(Forward, mtx);
+                        //Velocity = Vector2.TransformNormal(Velocity, mtx);
+                    }
+                    else
+                        CurrentMagnet = null;
                 }
                 else if (Class.MagnetismAnglePerSecond != 0)
                 {
-                    //check source faction
+                    //set max think speed
 
+                    //search in line
+                    var minDot = 1f;
+                    var minDist = float.PositiveInfinity;
+                    ActorInstance best = null;
+
+                    var sourceFaction = Source is ActorInstance sourceActor ? sourceActor.Faction : Factions.None;
+
+                    int n = 0;
+                    foreach (var sector in Map.TraceSectors(Position, Forward, 1000)) //todo: limit distance by forward speed?
+                    {
+                        ++n;
+                        foreach (var ent in sector.entities)
+                        {
+                            if (ent != this && ent is ActorInstance actor && !actor.IsAlliedWith(sourceFaction))
+                            {
+                                var diff = ent.Position - Position;
+                                var length = diff.Length();
+                                var norm = diff / length;
+                                var dot = Vector2.Dot(norm, Forward);
+
+                                if (dot <= 0)
+                                    return;
+
+                                if (length < minDist || (length == minDist && dot < minDot))
+                                {
+                                    best = actor;
+                                    minDot = dot;
+                                    minDist = length;
+                                }
+                            }
+                        }
+
+                        if (best != null)
+                        {
+                            CurrentMagnet = best;
+                            System.Diagnostics.Debug.WriteLine($"{this} magnetized to {CurrentMagnet}");
+                            break;
+                        }
+                    }
                 }
             }
 
