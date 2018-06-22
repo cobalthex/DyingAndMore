@@ -126,7 +126,7 @@ namespace Takai.Game
         /// <param name="position">The origin search point</param>
         /// <param name="searchRadius">The maximum search radius</param>
         /// <param name="searchInSectors">Also search entities in sectors</param>
-        public List<EntityInstance> FindEntities(Vector2 position, float searchRadius)
+        public List<EntityInstance> FindEntitiesInRegion(Vector2 position, float searchRadius)
         {
             var ents = new HashSet<EntityInstance>();
 
@@ -154,7 +154,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="region">The region of the map to search</param>
         /// <returns></returns>
-        public List<EntityInstance> FindEntities(Rectangle region)
+        public List<EntityInstance> FindEntitiesInRegion(Rectangle region)
         {
             var ents = new HashSet<EntityInstance>();
 
@@ -174,7 +174,7 @@ namespace Takai.Game
         /// <param name="position">the point to search from</param>
         /// <param name="searchRadius">how far out to search before stopping. 0 for infinite</param>
         /// <returns>The closest entity or null if none are found</returns>
-        public EntityInstance FindEntity(Vector2 position, float searchRadius = 0)
+        public EntityInstance FindClosestEntity(Vector2 position, float searchRadius = 0)
         {
             var radiusSq = searchRadius * searchRadius;
 

@@ -357,7 +357,7 @@ namespace Takai.Game
 
                     if (p.Key.CollisionEffect != null)
                     {
-                        var ent = FindEntity(x.position, p.Key.Radius * x.scale);
+                        var ent = FindClosestEntity(x.position, p.Key.Radius * x.scale);
                         if (ent != null)
                         {
                             isDead = true;

@@ -267,7 +267,7 @@ namespace Takai.Game
             if (Force == 0 || Angle.TotalRange() == 0)
                 return;
 
-            var nearby = instance.Map.FindEntities(instance.Position, (float)Math.Sqrt(Force));
+            var nearby = instance.Map.FindEntitiesInRegion(instance.Position, (float)Math.Sqrt(Force));
             foreach (var ent in nearby)
             {
                 if (!ent.Class.IsPhysical || ent == instance.Source)

@@ -188,7 +188,7 @@ namespace DyingAndMore.Game.Entities
         {
             if (AI.Target == null || !AI.Target.IsAlive || AI.Target.Map != AI.Actor.Map)
             {
-                var ents = AI.Actor.Map.FindEntities(AI.Actor.Position, SightDistance);
+                var ents = AI.Actor.Map.FindEntitiesInRegion(AI.Actor.Position, SightDistance);
                 var possibles = new List<ActorInstance>();
                 foreach (var ent in ents)
                 {

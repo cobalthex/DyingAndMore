@@ -45,7 +45,7 @@ namespace DyingAndMore.Game
             }
             else
             {
-                var ents = instance.Map.FindEntities(instance.Position, Radius);
+                var ents = instance.Map.FindEntitiesInRegion(instance.Position, Radius);
                 foreach (var ent in ents)
                 {
                     if ((ent == instance.Source && !CanAffectSource) ||

@@ -86,7 +86,7 @@ namespace DyingAndMore.Game.Entities
 
         public void Spawn(EffectsInstance instance)
         {
-            var ents = instance.Map.FindEntities(instance.Position, Radius);
+            var ents = instance.Map.FindEntitiesInRegion(instance.Position, Radius);
             var rSq = Radius * Radius;
             foreach (var ent in ents)
             {
