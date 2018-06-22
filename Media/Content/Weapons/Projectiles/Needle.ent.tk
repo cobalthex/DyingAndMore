@@ -6,6 +6,7 @@ ProjectileClass {
     Range: 100000;
     Drag: 0.0;
     MinimumSpeed: 10;
+    MagnetismAnglePerSecond: 120deg;
 
     Trail: {
         MaxPoints: 20;
