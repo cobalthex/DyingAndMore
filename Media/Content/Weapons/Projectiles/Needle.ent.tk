@@ -6,15 +6,16 @@ ProjectileClass {
     Range: 100000;
     Drag: 0.0;
     MinimumSpeed: 10;
-    MagnetismAnglePerSecond: 120deg;
+    MagnetismAnglePerSecond: 400deg;
 
     Trail: {
-        MaxPoints: 20;
-        LifeSpan: 0.5sec;
+        MaxPoints: 2000;
+        LifeSpan: 1.5sec;
         CaptureDelay: 10msec;
         MergeCollinear: true;
         Sprite: @"Effects/Trails/Needler.png";
         SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
+        Color: Color.Black;
         SpriteScale: 2;
 
         width: {
@@ -27,6 +28,9 @@ ProjectileClass {
     }
 
     Animations: {
+        Dead: {
+
+        };
         Idle: {
             Sprite: {
                 Texture: @"./needle.png";
@@ -40,7 +44,7 @@ ProjectileClass {
                             Sprite: {
                                 Texture: @"Effects/trailglow.png";
                             };
-                            Blend: BlendState.NonPremultiplied;
+                            Blend: BlendState.Additive;
                             ColorOverTime: {
                                 Values: [
                                     [0 [255 0 255 255]];

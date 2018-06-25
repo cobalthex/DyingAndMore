@@ -74,6 +74,12 @@ namespace Takai.Game
         public float TimeScale { get; set; } = 1;
 
         /// <summary>
+        /// Real time passed in to update. Primarily used for slowing down update cycles
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public GameTime RealTime { get; protected set; }
+
+        /// <summary>
         /// Ents to destroy during the next Update()
         /// </summary>
         protected List<EntityInstance> entsToDestroy = new List<EntityInstance>(8);
@@ -97,6 +103,7 @@ namespace Takai.Game
         /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
         public void Update(GameTime realTime, Camera camera = null)
         {
+            RealTime = realTime;
             _updateStats = new MapUpdateStats();
 
             if (camera == null)

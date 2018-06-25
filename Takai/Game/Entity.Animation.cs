@@ -139,8 +139,9 @@ namespace Takai.Game
 
         public bool PlayAnimation(string animation, Action completionCallback = null)
         {
-            if (string.IsNullOrEmpty(animation) || Class.Animations == null || !Class.Animations.TryGetValue(animation, out var animClass))
+            if (string.IsNullOrEmpty(animation) && Class.Animations == null || !Class.Animations.TryGetValue(animation, out var animClass))
             {
+                //System.Diagnostics.Debug.WriteLine($"{this}: animation '{animation}' does not exist");
                 completionCallback?.Invoke();
                 return false;
             }
@@ -191,7 +192,6 @@ namespace Takai.Game
 
                 overlayAnimations.Add(instance);
             }
-
 
             Radius = Math.Max(Radius, animation.Radius);
             if (animation.Sprite != null)

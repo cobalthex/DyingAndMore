@@ -115,18 +115,7 @@ namespace DyingAndMore.Game.Entities
         public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
         {
             if (collider is WeaponPickupInstance wpi)
-            {
-                var weapon = wpi.Weapon;
-                if (Actor.Weapon != null && Actor.Weapon.Class == weapon.Class)
-                {
-                    Actor.Weapon.Combine(weapon);
-                    //if doesn't use all weapon ammo, store some?
-                }
-                else
-                    Actor.Weapon = weapon.Clone();
-
-                collider.Kill();
-            }
+                Actor.Weapon = wpi.ApplyTo(Actor.Weapon);
         }
     }
 }

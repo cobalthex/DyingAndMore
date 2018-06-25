@@ -203,7 +203,6 @@ namespace DyingAndMore.Game
             }
 
             Map.ActiveCamera = new Camera(player); //todo: resume control
-            x = false;
 
             gameHuds.RemoveAllChildren();
             if (player?.Hud != null)
@@ -218,18 +217,11 @@ namespace DyingAndMore.Game
                     + $"{time.Milliseconds:D3}";
         }
 
-        bool x = false;
         protected override void UpdateSelf(GameTime time)
         {
             GameInstance.Current.ElapsedRealTime += time.ElapsedGameTime;
             clockDisplay.Text = $"{GetClockText(GameInstance.Current.ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}x{Map.TimeScale:N1}{(IsPaused ? "\n -- PAUSED --" : "")}";
             clockDisplay.AutoSize();
-
-            if (!x)
-            {
-                x = true;
-                Cache.CleanupStaleReferences(); //todo: find better place for this (editor needs to be fully out of scope)
-            }
 
             if (!IsPaused)
             {
@@ -606,30 +598,30 @@ namespace DyingAndMore.Game
             {
                 foreach (var ent in Map.EnumerateVisibleEntities())
                 {
-                    if (!(ent is Entities.ActorInstance actor))
-                        continue;
-
-                    var pos = Map.ActiveCamera.WorldToScreen(actor.Position) + new Vector2(ent.Radius / 2 * Map.ActiveCamera.Scale);
+                    var pos = Map.ActiveCamera.WorldToScreen(ent.Position) + new Vector2(ent.Radius / 2 * Map.ActiveCamera.Scale);
 
                     var sb = new System.Text.StringBuilder();
-                    sb.Append($"{actor.Id}: ");
-                    sb.Append($"`f76{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}`x\n");
-                    if (actor.Weapon is Weapons.GunInstance gun)
-                        sb.Append($"`bcf{gun.AmmoCount} {gun.State} {gun.Charge:N2}`x\n");
-                    if (actor.Controller is Entities.AIController ai)
-                    {
-                        sb.Append($"`ad4{ai.Target}");
-                        for (int i = 0; i < ai.ChosenBehaviors.Length; ++i)
-                        {
-                            if (ai.ChosenBehaviors[i] != null)
-                            {
-                                sb.Append("\n");
-                                sb.Append(ai.ChosenBehaviors[i].ToString());
-                            }
-                        }
-                        sb.Append("`x\n");
-                    }
+                    sb.Append($"{ent.Id}: {string.Join(",", ent.ActiveAnimations)}\n");
 
+                    if (ent is Entities.ActorInstance actor)
+                    {
+                        sb.Append($"`f76{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}`x\n");
+                        if (actor.Weapon is Weapons.GunInstance gun)
+                            sb.Append($"`bcf{gun.AmmoCount} {gun.State} {gun.Charge:N2}`x\n");
+                        if (actor.Controller is Entities.AIController ai)
+                        {
+                            sb.Append($"`ad4{ai.Target}");
+                            for (int i = 0; i < ai.ChosenBehaviors.Length; ++i)
+                            {
+                                if (ai.ChosenBehaviors[i] != null)
+                                {
+                                    sb.Append("\n");
+                                    sb.Append(ai.ChosenBehaviors[i].ToString());
+                                }
+                            }
+                            sb.Append("`x\n");
+                        }
+                    }
                     DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
 
                     //draw trigger names

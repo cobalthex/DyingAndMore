@@ -7,12 +7,12 @@ EffectsClass {
                     Tween: TweenStyle.Overlap;
                 };
                 Blend: BlendState.Additive;
-                InitialSpeed: [50 100];
-                LifeSpan: [0.2sec 1sec];
+                InitialSpeed: [-20 -50];
+                LifeSpan: [0.2sec 0.5sec];
                 ScaleOverTime: {
                     Values: [
-                        [0 1];
-                        [1 0];
+                        [0 0];
+                        [1 1];
                     ];
                 };
                 ColorOverTime: {

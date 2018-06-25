@@ -29,6 +29,28 @@ namespace Takai.Game
             inst.ActiveCamera = new Camera(new Vector2(size / 2));
             return inst;
         }
+
+        /// <summary>
+        /// Get the collision value at a point on the map
+        /// </summary>
+        /// <param name="point">The point to check</param>
+        /// <returns>True if in the map, false otherwise</returns>
+        public bool GetCollisionValueAt(Vector2 point)
+        {
+            if (!Bounds.Contains(point))
+                return false;
+
+            var pp = (point / TileSize).ToPoint();
+            var cr = new Point((int)point.X % TileSize, (int)point.Y % TileSize);
+            var tile = Tiles[pp.Y, pp.X];
+            if (tile == -1)
+                return false;
+
+            var mask = cr.X + (cr.Y * TilesImage.Width);
+            mask += (tile % TilesPerRow) * TileSize;
+            mask += (tile / TilesPerRow) * TileSize * TilesImage.Width;
+            return CollisionMask[mask];
+        }
     }
 
     public partial class MapInstance
@@ -348,8 +370,9 @@ namespace Takai.Game
 
             var pos = start;
             var diff = (end - start);
+            var ndiff = Vector2.Normalize(diff);
             var n = Math.Max(Math.Abs(diff.X), Math.Abs(diff.Y)) / stepSize;
-            var delta = Vector2.Normalize(diff) * stepSize;
+            var delta = ndiff * stepSize;
 
             for (int i = 0; i < n; ++i)
             {
@@ -357,24 +380,49 @@ namespace Takai.Game
                 if (!Class.Bounds.Contains(pos))
                     return pos;
 
-                var tile = Class.Tiles[(int)pos.Y / Class.TileSize, (int)pos.X / Class.TileSize];
-                if (tile == -1)
+                bool inMap = Class.GetCollisionValueAt(Util.Round(pos));
+                if (!inMap)
+                {
+                    //walk back
+                    for (int j = 0; j < (int)stepSize; ++j)
+                    {
+                        var npos = pos - ndiff;
+                        if (Class.GetCollisionValueAt(npos))
+                            return npos;
+                        pos = npos;
+                    }
+
                     return pos;
+                }
 
-                var relPos = new Point((int)pos.X % Class.TileSize, (int)pos.Y % Class.TileSize);
-                var mask = relPos.X + (relPos.Y * Class.TilesImage.Width);
-                mask += (tile % Class.TilesPerRow) * Class.TileSize;
-                mask += (tile / Class.TilesPerRow) * Class.TileSize * Class.TilesImage.Width;
-
-                var collis = Class.CollisionMask[mask];
-                if (!collis)
-                    return pos;
-
-                //DrawRect(new Rectangle((int)pos.X, (int)pos.Y, 1, 1), Color.MintCream);
                 pos += delta;
             }
 
             return end;
+        }
+
+        /// <summary>
+        /// Approximate the tangent of the wall based on the collision at a point in the map
+        /// </summary>
+        /// <param name="collision"></param>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        public Vector2 GetTilesCollisionTangent(Vector2 collision, Vector2 direction)
+        {
+            var tangent = Util.Ortho(direction);
+            var a = Class.GetCollisionValueAt(Util.Round(collision - tangent));
+            var c = Class.GetCollisionValueAt(Util.Round(collision + tangent));
+
+            if (!a && c)
+                return Vector2.Normalize(direction + tangent);
+            if (a && !c)
+                return Vector2.Normalize(direction - tangent);
+
+            //todo: if -1 align to tile edge
+
+            //todo: needs work
+
+            return tangent;
         }
 
         public IEnumerable<MapSector> TraceSectors(Vector2 start, Vector2 direction, float maxDistance = 0)

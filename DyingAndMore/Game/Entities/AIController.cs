@@ -365,7 +365,6 @@ namespace DyingAndMore.Game.Entities
             return BehaviorPriority.Low;
         }
 
-
         public override void Think(TimeSpan deltaTime)
         {
             var diff = Vector2.Normalize(AI.Target.Position - AI.Actor.Position);

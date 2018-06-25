@@ -103,6 +103,7 @@ namespace DyingAndMore.Editor
             modes.AddMode(new EntitiesEditorMode(this));
             modes.AddMode(new PathsEditorMode(this));
             modes.AddMode(new TriggersEditorMode(this));
+            modes.AddMode(new TestEditorMode(this));
         }
 
         protected override void OnMapChanged(System.EventArgs e)
