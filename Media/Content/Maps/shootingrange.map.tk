@@ -11,25 +11,25 @@ MapClass {
             }
             EntitySpawn {
                 Class: @"Pickups/MG.ent.tk";
-                Position: [48.01904 144.759];
+                Position: [430.7063 48.2253];
                 Forward: [1 0];
                 Name: Null;
             }
             EntitySpawn {
                 Class: @"Pickups/TestPfx.ent.tk";
-                Position: [46.41661 237.6997];
+                Position: [142.9503 46.93073];
                 Forward: [1 0];
                 Name: Null;
             }
             EntitySpawn {
                 Class: @"Pickups/Tuber.ent.tk";
-                Position: [49.62146 48.61347];
+                Position: [239.2412 47.46425];
                 Forward: [1 0];
                 Name: Null;
             }
             EntitySpawn {
                 Class: @"Pickups/Bfg.ent.tk";
-                Position: [49.62146 333.8452];
+                Position: [334.6257 49.99015];
                 Forward: [1 0];
                 Name: Null;
             }
@@ -55,15 +55,7 @@ MapClass {
                 scale: 1;
             }
         ];
-        Triggers: [
-            TriggerClass {
-                Id: 1;
-                Name: "border";
-                Region: [528 0 48 386];
-                MaxUses: 0;
-                OnEnterCommands: Null;
-            }
-        ];
+        Triggers: [];
     };
     TilesImage: "Tilesets/Tiles2.png";
     Width: 256;

@@ -182,6 +182,7 @@ namespace DyingAndMore.Editor
                 var textPos = new Vector2(activeTrigger.Class.Region.X + 5, activeTrigger.Class.Region.Y + 5);
                 DefaultFont?.Draw(spriteBatch, activeTrigger.Class.Name, editor.Map.ActiveCamera.WorldToScreen(textPos), Color.White);
             }
+            base.DrawSelf(spriteBatch);
         }
     }
 }

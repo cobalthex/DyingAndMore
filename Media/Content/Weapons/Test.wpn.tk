@@ -1,7 +1,7 @@
 GunClass {
     Projectile: @"Weapons/Projectiles/Needle.ent.tk";
 
-    MaxAmmo: 2000;
+    MaxAmmo: 200;
     #RoundsPerBurst: 3;
     ProjectilesPerRound: 1;
     #MaxBursts: 3;
@@ -10,7 +10,7 @@ GunClass {
     DischargeTime: 400rpm;
     CooldownTime: 2sec;
     CanAlwaysCharge: true;
-    ErrorAngle: [-1deg 1deg]; # test
+    ErrorAngle: [-5deg 5deg]; # test
 
     DischargeEffect: {
         Effects: [

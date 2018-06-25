@@ -347,6 +347,15 @@ namespace Takai.Game
             IsAlive = false;
         }
 
+        public virtual void Resurrect()
+        {
+            if (IsAlive)
+                return;
+
+            PlayAnimation(Class.DefaultBaseAnimation);
+            IsAlive = true;
+        }
+
         /// <summary>
         /// Called when there is a collision between this instance and another
         /// </summary>

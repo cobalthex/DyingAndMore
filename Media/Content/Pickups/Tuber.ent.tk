@@ -1,8 +1,17 @@
 WeaponPickupClass {
 	Weapon: @"Weapons/Test.wpn.tk";
+    
+    RespawnTime: 3sec;
+    DestroyOnDeath: false;
 
     Animations: {
+        Dead: {
+            Name:"Dead";
+            EnterEffect: @"./Pickup.fx.tk";
+        };
         Idle: {
+            Name:"Idle";
+            EnterEffect: @"./PickupSpawn.fx.tk";
         	Sprite: {
                 texture: @"./TuberPickup.png";
                 width: 48;
@@ -14,6 +23,4 @@ WeaponPickupClass {
             };
         };
     };
-
-    DestructionEffect: @"./Pickup.fx.tk";
 }

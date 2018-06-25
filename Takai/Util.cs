@@ -74,6 +74,11 @@ namespace Takai
             return (a.X * b.Y) - (a.Y * b.X);
         }
 
+        public static Vector2 Round(this Vector2 v)
+        {
+            return new Vector2((float)Math.Round(v.X), (float)Math.Round(v.Y));
+        }
+
         /// <summary>
         /// Return a vector orthagonal to this one
         /// </summary>

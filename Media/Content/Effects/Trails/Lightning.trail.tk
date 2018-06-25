@@ -16,7 +16,7 @@ TrailClass {
 
     Jitter: [-20 20];
     SkipChance: 50%;
-    #CaptureDelay: 40Hz;
+    CaptureDelay: 240Hz;
     LifeSpan: 0.5sec;
 }
 

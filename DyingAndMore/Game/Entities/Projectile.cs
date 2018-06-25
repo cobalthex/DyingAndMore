@@ -91,6 +91,8 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         protected Vector2 origin; //origin angle?
 
+        protected TimeSpan nextTargetSearchTime;
+
         public ProjectileInstance() { }
         public ProjectileInstance(ProjectileClass @class)
             : base(@class)
@@ -98,7 +100,7 @@ namespace DyingAndMore.Game.Entities
 
         }
 
-        public override void Think(TimeSpan DeltaTime)
+        public override void Think(TimeSpan deltaTime)
         {
             if (IsAlive &&
                 (ForwardSpeed() < Class.MinimumSpeed ||
@@ -115,80 +117,74 @@ namespace DyingAndMore.Game.Entities
 
                 //todo: move to collision fx and destruction fx?
             }
-            else
+            else if (IsAlive)
             {
                 if (CurrentMagnet != null)
                 {
                     var diff = CurrentMagnet.Position - Position;
 
-                    if (CurrentMagnet.Map == Map && Vector2.Dot(diff, Forward) > 0)
+                    if (CurrentMagnet.IsAliveIn(Map) && Vector2.Dot(diff, Forward) > 0)
                     {
-
-                        var theta = Takai.Util.Angle(diff);
-
                         //todo: pid controller
 
-                        var fwdAngle = Takai.Util.Angle(Forward);
+                        var sign = Takai.Util.Determinant(Forward, Vector2.Normalize(diff));
 
-                        Forward = Takai.Util.Direction(MathHelper.Lerp(theta, fwdAngle, 0.05f));
+                        Forward = Vector2.TransformNormal(Forward, Matrix.CreateRotationZ(sign * Class.MagnetismAnglePerSecond * (float)deltaTime.TotalSeconds));
                         Velocity = Forward * Velocity.Length();
-
-                        //var diffAngle = MathHelper.Clamp(theta - fwdAngle, -Class.MagnetismAnglePerSecond, Class.MagnetismAnglePerSecond);
-                        //diffAngle *= (float)DeltaTime.TotalSeconds;
-                        //var mtx = Matrix.CreateRotationZ(diffAngle);
-                        //Forward = Vector2.TransformNormal(Forward, mtx);
-                        //Velocity = Vector2.TransformNormal(Velocity, mtx);
                     }
                     else
                         CurrentMagnet = null;
                 }
-                else if (Class.MagnetismAnglePerSecond != 0)
+                else if (Class.MagnetismAnglePerSecond != 0 && Map.RealTime.TotalGameTime >= nextTargetSearchTime)
                 {
-                    //set max think speed
-
-                    //search in line
-                    var minDot = 1f;
-                    var minDist = float.PositiveInfinity;
-                    ActorInstance best = null;
-
-                    var sourceFaction = Source is ActorInstance sourceActor ? sourceActor.Faction : Factions.None;
-
-                    int n = 0;
-                    foreach (var sector in Map.TraceSectors(Position, Forward, 1000)) //todo: limit distance by forward speed?
-                    {
-                        ++n;
-                        foreach (var ent in sector.entities)
-                        {
-                            if (ent != this && ent is ActorInstance actor && !actor.IsAlliedWith(sourceFaction))
-                            {
-                                var diff = ent.Position - Position;
-                                var length = diff.Length();
-                                var norm = diff / length;
-                                var dot = Vector2.Dot(norm, Forward);
-
-                                if (dot <= 0)
-                                    return;
-
-                                if (length < minDist || (length == minDist && dot < minDot))
-                                {
-                                    best = actor;
-                                    minDot = dot;
-                                    minDist = length;
-                                }
-                            }
-                        }
-
-                        if (best != null)
-                        {
-                            CurrentMagnet = best;
-                            System.Diagnostics.Debug.WriteLine($"{this} magnetized to {CurrentMagnet}");
-                            break;
-                        }
-                    }
+                    CurrentMagnet = FindTarget();
+                    nextTargetSearchTime = Map.RealTime.TotalGameTime + TimeSpan.FromMilliseconds(50); //store delay in editor config?
                 }
             }
 
-            base.Think(DeltaTime);
+            base.Think(deltaTime);
+        }
+
+        public ActorInstance FindTarget()
+        {
+            //search in line
+            var minDot = 1f;
+            var minDist = float.PositiveInfinity;
+            ActorInstance best = null;
+
+            var sourceFaction = Source is ActorInstance sourceActor ? sourceActor.Faction : Factions.None;
+
+            int n = 0;
+            //search out in triangle?
+            foreach (var sector in Map.TraceSectors(Position, Forward, Class.Range))
+            {
+                ++n;
+                foreach (var ent in sector.entities)
+                {
+                    if (ent != this && ent is ActorInstance actor && !actor.IsAlliedWith(sourceFaction))
+                    {
+                        var diff = ent.Position - Position;
+                        var length = diff.Length();
+                        var norm = diff / length;
+                        var dot = Vector2.Dot(norm, Forward);
+
+                        if (dot <= 0)
+                            continue;
+
+                        if (length < minDist || (length == minDist && dot < minDot))
+                        {
+                            best = actor;
+                            minDot = dot;
+                            minDist = length;
+                        }
+                    }
+                }
+
+                if (best != null)
+                    break;
+            }
+
+            return best;
         }
 
         public override void OnSpawn()

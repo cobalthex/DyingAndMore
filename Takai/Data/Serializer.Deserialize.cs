@@ -171,6 +171,9 @@ namespace Takai.Data
                         context.AddPending(pr);
                     }
 
+                    if (dict.ContainsKey(keyStr))
+                        System.Diagnostics.Debug.WriteLine($"Property '{keyStr}' was duplicated in {context.file}");
+
                     dict[keyStr] = value;
 
                     SkipIgnored(context.reader);
@@ -280,13 +283,13 @@ namespace Takai.Data
                 return ReadString(context.reader);
 
             string word;
-            do
-            {
-                if (peek == '-' || peek == '+' || peek == '.')
-                    word = (char)context.reader.Read() + ReadWord(context.reader);
-                else
-                    word = ReadWord(context.reader);
-            } while (context.reader.Peek() > 0 && word.Length < 1);
+            if (peek == '-' || peek == '+' || peek == '.')
+                word = (char)context.reader.Read() + ReadWord(context.reader);
+            else
+                word = ReadWord(context.reader);
+
+            if (word.Length == 0)
+                throw new Exception("Invalid char: " + (char)peek); //todo: proper exception
 
             if ("-+.".Contains(word[0]) || char.IsDigit(word[0])) //maybe handle ,
             {

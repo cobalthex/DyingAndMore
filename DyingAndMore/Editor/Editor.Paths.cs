@@ -119,6 +119,7 @@ namespace DyingAndMore.Editor
             editor.Map.Spawn(trail);
             foreach (var path in paths)
                 DrawPath(path);
+            base.DrawSelf(spriteBatch);
         }
     }
 }

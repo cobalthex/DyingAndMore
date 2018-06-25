@@ -43,3 +43,9 @@ Stuff to do in the future
 	visible from code, and deserializer as &var.taco
 
 0. default button in UI (click enter in text box to submit)
+
+0. player input system
+
+0. collision graph (necessary?) Dictionary<Collider, HashSet<Collider>>
+
+0. Think only when alive?
