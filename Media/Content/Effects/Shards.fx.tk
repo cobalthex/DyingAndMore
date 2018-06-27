@@ -1,0 +1,28 @@
+EffectsClass {
+	Effects: [
+		ParticleEffect {
+            Class: {
+                Sprite: @"./spark.png";
+                Blend: BlendState.Additive;
+                ColorOverTime: Color.HotPink;
+                InitialSpeed: [-300 -400];
+                LifeSpan: [0.15sec 1sec];
+                Drag: 8;
+            }
+            Count: [3 8];
+            Spread: [-80deg -50deg];
+        };
+        ParticleEffect {
+            Class: {
+                Sprite: @"./spark.png";
+                Blend: BlendState.Additive;
+                ColorOverTime: Color.HotPink;
+                InitialSpeed: [-300 -400];
+                LifeSpan: [0.15sec 1sec];
+                Drag: 8;
+            }
+            Count: [3 8];
+            Spread: [50deg 80deg];
+        };
+	];
+};

@@ -1,0 +1,17 @@
+Proposed render system for game
+===============================
+
+Submit sprites, meshes, lines, etc to render system
+
+Specify explicit passes (bound buffers, render targets, etc) -- barriers
+
+dynamic vertex buffer built up and multiple textures bound and single draw call issued
+
+instancing used, draw as many objects as possible under number of bounds slots. broken up by shader
+
+apply all state at once (blend,raster,shader,etc)
+
+render sort option?
+
+
+Renders grouped by state, then texture

@@ -209,10 +209,16 @@ namespace Takai.Game
                                     if (isMapCollisionEnabled) //cleanup
                                     {
                                         entity.Position = target;
-                                        entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
+
+                                        var interaction = Class.MaterialInteractions.Find(entity.Material, Class.TilesMaterial);
 
                                         //todo: improve
-                                        entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;
+                                        entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;6
+
+                                        if (interaction.Effect != null)
+                                            Spawn(interaction.Effect.Instantiate(entity));
+
+                                        entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
                                     }
                                 }
                                 else if (isEntityCollisionEnabled)
@@ -226,14 +232,19 @@ namespace Takai.Game
                                         depth = deltaVLen - hit.distance //todo: distance between origins minus radii
                                     };
 
-                                    entity.OnEntityCollision(hit.entity, cm, deltaTime);
-                                    hit.entity.OnEntityCollision(entity, cm.Reciprocal(), deltaTime);
+                                    var interaction = Class.MaterialInteractions.Find(entity.Material, hit.entity.Material);
 
                                     if (entity.Class.IsPhysical)
                                     {
                                         var diff = Vector2.Normalize(hit.entity.Position - entity.Position);
                                         entity.Velocity -= diff * Vector2.Dot(entity.Velocity, diff);
                                     }
+
+                                    if (interaction.Effect != null)
+                                        Spawn(interaction.Effect.Instantiate(entity, hit.entity));
+
+                                    entity.OnEntityCollision(hit.entity, cm, deltaTime);
+                                    hit.entity.OnEntityCollision(entity, cm.Reciprocal(), deltaTime);
                                 }
                             }
 

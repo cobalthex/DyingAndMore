@@ -19,6 +19,8 @@ ActorClass {
             Sound: {
                 #Sound: "mech8.ogg";
             }
+
+            Material: "Player";
         };
     };
 

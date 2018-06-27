@@ -4,6 +4,9 @@ MapClass {
     Width: 20;
     Height: 20;
     TileBounds: [0 0 20 20];
+
+    MaterialInteractions: @"Materials/Test.mtl.tk";
+
     InitialState: InitialMapState {
         Entities: [
             EntitySpawn {
