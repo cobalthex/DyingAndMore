@@ -1,7 +1,7 @@
 GunClass {
     Projectile: @"Weapons/Projectiles/Needle.ent.tk";
 
-    MaxAmmo: 200;
+    MaxAmmo: 400;
     #RoundsPerBurst: 3;
     ProjectilesPerRound: 1;
     #MaxBursts: 3;

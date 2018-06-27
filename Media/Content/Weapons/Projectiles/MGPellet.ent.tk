@@ -7,8 +7,6 @@ ProjectileClass {
     Drag: 1.0;
     MinimumSpeed: 100;
 
-    Trail: @"Effects/Trails/Lightning.trail.tk";
-
     Animations: {
         Idle: {
             Sprite: {
@@ -17,6 +15,7 @@ ProjectileClass {
                 IsLooping: true;
                 Origin: [0 0];
             };
+            Material: "Brass";
         }
     }
 }

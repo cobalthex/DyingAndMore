@@ -6,7 +6,7 @@ ActorClass {
     Animations: {
         Idle: {
             Sprite: @"./target.png";
-            Material: @"Materials/Default.mtl.tk";
+            Material: "Target";
         };
     };
 

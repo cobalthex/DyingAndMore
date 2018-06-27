@@ -29,7 +29,7 @@ namespace Takai.Game
         //todo: sprite loop frame?
         public Graphics.Sprite Sprite { get; set; }
 
-        public Material Material { get; set; }
+        public string Material { get; set; } = "";
 
         /// <summary>
         /// Looping state sound
@@ -135,7 +135,7 @@ namespace Takai.Game
             }
         }
 
-        public Material Material => baseAnimation.Class?.Material;
+        public string Material => baseAnimation.Class?.Material;
 
         public bool PlayAnimation(string animation, Action completionCallback = null)
         {

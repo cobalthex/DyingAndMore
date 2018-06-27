@@ -15,7 +15,12 @@ ProjectileClass {
         MergeCollinear: true;
         Sprite: @"Effects/Trails/Needler.png";
         SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
-        Color: Color.Black;
+        Color: {
+            Values: [
+                [0 [0 0 1 255]];
+                [1 Color.Purple];
+            ]
+        }
         SpriteScale: 2;
 
         width: {
@@ -36,6 +41,7 @@ ProjectileClass {
                 Texture: @"./needle.png";
                 Origin: [28 0];
             };
+            Material: "Needle";
 
             Effect: {
                 Effects: [

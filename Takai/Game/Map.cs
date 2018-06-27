@@ -102,6 +102,10 @@ namespace Takai.Game
         /// </summary>
         public InitialMapState InitialState { get; set; } //todo: lazy
 
+        public MaterialInteractions MaterialInteractions { get; set; } = new MaterialInteractions();
+
+        public string TilesMaterial { get; set; } = "Tiles";
+
         public MapInstance Instantiate()
         {
             var instance = new MapInstance(this);
@@ -138,7 +142,6 @@ namespace Takai.Game
 
             return instance;
         }
-
     }
 
     /// <summary>

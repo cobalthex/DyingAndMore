@@ -782,6 +782,17 @@ namespace Takai.Data
 
                 //if (genericType is typeof(Lazy<>))
 
+                //implicit cast (limited support)
+                if (genericArgs.Length == 1 && !sourceTypeInfo.IsGenericType)
+                {
+                    var implCast = destType.GetMethod("op_Implicit", new[] { genericArgs[0] });
+                    if (implCast != null)
+                    {
+                        var genericCvt = Cast(genericArgs[0], source, context);
+                        return implCast.Invoke(null, new[] { genericCvt });
+                    }
+                }
+
                 //todo: support any number of items in tuple
                 if (genericType == typeof(Tuple<,>))
                 {
@@ -791,13 +802,6 @@ namespace Takai.Data
                     for (int i = 0; i < sourceList.Count; ++i)
                         sourceList[i] = Cast(genericArgs[i], sourceList[i], context);
                     return Activator.CreateInstance(destType, sourceList.ToArray());
-                }
-
-                if (genericType == typeof(List<>))
-                {
-                    sourceList = sourceList.Select(i => Cast(genericArgs[0], i, context)).ToList(); //todo: List.ConvertAll (doesn't work on .net core)
-                    var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
-                    return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
                 }
 
                 //if (typeof(IEnumerable<>).IsAssignableFrom(genericType) && genericArgs.Count() == 1)
@@ -829,15 +833,11 @@ namespace Takai.Data
                     return dict;
                 }
 
-                //implicit cast (limited support)
-                if (genericArgs.Length == 1 && !sourceTypeInfo.IsGenericType)
+                if (genericType == typeof(List<>) || genericType == typeof(IEnumerable<>))
                 {
-                    var implCast = destType.GetMethod("op_Implicit", new[] { genericArgs[0] });
-                    if (implCast != null)
-                    {
-                        var genericCvt = Cast(genericArgs[0], source, context);
-                        return implCast.Invoke(null, new[] { genericCvt });
-                    }
+                    sourceList = sourceList.Select(i => Cast(genericArgs[0], i, context)).ToList(); //todo: List.ConvertAll (doesn't work on .net core)
+                    var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
+                    return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
                 }
             }
 
