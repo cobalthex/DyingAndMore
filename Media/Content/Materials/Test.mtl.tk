@@ -1,11 +1,11 @@
 MaterialInteractions {
     Interactions: [
         ["Player" "Tiles" MaterialInteraction {
-            Effect: @"Effects/trail.fx.tk";    
+            Effect: @"Effects/trail.fx.tk";
         }]
-        
+
         ["Brass" "Target" MaterialInteraction {
-            Effect: @"Effects/Sparks.fx.tk";    
+            Effect: @"Effects/Sparks.fx.tk";
         }]
         ["Brass" "Tiles" MaterialInteraction {
             Effect: @"Effects/Sparks.fx.tk";
@@ -14,13 +14,7 @@ MaterialInteractions {
             Effect: @"Effects/Sparks.fx.tk";
         }]
 
-        ["Needle" "Tiles" MaterialInteraction {
-            Effect: @"Effects/Shards.fx.tk";
-        }]
-        ["Needle" "Target" MaterialInteraction {
-            Effect: @"Effects/Shards.fx.tk";
-        }]
-        ["Needle" "" MaterialInteraction {
+        ["Needle" "*" MaterialInteraction {
             Effect: @"Effects/Shards.fx.tk";
         }]
     ];

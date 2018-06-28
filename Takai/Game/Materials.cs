@@ -26,6 +26,8 @@ namespace Takai.Game
 
     public class MaterialInteractions
     {
+        public const string AnyInteraction = "*";
+
         public struct MaterialInteractionPair
         {
             public string materialA;
@@ -76,8 +78,6 @@ namespace Takai.Game
             if (materialA == null || materialB == null)
                 return;
 
-            //default interactions? (*)
-
             AddInteractionSingle(materialA, materialB, interaction);
             AddInteractionSingle(materialB, materialA, interaction);
         }
@@ -92,9 +92,21 @@ namespace Takai.Game
         public MaterialInteraction Find(string materialA, string materialB)
         {
             MaterialInteraction mat = new MaterialInteraction();
-            if (materialA != null && materialB != null &&
-                interactions.TryGetValue(materialA, out var inner))
-                inner.TryGetValue(materialB, out mat);
+            if (materialA != null && materialB != null)
+            {
+                if (interactions.TryGetValue(materialA, out var inner))
+                {
+                    if (!inner.TryGetValue(materialB, out mat))
+                        inner.TryGetValue(AnyInteraction, out mat);
+                }
+                else if (interactions.TryGetValue(materialB, out inner))
+                {
+                    if (!inner.TryGetValue(materialA, out mat))
+                        inner.TryGetValue(AnyInteraction, out mat);
+                }
+                else if (interactions.TryGetValue(AnyInteraction, out inner))
+                    inner.TryGetValue(AnyInteraction, out mat);
+            }
             return mat;
         }
     }
