@@ -24,9 +24,11 @@ namespace Takai.Game
         //refraction (reflection offset jitter?)
     }
 
-    public class MaterialInteractions
+    public class MaterialInteractions : Data.ISerializeExternally
     {
-        public const string AnyInteraction = "*";
+        public string File { get; set; }
+
+        public const string AnyMaterial = "*";
 
         public struct MaterialInteractionPair
         {
@@ -92,21 +94,25 @@ namespace Takai.Game
         public MaterialInteraction Find(string materialA, string materialB)
         {
             MaterialInteraction mat = new MaterialInteraction();
-            if (materialA != null && materialB != null)
+
+            if (materialA == null)
+                materialA = AnyMaterial;
+            if (materialB == null)
+                materialB = AnyMaterial;
+
+            if (interactions.TryGetValue(materialA, out var inner))
             {
-                if (interactions.TryGetValue(materialA, out var inner))
-                {
-                    if (!inner.TryGetValue(materialB, out mat))
-                        inner.TryGetValue(AnyInteraction, out mat);
-                }
-                else if (interactions.TryGetValue(materialB, out inner))
-                {
-                    if (!inner.TryGetValue(materialA, out mat))
-                        inner.TryGetValue(AnyInteraction, out mat);
-                }
-                else if (interactions.TryGetValue(AnyInteraction, out inner))
-                    inner.TryGetValue(AnyInteraction, out mat);
+                if (!inner.TryGetValue(materialB, out mat))
+                    inner.TryGetValue(AnyMaterial, out mat);
             }
+            else if (interactions.TryGetValue(materialB, out inner))
+            {
+                if (!inner.TryGetValue(materialA, out mat))
+                    inner.TryGetValue(AnyMaterial, out mat);
+            }
+            else if (interactions.TryGetValue(AnyMaterial, out inner))
+                inner.TryGetValue(AnyMaterial, out mat);
+
             return mat;
         }
     }

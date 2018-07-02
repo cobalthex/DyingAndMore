@@ -11,8 +11,7 @@ ProjectileClass {
     Trail: {
         MaxPoints: 2000;
         LifeSpan: 1.5sec;
-        CaptureDelay: 10msec;
-        MergeCollinear: true;
+        CaptureDelay: 30Hz;
         Sprite: @"Effects/Trails/Needler.png";
         SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
         Color: {

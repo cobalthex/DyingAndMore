@@ -9,24 +9,86 @@ GunClass {
     DischargeTime: 800rpm;
     ErrorAngle: [-4deg 4deg];
 
-    DischargeEffect: { #move to spawn effect on projectile?
+
+    DischargeEffect: {
         Effects: [
+            RandomEffect {
+                Effects: [
+                    ParticleEffect {
+                        Class: {
+                            Sprite: {
+                                Texture: @"./MuzzleFlash.png";
+                                width: 48;
+                                height: 48;
+                                frameLength: 20msec;
+                                frameCount: 4;
+                            };
+                            Blend: BlendState.AlphaBlend;
+                            InitialSpeed: [0 0];
+                            Drag: 1.3;
+                            LifeSpan: [80msec 80msec];
+                        };
+                        Count: [3 12];
+                        Spread: [-30deg 30deg];
+                    }
+
+                    ParticleEffect {
+                        Class: {
+                            Sprite: {
+                                Texture: @"./MuzzleFlash2.png";
+                                width: 48;
+                                height: 48;
+                                frameLength: 20msec;
+                                frameCount: 4;
+                            };
+                            Blend: BlendState.AlphaBlend;
+                            InitialSpeed: [0 0];
+                            Drag: 1.3;
+                            LifeSpan: [80msec 80msec];
+                        }
+                        Count: [3 12];
+                        Spread: [-30deg 30deg];
+                    };
+                ];
+            };
             ParticleEffect {
                 Class: {
                     Sprite: {
-                        Texture: @"./MuzzleFlash.png";
-                        width: 48;
-                        height: 48;
-                        frameLength: 40msec;
-                        frameCount: 4;
+                        Texture: @"./ejection.png";
+                        width: 8;
+                        height: 8;
+                        frameLength: 20msec;
+                        frameCount: 1;
+                        IsLooping: true;
                     };
-                    Blend: BlendState.AlphaBlend;
-                    InitialSpeed: [0 0];
-                    Drag: 1.3;
-                    LifeSpan: [160msec 160msec];
+                    Blend: BlendState.NonPremultiplied;
+                    InitialSpeed: [200 400];
+                    Drag: 1.5;
+                    LifeSpan: 800msec;
+                    ColorOverTime: {
+                        Reverse: true;
+                        Values: [
+                            [0 Color.White];
+                            [1 Color.Transparent];
+                        ];
+                    };
+
+                    ScaleOverTime: {
+                        Values: [
+                            [0 1]
+                            [1 0.5]
+                        ];
+                    };
+
+                    SpinOverTime: {
+                        Values: [
+                            [0 0]
+                            [1 3pi]
+                        ];
+                    };
                 }
-                Count: [3 12];
-                Spread: [-30deg 30deg];
+                Count: 1;
+                Spread: [-120deg -60deg];
             };
         ]
     }

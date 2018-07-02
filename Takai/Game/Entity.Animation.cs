@@ -29,7 +29,10 @@ namespace Takai.Game
         //todo: sprite loop frame?
         public Graphics.Sprite Sprite { get; set; }
 
-        public string Material { get; set; } = "";
+        /// <summary>
+        /// The name of the material for this animation. Mainly for physics
+        /// </summary>
+        public string Material { get; set; }
 
         /// <summary>
         /// Looping state sound

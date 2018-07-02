@@ -1,12 +1,6 @@
 MapClass {
     Name: "playground";
     TileSize: 48;
-    Width: 20;
-    Height: 20;
-    TileBounds: [0 0 20 20];
-
-    MaterialInteractions: @"Materials/Test.mtl.tk";
-
     InitialState: InitialMapState {
         Entities: [
             EntitySpawn {
@@ -25,6 +19,12 @@ MapClass {
                 Class: @"Scenery/Smoke.ent.tk";
                 Position: [452.8261 582.2051];
                 Forward: [-4.371139E-08 -1];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Pickups/MG.ent.tk";
+                Position: [33.81819 301.0909];
+                Forward: [1 0];
                 Name: Null;
             }
         ];
@@ -350,7 +350,12 @@ MapClass {
                 scale: 1;
             }
         ];
+        Triggers: [];
     };
-    TilesImage: @"Tilesets/Tiles2.png";
+    MaterialInteractions: @"Materials/Test.mtl.tk";
+    TilesMaterial: "Tiles";
+    TilesImage: "Tilesets/Tiles2.png";
+    Width: 20;
+    Height: 20;
     Tiles: [0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 22 0 0 0 23 0 0 0 22 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 24 25 0 0 50 0 0 0 -1 0 0 0 0 15 14 0 0 0 0 0 26 27 0 0 -1 14 0 0 13 -1 -1 -1 -1 -1 12 0 0 0 0 0 0 0 0 0 -1 -1 14 0 0 13 -1 -1 -1 -1 0 0 0 -1 -1 -1 0 -1 -1 -1 -1 -1 -1 14 0 0 -1 -1 -1 -1 0 0 0 -1 28 29 0 -1 -1 -1 -1 -1 -1 -1 14 0 13 -1 -1 -1 0 0 0 -1 30 31 0 -1 -1 -1 -1 8 0 9 -1 14 0 -1 -1 -1 0 0 0 -1 -1 -1 0 -1 -1 -1 -1 0 0 0 -1 -1 14 13 -1 -1 0 0 0 -1 -1 -1 0 -1 -1 -1 -1 0 0 0 13 -1 -1 14 13 -1 0 0 0 0 0 -1 0 0 -1 0 0 0 0 0 0 13 -1 -1 14 13 0 0 0 0 0 -1 -1 0 -1 0 0 0 0 0 0 0 -1 -1 -1 14 0 0 0 0 -1 -1 0 0 -1 0 0 0 0 0 0 0 13 4 4 12 0 0 0 0 0 -1 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 55 0 0 -1 14 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 47 -1 0 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 26 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
 }

@@ -2,7 +2,7 @@ EffectsClass {
 	Effects: [
 		ParticleEffect {
             Class: {
-                Sprite: @"./spark.png";
+            Sprite: @"./spark.png";
                 Blend: BlendState.Additive;
                 ScaleOverTime: {
                     values: [
@@ -10,12 +10,19 @@ EffectsClass {
                         [1 0];
                     ];
                 };
-                InitialSpeed: [-100 -200];
-                LifeSpan: [0.15sec 0.35sec];
-                Drag: 5;
+                ColorOverTime: {
+                    values: [
+                        [0 Color.White];
+                        [1 Color.Red];
+                    ];
+                };
+                InitialSpeed: [-100 -400];
+                LifeSpan: [0.15sec 0.55sec];
+                Drag: 15;
             }
-            Count: [10 20];
+            Count: [5 10];
             Spread: [-50deg 50deg];
+            Radius: 3;
         };
 	];
 };
