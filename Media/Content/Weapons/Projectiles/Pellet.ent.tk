@@ -9,6 +9,7 @@ ProjectileClass {
 
     Animations: {
         Idle: {
+            Material: "Brass";
             Sprite: {
                 Texture: @"./Tracer.png";
                 Height: 1;
@@ -18,32 +19,5 @@ ProjectileClass {
                 Origin: [0 0];
             };
         }
-    }
-
-    DestructionEffect: {
-        Effects: [
-            ParticleEffect {
-                Class: {
-                    Sprite: {
-                        Texture: @"./Pellet.png";
-                        height: 1;
-                        frameLength: 50msec;
-                        frameCount: 4;
-                    };
-                    Blend: BlendState.NonPremultiplied;
-                    InitialSpeed: [200 600];
-                    Drag: 10;
-                    LifeSpan: [200msec 300msec];
-                    ColorOverTime: {
-                        Values: [
-                            [0 Color.White];
-                            [1 [127 127 127 0]];
-                        ];
-                    };
-                }
-                Count: [3 12];
-                Spread: [120deg 230deg];
-            };
-        ]
     }
 }

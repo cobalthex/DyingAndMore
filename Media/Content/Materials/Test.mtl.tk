@@ -4,18 +4,14 @@ MaterialInteractions {
             Effect: @"Effects/trail.fx.tk";
         }]
 
-        ["Brass" "Target" MaterialInteraction {
-            Effect: @"Effects/Sparks.fx.tk";
-        }]
-        ["Brass" "Tiles" MaterialInteraction {
-            Effect: @"Effects/Sparks.fx.tk";
-        }]
-        ["Brass" "" MaterialInteraction {
+        ["Brass" "*" MaterialInteraction {
+            ReflectAngle: [-50deg 50deg];
             Effect: @"Effects/Sparks.fx.tk";
         }]
 
         ["Needle" "*" MaterialInteraction {
             Effect: @"Effects/Shards.fx.tk";
+            ReflectAngle: [-50deg 50deg];
         }]
     ];
 }

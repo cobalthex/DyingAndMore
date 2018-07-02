@@ -231,7 +231,6 @@ namespace DyingAndMore.Game.Weapons
             }
         }
 
-
         public virtual bool CanUse(TimeSpan totalTime)
         {
             return !IsDepleted();

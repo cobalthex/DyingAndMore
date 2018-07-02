@@ -212,13 +212,23 @@ namespace Takai.Game
 
                                         var interaction = Class.MaterialInteractions.Find(entity.Material, Class.TilesMaterial);
 
-                                        //todo: improve
-                                        entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;6
+                                        var tangent = GetTilesCollisionTangent(target, normV);
+                                        tangent = Vector2.UnitX;
+                                        var colNorm = tangent.Ortho();
+                                        if (interaction.ReflectAngle.Contains(Math.Abs(Vector2.Dot(colNorm, normV)) * MathHelper.Pi))
+                                        {
+                                            //add remaining distance to relfection? (trace that)
+                                            entity.Velocity = Vector2.Reflect(entity.Velocity, colNorm);
+                                            entity.Forward = Vector2.Reflect(entity.Forward, colNorm);
+                                        }
+                                        else
+                                            //todo: improve
+                                            entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;6
 
                                         if (interaction.Effect != null)
                                             Spawn(interaction.Effect.Instantiate(entity));
 
-                                        entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
+                                        //entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
                                     }
                                 }
                                 else if (isEntityCollisionEnabled)
