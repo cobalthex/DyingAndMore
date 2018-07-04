@@ -18,4 +18,24 @@ ProjectileClass {
             Material: "Brass";
         }
     }
+
+    Trail: {
+        MaxPoints: 20;
+        LifeSpan: 0.15sec;
+        CaptureDelay: 30Hz;
+        SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
+        Color: {
+            Values: [
+                [0 [30 30 30 64]];
+                [1 [192 192 30 192]];
+            ]
+        }
+
+        width: {
+            values: [
+                [0 1]
+                [1 1]
+            ]
+        }
+    }
 }

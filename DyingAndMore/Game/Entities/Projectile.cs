@@ -190,6 +190,10 @@ namespace DyingAndMore.Game.Entities
         public override void OnSpawn()
         {
             origin = Position;
+            if (Class.InheritSourcePhysics) //todo: this should be part of entity spawning?
+            {
+                Velocity += Source.Velocity;
+            }
         }
 
         public override void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime)

@@ -396,6 +396,9 @@ namespace Takai.Game
         /// </summary>
         public virtual void OnDestroy()
         {
+            if (Trail != null && Velocity != Vector2.Zero)
+                Trail.AddPoint(Position, Vector2.Normalize(Velocity));
+
             if (!DisableNextDestructionEffect)
             {
                 var fx = Class.DestructionEffect?.Instantiate(this);
