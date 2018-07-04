@@ -1,11 +1,20 @@
 ActorClass {
     Name: "Shooter Test";
-    MaxHealth: 50;
+    MaxHealth: 500;
+
+    FieldOfView: 2.356194;
+    MaxSpeed: [300 400];
+    MoveForce: 600;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: False;
+
     DefaultFaction: Factions [Enemy];
 
     DefaultController: AIController {
         Behaviors: [
             TargetEnemyBehavior {};
+            FlowSeekBehavior {};
             ShootBehavior {};
         ];
     };
@@ -25,11 +34,4 @@ ActorClass {
             };
         };
     };
-
-    FieldOfView: 2.356194;
-    MaxSpeed: [400 400];
-    MoveForce: 600;
-    IsPhysical: True;
-    IgnoreTrace: False;
-    AlwaysDrawUpright: False;
 }
