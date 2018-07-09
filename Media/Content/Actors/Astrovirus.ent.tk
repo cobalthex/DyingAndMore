@@ -1,7 +1,7 @@
 ActorClass {
     Name: "Astrovirus";
     MaxHealth: 40;
-    DefaultFaction: Factions [Enemy Common];
+    DefaultFaction: Factions.Enemy;
 
     FieldOfView: 2.356194;
     MaxSpeed: [50 200];

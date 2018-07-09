@@ -70,7 +70,7 @@ GunClass {
 
                     CollisionEffect: {
                         Effects: [
-                            #*AreaHealthEffect {
+                            #*HealthEffect {
                                 MaxDamage: 3;
                                 Radius: 0;
                                 CanAffectSource: false;

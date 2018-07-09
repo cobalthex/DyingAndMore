@@ -12,7 +12,7 @@ ProjectileClass {
 
     Trail: {
         MaxPoints: 200;
-        Color: Color.Cyan;
+        Color: Color.Gray;
         LifeSpan: 0.5sec;
         Width: {
             Values: [
@@ -24,13 +24,18 @@ ProjectileClass {
 
     FadeEffect: {
         Effects: [
-            AreaHealthEffect {
-                MaxDamage: 1000;
+            HealthEffect {
+                MaxDamage: 10000;
                 Radius: 20;
             };
 
             ForceEffect {
                 Force: 8000;
+            }
+
+            CameraJerkEffect {
+                Tilt: [-10 10];
+                Jitter: [-10 10];
             }
 
             ParticleEffect {

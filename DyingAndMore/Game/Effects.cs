@@ -4,9 +4,9 @@ using Takai.Game;
 namespace DyingAndMore.Game
 {
     /// <summary>
-    /// An area of effect damage/boon (for example, grenade)
+    /// A focused or area health (damage or boon) effect (for example, grenade) on actors
     /// </summary>
-    public class AreaHealthEffect : IGameEffect
+    public class HealthEffect : IGameEffect
         //todo: rename to health effect
     {
         public float MaxDamage { get; set; }
@@ -40,7 +40,6 @@ namespace DyingAndMore.Game
                     var distSq = Vector2.DistanceSquared(instance.Position, instance.Target.Position);
                     if (distSq <= rSq)
                         targetActor.ReceiveDamage(MaxDamage * (rSq - distSq) / rSq, instance.Source); //falloff curve?
-
                 }
             }
             else

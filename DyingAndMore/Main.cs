@@ -140,7 +140,7 @@ namespace DyingAndMore
 
             Takai.Data.Serializer.LoadTypesFrom(typeof(DyingAndMoreGame).GetTypeInfo().Assembly);
 #if DEBUG
-            Takai.Data.Cache.WatchDirectory(Takai.Data.Cache.DefaultRoot);
+            Takai.Data.Cache.WatchDirectory(Takai.Data.Cache.Root);
 #endif
 
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
@@ -170,7 +170,7 @@ namespace DyingAndMore
 
             debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
 
-
+            /*
 #if WINDOWS //UWP launch activation parameters?
             //parse command line args
             var args = System.Environment.GetCommandLineArgs();
@@ -194,7 +194,7 @@ namespace DyingAndMore
                     map.InitializeGraphics();
                     var instance = map.Instantiate();
                     if (presetMode == "game")
-                        ui = new Takai.UI.Static(new Game.Game(instance));
+                        ui = new Takai.UI.Static(new Game.GameInstance(new Game.Game { Map = instance }));
                     else
                         ui = new Takai.UI.Static(new Editor.Editor(instance));
                     return;
@@ -202,7 +202,6 @@ namespace DyingAndMore
                 catch (System.IO.FileNotFoundException) { }
             }
 #endif
-
             ui = Takai.Data.Cache.Load<Takai.UI.Static>("UI/NoMap.ui.tk");
             var mapList = ui.FindChildByName< Takai.UI.FileList>("maps");
             mapList.SelectionChanged += delegate
@@ -256,6 +255,24 @@ namespace DyingAndMore
 
                 ui.ReplaceAllChildren(newMapUi);
             };
+            */
+
+            var storySelect = new Game.StorySelect
+            {
+                Size = new Vector2(400),
+                HorizontalAlignment = Takai.UI.Alignment.Middle,
+                VerticalAlignment = Takai.UI.Alignment.Middle,
+            };
+            storySelect.StorySelected += delegate (object _sender, Game.GameStory story)
+            {
+                var game = new Game.Game
+                {
+                    Story = story,
+                };
+                game.LoadNextStoryMap();
+                ui.ReplaceAllChildren(new Game.GameInstance(game));
+            };
+            ui = new Takai.UI.Static(storySelect);
 
             fpsGraph = new Takai.FpsGraph()
             {

@@ -1,0 +1,9 @@
+GameStory {
+	Name: "Test Story";
+	Description: "A simple test story";
+
+	MapFiles: [
+		"Maps/ShootingRange.map.tk";
+		"Maps/Empty.map.tk";
+	];
+}

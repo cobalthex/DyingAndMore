@@ -10,16 +10,22 @@ namespace Takai.Game
         public EffectsClass Effect { get; set; }
 
         /// <summary>
-        /// If the angle of collision is within this range, the projectile will reflect
+        /// If the angle of collision is within this range, the projectile will bounce
         /// </summary>
-        /// <remarks>0 to 2pi radians, empty range to not reflect</remarks>
-        public Range<float> ReflectAngle { get; set; }
-        public Range<float> ReflectSpeed { get; set; }
+        /// <remarks>The maximum angle difference to bounce from</remarks>
+        public float MaxBounceAngle { get; set; }
+        /// <summary>
+        /// Speeds required to bounce
+        /// </summary>
+        public Range<float> BounceSpeedRange { get; set; }
+
+        /// <summary>
+        /// Energy lost, as a fraction of the total energy
+        /// </summary>
+        public Range<float> Friction { get; set; }
 
         //Overpenetrate (glass/breakable materials?) -- enemies
         //attach
-
-        //friction, dampening
 
         //refraction (reflection offset jitter?)
     }

@@ -9,54 +9,26 @@ using Takai.Game;
 using Takai.Input;
 using Takai.UI;
 using Takai;
+using System.Collections.Generic;
 
 namespace DyingAndMore.Game
 {
-    //map spawn configurations? (akin to difficulty)
-
-    /// <summary>
-    /// A configuration for a game. Akin to a game mode
-    /// </summary>
-    public class GameConfiguration : INamedObject
-    {
-        public string Name { get; set; }
-        public string File { get; set; }
-
-        //spawn settings
-        //aggressiveness
-        //ammo settings
-        public bool AllowFriendlyFire { get; set; }
-
-        //fixed vs adaptive difficulty
-    }
-
     public class GameplaySettings
     {
         public bool isAiEnabled = true;
         public bool isPlayerInputEnabled = true;
-        public bool canActorsDie = true;
     }
 
-    public class GameInstance
+    public class GameInstance : MapView
     {
-        public static GameInstance Current;
+        public static GameInstance Current { get; set; }
 
-        //move into Game?
+        public Game Game { get; set; }
         public TimeSpan ElapsedRealTime { get; set; }
 
-        //Game Campaign
-        public GameConfiguration Configuration { get; set; } = new GameConfiguration();
-
-        [Serializer.Ignored]
         public GameplaySettings GameplaySettings { get; set; } = new GameplaySettings();
 
-        public System.Collections.Generic.List<Entities.ActorInstance> players;
-
-        //campaign
-    }
-
-    class Game : MapView
-    {
+        List<Entities.ActorInstance> players;
         Entities.ActorInstance player = null;
         Entities.Controller lastController = null;
 
@@ -64,13 +36,41 @@ namespace DyingAndMore.Game
         Static crapDisplay;
         Static clockDisplay;
 
-        Static gameHuds;
-
         TextInput debugConsole;
 
         Static renderSettingsConsole;
         Static updateSettingsConsole;
         Static gameplaySettingsConsole;
+
+        Static gameHuds;
+
+        public Dictionary<string, CommandAction> GameActions => new Dictionary<string, CommandAction>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["LoadMap"] = delegate (object map)
+            {
+                MapInstance inst = null;
+                if (map is string mapName)
+                {
+                    var loaded = Cache.Load(mapName);
+                    if (loaded is MapInstance loadedInst)
+                        inst = loadedInst;
+                    else if (loaded is MapClass loadedClass)
+                        inst = loadedClass.Instantiate();
+                }
+                else if (map is MapClass mapClass)
+                    inst = mapClass.Instantiate();
+                else
+                    inst = map as MapInstance;
+
+                if (inst != null)
+                    Map = Game.Map = inst;
+            },
+            ["LoadNextMap"] = delegate (object ignored)
+            {
+                Game.LoadNextStoryMap();
+                Map = Game.Map;
+            },
+        };
 
         void ToggleUI(Static ui)
         {
@@ -86,12 +86,12 @@ namespace DyingAndMore.Game
             }
         }
 
-        public Game(MapInstance map)
+        public GameInstance(Game game)
         {
-            if (map == null)
+            if (game?.Map == null)
                 throw new ArgumentNullException("There must be a map to play");
 
-            GameInstance.Current = new GameInstance();
+            Game = game;
 
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
@@ -143,7 +143,7 @@ namespace DyingAndMore.Game
                 inp.Text = String.Empty;
             };
 
-            Map = map;
+            Map = Game.Map;
 
             renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor);
             renderSettingsConsole.Position = new Vector2(100, 0);
@@ -155,23 +155,26 @@ namespace DyingAndMore.Game
             updateSettingsConsole.VerticalAlignment = Alignment.Middle;
             updateSettingsConsole.UserData = Map.updateSettings;
 
-            gameplaySettingsConsole = GeneratePropSheet(GameInstance.Current.GameplaySettings, DefaultFont, DefaultColor);
+            gameplaySettingsConsole = GeneratePropSheet(GameplaySettings, DefaultFont, DefaultColor);
             gameplaySettingsConsole.Position = new Vector2(100, 0);
             gameplaySettingsConsole.VerticalAlignment = Alignment.Middle;
-            gameplaySettingsConsole.UserData = GameInstance.Current.GameplaySettings;
+            gameplaySettingsConsole.UserData = GameplaySettings;
 
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
         }
 
         protected override void OnMapChanged(EventArgs e)
         {
-            GameInstance.Current.ElapsedRealTime = TimeSpan.Zero;
+            if (Map == null)
+                throw new ArgumentNullException("There must be a map to play");
+
+            ElapsedRealTime = TimeSpan.Zero;
 
             Map.updateSettings = MapInstance.UpdateSettings.Game;
             Map.renderSettings = MapInstance.RenderSettings.Default;
 
-            var players = new System.Collections.Generic.List<Entities.ActorInstance>();
-            var enemies = new System.Collections.Generic.List<Entities.ActorInstance>();
+            var players = new List<Entities.ActorInstance>();
+            var enemies = new List<Entities.ActorInstance>();
 
             foreach (var ent in Map.AllEntities)
             {
@@ -194,12 +197,12 @@ namespace DyingAndMore.Game
 
             if (players.Count > 0)
             {
-                GameInstance.Current.players = players;
+                this.players = players;
                 //GameInstance.Current.players = players.GetRange(0, numPlayers);
                 //for (int i = numPlayers; i < players.Count; ++i)
                 //    Map.Destroy(players[i]);
 
-                player = GameInstance.Current.players[0];
+                player = players[0];
             }
 
             Map.ActiveCamera = new Camera(player); //todo: resume control
@@ -219,18 +222,18 @@ namespace DyingAndMore.Game
 
         protected override void UpdateSelf(GameTime time)
         {
-            GameInstance.Current.ElapsedRealTime += time.ElapsedGameTime;
-            clockDisplay.Text = $"{GetClockText(GameInstance.Current.ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}x{Map.TimeScale:N1}{(IsPaused ? "\n -- PAUSED --" : "")}";
+            ElapsedRealTime += time.ElapsedGameTime;
+            clockDisplay.Text = $"{GetClockText(ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}x{Map.TimeScale:N1}{(IsPaused ? "\n -- PAUSED --" : "")}";
             clockDisplay.AutoSize();
 
             if (!IsPaused)
             {
-                for (int i = 0; i < (GameInstance.Current.players?.Count ?? 0); ++i)
+                for (int i = 0; i < (players?.Count ?? 0); ++i)
                 {
                     //var region = new Rectangle(GameInstance.Current.players[i].Position.ToPoint(), new Point(1));
                     var region = Map.ActiveCamera.VisibleRegion;
                     region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
-                    Map.BuildHeuristic((GameInstance.Current.players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
+                    Map.BuildHeuristic((players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
                 }
             }
 
@@ -253,6 +256,13 @@ namespace DyingAndMore.Game
             var words = command.Split(' ');
             switch (words[0].ToLowerInvariant())
             {
+                case "action":
+                    {
+                        if (words.Length > 0 && GameActions.TryGetValue(words[1], out var action))
+                            action.Invoke(words.Length > 2 ? words[2] : null);
+                    }
+                    break;
+
                 case "cleanup":
                     {
                         var cleans = MapInstance.CleanupOptions.None;
@@ -288,7 +298,7 @@ namespace DyingAndMore.Game
                         {
                             case "entities":
                                 EntityInstance camFollow = null;
-                                var newEnts = new System.Collections.Generic.List<EntityInstance>();
+                                var newEnts = new List<EntityInstance>();
                                 foreach (var entity in Map.AllEntities)
                                 {
                                     var newInst = entity.Class.Instantiate();
@@ -338,7 +348,7 @@ namespace DyingAndMore.Game
                         };
                         s.Click += delegate (object sender, ClickEventArgs e) { ((Static)sender).RemoveFromParent(); };
 
-                        System.Collections.Generic.Dictionary<string, object> type;
+                        Dictionary<string, object> type;
                         try
                         {
                             type = Serializer.DescribeType(Serializer.RegisteredTypes[words[1]]);

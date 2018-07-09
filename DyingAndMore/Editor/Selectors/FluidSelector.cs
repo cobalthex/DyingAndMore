@@ -14,7 +14,7 @@ namespace DyingAndMore.Editor.Selectors
             : base(editor)
         {
             fluids = new List<Takai.Game.FluidClass>();
-            var searchPath = Path.Combine(Takai.Data.Cache.DefaultRoot, "Fluids");
+            var searchPath = Path.Combine(Takai.Data.Cache.Root, "Fluids");
             foreach (var file in Directory.EnumerateFiles(searchPath, "*.fluid.tk", SearchOption.AllDirectories))
             {
                 try

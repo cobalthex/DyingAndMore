@@ -204,6 +204,9 @@ namespace Takai.Game
 
                             if (hit.didHit)
                             {
+                                if (entity.Trail != null)
+                                    entity.Trail.AddPoint(target, normV);
+
                                 if (hit.entity == null) //map collision
                                 {
                                     if (isMapCollisionEnabled) //cleanup
@@ -214,19 +217,25 @@ namespace Takai.Game
 
                                         var tangent = GetTilesCollisionTangent(target, normV);
                                         tangent = Vector2.UnitX;
-                                        var colNorm = tangent.Ortho();
-                                        if (interaction.ReflectAngle.Contains(Math.Abs(Vector2.Dot(colNorm, normV)) * MathHelper.Pi))
+                                        var colNorm = -tangent.Ortho();
+                                        if (Math.Acos(Math.Abs(Vector2.Dot(tangent, normV))) <= interaction.MaxBounceAngle)
                                         {
                                             //add remaining distance to relfection? (trace that)
-                                            entity.Velocity = Vector2.Reflect(entity.Velocity, colNorm);
+                                            entity.Velocity = Vector2.Reflect(entity.Velocity, colNorm) * (1 - interaction.Friction.Random());
                                             entity.Forward = Vector2.Reflect(entity.Forward, colNorm);
                                         }
                                         else
                                             //todo: improve
-                                            entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;6
+                                            entity.Velocity = Vector2.Zero;// (hit.distance / deltaVLen) * entity.Velocity;
 
                                         if (interaction.Effect != null)
-                                            Spawn(interaction.Effect.Instantiate(entity));
+                                        {
+                                            var fx = interaction.Effect.Instantiate();
+                                            fx.Source = entity;
+                                            fx.Position = target;
+                                            fx.Direction = colNorm;
+                                            Spawn(fx);
+                                        }
 
                                         //entity.OnMapCollision((target / Class.TileSize).ToPoint(), target, deltaTime);
                                     }

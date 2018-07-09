@@ -34,13 +34,9 @@ namespace Takai.UI
                 System.Diagnostics.Contracts.Contract.Assume(value != null, "Container cannot be null");
 
                 if (_container != null)
-                {
-                    _container.Resize -= Container_Resize;
                     _container.MoveAllChildrenTo(value);
-                }
 
                 _container = value;
-                _container.Resize += Container_Resize;
                 ReplaceAllChildren(_container);
                 Container.AutoSize();
             }
@@ -142,14 +138,6 @@ namespace Takai.UI
             }
 
             Container.AutoSize();
-        }
-
-        protected void Container_Resize(object sender, EventArgs e)
-        {
-            Size = new Vector2(
-                HorizontalAlignment == Alignment.Stretch ? Size.X : Container.Size.X,
-                VerticalAlignment   == Alignment.Stretch ? Size.Y : Container.Size.Y
-            );
         }
 
         protected Static CreateItem(T value)

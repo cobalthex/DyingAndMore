@@ -71,6 +71,9 @@ namespace Takai.Game
         public Vector2 Position { get; set; }
         public Vector2 Direction { get; set; }
         public Vector2 Velocity { get; set; }
+        /// <summary>
+        /// The entity that spawned this effect. null for none
+        /// </summary>
         public EntityInstance Source { get; set; }
         /// <summary>
         /// Contextual target for recieving any affects
@@ -174,7 +177,7 @@ namespace Takai.Game
                         * (float)Util.RandomGenerator.NextDouble() * Radius;
                 }
 
-                var particle = new ParticleInstance()
+                var particle = new ParticleInstance
                 {
                     color = Class.ColorOverTime.Count > 0 ? Class.ColorOverTime.Evaluate(0) : Color.White,
                     position = position,

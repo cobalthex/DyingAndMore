@@ -1,0 +1,8 @@
+StorySelect {
+    Margin: 10;
+    Direction: Direction.Vertical;
+    HorizontalAlignment: Alignment.Middle;
+    verticalAlignment: Alignment.Middle;
+}
+
+# todo: item template

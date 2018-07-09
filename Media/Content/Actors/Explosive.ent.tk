@@ -1,0 +1,58 @@
+ActorClass {
+    Name: "Explosive";
+    MaxHealth: 100;
+
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: true;
+
+    DestructionEffect: {
+        Effects: [
+            HealthEffect {
+                MaxDamage: 1000;
+                Radius: 100;
+                CanAffectSource: true;
+            }
+            ParticleEffect {
+                Class: {
+                    Sprite: {
+                        Texture: @"Effects/Smoke2.png";
+                        Width: 16;
+                        Height: 16;
+                        FrameCount: 4;
+                        FrameLength: 0.5sec;
+                        Tween: TweenStyle.Overlap;
+                    };
+                    Blend: BlendState.Additive;
+                    InitialSpeed: [50 400];
+                    LifeSpan: [0.5sec 1.5sec];
+                    Drag: 5;
+                    ColorOverTime: {
+                        Values: [
+                            [0 Color.White]
+                            [0.25 Color.Gold]
+                            [0.5 Color.Maroon]
+                            [1 Color.Transparent]
+                        ]
+                    }
+                    ScaleOverTime: {
+                        Values: [
+                            [0 1];
+                            [0.9 5];
+                            [1 0]
+                        ]
+                    }
+                }
+                Count: [150 300];
+                Spread: [0 2pi];
+                Radius: 16;
+            }
+        ]
+    }
+
+    Animations: {
+        Idle: {
+            Sprite: @"./Explosive.png";
+        };
+    };
+}

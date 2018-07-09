@@ -2,8 +2,13 @@
 {
     public abstract class Command
     {
+        public string ActionName { get; set; }
+        public object ActionParameter { get; set; }
+
         public abstract void Invoke();
     }
+
+    public delegate void CommandAction(object parameter);
 
     //todo: data model command, map command
 
@@ -12,8 +17,6 @@
     public class EntityCommand : Command
     {
         public EntityInstance Target { get; set; }
-        public string ActionName { get; set; }
-        public object ActionParameter { get; set; }
 
         public override void Invoke()
         {

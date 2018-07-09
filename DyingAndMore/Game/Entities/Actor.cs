@@ -11,19 +11,18 @@ namespace DyingAndMore.Game.Entities
     public enum Factions
     {
         None = 0,
-        Player = (1 << 0),
-        Enemy = (1 << 1),
-        Boss = (1 << 2),
 
-        Powerup = (1 << 4),
+        All = ~0,
+        Any = All,
 
-        Virus = (1 << 24),
+        Player = (1 << 0), //only player should have this faction
 
-        Common = (1 << 56),
-        //auto-immune
-        //cancerous
+        Ally = (1 << 10), //allied with player
 
-        //max = 1 << 63
+        Enemy = (1 << 20), //enemy to player and allies
+
+        Boss = (1 << 30),
+
     }
 
     public class ActorClass : EntityClass
@@ -201,12 +200,6 @@ namespace DyingAndMore.Game.Entities
             base.Think(deltaTime);
         }
 
-        public override void Kill()
-        {
-            if (GameInstance.Current == null || GameInstance.Current.GameplaySettings.canActorsDie)
-                base.Kill();
-        }
-
         public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
         {
             Controller?.OnEntityCollision(collider, collision, deltaTime);
@@ -247,15 +240,16 @@ namespace DyingAndMore.Game.Entities
         public void ReceiveDamage(float damage, EntityInstance source = null)
         {
             if (source != this && //can damage self
-                (GameInstance.Current != null && !GameInstance.Current.Configuration.AllowFriendlyFire) &&
+                (GameInstance.Current != null && !GameInstance.Current.Game.Configuration.AllowFriendlyFire) &&
                 source is ActorInstance actor &&
                 (actor.Faction & Faction) != 0)
                 return;
 
             CurrentHealth -= damage;
 
+            //todo: propertify (damage effect?)
             TintColor = Color.Tomato;
-            TintColorDuration = TimeSpan.FromMilliseconds(20);
+            TintColorDuration = TimeSpan.FromMilliseconds(50);
         }
 
         #region Helpers

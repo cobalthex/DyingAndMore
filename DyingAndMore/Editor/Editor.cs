@@ -132,7 +132,7 @@ namespace DyingAndMore.Editor
         void SwitchToGame()
         {
             modes.Mode?.End();
-            Parent.ReplaceAllChildren(new Game.Game(Map));
+            Parent.ReplaceAllChildren(Game.GameInstance.Current ?? new Game.GameInstance(new Game.Game { Map = Map }));
         }
 
         protected override bool HandleInput(GameTime time)
@@ -227,7 +227,7 @@ namespace DyingAndMore.Editor
                     {
                         Filter = "Dying and More! Maps (*.map.tk)|*.map.tk|Dying and More! Saves (*.d2sav)|*.d2sav",
                         FileName = "",
-                        InitialDirectory = System.IO.Path.Combine(Cache.DefaultRoot, "Maps"),
+                        InitialDirectory = System.IO.Path.Combine(Cache.Root, "Maps"),
                         RestoreDirectory = true,
                         SupportMultiDottedExtensions = true,
                     })

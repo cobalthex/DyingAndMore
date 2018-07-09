@@ -250,10 +250,38 @@ namespace Takai.Game
         /// </summary>
         public Dictionary<string, List<Command>> EventHandlers { get; set; }
 
-        public virtual Dictionary<string, Action<object>> Actions => new Dictionary<string, Action<object>>
+        /// <summary>
+        /// Actions that this entity can perform
+        /// </summary>
+        public virtual Dictionary<string, CommandAction> Actions => new Dictionary<string, CommandAction>
         {
             ["Kill"] = (ignored) => Kill(),
-        };
+            ["Resurrect"] = (ignored) => Resurrect(),
+            ["ApplyEffect"] = delegate (object effect)
+            {
+                if (effect is EffectsClass ec && Map != null) //todo: pass effects instance?
+                {
+                    var ei = ec.Instantiate(null, this);
+                    ei.Position = Position;
+                    Map.Spawn(ei);
+                }
+            },
+            ["PlayAnimation"] = delegate (object animation)
+            {
+                if (animation is string animName)
+                    PlayAnimation(animName);
+                else if (animation is AnimationClass animClass)
+                    PlayAnimation(animClass);
+            },
+            ["StopAnimation"] = delegate (object animation)
+            {
+                if (animation is string animName)
+                    StopAnimation(animName);
+                else if (animation is AnimationClass animClass)
+                    StopAnimation(animClass);
+            },
+            //set trail, tint, outline?
+        }; //todo: create this in a better way
 
         public EntityInstance() : this(null) { }
         public EntityInstance(EntityClass @class)
@@ -435,11 +463,16 @@ namespace Takai.Game
                 return false;
 
             foreach (var command in commands)
-                ;
+                command.Invoke();
 
             return true;
         }
-
-        //collision material fx (all entities get a material, map gets its own)
     }
 }
+
+/*
+ * Entity commands and actions
+ *  Entities have events that are defined by the entity (e.g OnDeath)
+ *  Call any EventHandlers
+ *  EventHandlers have Commands. Commands can trigger actions, either on entities, game settings, etc
+*/
