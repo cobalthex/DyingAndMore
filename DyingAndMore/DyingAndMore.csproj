@@ -66,6 +66,7 @@
     <Compile Include="Editor\ModeSelector.cs" />
     <Compile Include="Editor\Selectors\Selector.cs" />
     <Compile Include="Editor\Selectors\TileSelector.cs" />
+    <Compile Include="Game\Commands.cs" />
     <Compile Include="Game\Effects.cs" />
     <Compile Include="Game\Entities\AIController.cs" />
     <Compile Include="Game\Entities\ArtilleryController.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Game\Entities\InputController.cs" />
     <Compile Include="Game\Entities\Projectile.cs" />
     <Compile Include="Game\Entities\Vehicle.cs" />
+    <Compile Include="Game\GameInfo.cs" />
     <Compile Include="Game\Weapons\Gun.cs" />
     <Compile Include="Game\Weapons\Spawner.cs" />
     <Compile Include="Game\Weapons\Weapon.cs" />

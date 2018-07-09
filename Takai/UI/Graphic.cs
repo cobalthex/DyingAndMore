@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
@@ -41,6 +42,30 @@ namespace Takai.UI
             }
 
             base.DrawSelf(spriteBatch);
+        }
+
+        public override void DerivedDeserialize(Dictionary<string, object> props)
+        {
+            base.DerivedDeserialize(props);
+
+            if (Sprite == null)
+                return;
+
+            //proportional scaling if only one property is given
+
+            var hasWidth = props.TryGetValue("Width", out var _width);
+            var hasHeight = props.TryGetValue("Height", out var _height);
+
+            if (hasWidth && !hasHeight)
+            {
+                var width = Data.Serializer.Cast<float>(_width);
+                Size = new Vector2(width, width * Sprite.Height / Sprite.Width);
+            }
+            else if (!hasWidth && hasHeight)
+            {
+                var height = Data.Serializer.Cast<float>(_height);
+                Size = new Vector2(height * Sprite.Width / Sprite.Height, height);
+            }
         }
     }
 }

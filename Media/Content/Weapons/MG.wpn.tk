@@ -7,8 +7,7 @@ GunClass {
     MaxBursts: 0;
     ChargeTime: 0msec;
     DischargeTime: 800rpm;
-    ErrorAngle: [-4deg 4deg];
-
+    #ErrorAngle: [-4deg 4deg];
 
     DischargeEffect: {
         Effects: [

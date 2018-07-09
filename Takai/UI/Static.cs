@@ -8,12 +8,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
+    /// <summary>
+    /// How an element aligns itself inside its parent
+    /// </summary>
     public enum Alignment
     {
         Start,
         Middle,
         End,
-        Stretch //Special case, overrides position and size
+        Stretch, //Special case, overrides position and size
+
+        Left = Start,
+        Top = Start,
+
+        Right = End,
+        Bottom = End,
     }
 
     public class ClickEventArgs : System.EventArgs
@@ -29,15 +38,6 @@ namespace Takai.UI
     }
 
     //todo: invalidation/dirty states, instead of reflow each time property is updated, mark dirty. On next update, reflow if dirty
-
-    public struct Binding
-    {
-        public string key;
-
-        public float scale;
-        public long min, max;
-        public bool wrap;
-    }
 
     /// <summary>
     /// The basic UI element
@@ -374,6 +374,17 @@ namespace Takai.UI
         public Static()
         {
             Children = children.AsReadOnly();
+        }
+
+        /// <summary>
+        /// Create a simple static label. Calls <see cref="AutoSize(float)"/>
+        /// </summary>
+        /// <param name="text">The text to set</param>
+        public Static(string text, float padding = 0)
+            : this()
+        {
+            Text = text;
+            AutoSize(padding);
         }
 
         /// <summary>
@@ -1125,8 +1136,11 @@ namespace Takai.UI
 
                 toDraw.DrawSelf(spriteBatch);
 
-                //Graphics.Primitives2D.DrawRect(spriteBatch, Color.Tomato, toDraw.VirtualBounds);
-                Graphics.Primitives2D.DrawRect(spriteBatch, (toDraw.HasFocus && toDraw.CanFocus) ? FocusedBorderColor : toDraw.BorderColor, toDraw.VisibleBounds);
+                var borderColor = (toDraw.HasFocus && toDraw.CanFocus) ? FocusedBorderColor : toDraw.BorderColor;
+                if (DebugFont != null && borderColor == Color.Transparent)
+                    borderColor = Color.SteelBlue;
+
+                Graphics.Primitives2D.DrawRect(spriteBatch, borderColor, toDraw.VisibleBounds);
 
                 if (DebugFont != null && toDraw.VisibleBounds.Contains(Input.InputState.MousePoint))
                 {
@@ -1166,7 +1180,7 @@ namespace Takai.UI
             Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleBounds, position, Color);
         }
 
-        public void DerivedDeserialize(Dictionary<string, object> props)
+        public virtual void DerivedDeserialize(Dictionary<string, object> props)
         {
             if (props.TryGetValue("AutoSize", out var autoSize))
             {

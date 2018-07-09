@@ -19,7 +19,7 @@ namespace DyingAndMore.Editor.Selectors
 
             foreach (var path in searchPaths)
             {
-                var searchPath = Path.Combine(Takai.Data.Cache.DefaultRoot, path);
+                var searchPath = Path.Combine(Takai.Data.Cache.Root, path);
                 int i = 0;
                 foreach (var file in Directory.EnumerateFiles(searchPath, "*.ent.tk", SearchOption.AllDirectories))
                 {

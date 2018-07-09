@@ -160,6 +160,7 @@ namespace Takai.Game
         public List<TriggerInstance> triggers = new List<TriggerInstance>(); //triggers may be in one or more sectors, list as it shouldn't be modified during runtime
     }
 
+    [Data.Cache.AlwaysReload] //todo: necessary?
     public partial class MapInstance : IInstance<MapClass>
     {
         private int nextEntityID = 0;

@@ -1,0 +1,12 @@
+GunClass {
+    Projectile: @"Weapons/Projectiles/Plasma.ent.tk";
+
+    MaxAmmo: 1000;
+    RoundsPerBurst: 1;
+    ProjectilesPerRound: 1;
+    MaxBursts: 0;
+    ChargeTime: 0msec;
+    DischargeTime: 300msec;
+    CooldownTime: 600msec;
+    ErrorAngle: [-6deg 6deg];
+}

@@ -1,9 +1,9 @@
 ActorClass {
     Name: "Shooter Test";
-    MaxHealth: 500;
+    MaxHealth: 2000;
 
     FieldOfView: 2.356194;
-    MaxSpeed: [300 400];
+    MaxSpeed: [100 200];
     MoveForce: 600;
     IsPhysical: True;
     IgnoreTrace: False;
@@ -19,7 +19,7 @@ ActorClass {
         ];
     };
 
-    DefaultWeapon: @"Weapons/Test.wpn.tk";
+    DefaultWeapon: @"Weapons/Plasma.wpn.tk";
 
     Animations: {
         Idle: {

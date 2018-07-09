@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
@@ -244,6 +245,12 @@ namespace Takai.UI
             return added;
         }
 
+        public override void AddChildren(IEnumerable<Static> children)
+        {
+            base.AddChildren(children);
+            ResizeContentArea();
+        }
+
         protected override void OnResize(EventArgs e)
         {
             ResizeContentArea();
@@ -295,6 +302,12 @@ namespace Takai.UI
                 base.RemoveChild(verticalScrollbar);
 
             contentArea.Size = new Vector2(hsize, vsize);
+        }
+
+        public override void DerivedDeserialize(Dictionary<string, object> props)
+        {
+            base.DerivedDeserialize(props);
+            ResizeContentArea();
         }
 
         protected override bool HandleInput(GameTime time)

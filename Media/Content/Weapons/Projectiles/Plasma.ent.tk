@@ -1,5 +1,5 @@
 ProjectileClass {
-    Name: "Missile";
+    Name: "Plasma rocket";
     MuzzleVelocity: 500;
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
@@ -8,7 +8,6 @@ ProjectileClass {
     CanAffectSource: true;
     InheritSourcePhysics: true;    
 
-    Range: 400;
     #*FadeEffect: {
         Effects: [
             EntityEffect {
@@ -30,7 +29,7 @@ ProjectileClass {
     Trail: {
         MaxPoints: 200;
         Color: Color.Aquamarine;
-        Sprite: @"Effects/Trails/Missile.png";
+        Sprite: @"Effects/Trails/Lightning.png";
         LifeSpan: 0.5sec;
         CaptureDelay: 300hz;
         Width: {
@@ -48,7 +47,7 @@ ProjectileClass {
             Sprite: {
                 Texture: @"./Antibody.png";
             };
-            Effect: @"Effects/trail.fx.tk";
+            Effect: @"Effects/Sparks.fx.tk";
         }
     }
 }

@@ -5,13 +5,13 @@ MaterialInteractions {
         }]
 
         ["Brass" "*" MaterialInteraction {
-            ReflectAngle: [-50deg 50deg];
+            MaxBounceAngle: 25deg;
+            Friction: 0.1;
             Effect: @"Effects/Sparks.fx.tk";
         }]
 
         ["Needle" "*" MaterialInteraction {
             Effect: @"Effects/Shards.fx.tk";
-            ReflectAngle: [-50deg 50deg];
         }]
     ];
 }

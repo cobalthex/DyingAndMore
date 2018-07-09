@@ -1,45 +1,48 @@
-List {
-    Margin: 10;
-    Direction: Direction.Vertical;
-    HorizontalAlignment: Alignment.Middle;
-    VerticalAlignment: Alignment.Middle;
-
+Static {
     Children: [
-        Graphic {
-            Sprite: @"promo/dejitaru.png";
-            AutoSize: true;
+        List {
+            Margin: 10;
+            Direction: Direction.Vertical;
             HorizontalAlignment: Alignment.Middle;
-        };
-        Static {
-            Height: 50px;
-        }
+            VerticalAlignment: Alignment.Middle;
 
-        Static {
-            Text: "No map loaded";
-            Font: @"Fonts/UILarge.bfnt";
-            Color: Color.White;
-            HorizontalAlignment: Alignment.Middle;
-        }
-
-        Static {
-            Name: "new";
-            Text: "Press Ctrl+N to create a new map";
-            Color: Color.White;
-            HorizontalAlignment: Alignment.Middle;
-        }
-
-        ScrollBox {
-            Size: [400 400];
-            HorizontalAlignment: Alignment.Middle;
             Children: [
-                FileList {
-                    Name: "maps";
-                    Path: 'Content/Maps';
-                    HorizontalAlignment: Alignment.Stretch;
-                    VerticalAlignment: Alignment.Stretch;
-                    Container: List {
-                        HorizontalAlignment: Alignment.Middle;
-                    }
+                Graphic {
+                    Sprite: @"promo/dejitaru.png";
+                    Height: 200px;
+                    HorizontalAlignment: Alignment.Middle;
+                };
+                Static {
+                    Height: 40px;
+                }
+
+                Static {
+                    Text: "No map loaded";
+                    Font: @"Fonts/UILarge.bfnt";
+                    Color: Color.White;
+                    HorizontalAlignment: Alignment.Middle;
+                }
+
+                Static {
+                    Name: "new";
+                    Text: "Press Ctrl+N to create a new map";
+                    Color: Color.White;
+                    HorizontalAlignment: Alignment.Middle;
+                }
+
+                ScrollBox {
+                    Size: [400 500];
+                    HorizontalAlignment: Alignment.Middle;
+                    Children: [
+                        FileList {
+                            Name: "maps";
+                            Path: 'Content/Maps';
+                            HorizontalAlignment: Alignment.Stretch;
+                            Container: List {
+                                HorizontalAlignment: Alignment.Start;
+                            }
+                        }
+                    ]
                 }
             ]
         }

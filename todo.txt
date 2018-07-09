@@ -1,0 +1,69 @@
+	☐  Tkz format that uses gzip. Add serializer helpers to check for compression (based on header) and automatically run correct handlers
+
+	Conditions:
+		☐  Invisibility
+		☐  Invincibility
+
+	Game AI:
+		☐  Squads/Platoons
+		☐  Cover
+		☐  Waypoints
+		☐  Objectives/navpoints
+		☐  Cutscenes (maybe with some scripting)
+		☐  Events
+		☐  doors/devices
+		☐  marquee
+		☐  conditions/senses
+		☐	
+
+	Gases:
+		☐  Behavior changing
+
+	☐  Variations for enemy skins
+
+	☐  serializer configurations (save these props under this configuration, etc)
+
+	☐  Fix pathfinding for non full tiles
+
+	☐  fill out AI more and create demo for game
+
+	☐  tile patches in sectors. allows for destructable/modifyable tiles
+
+	☐  non destroying/pickupable projectiles (arrows)
+
+	overhaul physics system:
+		☐  proper collidable shapes
+		☐  collision graph (necessary?) Dictionary<Collider, HashSet<Collider>>
+
+	☐  unified entity system? (basic entities) vs ecs esque design
+
+	☐  editorable commands
+
+	☐  named reference objects from files? (necessary?)
+		`$taco Sprite { ... }`
+		visible from code, and deserializer as &var.taco
+
+	☐  default button in UI (click enter in text box to submit)
+
+	☐  player input system
+
+	☐  Think only when alive?
+
+	☐  Update cache hotloader to use Deserialize into object
+
+	☐  doors
+
+	☐  vehicles/turrets
+
+	☐  Displacement fx
+
+	Trigger actions:
+		☐	block projectiles
+		☐	block line of sight
+		☐	block except projectiles (invisible?) -- block actors?
+		☐	solid wall
+		☐	nodraw (only draw if inside, trigger, blah)
+
+	☐	Don't hardcode file type paths (.ent.tk, .story.tk, etc)
+	☐	are configurations tied to game stories? (easy hard etc for single, vs ctf for multi)
+	☐	Game story should be genericized to support MP (level rotations)

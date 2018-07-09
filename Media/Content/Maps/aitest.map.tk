@@ -1,0 +1,215 @@
+MapClass {
+    Name: "Large empty map";
+    TileSize: 48;
+    InitialState: InitialMapState {
+        Entities: [
+            EntitySpawn {
+                Class: @"Actors/Player.ent.tk";
+                Position: [267 259];
+                Forward: [0.9955281 0.09446617];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Target.ent.tk";
+                Position: [100.3633 92.83556];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Target.ent.tk";
+                Position: [100.3633 283.5265];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Target.ent.tk";
+                Position: [291.0542 92.83557];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [1577.595 987.7755];
+                Forward: [-0.6674107 -0.7446898];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [1369.38 1344.716];
+                Forward: [-0.7071068 -0.7071068];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [897.7086 1523.186];
+                Forward: [-0.3376324 -0.941278];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [489.7769 1582.676];
+                Forward: [-4.371139E-08 -1];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [149.8339 1531.684];
+                Forward: [-4.371139E-08 -1];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [1739.068 622.3367];
+                Forward: [-1 8.742278E-08];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [1768.813 205.9065];
+                Forward: [-0.9917025 0.128554];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/SoundTest.ent.tk";
+                Position: [880.7114 898.5404];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Pickups/Tuber.ent.tk";
+                Position: [477.0291 477.8609];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Pickups/MG.ent.tk";
+                Position: [383.5447 473.6116];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Pickups/Bfg.ent.tk";
+                Position: [477.0291 384.3766];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Pickups/GrenadeLauncher.ent.tk";
+                Position: [94.59319 184.6601];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Pickups/TestPfx.ent.tk";
+                Position: [192.3268 95.42503];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Cyst.ent.tk";
+                Position: [2189.492 711.5718];
+                Forward: [-1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Cyst.ent.tk";
+                Position: [2180.993 958.0304];
+                Forward: [-1 8.742278E-08];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Cyst.ent.tk";
+                Position: [2193.741 1191.741];
+                Forward: [-1 -8.742278E-08];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [1947.282 1869.943];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [1785.809 1857.195];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [1768.812 1653.229];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [1586.093 1789.207];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [1539.35 1895.439];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [1645.583 1993.172];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Astrovirus.ent.tk";
+                Position: [1900.54 2014.419];
+                Forward: [1 0];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/Rhinovirus.ent.tk";
+                Position: [188.077 2048.413];
+                Forward: [0.6549301 -0.7556894];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [706.4901 1929.433];
+                Forward: [-0.2833461 -0.9590177];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [545.0172 1942.181];
+                Forward: [-0.09219804 -0.9957407];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [876.4616 1895.439];
+                Forward: [-0.3162279 -0.9486832];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [1046.433 1806.204];
+                Forward: [-0.3807499 -0.9246781];
+                Name: Null;
+            }
+            EntitySpawn {
+                Class: @"Actors/ShootTest.ent.tk";
+                Position: [1263.147 1704.221];
+                Forward: [-0.5230161 -0.8523228];
+                Name: Null;
+            }
+        ];
+        Fluids: [];
+        Decals: [];
+        Triggers: [];
+    };
+    MaterialInteractions: @"Materials/Test.mtl.tk";
+    TilesMaterial: "Tiles";
+    TilesImage: "Tilesets/Tiles2.png";
+    Width: 46;
+    Height: 46;
+    Tiles: [0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+}

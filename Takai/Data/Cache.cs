@@ -24,9 +24,14 @@ namespace Takai.Data
     public static class Cache
     {
         /// <summary>
+        /// If Calling Load&lt;T&gt; always force load
+        /// </summary>
+        public class AlwaysReloadAttribute : Attribute { }
+
+        /// <summary>
         /// Where all content lives
         /// </summary>
-        public static string DefaultRoot = "Content";
+        public static string Root = "Content";
 
         public struct CustomLoad
         {
@@ -135,7 +140,7 @@ namespace Takai.Data
             //var swatch = System.Diagnostics.Stopwatch.StartNew();
 
             if (root == null)
-                root = DefaultRoot;
+                root = Root;
             else if (root == "")
                 root = Directory.GetCurrentDirectory();
 
@@ -143,10 +148,10 @@ namespace Takai.Data
             file = Normalize(file);
 
             string realFile;
-            if (PathStartsWith(file, DefaultRoot) && root == DefaultRoot)
+            if (PathStartsWith(file, Root) && root == Root)
             {
                 realFile = file;
-                file = file.Substring(DefaultRoot.Length + 1);
+                file = file.Substring(Root.Length + 1);
             }
             else if (Path.IsPathRooted(file) || PathStartsWith(file, root))
             {
@@ -327,7 +332,7 @@ namespace Takai.Data
         /// <returns>The loaded object, casted to <typeparamref name="T"/></returns>
         public static T Load<T>(string file, string root = null, bool forceLoad = false)
         {
-            var loaded = Load(file, root, forceLoad);
+            var loaded = Load(file, root, typeof(T).IsDefined(typeof(AlwaysReloadAttribute), true) || forceLoad);
             return Serializer.Cast<T>(loaded);
         }
 

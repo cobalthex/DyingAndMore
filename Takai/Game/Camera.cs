@@ -150,7 +150,10 @@ namespace Takai.Game
         public virtual void Update(GameTime time)
         {
             if (Follow != null)
+            {
                 Position = Follow.Position;
+                Rotation = 0;
+            }
 
             if (Shake != 0)
                 actualRotation = Rotation + ((float)randGen.NextDouble() * 2 * Shake - Shake);
