@@ -377,6 +377,25 @@ namespace DyingAndMore.Game.Entities
             AI.Actor.Forward = Vector2.TransformNormal(AI.Actor.Forward, Matrix.CreateRotationZ(angle * (float)deltaTime.TotalSeconds));
         }
     }
+
+    /// <summary>
+    /// Simple test behavior to always shoot at direction facing
+    /// </summary>
+    class DebugShootBehavior : Behavior
+    {
+        public override BehaviorMask Mask => BehaviorMask.Weapons;
+        public override BehaviorFilters Filter => BehaviorFilters.None;
+
+        public override BehaviorPriority CalculatePriority()
+        {
+            return BehaviorPriority.Normal;
+        }
+
+        public override void Think(TimeSpan deltaTime)
+        {
+            AI.Actor.Weapon.TryUse();
+        }
+    }
 }
 
 

@@ -93,6 +93,7 @@
     <Compile Include="Objects.cs" />
     <Compile Include="Game\Path.cs" />
     <Compile Include="Game\Trigger.cs" />
+    <Compile Include="Ranges.cs" />
     <Compile Include="Runtime.cs" />
     <Compile Include="Graphics\BitmapFont.cs" />
     <Compile Include="Graphics\Sprite.cs" />

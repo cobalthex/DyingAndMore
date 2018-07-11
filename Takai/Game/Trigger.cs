@@ -3,6 +3,11 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
+    public interface ITriggerFilter
+    {
+        bool CanTrigger(EntityInstance entity);
+    }
+
     /// <summary>
     /// A region that can trigger commands when an entity enters the trigger region
     /// </summary>
@@ -29,6 +34,11 @@ namespace Takai.Game
         /// How many times this trigger can be used, 0 for infinite
         /// </summary>
         public int MaxUses { get; set; } = 0;
+
+        /// <summary>
+        /// Restrict who can activate this trigger (by default, anyone)
+        /// </summary>
+        public ITriggerFilter Filter { get; set; }
 
         public List<Command> OnEnterCommands { get; set; }
 
@@ -72,7 +82,9 @@ namespace Takai.Game
         /// <returns>True if the entity entered the trigger region</returns>
         public bool TryEnter(EntityInstance entity)
         {
-            if ((Class.MaxUses > 0 && UseCount >= Class.MaxUses) || !ContainedEntities.Add(entity))
+            if ((Class.MaxUses > 0 && UseCount >= Class.MaxUses) ||
+                (Class.Filter != null && !Class.Filter.CanTrigger(entity)) ||
+                !ContainedEntities.Add(entity))
                 return false;
 
             ++UseCount;

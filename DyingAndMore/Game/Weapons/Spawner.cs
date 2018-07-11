@@ -6,13 +6,11 @@ namespace DyingAndMore.Game.Weapons
 {
     class SpawnerClass : WeaponClass
     {
-        protected static Random randGen = new Random();
-
         /// <summary>
         /// Spawns are generated from this template. All classes will be spawned with a random number between its range
         /// Spawn order is randomized
         /// </summary>
-        public List<Tuple<EntityClass, Range<int>>> Spawns { get; set; }
+        public List<Tuple<EntityClass, Takai.Range<int>>> Spawns { get; set; }
 
         /// <summary>
         /// Generate a list of entities based on the templates provided in <see cref="Spawns"/>. Does not create clones
@@ -27,7 +25,7 @@ namespace DyingAndMore.Game.Weapons
 
             foreach (var ent in Spawns)
             {
-                int count = randGen.Next(ent.Item2.min, ent.Item2.max);
+                int count = Takai.Util.RandomGenerator.Next(ent.Item2.min, ent.Item2.max);
                 for (int i = 0; i < count; ++i)
                     spawns.Add(ent.Item1);
             }
@@ -36,7 +34,7 @@ namespace DyingAndMore.Game.Weapons
             int n = spawns.Count;
             while (n > 1)
             {
-                int k = (randGen.Next(0, n) % n);
+                int k = (Takai.Util.RandomGenerator.Next(0, n) % n);
                 --n;
                 var value = spawns[k];
                 spawns[k] = spawns[n];

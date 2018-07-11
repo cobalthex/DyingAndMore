@@ -374,7 +374,7 @@ namespace Takai.Game
 
                 entity.UpdateAnimations(deltaTime);
 
-                if (updateSettings.isEntityLogicEnabled)
+                //if (updateSettings.isEntityLogicEnabled)
                     entity.Think(deltaTime);
             }
 
