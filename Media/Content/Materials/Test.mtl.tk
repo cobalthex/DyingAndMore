@@ -9,6 +9,11 @@ MaterialInteractions {
             Friction: 0.1;
             Effect: @"Effects/Sparks.fx.tk";
         }]
+        ["Brass 2" "*" MaterialInteraction {
+            MaxBounceAngle: 25deg;
+            Friction: 0.1;
+            Effect: @"Effects/Sparks2.fx.tk";
+        }]
 
         ["Needle" "*" MaterialInteraction {
             Effect: @"Effects/Shards.fx.tk";

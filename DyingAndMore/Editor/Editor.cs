@@ -132,6 +132,8 @@ namespace DyingAndMore.Editor
         void SwitchToGame()
         {
             modes.Mode?.End();
+            if (Game.GameInstance.Current != null)
+                Game.GameInstance.Current.Game.Map = Game.GameInstance.Current.Map = Map;
             Parent.ReplaceAllChildren(Game.GameInstance.Current ?? new Game.GameInstance(new Game.Game { Map = Map }));
         }
 

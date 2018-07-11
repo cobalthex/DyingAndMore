@@ -1,0 +1,27 @@
+ActorClass {
+	Name: "Fake laser weapon";
+	MaxHealth: 5000;
+
+    DefaultController: AIController {
+        Behaviors: [
+            DebugShootBehavior {};
+        ];
+    }
+
+    DefaultWeapon: GunClass {
+        MaxAmmo: 0;
+        Projectile: {
+            Trail: @"Effects/Trails/laser.trail.tk";
+            MuzzleVelocity: 1E10;
+            Damage: 100;
+            Drag: 0;
+            DischargeTime: 100msec;
+        };
+    };
+
+    Animations: {
+    	Idle: {
+    		Sprite: @"./TurretA.png";
+    	};
+    };
+};

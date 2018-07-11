@@ -149,6 +149,7 @@ namespace Takai.Game
 
         public Range<int> Count { get; set; } = 0;
         public Range<float> Spread { get; set; } = new Range<float>(0, MathHelper.TwoPi);
+        public RandomDistribution SpreadDistribution { get; set; }
         public float Radius { get; set; } = 0; //spawn radius around the spawn point
 
         public bool InheritParentVelocity { get; set; }
@@ -165,7 +166,7 @@ namespace Takai.Game
             instance.Map.Particles[Class].Capacity = Math.Max(instance.Map.Particles[Class].Capacity, numParticles);
             for (int i = 0; i < numParticles; ++i)
             {
-                var angle = Spread.Random();
+                var angle = Spread.Random(SpreadDistribution);
                 var dir = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(-angle));
                 var initAngle = dir.Angle();
 

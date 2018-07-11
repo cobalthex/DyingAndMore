@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using Takai.Game;
+using Takai;
 
 namespace DyingAndMore.Game.Weapons
 {
@@ -134,6 +134,8 @@ namespace DyingAndMore.Game.Weapons
         {
             if (Class == null || other.Class != Class)
                 return false;
+
+            //todo: option to combine if weapon shares same projectile type
 
             var gun = (GunInstance)other;
             var lastAmmoCount = AmmoCount;

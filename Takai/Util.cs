@@ -8,6 +8,25 @@ namespace Takai
         public static readonly Random RandomGenerator = new Random();
 
         /// <summary>
+        /// Return a gaussian distribution of a random double
+        /// </summary>
+        /// <param name="random">The random generator</param>
+        /// <param name="mean">The mean value of the curve</param>
+        /// <param name="standardDeviation">The standard deviation of the curve</param>
+        /// <returns>The gaussian distributed random</returns>
+        public static double NextGaussian(this Random random, double mean = 0, double standardDeviation = 1)
+        {
+            //todo: use carry to avoid trig
+            //todo: zigurat algorithm
+
+            //box muller formula
+            var u1 = 1.0 - random.NextDouble(); //uniform(0,1] random doubles
+            var u2 = 1.0 - random.NextDouble();
+            var randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+            return mean + standardDeviation * randStdNormal; //random normal(mean,stdDev^2)
+        }
+
+        /// <summary>
         /// Resize an array
         /// </summary>
         /// <typeparam name="T">The array type</typeparam>

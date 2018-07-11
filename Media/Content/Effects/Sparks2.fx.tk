@@ -13,7 +13,7 @@ EffectsClass {
                 ColorOverTime: {
                     values: [
                         [0 Color.White];
-                        [1 Color.Red];
+                        [0.5 Color.RoyalBlue];
                     ];
                 };
                 InitialSpeed: [-100 -400];
@@ -22,7 +22,7 @@ EffectsClass {
             }
             Count: [5 10];
             Spread: [-90deg 90deg];
-            SpreadDistribution: RandomDistribution.Gaussian;
+            SpreadDistribution: RandomDistribution.Default;
             Radius: 3;
         };
 	];

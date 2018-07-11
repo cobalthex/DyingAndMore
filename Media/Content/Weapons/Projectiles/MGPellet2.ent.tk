@@ -1,0 +1,41 @@
+ProjectileClass {
+    Name: "Pellet";
+    MuzzleVelocity: [8000 9800];
+    DestroyIfOffscreen: True;
+    IgnoreTrace: True;
+    Range: 2000;
+    Drag: 1.0;
+    MinimumSpeed: 100;
+
+    Animations: {
+        Idle: {
+            Sprite: {
+                Texture: @"./Tracer.png";
+                Height: 1;
+                IsLooping: true;
+                Origin: [0 0];
+            };
+            Material: "Brass 2";
+        }
+    }
+
+    Trail: {
+        MaxPoints: 20;
+        LifeSpan: 0.15sec;
+        CaptureDelay: 30Hz;
+        SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
+        Color: {
+            Values: [
+                [0 [30 30 30 64]];
+                [1 [192 192 30 192]];
+            ]
+        }
+
+        width: {
+            values: [
+                [0 1]
+                [1 1]
+            ]
+        }
+    }
+}

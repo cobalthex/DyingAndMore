@@ -12,7 +12,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// Initial speed of the projectile
         /// </summary>
-        public Range<float> MuzzleVelocity { get; set; } = 100;
+        public Takai.Range<float> MuzzleVelocity { get; set; } = 100;
 
         /// <summary>
         /// How much damage this projectile will inflict upon an emeny
@@ -194,6 +194,7 @@ namespace DyingAndMore.Game.Entities
             {
                 Velocity += Source.Velocity;
             }
+            base.OnSpawn();
         }
 
         public override void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime)

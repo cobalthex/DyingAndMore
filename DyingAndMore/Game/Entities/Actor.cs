@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Takai.Game;
+using Takai;
 
 namespace DyingAndMore.Game.Entities
 {
@@ -15,14 +16,27 @@ namespace DyingAndMore.Game.Entities
         All = ~0,
         Any = All,
 
-        Player = (1 << 0), //only player should have this faction
+        Player = (1 << 0), //only player(s) should have this faction
 
-        Ally = (1 << 10), //allied with player
+        Ally = (1 << 10), //the player or any actors allied with the player
 
         Enemy = (1 << 20), //enemy to player and allies
 
         Boss = (1 << 30),
 
+    }
+
+    public class ActorTriggerFilter : ITriggerFilter
+    {
+        /// <summary>
+        /// A faction that this actor must be a part of to trigger
+        /// </summary>
+        public Factions faction;
+
+        public bool CanTrigger(EntityInstance entity)
+        {
+            return (entity is ActorInstance actor) && actor.IsAlliedWith(faction);
+        }
     }
 
     public class ActorClass : EntityClass

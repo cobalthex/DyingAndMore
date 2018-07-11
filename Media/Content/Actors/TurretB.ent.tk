@@ -1,0 +1,18 @@
+ActorClass {
+	Name: "Debug Turret B";
+	MaxHealth: 5000;
+
+    DefaultController: AIController {
+        Behaviors: [
+            DebugShootBehavior {};
+        ];
+    }
+
+    DefaultWeapon: @"Weapons/MG2.wpn.tk";
+
+    Animations: {
+    	Idle: {
+    		Sprite: @"./TurretB.png";
+    	};
+    };
+};

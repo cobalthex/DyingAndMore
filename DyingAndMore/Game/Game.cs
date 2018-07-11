@@ -65,7 +65,7 @@ namespace DyingAndMore.Game
                 if (inst != null)
                     Map = Game.Map = inst;
             },
-            ["LoadNextMap"] = delegate (object ignored)
+            ["CompleteMap"] = delegate (object ignored)
             {
                 Game.LoadNextStoryMap();
                 Map = Game.Map;
@@ -92,6 +92,7 @@ namespace DyingAndMore.Game
                 throw new ArgumentNullException("There must be a map to play");
 
             Game = game;
+            Current = this; //apply elsewhere?
 
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;

@@ -1,6 +1,7 @@
 TrailClass {
 	MaxPoints: 400;
-	Width: 10;
+	Width: 32;
+	LifeSpan: 100msec;
 	Sprite: {
 		Texture: @"./laser.png";
 	}
