@@ -216,7 +216,7 @@ namespace Takai.Game
                                         var interaction = Class.MaterialInteractions.Find(entity.Material, Class.TilesMaterial);
 
                                         var tangent = GetTilesCollisionTangent(target, normV);
-                                        tangent = Vector2.UnitX;
+                                        //tangent = Vector2.UnitX;
                                         var colNorm = -tangent.Ortho();
                                         if (Math.Acos(Math.Abs(Vector2.Dot(tangent, normV))) <= interaction.MaxBounceAngle)
                                         {
