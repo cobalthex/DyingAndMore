@@ -32,7 +32,7 @@ namespace DyingAndMore.Editor
 
         protected override bool HandleInput(GameTime time)
         {
-            var pos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            var pos = editor.Camera.ScreenToWorld(InputState.MouseVector);
             if (InputState.IsPress(MouseButtons.Left))
             {
                 start = pos;

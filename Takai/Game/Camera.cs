@@ -14,8 +14,9 @@ namespace Takai.Game
         public Effect PostEffect { get; set; } = null;
 
         /// <summary>
-        /// Where to draw this camera to
+        /// Where to draw this camera to (on screen)
         /// </summary>
+        [Data.Serializer.Ignored]
         public Rectangle Viewport { get; set; }
 
         /// <summary>

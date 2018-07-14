@@ -173,7 +173,7 @@ namespace Takai.Game
         /// <summary>
         /// All of the available render settings customizations
         /// </summary>
-        public class RenderSettings
+        public class RenderSettings //class so that it can be reflected
         {
             public bool drawTiles;
             public bool drawEntities;
@@ -195,22 +195,43 @@ namespace Takai.Game
             public bool drawScreenEffects;
             public bool drawDebugInfo;
 
-            public static readonly RenderSettings Default = new RenderSettings
+            public RenderSettings()
             {
-                drawTiles = true,
-                drawEntities = true,
-                drawFluids = true,
-                drawReflections = true,
-                drawDecals = true,
-                drawParticles = true,
-                drawTrails = true,
-                drawLines = true,
-                drawScreenEffects = true,
-            };
+                SetDefault();
+            }
+
+            public void SetDefault()
+            {
+                drawFluidReflectionMask = false;
+                drawTrailMesh = false;
+                drawTriggers = false;
+                drawGrids = false;
+                drawSectorsOnGrid = false;
+                drawBordersAroundNonDrawingEntities = false;
+                drawEntityForwardVectors = false;
+                drawColliders = false;
+                drawPathHeuristic = false;
+                drawDebugInfo = false;
+
+                drawTiles = true;
+                drawEntities = true;
+                drawFluids = true;
+                drawReflections = true;
+                drawDecals = true;
+                drawParticles = true;
+                drawTrails = true;
+                drawLines = true;
+                drawScreenEffects = true;
+            }
+
+            public RenderSettings Clone()
+            {
+                return (RenderSettings)MemberwiseClone();
+            }
         }
 
         [Data.Serializer.Ignored]
-        public RenderSettings renderSettings = RenderSettings.Default;
+        public RenderSettings renderSettings = new RenderSettings();
 
         /// <summary>
         /// The current fade. Ignored if duration <= 0 (counts down)
@@ -288,6 +309,8 @@ namespace Takai.Game
 
             public Camera camera;
             public Matrix cameraTransform;
+            public Matrix projection;
+            public Matrix viewTransform;
             public Rectangle visibleSectors;
             public Rectangle visibleRegion;
             public Rectangle visibleTiles;
@@ -296,18 +319,10 @@ namespace Takai.Game
         /// <summary>
         /// Draw the map, centered around the Camera
         /// </summary>
-        /// <param name="camera">The top-left corner of the visible area</param>
-        /// <param name="Viewport">Where on screen to draw</param>
-        /// <param name="Class.PostEffect">An optional fullscreen post effect to render with</param>
-        /// <param name="DrawSectorEntities">Draw entities in sectors. Typically used for debugging/map editing</param>
-        /// <remarks>All rendering management handled internally</remarks>
-        public void Draw(Camera camera = null, XnaEffect postEffect = null)
+        /// <param name="camera">Where and what to draw</param>
+        /// <param name="postEffect">An optional fullscreen post effect to render with</param>
+        public void Draw(Camera camera)
         {
-            if (camera == null)
-                camera = ActiveCamera;
-
-            //todo: break out into separate functions
-
             _renderStats = new MapRenderStats
             {
                 trailPointCount = renderedTrailPointCount
@@ -318,31 +333,40 @@ namespace Takai.Game
             var originalRt = Runtime.GraphicsDevice.GetRenderTargets();
 
             var visibleRegion = Rectangle.Intersect(camera.VisibleRegion, Class.Bounds);
-            var visibleTiles = Rectangle.Intersect(
-                new Rectangle(
-                    visibleRegion.X / Class.TileSize,
-                    visibleRegion.Y / Class.TileSize,
-                    visibleRegion.Width / Class.TileSize + 2,
-                    visibleRegion.Height / Class.TileSize + 2
-                ),
-                Class.TileBounds
+            var cameraTransform = camera.Transform;
+            var projection = Matrix.CreateOrthographicOffCenter(
+                Runtime.GraphicsDevice.Viewport.Bounds.Left,
+                Runtime.GraphicsDevice.Viewport.Bounds.Right,
+                Runtime.GraphicsDevice.Viewport.Bounds.Bottom,
+                Runtime.GraphicsDevice.Viewport.Bounds.Top,
+                0, 1
             );
-            var visibleSectors = GetOverlappingSectors(visibleRegion);
-
             RenderContext context = new RenderContext
             {
                 spriteBatch = Class.spriteBatch,
                 camera = camera,
-                cameraTransform = camera.Transform,
+                cameraTransform = cameraTransform,
+                projection = projection,
+                viewTransform = cameraTransform * projection,
                 visibleRegion = visibleRegion,
-                visibleTiles = visibleTiles,
-                visibleSectors = visibleSectors
+                visibleTiles = Rectangle.Intersect(
+                    new Rectangle(
+                        visibleRegion.X / Class.TileSize,
+                        visibleRegion.Y / Class.TileSize,
+                        visibleRegion.Width / Class.TileSize + 2,
+                        visibleRegion.Height / Class.TileSize + 2
+                    ),
+                    Class.TileBounds
+                ),
+                visibleSectors = GetOverlappingSectors(visibleRegion)
             };
 
+            Runtime.GraphicsDevice.Viewport = new Viewport(camera.Viewport);
+            Runtime.GraphicsDevice.ScissorRectangle = camera.Viewport;
             Runtime.GraphicsDevice.SetRenderTarget(Class.reflectedRenderTarget);
             Runtime.GraphicsDevice.Clear(Color.Transparent);
 
-            if (renderSettings.drawTrails)
+            if (renderSettings.drawTrails || renderSettings.drawTrailMesh)
                 DrawTrails(ref context);
 
             if (renderSettings.drawEntities)
@@ -418,8 +442,8 @@ namespace Takai.Game
 
             Runtime.GraphicsDevice.SetRenderTargets(originalRt);
 
-            context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, postEffect);
-            context.spriteBatch.Draw(Class.preRenderTarget, Vector2.Zero, Color.White);
+            context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, camera.PostEffect);
+            context.spriteBatch.Draw(Class.preRenderTarget, new Vector2(camera.Viewport.X, camera.Viewport.Y), Color.White);
             context.spriteBatch.End();
 
             #endregion
@@ -456,15 +480,7 @@ namespace Takai.Game
 
         public void DrawTiles(ref RenderContext c)
         {
-            var camViewport = c.camera.Viewport;
-            var projection = Matrix.CreateOrthographicOffCenter(
-                camViewport.Left,
-                camViewport.Right,
-                camViewport.Bottom,
-                camViewport.Top,
-                0, 1
-            );
-            Class.mapAlphaTest.Projection = projection;
+            Class.mapAlphaTest.Projection = c.projection;
             Class.mapAlphaTest.View = c.cameraTransform;
             c.spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, Class.stencilWrite, null, Class.mapAlphaTest);
 
@@ -755,34 +771,29 @@ namespace Takai.Game
             Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
             Runtime.GraphicsDevice.SamplerStates[0] = SamplerState.AnisotropicWrap;
 
-            var camViewport = c.camera.Viewport;
-            var cameraTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(
-                camViewport.Left,
-                camViewport.Right,
-                camViewport.Bottom,
-                camViewport.Top,
-                0, 1
-            );
-            Class.basicEffect.Parameters["Transform"].SetValue(cameraTransform);
+            Class.basicEffect.Parameters["Transform"].SetValue(c.viewTransform);
 
-            foreach (EffectPass pass in Class.basicEffect.CurrentTechnique.Passes)
+            if (renderSettings.drawTrails)
             {
-                pass.Apply();
-                next = 0;
-                foreach (var trail in Trails)
+                foreach (EffectPass pass in Class.basicEffect.CurrentTechnique.Passes)
                 {
-                    if (trail.Count < 2)
-                        continue;
+                    pass.Apply();
+                    next = 0;
+                    foreach (var trail in Trails)
+                    {
+                        if (trail.Count < 2)
+                            continue;
 
-                    Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture ?? Graphics.Primitives2D.Pixel;
-                    Runtime.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, next, trail.Count * 2 - 2);
-                    next += trail.Count * 2;
+                        Runtime.GraphicsDevice.Textures[0] = trail.Class.Sprite?.Texture ?? Graphics.Primitives2D.Pixel;
+                        Runtime.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, next, trail.Count * 2 - 2);
+                        next += trail.Count * 2;
+                    }
                 }
             }
 
             if (renderSettings.drawTrailMesh)
             {
-                Class.colorEffect.Parameters["Transform"].SetValue(cameraTransform);
+                Class.colorEffect.Parameters["Transform"].SetValue(c.viewTransform);
                 Runtime.GraphicsDevice.RasterizerState = MapClass.wireframeRaster;
                 foreach (EffectPass pass in Class.colorEffect.CurrentTechnique.Passes)
                 {
@@ -803,17 +814,9 @@ namespace Takai.Game
 
         public void DrawLines(ref RenderContext c)
         {
-            var camViewport = c.camera.Viewport;
             if (renderedCircles.Count > 0)
             {
-                var circleTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter( //todo: precalc
-                    camViewport.Left,
-                    camViewport.Right,
-                    camViewport.Bottom,
-                    camViewport.Top,
-                    0, 1
-                );
-                Class.circleEffect.Parameters["Transform"].SetValue(circleTransform);
+                Class.circleEffect.Parameters["Transform"].SetValue(c.viewTransform);
 
                 Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
                 Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
@@ -831,14 +834,7 @@ namespace Takai.Game
                 Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
                 Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
                 Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
-                var lineTransform = c.cameraTransform * Matrix.CreateOrthographicOffCenter(
-                    camViewport.Left,
-                    camViewport.Right,
-                    camViewport.Bottom,
-                    camViewport.Top,
-                    0, 1
-                );
-                Class.colorEffect.Parameters["Transform"].SetValue(lineTransform);
+                Class.colorEffect.Parameters["Transform"].SetValue(c.viewTransform);
 
                 var blackLines = new VertexPositionColor[renderedLines.Count];
                 for (int i = 0; i < renderedLines.Count; ++i)
@@ -866,14 +862,7 @@ namespace Takai.Game
             Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
             Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.None;
-            var viewProjection = Matrix.CreateOrthographicOffCenter(
-                camViewport.Left,
-                camViewport.Right,
-                camViewport.Bottom,
-                camViewport.Top,
-                0, 1
-            );
-            Class.colorEffect.Parameters["Transform"].SetValue(c.cameraTransform * viewProjection);
+            Class.colorEffect.Parameters["Transform"].SetValue(c.viewTransform);
 
             var grids = new VertexPositionColor[c.visibleTiles.Width * 2 + c.visibleTiles.Height * 2 + 4];
             var gridColor = new Color(Color.Gray, 0.3f);

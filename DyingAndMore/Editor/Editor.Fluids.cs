@@ -59,7 +59,7 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
-            var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 
             if (selector.SelectedItem >= 0 && time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
             {

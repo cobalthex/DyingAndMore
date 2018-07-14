@@ -143,6 +143,11 @@ namespace DyingAndMore.Game.Weapons
             gun.AmmoCount -= AmmoCount - lastAmmoCount;
             return true;
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} ({AmmoCount}/{Class?.MaxAmmo})";
+        }
     }
 }
 

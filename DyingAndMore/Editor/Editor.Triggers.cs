@@ -71,7 +71,7 @@ namespace DyingAndMore.Editor
 
         protected override bool HandleInput(GameTime time)
         {
-            var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 
             if (activeTrigger != null && InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Space))
             {
@@ -158,7 +158,7 @@ namespace DyingAndMore.Editor
 
         void SelectTrigger(Vector2 Position)
         {
-            var currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
             var sectorIndex = editor.Map.GetOverlappingSector(currentWorldPos);
             var sector = editor.Map.Sectors[sectorIndex.Y, sectorIndex.X];
 
@@ -180,7 +180,7 @@ namespace DyingAndMore.Editor
             {
                 editor.Map.DrawRect(activeTrigger.Class.Region, Color.GreenYellow);
                 var textPos = new Vector2(activeTrigger.Class.Region.X + 5, activeTrigger.Class.Region.Y + 5);
-                DefaultFont?.Draw(spriteBatch, activeTrigger.Class.Name, editor.Map.ActiveCamera.WorldToScreen(textPos), Color.White);
+                DefaultFont?.Draw(spriteBatch, activeTrigger.Class.Name, editor.Camera.WorldToScreen(textPos), Color.White);
             }
             base.DrawSelf(spriteBatch);
         }

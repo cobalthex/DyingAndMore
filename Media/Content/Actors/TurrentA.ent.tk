@@ -15,8 +15,8 @@ ActorClass {
             MuzzleVelocity: 1E10;
             Damage: 100;
             Drag: 0;
-            DischargeTime: 100msec;
         };
+        DischargeTime: 100msec;
     };
 
     Animations: {

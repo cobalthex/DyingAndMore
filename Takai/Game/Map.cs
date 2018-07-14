@@ -229,12 +229,6 @@ namespace Takai.Game
         /// </summary>
         public List<SoundInstance> Sounds { get; set; } = new List<SoundInstance>();
 
-        /// <summary>
-        /// The currently active camera. Determines what part of the map is active
-        /// </summary>
-        [Data.Serializer.Ignored] //maybe?
-        public Camera ActiveCamera { get; set; } //todo: necessary?
-
         public MapInstance() { }
 
         public MapInstance(MapClass @class)
@@ -331,8 +325,9 @@ namespace Takai.Game
         /// Remove an entity from the map sectors
         /// </summary>
         /// <param name="instance">The entity to remove</param>
-        protected void RemoveFromSectors(EntityInstance instance)
+        protected void RemoveFromMap(EntityInstance instance)
         {
+            activeEntities.Remove(instance);
             var sectors = GetOverlappingSectors(instance.AxisAlignedBounds);
             for (int y = sectors.Top; y < sectors.Bottom; ++y)
             {

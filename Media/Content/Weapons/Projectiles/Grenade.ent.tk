@@ -25,7 +25,7 @@ ProjectileClass {
     FadeEffect: {
         Effects: [
             HealthEffect {
-                MaxDamage: 10000;
+                MaxDamage: 100000;
                 Radius: 20;
             };
 

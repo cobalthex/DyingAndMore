@@ -60,7 +60,7 @@ namespace Takai.Game
         /// <summary>
         /// Should the sprite always be drawn with the original sprite orientation?
         /// </summary>
-        public bool AlwaysDrawUpright { get; set; } = false;
+        public bool AlwaysDrawUpright { get; set; } = false; //todo: move to animation
 
         /// <summary>
         /// An effect created at the entity's position when its spawned in a map

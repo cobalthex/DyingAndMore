@@ -37,6 +37,16 @@ namespace Takai.UI
         //input device
     }
 
+    public class ParentChangedEventArgs : System.EventArgs
+    {
+        public Static Previous { get; set; }
+
+        public ParentChangedEventArgs(Static previousParent)
+        {
+            Previous = previousParent;
+        }
+    }
+
     //todo: invalidation/dirty states, instead of reflow each time property is updated, mark dirty. On next update, reflow if dirty
 
     /// <summary>
@@ -102,7 +112,7 @@ namespace Takai.UI
                 if (_font != value)
                 {
                     _font = value;
-                    textSize = _font?.MeasureString(_text) ?? Vector2.One;
+                    textSize = _font?.MeasureString(Text) ?? Vector2.One;
                 }
             }
         }
@@ -254,8 +264,8 @@ namespace Takai.UI
 
                     //defocus all elements in tree
                     Static next = this;
-                    while (next._parent != null)
-                        next = next._parent;
+                    while (next.Parent != null)
+                        next = next.Parent;
 
                     defocusing.Push(next);
                     while (defocusing.Count > 0)
@@ -278,6 +288,8 @@ namespace Takai.UI
         /// </summary>
         public bool IsModal { get; set; } = false;
 
+        #region Events
+
         /// <summary>
         /// Can this element be focused
         /// </summary>
@@ -285,9 +297,14 @@ namespace Takai.UI
         public virtual bool CanFocus { get => Click != null; }
 
         /// <summary>
+        /// Called whenever the element has its parent changed
+        /// </summary>
+        public event System.EventHandler<ParentChangedEventArgs> ParentChanged = null;
+        protected virtual void OnParentChanged(ParentChangedEventArgs e) { }
+
+        /// <summary>
         /// Called whenever the element is pressed.
         /// </summary>
-        [Data.Serializer.Ignored]
         public event System.EventHandler<ClickEventArgs> Press = null;
         protected virtual void OnPress(ClickEventArgs e) { }
 
@@ -295,16 +312,16 @@ namespace Takai.UI
         /// Called whenever the element is clicked (mouse just released).
         /// By default, whether or not there is a click handler determines if this is focusable
         /// </summary>
-        [Data.Serializer.Ignored]
         public event System.EventHandler<ClickEventArgs> Click = null;
         protected virtual void OnClick(ClickEventArgs e) { }
 
         /// <summary>
         /// Called whenever the size of this element is updated
         /// </summary>
-        [Data.Serializer.Ignored]
         public event System.EventHandler Resize = null;
         protected virtual void OnResize(System.EventArgs e) { }
+
+        #endregion
 
         /// <summary>
         /// Disable the default behavior of the tab key
@@ -340,14 +357,23 @@ namespace Takai.UI
             get => _parent;
             protected set
             {
-                if (_parent != value)
-                {
-                    _parent = value;
-                    Reflow();
-                }
+                if (_parent == value)
+                    return;
+
+                SetParentNoReflow(value);
+                Reflow();
             }
         }
         private Static _parent = null;
+
+        private void SetParentNoReflow(Static newParent)
+        {
+            var changed = new ParentChangedEventArgs(_parent);
+            _parent = newParent;
+
+            OnParentChanged(changed);
+            ParentChanged?.Invoke(this, changed);
+        }
 
         /// <summary>
         /// A readonly collection of all of the children in this element
@@ -408,7 +434,7 @@ namespace Takai.UI
         public Static Clone()
         {
             var clone = CloneSelf();
-            clone._parent = null;
+            clone.SetParentNoReflow(null);
             Stack<Static> clones = new Stack<Static>(new[] { clone });
             while (clones.Count > 0)
             {
@@ -416,7 +442,7 @@ namespace Takai.UI
                 for (int i = 0; i < top.children.Count; ++i)
                 {
                     var child = top.children[i].CloneSelf();
-                    child._parent = top;
+                    child.SetParentNoReflow(top);
                     top.children[i] = child;
                     if (child.children.Count > 0)
                         clones.Push(child);
@@ -457,7 +483,7 @@ namespace Takai.UI
                 child.RemoveFromParent();
 
             //todo: come up with a common interface for modifying children
-            child._parent = this;
+            child.SetParentNoReflow(this);
             children.Add(child);
             if (child.HasFocus)
                 child.HasFocus = true;
@@ -476,7 +502,7 @@ namespace Takai.UI
             if (children[index] != null)
                 children[index].Parent = null;
 
-            child._parent = this;
+            child.SetParentNoReflow(this);
             children[index] = child;
             if (child.HasFocus)
                 child.HasFocus = true;
@@ -490,7 +516,7 @@ namespace Takai.UI
             if (child.Parent == this)
                 return child;
 
-            child._parent = this;
+            child.SetParentNoReflow(this);
             children.Insert(index, child);
             if (child.HasFocus) //re-apply throughout tree
                 child.HasFocus = true;
@@ -508,7 +534,7 @@ namespace Takai.UI
                 if (child.Parent == this)
                     continue;
 
-                child._parent = this;
+                child.SetParentNoReflow(this);
                 this.children.Add(child);
                 if (child.HasFocus)
                     lastFocus = child;
@@ -530,7 +556,7 @@ namespace Takai.UI
                 if (child.Parent == this)
                     continue;
 
-                child._parent = this;
+                child.SetParentNoReflow(this);
                 this.children.Add(child);
                 if (child.HasFocus)
                     lastFocus = child;
@@ -558,8 +584,8 @@ namespace Takai.UI
 
             var child = children[index];
             children.RemoveAt(index);
-            if (child._parent == this)
-                child._parent = null;
+            if (child.Parent == this)
+                child.SetParentNoReflow(null);
             return child;
         }
 
@@ -567,8 +593,8 @@ namespace Takai.UI
         {
             foreach (var child in children)
             {
-                if (child._parent == this)
-                    child._parent = null;
+                if (child.Parent == this)
+                    child.SetParentNoReflow(null);
             }
             children.Clear();
         }
@@ -658,7 +684,7 @@ namespace Takai.UI
                 if (current != next)
                     continue;
 
-                while (next._parent != null)
+                while (next.Parent != null)
                 {
                     var index = next.Parent.Children.IndexOf(next) + 1;
                     if (index < next.Parent.Children.Count)
@@ -667,7 +693,7 @@ namespace Takai.UI
                         break;
                     }
                     else
-                        next = next._parent;
+                        next = next.Parent;
                 }
 
                 if (next.CanFocus)
@@ -692,7 +718,7 @@ namespace Takai.UI
             var prev = this;
             while (true)
             {
-                if (prev._parent == null)
+                if (prev.Parent == null)
                 {
                     while (prev.children.Count > 0)
                         prev = prev.children[prev.children.Count - 1];
@@ -708,7 +734,7 @@ namespace Takai.UI
                             prev = prev.children[prev.children.Count - 1];
                     }
                     else
-                        prev = prev._parent;
+                        prev = prev.Parent;
                 }
 
 
@@ -865,19 +891,19 @@ namespace Takai.UI
         /// </summary>
         public virtual void Reflow()
         {
-            if (_parent != null &&
+            if (Parent != null &&
                 (HorizontalAlignment == Alignment.Stretch ||
                 VerticalAlignment == Alignment.Stretch))
             {
                 if (HorizontalAlignment == Alignment.Stretch)
                 {
                     _position.X = 0;
-                    _size.X = _parent._size.X;
+                    _size.X = Parent.Size.X;
                 }
                 if (VerticalAlignment == Alignment.Stretch)
                 {
                     _position.Y = 0;
-                    _size.Y = _parent._size.Y;
+                    _size.Y = Parent.Size.Y;
                 }
                 CalculateBounds();
 
@@ -1001,7 +1027,7 @@ namespace Takai.UI
                 toUpdate.UpdateSelf(time);
 
                 //stop at this element
-                if (toUpdate._parent == null || toUpdate == this)
+                if (toUpdate.Parent == null || toUpdate == this)
                     break;
 
                 var index = toUpdate.Parent.Children.IndexOf(toUpdate) - 1;
@@ -1013,7 +1039,7 @@ namespace Takai.UI
                         toUpdate = toUpdate.children[toUpdate.children.Count - 1];
                 }
                 else
-                    toUpdate = toUpdate._parent;
+                    toUpdate = toUpdate.Parent;
                 ++i;
             }
         }
@@ -1165,7 +1191,7 @@ namespace Takai.UI
         {
             if (Font != null)
             {
-                var textPos = ((_size - textSize) / 2).ToPoint();
+                var textPos = ((Size - textSize) / 2).ToPoint();
                 DrawText(spriteBatch, textPos);
             }
         }
@@ -1199,7 +1225,7 @@ namespace Takai.UI
                 Size = new Vector2(Data.Serializer.Cast<float>(width), Size.Y);
 
             if (props.TryGetValue("Height", out var height))
-                Size = new Vector2(_size.X, Data.Serializer.Cast<float>(height));
+                Size = new Vector2(Size.X, Data.Serializer.Cast<float>(height));
         }
 
         #endregion
@@ -1294,10 +1320,10 @@ namespace Takai.UI
                         };
                         check.AutoSize();
                         root.AddChild(check);
-                        maxWidth = System.Math.Max(maxWidth, check._size.X);
+                        maxWidth = System.Math.Max(maxWidth, check.Size.X);
                     }
                 }
-                root._size = new Vector2(maxWidth, 1);
+                root.Size = new Vector2(maxWidth, 1);
                 root.AutoSize();
                 return root;
             }
@@ -1344,7 +1370,7 @@ namespace Takai.UI
                     label.AutoSize();
                     root.AddChild(label);
 
-                    maxWidth = System.Math.Max(maxWidth, label._size.X);
+                    maxWidth = System.Math.Max(maxWidth, label.Size.X);
                 }
 
                 if (memberType == typeof(bool))
@@ -1362,7 +1388,7 @@ namespace Takai.UI
                     };
                     check.AutoSize();
                     root.AddChild(check);
-                    maxWidth = System.Math.Max(maxWidth, check._size.X);
+                    maxWidth = System.Math.Max(maxWidth, check.Size.X);
                 }
                 else if (memberType == typeof(int))
                 {

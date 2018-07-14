@@ -111,6 +111,11 @@ namespace Takai.Data
             return error; //todo
         }
 
+        static void Warn(string message, DeserializationContext context)
+        {
+            System.Diagnostics.Debug.WriteLine(message + $" <{context.file}>", context);
+        }
+
         public static T TextDeserialize<T>(DeserializationContext context)
         {
             return Cast<T>(TextDeserialize(context), context);
@@ -172,7 +177,7 @@ namespace Takai.Data
                     }
 
                     if (dict.ContainsKey(keyStr))
-                        System.Diagnostics.Debug.WriteLine($"Property '{keyStr}' was duplicated in {context.file}");
+                        Warn($"Property '{keyStr}' was duplicated in {context.file}", context);
 
                     dict[keyStr] = value;
 
@@ -627,12 +632,12 @@ namespace Takai.Data
                             else if (late != null)
                                 late.setter = (value) => ParseMember(destObject, value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                             else
-                               ParseMember(destObject, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
+                                ParseMember(destObject, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                         }
                         else if (derived != null)
-                            System.Diagnostics.Debug.WriteLine($"Ignoring possible unknown field:{pair.Key} in DestType:{destType.Name} (May be derived)"); //pass filename through?
+                            Warn($"Ignoring possible unknown field:{pair.Key} in DestType:{destType.Name} (May be derived)", context);
                         else
-                            System.Diagnostics.Debug.WriteLine($"Ignoring unknown field:{pair.Key} in DestType:{destType.Name}"); //pass filename through?
+                            Warn($"Ignoring unknown field:{pair.Key} in DestType:{destType.Name}", context);
                     }
                 }
                 catch (InvalidCastException expt)

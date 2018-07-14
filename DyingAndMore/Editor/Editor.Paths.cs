@@ -34,7 +34,12 @@ namespace DyingAndMore.Editor
                 new Takai.Game.VectorCurve()
             };
 
-            trail = Takai.Data.Cache.Load<Takai.Game.TrailClass>("Effects/Trails/road.trail.tk").Instantiate();
+            trail = new Takai.Game.TrailClass
+            {
+                Color = Color.Blue,
+                Width = 10,
+            }.Instantiate();
+            //trail = Takai.Data.Cache.Load<Takai.Game.TrailClass>("Effects/Trails/road.trail.tk").Instantiate();
         }
 
         public override void Start()
@@ -74,7 +79,7 @@ namespace DyingAndMore.Editor
         {
             if (Takai.Input.InputState.IsPress(Takai.Input.MouseButtons.Left))
             {
-                AddPathPoint(editor.Map.ActiveCamera.ScreenToWorld(Takai.Input.InputState.MouseVector));
+                AddPathPoint(editor.Camera.ScreenToWorld(Takai.Input.InputState.MouseVector));
                 return false;
             }
 

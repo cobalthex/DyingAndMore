@@ -2,6 +2,7 @@ WeaponPickupClass {
     Name: "Machine gun test gun";
 
 	Weapon: @"Weapons/mg.wpn.tk";
+    AlwaysDrawUpright: true;
 
     Animations: {
         Idle: {

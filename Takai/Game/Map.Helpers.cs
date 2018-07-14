@@ -26,7 +26,6 @@ namespace Takai.Game
             if (initializeGraphics)
                 map.InitializeGraphics();
             var inst = map.Instantiate();
-            inst.ActiveCamera = new Camera(new Vector2(size / 2));
             return inst;
         }
 
@@ -125,11 +124,6 @@ namespace Takai.Game
                 for (int x = sectors.Left; x < sectors.Right; ++x)
                     foreach (var ent in Sectors[y, x].entities)
                         yield return ent; //todo: needs to test if >= sector bounds (to not draw twice)
-        }
-
-        public IEnumerable<EntityInstance> EnumerateVisibleEntities()
-        {
-            return EnumerateEntitiesInSectors(GetOverlappingSectors(ActiveCamera.VisibleRegion));
         }
 
         public IEnumerable<MapSector> EnumeratateSectorsInRegion(Rectangle region)

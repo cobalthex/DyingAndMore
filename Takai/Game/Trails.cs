@@ -33,7 +33,11 @@ namespace Takai.Game
         public string File { get; set; }
         public string Name { get; set; }
 
-        public int MaxPoints { get; set; } = 10;
+        /// <summary>
+        /// The maximum number of points in this trail. 0 for infinite
+        /// Note, any number not zero will be pre-sized
+        /// </summary>
+        public int MaxPoints { get; set; } = 0;
 
         public Graphics.Sprite Sprite { get; set; }
         public TrailSpriteRenderStyle SpriteRenderStyle { get; set; }

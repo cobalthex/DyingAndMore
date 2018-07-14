@@ -1,0 +1,8 @@
+GameStory {
+	Name: "A painful story";
+	Description: "Try again";
+
+	MapFiles: [
+		"Maps/hell.map.tk";
+	];
+}
