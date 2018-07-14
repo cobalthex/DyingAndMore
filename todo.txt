@@ -67,3 +67,6 @@
 	☐	Don't hardcode file type paths (.ent.tk, .story.tk, etc)
 	☐	are configurations tied to game stories? (easy hard etc for single, vs ctf for multi)
 	☐	Game story should be genericized to support MP (level rotations)
+
+	☐	Dynamic render quality, esp for split screen
+	☐	Pixel shader to draw tilemap (use tilemap as texture)

@@ -102,7 +102,7 @@ namespace DyingAndMore.Editor
 
         public override void Start()
         {
-            lastWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            lastWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
             editor.Map.renderSettings.drawEntityForwardVectors = true;
         }
 
@@ -130,7 +130,7 @@ namespace DyingAndMore.Editor
             }
 
             lastWorldPos = currentWorldPos;
-            currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 
             if (SelectedEntity != null)
                 SelectedEntity.OutlineColor = Color.Transparent;

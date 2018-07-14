@@ -318,13 +318,7 @@ namespace Takai.Game
 
         public void Spawn(EffectsInstance instance)
         {
-            if (instance.Map.ActiveCamera == null)
-                return;
-
-            instance.Map.ActiveCamera.Position += new Vector2(Jitter.Random(), Jitter.Random());
-            instance.Map.ActiveCamera.Rotation += Tilt.Random();
-
-            //todo: sustained rumble
+            //todo
         }
     }
 

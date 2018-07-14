@@ -1,6 +1,6 @@
 ActorClass {
     Name: "Shooter Test";
-    MaxHealth: 2000;
+    MaxHealth: 3000;
 
     FieldOfView: 2.356194;
     MaxSpeed: [100 200];

@@ -5,7 +5,7 @@ ProjectileClass {
     IgnoreTrace: True;
     Drag: 0.4;
     MinimumSpeed: 300;
-    CanAffectSource: true;
+    CanDamageSource: true;
     InheritSourcePhysics: true;    
 
     #*FadeEffect: {

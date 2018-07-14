@@ -11,6 +11,8 @@ ActorClass {
     AlwaysDrawUpright: true;
     DestroyOnDeath: true;
 
+    Material: 'Infection';
+
     DefaultController: AIController {
         Behaviors: [
             FlowSeekBehavior { };
@@ -18,8 +20,7 @@ ActorClass {
             #TargetEnemyBehavior { };
             #FocusBehavior { };
 
-            SuicideBehavior {
-                Radius: 80;
+            FlowKamikazeBehavior {
                 Effect: @"Effects/Damage.fx.tk";
             };
         ];

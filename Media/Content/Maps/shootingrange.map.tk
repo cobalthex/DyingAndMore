@@ -9,6 +9,7 @@ MapClass {
                 Forward: [1 0];
                 Name: Null;
             }
+
             EntitySpawn {
                 Class: @"Pickups/MG.ent.tk";
                 Position: [430.7063 48.2253];

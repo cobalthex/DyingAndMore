@@ -2,10 +2,11 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.Graphics;
 using Takai.Data;
 using Takai.Input;
 using Takai.UI;
+using Takai.Game;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace DyingAndMore.Editor
 {
@@ -23,17 +24,37 @@ namespace DyingAndMore.Editor
         public virtual void End() { }
     }
 
-    struct EditorConfiguration
+    public struct EditorConfiguration
     {
 #pragma warning disable 0649
         public int maxMapSize;
         public float snapAngle;
-        public Takai.Game.MapInstance.RenderSettings renderSettings;
+        public MapInstance.RenderSettings renderSettings;
 #pragma warning restore 0649
     }
 
-    class Editor : MapView
+    public class Editor : Static
     {
+        public static Editor Current { get; set; }
+
+        public MapInstance Map
+        {
+            get => _map;
+            set
+            {
+                if (value == null)
+                    throw new System.ArgumentNullException("Map cannot be null");
+                if (_map == value)
+                    return;
+
+                _map = value;
+                OnMapChanged();
+            }
+        }
+        private MapInstance _map;
+
+        public Camera Camera { get; set; }
+
         ModeSelector modes;
         Static renderSettingsConsole;
         Static fpsDisplay;
@@ -42,7 +63,7 @@ namespace DyingAndMore.Editor
 
         public EditorConfiguration config;
 
-        public Editor(Takai.Game.MapInstance map)
+        public Editor(MapInstance map)
         {
             var swatch = System.Diagnostics.Stopwatch.StartNew();
             config = Cache.Load<EditorConfiguration>("Editor.conf.tk", "Config");
@@ -93,6 +114,7 @@ namespace DyingAndMore.Editor
 
             swatch.Stop();
             Takai.LogBuffer.Append($"Loaded editor and map \"{map.Class.Name}\" ({map.Class.File}) in {swatch.ElapsedMilliseconds}msec");
+            //todo: move this to mapChanged
         }
 
         void AddModes()
@@ -106,19 +128,84 @@ namespace DyingAndMore.Editor
             modes.AddMode(new TestEditorMode(this));
         }
 
-        protected override void OnMapChanged(System.EventArgs e)
+        protected override void OnParentChanged(ParentChangedEventArgs e)
         {
-            Map.ActiveCamera = new EditorCamera();
+            if (Parent == null)
+                return;
 
-            Map.updateSettings = Takai.Game.MapInstance.UpdateSettings.Editor;
-            Map.renderSettings = config.renderSettings;
+            Map.updateSettings.SetEditor();
+            Map.renderSettings = config.renderSettings.Clone();
+        }
+
+        protected void OnMapChanged()
+        {
+            if (renderSettingsConsole != null)
+                renderSettingsConsole.UserData = Map.renderSettings;
 
             //start zoomed out to see the whole map
             var mapSize = new Vector2(Map.Class.Width, Map.Class.Height) * Map.Class.TileSize;
             var xyScale = new Vector2(Takai.Runtime.GraphicsDevice.Viewport.Width - 20,
                                       Takai.Runtime.GraphicsDevice.Viewport.Height - 20) / mapSize;
-            Map.ActiveCamera.Scale = MathHelper.Clamp(System.Math.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
-            Map.ActiveCamera.MoveTo(mapSize / 2);
+
+            Camera = new Camera
+            {
+                Scale = MathHelper.Clamp(System.Math.Min(xyScale.X, xyScale.Y), 0.1f, 1f)
+            };
+            Camera.MoveTo(mapSize / 2);
+        }
+
+        void SwitchToGame()
+        {
+            modes.Mode?.End();
+
+            if (Game.GameInstance.Current == null)
+                Game.GameInstance.Current = new Game.GameInstance(new Game.Game { Map = Map });
+            else
+                Game.GameInstance.Current.Map = Map;
+
+            Parent.ReplaceAllChildren(Game.GameInstance.Current);
+        }
+
+        void UpdateCamera(GameTime time)
+        {
+            if (InputState.IsButtonDown(MouseButtons.Middle))
+                Camera.MoveTo(Camera.Position - Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(Camera.Transform)));
+            else
+            {
+                var d = Vector2.Zero;
+                if (InputState.IsButtonDown(Keys.A) || InputState.IsButtonDown(Keys.Left))
+                    d -= Vector2.UnitX;
+                if (InputState.IsButtonDown(Keys.W) || InputState.IsButtonDown(Keys.Up))
+                    d -= Vector2.UnitY;
+                if (InputState.IsButtonDown(Keys.D) || InputState.IsButtonDown(Keys.Right))
+                    d += Vector2.UnitX;
+                if (InputState.IsButtonDown(Keys.S) || InputState.IsButtonDown(Keys.Down))
+                    d += Vector2.UnitY;
+
+                if (d != Vector2.Zero)
+                {
+                    d.Normalize();
+                    d = d * Camera.MoveSpeed * (float)time.ElapsedGameTime.TotalSeconds; //(camera velocity)
+                    Camera.Position += Vector2.TransformNormal(d, Matrix.Invert(Camera.Transform));
+                }
+            }
+
+            if (InputState.HasScrolled())
+            {
+                var delta = (Camera.Scale * InputState.ScrollDelta()) / 1024f;
+                if (InputState.IsButtonDown(Keys.LeftShift))
+                    Camera.Rotation += delta;
+                else
+                {
+                    Camera.Scale += delta;
+                    if (System.Math.Abs(Camera.Scale - 1) < 0.1f) //snap to 100% when near
+                        Camera.Scale = 1;
+                }
+            }
+
+            Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 10f); //todo: make ranges global and move to some game settings
+            Camera.Viewport = VisibleBounds;
+            Camera.Update(time);
         }
 
         protected override void UpdateSelf(GameTime time)
@@ -126,15 +213,11 @@ namespace DyingAndMore.Editor
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
-            base.UpdateSelf(time);
-        }
+            Map.BeginUpdate();
+            Map.MarkRegionActive(Camera);
+            Map.Update(time);
 
-        void SwitchToGame()
-        {
-            modes.Mode?.End();
-            if (Game.GameInstance.Current != null)
-                Game.GameInstance.Current.Game.Map = Game.GameInstance.Current.Map = Map;
-            Parent.ReplaceAllChildren(Game.GameInstance.Current ?? new Game.GameInstance(new Game.Game { Map = Map }));
+            base.UpdateSelf(time);
         }
 
         protected override bool HandleInput(GameTime time)
@@ -157,7 +240,7 @@ namespace DyingAndMore.Editor
                 if (Vector2.Dot(gesture.Delta, gesture.Delta2) > 0)
                 {
                     //todo: maybe add velocity
-                    Map.ActiveCamera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(Map.ActiveCamera.Transform)) / 2;
+                    Camera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(Camera.Transform)) / 2;
                 }
                 //scale
                 else
@@ -168,7 +251,7 @@ namespace DyingAndMore.Editor
                     var ld = Vector2.Distance(lp1, lp2);
 
                     var scale = (dist / ld) / 100;
-                    Map.ActiveCamera.Scale += scale;
+                    Camera.Scale += scale;
                 }
             }
 
@@ -240,7 +323,7 @@ namespace DyingAndMore.Editor
                             {
                                 if (ofd.FileName.EndsWith(".d2sav"))
                                 {
-                                    var instance = Cache.Load<Takai.Game.MapInstance>(ofd.FileName);
+                                    var instance = Cache.Load<MapInstance>(ofd.FileName);
                                     if (instance.Class != null)
                                     {
                                         instance.Class.InitializeGraphics();
@@ -249,7 +332,7 @@ namespace DyingAndMore.Editor
                                 }
                                 else
                                 {
-                                    var mapClass = Cache.Load<Takai.Game.MapClass>(ofd.FileName);
+                                    var mapClass = Cache.Load<MapClass>(ofd.FileName);
                                     mapClass.InitializeGraphics();
                                     Parent.ReplaceAllChildren(new Editor(mapClass.Instantiate()));
                                 }
@@ -274,9 +357,9 @@ namespace DyingAndMore.Editor
                         var name = resizeMap.FindChildByName("name").Text;
                         var width = resizeMap.FindChildByName<NumericBase>("width").Value;
                         var height = resizeMap.FindChildByName<NumericBase>("height").Value;
-                        var tileset = Cache.Load<Takai.Game.Tileset>(resizeMap.FindChildByName<FileInputBase>("tileset").Value);
+                        var tileset = Cache.Load<Tileset>(resizeMap.FindChildByName<FileInputBase>("tileset").Value);
 
-                        var map = new Takai.Game.MapClass
+                        var map = new MapClass
                         {
                             Name = name,
                             Tiles = new short[height, width],
@@ -321,7 +404,15 @@ namespace DyingAndMore.Editor
 
 #endif
 
+            UpdateCamera(time);
+
             return base.HandleInput(time);
+        }
+
+        protected override void DrawSelf(SpriteBatch spriteBatch)
+        {
+            base.DrawSelf(spriteBatch);
+            Map.Draw(Camera);
         }
 
         void ToggleRenderSettingsConsole()
@@ -329,7 +420,7 @@ namespace DyingAndMore.Editor
             if (!renderSettingsConsole.RemoveFromParent())
             {
                 //refresh individual render settings
-                var settings = typeof(Takai.Game.MapInstance.RenderSettings);
+                var settings = typeof(MapInstance.RenderSettings);
                 settings.GetTypeInfo();
                 foreach (var child in renderSettingsConsole.Children)
                     ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);

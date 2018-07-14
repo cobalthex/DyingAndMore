@@ -59,8 +59,7 @@ namespace Takai
             switch (distribution)
             {
                 case RandomDistribution.Gaussian:
-                    random = Util.RandomGenerator.NextGaussian();
-                    break;
+                    return (int)Util.RandomGenerator.NextGaussian((range.max + range.min) / 2f, (range.max - range.min) / 6f);
                 case RandomDistribution.Polar:
                     random = Math.Sin(Util.RandomGenerator.NextDouble());
                     break;
@@ -76,7 +75,6 @@ namespace Takai
             {
                 case RandomDistribution.Gaussian:
                     return (float)Util.RandomGenerator.NextGaussian((range.max + range.min) / 2, (range.max - range.min) / 6);
-                    break;
                 case RandomDistribution.Polar:
                     random = Math.Sin(Util.RandomGenerator.NextDouble());
                     break;

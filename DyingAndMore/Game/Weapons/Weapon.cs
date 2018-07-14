@@ -253,7 +253,7 @@ namespace DyingAndMore.Game.Weapons
 
         public override string ToString()
         {
-            return GetType().Name;
+            return Class?.Name ?? GetType().Name;
         }
     }
 }

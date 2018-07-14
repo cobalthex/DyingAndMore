@@ -36,6 +36,16 @@ namespace DyingAndMore.Game
         public string[] MapFiles { get; set; } //todo: lazy load map class
     }
 
+    public class MapChangedEventArgs : EventArgs
+    {
+        public MapInstance PreviousMap { get; set; }
+
+        public MapChangedEventArgs(MapInstance previousMap)
+        {
+            PreviousMap = previousMap;
+        }
+    }
+
     /// <summary>
     /// The current game being played
     /// </summary>
@@ -45,7 +55,20 @@ namespace DyingAndMore.Game
         /// <summary>
         /// The current map
         /// </summary>
-        public MapInstance Map { get; set; }
+        public MapInstance Map
+        {
+            get => _map;
+            set
+            {
+                var oldMap = _map;
+                if (oldMap != value)
+                {
+                    _map = value;
+                    MapChanged?.Invoke(this, new MapChangedEventArgs(oldMap));
+                }
+            }
+        }
+        private MapInstance _map;
 
         /// <summary>
         /// The current story this game is playing through. <see cref="Map"/> should be part of this story
@@ -54,6 +77,8 @@ namespace DyingAndMore.Game
 
         //gampaign settings
         public GameConfiguration Configuration { get; set; } = new GameConfiguration();
+
+        public event EventHandler<MapChangedEventArgs> MapChanged;
 
         public enum LoadMapResult
         {
@@ -126,7 +151,7 @@ namespace DyingAndMore.Game
                         };
                         ui.AddChild(new Static(story.Name));
                         ui.AddChild(new Static(story.Description));
-                        ui.AddChild(new Static($"{story.MapFiles.Length} maps"));
+                        ui.AddChild(new Static($"{story.MapFiles.Length} map{(story.MapFiles.Length == 1 ? "" : "s")}"));
                         ui.AutoSize(10);
                         ui.Click += delegate
                         {

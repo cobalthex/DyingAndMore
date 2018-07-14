@@ -9,8 +9,8 @@ ActorClass {
     DestructionEffect: {
         Effects: [
             HealthEffect {
-                MaxDamage: 1000;
-                Radius: 100;
+                MaxDamage: 3000;
+                Radius: 20;
                 CanAffectSource: true;
             }
             ParticleEffect {

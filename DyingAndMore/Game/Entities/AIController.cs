@@ -235,9 +235,9 @@ namespace DyingAndMore.Game.Entities
     /// <summary>
     /// Commit suicide when close to an enemy (actor of a different faction)
     /// </summary>
-    class SuicideBehavior : Behavior
+    class KamikazeBehavior : Behavior
     {
-        public override BehaviorMask Mask => BehaviorMask.Unknown;
+        public override BehaviorMask Mask => BehaviorMask.Weapons;
         public override BehaviorFilters Filter => BehaviorFilters.RequiresTarget;
 
         public float Radius { get; set; } = 0;
@@ -251,6 +251,40 @@ namespace DyingAndMore.Game.Entities
         {
             var distance = Vector2.DistanceSquared(AI.Actor.Position, AI.Target.Position);
             if (distance < Radius * Radius)
+                return BehaviorPriority.High;
+            return BehaviorPriority.Never;
+        }
+
+        public override void Think(TimeSpan deltaTime)
+        {
+            AI.Actor.Kill(); //todo: should this be handled by the effect?
+            if (Effect != null)
+                AI.Actor.Map.Spawn(Effect.Instantiate(AI.Actor));
+        }
+    }
+
+    /// <summary>
+    /// Similar behavior to <see cref="KamikazeBehavior"/> except relying on the flow map
+    /// </summary>
+    class FlowKamikazeBehavior : Behavior
+    {
+        public override BehaviorMask Mask => BehaviorMask.Weapons;
+        public override BehaviorFilters Filter => BehaviorFilters.None;
+
+        /// <summary>
+        /// maximum flow map value to find to suicide
+        /// </summary>
+        public int Bias { get; set; } = 1;
+
+        /// <summary>
+        /// An optional effect to play when committing seppeku
+        /// </summary>
+        public Takai.Game.EffectsClass Effect { get; set; }
+
+        public override BehaviorPriority CalculatePriority()
+        {
+            var flow = AI.Actor.Map.PathInfoAt(AI.Actor.Position);
+            if (flow.heuristic <= Bias)
                 return BehaviorPriority.High;
             return BehaviorPriority.Never;
         }

@@ -70,7 +70,7 @@ namespace DyingAndMore.Editor
             }
 
             lastWorldPos = currentWorldPos;
-            currentWorldPos = editor.Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
+            currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsPress(Keys.LeftControl) || InputState.IsPress(Keys.RightControl))
             {
@@ -165,7 +165,7 @@ namespace DyingAndMore.Editor
 
                     var w = (System.Math.Abs((int)diff.X) - 1) / editor.Map.Class.TileSize + 1;
                     var h = (System.Math.Abs((int)diff.Y) - 1) / editor.Map.Class.TileSize + 1;
-                    Font.Draw(spriteBatch, $"w:{w}, h:{w}", editor.Map.ActiveCamera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
+                    Font.Draw(spriteBatch, $"w:{w}, h:{w}", editor.Camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
                 else
                 {
@@ -176,7 +176,7 @@ namespace DyingAndMore.Editor
 
                     diff /= editor.Map.Class.TileSize;
                     Font.Draw(spriteBatch, $"x:{System.Math.Ceiling(diff.X)} y:{System.Math.Ceiling(diff.Y)} deg:{angle}",
-                        editor.Map.ActiveCamera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
+                        editor.Camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
             }
         }

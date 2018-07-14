@@ -5,16 +5,15 @@ ProjectileClass {
     IgnoreTrace: True;
     Range: 100000;
     Drag: 0.0;
-    MinimumSpeed: 10;
+    MinimumSpeed: 100;
     MagnetismAnglePerSecond: 400deg;
-    InheritSourcePhysics: true;
+    InheritSourcePhysics: false;
+    Damage: 15;
 
     Trail: {
-        MaxPoints: 2000;
-        LifeSpan: 1.5sec;
+        #MaxPoints: 20;
+        LifeSpan: 0.25sec;
         CaptureDelay: 30Hz;
-        Sprite: @"Effects/Trails/Needler.png";
-        SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
         Color: {
             Values: [
                 [0 [0 0 1 255]];
@@ -67,7 +66,7 @@ ProjectileClass {
                             LifeSpan: [0.25sec 0.85sec];
                             Drag: 5;
                         }
-                        Count: [-10 1];
+                        Count: [-20 1];
                         Spread: [-30deg 30deg];
                     };
                 ]

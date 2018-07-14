@@ -6,10 +6,10 @@ EffectsClass {
                 Blend: BlendState.Additive;
                 ColorOverTime: Color.HotPink;
                 InitialSpeed: [-300 -400];
-                LifeSpan: [0.15sec 1sec];
+                LifeSpan: [0.15sec 0.5sec];
                 Drag: 8;
             }
-            Count: [3 8];
+            Count: [1 5];
             Spread: [-80deg -50deg];
         };
         ParticleEffect {
@@ -18,7 +18,7 @@ EffectsClass {
                 Blend: BlendState.Additive;
                 ColorOverTime: Color.HotPink;
                 InitialSpeed: [-300 -400];
-                LifeSpan: [0.15sec 1sec];
+                LifeSpan: [0.15sec 0.5sec];
                 Drag: 8;
             }
             Count: [3 8];

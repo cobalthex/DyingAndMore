@@ -108,7 +108,6 @@
     <Compile Include="UI\Graphic.cs" />
     <Compile Include="UI\ItemList.cs" />
     <Compile Include="UI\List.cs" />
-    <Compile Include="UI\MapView.cs" />
     <Compile Include="UI\Meter.cs" />
     <Compile Include="UI\NumericInput.cs" />
     <Compile Include="UI\RadialList.cs" />

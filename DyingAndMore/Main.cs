@@ -97,8 +97,6 @@ namespace DyingAndMore
         SpriteBatch sbatch;
         Takai.UI.Static ui;
 
-        Takai.Graphics.BitmapFont debugFont;
-
         Takai.FpsGraph fpsGraph;
 
         public Matrix uiMatrix;
@@ -123,6 +121,11 @@ namespace DyingAndMore
             };
 
             gdm.DeviceCreated += GdmDeviceCreated;
+            gdm.PreparingDeviceSettings += delegate (object sender, PreparingDeviceSettingsEventArgs e)
+            {
+                //required for splitscreen (currently)
+                //e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
+            };
 
             IsMouseVisible = true;
 
@@ -167,8 +170,6 @@ namespace DyingAndMore
             //GameManager.PushState(state);
 
             Takai.UI.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
-
-            debugFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/rct2.bfnt");
 
             /*
 #if WINDOWS //UWP launch activation parameters?
@@ -305,7 +306,7 @@ namespace DyingAndMore
             }
 
             if (InputState.IsPress(Keys.F10))
-                Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? debugFont : null);
+                Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
 
             if (InputState.IsPress(Keys.F7))
             {
@@ -339,10 +340,10 @@ namespace DyingAndMore
                 if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
                 {
                     var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
-                    var sz = debugFont.MeasureString(text);
-                    debugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
+                    var sz = Takai.UI.Static.DefaultFont.MeasureString(text);
+                    Takai.UI.Static.DefaultFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
                 }
-                y -= debugFont.MaxCharHeight;
+                y -= Takai.UI.Static.DefaultFont.MaxCharHeight;
             }
 
             sbatch.End();

@@ -3,7 +3,7 @@ GameStory {
 	Description: "A simple test story";
 
 	MapFiles: [
-		"Maps/Empty.map.tk";
 		"Maps/ShootingRange.map.tk";
+		"Maps/Empty.map.tk";
 	];
 }

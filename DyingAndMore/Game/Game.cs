@@ -19,30 +19,90 @@ namespace DyingAndMore.Game
         public bool isPlayerInputEnabled = true;
     }
 
-    public class GameInstance : MapView
+    //separate out debug info
+
+    /// <summary>
+    /// A display for one local player's camera
+    /// </summary>
+    public class PlayerView
+    {
+        public Entities.ActorInstance actor;
+        public Camera camera;
+
+        //debug
+        Entities.Controller lastController;
+
+        public PlayerView(Entities.ActorInstance actor, Rectangle viewport)
+        {
+            this.actor = actor;
+            camera = new Camera(actor)
+            {
+                Viewport = viewport
+            };
+        }
+    }
+
+    public class GameInstance : Static
     {
         public static GameInstance Current { get; set; }
 
-        public Game Game { get; set; }
+        /// <summary>
+        /// The current game that this game instance is playing
+        /// </summary>
+        public Game Game
+        {
+            get => _game;
+            set
+            {
+                if (_game == value)
+                    return;
+
+                if (_game != null)
+                    _game.MapChanged -= GameMapChanged;
+
+                _game = value;
+                if (_game != null)
+                    _game.MapChanged += GameMapChanged;
+            }
+        }
+        private Game _game;
+
+        public MapInstance Map
+        {
+            get => _map;
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException("Map cannot be null");
+                if (Map == value)
+                    return;
+
+                _map = value;
+                OnMapChanged();
+            }
+        }
+        private MapInstance _map;
+
+        public bool IsPaused { get; set; }
+
         public TimeSpan ElapsedRealTime { get; set; }
 
         public GameplaySettings GameplaySettings { get; set; } = new GameplaySettings();
 
-        List<Entities.ActorInstance> players;
-        Entities.ActorInstance player = null;
-        Entities.Controller lastController = null;
+        List<PlayerView> players;
 
         Static fpsDisplay;
         Static crapDisplay;
         Static clockDisplay;
-
-        TextInput debugConsole;
 
         Static renderSettingsConsole;
         Static updateSettingsConsole;
         Static gameplaySettingsConsole;
 
         Static gameHuds;
+
+        bool isDead = false;
+        TimeSpan restartTimer;
 
         public Dictionary<string, CommandAction> GameActions => new Dictionary<string, CommandAction>(StringComparer.OrdinalIgnoreCase)
         {
@@ -68,7 +128,6 @@ namespace DyingAndMore.Game
             ["CompleteMap"] = delegate (object ignored)
             {
                 Game.LoadNextStoryMap();
-                Map = Game.Map;
             },
         };
 
@@ -128,23 +187,7 @@ namespace DyingAndMore.Game
                 Color = new Color(1, 1, 1, 0.5f),
             });
 
-            debugConsole = new TextInput
-            {
-                Name = "debug console",
-                Position = new Vector2(20),
-                Size = new Vector2(400, 30),
-                VerticalAlignment = Alignment.End,
-                Font = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/xbox.bfnt"),
-            };
-            debugConsole.Submit += delegate (object sender, EventArgs e)
-            {
-                var inp = (TextInput)sender;
-                ParseCommand(inp.Text);
-                inp.RemoveFromParent();
-                inp.Text = String.Empty;
-            };
-
-            Map = Game.Map;
+            Map = game.Map;
 
             renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor);
             renderSettingsConsole.Position = new Vector2(100, 0);
@@ -164,15 +207,22 @@ namespace DyingAndMore.Game
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
         }
 
-        protected override void OnMapChanged(EventArgs e)
+        private void GameMapChanged(object sender, MapChangedEventArgs e)
         {
-            if (Map == null)
-                throw new ArgumentNullException("There must be a map to play");
+            Map = ((Game)sender).Map;
+        }
+
+        protected void OnMapChanged()
+        {
+            if (Map.Class != Game.Map.Class)
+                Game = new Game { Map = Map }; //todo: proper map reset support
 
             ElapsedRealTime = TimeSpan.Zero;
 
-            Map.updateSettings = MapInstance.UpdateSettings.Game;
-            Map.renderSettings = MapInstance.RenderSettings.Default;
+            if (updateSettingsConsole != null)
+                updateSettingsConsole.UserData = Map.updateSettings;
+            if (renderSettingsConsole != null)
+                renderSettingsConsole.UserData = Map.renderSettings;
 
             var players = new List<Entities.ActorInstance>();
             var enemies = new List<Entities.ActorInstance>();
@@ -196,21 +246,50 @@ namespace DyingAndMore.Game
                 //spawn players behind the last
             }
 
-            if (players.Count > 0)
+            SetPlayers(players);
+        }
+
+        /// <summary>
+        /// The player layouts, organized by [# of players][player index], each value is out of 100 (%)
+        /// </summary>
+        //too: multiple layouts per player count (horizontal vs vertical layout, etc)
+        static readonly Rectangle[][] viewportLayouts = new Rectangle[][]
+        {
+            new []
             {
-                this.players = players;
-                //GameInstance.Current.players = players.GetRange(0, numPlayers);
-                //for (int i = numPlayers; i < players.Count; ++i)
-                //    Map.Destroy(players[i]);
+                new Rectangle(0, 0, 0, 0),
+            },
+            new []
+            {
+                new Rectangle(0, 0, 100, 100)
+            },
+            new []
+            {
+                new Rectangle(0,  0, 100, 50),
+                new Rectangle(0, 50, 100, 50),
+            },
+            new []
+            {
+                new Rectangle( 0,  0, 100, 40),
+                new Rectangle( 0, 40,  50, 60),
+                new Rectangle(50, 40,  50, 60),
+            },
+            new []
+            {
+                new Rectangle( 0,  0, 50, 50),
+                new Rectangle(50,  0, 50, 50),
+                new Rectangle( 0, 50, 50, 50),
+                new Rectangle(50, 50, 50, 50),
+            },
+        };
 
-                player = players[0];
-            }
+        void SetPlayers(List<Entities.ActorInstance> actors)
+        {
+            players = new List<PlayerView>(actors.Count);
+            foreach (var actor in actors)
+                players.Add(new PlayerView(actor, new Rectangle()));
 
-            Map.ActiveCamera = new Camera(player); //todo: resume control
-
-            gameHuds.RemoveAllChildren();
-            if (player?.Hud != null)
-                gameHuds.AddChild(player.Hud);
+            OnResize(EventArgs.Empty);
         }
 
         string GetClockText(TimeSpan time)
@@ -221,236 +300,101 @@ namespace DyingAndMore.Game
                     + $"{time.Milliseconds:D3}";
         }
 
+        protected override void OnParentChanged(ParentChangedEventArgs e)
+        {
+            if (Parent == null)
+                return;
+
+            Map.updateSettings.SetGame();
+            Map.renderSettings.SetDefault();
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+
+            var wx = 0.01f * Size.X;
+            var wy = 0.01f * Size.Y;
+
+            for (int i = 0; i < players.Count; ++i)
+            {
+                var viewport = new Rectangle();
+                if (players.Count <= viewportLayouts.Length && i < viewportLayouts[players.Count].Length)
+                    viewport = viewportLayouts[players.Count][i];
+
+                //todo: move to resize method (for window resize support too)
+                viewport.X = (int)(viewport.X * wx);
+                viewport.Y = (int)(viewport.Y * wy);
+                viewport.Width = (int)(viewport.Width * wx);
+                viewport.Height = (int)(viewport.Height * wy);
+
+                players[i].camera.Viewport = viewport;
+            }
+        }
+
         protected override void UpdateSelf(GameTime time)
         {
             ElapsedRealTime += time.ElapsedGameTime;
             clockDisplay.Text = $"{GetClockText(ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}x{Map.TimeScale:N1}{(IsPaused ? "\n -- PAUSED --" : "")}";
             clockDisplay.AutoSize();
 
+            if (isDead && time.TotalGameTime > restartTimer)
+            {
+                Map = Map.Class.Instantiate();
+                isDead = false;
+                OnParentChanged(new ParentChangedEventArgs(null));
+                return;
+            }
+
             if (!IsPaused)
             {
-                for (int i = 0; i < (players?.Count ?? 0); ++i)
+                Map.BeginUpdate();
+
+                var allDead = true;
+                //todo: this doesn't support networking
+                for (int i = 0; i < players.Count; ++i)
                 {
                     //var region = new Rectangle(GameInstance.Current.players[i].Position.ToPoint(), new Point(1));
-                    var region = Map.ActiveCamera.VisibleRegion;
+                    var region = players[i].camera.VisibleRegion;
                     region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
-                    Map.BuildHeuristic((players[i].Position / Map.Class.TileSize).ToPoint(), region, i > 0);
+
+                    Map.BuildHeuristic((players[i].actor.Position / Map.Class.TileSize).ToPoint(), region, i > 0);
+
+                    allDead &= !players[i].actor.IsAlive;
                 }
+
+                if (!isDead && allDead)
+                    restartTimer = time.TotalGameTime + TimeSpan.FromSeconds(2);
+                isDead = allDead;
+
+                foreach (var player in players)
+                {
+                    player.camera.Update(time);
+                    Map.MarkRegionActive(player.camera);
+                }
+
+                Map.Update(time);
             }
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
             fpsDisplay.AutoSize();
 
-            crapDisplay.Text = $"Zoom:{Map.ActiveCamera.Scale:N1}";
-            crapDisplay.AutoSize();
-
-            DataModel.Globals["player.health"] = player.CurrentHealth / player.Class.MaxHealth;
-
             base.UpdateSelf(time);
         }
 
-        void ParseCommand(string command)
+        protected void SwitchToEditor()
         {
-            if (string.IsNullOrEmpty(command))
-                return;
+            if (Editor.Editor.Current == null)
+                Editor.Editor.Current = new Editor.Editor(Map);
+            else
+                Editor.Editor.Current.Map = Map;
 
-            var words = command.Split(' ');
-            switch (words[0].ToLowerInvariant())
-            {
-                case "action":
-                    {
-                        if (words.Length > 0 && GameActions.TryGetValue(words[1], out var action))
-                            action.Invoke(words.Length > 2 ? words[2] : null);
-                    }
-                    break;
-
-                case "cleanup":
-                    {
-                        var cleans = MapInstance.CleanupOptions.None;
-                        for (int i = 1; i < words.Length; ++i)
-                        {
-                            switch (words[i])
-                            {
-                                case "all":
-                                    cleans |= MapInstance.CleanupOptions.All;
-                                    i = words.Length;
-                                    break;
-
-                                case "fluid":
-                                case "fluids":
-                                    cleans |= MapInstance.CleanupOptions.Fluids;
-                                    LogBuffer.Append("Removing all fluids");
-                                    break;
-
-                                case "particles":
-                                    cleans |= MapInstance.CleanupOptions.Particles;
-                                    Takai.LogBuffer.Append("Removing all particles");
-                                    break;
-                            }
-                        }
-                        Map.CleanupAll(cleans);
-                    }
-                    break;
-
-                case "refresh":
-                    for (int i = 1; i < words.Length; ++i)
-                    {
-                        switch (words[i])
-                        {
-                            case "entities":
-                                EntityInstance camFollow = null;
-                                var newEnts = new List<EntityInstance>();
-                                foreach (var entity in Map.AllEntities)
-                                {
-                                    var newInst = entity.Class.Instantiate();
-                                    newInst.Position = entity.Position;
-                                    newInst.Forward = entity.Forward;
-                                    newInst.Velocity = entity.Velocity;
-                                    newEnts.Add(newInst);
-
-                                    if (Map.ActiveCamera.Follow == entity)
-                                        camFollow = newInst;
-                                }
-
-                                Map.RemoveAllEntities();
-                                foreach (var ent in newEnts)
-                                    Map.Spawn(ent);
-
-                                Map.ActiveCamera.Follow = camFollow;
-
-                                break;
-                        }
-                    }
-                    break;
-
-                case "reset":
-                    Map = Map.Class.Instantiate();
-                    break;
-
-                case "timescale":
-                    if (words.Length == 1)
-                        Takai.LogBuffer.Append("Time scale: " + Map.TimeScale);
-                    else
-                        Map.TimeScale = float.Parse(words[1]);
-                    break;
-
-                //this should go elsewhere
-                case "typeinfo":
-                    {
-                        if (words.Length < 2)
-                            break;
-
-                        ScrollBox s = new ScrollBox()
-                        {
-                            BackgroundColor = Color.DarkGray,
-                            Size = new Vector2(400),
-                            HorizontalAlignment = Alignment.Middle,
-                            VerticalAlignment = Alignment.Middle
-                        };
-                        s.Click += delegate (object sender, ClickEventArgs e) { ((Static)sender).RemoveFromParent(); };
-
-                        Dictionary<string, object> type;
-                        try
-                        {
-                            type = Serializer.DescribeType(Serializer.RegisteredTypes[words[1]]);
-                        }
-                        catch
-                        {
-                            break;
-                        }
-
-                        var info = new Static()
-                        {
-                            Text = words[1] + "\n" + string.Join("\n", type.Select(e => "    " + e.Key + ": " + e.Value).ToArray()),
-                        };
-                        info.AutoSize();
-                        s.AddChild(info);
-
-                        AddChild(s);
-                    }
-                    break;
-
-                case "entinfo":
-                    {
-                        if (words.Length < 2)
-                            break;
-
-                        int nextIndex = 1;
-                        bool writeFile = false;
-                        if (words[1] == "-f")
-                        {
-                            writeFile = true;
-                            ++nextIndex;
-                        }
-
-                        ScrollBox s = new ScrollBox()
-                        {
-                            BackgroundColor = new Color(40, 40, 40),
-                            BorderColor = Color.Gray,
-                            Size = new Vector2(600),
-                            HorizontalAlignment = Alignment.Middle,
-                            VerticalAlignment = Alignment.Middle,
-                        };
-                        s.Click += delegate (object sender, ClickEventArgs e) { ((Static)sender).RemoveFromParent(); };
-
-                        string entInfo = string.Empty;
-                        try
-                        {
-                            using (var writer = new System.IO.StringWriter())
-                            {
-                                for (int i = nextIndex; i < words.Length; ++i)
-                                {
-                                    if (i > nextIndex)
-                                        writer.WriteLine();
-                                    var ent = Map.FindEntityById(int.Parse(words[i]));
-                                    Serializer.TextSerialize(writer, ent, 0, false, true);
-                                }
-                                entInfo = writer.ToString();
-                            }
-                        }
-                        catch
-                        {
-                            break;
-                        }
-
-                        if (writeFile)
-                        {
-                            System.IO.Directory.CreateDirectory("debug");
-                            System.IO.File.WriteAllText("debug\\entinfo.tk", entInfo);
-#if WINDOWS
-                            System.Diagnostics.Process.Start("debug\\entinfo.tk");
-#endif
-                        }
-                        else
-                        {
-                            var info = new Static()
-                            {
-                                Text = entInfo,
-                            };
-                            info.AutoSize();
-                            s.AddChild(info);
-
-                            AddChild(s);
-                        }
-                    }
-                    break;
-
-                case "exit":
-                case "quit":
-                    Takai.Runtime.IsExiting = true;
-                    break;
-
-                default:
-                    Takai.LogBuffer.Append("Unkown command: " + words[0]);
-                    break;
-            }
+            Parent.ReplaceAllChildren(Editor.Editor.Current);
         }
 
         System.Diagnostics.Stopwatch swatch = new System.Diagnostics.Stopwatch();
         protected override bool HandleInput(GameTime time)
         {
-            Vector2 worldMousePos = Map.ActiveCamera.ScreenToWorld(InputState.MouseVector);
-
             /*if (player != null)
             {
                 swatch.Restart();
@@ -470,17 +414,10 @@ namespace DyingAndMore.Game
                 //Takai.LogBuffer.Append(swatch.ElapsedMilliseconds.ToString());
             }*/
 
-            if (InputState.IsPress(Keys.OemTilde))
-            {
-                debugConsole.HasFocus = true;
-                AddChild(debugConsole);
-                return false;
-            }
-
             if (InputState.IsPress(Keys.F1) ||
                 InputState.IsAnyPress(Buttons.Start))
             {
-                Parent.ReplaceAllChildren(new Editor.Editor(Map));
+                SwitchToEditor();
                 return false;
             }
 
@@ -530,34 +467,35 @@ namespace DyingAndMore.Game
             if (InputState.IsPress(Keys.Escape))
                 IsPaused = !IsPaused;
 
-            var scrollDelta = InputState.ScrollDelta();
-            if (scrollDelta != 0)
-            {
-                if (InputState.IsMod(KeyMod.Control))
-                    Map.TimeScale += Math.Sign(scrollDelta) * 0.1f;
-                else if (InputState.IsMod(KeyMod.Alt))
-                    Map.ActiveCamera.Rotation += Math.Sign(scrollDelta) * MathHelper.PiOver4;
-                else
-                    Map.ActiveCamera.Scale += Math.Sign(scrollDelta) * 0.1f;
-            }
+            //todo
+            //            var scrollDelta = InputState.ScrollDelta();
+            //            if (scrollDelta != 0)
+            //            {
+            //                if (InputState.IsMod(KeyMod.Control))
+            //                    Map.TimeScale += Math.Sign(scrollDelta) * 0.1f;
+            //                else if (InputState.IsMod(KeyMod.Alt))
+            //                    Map.ActiveCamera.Rotation += Math.Sign(scrollDelta) * MathHelper.PiOver4;
+            //                else
+            //                    Map.ActiveCamera.Scale += Math.Sign(scrollDelta) * 0.1f;
+            //            }
 
-#if DEBUG
-            {
-                if (InputState.IsButtonDown(MouseButtons.Middle))
-                {
-                    Map.ActiveCamera._DebugSetTransform(true, -Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(Map.ActiveCamera.Transform)));
-                }
-            }
-#endif
+            //#if DEBUG
+            //            {
+            //                if (InputState.IsButtonDown(MouseButtons.Middle))
+            //                {
+            //                    Map.ActiveCamera._DebugSetTransform(true, -Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(Map.ActiveCamera.Transform)));
+            //                }
+            //            }
+            //#endif
 
             if (InputState.IsMod(KeyMod.Control) && InputState.IsPress(Keys.Q))
             {
-                Takai.Runtime.IsExiting = true;
+                Runtime.IsExiting = true;
                 return false;
             }
 
             //possess actors
-#if DEBUG
+#if DEBUG && false //todo: fix
             if (InputState.IsMod(KeyMod.Alt) && InputState.IsPress(MouseButtons.Left))
             {
                 var targets = Map.FindEntitiesInRegion(worldMousePos, 5);
@@ -591,6 +529,22 @@ namespace DyingAndMore.Game
         {
             base.DrawSelf(spriteBatch);
 
+            foreach (var player in players)
+            {
+                Map.Draw(player.camera);
+                Takai.Graphics.Primitives2D.DrawLine(spriteBatch, Color.Gray,
+                    new Vector2(player.camera.Viewport.Right, player.camera.Viewport.Top),
+                    new Vector2(player.camera.Viewport.Right, player.camera.Viewport.Bottom),
+                    new Vector2(player.camera.Viewport.Left, player.camera.Viewport.Bottom)
+                );
+                DefaultFont.Draw(spriteBatch,
+                    $"Health:{player.actor.CurrentHealth}/{player.actor.Class.MaxHealth}\n" +
+                    $"Weapon:{player.actor.Weapon}",
+                    new Vector2(player.camera.Viewport.Left + 10, player.camera.Viewport.Top + 10),
+                    Color.Cyan
+                );
+            }
+
             var particleCount = 0;
             foreach (var ptype in Map.Particles)
                 particleCount += ptype.Value.Count;
@@ -601,52 +555,54 @@ namespace DyingAndMore.Game
                 $"\nTotal particles:{particleCount}" +
                 $"\nVisible fluids:A={Map.RenderStats.visibleActiveFluids} I={Map.RenderStats.visibleInactiveFluids}" +
                 $"\nTrail points:{Map.RenderStats.trailPointCount}",
-                new Vector2(20),
+                new Vector2(20, 100),
                 Color.Orange
             );
 
             if (Map.renderSettings.drawDebugInfo)
             {
-                foreach (var ent in Map.EnumerateVisibleEntities())
-                {
-                    var pos = Map.ActiveCamera.WorldToScreen(ent.Position) + new Vector2(ent.Radius / 2 * Map.ActiveCamera.Scale);
+                //todo: move text rendering to map (Map.DrawText(text, font))
 
-                    var sb = new System.Text.StringBuilder();
-                    sb.Append($"{ent.Id}: {string.Join(",", ent.ActiveAnimations)}\n");
+                //foreach (var ent in Map.EnumerateVisibleEntities())
+                //{
+                //    var pos = Map.ActiveCamera.WorldToScreen(ent.Position) + new Vector2(ent.Radius / 2 * Map.ActiveCamera.Scale);
 
-                    if (ent is Entities.ActorInstance actor)
-                    {
-                        sb.Append($"`f76{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}`x\n");
-                        if (actor.Weapon is Weapons.GunInstance gun)
-                            sb.Append($"`bcf{gun.AmmoCount} {gun.State} {gun.Charge:N2}`x\n");
-                        if (actor.Controller is Entities.AIController ai)
-                        {
-                            sb.Append($"`ad4{ai.Target}");
-                            for (int i = 0; i < ai.ChosenBehaviors.Length; ++i)
-                            {
-                                if (ai.ChosenBehaviors[i] != null)
-                                {
-                                    sb.Append("\n");
-                                    sb.Append(ai.ChosenBehaviors[i].ToString());
-                                }
-                            }
-                            sb.Append("`x\n");
-                        }
-                    }
-                    DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
+                //    var sb = new System.Text.StringBuilder();
+                //    sb.Append($"{ent.Id}: {string.Join(",", ent.ActiveAnimations)}\n");
 
-                    //draw trigger names
-                }
+                //    if (ent is Entities.ActorInstance actor)
+                //    {
+                //        sb.Append($"`f76{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}`x\n");
+                //        if (actor.Weapon is Weapons.GunInstance gun)
+                //            sb.Append($"`bcf{gun.AmmoCount} {gun.State} {gun.Charge:N2}`x\n");
+                //        if (actor.Controller is Entities.AIController ai)
+                //        {
+                //            sb.Append($"`ad4{ai.Target}");
+                //            for (int i = 0; i < ai.ChosenBehaviors.Length; ++i)
+                //            {
+                //                if (ai.ChosenBehaviors[i] != null)
+                //                {
+                //                    sb.Append("\n");
+                //                    sb.Append(ai.ChosenBehaviors[i].ToString());
+                //                }
+                //            }
+                //            sb.Append("`x\n");
+                //        }
+                //    }
+                //    DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
 
-                foreach (var sound in Map.Sounds)
-                {
-                    DefaultFont.Draw(
-                        spriteBatch,
-                        $"Vol:{sound.Instance.Volume:N2} Pan:{sound.Instance.Pan:N2} Pit:{sound.Instance.Pitch:N2}",
-                        Map.ActiveCamera.WorldToScreen(sound.Position) + new Vector2(0, 50),
-                        Color.Aquamarine
-                    );
-                }
+                //    //draw trigger names
+                //}
+
+                //foreach (var sound in Map.Sounds)
+                //{
+                //    DefaultFont.Draw(
+                //        spriteBatch,
+                //        $"Vol:{sound.Instance.Volume:N2} Pan:{sound.Instance.Pan:N2} Pit:{sound.Instance.Pitch:N2}",
+                //        Map.ActiveCamera.WorldToScreen(sound.Position) + new Vector2(0, 50),
+                //        Color.Aquamarine
+                //    );
+                //}
             }
         }
     }
