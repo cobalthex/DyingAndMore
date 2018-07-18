@@ -24,17 +24,28 @@ namespace DyingAndMore.Game
     /// <summary>
     /// A display for one local player's camera
     /// </summary>
-    public class PlayerView
+    public class PlayerInstance
     {
         public Entities.ActorInstance actor;
+        public Entities.InputMap inputs;
         public Camera camera;
 
         //debug
         Entities.Controller lastController;
 
-        public PlayerView(Entities.ActorInstance actor, Rectangle viewport)
+        public PlayerInstance(Entities.ActorInstance actor, PlayerIndex player, Rectangle viewport)
         {
+            inputs = new Entities.InputMap
+            {
+                Player = player
+            };
+
             this.actor = actor;
+            this.actor.Controller = new Entities.InputController
+            {
+                Inputs = inputs
+            };
+
             camera = new Camera(actor)
             {
                 Viewport = viewport
@@ -89,7 +100,7 @@ namespace DyingAndMore.Game
 
         public GameplaySettings GameplaySettings { get; set; } = new GameplaySettings();
 
-        List<PlayerView> players;
+        List<PlayerInstance> players;
 
         Static fpsDisplay;
         Static crapDisplay;
@@ -224,29 +235,30 @@ namespace DyingAndMore.Game
             if (renderSettingsConsole != null)
                 renderSettingsConsole.UserData = Map.renderSettings;
 
-            var players = new List<Entities.ActorInstance>();
-            var enemies = new List<Entities.ActorInstance>();
+            var possiblePlayers = new List<Entities.ActorInstance>();
 
             foreach (var ent in Map.AllEntities)
             {
-                if (ent is Entities.ActorInstance actor)
-                {
-                    if (actor.Controller is Entities.InputController)
-                        players.Add(actor);
-                    else if (actor.Controller == null)
-                        enemies.Add(actor);
-                }
+                if (ent is Entities.ActorInstance actor && actor.IsAlliedWith(Entities.Factions.Player))
+                        possiblePlayers.Add(actor);
             }
 
             int numPlayers = 1;
 
             //create extra players if not enough
-            for (int i = players.Count; i < numPlayers; ++i)
+            for (int i = possiblePlayers.Count; i < numPlayers; ++i)
             {
                 //spawn players behind the last
             }
 
-            SetPlayers(players);
+            SetPlayers(possiblePlayers);
+
+            players[0].inputs.Keys = new Dictionary<Keys, Entities.InputBinding>();
+            players[0].inputs.Keys[Keys.S] = new Entities.InputBinding(Entities.InputAction.MoveLineal, -1);
+            players[0].inputs.Keys[Keys.W] = new Entities.InputBinding(Entities.InputAction.MoveLineal,  1);
+            players[0].inputs.Keys[Keys.A] = new Entities.InputBinding(Entities.InputAction.MoveLateral, -1);
+            players[0].inputs.Keys[Keys.D] = new Entities.InputBinding(Entities.InputAction.MoveLateral,  1);
+            players[0].inputs.Keys[Keys.Space] = new Entities.InputBinding(Entities.InputAction.FirePrimaryWeapon, 1);
         }
 
         /// <summary>
@@ -285,9 +297,9 @@ namespace DyingAndMore.Game
 
         void SetPlayers(List<Entities.ActorInstance> actors)
         {
-            players = new List<PlayerView>(actors.Count);
-            foreach (var actor in actors)
-                players.Add(new PlayerView(actor, new Rectangle()));
+            players = new List<PlayerInstance>(actors.Count);
+            for (int i = 0; i < actors.Count; ++i)
+                players.Add(new PlayerInstance(actors[i], (PlayerIndex)i, new Rectangle()));
 
             OnResize(EventArgs.Empty);
         }
@@ -346,6 +358,8 @@ namespace DyingAndMore.Game
                 return;
             }
 
+            bool isPlayerInputEnabled = Runtime.HasFocus && GameplaySettings.isPlayerInputEnabled;
+
             if (!IsPaused)
             {
                 Map.BeginUpdate();
@@ -360,18 +374,18 @@ namespace DyingAndMore.Game
 
                     Map.BuildHeuristic((players[i].actor.Position / Map.Class.TileSize).ToPoint(), region, i > 0);
 
+                    players[i].camera.Update(time);
+                    Map.MarkRegionActive(players[i].camera);
+
+                    if (isPlayerInputEnabled)
+                        players[i].inputs.Update();
+
                     allDead &= !players[i].actor.IsAlive;
                 }
 
                 if (!isDead && allDead)
                     restartTimer = time.TotalGameTime + TimeSpan.FromSeconds(2);
                 isDead = allDead;
-
-                foreach (var player in players)
-                {
-                    player.camera.Update(time);
-                    Map.MarkRegionActive(player.camera);
-                }
 
                 Map.Update(time);
             }

@@ -33,6 +33,5 @@ ActorClass {
 
     #DefaultWeapon: @"Weapons/Flamethrower.wpn.tk";
 
-    DefaultController: InputController { };
     Hud: @"UI/HUDs/player.ui.tk";
 }
