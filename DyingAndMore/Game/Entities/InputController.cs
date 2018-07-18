@@ -7,109 +7,133 @@ using Takai.Input;
 
 namespace DyingAndMore.Game.Entities
 {
+    /// <summary>
+    /// Available actions that the player can take
+    /// Format: Verb adjective/noun
+    /// </summary>
+    public enum InputAction
+    {
+        None,
+        MoveLineal,
+        MoveLateral,
+        //move up,down,left,right
+        FirePrimaryWeapon,
+        FireSecondaryWeapon,
+    }
+
+    public struct InputBinding
+    {
+        public InputAction action;
+        public float magnitude;
+
+        public InputBinding(InputAction action, float magnitude)
+        {
+            this.action = action;
+            this.magnitude = magnitude;
+        }
+    }
+
+    public class InputMap
+    {
+        public PlayerIndex Player { get; set; } = PlayerIndex.One;
+
+        [Takai.Data.Serializer.Ignored]
+        public Dictionary<Keys, InputBinding> Keys { get; set; }
+        [Takai.Data.Serializer.Ignored]
+        public Dictionary<Buttons, InputBinding> Gamepads { get; set; }
+        [Takai.Data.Serializer.Ignored]
+        public Dictionary<MouseButtons, InputBinding> Mice { get; set; }
+
+        //thumbsticks, triggers, touchpad
+
+        [Takai.Data.Serializer.Ignored]
+        public Dictionary<InputAction, InputBinding> CurrentInputs { get; set; } = new Dictionary<InputAction, InputBinding>();
+
+        public void Update()
+        {
+            if (Keys != null)
+            {
+                foreach (var key in InputState.GetPressedKeys())
+                {
+                    if (Keys.TryGetValue(key, out var binding))
+                        CurrentInputs[binding.action] = binding;
+                }
+            }
+            if (Gamepads != null)
+            {
+                foreach (var binding in Gamepads)
+                {
+                    if (InputState.IsButtonDown(binding.Key, Player))
+                        CurrentInputs[binding.Value.action] = binding.Value;
+                }
+            }
+
+            //mice
+        }
+    }
+
     class InputController : Controller
     {
-        public enum Action
-        {
-            Unknown,
-            MoveUp,
-            MoveDown,
-            MoveLeft,
-            MoveRight,
-            Fire,
-        }
-
-        public enum ActionInputType
-        {
-            None,
-            Keyboard,
-            MouseButton,
-            JoystickButton,
-        }
-
-        public struct ActionInput
-        {
-            public ActionInputType type;
-            public int which;
-
-            public ActionInput(ActionInputType type, int which)
-            {
-                this.type = type;
-                this.which = which;
-            }
-        }
-
-        public bool IsActive(ActionInput action)
-        {
-            switch (action.type)
-            {
-                case ActionInputType.Keyboard:
-                    return InputState.IsButtonDown((Keys)action.which);
-                case ActionInputType.MouseButton:
-                    return InputState.IsButtonDown((MouseButtons)action.which);
-                default:
-                    return false;
-            }
-        }
-        public bool Released(ActionInput action)
-        {
-            switch (action.type)
-            {
-                case ActionInputType.Keyboard:
-                    return InputState.IsClick((Keys)action.which);
-                case ActionInputType.MouseButton:
-                    return InputState.IsClick((MouseButtons)action.which);
-                default:
-                    return false;
-            }
-        }
-
-        public Dictionary<Action, List<ActionInput>> ActionInputs { get; set; }
-            = new Dictionary<Action, List<ActionInput>>();
-
-        public PlayerIndex player = PlayerIndex.One;
+        public InputMap Inputs { get; set; }
 
         public InputController()
         {
-            ActionInputs[Action.Fire] = new List<ActionInput> { new ActionInput(ActionInputType.MouseButton, (int)MouseButtons.Left) };
         }
 
         public override void Think(TimeSpan deltaTime)
         {
-            if ((GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isPlayerInputEnabled) ||
-                !Takai.Runtime.HasFocus)
-                return;
+            //read input state
 
-            var d = Vector2.Zero;
-            if (InputState.IsButtonDown(Keys.W))
-                d -= Vector2.UnitY;
-            if (InputState.IsButtonDown(Keys.A))
-                d -= Vector2.UnitX;
-            if (InputState.IsButtonDown(Keys.S))
-                d += Vector2.UnitY;
-            if (InputState.IsButtonDown(Keys.D))
-                d += Vector2.UnitX;
+            //if ((GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isPlayerInputEnabled) ||
+            //    !Takai.Runtime.HasFocus)
+            //    return;
 
-            var sticks = InputState.Thumbsticks(player);
-            if (sticks.Left != Vector2.Zero)
-                d = Vector2.Normalize(sticks.Left) * new Vector2(1, -1);
+            //var d = Vector2.Zero;
+            //if (InputState.IsButtonDown(Keys.W))
+            //    d -= Vector2.UnitY;
+            //if (InputState.IsButtonDown(Keys.A))
+            //    d -= Vector2.UnitX;
+            //if (InputState.IsButtonDown(Keys.S))
+            //    d += Vector2.UnitY;
+            //if (InputState.IsButtonDown(Keys.D))
+            //    d += Vector2.UnitX;
 
-            if (sticks.Right != Vector2.Zero)
-                Actor.TurnTowards(Vector2.Normalize(sticks.Right) * new Vector2(1, -1));
+            //var sticks = InputState.Thumbsticks(Player);
+            //if (sticks.Left != Vector2.Zero)
+            //    d = Vector2.Normalize(sticks.Left) * new Vector2(1, -1);
 
-            if (InputState.IsButtonDown(MouseButtons.Left) ||
-                InputState.IsButtonDown(Buttons.RightTrigger, player) ||
-                InputState.IsButtonDown(Keys.Space))
-                Actor.Weapon?.TryUse();
+            //if (sticks.Right != Vector2.Zero)
+            //    Actor.TurnTowards(Vector2.Normalize(sticks.Right) * new Vector2(1, -1));
 
-            Actor.Accelerate(d);
+            //if (InputState.IsButtonDown(MouseButtons.Left) ||
+            //    InputState.IsButtonDown(Buttons.RightTrigger, Player) ||
+            //    InputState.IsButtonDown(Keys.Space))
+            //    Actor.Weapon?.TryUse();
 
+            //Actor.Accelerate(d);
+
+            //todo
             if (InputState.MouseDelta() != Vector2.Zero)
             {
                 var dir = InputState.PolarMouseVector;
                 dir.Normalize();
                 Actor.Forward = dir;
             }
+
+            if (Inputs == null)
+                return;
+
+            InputBinding binding;
+            if (Inputs.CurrentInputs.TryGetValue(InputAction.FirePrimaryWeapon, out binding))
+                Actor.Weapon?.TryUse();
+
+            if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveLineal, out binding))
+                Actor.Accelerate(Actor.Forward * binding.magnitude);
+
+            if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveLateral, out binding))
+                Actor.Accelerate(Takai.Util.Ortho(Actor.Forward) * binding.magnitude);
+
+            Inputs.CurrentInputs.Clear();
         }
 
         public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
