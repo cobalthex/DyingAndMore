@@ -215,6 +215,7 @@ namespace Takai.Input
         {
             return !IsButtonDown(Button);
         }
+
         /// <summary>
         /// Is the mouse button currently held down (current and last state)?
         /// </summary>

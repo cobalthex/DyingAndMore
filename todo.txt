@@ -14,7 +14,7 @@
 		☐  doors/devices
 		☐  marquee
 		☐  conditions/senses
-		☐	
+		☐
 
 	Gases:
 		☐  Behavior changing
@@ -70,3 +70,5 @@
 
 	☐	Dynamic render quality, esp for split screen
 	☐	Pixel shader to draw tilemap (use tilemap as texture)
+
+	☐	Falloff range for magnetism

@@ -240,7 +240,7 @@ namespace DyingAndMore.Game
             foreach (var ent in Map.AllEntities)
             {
                 if (ent is Entities.ActorInstance actor && actor.IsAlliedWith(Entities.Factions.Player))
-                        possiblePlayers.Add(actor);
+                    possiblePlayers.Add(actor);
             }
 
             int numPlayers = 1;
@@ -253,12 +253,18 @@ namespace DyingAndMore.Game
 
             SetPlayers(possiblePlayers);
 
-            players[0].inputs.Keys = new Dictionary<Keys, Entities.InputBinding>();
-            players[0].inputs.Keys[Keys.S] = new Entities.InputBinding(Entities.InputAction.MoveLineal, -1);
-            players[0].inputs.Keys[Keys.W] = new Entities.InputBinding(Entities.InputAction.MoveLineal,  1);
-            players[0].inputs.Keys[Keys.A] = new Entities.InputBinding(Entities.InputAction.MoveLateral, -1);
-            players[0].inputs.Keys[Keys.D] = new Entities.InputBinding(Entities.InputAction.MoveLateral,  1);
-            players[0].inputs.Keys[Keys.Space] = new Entities.InputBinding(Entities.InputAction.FirePrimaryWeapon, 1);
+            players[0].inputs.Keys = new Dictionary<Keys, Entities.InputBinding>
+            {
+                [Keys.S] = new Entities.InputBinding(Entities.InputAction.MoveY,  1),
+                [Keys.W] = new Entities.InputBinding(Entities.InputAction.MoveY, -1),
+                [Keys.A] = new Entities.InputBinding(Entities.InputAction.MoveX, -1),
+                [Keys.D] = new Entities.InputBinding(Entities.InputAction.MoveX,  1),
+                [Keys.Space] = new Entities.InputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
+            };
+            players[0].inputs.MouseButtons = new Dictionary<MouseButtons, Entities.InputBinding>
+            {
+                [MouseButtons.Left] = new Entities.InputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
+            };
         }
 
         /// <summary>
