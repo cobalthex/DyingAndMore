@@ -14,9 +14,19 @@ namespace DyingAndMore.Game.Entities
     public enum InputAction
     {
         None,
-        MoveLineal,
-        MoveLateral,
-        //move up,down,left,right
+
+        _MOVEMENT_,
+
+        MoveLineal, //forward/backward
+        MoveLateral, //left/right (of forward)
+        MoveX, //relative to camera (1 is right, -1 is left)
+        MoveY, //relative to camera (1 is down, -1 is up)
+
+        FaceX,
+        FaceY,
+
+        _WEAPONS_,
+
         FirePrimaryWeapon,
         FireSecondaryWeapon,
     }
@@ -33,6 +43,12 @@ namespace DyingAndMore.Game.Entities
         }
     }
 
+    public struct InputBinding2D
+    {
+        public InputBinding horiziontal;
+        public InputBinding vertical;
+    }
+
     public class InputMap
     {
         public PlayerIndex Player { get; set; } = PlayerIndex.One;
@@ -40,14 +56,24 @@ namespace DyingAndMore.Game.Entities
         [Takai.Data.Serializer.Ignored]
         public Dictionary<Keys, InputBinding> Keys { get; set; }
         [Takai.Data.Serializer.Ignored]
-        public Dictionary<Buttons, InputBinding> Gamepads { get; set; }
+        public Dictionary<Buttons, InputBinding> GamepadButtons { get; set; }
         [Takai.Data.Serializer.Ignored]
-        public Dictionary<MouseButtons, InputBinding> Mice { get; set; }
+        public Dictionary<MouseButtons, InputBinding> MouseButtons { get; set; }
+
+        public InputBinding2D MousePosition { get; set; }
+
+        public InputBinding2D GamepadLeftThumbstick { get; set; }
+        public InputBinding2D GamepadRightThumbstick { get; set; }
+
+        public InputBinding GamepadLeftTrigger { get; set; }
+        public InputBinding GamepadRightTrigger { get; set; }
 
         //thumbsticks, triggers, touchpad
 
         [Takai.Data.Serializer.Ignored]
         public Dictionary<InputAction, InputBinding> CurrentInputs { get; set; } = new Dictionary<InputAction, InputBinding>();
+
+        //todo: serialization
 
         public void Update()
         {
@@ -59,16 +85,22 @@ namespace DyingAndMore.Game.Entities
                         CurrentInputs[binding.action] = binding;
                 }
             }
-            if (Gamepads != null)
+            if (GamepadButtons != null)
             {
-                foreach (var binding in Gamepads)
+                foreach (var binding in GamepadButtons)
                 {
                     if (InputState.IsButtonDown(binding.Key, Player))
                         CurrentInputs[binding.Value.action] = binding.Value;
                 }
             }
-
-            //mice
+            if (MouseButtons != null)
+            {
+                foreach (var binding in MouseButtons)
+                {
+                    if (InputState.IsButtonDown(binding.Key))
+                        CurrentInputs[binding.Value.action] = binding.Value;
+                }
+            }
         }
     }
 
@@ -82,37 +114,7 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
-            //read input state
-
-            //if ((GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isPlayerInputEnabled) ||
-            //    !Takai.Runtime.HasFocus)
-            //    return;
-
-            //var d = Vector2.Zero;
-            //if (InputState.IsButtonDown(Keys.W))
-            //    d -= Vector2.UnitY;
-            //if (InputState.IsButtonDown(Keys.A))
-            //    d -= Vector2.UnitX;
-            //if (InputState.IsButtonDown(Keys.S))
-            //    d += Vector2.UnitY;
-            //if (InputState.IsButtonDown(Keys.D))
-            //    d += Vector2.UnitX;
-
-            //var sticks = InputState.Thumbsticks(Player);
-            //if (sticks.Left != Vector2.Zero)
-            //    d = Vector2.Normalize(sticks.Left) * new Vector2(1, -1);
-
-            //if (sticks.Right != Vector2.Zero)
-            //    Actor.TurnTowards(Vector2.Normalize(sticks.Right) * new Vector2(1, -1));
-
-            //if (InputState.IsButtonDown(MouseButtons.Left) ||
-            //    InputState.IsButtonDown(Buttons.RightTrigger, Player) ||
-            //    InputState.IsButtonDown(Keys.Space))
-            //    Actor.Weapon?.TryUse();
-
-            //Actor.Accelerate(d);
-
-            //todo
+            //todo, turn towards
             if (InputState.MouseDelta() != Vector2.Zero)
             {
                 var dir = InputState.PolarMouseVector;
@@ -127,11 +129,19 @@ namespace DyingAndMore.Game.Entities
             if (Inputs.CurrentInputs.TryGetValue(InputAction.FirePrimaryWeapon, out binding))
                 Actor.Weapon?.TryUse();
 
-            if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveLineal, out binding))
-                Actor.Accelerate(Actor.Forward * binding.magnitude);
+            Vector2 moveDirection;
+            //todo: needs ability to lerp between multiple directions
+            //maybe isolate heading movement from cardinal movement and scale heading by forward later
 
+            if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveLineal, out binding))
+                moveDirection = Actor.Forward * binding.magnitude;
             if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveLateral, out binding))
                 Actor.Accelerate(Takai.Util.Ortho(Actor.Forward) * binding.magnitude);
+
+            if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveX, out binding))
+                Actor.Accelerate(Vector2.UnitX * binding.magnitude);
+            if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveY, out binding))
+                Actor.Accelerate(Vector2.UnitY * binding.magnitude);
 
             Inputs.CurrentInputs.Clear();
         }
