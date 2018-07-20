@@ -2,7 +2,7 @@ GunClass {
     Name: "Big fucking gun";
     Projectile: @"Weapons/Projectiles/Needle.ent.tk";
 
-    MaxAmmo: 10000;
+    MaxAmmo: 5000;
     RoundsPerBurst: 1;
     ProjectilesPerRound: 6;
     MaxBursts: 0;

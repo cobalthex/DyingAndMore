@@ -11,8 +11,6 @@ ActorClass {
     AlwaysDrawUpright: true;
     DestroyOnDeath: true;
 
-    Material: 'Infection';
-
     DefaultController: AIController {
         Behaviors: [
             FlowSeekBehavior { };
@@ -41,6 +39,7 @@ ActorClass {
                 Tween: TweenStyle [Overlap];
             };
             Sound: { };
+            Material: 'Infection';
         };
         Dead: {
             Sprite: {
@@ -55,6 +54,7 @@ ActorClass {
                 Tween: TweenStyle [Overlap];
             };
             Sound: { };
+            Material: 'Infection';
         };
     };
 }

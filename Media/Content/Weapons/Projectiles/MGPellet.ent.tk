@@ -26,8 +26,8 @@ ProjectileClass {
         SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
         Color: {
             Values: [
-                [0 [30 30 30 64]];
-                [1 [192 192 30 192]];
+                [0 [30 30 30 32]];
+                [1 [192 192 30 128]];
             ]
         }
 

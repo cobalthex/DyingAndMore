@@ -3,10 +3,10 @@ GunClass {
 
     MaxAmmo: 1000;
     RoundsPerBurst: 1;
-    #ProjectilesPerRound: 6;
+    #ProjectilesPerRound: 16;
     MaxBursts: 0;
     ChargeTime: 0msec;
-    DischargeTime: 800rpm;
+    DischargeTime: 1800rpm;
     ErrorAngle: [-4deg 4deg];
 
     DischargeEffect: {

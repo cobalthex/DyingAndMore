@@ -380,10 +380,10 @@ namespace Takai.Game
                     //walk back
                     for (int j = 0; j < (int)stepSize; ++j)
                     {
-                        var npos = pos - ndiff;
-                        if (Class.GetCollisionValueAt(npos))
-                            return npos;
-                        pos = npos;
+                        //var npos = Util.Round(pos - ndiff);
+                        //if (Class.GetCollisionValueAt(npos))
+                        //    return pos;
+                        //pos = npos;
                     }
 
                     return pos;
