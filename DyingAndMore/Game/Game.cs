@@ -11,6 +11,9 @@ using Takai.UI;
 using Takai;
 using System.Collections.Generic;
 
+using PlayerInputBinding = Takai.Input.InputBinding<DyingAndMore.Game.Entities.InputAction>;
+using PlayerInputBinding2D = Takai.Input.InputBinding2D<DyingAndMore.Game.Entities.InputAction>;
+
 namespace DyingAndMore.Game
 {
     public class GameplaySettings
@@ -27,23 +30,20 @@ namespace DyingAndMore.Game
     public class PlayerInstance
     {
         public Entities.ActorInstance actor;
-        public Entities.InputMap inputs;
+        public InputMap<Entities.InputAction> inputs;
         public Camera camera;
 
         //debug
         Entities.Controller lastController;
 
-        public PlayerInstance(Entities.ActorInstance actor, PlayerIndex player, Rectangle viewport)
+        public PlayerInstance(Entities.ActorInstance actor, Rectangle viewport)
         {
-            inputs = new Entities.InputMap
-            {
-                Player = player
-            };
+            inputs = new InputMap<Entities.InputAction>();
 
             this.actor = actor;
             this.actor.Controller = new Entities.InputController
             {
-                Inputs = inputs
+                Inputs = inputs,
             };
 
             camera = new Camera(actor)
@@ -253,18 +253,40 @@ namespace DyingAndMore.Game
 
             SetPlayers(possiblePlayers);
 
-            players[0].inputs.Keys = new Dictionary<Keys, Entities.InputBinding>
+            players[0].inputs.Keys = new Dictionary<Keys, PlayerInputBinding>
             {
-                [Keys.S] = new Entities.InputBinding(Entities.InputAction.MoveY,  1),
-                [Keys.W] = new Entities.InputBinding(Entities.InputAction.MoveY, -1),
-                [Keys.A] = new Entities.InputBinding(Entities.InputAction.MoveX, -1),
-                [Keys.D] = new Entities.InputBinding(Entities.InputAction.MoveX,  1),
-                [Keys.Space] = new Entities.InputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
+                [Keys.S] = new PlayerInputBinding(Entities.InputAction.MoveY,  1),
+                [Keys.W] = new PlayerInputBinding(Entities.InputAction.MoveY, -1),
+                [Keys.A] = new PlayerInputBinding(Entities.InputAction.MoveX, -1),
+                [Keys.D] = new PlayerInputBinding(Entities.InputAction.MoveX,  1),
+                [Keys.Space] = new PlayerInputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
             };
-            players[0].inputs.MouseButtons = new Dictionary<MouseButtons, Entities.InputBinding>
+            players[0].inputs.MouseButtons = new Dictionary<MouseButtons, PlayerInputBinding>
             {
-                [MouseButtons.Left] = new Entities.InputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
+                [MouseButtons.Left] = new PlayerInputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
             };
+            players[0].inputs.MousePolar = new PlayerInputBinding2D(
+                new PlayerInputBinding(Entities.InputAction.FaceX),
+                new PlayerInputBinding(Entities.InputAction.FaceY)
+            );
+            players[0].inputs.GamepadButtons = new Dictionary<Buttons, PlayerInputBinding>
+            {
+                [Buttons.DPadUp]       = new PlayerInputBinding(Entities.InputAction.MoveY, -1),
+                [Buttons.DPadDown]     = new PlayerInputBinding(Entities.InputAction.MoveY,  1),
+                [Buttons.DPadLeft]     = new PlayerInputBinding(Entities.InputAction.MoveX, -1),
+                [Buttons.DPadRight]    = new PlayerInputBinding(Entities.InputAction.MoveX,  1),
+                [Buttons.RightTrigger] = new PlayerInputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
+            };
+            players[0].inputs.GamepadLeftThumbstick = new PlayerInputBinding2D(
+                new PlayerInputBinding(Entities.InputAction.MoveX, 1),
+                new PlayerInputBinding(Entities.InputAction.MoveY, -1)
+            );
+            players[0].inputs.GamepadRightThumbstick = new PlayerInputBinding2D(
+                new PlayerInputBinding(Entities.InputAction.FaceX, 1),
+                new PlayerInputBinding(Entities.InputAction.FaceY, -1)
+            );
+
+            Serializer.TextSerialize("player.input.tk", players[0].inputs);
         }
 
         /// <summary>
@@ -305,7 +327,7 @@ namespace DyingAndMore.Game
         {
             players = new List<PlayerInstance>(actors.Count);
             for (int i = 0; i < actors.Count; ++i)
-                players.Add(new PlayerInstance(actors[i], (PlayerIndex)i, new Rectangle()));
+                players.Add(new PlayerInstance(actors[i], new Rectangle()));
 
             OnResize(EventArgs.Empty);
         }
@@ -384,7 +406,7 @@ namespace DyingAndMore.Game
                     Map.MarkRegionActive(players[i].camera);
 
                     if (isPlayerInputEnabled)
-                        players[i].inputs.Update();
+                        players[i].inputs.Update((PlayerIndex)i);
 
                     allDead &= !players[i].actor.IsAlive;
                 }
@@ -488,16 +510,16 @@ namespace DyingAndMore.Game
                 IsPaused = !IsPaused;
 
             //todo
-            //            var scrollDelta = InputState.ScrollDelta();
-            //            if (scrollDelta != 0)
-            //            {
-            //                if (InputState.IsMod(KeyMod.Control))
-            //                    Map.TimeScale += Math.Sign(scrollDelta) * 0.1f;
-            //                else if (InputState.IsMod(KeyMod.Alt))
-            //                    Map.ActiveCamera.Rotation += Math.Sign(scrollDelta) * MathHelper.PiOver4;
-            //                else
-            //                    Map.ActiveCamera.Scale += Math.Sign(scrollDelta) * 0.1f;
-            //            }
+            var scrollDelta = InputState.ScrollDelta();
+            if (scrollDelta != 0)
+            {
+                if (InputState.IsMod(KeyMod.Control))
+                    Map.TimeScale += Math.Sign(scrollDelta) * 0.1f;
+                //else if (InputState.IsMod(KeyMod.Alt))
+                //    Map.ActiveCamera.Rotation += Math.Sign(scrollDelta) * MathHelper.PiOver4;
+                //else
+                //    Map.ActiveCamera.Scale += Math.Sign(scrollDelta) * 0.1f;
+            }
 
             //#if DEBUG
             //            {

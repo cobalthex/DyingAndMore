@@ -40,6 +40,7 @@ namespace Takai.Game
             public bool isMapCollisionEnabled;
             public bool isEntityCollisionEnabled;
             public bool isSoundEnabled;
+            public bool allowEntityDeletion; //only applies for deletions in Update() (Destroy() can still be called)
 
             public void SetGame()
             {
@@ -48,6 +49,7 @@ namespace Takai.Game
                 isMapCollisionEnabled = true;
                 isEntityCollisionEnabled = true;
                 isSoundEnabled = true;
+                allowEntityDeletion = true;
             }
 
             public void SetEditor()
@@ -57,6 +59,7 @@ namespace Takai.Game
                 isMapCollisionEnabled = true;
                 isEntityCollisionEnabled = true;
                 isSoundEnabled = false;
+                allowEntityDeletion = false;
             }
 
             public UpdateSettings Clone()
@@ -93,6 +96,7 @@ namespace Takai.Game
         /// Ents to add to the map during the next Update()
         /// </summary>
         protected HashSet<EntityInstance> activeEntities = new HashSet<EntityInstance>();
+        protected HashSet<EntityInstance> possibleOffscreenEntities = new HashSet<EntityInstance>();
 
         HashSet<FluidInstance> collidingFluids = new HashSet<FluidInstance>();
 
@@ -168,6 +172,17 @@ namespace Takai.Game
             #endregion
 
             #region entities
+
+            if (updateSettings.allowEntityDeletion)
+            {
+                foreach (var entity in possibleOffscreenEntities)
+                {
+                    if (!activeEntities.Contains(entity) &&
+                        (!entity.Class.DestroyIfDeadAndOffscreen || !entity.IsAlive))
+                        Destroy(entity);
+                }
+            }
+            possibleOffscreenEntities.Clear();
 
             //remove entities that have been destroyed
             foreach (var entity in entsToDestroy)
@@ -357,6 +372,9 @@ namespace Takai.Game
                 }
                 entity.lastAABB = eaabb;
 
+                if (entity.Class.DestroyIfDeadAndOffscreen || entity.Class.DestroyIfOffscreen)
+                    possibleOffscreenEntities.Add(entity);
+
                 if (entity.Trail != null)
                     Trails.Add(entity.Trail);
 
@@ -367,17 +385,6 @@ namespace Takai.Game
             }
 
             _updateStats.updatedEntities = activeEntities.Count;
-            //foreach (var inactive in lastActiveEntities)
-            {
-                //todo
-                //if (!visibleRegion.Intersects(eaabb) &&
-                //    (entity.Class.DestroyIfOffscreen ||
-                //    (entity.Class.DestroyIfDeadAndOffscreen && !entity.IsAlive)))
-                //{
-                //    Destroy(entity);
-                //    continue;
-                //}
-            }
 
             #endregion
 

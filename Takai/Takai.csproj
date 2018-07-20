@@ -90,6 +90,7 @@
     <Compile Include="Game\Sound.cs" />
     <Compile Include="Diagnostics.cs" />
     <Compile Include="Game\Trails.cs" />
+    <Compile Include="Input\InputMap.cs" />
     <Compile Include="Objects.cs" />
     <Compile Include="Game\Path.cs" />
     <Compile Include="Game\Trigger.cs" />

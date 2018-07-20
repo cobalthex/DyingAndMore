@@ -18,7 +18,7 @@ EffectsClass {
                         [1 0.5pi];
                     ];
                 };
-                LifeSpan: [0.5sec 1.5sec];
+                LifeSpan: [0.5sec 0.9sec];
                 Drag: 1;
             }
             Count: [5 10];

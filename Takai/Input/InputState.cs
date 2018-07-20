@@ -33,6 +33,8 @@ namespace Takai.Input
         private static Vector2[] mouseDownPositions;
         private static TouchCollection touches, lastTouches;
 
+        //accelerometer
+
         static InputState()
         {
             mouseDownPositions = new Vector2[System.Enum.GetNames(typeof(MouseButtons)).Length];
@@ -389,6 +391,16 @@ namespace Takai.Input
         public static GamePadThumbSticks LastThumbsticks(PlayerIndex player = PlayerIndex.One)
         {
             return lastGamePadState[(int)player].ThumbSticks;
+        }
+
+        public static GamePadTriggers Triggers(PlayerIndex player = PlayerIndex.One)
+        {
+            return gamePadState[(int)player].Triggers;
+        }
+
+        public static GamePadTriggers LastTriggers(PlayerIndex player = PlayerIndex.One)
+        {
+            return lastGamePadState[(int)player].Triggers;
         }
 
         /// <summary>

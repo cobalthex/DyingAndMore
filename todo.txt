@@ -72,3 +72,9 @@
 	☐	Pixel shader to draw tilemap (use tilemap as texture)
 
 	☐	Falloff range for magnetism
+
+	☐ update/render settings dialogs dont work when switching between modes
+
+	☐	GetTileCollisionTangent doesnt work. Also may be more efficient as GetNormal
+
+	☐	draw one extra sector of fluids?
