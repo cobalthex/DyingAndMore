@@ -69,11 +69,8 @@ namespace Takai.Input
     /// <typeparam name="TAction">The action type to bind to</typeparam>
     public class InputMap<TAction>
     {
-        [Data.Serializer.Ignored]
         public Dictionary<Keys, InputBinding<TAction>> Keys { get; set; }
-        [Data.Serializer.Ignored]
         public Dictionary<Buttons, InputBinding<TAction>> GamepadButtons { get; set; }
-        [Data.Serializer.Ignored]
         public Dictionary<MouseButtons, InputBinding<TAction>> MouseButtons { get; set; }
 
         //public InputBinding2D MousePosition { get; set; }
