@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Linq;
 using System.Reflection;
+
 using Takai.Data;
 using Takai.Game;
 using Takai.Input;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 
 using PlayerInputBinding = Takai.Input.InputBinding<DyingAndMore.Game.Entities.InputAction>;
 using PlayerInputBinding2D = Takai.Input.InputBinding2D<DyingAndMore.Game.Entities.InputAction>;
+using PlayerPolarInputBinding = Takai.Input.PolarInputBinding<DyingAndMore.Game.Entities.InputAction>;
 
 namespace DyingAndMore.Game
 {
@@ -147,7 +149,7 @@ namespace DyingAndMore.Game
             if (!ui.RemoveFromParent())
             {
                 //refresh individual render settings
-                var settings = ui.UserData.GetType().GetTypeInfo();
+                var settings = ui.UserData.GetType();
                 foreach (var child in ui.Children)
                     ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(ui.UserData);
 
@@ -265,9 +267,10 @@ namespace DyingAndMore.Game
             {
                 [MouseButtons.Left] = new PlayerInputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
             };
-            players[0].inputs.MousePolar = new PlayerInputBinding2D(
+            players[0].inputs.Mouse = new PlayerPolarInputBinding(
                 new PlayerInputBinding(Entities.InputAction.FaceX),
-                new PlayerInputBinding(Entities.InputAction.FaceY)
+                new PlayerInputBinding(Entities.InputAction.FaceY),
+                new Extent(Vector2.Zero, Vector2.One)
             );
             players[0].inputs.GamepadButtons = new Dictionary<Buttons, PlayerInputBinding>
             {
@@ -285,6 +288,24 @@ namespace DyingAndMore.Game
                 new PlayerInputBinding(Entities.InputAction.FaceX, 1),
                 new PlayerInputBinding(Entities.InputAction.FaceY, -1)
             );
+            players[0].inputs.Touches = new[]
+            {
+                new PlayerPolarInputBinding(
+                    new PlayerInputBinding(Entities.InputAction.MoveX),
+                    new PlayerInputBinding(Entities.InputAction.MoveY),
+                    new Extent(new Vector2(0, 0.65f), new Vector2(0.25f, 1))
+                ),
+                new PlayerPolarInputBinding(
+                    new PlayerInputBinding(Entities.InputAction.FaceX),
+                    new PlayerInputBinding(Entities.InputAction.FaceY),
+                    new Extent(new Vector2(0.75f, 0.65f), new Vector2(1, 1))
+                ),
+                new PlayerPolarInputBinding(
+                    new PlayerInputBinding(Entities.InputAction.FirePrimaryWeapon),
+                    new PlayerInputBinding(Entities.InputAction.None),
+                    new Extent(new Vector2(0.75f, 0.65f), new Vector2(1, 1))
+                )
+            };
 
             Serializer.TextSerialize("player.input.tk", players[0].inputs);
         }
@@ -406,7 +427,7 @@ namespace DyingAndMore.Game
                     Map.MarkRegionActive(players[i].camera);
 
                     if (isPlayerInputEnabled)
-                        players[i].inputs.Update((PlayerIndex)i);
+                        players[i].inputs.Update((PlayerIndex)i, players[i].camera.Viewport);
 
                     allDead &= !players[i].actor.IsAlive;
                 }
@@ -585,6 +606,18 @@ namespace DyingAndMore.Game
                     new Vector2(player.camera.Viewport.Left + 10, player.camera.Viewport.Top + 10),
                     Color.Cyan
                 );
+
+                var v = new Vector2(player.camera.Viewport.Width, player.camera.Viewport.Height);
+                foreach (var touch in player.inputs.Touches)
+                {
+                    Takai.Graphics.Primitives2D.DrawLine(spriteBatch, Color.CornflowerBlue,
+                        new Vector2(touch.boundsPercent.min.X, touch.boundsPercent.min.Y) * v,
+                        new Vector2(touch.boundsPercent.max.X, touch.boundsPercent.min.Y) * v,
+                        new Vector2(touch.boundsPercent.max.X, touch.boundsPercent.max.Y) * v,
+                        new Vector2(touch.boundsPercent.min.X, touch.boundsPercent.max.Y) * v,
+                        new Vector2(touch.boundsPercent.min.X, touch.boundsPercent.min.Y) * v
+                    );
+                }
             }
 
             var particleCount = 0;

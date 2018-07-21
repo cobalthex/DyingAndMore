@@ -271,5 +271,44 @@ namespace Takai
         {
             return r.Contains((int)v.X, (int)v.Y);
         }
+
+        public static Point Relative(this Rectangle r, Point p)
+        {
+            return new Point(p.X - r.X, p.Y - r.Y);
+        }
+
+        public static Vector2 Relative(this Rectangle r, Vector2 v)
+        {
+            return new Vector2(v.X - r.X, v.Y - r.Y);
+        }
+    }
+
+    public struct Extent
+    {
+        public Vector2 min, max;
+
+        public Extent(Vector2 min, Vector2 max)
+        {
+            this.min = min;
+            this.max = max;
+        }
+
+        public bool Contains(Vector2 point)
+        {
+            return (point.X >= min.X && point.X <= max.X &&
+                    point.Y >= min.Y && point.Y <= max.Y);
+        }
+    }
+
+    public struct Circle
+    {
+        public Vector2 center;
+        public float radius;
+
+        public Circle(Vector2 center, float radius)
+        {
+            this.center = center;
+            this.radius = radius;
+        }
     }
 }

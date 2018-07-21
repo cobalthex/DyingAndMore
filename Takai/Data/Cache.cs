@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Reflection;
 using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -332,7 +332,7 @@ namespace Takai.Data
         /// <returns>The loaded object, casted to <typeparamref name="T"/></returns>
         public static T Load<T>(string file, string root = null, bool forceLoad = false)
         {
-            var loaded = Load(file, root, typeof(T).IsDefined(typeof(AlwaysReloadAttribute), true) || forceLoad);
+            var loaded = Load(file, root, forceLoad || typeof(T).GetTypeInfo().IsDefined(typeof(AlwaysReloadAttribute), true));
             return Serializer.Cast<T>(loaded);
         }
 
@@ -522,6 +522,7 @@ namespace Takai.Data
 
         public class OpusSoundSource : ISoundSource
         {
+#if WINDOWS
             Concentus.Structs.OpusDecoder decoder;
             Concentus.Oggfile.OpusOggReadStream stream;
 
@@ -576,6 +577,14 @@ namespace Takai.Data
             {
                 decoder.ResetState();
             }
+#else
+            public SoundEffectInstance Instantiate()
+            {
+                return new DynamicSoundEffectInstance(41400, AudioChannels.Mono);
+            }
+
+            public void Dispose() { }
+#endif
         }
 
         class OpusLoader : CustomLoader
@@ -589,9 +598,13 @@ namespace Takai.Data
 
             public override object Load(CustomLoad load)
             {
+#if WINDOWS
                 var decoder = new Concentus.Structs.OpusDecoder(48000, 2); //todo: configurable quality?
                 var oggStream = new Concentus.Oggfile.OpusOggReadStream(decoder, load.stream);
                 return new OpusSoundSource(oggStream, decoder);
+#else
+                return new OpusSoundSource();
+#endif
             }
         }
 
@@ -623,6 +636,6 @@ namespace Takai.Data
             }
         }
 
-        #endregion
+#endregion
     }
 }
