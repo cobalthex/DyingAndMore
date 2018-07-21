@@ -1100,8 +1100,23 @@ namespace Takai.UI
                 }
             }
 
-            var mouse = Input.InputState.MousePoint;
+            //todo: improve
+            if (Input.InputState.IsPress(0) && VisibleBounds.Contains(Input.InputState.touches[0].Position))
+            {
+                var e = new ClickEventArgs { position = Vector2.Zero };
+                OnClick(e);
+                Click?.Invoke(this, e);
 
+                if (CanFocus)
+                {
+                    HasFocus = true;
+                    return false;
+                }
+
+                return false;
+            }
+
+            var mouse = Input.InputState.MousePoint;
             return HandleMouseInput(mouse, Input.MouseButtons.Left);
         }
 
@@ -1229,6 +1244,14 @@ namespace Takai.UI
         }
 
         #endregion
+
+        //todo: better name (maybe have other call sites use this?)
+        public void TriggerClick(Vector2 relativePosition)
+        {
+            var ce = new ClickEventArgs { position = relativePosition, inputIndex = 0 };
+            OnClick(ce);
+            Click?.Invoke(this, ce);
+        }
 
         public override string ToString()
         {

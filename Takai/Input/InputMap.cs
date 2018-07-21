@@ -40,9 +40,27 @@ namespace Takai.Input
 
     public struct PolarInputBinding<TAction>
     {
-        InputBinding<TAction> horizontal;
-        InputBinding<TAction> vertical;
-        Rectangle bounds;
+        public InputBinding<TAction> horizontal;
+        public InputBinding<TAction> vertical;
+        public Extent boundsPercent;
+
+        //required touch?
+
+        public PolarInputBinding(InputBinding<TAction> horizontal, InputBinding<TAction> vertical, Extent boundsPercent)
+        {
+            this.horizontal = horizontal;
+            this.vertical = vertical;
+            this.boundsPercent = boundsPercent;
+        }
+
+        public Extent GetBounds(Rectangle viewport)
+        {
+            var sz = new Vector2(viewport.Width, viewport.Height);
+            return new Extent(
+                sz * boundsPercent.min,
+                sz * boundsPercent.max
+            );
+        }
     }
 
     /// <summary>
@@ -59,13 +77,15 @@ namespace Takai.Input
         public Dictionary<MouseButtons, InputBinding<TAction>> MouseButtons { get; set; }
 
         //public InputBinding2D MousePosition { get; set; }
-        public PolarInputBinding<TAction> MousePolar { get; set; }
+        public PolarInputBinding<TAction> Mouse { get; set; }
 
         public InputBinding2D<TAction> GamepadLeftThumbstick { get; set; }
         public InputBinding2D<TAction> GamepadRightThumbstick { get; set; }
 
         public InputBinding<TAction> GamepadLeftTrigger { get; set; }
         public InputBinding<TAction> GamepadRightTrigger { get; set; }
+
+        public PolarInputBinding<TAction>[] Touches { get; set; }
 
         //todo: touch
 
@@ -86,7 +106,7 @@ namespace Takai.Input
             CurrentInputs[binding.action] = magnitude;
         }
 
-        public void Update(PlayerIndex player)
+        public void Update(PlayerIndex player, Rectangle viewport)
         {
             if (Keys != null)
             {
@@ -113,11 +133,13 @@ namespace Takai.Input
                 }
             }
 
-            if (InputState.MouseDelta() != Vector2.Zero)
+            var mouse = InputState.MouseVector;
+            if (InputState.MouseDelta() != Vector2.Zero && viewport.Contains(mouse))
             {
-                var mousePolar = InputState.PolarMouseVector; //todo: should be relative to camera viewport
-                SetInput(MousePolar.horizontal, mousePolar.X);
-                SetInput(MousePolar.vertical, mousePolar.Y);
+                var relative = viewport.Relative(mouse) / new Vector2(viewport.Width, viewport.Height);
+                relative -= (Mouse.boundsPercent.min + Mouse.boundsPercent.max) / 2;
+                SetInput(Mouse.horizontal, relative.X * 2);
+                SetInput(Mouse.vertical, relative.Y * 2);
             }
 
             var thumbsticks = InputState.Thumbsticks(player);
@@ -129,6 +151,28 @@ namespace Takai.Input
             var triggers = InputState.Triggers(player);
             SetInput(GamepadLeftTrigger, triggers.Left);
             SetInput(GamepadRightTrigger, triggers.Right);
+
+            if (Touches != null)
+            {
+                //todo: convert to circle (allow for magnitude)
+                foreach (var touch in InputState.touches)
+                {
+                    foreach (var touchAction in Touches)
+                    {
+                        var v = new Vector2(viewport.Width, viewport.Height);
+                        var absMin = (touchAction.boundsPercent.min * v).ToPoint();
+                        var absMax = (touchAction.boundsPercent.max * v).ToPoint();
+                        var rv = absMax - absMin;
+                        if (!new Rectangle(absMin.X, absMin.Y, rv.X, rv.Y).Contains(touch.Position))
+                            continue;
+
+                        var polar = (touch.Position - ((absMin + absMax).ToVector2() / 2)) / rv.ToVector2();
+                        polar.Normalize();
+                        SetInput(touchAction.horizontal, polar.X);
+                        SetInput(touchAction.vertical, polar.Y);
+                    }
+                }
+            }
         }
     }
 }

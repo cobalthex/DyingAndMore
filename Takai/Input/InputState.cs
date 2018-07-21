@@ -31,7 +31,7 @@ namespace Takai.Input
         private static GamePadState[] gamePadState, lastGamePadState;
         private static MouseState mouseState, lastMouseState;
         private static Vector2[] mouseDownPositions;
-        private static TouchCollection touches, lastTouches;
+        public static TouchCollection touches, lastTouches; //todo: make better
 
         //accelerometer
 
@@ -253,14 +253,12 @@ namespace Takai.Input
 
         public static bool IsPress(int touchIndex)
         {
-            return (touches.Count > touchIndex && touches[touchIndex].State == TouchLocationState.Pressed) &&
-                   (lastTouches.Count > touchIndex && lastTouches[touchIndex].State == TouchLocationState.Released);
+            return (touches.Count > touchIndex && touches[touchIndex].State == TouchLocationState.Pressed);
         }
 
         public static bool IsClick(int touchIndex)
         {
-            return (touches.Count > touchIndex && touches[touchIndex].State == TouchLocationState.Released) &&
-                   (lastTouches.Count > touchIndex && lastTouches[touchIndex].State == TouchLocationState.Pressed);
+            return (touches.Count > touchIndex && touches[touchIndex].State == TouchLocationState.Released);
         }
 
         /// <summary>

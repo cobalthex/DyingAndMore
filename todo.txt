@@ -43,7 +43,9 @@
 		`$taco Sprite { ... }`
 		visible from code, and deserializer as &var.taco
 
-	☐  default button in UI (click enter in text box to submit)
+UI:
+	☐  default buttons (click enter in text box to submit)
+	☐	display scaling
 
 	☐  player input system
 
@@ -73,7 +75,7 @@
 
 	☐	Falloff range for magnetism
 
-	☐ update/render settings dialogs dont work when switching between modes
+	☐	update/render settings dialogs dont work when switching between modes
 
 	☐	GetTileCollisionTangent doesnt work. Also may be more efficient as GetNormal
 
