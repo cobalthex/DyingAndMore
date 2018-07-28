@@ -108,6 +108,8 @@ namespace DyingAndMore.Game.Entities
         }
         private Controller _controller;
 
+        public float MaxHealth => Class.MaxHealth;
+
         /// <summary>
         /// The current health of the actor
         /// </summary>
@@ -140,10 +142,19 @@ namespace DyingAndMore.Game.Entities
                 if (_weapon != value)
                 {
                     if (_weapon != null)
+                    {
                         _weapon.Actor = null;
+                        if (Hud != null && _weapon.Hud != null)
+                            Hud.RemoveChild(_weapon.Hud);
+                    }
 
                     _weapon = value;
                     _weapon.Actor = this;
+                    if (Hud != null && _weapon.Hud != null)
+                    {
+                        Hud.AddChild(_weapon.Hud);
+                        Hud.AutoSize();
+                    }
                 }
             }
         }
@@ -156,7 +167,7 @@ namespace DyingAndMore.Game.Entities
         public ActorInstance(ActorClass @class)
             : base(@class)
         {
-            if (Class != null)
+            if (Class != null) //todo: move this stuff to class prop?
             {
                 MaxSpeed = Class.MaxSpeed.Random();
                 CurrentHealth = Class.MaxHealth;
@@ -167,7 +178,10 @@ namespace DyingAndMore.Game.Entities
                     Controller = Class.DefaultController.Clone();
 
                 if (Class.Hud != null)
+                {
                     Hud = Class.Hud.Clone();
+                    Hud.SetBindTargetRecursive(this);
+                }
             }
         }
 
@@ -180,7 +194,11 @@ namespace DyingAndMore.Game.Entities
 
             clone._weapon = null;
             clone.Weapon = Weapon?.Clone();
-
+            if (Hud != null)
+            {
+                clone.Hud = Hud.Clone();
+                clone.Hud.SetBindTargetRecursive(clone);
+            }
             return clone;
         }
 

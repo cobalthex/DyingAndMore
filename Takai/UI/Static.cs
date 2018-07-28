@@ -54,6 +54,8 @@ namespace Takai.UI
     /// </summary>
     public class Static : Data.IDerivedDeserialize
     {
+        #region Properties
+
         /// <summary>
         /// A font to use for drawing debug info.
         /// If null, debug info is not drawn
@@ -97,8 +99,22 @@ namespace Takai.UI
                 }
             }
         }
-        private string _text = "";
+        private string _text;
         protected Vector2 textSize;
+
+        /// <summary>
+        /// A binding to bind a value to this element's text
+        /// </summary>
+        public virtual string TextBinding
+        {
+            get => _textBinding;
+            set
+            {
+                _textBinding = value;
+                CreateBindings();
+            }
+        }
+        private string _textBinding;
 
         /// <summary>
         /// The font to draw the text of this element with.
@@ -366,21 +382,25 @@ namespace Takai.UI
         }
         private Static _parent = null;
 
-        private void SetParentNoReflow(Static newParent)
-        {
-            var changed = new ParentChangedEventArgs(_parent);
-            _parent = newParent;
-
-            OnParentChanged(changed);
-            ParentChanged?.Invoke(this, changed);
-        }
-
         /// <summary>
         /// A readonly collection of all of the children in this element
         /// </summary>
         [Data.CustomDeserialize(typeof(Static), "DeserializeChildren")]
         public ReadOnlyCollection<Static> Children { get; private set; } //todo: maybe observable
         private List<Static> children = new List<Static>();
+
+        public object CurrentBindTarget
+        {
+            get => _currentBindTarget;
+            set
+            {
+                _currentBindTarget = value;
+                CreateBindings();
+            }
+        }
+        private object _currentBindTarget;
+
+        #endregion
 
         private void DeserializeChildren(object objects)
         {
@@ -391,11 +411,6 @@ namespace Takai.UI
                     AddChild(child);
             }
         }
-
-        /// <summary>
-        /// A binding to bind a value to this element's text
-        /// </summary>
-        public virtual string TextBinding { get; set; }
 
         public Static()
         {
@@ -424,7 +439,66 @@ namespace Takai.UI
                 AddChild(child);
         }
 
-        #region Children/cloning
+        private Util.GetSet textBindMethods;
+
+        public void SetBindTargetRecursive(object target)
+        {
+            foreach (var elem in EnumerateRecursive())
+                elem.CurrentBindTarget = target;
+        }
+
+        protected Util.GetSet GetBinding(string binding)
+        {
+            //todo: message when binding not found
+
+            Util.GetSet getset;
+
+            if (binding.StartsWith("global.", System.StringComparison.OrdinalIgnoreCase))
+            {
+                var bindName = binding.Substring("global.".Length);
+                getset = new Util.GetSet
+                {
+                    get = delegate
+                    {
+                        Data.DataModel.Globals.TryGetValue(bindName, out var value);
+                        return value;
+                    },
+                    set = (value) => Data.DataModel.Globals[bindName] = value
+                };
+            }
+            else
+                getset = Util.GetMemberAccessors(binding, CurrentBindTarget);
+
+            if (getset.get == null && getset.set == null)
+                System.Diagnostics.Debug.WriteLine($"UI binding '{binding}' does not exist in '{CurrentBindTarget.GetType()}'");
+
+            return getset;
+        }
+
+        protected virtual void CreateBindings()
+        {
+            if (CurrentBindTarget == null)
+                return;
+
+            if (TextBinding != null)
+                textBindMethods = GetBinding(TextBinding);
+        }
+        protected virtual void UpdateBindingValues()
+        {
+            if (textBindMethods.get != null)
+                Text = textBindMethods.get()?.ToString();
+        }
+
+        #region Hierarchy/cloning
+
+        private void SetParentNoReflow(Static newParent)
+        {
+            var changed = new ParentChangedEventArgs(_parent);
+            _parent = newParent;
+
+            OnParentChanged(changed);
+            ParentChanged?.Invoke(this, changed);
+        }
 
         /// <summary>
         /// Create a clone of this static and all of its children
@@ -1040,7 +1114,7 @@ namespace Takai.UI
                 }
                 else
                     toUpdate = toUpdate.Parent;
-                ++i;
+                ++i; //todo: this can get stuck in an infinite loop
             }
         }
 
@@ -1051,8 +1125,7 @@ namespace Takai.UI
         /// <param name="time">game time</param>
         protected virtual void UpdateSelf(GameTime time)
         {
-            if (TextBinding != null && Data.DataModel.Globals.TryGetValue(TextBinding, out var bindValue))
-                Text = bindValue.ToString();
+            UpdateBindingValues();
         }
 
         /// <summary>
@@ -1204,7 +1277,7 @@ namespace Takai.UI
         /// <param name="spriteBatch">The spritebatch to use</param>
         protected virtual void DrawSelf(SpriteBatch spriteBatch)
         {
-            if (Font != null)
+            if (Font != null && Text != null)
             {
                 var textPos = ((Size - textSize) / 2).ToPoint();
                 DrawText(spriteBatch, textPos);

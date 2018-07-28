@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 
 namespace Takai
@@ -280,6 +281,40 @@ namespace Takai
         public static Vector2 Relative(this Rectangle r, Vector2 v)
         {
             return new Vector2(v.X - r.X, v.Y - r.Y);
+        }
+
+        public struct GetSet
+        {
+            public Func<object> get;
+            public Action<object> set;
+        }
+        public static GetSet GetMemberAccessors(string memberName, object obj)
+        {
+            var getset = new GetSet();
+
+            if (obj == null)
+                return getset;
+
+            var type = obj.GetType();
+
+            var prop = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            if (prop != null)
+            {
+                //todo: get delegates working
+                getset.get = () => prop.GetValue(obj);
+                getset.set = (value) => prop.SetValue(obj, value);
+                //getset.get = prop.CanRead ? (Func<object>)prop.GetGetMethod(false).CreateDelegate(typeof(Func<object>), obj) : null;
+                //getset.set = prop.CanWrite ? (Action<object>)prop.GetSetMethod(false).CreateDelegate(typeof(Action<object>), obj) : null;
+                return getset;
+            }
+
+            var field = type.GetField(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            if (field != null)
+            {
+                throw new NotImplementedException(); //todo
+            }
+
+            return getset;
         }
     }
 

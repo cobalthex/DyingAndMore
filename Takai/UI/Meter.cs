@@ -6,7 +6,7 @@ namespace Takai.UI
     /// <summary>
     /// Display a graphic in a variey of ways according to a value
     /// </summary>
-    public class Meter : Static
+    public class Meter : NumericBase
     {
         public Graphics.Sprite Sprite { get; set; }
 
@@ -16,17 +16,10 @@ namespace Takai.UI
         public Graphics.Sprite Mask { get; set; }
 
         /// <summary>
-        /// The cutoff value for the mask (display anything less than this)
-        /// Or, see <seealso cref="Range"/>
-        /// </summary>
-        public float Value { get; set; } = 1;
-        /// <summary>
-        /// THe range to pad around the cutoff value. If 0, <see cref="Value"/> acts as a cutoffio
+        /// THe range to pad around the cutoff value. If 0, <see cref="Value"/> acts as a cutoff
         /// If != 0, it behaves as a range and this is a padding factor (*2 for above and below <see cref="Value"/>)
         /// </summary>
         public float Range { get; set; } = 0;
-
-        public string ValueBinding { get; set; }
 
         Effect maskEffect;
         SpriteBatch sbatch;
@@ -42,22 +35,12 @@ namespace Takai.UI
             Size = (Sprite?.Size.ToVector2() ?? new Vector2(1)) + new Vector2(padding);
         }
 
-        protected override void UpdateSelf(GameTime time)
-        {
-            if (ValueBinding != null && Data.DataModel.Globals.TryGetValue(ValueBinding, out var bindValue))
-            {
-                Value = System.Convert.ToSingle(bindValue);
-            }
-
-            base.UpdateSelf(time);
-        }
-
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             base.DrawSelf(spriteBatch);
 
-            maskEffect.Parameters["Cutoff"].SetValue(Value);
-            maskEffect.Parameters["Range"].SetValue(Range);
+            maskEffect.Parameters["Cutoff"].SetValue(NormalizedValue);
+            //maskEffect.Parameters["Range"].SetValue(Range);
             maskEffect.Parameters["Mask"].SetValue(Mask.Texture);
             sbatch.Begin(SpriteSortMode.Deferred, null, null, null, null, maskEffect);
             Sprite.Draw(sbatch, VisibleBounds, 0, Color, Sprite.ElapsedTime);

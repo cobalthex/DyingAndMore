@@ -2,9 +2,10 @@ Static {
 	Position: [100 100];
 	Children: [
 		Meter {
-			name: "asdf";
-			Position: [2 82];
-			ValueBinding: "player.health";
+			Position: [2 64];
+			ValueBinding: "CurrentHealth";
+			MaximumBinding: "MaxHealth";
+			Minimum: 0;
 			Sprite: {
 				Texture: @"./player.png";
 				ClipRect: [0 88 84 88];
@@ -19,30 +20,13 @@ Static {
 			}
 		}
 		Graphic {
-			Position: [0 80];
+			Position: [0 62];
 			Sprite: {
 				Texture: @"./Player.png";
 				ClipRect: [88 77 86 92];
 				Width: 86;
 				Height: 92;
 			};
-		}
-		Meter {
-			name: "donk";
-			Position: [40 0];
-			ValueBinding: "map.time.seconds";
-			Sprite: {
-				Texture: @"./player.png";
-				ClipRect: [0 0 84 84];
-				Width: 84;
-				Height: 84;
-			}
-			Mask: {
-				Texture: @"./player.mask.png";
-				ClipRect: [0 0 84 84];
-				Width: 84;
-				Height: 84;
-			}
 		}
 	];
 }

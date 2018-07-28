@@ -69,6 +69,8 @@ namespace DyingAndMore.Game.Weapons
 
         //rate of fire over time, speed up time
 
+        public Takai.UI.Static Hud { get; set; }
+
         public abstract WeaponInstance Instantiate();
     }
 
@@ -113,10 +115,20 @@ namespace DyingAndMore.Game.Weapons
         protected bool isUsing = false;
         protected bool wasUsing = false;
 
+        public Takai.UI.Static Hud { get; set; }
+
         public WeaponInstance() { }
         public WeaponInstance(WeaponClass @class)
         {
             Class = @class;
+            if (Class != null)
+            {
+                if (Class.Hud != null) //todo: move this stuff to class prop?
+                {
+                    Hud = Class.Hud.Clone();
+                    Hud.SetBindTargetRecursive(this);
+                }
+            }
         }
 
         public virtual WeaponInstance Clone()
@@ -124,6 +136,11 @@ namespace DyingAndMore.Game.Weapons
             var clone = (WeaponInstance)MemberwiseClone();
             clone.Actor = null;
             clone.isUsing = false;
+            if (Hud != null)
+            {
+                clone.Hud = Hud.Clone();
+                clone.Hud.SetBindTargetRecursive(clone);
+            }
             return clone;
         }
 

@@ -10,6 +10,31 @@ GunClass {
     CooldownTime: 30msec;
     ErrorAngle: [-16deg 16deg];
 
+    Hud: {
+        name: "asdf";
+        Children: [
+            Meter {
+                Position: [8 0];
+                Size: [76 76];
+                ValueBinding: "CurrentAmmo";
+                MaximumBinding: "MaxAmmo";
+                Minimum: 0;
+                Sprite: {
+                    Texture: @"UI/HUDs/player.png";
+                    ClipRect: [85 0 76 76];
+                    Width: 76;
+                    Height: 76;
+                }
+                Mask: {
+                    Texture: @"UI/HUDs/player.mask.png";
+                    ClipRect: [85 0 76 76];
+                    Width: 76;
+                    Height: 76;
+                }
+            }
+        ];
+    }
+
     DischargeEffect: { #move to spawn effect on projectile?
         Effects: [
             ParticleEffect {

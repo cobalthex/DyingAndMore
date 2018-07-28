@@ -440,9 +440,9 @@ namespace Takai.Graphics
             bool hasSize = props.ContainsKey("Size");
 
             if (!hasSize && !props.ContainsKey("Width"))
-                Width = Texture?.Width ?? 1;
+                Width = ClipRect.Width;
             if (!hasSize && !props.ContainsKey("Height"))
-                Height = Texture?.Height ?? 1;
+                Height = ClipRect.Height;
 
             //center sprite by default
             if (!(props.TryGetValue("Center", out var center) &&

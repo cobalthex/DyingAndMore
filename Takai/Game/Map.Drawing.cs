@@ -361,7 +361,7 @@ namespace Takai.Game
                 visibleSectors = GetOverlappingSectors(visibleRegion)
             };
 
-            Runtime.GraphicsDevice.Viewport = new Viewport(camera.Viewport);
+            //Runtime.GraphicsDevice.Viewport = new Viewport(camera.Viewport);
             Runtime.GraphicsDevice.ScissorRectangle = camera.Viewport;
             Runtime.GraphicsDevice.SetRenderTarget(Class.reflectedRenderTarget);
             Runtime.GraphicsDevice.Clear(Color.Transparent);

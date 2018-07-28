@@ -54,7 +54,9 @@ namespace DyingAndMore.Game.Weapons
             set => base.Class = value;
         }
 
-        public int AmmoCount { get; set; }
+        public int MaxAmmo => Class.MaxAmmo;
+
+        public int CurrentAmmo { get; set; }
 
         protected int currentBurstShotCount = 0;
         protected int burstCount = 0;
@@ -65,7 +67,7 @@ namespace DyingAndMore.Game.Weapons
         {
             if (@class != null)
             {
-                AmmoCount = @class.MaxAmmo;
+                CurrentAmmo = @class.MaxAmmo;
             }
         }
 
@@ -77,7 +79,7 @@ namespace DyingAndMore.Game.Weapons
 
         public override bool IsDepleted()
         {
-            return Class.MaxAmmo > 0 && AmmoCount <= 0;
+            return Class.MaxAmmo > 0 && CurrentAmmo <= 0;
         }
 
         public override bool CanUse(TimeSpan elapsedTime)
@@ -124,7 +126,7 @@ namespace DyingAndMore.Game.Weapons
                 }
             }
 
-            --AmmoCount;
+            --CurrentAmmo;
             ++currentBurstShotCount;
 
             base.OnDischarge();
@@ -138,15 +140,15 @@ namespace DyingAndMore.Game.Weapons
             //todo: option to combine if weapon shares same projectile type
 
             var gun = (GunInstance)other;
-            var lastAmmoCount = AmmoCount;
-            AmmoCount = Math.Min(Class.MaxAmmo, AmmoCount + (gun.AmmoCount));
-            gun.AmmoCount -= AmmoCount - lastAmmoCount;
+            var lastAmmoCount = CurrentAmmo;
+            CurrentAmmo = Math.Min(Class.MaxAmmo, CurrentAmmo + (gun.CurrentAmmo));
+            gun.CurrentAmmo -= CurrentAmmo - lastAmmoCount;
             return true;
         }
 
         public override string ToString()
         {
-            return $"{base.ToString()} ({AmmoCount}/{Class?.MaxAmmo})";
+            return $"{base.ToString()} ({CurrentAmmo}/{Class?.MaxAmmo})";
         }
     }
 }
