@@ -112,7 +112,7 @@ namespace DyingAndMore.Game
         Static updateSettingsConsole;
         Static gameplaySettingsConsole;
 
-        Static gameHuds;
+        Static hudContainer;
 
         bool isDead = false;
         TimeSpan restartTimer;
@@ -138,11 +138,15 @@ namespace DyingAndMore.Game
                 if (inst != null)
                     Map = Game.Map = inst;
             },
-            ["CompleteMap"] = delegate (object ignored)
-            {
-                Game.LoadNextStoryMap();
-            },
+            ["CompleteMap"] = (ignored) => CompleteMap(),
         };
+
+        public void CompleteMap()
+        {
+            //todo: display end of game stats
+
+            Game.LoadNextStoryMap();
+        }
 
         void ToggleUI(Static ui)
         {
@@ -169,7 +173,7 @@ namespace DyingAndMore.Game
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
 
-            AddChild(gameHuds = new Static
+            AddChild(hudContainer = new Static
             {
                 Name = "HUD container",
                 VerticalAlignment = Alignment.Stretch,
@@ -218,6 +222,12 @@ namespace DyingAndMore.Game
             gameplaySettingsConsole.UserData = GameplaySettings;
 
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
+
+            AddChild(hudContainer = new Static
+            {
+                HorizontalAlignment = Alignment.Stretch,
+                VerticalAlignment = Alignment.Stretch
+            });
         }
 
         private void GameMapChanged(object sender, MapChangedEventArgs e)
@@ -231,6 +241,8 @@ namespace DyingAndMore.Game
                 Game = new Game { Map = Map }; //todo: proper map reset support
 
             ElapsedRealTime = TimeSpan.Zero;
+
+            hudContainer.RemoveAllChildren();
 
             if (updateSettingsConsole != null)
                 updateSettingsConsole.UserData = Map.updateSettings;
@@ -253,7 +265,18 @@ namespace DyingAndMore.Game
                 //spawn players behind the last
             }
 
-            SetPlayers(possiblePlayers);
+            players = new List<PlayerInstance>(possiblePlayers.Count);
+            for (int i = 0; i < possiblePlayers.Count; ++i)
+            {
+                players.Add(new PlayerInstance(possiblePlayers[i], new Rectangle()));
+
+                if (possiblePlayers[i].Hud != null)
+                    hudContainer.AddChild(possiblePlayers[i].Hud);
+                if (possiblePlayers[i].Weapon?.Hud != null)
+                    hudContainer.AddChild(possiblePlayers[i].Hud);
+            }
+
+            OnResize(EventArgs.Empty);
 
             players[0].inputs.Keys = new Dictionary<Keys, PlayerInputBinding>
             {
@@ -344,15 +367,6 @@ namespace DyingAndMore.Game
             },
         };
 
-        void SetPlayers(List<Entities.ActorInstance> actors)
-        {
-            players = new List<PlayerInstance>(actors.Count);
-            for (int i = 0; i < actors.Count; ++i)
-                players.Add(new PlayerInstance(actors[i], new Rectangle()));
-
-            OnResize(EventArgs.Empty);
-        }
-
         string GetClockText(TimeSpan time)
         {
             return $"{(int)time.TotalHours:D2}:"
@@ -395,6 +409,8 @@ namespace DyingAndMore.Game
 
         protected override void UpdateSelf(GameTime time)
         {
+            DataModel.Globals["test"] = time.TotalGameTime;
+
             ElapsedRealTime += time.ElapsedGameTime;
             clockDisplay.Text = $"{GetClockText(ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}x{Map.TimeScale:N1}{(IsPaused ? "\n -- PAUSED --" : "")}";
             clockDisplay.AutoSize();
@@ -630,7 +646,7 @@ namespace DyingAndMore.Game
                 $"\nTotal particles:{particleCount}" +
                 $"\nVisible fluids:A={Map.RenderStats.visibleActiveFluids} I={Map.RenderStats.visibleInactiveFluids}" +
                 $"\nTrail points:{Map.RenderStats.trailPointCount}",
-                new Vector2(20, 100),
+                new Vector2(20, 200),
                 Color.Orange
             );
 

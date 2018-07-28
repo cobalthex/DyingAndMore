@@ -317,17 +317,12 @@ namespace Takai.Game
 
             instance.OnDestroy();
             instance.SpawnTime = TimeSpan.Zero;
-            instance.Id = 0;
+            //instance.Id = 0;
             instance.Map = null;
-            _allEntities.Remove(instance);
-        }
-        /// <summary>
-        /// Remove an entity from the map sectors
-        /// </summary>
-        /// <param name="instance">The entity to remove</param>
-        protected void RemoveFromMap(EntityInstance instance)
-        {
+
+            possibleOffscreenEntities.Remove(instance);
             activeEntities.Remove(instance);
+            _allEntities.Remove(instance);
             var sectors = GetOverlappingSectors(instance.AxisAlignedBounds);
             for (int y = sectors.Top; y < sectors.Bottom; ++y)
             {

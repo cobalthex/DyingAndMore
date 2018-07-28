@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build;CompileShaders;SymlinkMediaFiles" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props')" />
-  <PropertyGroup>
-    <MediaDir>..\Media\</MediaDir>
-  </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -43,11 +40,25 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
+  <PropertyGroup>
+    <MediaDir>$(SolutionDir)Media\</MediaDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ShaderProfile>DX11</ShaderProfile>
+  </PropertyGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MediaDir)Shaders\compile.ps1">
+      <Link>Shaders\%(Filename)%(Extension)</Link>
+    </None>
+    <Shaders Include="$(MediaDir)Shaders\**\*.fx">
+      <Link>Shaders\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Shaders>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssetView.cs" />
@@ -84,10 +95,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <PropertyGroup>
-    <MediaDir>$(SolutionDir)Media\</MediaDir>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <Content Include="$(MediaDir)Content\**\*.*">
       <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -100,10 +108,6 @@
       <Link>Config\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <!--<Content Include="..\Media\Shaders\DX11\**\*.*">
-      <Link>Content\Shaders\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>-->
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
@@ -121,19 +125,36 @@
       <Name>Takai</Name>
     </ProjectReference>
   </ItemGroup>
+
+  <Target
+    Name="CompileShaders"
+    Label="Compile shaders"
+    AfterTargets="Build"
+    Inputs="@(Shaders)"
+    Outputs="@(Shaders -> '$(MediaDir)Shaders\$(ShaderProfile)\%(RecursiveDir)%(Filename).mgfx')">
+    <Exec 
+      Command="
+        powershell.exe ^
+          -ExecutionPolicy Bypass ^
+          -NoLogo ^
+          -NonInteractive ^
+          -NoProfile ^
+          -File &quot;$(MediaDir)Shaders\compile.ps1&quot; ^
+            -Files %(Shaders.Identity) ^
+            -$(ShaderProfile) ^
+            -Configuration $(Configuration) ^
+        " 
+      WorkingDirectory="$(MediaDir)Shaders\"
+    />
+  </Target>
+
+  <Target
+    Name="SymlinkMediaFiles"
+    Label="Symlink media files"
+    AfterTargets="Build"
+    Condition="'$(Configuration)' == 'Debug'">
+    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -Command &quot;New-Item -Force -ItemType directory -Path '$(MediaDir)Content\Shaders' | Out-Null; Copy-Item -Force -Container -Recurse '$(MediaDir)Shaders\$(ShaderProfile)\*' '$(MediaDir)Content\Shaders';    ('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }&quot;" />
+  </Target>
+
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <ShaderProfile>DX11</ShaderProfile>
-    <PostBuildEvent>
-      powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File "$(SolutionDir)Media\Shaders\compile.ps1" -$(ShaderProfile) -Configuration $(Configuration)
-
-      if '$(ConfigurationName)' == 'Debug' (
-        powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -Command "New-Item -Force -ItemType directory -Path '$(SolutionDir)Media\Content\Shaders' | Out-Null; Copy-Item -Recurse '$(SolutionDir)Media\Shaders\$(ShaderProfile)\*' '$(SolutionDir)Media\Content\Shaders';    ('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }"
-      )
-
-      set rce=%25errorlevel%25
-      if not %25rce%25==1 exit %25rce%25 else exit 0
-    </PostBuildEvent>
-  </PropertyGroup>
 </Project>

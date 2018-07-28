@@ -141,9 +141,6 @@ namespace Takai.Game
             var deltaSeconds = (float)deltaTime.TotalSeconds;
             ElapsedTime += deltaTime;
 
-            Data.DataModel.Globals["map.time.seconds"] = ElapsedTime.TotalSeconds;
-            Data.DataModel.Globals["map.time.milliseconds"] = ElapsedTime.TotalMilliseconds;
-
             //if (deltaTicks == 0)
             //    return;
 
@@ -173,24 +170,24 @@ namespace Takai.Game
 
             #region entities
 
-            if (updateSettings.allowEntityDeletion)
+            foreach (var entity in possibleOffscreenEntities)
             {
-                foreach (var entity in possibleOffscreenEntities)
-                {
-                    if (!activeEntities.Contains(entity) &&
-                        (!entity.Class.DestroyIfDeadAndOffscreen || !entity.IsAlive))
-                        Destroy(entity);
-                }
+                if (!activeEntities.Contains(entity) &&
+                    (!entity.Class.DestroyIfDeadAndOffscreen || !entity.IsAlive))
+                    Destroy(entity);
             }
             possibleOffscreenEntities.Clear();
 
             //remove entities that have been destroyed
-            foreach (var entity in entsToDestroy)
+            if (updateSettings.allowEntityDeletion)
             {
-                if (entity.Map != this)
-                    continue; //delete may be being called twice?
-                FinalDestroy(entity);
-                RemoveFromMap(entity);
+                foreach (var entity in entsToDestroy)
+                {
+                    if (entity.Map != this && entity.Map != null)
+                        continue; //delete may be being called twice?
+
+                    FinalDestroy(entity);
+                }
             }
             entsToDestroy.Clear();
 

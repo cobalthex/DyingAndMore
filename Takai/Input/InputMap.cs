@@ -4,6 +4,18 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Takai.Input
 {
+    public enum InputDeviceType
+    {
+        Unknown,
+        Key,
+        MouseButton,
+        MousePosition,
+        GamepadButton,
+        GamepadThumbstick,
+        GamepadTrigger,
+        TouchPosition,
+    }
+
     public struct InputBinding<TAction>
     {
         /// <summary>

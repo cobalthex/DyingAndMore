@@ -30,6 +30,9 @@ namespace Takai.UI
         }
         private NumericBaseType _value;
 
+        public string ValueBinding { get; set; }
+        private Util.GetSet valueBindingAccessors;
+
         /// <summary>
         /// The normalized value (from 0 to 1) of this range
         /// </summary>
@@ -55,6 +58,9 @@ namespace Takai.UI
         }
         private NumericBaseType _minimum = NumericBaseType.MinValue;
 
+        public string MinimumBinding { get; set; }
+        private Util.GetSet minimumBindingAccessors;
+
         /// <summary>
         /// The maximum allowed value
         /// Setting this may affect Value
@@ -71,6 +77,9 @@ namespace Takai.UI
         }
         private NumericBaseType _maximum = NumericBaseType.MaxValue;
 
+        public string MaximumBinding { get; set; }
+        private Util.GetSet maximumBindingAccessors;
+
         /// <summary>
         /// How much to increase or decrease the value by each step
         /// </summary>
@@ -82,6 +91,48 @@ namespace Takai.UI
         public event EventHandler ValueChanged;
 
         protected virtual void OnValueChanged(EventArgs e) { }
+
+        protected override void CreateBindings()
+        {
+            base.CreateBindings();
+            if (ValueBinding != null)
+                valueBindingAccessors = GetBinding(ValueBinding);
+            if (MinimumBinding != null)
+                minimumBindingAccessors = GetBinding(MinimumBinding);
+            if (MaximumBinding != null)
+                maximumBindingAccessors = GetBinding(MaximumBinding);
+        }
+        protected override void UpdateBindingValues()
+        {
+            base.UpdateBindingValues();
+            if (valueBindingAccessors.get != null)
+            {
+                var val = valueBindingAccessors.get();
+                try
+                {
+                    Value = Convert.ToInt64(val);
+                }
+                catch { }
+            }
+            if (minimumBindingAccessors.get != null)
+            {
+                var val = minimumBindingAccessors.get();
+                try
+                {
+                    Minimum = Convert.ToInt64(val);
+                }
+                catch { }
+            }
+            if (maximumBindingAccessors.get != null)
+            {
+                var val = maximumBindingAccessors.get();
+                try
+                {
+                    Maximum = Convert.ToInt64(val);
+                }
+                catch { }
+            }
+        }
     }
 
     /// <summary>

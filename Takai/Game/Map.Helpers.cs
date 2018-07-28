@@ -285,16 +285,6 @@ namespace Takai.Game
                 if (options.HasFlag(CleanupOptions.DeadEntities))
                     sector.entities.RemoveWhere((ent) => !ent.IsAlive);
             }
-
-            if (options.HasFlag(CleanupOptions.DeadEntities))
-            {
-                //todo: this is crashy
-                foreach (var ent in _allEntities)
-                {
-                    if (!ent.IsAlive)
-                        FinalDestroy(ent);
-                }
-            }
         }
 
         public void CleanupOffscreen(CleanupOptions options)
