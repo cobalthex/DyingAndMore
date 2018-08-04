@@ -295,6 +295,7 @@ namespace DyingAndMore.Game
                 new PlayerInputBinding(Entities.InputAction.FaceY),
                 new Extent(Vector2.Zero, Vector2.One)
             );
+            players[0].inputs.MouseWheel = new PlayerInputBinding(Entities.InputAction.ZoomCamera, 1);
             players[0].inputs.GamepadButtons = new Dictionary<Buttons, PlayerInputBinding>
             {
                 [Buttons.DPadUp]       = new PlayerInputBinding(Entities.InputAction.MoveY, -1),
@@ -443,7 +444,12 @@ namespace DyingAndMore.Game
                     Map.MarkRegionActive(players[i].camera);
 
                     if (isPlayerInputEnabled)
+                    {
                         players[i].inputs.Update((PlayerIndex)i, players[i].camera.Viewport);
+
+                        if (players[i].inputs.CurrentInputs.TryGetValue(Entities.InputAction.ZoomCamera, out var zoom))
+                            players[i].camera.Scale += 0.1f * zoom;
+                    }
 
                     allDead &= !players[i].actor.IsAlive;
                 }

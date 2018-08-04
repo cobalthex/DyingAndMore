@@ -27,6 +27,8 @@ namespace DyingAndMore.Game.Entities
 
         FirePrimaryWeapon,
         FireSecondaryWeapon,
+
+        ZoomCamera
     }
 
     class InputController : Controller
