@@ -87,6 +87,7 @@ namespace Takai.Input
 
         //public InputBinding2D MousePosition { get; set; }
         public PolarInputBinding<TAction> Mouse { get; set; }
+        public InputBinding<TAction> MouseWheel { get; set; }
 
         public InputBinding2D<TAction> GamepadLeftThumbstick { get; set; }
         public InputBinding2D<TAction> GamepadRightThumbstick { get; set; }
@@ -150,6 +151,8 @@ namespace Takai.Input
                 SetInput(Mouse.horizontal, relative.X * 2);
                 SetInput(Mouse.vertical, relative.Y * 2);
             }
+            if (InputState.HasScrolled())
+                SetInput(MouseWheel, System.Math.Sign(InputState.ScrollDelta()));
 
             var thumbsticks = InputState.Thumbsticks(player);
             SetInput(GamepadLeftThumbstick.horizontal, thumbsticks.Left.X);

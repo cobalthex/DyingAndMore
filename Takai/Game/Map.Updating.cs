@@ -243,7 +243,7 @@ namespace Takai.Game
                                     var fx = interaction.Effect.Instantiate();
                                     fx.Source = entity;
                                     fx.Position = target;
-                                    fx.Direction = colNorm;
+                                    fx.Direction = colNorm; // Vector2.Reflect(entity.Forward, colNorm);
                                     Spawn(fx);
                                 }
 
@@ -261,6 +261,8 @@ namespace Takai.Game
                                 depth = deltaVLen - hit.distance //todo: distance between origins minus radii
                             };
 
+                            //interaction should happen at reflect angle
+
                             var interaction = Class.MaterialInteractions.Find(entity.Material, hit.entity.Material);
 
                             if (entity.Class.IsPhysical)
@@ -270,7 +272,15 @@ namespace Takai.Game
                             }
 
                             if (interaction.Effect != null)
-                                Spawn(interaction.Effect.Instantiate(entity, hit.entity));
+                            {
+
+                                var fx = interaction.Effect.Instantiate();
+                                fx.Source = entity;
+                                fx.Target = hit.entity;
+                                fx.Position = target;
+                                fx.Direction = -Vector2.Reflect(entity.Forward, Vector2.Normalize(target - hit.entity.Position));
+                                Spawn(fx);
+                            }
 
                             entity.OnEntityCollision(hit.entity, cm, deltaTime);
                             hit.entity.OnEntityCollision(entity, cm.Reciprocal(), deltaTime);
