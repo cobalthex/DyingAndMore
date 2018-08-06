@@ -95,7 +95,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <Content Include="$(MediaDir)Content\**\*.*">
       <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -125,36 +125,17 @@
       <Name>Takai</Name>
     </ProjectReference>
   </ItemGroup>
-
-  <Target
-    Name="CompileShaders"
-    Label="Compile shaders"
-    AfterTargets="Build"
-    Inputs="@(Shaders)"
-    Outputs="@(Shaders -> '$(MediaDir)Shaders\$(ShaderProfile)\%(RecursiveDir)%(Filename).mgfx')">
-    <Exec 
-      Command="
-        powershell.exe ^
-          -ExecutionPolicy Bypass ^
-          -NoLogo ^
-          -NonInteractive ^
-          -NoProfile ^
-          -File &quot;$(MediaDir)Shaders\compile.ps1&quot; ^
-            -Files %(Shaders.Identity) ^
-            -$(ShaderProfile) ^
-            -Configuration $(Configuration) ^
-        " 
-      WorkingDirectory="$(MediaDir)Shaders\"
-    />
+  <ItemGroup>
+    <PowershellArgs Include="-ExecutionPolicy Bypass" />
+    <PowershellArgs Include="-NoLogo" />
+    <PowershellArgs Include="-NonInteractive" />
+    <PowershellArgs Include="-NoProfile" />
+  </ItemGroup>
+  <Target Name="CompileShaders" Label="Compile shaders" AfterTargets="Build" Inputs="@(Shaders)" Outputs="@(Shaders -> '$(MediaDir)Shaders\$(ShaderProfile)\%(RecursiveDir)%(Filename).mgfx')">
+    <Exec Command="&#xD;&#xA;        powershell.exe @(PowershellArgs, ' ') ^&#xD;&#xA;          -File &quot;$(MediaDir)Shaders\compile.ps1&quot; ^&#xD;&#xA;            -Files %(Shaders.Identity) ^&#xD;&#xA;            -$(ShaderProfile) ^&#xD;&#xA;            -Configuration $(Configuration) ^&#xD;&#xA;        " WorkingDirectory="$(MediaDir)Shaders\" />
   </Target>
-
-  <Target
-    Name="SymlinkMediaFiles"
-    Label="Symlink media files"
-    AfterTargets="Build"
-    Condition="'$(Configuration)' == 'Debug'">
-    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -Command &quot;New-Item -Force -ItemType directory -Path '$(MediaDir)Content\Shaders' | Out-Null; Copy-Item -Force -Container -Recurse '$(MediaDir)Shaders\$(ShaderProfile)\*' '$(MediaDir)Content\Shaders';    ('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }&quot;" />
+  <Target Name="SymlinkMediaFiles" Label="Symlink media files" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <Exec Command="&#xD;&#xA;        powershell.exe @(PowershellArgs, ' ') ^&#xD;&#xA;          -Command &quot; Copy-Item -Force -Container -Recurse -Path '$(MediaDir)Shaders\$(ShaderProfile)\*' -Destination (New-Item -Force -ItemType directory -Path '$(MediaDir)Content\Shaders'); ('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }&quot;&#xD;&#xA;      " />
   </Target>
-
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

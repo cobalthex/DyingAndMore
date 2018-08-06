@@ -2,7 +2,7 @@ Static {
 	Position: [100 100];
 	Children: [
 		Meter {
-			Position: [2 64];
+			Position: [0 64];
 			ValueBinding: "CurrentHealth";
 			MaximumBinding: "MaxHealth";
 			Minimum: 0;

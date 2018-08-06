@@ -134,25 +134,36 @@ namespace Takai.Input
                         SetInput(binding.Value);
                 }
             }
-            if (MouseButtons != null)
-            {
-                foreach (var binding in MouseButtons)
-                {
-                    if (InputState.IsButtonDown(binding.Key))
-                        SetInput(binding.Value);
-                }
-            }
 
-            var mouse = InputState.MouseVector;
-            if (InputState.MouseDelta() != Vector2.Zero && viewport.Contains(mouse))
+            if (viewport.Contains(InputState.MousePoint))
             {
-                var relative = viewport.Relative(mouse) / new Vector2(viewport.Width, viewport.Height);
-                relative -= (Mouse.boundsPercent.min + Mouse.boundsPercent.max) / 2;
-                SetInput(Mouse.horizontal, relative.X * 2);
-                SetInput(Mouse.vertical, relative.Y * 2);
+                if (MouseButtons != null)
+                {
+                    foreach (var binding in MouseButtons)
+                    {
+                        if (InputState.IsButtonDown(binding.Key))
+                            SetInput(binding.Value);
+                    }
+                }
+
+                var mouse = InputState.MouseVector;
+                if (InputState.MouseDelta() != Vector2.Zero)
+                {
+                    var v = new Vector2(viewport.Width, viewport.Height);
+                    var absMin = (Mouse.boundsPercent.min * v).ToPoint();
+                    var absMax = (Mouse.boundsPercent.max * v).ToPoint();
+                    var rv = absMax - absMin;
+                    if (new Rectangle(absMin.X, absMin.Y, rv.X, rv.Y).Contains(mouse))
+                    {
+                        var polar = (mouse - ((absMin + absMax).ToVector2() / 2)) / rv.ToVector2();
+                        polar.Normalize();
+                        SetInput(Mouse.horizontal, polar.X);
+                        SetInput(Mouse.vertical, polar.Y);
+                    }
+                }
+                if (InputState.HasScrolled())
+                    SetInput(MouseWheel, System.Math.Sign(InputState.ScrollDelta()));
             }
-            if (InputState.HasScrolled())
-                SetInput(MouseWheel, System.Math.Sign(InputState.ScrollDelta()));
 
             var thumbsticks = InputState.Thumbsticks(player);
             SetInput(GamepadLeftThumbstick.horizontal, thumbsticks.Left.X);

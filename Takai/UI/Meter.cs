@@ -40,7 +40,7 @@ namespace Takai.UI
             base.DrawSelf(spriteBatch);
 
             maskEffect.Parameters["Cutoff"].SetValue(NormalizedValue);
-            //maskEffect.Parameters["Range"].SetValue(Range);
+            maskEffect.Parameters["Range"].SetValue(Range);
             maskEffect.Parameters["Mask"].SetValue(Mask.Texture);
             sbatch.Begin(SpriteSortMode.Deferred, null, null, null, null, maskEffect);
             Sprite.Draw(sbatch, VisibleBounds, 0, Color, Sprite.ElapsedTime);

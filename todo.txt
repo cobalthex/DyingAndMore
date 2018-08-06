@@ -18,6 +18,7 @@
 
   Gases:
     ☐  Behavior changing
+    ☐ AI avoidance
 
   ☐  Variations for enemy skins
 
@@ -46,6 +47,7 @@
   UI:
     ☐ default buttons (click enter in text box to submit)
     ☐ display scaling
+    ☐ new binding system: 'Bindings: ['varname', 'input'] <- update every frame and refresh when input value changes
 
   ☐  Think only when alive?
 
