@@ -273,7 +273,6 @@ namespace Takai.Game
 
                             if (interaction.Effect != null)
                             {
-
                                 var fx = interaction.Effect.Instantiate();
                                 fx.Source = entity;
                                 fx.Target = hit.entity;

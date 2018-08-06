@@ -14,7 +14,7 @@ float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoo
         (Cutoff - Range <= mask.x && Cutoff + Range >= mask.x))
     {
         col = Tex.Sample(Sampler, texcoord) * color;
-        col.a *= (mask.x + Cutoff) / max(1 - fwidth(mask.x), 0.0001);
+        //col.a *= 1 - saturate((Cutoff - mask.x) / max(fwidth(mask.x), 0.0001));
     }
     return col;
 }
