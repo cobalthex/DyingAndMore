@@ -10,7 +10,7 @@ namespace Takai.Input
         Middle,
         Right,
         X4,
-        X5
+        X5,
     }
 
     public enum KeyMod

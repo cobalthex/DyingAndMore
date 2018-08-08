@@ -59,7 +59,7 @@ if ($DX11)
             '/Profile:DirectX_11' `
             $(If ($Configuration -eq 'Debug') { '/Debug' })
         if (!$?) {
-            throw "Error compiling DirectX 11 shader '$_'"
+            throw "Error compiling DirectX 11 shader '$_'"  
         }
     }
 }

@@ -1,0 +1,37 @@
+ConditionClass {
+	HealthPerSecond: -4;
+	ActiveEffect: {
+		Effects: [
+            EntityTintEffect {
+                Tint: Color.Olive;
+                Duration: 0.1sec;
+            }
+			ParticleEffect {
+                Count: [-80 1];
+                Spread: [80deg 100deg];
+                Radius: 16;
+                Class: {
+                    Sprite: {
+                        Texture: @"Effects/Decay.png";
+                    };
+                    Blend: BlendState.Additive;
+                    Drag: 0.1;
+                    LifeSpan: [100msec 1500msec];
+                    ScaleOverTime: {
+                        IsLinear: true;
+                        Values: [
+                            [0 1]
+                            [1 2]
+                        ];
+                    };
+                    ColorOverTime: {
+                        Values: [
+                            [0 Color.White];
+                            [1 Color.Transparent];
+                        ]
+                    }
+	            };
+	        };
+        ];
+	}
+}

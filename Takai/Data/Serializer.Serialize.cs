@@ -54,7 +54,7 @@ namespace Takai.Data
             var dir = Path.GetDirectoryName(file);
             if (!string.IsNullOrEmpty(dir))
                 Directory.CreateDirectory(dir);
-            using (var writer = new StreamWriter(File.OpenWrite(file)))
+            using (var writer = new StreamWriter(new FileStream(file, FileMode.Create)))
                 TextSerialize(writer, serializing);
         }
 

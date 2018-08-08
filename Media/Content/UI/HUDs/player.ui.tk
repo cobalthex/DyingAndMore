@@ -1,5 +1,6 @@
 Static {
 	Position: [100 100];
+	Size: [200 200];
 	Children: [
 		Meter {
 			Position: [0 64];

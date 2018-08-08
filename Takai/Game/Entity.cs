@@ -255,6 +255,8 @@ namespace Takai.Game
         /// </summary>
         public virtual Dictionary<string, CommandAction> Actions => new Dictionary<string, CommandAction>
         {
+            //todo: this needs a better format
+
             ["Kill"] = (ignored) => Kill(),
             ["Resurrect"] = (ignored) => Resurrect(),
             ["ApplyEffect"] = delegate (object effect)

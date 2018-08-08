@@ -278,60 +278,8 @@ namespace DyingAndMore.Game
 
             OnResize(EventArgs.Empty);
 
-            players[0].inputs.Keys = new Dictionary<Keys, PlayerInputBinding>
-            {
-                [Keys.S] = new PlayerInputBinding(Entities.InputAction.MoveY,  1),
-                [Keys.W] = new PlayerInputBinding(Entities.InputAction.MoveY, -1),
-                [Keys.A] = new PlayerInputBinding(Entities.InputAction.MoveX, -1),
-                [Keys.D] = new PlayerInputBinding(Entities.InputAction.MoveX,  1),
-                [Keys.Space] = new PlayerInputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
-            };
-            players[0].inputs.MouseButtons = new Dictionary<MouseButtons, PlayerInputBinding>
-            {
-                [MouseButtons.Left] = new PlayerInputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
-            };
-            players[0].inputs.Mouse = new PlayerPolarInputBinding(
-                new PlayerInputBinding(Entities.InputAction.FaceX),
-                new PlayerInputBinding(Entities.InputAction.FaceY),
-                new Extent(Vector2.Zero, Vector2.One)
-            );
-            players[0].inputs.MouseWheel = new PlayerInputBinding(Entities.InputAction.ZoomCamera, 1);
-            players[0].inputs.GamepadButtons = new Dictionary<Buttons, PlayerInputBinding>
-            {
-                [Buttons.DPadUp]       = new PlayerInputBinding(Entities.InputAction.MoveY, -1),
-                [Buttons.DPadDown]     = new PlayerInputBinding(Entities.InputAction.MoveY,  1),
-                [Buttons.DPadLeft]     = new PlayerInputBinding(Entities.InputAction.MoveX, -1),
-                [Buttons.DPadRight]    = new PlayerInputBinding(Entities.InputAction.MoveX,  1),
-                [Buttons.RightTrigger] = new PlayerInputBinding(Entities.InputAction.FirePrimaryWeapon, 1),
-            };
-            players[0].inputs.GamepadLeftThumbstick = new PlayerInputBinding2D(
-                new PlayerInputBinding(Entities.InputAction.MoveX, 1),
-                new PlayerInputBinding(Entities.InputAction.MoveY, -1)
-            );
-            players[0].inputs.GamepadRightThumbstick = new PlayerInputBinding2D(
-                new PlayerInputBinding(Entities.InputAction.FaceX, 1),
-                new PlayerInputBinding(Entities.InputAction.FaceY, -1)
-            );
-            players[0].inputs.Touches = new[]
-            {
-                new PlayerPolarInputBinding(
-                    new PlayerInputBinding(Entities.InputAction.MoveX),
-                    new PlayerInputBinding(Entities.InputAction.MoveY),
-                    new Extent(new Vector2(0, 0.65f), new Vector2(0.25f, 1))
-                ),
-                new PlayerPolarInputBinding(
-                    new PlayerInputBinding(Entities.InputAction.FaceX),
-                    new PlayerInputBinding(Entities.InputAction.FaceY),
-                    new Extent(new Vector2(0.75f, 0.65f), new Vector2(1, 1))
-                ),
-                new PlayerPolarInputBinding(
-                    new PlayerInputBinding(Entities.InputAction.FirePrimaryWeapon),
-                    new PlayerInputBinding(Entities.InputAction.None),
-                    new Extent(new Vector2(0.75f, 0.65f), new Vector2(1, 1))
-                )
-            };
-
-            Serializer.TextSerialize("player.input.tk", players[0].inputs);
+            players[0].inputs = Cache.Load<InputMap<Entities.InputAction>>("Player1.input.tk", "Config");
+            ((Entities.InputController)players[0].actor.Controller).Inputs = players[0].inputs;
         }
 
         /// <summary>

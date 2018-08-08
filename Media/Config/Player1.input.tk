@@ -1,0 +1,171 @@
+{
+    Mouse: {
+        horizontal: {
+            action: InputAction.FaceX;
+            magnitude: 1;
+        };
+        vertical: {
+            action: InputAction.FaceY;
+            magnitude: 1;
+        };
+        boundsPercent: Extent {
+            min: [0 0];
+            max: [1 1];
+        };
+    };
+    MouseWheel: {
+        action: InputAction.ZoomCamera;
+        magnitude: 1;
+    };
+    GamepadLeftThumbstick: {
+        horizontal: {
+            action: InputAction.MoveX;
+            magnitude: 1;
+        };
+        vertical: {
+            action: InputAction.MoveY;
+            magnitude: -1;
+        };
+    };
+    GamepadRightThumbstick: {
+        horizontal: {
+            action: InputAction.FaceX;
+            magnitude: 1;
+        };
+        vertical: {
+            action: InputAction.FaceY;
+            magnitude: -1;
+        };
+    };
+    GamepadLeftTrigger: {
+        action: InputAction.None;
+        magnitude: 0;
+    };
+    GamepadRightTrigger: {
+        action: InputAction.None;
+        magnitude: 0;
+    };
+    Touches: [
+        {
+            horizontal: {
+                action: InputAction.MoveX;
+                magnitude: 1;
+            };
+            vertical: {
+                action: InputAction.MoveY;
+                magnitude: 1;
+            };
+            boundsPercent: Extent {
+                min: [0 0.65];
+                max: [0.25 1];
+            };
+        }
+        {
+            horizontal: {
+                action: InputAction.FaceX;
+                magnitude: 1;
+            };
+            vertical: {
+                action: InputAction.FaceY;
+                magnitude: 1;
+            };
+            boundsPercent: Extent {
+                min: [0.75 0.65];
+                max: [1 1];
+            };
+        }
+        {
+            horizontal: {
+                action: InputAction.FirePrimaryWeapon;
+                magnitude: 1;
+            };
+            vertical: {
+                action: InputAction.None;
+                magnitude: 1;
+            };
+            boundsPercent: Extent {
+                min: [0.75 0.65];
+                max: [1 1];
+            };
+        }
+    ];
+    Buttons: [
+        {
+            input: Keys.S;
+            action: {
+                action: InputAction.MoveY;
+                magnitude: 1;
+            };
+        }
+        {
+            input: Keys.W;
+            action: {
+                action: InputAction.MoveY;
+                magnitude: -1;
+            };
+        }
+        {
+            input: Keys.A;
+            action: {
+                action: InputAction.MoveX;
+                magnitude: -1;
+            };
+        }
+        {
+            input: Keys.D;
+            action: {
+                action: InputAction.MoveX;
+                magnitude: 1;
+            };
+        }
+        {
+            input: Keys.Space;
+            action: {
+                action: InputAction.FirePrimaryWeapon;
+                magnitude: 1;
+            };
+        }
+        {
+            input: Buttons.DPadUp;
+            action: {
+                action: InputAction.MoveY;
+                magnitude: -1;
+            };
+        }
+        {
+            input: Buttons.DPadDown;
+            action: {
+                action: InputAction.MoveY;
+                magnitude: 1;
+            };
+        }
+        {
+            input: Buttons.DPadLeft;
+            action: {
+                action: InputAction.MoveX;
+                magnitude: -1;
+            };
+        }
+        {
+            input: Buttons.DPadRight;
+            action: {
+                action: InputAction.MoveX;
+                magnitude: 1;
+            };
+        }
+        {
+            input: Buttons.RightTrigger;
+            action: {
+                action: InputAction.FirePrimaryWeapon;
+                magnitude: 1;
+            };
+        }
+        {
+            input: MouseButtons.Left;
+            action: {
+                action: InputAction.FirePrimaryWeapon;
+                magnitude: 1;
+            };
+        }
+    ];
+}

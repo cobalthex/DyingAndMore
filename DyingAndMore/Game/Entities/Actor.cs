@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Takai.Game;
 using Takai;
+using System.Collections.Generic;
 
 namespace DyingAndMore.Game.Entities
 {
@@ -162,6 +163,10 @@ namespace DyingAndMore.Game.Entities
 
         [Takai.Data.Serializer.Ignored]
         public Takai.UI.Static Hud { get; set; }
+
+        //public override Dictionary<string, CommandAction> Actions => new Dictionary<string, CommandAction>(base.Actions)
+        //{
+        //};
 
         public ActorInstance() : this(null) { }
         public ActorInstance(ActorClass @class)

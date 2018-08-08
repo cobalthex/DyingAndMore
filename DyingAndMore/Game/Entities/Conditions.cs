@@ -20,7 +20,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// How much health to add or remove per second (positive for boon, negative for poison)
         /// </summary>
-        public float HealthPerSecond { get; set; } = 0;
+        public float HealthPerSecond { get; set; } = 0; //todo: effect?
 
         /// <summary>
         /// Affect actor speed
@@ -84,20 +84,27 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public float AcquireChance { get; set; } = 1;
 
+        void ApplyCondition(EntityInstance entity)
+        {
+            if (!(entity is ActorInstance actor) || !Takai.Util.PassChance(AcquireChance))
+                return;
+
+            if (!actor.Conditions.TryGetValue(Condition, out var cond))
+                actor.Conditions[Condition] = cond = Condition.Instantiate();
+
+            cond.TimeRemaining = Takai.Util.Max(cond.TimeRemaining, Duration);
+        }
+
         public void Spawn(EffectsInstance instance)
         {
-            var ents = instance.Map.FindEntitiesInRegion(instance.Position, Radius);
-            var rSq = Radius * Radius;
-            foreach (var ent in ents)
+            if (instance.Target != null)
+                ApplyCondition(instance.Target);
+            else
             {
-                if (ent is ActorInstance actor && Takai.Util.PassChance(AcquireChance))
-                {
-                    if (!actor.Conditions.TryGetValue(Condition, out var cond))
-                        actor.Conditions[Condition] = cond = Condition.Instantiate();
-
-                    cond.TimeRemaining = Takai.Util.Max(cond.TimeRemaining, Duration);
-                    //todo: refresh vars?
-                }
+                var ents = instance.Map.FindEntitiesInRegion(instance.Position, Radius);
+                var rSq = Radius * Radius;
+                foreach (var ent in ents)
+                    ApplyCondition(ent);
             }
         }
     }
