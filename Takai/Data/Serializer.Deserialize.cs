@@ -75,7 +75,6 @@ namespace Takai.Data
 
             public void AddPending(PendingResolution pending)
             {
-
                 if (!pendingCache.TryGetValue(pending.id, out var prList))
                     pendingCache[pending.id] = prList = new List<PendingResolution>();
                 prList.Add(pending);
@@ -114,6 +113,16 @@ namespace Takai.Data
         static void Warn(string message, DeserializationContext context)
         {
             System.Diagnostics.Debug.WriteLine(message + $" <{context.file}>", context);
+        }
+
+        public static T TextDeserialize<T>(string file)
+        {
+            var context = new DeserializationContext
+            {
+                file = file,
+                reader = new StreamReader(File.OpenRead(file))
+            };
+            return TextDeserialize<T>(context);
         }
 
         public static T TextDeserialize<T>(DeserializationContext context)

@@ -126,16 +126,19 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PowershellArgs Include="-ExecutionPolicy Bypass" />
-    <PowershellArgs Include="-NoLogo" />
-    <PowershellArgs Include="-NonInteractive" />
-    <PowershellArgs Include="-NoProfile" />
+    <PowershellArgs Include="-ExecutionPolicy Bypass"><InProject>false</InProject></PowershellArgs>
+    <PowershellArgs Include="-NoLogo"><InProject>false</InProject></PowershellArgs>
+    <PowershellArgs Include="-NonInteractive"><InProject>false</InProject></PowershellArgs>
+    <PowershellArgs Include="-NoProfile"><InProject>false</InProject></PowershellArgs>
   </ItemGroup>
   <Target Name="CompileShaders" Label="Compile shaders" AfterTargets="Build" Inputs="@(Shaders)" Outputs="@(Shaders -> '$(MediaDir)Shaders\$(ShaderProfile)\%(RecursiveDir)%(Filename).mgfx')">
-    <Exec Command="&#xD;&#xA;        powershell.exe @(PowershellArgs, ' ') ^&#xD;&#xA;          -File &quot;$(MediaDir)Shaders\compile.ps1&quot; ^&#xD;&#xA;            -Files %(Shaders.Identity) ^&#xD;&#xA;            -$(ShaderProfile) ^&#xD;&#xA;            -Configuration $(Configuration) ^&#xD;&#xA;        " WorkingDirectory="$(MediaDir)Shaders\" />
+    <Exec Command="
+powershell.exe @(PowershellArgs, ' ') -File &quot;$(MediaDir)Shaders\compile.ps1&quot; -Files %(Shaders.Identity) -$(ShaderProfile) -Configuration $(Configuration)" WorkingDirectory="$(MediaDir)Shaders\" />
   </Target>
   <Target Name="SymlinkMediaFiles" Label="Symlink media files" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
-    <Exec Command="&#xD;&#xA;        powershell.exe @(PowershellArgs, ' ') ^&#xD;&#xA;          -Command &quot; Copy-Item -Force -Container -Recurse -Path '$(MediaDir)Shaders\$(ShaderProfile)\*' -Destination (New-Item -Force -ItemType directory -Path '$(MediaDir)Content\Shaders'); ('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }&quot;&#xD;&#xA;      " />
+    <Exec Command="
+            powershell.exe @(PowershellArgs, ' ') -Command &quot; Copy-Item -Force -Container -Recurse -Path '$(MediaDir)Shaders\$(ShaderProfile)\*' -Destination (New-Item -Force -ItemType directory -Path '$(MediaDir)Content\Shaders'); ('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }&quot;
+          " />
   </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

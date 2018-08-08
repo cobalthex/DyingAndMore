@@ -40,9 +40,18 @@ namespace Takai.Game
         /// </summary>
         public ITriggerFilter Filter { get; set; }
 
+        /// <summary>
+        /// Commands that are executed when an entity enters this trigger region.
+        /// Any <see cref="EntityCommand"/> that have the target as null will trigger against the entity entering
+        /// </summary>
         public List<Command> OnEnterCommands { get; set; }
 
-        //effects?
+        /// <summary>
+        /// Play effects when an entity enters the trigger region
+        /// </summary>
+        public EffectsClass OnEnterEffects { get; set; }
+
+        //todo: create effects via GameCommand or create commands via effects
 
         public TriggerInstance Instantiate()
         {
@@ -92,7 +101,18 @@ namespace Takai.Game
             if (Class.OnEnterCommands != null)
             {
                 foreach (var command in Class.OnEnterCommands)
-                    command.Invoke();
+                {
+                    if (command is EntityCommand ec && ec.Target == null)
+                        ec.Invoke(entity);
+                    else
+                        command.Invoke();
+                }
+            }
+
+            if (Class.OnEnterEffects != null && entity.Map != null)
+            {
+                var fx = Class.OnEnterEffects.Instantiate(null, entity);
+                entity.Map.Spawn(fx);
             }
 
             System.Diagnostics.Debug.WriteLine($"{entity} entered trigger {Class.Name}");

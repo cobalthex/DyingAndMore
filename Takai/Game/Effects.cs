@@ -43,18 +43,18 @@ namespace Takai.Game
         /// <returns>The effect instance created</returns>
         public EffectsInstance Instantiate(EntityInstance source, EntityInstance target = null)
         {
-            if (source == null)
-                return Instantiate();
-
-            return new EffectsInstance(this)
+            var instance = Instantiate();
+            if (source != null)
             {
-                Map = source.Map,
-                Position = source.Position,
-                Direction = source.Forward,
-                Velocity = source.Velocity,
-                Source = source,
-                Target = target
-            };
+                instance.Map = source.Map;
+                instance.Position = source.Position;
+                instance.Direction = source.Forward;
+                instance.Velocity = source.Velocity;
+                instance.Source = source;
+            }
+            instance.Target = target;
+
+            return instance;
         }
     }
 

@@ -119,6 +119,9 @@ namespace Takai.Data
             RegisterType<BlendFunction>();
             RegisterType<Blend>();
 
+            RegisterType<Microsoft.Xna.Framework.Input.Buttons>();
+            RegisterType<Microsoft.Xna.Framework.Input.Keys>();
+
             Serializers[typeof(Vector2)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,

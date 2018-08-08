@@ -4,18 +4,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Takai.Input
 {
-    public enum InputDeviceType
-    {
-        Unknown,
-        Key,
-        MouseButton,
-        MousePosition,
-        GamepadButton,
-        GamepadThumbstick,
-        GamepadTrigger,
-        TouchPosition,
-    }
-
     public struct InputBinding<TAction>
     {
         /// <summary>
@@ -75,15 +63,32 @@ namespace Takai.Input
         }
     }
 
+    public struct InputButtonPair<TAction>
+    {
+        public object input; //key, mousebuttons, buttons
+        public InputBinding<TAction> action;
+
+        public InputButtonPair(object input, InputBinding<TAction> action)
+        {
+            this.input = input;
+            this.action = action;
+        }
+    }
+
     /// <summary>
     /// An input map that maps device inputs to user specified actions
     /// </summary>
     /// <typeparam name="TAction">The action type to bind to</typeparam>
+    //[Data.CustomSerialize("CustomSerialize"),
+    // Data.CustomDeserialize(typeof(InputMap<>), "CustomDeserialize")]
     public class InputMap<TAction>
     {
-        public Dictionary<Keys, InputBinding<TAction>> Keys { get; set; }
-        public Dictionary<Buttons, InputBinding<TAction>> GamepadButtons { get; set; }
-        public Dictionary<MouseButtons, InputBinding<TAction>> MouseButtons { get; set; }
+        [Data.Serializer.Ignored]
+        public Dictionary<Keys, InputBinding<TAction>> Keys { get; set; } = new Dictionary<Keys, InputBinding<TAction>>();
+        [Data.Serializer.Ignored]
+        public Dictionary<Buttons, InputBinding<TAction>> GamepadButtons { get; set; } = new Dictionary<Buttons, InputBinding<TAction>>();
+        [Data.Serializer.Ignored]
+        public Dictionary<MouseButtons, InputBinding<TAction>> MouseButtons { get; set; } = new Dictionary<MouseButtons, InputBinding<TAction>>();
 
         //public InputBinding2D MousePosition { get; set; }
         public PolarInputBinding<TAction> Mouse { get; set; }
@@ -95,9 +100,43 @@ namespace Takai.Input
         public InputBinding<TAction> GamepadLeftTrigger { get; set; }
         public InputBinding<TAction> GamepadRightTrigger { get; set; }
 
-        public PolarInputBinding<TAction>[] Touches { get; set; }
+        public PolarInputBinding<TAction>[] Touches { get; set; } = new PolarInputBinding<TAction>[0];
 
-        //todo: touch
+        /// <summary>
+        /// All of the button inputs (for serialization)
+        /// </summary>
+        public IEnumerable<InputButtonPair<TAction>> Buttons
+        {
+            get
+            {
+                foreach (var key in Keys)
+                    yield return new InputButtonPair<TAction>(key.Key, key.Value);
+                foreach (var gamepads in GamepadButtons)
+                    yield return new InputButtonPair<TAction>(gamepads.Key, gamepads.Value);
+                foreach (var mice in MouseButtons)
+                    yield return new InputButtonPair<TAction>(mice.Key, mice.Value);
+            }
+            set
+            {
+                foreach (var input in value)
+                {
+                    switch (input.input)
+                    {
+                        case Keys key:
+                            Keys.Add(key, input.action);
+                            break;
+                        case Buttons gamepad:
+                            GamepadButtons.Add(gamepad, input.action);
+                            break;
+                        case MouseButtons mouse:
+                            MouseButtons.Add(mouse, input.action);
+                            break;
+                    }
+                }
+            }
+        }
+
+        //todo: touch presses, mouse presses?
 
         /// <summary>
         /// The current inputs supplied. They are cleared after being read
@@ -105,8 +144,6 @@ namespace Takai.Input
         /// </summary>
         [Data.Serializer.Ignored]
         public Dictionary<TAction, float> CurrentInputs { get; set; } = new Dictionary<TAction, float>();
-
-        //todo: serialization
 
         protected void SetInput(InputBinding<TAction> binding, float magnitude = 1)
         {
@@ -118,32 +155,23 @@ namespace Takai.Input
 
         public void Update(PlayerIndex player, Rectangle viewport)
         {
-            if (Keys != null)
+            foreach (var key in InputState.GetPressedKeys())
             {
-                foreach (var key in InputState.GetPressedKeys())
-                {
-                    if (Keys.TryGetValue(key, out var binding))
-                        SetInput(binding);
-                }
+                if (Keys.TryGetValue(key, out var binding))
+                    SetInput(binding);
             }
-            if (GamepadButtons != null)
+            foreach (var binding in GamepadButtons)
             {
-                foreach (var binding in GamepadButtons)
-                {
-                    if (InputState.IsButtonDown(binding.Key, player))
-                        SetInput(binding.Value);
-                }
+                if (InputState.IsButtonDown(binding.Key, player))
+                    SetInput(binding.Value);
             }
 
             if (viewport.Contains(InputState.MousePoint))
             {
-                if (MouseButtons != null)
+                foreach (var binding in MouseButtons)
                 {
-                    foreach (var binding in MouseButtons)
-                    {
-                        if (InputState.IsButtonDown(binding.Key))
-                            SetInput(binding.Value);
-                    }
+                    if (InputState.IsButtonDown(binding.Key))
+                        SetInput(binding.Value);
                 }
 
                 var mouse = InputState.MouseVector;
@@ -175,25 +203,22 @@ namespace Takai.Input
             SetInput(GamepadLeftTrigger, triggers.Left);
             SetInput(GamepadRightTrigger, triggers.Right);
 
-            if (Touches != null)
+            //todo: convert to circle (allow for magnitude)
+            foreach (var touch in InputState.touches)
             {
-                //todo: convert to circle (allow for magnitude)
-                foreach (var touch in InputState.touches)
+                foreach (var touchAction in Touches)
                 {
-                    foreach (var touchAction in Touches)
-                    {
-                        var v = new Vector2(viewport.Width, viewport.Height);
-                        var absMin = (touchAction.boundsPercent.min * v).ToPoint();
-                        var absMax = (touchAction.boundsPercent.max * v).ToPoint();
-                        var rv = absMax - absMin;
-                        if (!new Rectangle(absMin.X, absMin.Y, rv.X, rv.Y).Contains(touch.Position))
-                            continue;
+                    var v = new Vector2(viewport.Width, viewport.Height);
+                    var absMin = (touchAction.boundsPercent.min * v).ToPoint();
+                    var absMax = (touchAction.boundsPercent.max * v).ToPoint();
+                    var rv = absMax - absMin;
+                    if (!new Rectangle(absMin.X, absMin.Y, rv.X, rv.Y).Contains(touch.Position))
+                        continue;
 
-                        var polar = (touch.Position - ((absMin + absMax).ToVector2() / 2)) / rv.ToVector2();
-                        polar.Normalize();
-                        SetInput(touchAction.horizontal, polar.X);
-                        SetInput(touchAction.vertical, polar.Y);
-                    }
+                    var polar = (touch.Position - ((absMin + absMax).ToVector2() / 2)) / rv.ToVector2();
+                    polar.Normalize();
+                    SetInput(touchAction.horizontal, polar.X);
+                    SetInput(touchAction.vertical, polar.Y);
                 }
             }
         }
