@@ -404,7 +404,10 @@ namespace Takai.Game
 
                     bool isDead = ElapsedTime >= x.spawnTime + x.lifeTime;
 
-                    if (p.Key.CollisionEffect != null)
+                    if (!Class.IsInsideMap(x.position))
+                        isDead = true;
+
+                    else if (p.Key.CollisionEffect != null)
                     {
                         var ent = FindClosestEntity(x.position, p.Key.Radius * x.scale);
                         if (ent != null)

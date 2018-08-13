@@ -34,7 +34,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="point">The point to check</param>
         /// <returns>True if in the map, false otherwise</returns>
-        public bool GetCollisionValueAt(Vector2 point)
+        public bool IsInsideMap(Vector2 point)
         {
             if (!Bounds.Contains(point))
                 return false;
@@ -364,7 +364,7 @@ namespace Takai.Game
                 if (!Class.Bounds.Contains(pos))
                     return pos;
 
-                bool inMap = Class.GetCollisionValueAt(Util.Round(pos));
+                bool inMap = Class.IsInsideMap(Util.Round(pos));
                 if (!inMap)
                 {
                     //walk back
@@ -394,8 +394,8 @@ namespace Takai.Game
         public Vector2 GetTilesCollisionTangent(Vector2 collision, Vector2 direction)
         {
             var tangent = Util.Ortho(direction);
-            var a = Class.GetCollisionValueAt(Util.Round(collision - tangent));
-            var c = Class.GetCollisionValueAt(Util.Round(collision + tangent));
+            var a = Class.IsInsideMap(Util.Round(collision - tangent));
+            var c = Class.IsInsideMap(Util.Round(collision + tangent));
 
             if (!a && c)
                 return Vector2.Normalize(direction + tangent);
