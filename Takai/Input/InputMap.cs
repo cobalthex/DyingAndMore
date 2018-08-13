@@ -183,8 +183,7 @@ namespace Takai.Input
                     var rv = absMax - absMin;
                     if (new Rectangle(absMin.X, absMin.Y, rv.X, rv.Y).Contains(mouse))
                     {
-                        var polar = (mouse - ((absMin + absMax).ToVector2() / 2)) / rv.ToVector2();
-                        polar.Normalize();
+                        var polar = Vector2.Normalize(mouse - (absMin + absMax).ToVector2() / 2);
                         SetInput(Mouse.horizontal, polar.X);
                         SetInput(Mouse.vertical, polar.Y);
                     }
