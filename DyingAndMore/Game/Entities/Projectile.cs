@@ -152,7 +152,7 @@ namespace DyingAndMore.Game.Entities
             var minDist = float.PositiveInfinity;
             ActorInstance best = null;
 
-            var sourceFaction = Source is ActorInstance sourceActor ? sourceActor.Faction : Factions.None;
+            var sourceFaction = Source is ActorInstance sourceActor ? sourceActor.Factions : Factions.None;
 
             int n = 0;
             //search out in triangle?

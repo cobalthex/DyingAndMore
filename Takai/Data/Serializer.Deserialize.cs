@@ -249,6 +249,7 @@ namespace Takai.Data
                 return values;
             }
 
+            //external references
             if (peek == '@')
             {
                 context.reader.Read();
@@ -261,12 +262,19 @@ namespace Takai.Data
                 }
                 else
                 {
+                    bool loadAllDefs = false;
+                    if (context.reader.Peek() == '@')
+                    {
+                        loadAllDefs = true;
+                        context.reader.Read();
+                    }
+
                     var file = ReadString(context.reader);
 
                     if (context.file != null && (file.StartsWith("./") || file.StartsWith(".\\")))
                         file = Path.Combine(Path.GetDirectoryName(context.file), file.Substring(2));
 
-                    loaded = Cache.Load(file, context.root, false);
+                    loaded = Cache.Load(file, context.root, false, loadAllDefs);
                 }
 
                 if (loaded is IReferenceable ir)
@@ -274,6 +282,7 @@ namespace Takai.Data
                 return loaded;
             }
 
+            //internal referecnes
             if (peek == '*')
             {
                 context.reader.Read();

@@ -13,7 +13,7 @@ MapInstance {
     Entities: [
         ActorInstance {
             Class: @"Actors/Player.ent.tk";
-            Faction: Factions [Player];
+            Factions: Factions [Player];
             Controller: InputController {
                 ActionInputs: {
                     Fire: [

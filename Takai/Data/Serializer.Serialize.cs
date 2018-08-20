@@ -104,7 +104,7 @@ namespace Takai.Data
                     foreach (var flag in enumValues)
                     {
                         var value = (Enum)Enum.Parse(ty, flag);
-                        if (Convert.ToUInt64(value) != 0 && e.HasFlag(value))
+                        if ((UInt64)Convert.ToInt64(value) != 0 && e.HasFlag(value)) //allow uint wraparound
                         {
                             if (n++ > 0)
                                 writer.Write(' ');

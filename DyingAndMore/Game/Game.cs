@@ -189,7 +189,7 @@ namespace DyingAndMore.Game
             });
             AddChild(crapDisplay = new Static
             {
-                Name = "blah",
+                Name = "stuff display",
                 Position = new Vector2(20),
                 VerticalAlignment = Alignment.Start,
                 HorizontalAlignment = Alignment.End,
@@ -222,12 +222,6 @@ namespace DyingAndMore.Game
             gameplaySettingsConsole.UserData = GameplaySettings;
 
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
-
-            AddChild(hudContainer = new Static
-            {
-                HorizontalAlignment = Alignment.Stretch,
-                VerticalAlignment = Alignment.Stretch
-            });
         }
 
         private void GameMapChanged(object sender, MapChangedEventArgs e)
@@ -608,36 +602,7 @@ namespace DyingAndMore.Game
             {
                 //todo: move text rendering to map (Map.DrawText(text, font))
 
-                //foreach (var ent in Map.EnumerateVisibleEntities())
-                //{
-                //    var pos = Map.ActiveCamera.WorldToScreen(ent.Position) + new Vector2(ent.Radius / 2 * Map.ActiveCamera.Scale);
 
-                //    var sb = new System.Text.StringBuilder();
-                //    sb.Append($"{ent.Id}: {string.Join(",", ent.ActiveAnimations)}\n");
-
-                //    if (ent is Entities.ActorInstance actor)
-                //    {
-                //        sb.Append($"`f76{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}`x\n");
-                //        if (actor.Weapon is Weapons.GunInstance gun)
-                //            sb.Append($"`bcf{gun.AmmoCount} {gun.State} {gun.Charge:N2}`x\n");
-                //        if (actor.Controller is Entities.AIController ai)
-                //        {
-                //            sb.Append($"`ad4{ai.Target}");
-                //            for (int i = 0; i < ai.ChosenBehaviors.Length; ++i)
-                //            {
-                //                if (ai.ChosenBehaviors[i] != null)
-                //                {
-                //                    sb.Append("\n");
-                //                    sb.Append(ai.ChosenBehaviors[i].ToString());
-                //                }
-                //            }
-                //            sb.Append("`x\n");
-                //        }
-                //    }
-                //    DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
-
-                //    //draw trigger names
-                //}
 
                 //foreach (var sound in Map.Sounds)
                 //{

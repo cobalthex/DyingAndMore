@@ -1,7 +1,7 @@
 ActorClass {
     Name: "Ebola";
     MaxHealth: 500;
-    DefaultFaction: Factions [Enemy];
+    DefaultFactions: Factions [Enemy];
 
     FieldOfView: 1.0;
     MaxSpeed: [200 300];

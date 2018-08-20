@@ -1,7 +1,7 @@
 ActorClass {
     Name: "Practice Target";
     MaxHealth: 50000;
-    DefaultFaction: Factions [Enemy];
+    DefaultFactions: Factions [Enemy];
 
     Animations: {
         Idle: {

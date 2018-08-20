@@ -9,7 +9,7 @@ ActorClass {
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
 
-    DefaultFaction: Factions [Enemy];
+    DefaultFactions: Factions [Enemy];
 
     DefaultController: AIController {
         Behaviors: [

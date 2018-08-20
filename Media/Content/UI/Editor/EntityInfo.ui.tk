@@ -1,0 +1,44 @@
+Table {
+    Name: "Entity info";
+    Position: [20 20];
+    VerticalAlignment: Alignment.Bottom;
+    ColumnCount: 2;
+    Margin: [10 2];
+    CollapseRowsWithEmptyCells: true;
+
+    Children: [
+        Static { Text: "Name"; };
+        Static { TextBinding: "Name"; Size: [100 20]; };
+
+        Static { Text: "ID"; };
+        Static { TextBinding: "Id"; Size: [100 20]; };
+
+        Static { Text: "Is Alive"; };
+        Static { TextBinding: "IsAlive"; Size: [100 20]; };
+
+        Static { Text: "Active Animations"; };
+        Static { TextBinding: "ActiveAnimations"; Size: [100 20]; };
+
+        # actor properties
+
+        Static { Text: "Health"; };
+        List {
+            Direction: Direction.Horizontal;
+            Margin: 5;
+            Children: [
+                Static { TextBinding: "CurrentHealth"; Size: [60 20]; };
+                Static { Text: "/"; };
+                Static { TextBinding: "MaxHealth"; Size: [60 20]; };
+            ];
+        };
+
+        Static { Text: "Factions"; };
+        Static { TextBinding: "Factions"; Size: [200 20]; };
+
+        Static { Text: "Controller"; };
+        Static { TextBinding: "Controller"; Size: [200 20]; };
+        
+        Static { Text: "Weapon"; };
+        Static { TextBinding: "Weapon"; Size: [200 20]; };
+    ];
+}

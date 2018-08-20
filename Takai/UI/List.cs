@@ -14,7 +14,7 @@ namespace Takai.UI
         /// <summary>
         /// Spacing between items
         /// </summary>
-        public int Margin { get; set; } = 0;
+        public float Margin { get; set; } = 0;
 
         /// <summary>
         /// Which direction should list items flow
@@ -33,6 +33,9 @@ namespace Takai.UI
             float size = Direction == Direction.Horizontal ? Size.X : Size.Y;
             foreach (var child in Children)
             {
+                if (!child.IsEnabled)
+                    continue;
+
                 if ((Direction == Direction.Horizontal
                 && child.HorizontalAlignment == Alignment.Stretch)
                 || (Direction == Direction.Vertical
@@ -54,6 +57,9 @@ namespace Takai.UI
             for (int i = 0; i < Children.Count; ++i)
             {
                 var child = Children[i];
+                if (!child.IsEnabled)
+                    continue;
+
                 //todo: account for auto size padding (first item offset)
 
                 if (i > 0)

@@ -56,6 +56,9 @@ namespace Takai.UI
     {
         #region Properties
 
+        //private static int idCounter = 0;
+        //private readonly int id = (++idCounter);
+
         /// <summary>
         /// A font to use for drawing debug info.
         /// If null, debug info is not drawn
@@ -289,7 +292,7 @@ namespace Takai.UI
                         next = defocusing.Pop();
                         next._hasFocus = false;
 
-                        foreach (var child in next.children)
+                        foreach (var child in next.Children)
                             defocusing.Push(child);
                     }
                 }
@@ -303,6 +306,11 @@ namespace Takai.UI
         /// Disallows input to elements below this one in the tree
         /// </summary>
         public bool IsModal { get; set; } = false;
+
+        /// <summary>
+        /// Is this element visible and updating. if false, does not take part in reflow/updating/darwing/etc
+        /// </summary>
+        public bool IsEnabled { get; set; } = true;
 
         #region Events
 
@@ -383,7 +391,7 @@ namespace Takai.UI
         private Static _parent = null;
 
         /// <summary>
-        /// A readonly collection of all of the children in this element
+        /// A readonly collection of all of the children in this element (including disabled children)
         /// </summary>
         [Data.CustomDeserialize(typeof(Static), "DeserializeChildren")]
         public ReadOnlyCollection<Static> Children { get; private set; } //todo: maybe observable
@@ -477,16 +485,35 @@ namespace Takai.UI
 
         protected virtual void CreateBindings()
         {
+            //todo: redo bindings
+
             if (CurrentBindTarget == null)
                 return;
 
             if (TextBinding != null)
                 textBindMethods = GetBinding(TextBinding);
+
         }
         protected virtual void UpdateBindingValues()
         {
             if (textBindMethods.get != null)
-                Text = textBindMethods.get()?.ToString();
+            {
+                var bindVal = textBindMethods.get();
+                if (bindVal is System.Collections.IEnumerable ie)
+                {
+                    var sb = new System.Text.StringBuilder();
+                    foreach (var e in ie)
+                    {
+                        sb.Append(e);
+                        sb.Append(' ');
+                    }
+                    if (sb.Length > 0)
+                        sb.Remove(sb.Length - 1, 1);
+                    Text = sb.ToString();
+                }
+                else
+                    Text = bindVal?.ToString();
+            }
         }
 
         #region Hierarchy/cloning
@@ -513,12 +540,12 @@ namespace Takai.UI
             while (clones.Count > 0)
             {
                 var top = clones.Pop();
-                for (int i = 0; i < top.children.Count; ++i)
+                for (int i = 0; i < top.Children.Count; ++i)
                 {
-                    var child = top.children[i].CloneSelf();
+                    var child = top.Children[i].CloneSelf();
                     child.SetParentNoReflow(top);
                     top.children[i] = child;
-                    if (child.children.Count > 0)
+                    if (child.Children.Count > 0)
                         clones.Push(child);
                 }
             }
@@ -740,9 +767,9 @@ namespace Takai.UI
             while (next != null)
             {
                 var current = next;
-                foreach (var child in next.children)
+                foreach (var child in next.Children)
                 {
-                    if (child.CanFocus)
+                    if (child.CanFocus && child.IsEnabled)
                     {
                         child.HasFocus = true;
                         return;
@@ -770,7 +797,7 @@ namespace Takai.UI
                         next = next.Parent;
                 }
 
-                if (next.CanFocus)
+                if (next.CanFocus && next.IsEnabled)
                 {
                     next.HasFocus = true;
                     return;
@@ -794,8 +821,8 @@ namespace Takai.UI
             {
                 if (prev.Parent == null)
                 {
-                    while (prev.children.Count > 0)
-                        prev = prev.children[prev.children.Count - 1];
+                    while (prev.Children.Count > 0)
+                        prev = prev.Children[prev.Children.Count - 1];
                 }
                 else
                 {
@@ -804,15 +831,15 @@ namespace Takai.UI
                     {
                         prev = prev.Parent.Children[index];
 
-                        while (prev.children.Count > 0)
-                            prev = prev.children[prev.children.Count - 1];
+                        while (prev.Children.Count > 0)
+                            prev = prev.Children[prev.Children.Count - 1];
                     }
                     else
                         prev = prev.Parent;
                 }
 
 
-                if (prev.CanFocus)
+                if (prev.CanFocus && prev.IsEnabled)
                 {
                     prev.HasFocus = true;
                     break;
@@ -845,7 +872,7 @@ namespace Takai.UI
                 //sort by combined score of dot and dist (length?)
 
                 var top = stack.Pop();
-                if (top != this && top.CanFocus)
+                if (top != this && top.CanFocus && top.IsEnabled)
                 {
                     var diff = (top.VirtualBounds.Location - VirtualBounds.Location).ToVector2();
 
@@ -882,7 +909,7 @@ namespace Takai.UI
             while (next.Count > 0)
             {
                 var elem = next.Dequeue();
-                if (elem.CanFocus)
+                if (elem.CanFocus && elem.IsEnabled)
                 {
                     elem.HasFocus = true;
                     return elem;
@@ -965,6 +992,8 @@ namespace Takai.UI
         /// </summary>
         public virtual void Reflow()
         {
+            //todo: ResizeSelf and make stack based?
+
             if (Parent != null &&
                 (HorizontalAlignment == Alignment.Stretch ||
                 VerticalAlignment == Alignment.Stretch))
@@ -988,7 +1017,10 @@ namespace Takai.UI
                 CalculateBounds();
 
             foreach (var child in Children)
-                child.Reflow();
+            {
+                if (child.IsEnabled)
+                    child.Reflow();
+            }
         }
 
         protected void ResizeAndReflow()
@@ -1057,6 +1089,9 @@ namespace Takai.UI
             var bounds = new Rectangle((int)Position.X, (int)Position.Y, (int)textSize.X, (int)textSize.Y);
             foreach (var child in Children)
             {
+                if (!child.IsEnabled)
+                    continue;
+
                 if (child.HorizontalAlignment != Alignment.Middle)
                     child.Position += new Vector2(padding, 0);
                 if (child.VerticalAlignment != Alignment.Middle)
@@ -1076,6 +1111,9 @@ namespace Takai.UI
         /// <param name="time">Game time</param>
         public virtual void Update(GameTime time)
         {
+            if (!IsEnabled)
+                return;
+
             /* update in the following order: H G F E D C B A
             A
                 B
@@ -1087,12 +1125,18 @@ namespace Takai.UI
                     H
             */
 
+            //find deepest darkest child
             var toUpdate = this;
-            while (toUpdate.children.Count > 0)
-                toUpdate = toUpdate.children[toUpdate.children.Count - 1];
+            for (int i = toUpdate.Children.Count - 1; i >= 0; --i)
+            {
+                if (!toUpdate.Children[i].IsEnabled)
+                    continue;
+
+                toUpdate = toUpdate.Children[i];
+                i = toUpdate.Children.Count - 1;
+            }
 
             bool handleInput = Runtime.HasFocus;
-            int i = 0;
             while (true)
             {
                 if (handleInput)
@@ -1104,17 +1148,24 @@ namespace Takai.UI
                 if (toUpdate.Parent == null || toUpdate == this)
                     break;
 
+                //iterate through previous children of current level
                 var index = toUpdate.Parent.Children.IndexOf(toUpdate) - 1;
                 if (index >= 0)
                 {
                     toUpdate = toUpdate.Parent.Children[index];
 
-                    while (toUpdate.children.Count > 0)
-                        toUpdate = toUpdate.children[toUpdate.children.Count - 1];
+                    //find deepest child
+                    for (int i = toUpdate.Children.Count - 1; i >= 0; --i)
+                    {
+                        if (!toUpdate.Children[i].IsEnabled)
+                            continue;
+
+                        toUpdate = toUpdate.Children[i];
+                        i = toUpdate.Children.Count - 1;
+                    }
                 }
                 else
                     toUpdate = toUpdate.Parent;
-                ++i; //todo: this can get stuck in an infinite loop
             }
         }
 
@@ -1237,6 +1288,9 @@ namespace Takai.UI
         /// <param name="spriteBatch">The spritebatch to use</param>
         public virtual void Draw(SpriteBatch spriteBatch)
         {
+            if (!IsEnabled)
+                return;
+
             var draws = new Queue<Static>(Children.Count + 1);
             draws.Enqueue(this);
 
@@ -1267,7 +1321,10 @@ namespace Takai.UI
                 }
 
                 foreach (var child in toDraw.Children)
-                    draws.Enqueue(child);
+                {
+                    if (child.IsEnabled)
+                        draws.Enqueue(child);
+                }
             }
         }
 
@@ -1334,18 +1391,22 @@ namespace Takai.UI
         /// <summary>
         /// Enumerate through all children and their descendents recursively (including this)
         /// </summary>
+        /// <param name="includeDisabled">Include elements that havee <see cref="IsEnabled"/> set to false</param>
         /// <returns>An enumerator to all elements</returns>
-        public IEnumerable<Static> EnumerateRecursive()
+        public IEnumerable<Static> EnumerateRecursive(bool includeDisabled = false)
         {
-            yield return this;
-
-            Stack<Static> children = new Stack<Static>(Children);
-            while (children.Count > 0)
+            Stack<Static> enumeration = new Stack<Static>();
+            enumeration.Push(this);
+            while (enumeration.Count > 0)
             {
-                var top = children.Pop();
+                var top = enumeration.Pop();
                 yield return top;
+
                 foreach (var child in top.Children)
-                    children.Push(child);
+                {
+                    if (child.IsEnabled)
+                        enumeration.Push(child);
+                }
             }
         }
 

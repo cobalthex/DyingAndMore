@@ -1,10 +1,11 @@
 ActorClass {
     Name: "Player";
     MaxHealth: 5000;
-    DefaultFaction: Factions [Player Ally];
+    DefaultFactions: Factions [Player Ally];
 
     Animations: {
         Idle: {
+            Name: "Idle";
             Sprite: {
                 texture: @"./Player.png";
                 width: 48;

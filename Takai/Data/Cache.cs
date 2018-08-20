@@ -131,8 +131,9 @@ namespace Takai.Data
         /// <param name="file">The relative location of file to load from</param>
         /// <param name="root">Where to search for the file. This is passed to any recursive loads. Use "" to load from working directory, null to load from DefaultRoot</param>
         /// <param name="forceLoad">Load the file even if it already exists in the cache</param>
+        /// <param name="loadMultiple">If the format supports loading multiple items, load all of them (object returned is a list)</param>
         /// <returns>The loaded object</returns>
-        public static object Load(string file, string root = null, bool forceLoad = false)
+        public static object Load(string file, string root = null, bool forceLoad = false, bool loadMultiple = false)
         {
             if (string.IsNullOrWhiteSpace(file))
                 throw new ArgumentException(nameof(file) + " cannot be null or empty");
@@ -241,6 +242,8 @@ namespace Takai.Data
                     var ext = GetExtension(file);
                     if (CustomLoaders.TryGetValue(ext, out var loader))
                     {
+                        //todo: multi load support
+
                         obj.reference = new WeakReference(loader.Load(load));
                         if (!loader.PreserveStream)
                             load.stream.Dispose();
@@ -254,11 +257,29 @@ namespace Takai.Data
                             root = root,
                         };
 
-                        var deserialized = Serializer.TextDeserialize(context);
+                        object deserialized;
+                        if (loadMultiple)
+                        {
+                            var allDeserialized = new List<object>();
+                            try
+                            {
+                                var intermed = Serializer.TextDeserialize(context);
+                                if (intermed is ISerializeExternally sxt)
+                                    sxt.File = fileRefName;
+                                allDeserialized.Add(intermed);
+                            }
+                            catch (EndOfStreamException) { }
+                            deserialized = allDeserialized;
+                        }
+                        else
+                        {
+                            deserialized = Serializer.TextDeserialize(context);
+
+                            if (deserialized is ISerializeExternally sxt)
+                                sxt.File = fileRefName;
+                        }
 
                         obj.reference = new WeakReference(deserialized);
-                        if (obj.reference.Target is ISerializeExternally sxt)
-                            sxt.File = fileRefName;
                         load.stream.Dispose();
                     }
                 }

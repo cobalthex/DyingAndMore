@@ -1,7 +1,7 @@
 ActorClass {
     Name: "Cyst";
     MaxHealth: 1000;
-    DefaultFaction: Factions.Enemy;
+    DefaultFactions: Factions.Enemy;
     DefaultController: ArtilleryController {
         CanRotate: false;
         MaxRange: 400;

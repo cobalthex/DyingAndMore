@@ -104,6 +104,11 @@ namespace Takai.UI
             };
         }
 
+        protected override void UpdateBindingValues()
+        {
+            base.UpdateBindingValues();
+        }
+
         protected void Items_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Reset)
@@ -137,6 +142,8 @@ namespace Takai.UI
                     Container.InsertChild(CreateItem((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
 
+            //todo: Items binding setter
+
             Container.AutoSize();
         }
 
@@ -158,5 +165,4 @@ namespace Takai.UI
             return item;
         }
     }
-
 }
