@@ -102,6 +102,11 @@ namespace Takai.Game
 
         protected List<TrailInstance> trailsToDestroy = new List<TrailInstance>();
 
+        /// <summary>
+        /// Entities were/are active (visible and updated)
+        /// </summary>
+        public IEnumerable<EntityInstance> ActiveEntities => activeEntities;
+
         public void BeginUpdate()
         {
             activeEntities.Clear();

@@ -1,8 +1,10 @@
 Static {
+	Name: "Player HUD";
 	Position: [100 100];
 	Size: [200 200];
 	Children: [
 		Meter {
+			Name: "Health";
 			Position: [0 64];
 			ValueBinding: "CurrentHealth";
 			MaximumBinding: "MaxHealth";
@@ -21,6 +23,7 @@ Static {
 			}
 		}
 		Graphic {
+			Name: "Health frame";
 			Position: [0 62];
 			Sprite: {
 				Texture: @"./Player.png";

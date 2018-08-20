@@ -32,11 +32,11 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// A faction that this actor must be a part of to trigger
         /// </summary>
-        public Factions faction;
+        public Factions factions;
 
         public bool CanTrigger(EntityInstance entity)
         {
-            return (entity is ActorInstance actor) && actor.IsAlliedWith(faction);
+            return (entity is ActorInstance actor) && actor.IsAlliedWith(factions);
         }
     }
 
@@ -61,7 +61,7 @@ namespace DyingAndMore.Game.Entities
         //inherited
         public Range<float> MaxSpeed { get; set; }
         public Weapons.WeaponClass DefaultWeapon { get; set; } = null;
-        public Factions DefaultFaction { get; set; } = Factions.None;
+        public Factions DefaultFactions { get; set; } = Factions.None;
         public Controller DefaultController { get; set; } = null;
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace DyingAndMore.Game.Entities
         /// The current faction. Typically used by the AI to determine enemies
         /// </summary>
         /// <remarks>0 is any/no faction</remarks>
-        public Factions Faction { get; set; } = Factions.None;
+        public Factions Factions { get; set; } = Factions.None;
 
         /// <summary>
         /// The current controller over this actor (null for none)
@@ -128,8 +128,8 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// All current conditions, and time remaining
         /// </summary>
-        public System.Collections.Generic.Dictionary<ConditionClass, ConditionInstance> Conditions { get; set; }
-            = new System.Collections.Generic.Dictionary<ConditionClass, ConditionInstance>();
+        public Dictionary<ConditionClass, ConditionInstance> Conditions { get; set; }
+            = new Dictionary<ConditionClass, ConditionInstance>();
 
         private Vector2 lastVelocity;
 
@@ -164,9 +164,14 @@ namespace DyingAndMore.Game.Entities
         [Takai.Data.Serializer.Ignored]
         public Takai.UI.Static Hud { get; set; }
 
-        //public override Dictionary<string, CommandAction> Actions => new Dictionary<string, CommandAction>(base.Actions)
-        //{
-        //};
+        public override Dictionary<string, CommandAction> Actions => new Dictionary<string, CommandAction>(base.Actions)
+        {
+            ["SetController"] = delegate (object controlObj)
+            {
+                if (controlObj is Controller controller)
+                    Controller = controller;
+            },
+        };
 
         public ActorInstance() : this(null) { }
         public ActorInstance(ActorClass @class)
@@ -177,7 +182,7 @@ namespace DyingAndMore.Game.Entities
                 MaxSpeed = Class.MaxSpeed.Random();
                 CurrentHealth = Class.MaxHealth;
                 Weapon = Class.DefaultWeapon?.Instantiate();
-                Faction = Class.DefaultFaction;
+                Factions = Class.DefaultFactions;
 
                 if (Class.DefaultController != null)
                     Controller = Class.DefaultController.Clone();
@@ -279,7 +284,7 @@ namespace DyingAndMore.Game.Entities
             if (source != this && //can damage self
                 (GameInstance.Current != null && !GameInstance.Current.Game.Configuration.AllowFriendlyFire) &&
                 source is ActorInstance actor &&
-                (actor.Faction & Faction) != 0)
+                (actor.Factions & Factions) != 0)
                 return;
 
             CurrentHealth -= damage;
@@ -322,7 +327,7 @@ namespace DyingAndMore.Game.Entities
 
         public bool IsAlliedWith(Factions factions)
         {
-            return (Faction & factions) != Factions.None;
+            return (Factions & factions) != Factions.None;
         }
 
         #endregion

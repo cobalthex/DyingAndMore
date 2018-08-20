@@ -63,7 +63,7 @@ namespace DyingAndMore.Game.Entities
                 var ents = Actor.Map.FindEntitiesInRegion(Actor.Position, MaxRange);
                 foreach (var ent in ents)
                 {
-                    if (ent != Actor && ent is ActorInstance nearbyActor && (nearbyActor.Faction & Actor.Faction) == 0 &&
+                    if (ent != Actor && ent is ActorInstance nearbyActor && (nearbyActor.Factions & Actor.Factions) == 0 &&
                         Actor.IsFacing(nearbyActor.Position))
                     {
                         trackedActor = nearbyActor;

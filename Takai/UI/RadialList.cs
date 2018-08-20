@@ -23,6 +23,9 @@ namespace Takai.UI
 
             for (int i = 0; i < Children.Count; ++i)
             {
+                if (!Children[i].IsEnabled)
+                    continue;
+
                 var vbnd = Children[i].Bounds;
                 var ccenter = new Vector2(vbnd.Width / 2, vbnd.Height / 2);
 
@@ -32,7 +35,10 @@ namespace Takai.UI
 
             CalculateBounds();
             foreach (var child in Children)
-                child.Reflow();
+            {
+                if (child.IsEnabled)
+                    child.Reflow();
+            }
         }
     }
 }

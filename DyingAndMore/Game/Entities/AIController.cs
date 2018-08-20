@@ -194,7 +194,7 @@ namespace DyingAndMore.Game.Entities
                 {
                     if (ent != AI.Actor &&
                         ent is ActorInstance actor &&
-                        !actor.IsAlliedWith(AI.Actor.Faction) &&
+                        !actor.IsAlliedWith(AI.Actor.Factions) &&
                         AI.Actor.IsFacing(actor.Position))
                         possibles.Add(actor);
                 }

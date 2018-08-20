@@ -63,6 +63,8 @@ namespace DyingAndMore.Editor
 
         public EditorConfiguration config;
 
+        public System.Collections.Generic.List<VectorCurve> Paths { get; set; } = new System.Collections.Generic.List<VectorCurve>();
+
         public Editor(MapInstance map)
         {
             var swatch = System.Diagnostics.Stopwatch.StartNew();
@@ -86,6 +88,7 @@ namespace DyingAndMore.Editor
 
             AddChild(fpsDisplay = new Static
             {
+                Name = "FPS",
                 Position = new Vector2(20),
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.End,
@@ -94,6 +97,7 @@ namespace DyingAndMore.Editor
 
             AddChild(playButton = new Static
             {
+                Name = "Play button",
                 Position = new Vector2(20),
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.Middle,
@@ -423,7 +427,10 @@ namespace DyingAndMore.Editor
                 var settings = typeof(MapInstance.RenderSettings);
                 settings.GetTypeInfo();
                 foreach (var child in renderSettingsConsole.Children)
-                    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
+                {
+                    if (child.IsEnabled)
+                        ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
+                }
 
                 AddChild(renderSettingsConsole);
             }

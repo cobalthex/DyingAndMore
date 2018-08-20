@@ -6,7 +6,7 @@ using Takai.Input;
 
 namespace Takai.UI
 {
-    public class ScrollEventArgs : System.EventArgs
+    public class ScrollEventArgs : EventArgs
     {
         public int Delta { get; set; }
 
@@ -18,7 +18,7 @@ namespace Takai.UI
 
     public class ScrollBar : Static
     {
-        static int ThumbMargin = 3; //todo: apply correctly
+        static float ThumbMargin = 3; //todo: apply correctly
 
         /// <summary>
         /// The size of the content. This determines how big the scroll thumb is
@@ -89,7 +89,7 @@ namespace Takai.UI
         {
             if (IsThumbVisible)
             {
-                if (DidPressInside(Input.MouseButtons.Left))
+                if (DidPressInside(MouseButtons.Left))
                 {
                     var mouse = InputState.MousePoint - VisibleBounds.Location;
                     var deltaMouse = InputState.MouseDelta();
@@ -139,9 +139,9 @@ namespace Takai.UI
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return (int)Size.Y - (ThumbMargin * 2);
+                    return (int)(Size.Y - ThumbMargin * 2);
                 case Direction.Horizontal:
-                    return (int)Size.X - (ThumbMargin * 2);
+                    return (int)(Size.X - ThumbMargin * 2);
                 default:
                     return 1;
             }
@@ -166,7 +166,7 @@ namespace Takai.UI
             int containerSize = GetContainerSize();
             int size = GetThumbSize();
 
-            return ThumbMargin + Util.Clamp((int)((ContentPosition / (float)ContentSize) * containerSize), 0, containerSize - size);
+            return (int)ThumbMargin + Util.Clamp((int)((ContentPosition / (float)ContentSize) * containerSize), 0, containerSize - size);
         }
 
         protected Rectangle GetThumbBounds()
@@ -174,9 +174,9 @@ namespace Takai.UI
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return new Rectangle(ThumbMargin, GetThumbOffset(), (int)Size.X - (ThumbMargin * 2), GetThumbSize());
+                    return new Rectangle((int)ThumbMargin, GetThumbOffset(), (int)(Size.X - ThumbMargin * 2), GetThumbSize());
                 case Direction.Horizontal:
-                    return new Rectangle(GetThumbOffset(), ThumbMargin, GetThumbSize(), (int)Size.Y - (ThumbMargin * 2));
+                    return new Rectangle(GetThumbOffset(), (int)ThumbMargin, GetThumbSize(), (int)(Size.Y - ThumbMargin * 2));
                 default:
                     return Rectangle.Empty;
             }
@@ -185,17 +185,18 @@ namespace Takai.UI
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             var bounds = VisibleBounds;
-            Takai.Graphics.Primitives2D.DrawRect(spriteBatch, BorderColor, bounds);
+            Graphics.Primitives2D.DrawRect(spriteBatch, BorderColor, bounds);
 
             if (IsThumbVisible)
             {
                 var thumb = GetThumbBounds();
                 thumb.Offset(VisibleBounds.Location);
-                Takai.Graphics.Primitives2D.DrawFill(spriteBatch, BorderColor, thumb);
+                Graphics.Primitives2D.DrawFill(spriteBatch, BorderColor, thumb);
             }
         }
     }
 
+    //todo: convert scroll bars to use enabled/disabled
     public class ScrollBox : Static
     {
         protected ScrollBar verticalScrollbar = new ScrollBar()
@@ -219,7 +220,8 @@ namespace Takai.UI
             {
                 foreach (var child in contentArea.Children)
                 {
-                    if (child != horizontalScrollbar &&
+                    if (child.IsEnabled &&
+                        child != horizontalScrollbar &&
                         child != verticalScrollbar)
                         child.Position -= new Vector2(e.Delta, 0);
                 }
@@ -229,7 +231,8 @@ namespace Takai.UI
             {
                 foreach (var child in contentArea.Children)
                 {
-                    if (child != horizontalScrollbar &&
+                    if (child.IsEnabled &&
+                        child != horizontalScrollbar &&
                         child != verticalScrollbar)
                         child.Position -= new Vector2(0, e.Delta);
                 }
@@ -266,7 +269,10 @@ namespace Takai.UI
 
             var bounds = Rectangle.Empty;
             foreach (var child in contentArea.Children)
-                bounds = Rectangle.Union(bounds, child.Bounds);
+            {
+                if (child.IsEnabled)
+                    bounds = Rectangle.Union(bounds, child.Bounds);
+            }
 
             horizontalScrollbar.ContentSize = bounds.Width;
             verticalScrollbar.ContentSize = bounds.Height;

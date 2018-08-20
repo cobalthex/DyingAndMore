@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Takai.Input;
 using Takai.UI;
 using Takai;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace DyingAndMore.Editor
 {
@@ -17,29 +18,7 @@ namespace DyingAndMore.Editor
             set
             {
                 _selectedEntity = value;
-                if (value == null)
-                    entInfo.Text = "";
-                else
-                {
-                    entInfo.Font = Font;
-                    entInfo.Text
-                        = $"`8df{BeautifyMemberName(_selectedEntity.Class?.Name)}`x\n"
-                        + $"Name: {(string.IsNullOrWhiteSpace(_selectedEntity.Name) ? "(No Name)" : SelectedEntity.Name)}\n"
-                        + $"ID: {_selectedEntity.Id}\n"
-                        + $"Position: {_selectedEntity.Position}\n"
-                        + $"State: {string.Join(",", _selectedEntity.ActiveAnimations)}\n";
-
-                    if (_selectedEntity is Game.Entities.ActorInstance actor &&
-                        actor.Class is Game.Entities.ActorClass @class)
-                    {
-                        entInfo.Text
-                            += $"Health: {actor.CurrentHealth}/{@class.MaxHealth}\n"
-                            +  $"Faction(s): {actor.Faction}\n"
-                            +  $"Controller: {actor.Controller}\n"
-                            +  $"Weapon: {actor.Weapon}\n";
-                    }
-                }
-                entInfo.AutoSize();
+                entInfo.SetBindTargetRecursive(value);
             }
         }
         Takai.Game.EntityInstance _selectedEntity;
@@ -50,6 +29,7 @@ namespace DyingAndMore.Editor
         Graphic preview;
 
         Static entInfo;
+        Static entEditor;
 
         public EntitiesEditorMode(Editor editor)
             : base("Entities", editor)
@@ -91,13 +71,8 @@ namespace DyingAndMore.Editor
             };
             selector.SelectedItem = 0;
 
-            AddChild(entInfo = new Static()
-            {
-                Position = new Vector2(20),
-                HorizontalAlignment = Alignment.Start,
-                VerticalAlignment = Alignment.End,
-                Font = Font
-            });
+            AddChild(entInfo = Takai.Data.Cache.Load<Static>("UI/Editor/EntityInfo.ui.tk").Clone());
+            entEditor = Takai.Data.Cache.Load<Static>("UI/Editor/EntityEditor.ui.tk").Clone();
         }
 
         public override void Start()
@@ -114,11 +89,6 @@ namespace DyingAndMore.Editor
                 SelectedEntity = null;
             }
             editor.Map.renderSettings.drawEntityForwardVectors = false;
-        }
-
-        protected override void OnPress(ClickEventArgs e)
-        {
-            base.OnPress(e);
         }
 
         protected override bool HandleInput(GameTime time)
@@ -236,6 +206,13 @@ namespace DyingAndMore.Editor
 
                     return false;
                 }
+
+                if (InputState.IsPress(Keys.Space))
+                {
+                    entEditor.SetBindTargetRecursive(SelectedEntity);
+                    AddChild(entEditor);
+                    return false;
+                }
             }
 
             return base.HandleInput(time);
@@ -259,6 +236,46 @@ namespace DyingAndMore.Editor
             {
                 for (int x = sectors.Left; x < sectors.Right; ++x)
                     editor.Map.Sectors[y, x].entities.Add(ent);
+            }
+        }
+
+        protected override void DrawSelf(SpriteBatch spriteBatch)
+        {
+            DrawEntityInfo(spriteBatch);
+
+            base.DrawSelf(spriteBatch);
+        }
+
+        //todo: make work in both editor and game
+        void DrawEntityInfo(SpriteBatch spriteBatch)
+        {
+            foreach (var ent in editor.Map.ActiveEntities)
+            {
+                var pos = editor.Camera.WorldToScreen(ent.Position) + new Vector2(ent.Radius / 2 * editor.Camera.Scale);
+
+                var sb = new System.Text.StringBuilder();
+                sb.Append($"{ent.Id}: {ent.Name} {{{string.Join(",", ent.ActiveAnimations)}}}\n");
+
+                if (ent is Game.Entities.ActorInstance actor)
+                {
+                    sb.Append($"`f76{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}`x\n");
+                    if (actor.Weapon is Game.Weapons.GunInstance gun)
+                        sb.Append($"`bcf{gun.CurrentAmmo} {gun.State} {gun.Charge:N2}`x\n");
+                    if (actor.Controller is Game.Entities.AIController ai)
+                    {
+                        sb.Append($"`ad4{ai.Target}");
+                        for (int i = 0; i < ai.ChosenBehaviors.Length; ++i)
+                        {
+                            if (ai.ChosenBehaviors[i] != null)
+                            {
+                                sb.Append("\n");
+                                sb.Append(ai.ChosenBehaviors[i].ToString());
+                            }
+                        }
+                        sb.Append("`x\n");
+                    }
+                }
+                DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
             }
         }
     }

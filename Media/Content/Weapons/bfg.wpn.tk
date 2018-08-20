@@ -11,7 +11,7 @@ GunClass {
     ErrorAngle: [-16deg 16deg];
 
     Hud: {
-        name: "asdf";
+        name: "BFG HUD";
         Children: [
             Meter {
                 Position: [8 0];

@@ -14,7 +14,7 @@
     ☐  doors/devices
     ☐  marquee
     ☐  conditions/senses
-    ☐
+    ☐  enemies that attach to walls and affect map (rumbling, destruction, etc)
 
   Gases:
     ☐  Behavior changing
@@ -90,3 +90,5 @@
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
   ✔  player input system @done (18-07-21 22:11)
+
+ ☐ tracer rounds (every 5 shots)

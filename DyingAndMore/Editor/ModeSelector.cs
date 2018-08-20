@@ -32,6 +32,9 @@ namespace DyingAndMore.Editor
 
                 for (int i = 0; i < tabs.Children.Count; ++i)
                 {
+                    if (!tabs.Children[i].IsEnabled)
+                        continue;
+
                     if (i == mode)
                     {
                         tabs.Children[i].Font = ActiveFont;

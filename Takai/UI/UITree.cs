@@ -51,7 +51,7 @@ namespace Takai.UI
                     {
                         Name = elem.Name,
                         Text = DisplayString(elem),
-                        Color = Color,
+                        Color = new Color(Color, elem.IsEnabled ? 1 : 0.5f),
                         Font = Font,
                         Position = new Vector2(20 * top.Key, y)
                     };

@@ -1,4 +1,5 @@
 Static {
+    Name: "Entity properties editor";
     IsModal: true;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
@@ -10,17 +11,25 @@ Static {
             Name: "Props";
             Size: [300 360];
             Direction: Direction.Vertical;
+
+            Children: [
+                List {
+                    Children: [
+
+                    ]
+                }
+            ]
         }
 
         Static {
-            Name: "Apply";
+            Action: "Apply";
             Text: "Apply";
             Position: [0 370];
             Size: [140 30];
         }
 
         Static {
-            Name: "Cancel";
+            Action: "Cancel";
             Text: "Cancel";
             Position: [160 370];
             Size: [140 30];

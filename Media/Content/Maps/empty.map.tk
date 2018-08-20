@@ -31,7 +31,7 @@ MapClass {
                 Region: [1924 1913 231 198];
                 MaxUses: 0;
                 Filter: ActorTriggerFilter {
-                    faction: Factions.Player;
+                    Factions: Factions.Player;
                 };
                 OnEnterCommands: [
                     GameCommand {

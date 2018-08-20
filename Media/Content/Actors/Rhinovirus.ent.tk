@@ -1,7 +1,7 @@
 ActorClass {
 	Name: "Rhinovirus";
 	MaxHealth: 5000;
-    DefaultFaction: Factions [Enemy Boss];
+    DefaultFactions: Factions [Enemy Boss];
     MaxSpeed: [10 20];
     MoveForce: 4;
 
