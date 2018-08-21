@@ -12,7 +12,7 @@ ProjectileClass {
 
     Trail: {
         #MaxPoints: 20;
-        LifeSpan: 0.25sec;
+        LifeSpan: 0.75sec;
         CaptureDelay: 30Hz;
         Color: {
             Values: [
