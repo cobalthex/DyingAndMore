@@ -285,6 +285,7 @@ namespace Takai
 
         public struct GetSet
         {
+            public Type type;
             public Func<object> get;
             public Action<object> set;
         }
@@ -301,6 +302,7 @@ namespace Takai
             if (prop != null)
             {
                 //todo: get delegates working
+                getset.type = prop.PropertyType;
                 getset.get = () => prop.GetValue(obj);
                 getset.set = (value) => prop.SetValue(obj, value);
                 //getset.get = prop.CanRead ? (Func<object>)prop.GetGetMethod(false).CreateDelegate(typeof(Func<object>), obj) : null;

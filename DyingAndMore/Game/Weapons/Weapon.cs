@@ -126,7 +126,7 @@ namespace DyingAndMore.Game.Weapons
                 if (Class.Hud != null) //todo: move this stuff to class prop?
                 {
                     Hud = Class.Hud.Clone();
-                    Hud.SetBindTargetRecursive(this);
+                    Hud.BindTo(this);
                 }
             }
         }
@@ -139,7 +139,7 @@ namespace DyingAndMore.Game.Weapons
             if (Hud != null)
             {
                 clone.Hud = Hud.Clone();
-                clone.Hud.SetBindTargetRecursive(clone);
+                clone.Hud.BindTo(clone);
             }
             return clone;
         }

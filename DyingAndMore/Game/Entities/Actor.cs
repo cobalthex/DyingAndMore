@@ -190,7 +190,7 @@ namespace DyingAndMore.Game.Entities
                 if (Class.Hud != null)
                 {
                     Hud = Class.Hud.Clone();
-                    Hud.SetBindTargetRecursive(this);
+                    Hud.BindTo(this);
                 }
             }
         }
@@ -207,7 +207,7 @@ namespace DyingAndMore.Game.Entities
             if (Hud != null)
             {
                 clone.Hud = Hud.Clone();
-                clone.Hud.SetBindTargetRecursive(clone);
+                clone.Hud.BindTo(clone);
             }
             return clone;
         }
