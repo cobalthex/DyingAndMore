@@ -6,9 +6,19 @@ Static {
 		Meter {
 			Name: "Health";
 			Position: [0 64];
-			ValueBinding: "CurrentHealth";
-			MaximumBinding: "MaxHealth";
+
 			Minimum: 0;
+			Bindings: [
+                {
+                    SourceProperty: "CurrentHealth";
+                    TargetProperty: "Value";
+                };
+                {
+                    SourceProperty: "MaxHealth";
+                    TargetProperty: "Maximum";
+                };
+			];
+
 			Sprite: {
 				Texture: @"./player.png";
 				ClipRect: [0 88 84 88];

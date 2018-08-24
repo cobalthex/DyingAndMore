@@ -18,7 +18,7 @@ namespace DyingAndMore.Editor
             set
             {
                 _selectedEntity = value;
-                entInfo.SetBindTargetRecursive(value);
+                entInfo.BindTo(value);
             }
         }
         Takai.Game.EntityInstance _selectedEntity;
@@ -209,7 +209,7 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsPress(Keys.Space))
                 {
-                    entEditor.SetBindTargetRecursive(SelectedEntity);
+                    entEditor.BindTo(SelectedEntity);
                     AddChild(entEditor);
                     return false;
                 }

@@ -8,9 +8,6 @@ namespace Takai.UI
     {
         public Graphics.Sprite Sprite { get; set; }
 
-        public string SpriteBinding { get; set; }
-        private Util.GetSet spriteBindingAccessors;
-
         /// <summary>
         /// Draw an X in the graphic if the sprite is missing
         /// </summary>
@@ -19,21 +16,6 @@ namespace Takai.UI
         public override void AutoSize(float padding = 0)
         {
             Size = (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2()) + new Vector2(padding);
-        }
-
-        protected override void CreateBindings()
-        {
-            base.CreateBindings();
-            if (SpriteBinding != null)
-                spriteBindingAccessors = GetBinding(SpriteBinding);
-        }
-        protected override void UpdateBindingValues()
-        {
-            base.UpdateBindingValues();
-            if (spriteBindingAccessors.get != null)
-            {
-                Sprite = Data.Serializer.Cast<Graphics.Sprite>(spriteBindingAccessors.get()); //todo: track prev vals
-            }
         }
 
         protected override void UpdateSelf(GameTime time)

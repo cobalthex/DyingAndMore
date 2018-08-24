@@ -106,20 +106,6 @@ namespace Takai.UI
         protected Vector2 textSize;
 
         /// <summary>
-        /// A binding to bind a value to this element's text
-        /// </summary>
-        public virtual string TextBinding
-        {
-            get => _textBinding;
-            set
-            {
-                _textBinding = value;
-                CreateBindings();
-            }
-        }
-        private string _textBinding;
-
-        /// <summary>
         /// The font to draw the text of this element with.
         /// Optional if text is null
         /// </summary>
@@ -237,7 +223,7 @@ namespace Takai.UI
         /// <seealso cref="VisibleBounds"/>
         public Rectangle Bounds
         {
-            get => new Rectangle((int) Position.X, (int) Position.Y, (int) Size.X, (int) Size.Y);
+            get => new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
             set
             {
                 if (Bounds != value)
@@ -397,13 +383,33 @@ namespace Takai.UI
         public ReadOnlyCollection<Static> Children { get; private set; } //todo: maybe observable
         private List<Static> children = new List<Static>();
 
-        public object CurrentBindTarget
+        /// <summary>
+        /// Bind properties of <see cref="BindingSource"/> to properties of this UI element
+        /// </summary>
+        public List<Binding> Bindings
+        {
+            get => _bindings;
+            set
+            {
+                _bindings = value;
+                if (_bindings != null && BindingSource != null)
+                {
+                    foreach (var binding in _bindings)
+                        binding.BindTo(BindingSource, this);
+                }
+            }
+        }
+        private List<Binding> _bindings;
+
+        //todo: does this need to be stored?
+        [Data.Serializer.Ignored]
+        public object BindingSource
         {
             get => _currentBindTarget;
             set
             {
                 _currentBindTarget = value;
-                CreateBindings();
+                Bindings = Bindings;
             }
         }
         private object _currentBindTarget;
@@ -447,73 +453,20 @@ namespace Takai.UI
                 AddChild(child);
         }
 
-        private Util.GetSet textBindMethods;
-
-        public void SetBindTargetRecursive(object target)
+        /// <summary>
+        /// Bind this UI element to an object
+        /// </summary>
+        /// <param name="source">The source object for the bindings</param>
+        /// <param name="recursive">Recurse through all children and set their source aswell</param>
+        public void BindTo(object source, bool recursive = true)
         {
-            foreach (var elem in EnumerateRecursive())
-                elem.CurrentBindTarget = target;
-        }
-
-        protected Util.GetSet GetBinding(string binding)
-        {
-            //todo: message when binding not found
-
-            Util.GetSet getset;
-
-            if (binding.StartsWith("global.", System.StringComparison.OrdinalIgnoreCase))
+            if (recursive)
             {
-                var bindName = binding.Substring("global.".Length);
-                getset = new Util.GetSet
-                {
-                    get = delegate
-                    {
-                        Data.DataModel.Globals.TryGetValue(bindName, out var value);
-                        return value;
-                    },
-                    set = (value) => Data.DataModel.Globals[bindName] = value
-                };
+                foreach (var elem in EnumerateRecursive())
+                    elem.BindingSource = source;
             }
             else
-                getset = Util.GetMemberAccessors(binding, CurrentBindTarget);
-
-            if (getset.get == null && getset.set == null)
-                System.Diagnostics.Debug.WriteLine($"UI binding '{binding}' does not exist in '{CurrentBindTarget.GetType()}'");
-
-            return getset;
-        }
-
-        protected virtual void CreateBindings()
-        {
-            //todo: redo bindings
-
-            if (CurrentBindTarget == null)
-                return;
-
-            if (TextBinding != null)
-                textBindMethods = GetBinding(TextBinding);
-
-        }
-        protected virtual void UpdateBindingValues()
-        {
-            if (textBindMethods.get != null)
-            {
-                var bindVal = textBindMethods.get();
-                if (bindVal is System.Collections.IEnumerable ie)
-                {
-                    var sb = new System.Text.StringBuilder();
-                    foreach (var e in ie)
-                    {
-                        sb.Append(e);
-                        sb.Append(' ');
-                    }
-                    if (sb.Length > 0)
-                        sb.Remove(sb.Length - 1, 1);
-                    Text = sb.ToString();
-                }
-                else
-                    Text = bindVal?.ToString();
-            }
+                BindingSource = source;
         }
 
         #region Hierarchy/cloning
@@ -1133,7 +1086,7 @@ namespace Takai.UI
                     continue;
 
                 toUpdate = toUpdate.Children[i];
-                i = toUpdate.Children.Count - 1;
+                i = toUpdate.Children.Count;
             }
 
             bool handleInput = Runtime.HasFocus;
@@ -1161,7 +1114,7 @@ namespace Takai.UI
                             continue;
 
                         toUpdate = toUpdate.Children[i];
-                        i = toUpdate.Children.Count - 1;
+                        i = toUpdate.Children.Count;
                     }
                 }
                 else
@@ -1176,7 +1129,11 @@ namespace Takai.UI
         /// <param name="time">game time</param>
         protected virtual void UpdateSelf(GameTime time)
         {
-            UpdateBindingValues();
+            if (Bindings != null)
+            {
+                foreach (var binding in Bindings)
+                    binding.Update();
+            }
         }
 
         /// <summary>

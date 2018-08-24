@@ -919,6 +919,9 @@ namespace Takai.Data
             if (canConvert)
                 return Convert.ChangeType(source, destType);
 
+            if (destType == typeof(string))
+                return source.ToString();
+
             throw new InvalidCastException($"Error converting '{source}' from type:{sourceType.Name} to type:{destType.Name}");
         }
 

@@ -4,20 +4,51 @@ Table {
     VerticalAlignment: Alignment.Bottom;
     ColumnCount: 2;
     Margin: [10 2];
-    CollapseRowsWithEmptyCells: true;
 
     Children: [
         Static { Text: "Name"; };
-        Static { TextBinding: "Name"; Size: [100 20]; };
+        Static {
+            Bindings: [
+                {
+                    SourceProperty: "Name";
+                    TargetProperty: "Text";
+                }
+            ];
+             Size: [200 20];
+         };
 
         Static { Text: "ID"; };
-        Static { TextBinding: "Id"; Size: [100 20]; };
+        Static {
+            Bindings: [
+                {
+                    SourceProperty: "Id";
+                    TargetProperty: "Text";
+                }
+            ];
+             Size: [200 20];
+         };
 
         Static { Text: "Is Alive"; };
-        Static { TextBinding: "IsAlive"; Size: [100 20]; };
+        Static {
+            Bindings: [
+                {
+                    SourceProperty: "IsAlive";
+                    TargetProperty: "Text";
+                }
+            ];
+             Size: [200 20];
+         };
 
         Static { Text: "Active Animations"; };
-        Static { TextBinding: "ActiveAnimations"; Size: [100 20]; };
+        Static {
+            Bindings: [
+                {
+                    SourceProperty: "ActiveAnimations";
+                    TargetProperty: "Text";
+                }
+            ];
+             Size: [200 20];
+         };
 
         # actor properties
 
@@ -26,19 +57,61 @@ Table {
             Direction: Direction.Horizontal;
             Margin: 5;
             Children: [
-                Static { TextBinding: "CurrentHealth"; Size: [60 20]; };
+                Static {
+                    Bindings: [
+                        {
+                            SourceProperty: "CurrentHealth";
+                            TargetProperty: "Text";
+                            Mode: BindingMode.OneWay;
+                        }
+                    ];
+                     Size: [60 20];
+                 };
                 Static { Text: "/"; };
-                Static { TextBinding: "MaxHealth"; Size: [60 20]; };
+                Static {
+                    Bindings: [
+                        {
+                            SourceProperty: "MaxHealth";
+                            TargetProperty: "Text";
+                            Mode: BindingMode.OneWay;
+                        }
+                    ];
+                     Size: [60 20];
+                 };
             ];
         };
 
         Static { Text: "Factions"; };
-        Static { TextBinding: "Factions"; Size: [200 20]; };
+        Static {
+            Bindings: [
+                {
+                    SourceProperty: "Factions";
+                    TargetProperty: "Text";
+                }
+            ];
+             Size: [200 20];
+         };
 
         Static { Text: "Controller"; };
-        Static { TextBinding: "Controller"; Size: [200 20]; };
+        Static {
+            Bindings: [
+                {
+                    SourceProperty: "Controller";
+                    TargetProperty: "Text";
+                }
+            ];
+             Size: [200 20];
+         };
         
         Static { Text: "Weapon"; };
-        Static { TextBinding: "Weapon"; Size: [200 20]; };
+        Static {
+            Bindings: [
+                {
+                    SourceProperty: "Weapon";
+                    TargetProperty: "Text";
+                }
+            ];
+             Size: [200 20];
+         };
     ];
 }
