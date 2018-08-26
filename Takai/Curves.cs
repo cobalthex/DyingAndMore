@@ -103,7 +103,7 @@ namespace Takai
         }
     }
 
-    public class HSLCurve : ValueCurve<Vector4>
+    public class ChromaCurve : ValueCurve<Vector4>
     {
         /// <summary>
         /// Lerp the gradient counter-clockwise around the HSL hue circle as opposed to clockwise
@@ -111,26 +111,36 @@ namespace Takai
         /// </summary>
         public bool Reverse { get; set; }
 
-        public HSLCurve() { }
+        public ChromaCurve() { }
 
         protected override Vector4 Function(Vector4 a, Vector4 b, Vector4 c, Vector4 d, float t)
         {
             if (Reverse)
-                return Util.HSLReverseLerp(b, c, t);
+                return Graphics.ColorUtil.HSLReverseLerp(b, c, t);
             return Vector4.Lerp(b, c, t);
         }
 
-        public static implicit operator HSLCurve(Vector4 hsla)
+        public static implicit operator ChromaCurve(Vector4 color)
         {
-            var curve = new HSLCurve();
-            curve.Values.Add(new CurveValue<Vector4>(0, hsla));
+            var curve = new ChromaCurve();
+            curve.Values.Add(new CurveValue<Vector4>(0, color));
             return curve;
         }
     }
 
+    public enum ChromaMode
+    {
+        HSL,
+        HSV
+    }
+
     public class ColorCurve : Data.IDerivedDeserialize
     {
-        protected HSLCurve curve = new HSLCurve();
+        protected ChromaCurve curve = new ChromaCurve();
+        /// <summary>
+        /// How to interpret colors stored in this curve. Changing this does not change the stored values
+        /// </summary>
+        public ChromaMode Mode { get; set; }
 
         public bool Reverse
         {
@@ -143,23 +153,43 @@ namespace Takai
             get
             {
                 foreach (var value in curve.Values)
-                    yield return new CurveValue<Color>(value.position, Util.ColorFromHSL(value.value));
+                    yield return new CurveValue<Color>(value.position, Graphics.ColorUtil.ColorFromHSV(value.value));
             }
         }
 
-        [Data.Serializer.Ignored]
         public int Count => curve.Values.Count;
 
         public ColorCurve() { }
 
         public void AddValue(float t, Color c)
         {
-            curve.AddValue(t, Util.ColorToHSL(c));
+            switch (Mode)
+            {
+                case ChromaMode.HSL:
+                   curve.AddValue(t, Graphics.ColorUtil.ColorToHSL(c));
+                    break;
+                case ChromaMode.HSV:
+                   curve.AddValue(t, Graphics.ColorUtil.ColorToHSV(c));
+                    break;
+            }
         }
 
         public Color Evaluate(float t)
         {
-            return Util.ColorFromHSL(curve.Evaluate(t));
+            switch (Mode)
+            {
+                case ChromaMode.HSL:
+                    return Graphics.ColorUtil.ColorFromHSL(curve.Evaluate(t));
+                case ChromaMode.HSV:
+                    return Graphics.ColorUtil.ColorFromHSV(curve.Evaluate(t));
+                default:
+                    return new Color();
+            }
+        }
+
+        public Vector4 EvaluateChroma(float t)
+        {
+            return curve.Evaluate(t);
         }
 
         public static implicit operator ColorCurve(Color color)
@@ -175,7 +205,18 @@ namespace Takai
             {
                 var dstValues = Data.Serializer.Cast<List<CurveValue<Color>>>(srcValues);
                 foreach (var v in dstValues)
-                    curve.Values.Add(new CurveValue<Vector4>(v.position, Util.ColorToHSL(v.value)));
+                {
+
+                    switch (Mode)
+                    {
+                        case ChromaMode.HSL:
+                            curve.Values.Add(new CurveValue<Vector4>(v.position, Graphics.ColorUtil.ColorToHSL(v.value)));
+                            break;
+                        case ChromaMode.HSV:
+                            curve.Values.Add(new CurveValue<Vector4>(v.position, Graphics.ColorUtil.ColorToHSV(v.value)));
+                            break;
+                    }
+                }
             }
         }
     }

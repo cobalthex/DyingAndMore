@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Takai.UI
+namespace Takai.Data
 {
     public class FileInputBase : List
     {

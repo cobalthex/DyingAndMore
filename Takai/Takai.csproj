@@ -90,6 +90,7 @@
     <Compile Include="Game\Sound.cs" />
     <Compile Include="Diagnostics.cs" />
     <Compile Include="Game\Trails.cs" />
+    <Compile Include="Graphics\ColorUtil.cs" />
     <Compile Include="Input\InputMap.cs" />
     <Compile Include="Objects.cs" />
     <Compile Include="Game\Path.cs" />
@@ -101,7 +102,8 @@
     <Compile Include="Graphics\Primitives2D.cs" />
     <Compile Include="Input\InputState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\Binding.cs" />
+    <Compile Include="Data\Binding.cs" />
+    <Compile Include="UI\Animation.cs" />
     <Compile Include="UI\CheckBox.cs" />
     <Compile Include="Data\DataModel.cs" />
     <Compile Include="UI\DropdownSelect.cs" />

@@ -1,7 +1,6 @@
 ﻿using System;
 using Takai.Data;
 using Takai.Game;
-using Takai.UI;
 
 namespace DyingAndMore.Game
 {

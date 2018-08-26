@@ -150,6 +150,11 @@ namespace Takai.Game
         private EntityClass _class;
 
         /// <summary>
+        /// The name of this entity's class
+        /// </summary>
+        public string ClassName => Class?.Name;
+
+        /// <summary>
         /// A name for this instance, should be unique
         /// </summary>
         public string Name { get; set; } = null;

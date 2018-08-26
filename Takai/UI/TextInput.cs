@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
-namespace Takai.UI
+namespace Takai.Data
 {
     public class TextInput : Static
     {

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Reflection;
 
-namespace Takai.UI
+namespace Takai.Data
 {
     public enum BindingMode
     {
@@ -13,7 +12,7 @@ namespace Takai.UI
     /// Allows binding one object's property (source) to a target
     /// Source has priority if both are modified
     /// </summary>
-    public class Binding
+    public class Binding : ICloneable
     {
         public BindingMode Mode { get; set; } = BindingMode.OneWay;
 
@@ -28,16 +27,21 @@ namespace Takai.UI
         object cachedValue;
         int cachedHash;
 
-        public void BindTo(object source, object target)
+        public object Clone()
         {
-            sourceAccessors = GetBinding(SourceProperty, source);
-            targetAccessors = GetBinding(TargetProperty, target);
+            return MemberwiseClone();
+        }
+
+        public virtual void BindTo(object source, object target)
+        {
+            sourceAccessors = GetAccessors(SourceProperty, source);
+            targetAccessors = GetAccessors(TargetProperty, target);
             Update();
 
             //todo: need to clear values of nulls
         }
 
-        public static Util.GetSet GetBinding(string binding, object obj)
+        public static Util.GetSet GetAccessors(string binding, object obj)
         {
             //todo: message when binding not found
 
@@ -51,10 +55,10 @@ namespace Takai.UI
                     type = obj.GetType(),
                     get = delegate
                     {
-                        Data.DataModel.Globals.TryGetValue(bindName, out var value);
+                        DataModel.Globals.TryGetValue(bindName, out var value);
                         return value;
                     },
-                    set = (value) => Data.DataModel.Globals[bindName] = value
+                    set = (value) => DataModel.Globals[bindName] = value
                 };
             }
             else
@@ -66,26 +70,33 @@ namespace Takai.UI
             return getset;
         }
 
-        public void Update()
+        /// <summary>
+        /// Check to see if the binding needs update and perform the update
+        /// </summary>
+        /// <returns>True if the binding's value was updated</returns>
+        public bool Update()
         {
             if (targetAccessors.set == null)
-                return;
+                return false;
 
             var srcVal = sourceAccessors.get?.Invoke() ?? null;
             var srcHash = srcVal?.GetHashCode() ?? 0;
             var srcMatches = (srcHash == cachedHash && (srcVal == null ? cachedValue == null : srcVal.Equals(cachedValue)));
 
-            //todo: optimize casts?
+            //todo: optimize casts? necessary?
 
             if (!srcMatches)
             {
-                targetAccessors.set(Data.Serializer.Cast(targetAccessors.type, srcVal));
+                targetAccessors.set(Serializer.Cast(targetAccessors.type, srcVal));
                 cachedValue = srcVal;
                 cachedHash = srcHash;
+                OnUpdated();
 
-                System.Diagnostics.Debug.WriteLine($"Updated binding for source:{SourceProperty} to target:{TargetProperty} = {cachedValue}");
+                //System.Diagnostics.Debug.WriteLine($"Updated binding for source:{SourceProperty} to target:{TargetProperty} = {cachedValue}");
+                return true;
             }
-            else if (Mode == BindingMode.TwoTway && targetAccessors.get != null && sourceAccessors.set != null)
+
+            if (Mode == BindingMode.TwoTway && targetAccessors.get != null && sourceAccessors.set != null)
             {
                 var tgtVal = targetAccessors.get();
                 var tgtHash = tgtVal?.GetHashCode() ?? 0;
@@ -93,13 +104,18 @@ namespace Takai.UI
 
                 if (!tgtMatches)
                 {
-                    sourceAccessors.set(Data.Serializer.Cast(sourceAccessors.type, tgtVal));
+                    sourceAccessors.set(Serializer.Cast(sourceAccessors.type, tgtVal));
                     cachedValue = tgtVal;
                     cachedHash = tgtHash;
+                    OnUpdated();
 
-                    System.Diagnostics.Debug.WriteLine($"Updated binding for target:{TargetProperty} to source:{SourceProperty} = {cachedValue}");
+                    //System.Diagnostics.Debug.WriteLine($"Updated binding for target:{TargetProperty} to source:{SourceProperty} = {cachedValue}");
+                    return true;
                 }
             }
+            return false;
         }
+
+        protected virtual void OnUpdated() { }
     }
 }

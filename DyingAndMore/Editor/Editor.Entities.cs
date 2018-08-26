@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Takai.Input;
-using Takai.UI;
+using Takai.Data;
 using Takai;
 using Microsoft.Xna.Framework.Graphics;
 

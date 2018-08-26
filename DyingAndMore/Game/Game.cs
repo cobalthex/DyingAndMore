@@ -3,18 +3,12 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Linq;
-using System.Reflection;
 
 using Takai.Data;
 using Takai.Game;
 using Takai.Input;
-using Takai.UI;
 using Takai;
 using System.Collections.Generic;
-
-using PlayerInputBinding = Takai.Input.InputBinding<DyingAndMore.Game.Entities.InputAction>;
-using PlayerInputBinding2D = Takai.Input.InputBinding2D<DyingAndMore.Game.Entities.InputAction>;
-using PlayerPolarInputBinding = Takai.Input.PolarInputBinding<DyingAndMore.Game.Entities.InputAction>;
 
 namespace DyingAndMore.Game
 {

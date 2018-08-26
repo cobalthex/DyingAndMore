@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Takai.Data;
 using Takai.Input;
-using Takai.UI;
 using Takai.Game;
 using Microsoft.Xna.Framework.Graphics;
 

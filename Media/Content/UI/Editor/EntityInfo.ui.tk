@@ -14,8 +14,21 @@ Table {
                     TargetProperty: "Text";
                 }
             ];
-             Size: [200 20];
-         };
+            AutoSizeOnBindingUpdate: true;
+            Size: [400 20];
+        };
+
+        Static { Text: "Class"; };
+        Static {
+            Bindings: [
+                {
+                    SourceProperty: "ClassName";
+                    TargetProperty: "Text";
+                }
+            ];
+            AutoSizeOnBindingUpdate: true;
+            Size: [400 20];
+        };
 
         Static { Text: "ID"; };
         Static {
@@ -25,8 +38,9 @@ Table {
                     TargetProperty: "Text";
                 }
             ];
-             Size: [200 20];
-         };
+            AutoSizeOnBindingUpdate: true;
+            Size: [400 20];
+        };
 
         Static { Text: "Is Alive"; };
         Static {
@@ -36,9 +50,11 @@ Table {
                     TargetProperty: "Text";
                 }
             ];
-             Size: [200 20];
-         };
+            AutoSizeOnBindingUpdate: true;
+            Size: [400 20];
+        };
 
+        #*
         Static { Text: "Active Animations"; };
         Static {
             Bindings: [
@@ -47,8 +63,10 @@ Table {
                     TargetProperty: "Text";
                 }
             ];
-             Size: [200 20];
-         };
+            AutoSizeOnBindingUpdate: true;
+            Size: [400 20];
+        };
+        *#
 
         # actor properties
 
@@ -65,7 +83,8 @@ Table {
                             Mode: BindingMode.OneWay;
                         }
                     ];
-                     Size: [60 20];
+                    AutoSizeOnBindingUpdate: true;
+                    Size: [60 20];
                  };
                 Static { Text: "/"; };
                 Static {
@@ -76,7 +95,8 @@ Table {
                             Mode: BindingMode.OneWay;
                         }
                     ];
-                     Size: [60 20];
+                    AutoSizeOnBindingUpdate: true;
+                    Size: [60 20];
                  };
             ];
         };
@@ -89,8 +109,9 @@ Table {
                     TargetProperty: "Text";
                 }
             ];
-             Size: [200 20];
-         };
+            AutoSizeOnBindingUpdate: true;
+            Size: [400 20];
+        };
 
         Static { Text: "Controller"; };
         Static {
@@ -100,8 +121,9 @@ Table {
                     TargetProperty: "Text";
                 }
             ];
-             Size: [200 20];
-         };
+            AutoSizeOnBindingUpdate: true;
+            Size: [400 20];
+        };
         
         Static { Text: "Weapon"; };
         Static {
@@ -111,7 +133,8 @@ Table {
                     TargetProperty: "Text";
                 }
             ];
-             Size: [200 20];
-         };
+            AutoSizeOnBindingUpdate: true;
+            Size: [400 20];
+        };
     ];
 }

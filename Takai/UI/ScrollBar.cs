@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 
-namespace Takai.UI
+namespace Takai.Data
 {
     public class ScrollEventArgs : EventArgs
     {

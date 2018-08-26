@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Takai.UI
+namespace Takai.Data
 {
     /// <summary>
     /// How an element aligns itself inside its parent
@@ -52,7 +52,7 @@ namespace Takai.UI
     /// <summary>
     /// The basic UI element
     /// </summary>
-    public class Static : Data.IDerivedDeserialize
+    public class Static : IDerivedDeserialize
     {
         #region Properties
 
@@ -396,6 +396,9 @@ namespace Takai.UI
                 {
                     foreach (var binding in _bindings)
                         binding.BindTo(BindingSource, this);
+
+                    if (AutoSizeOnBindingUpdate)
+                        AutoSize();
                 }
             }
         }
@@ -413,6 +416,11 @@ namespace Takai.UI
             }
         }
         private object _currentBindTarget;
+
+        /// <summary>
+        /// Autosize this element if any of the bindings is refreshed
+        /// </summary>
+        public bool AutoSizeOnBindingUpdate { get; set; }
 
         #endregion
 
@@ -1131,8 +1139,11 @@ namespace Takai.UI
         {
             if (Bindings != null)
             {
+                bool didUpdateBinding = false;
                 foreach (var binding in Bindings)
-                    binding.Update();
+                    didUpdateBinding |= binding.Update();
+                if (didUpdateBinding && AutoSizeOnBindingUpdate)
+                    AutoSize();
             }
         }
 

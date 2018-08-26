@@ -83,7 +83,7 @@ namespace Takai
         }
     }
 
-    public class FpsGraph : UI.Static
+    public class FpsGraph : Data.Static
     {
         struct FpsTick
         {

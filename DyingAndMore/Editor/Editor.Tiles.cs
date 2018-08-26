@@ -13,15 +13,15 @@ namespace DyingAndMore.Editor
         Vector2 savedWorldPos, lastWorldPos, currentWorldPos;
 
         Selectors.TileSelector selector;
-        Takai.UI.Graphic preview;
+        Takai.Data.Graphic preview;
 
         public TilesEditorMode(Editor editor)
             : base("Tiles", editor)
         {
-            VerticalAlignment = Takai.UI.Alignment.Stretch;
-            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+            VerticalAlignment = Takai.Data.Alignment.Stretch;
+            HorizontalAlignment = Takai.Data.Alignment.Stretch;
 
-            AddChild(preview = new Takai.UI.Graphic()
+            AddChild(preview = new Takai.Data.Graphic()
             {
                 Sprite = new Takai.Graphics.Sprite()
                 {
@@ -31,8 +31,8 @@ namespace DyingAndMore.Editor
                 },
                 Position = new Vector2(20),
                 Size = new Vector2(editor.Map.Class.TileSize),
-                HorizontalAlignment = Takai.UI.Alignment.End,
-                VerticalAlignment = Takai.UI.Alignment.Start,
+                HorizontalAlignment = Takai.Data.Alignment.End,
+                VerticalAlignment = Takai.Data.Alignment.Start,
                 BorderColor = Color.White
             });
             preview.Click += delegate
@@ -44,7 +44,7 @@ namespace DyingAndMore.Editor
             {
                 Size = new Vector2(48 * 9, 400),
                 //VerticalAlignment = Takai.UI.Alignment.Stretch,
-                HorizontalAlignment = Takai.UI.Alignment.End
+                HorizontalAlignment = Takai.Data.Alignment.End
             };
             selector.SelectionChanged += delegate
             {
