@@ -469,7 +469,7 @@ namespace Takai.Game
 
                     Graphics.Primitives2D.DrawFill(
                         c.spriteBatch,
-                        Util.ColorFromHSL(path.heuristic * mult, 1, 0.8f, 1),
+                        Graphics.ColorUtil.ColorFromHSL(path.heuristic * mult, 1, 0.8f, 1),
                         new Rectangle(x * Class.TileSize, y * Class.TileSize, Class.TileSize, Class.TileSize)
                     );
                 }

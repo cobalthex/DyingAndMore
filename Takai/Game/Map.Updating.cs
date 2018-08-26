@@ -175,24 +175,24 @@ namespace Takai.Game
 
             #region entities
 
-            foreach (var entity in possibleOffscreenEntities)
+            if (updateSettings.allowEntityDeletion)
             {
-                if (!activeEntities.Contains(entity) &&
-                    (!entity.Class.DestroyIfDeadAndOffscreen || !entity.IsAlive))
-                    Destroy(entity);
+                foreach (var entity in possibleOffscreenEntities)
+                {
+                    if (!activeEntities.Contains(entity) &&
+                        (!entity.Class.DestroyIfDeadAndOffscreen || !entity.IsAlive))
+                        Destroy(entity);
+                }
             }
             possibleOffscreenEntities.Clear();
 
             //remove entities that have been destroyed
-            if (updateSettings.allowEntityDeletion)
+            foreach (var entity in entsToDestroy)
             {
-                foreach (var entity in entsToDestroy)
-                {
-                    if (entity.Map != this && entity.Map != null)
-                        continue; //delete may be being called twice?
+                if (entity.Map != this || entity.Map == null)
+                    continue; //delete may be being called twice?
 
-                    FinalDestroy(entity);
-                }
+                FinalDestroy(entity);
             }
             entsToDestroy.Clear();
 

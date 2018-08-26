@@ -5,7 +5,7 @@ using Takai.Graphics;
 
 using NumericBaseType = System.Int64;
 
-namespace Takai.UI
+namespace Takai.Data
 {
     public abstract class NumericBase : Static
     {

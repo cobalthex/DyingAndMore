@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
-namespace Takai.UI
+namespace Takai.Data
 {
     /// <summary>
     /// Displays the full tree of <see cref="Display"/>'s hierarchy

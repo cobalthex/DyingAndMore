@@ -78,7 +78,7 @@ MapClass {
                     Effects: [
                         ConditionEffect {
                             Condition: @"Actors/Conditions/poison.cond.tk";
-                            Duration: 3sec;
+                            Duration: 15sec;
                         }
                     ]
                 };

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Takai.UI
+namespace Takai.Data
 {
     //scroll base?
     public class TrackBar : NumericBase

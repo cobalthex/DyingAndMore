@@ -109,108 +109,6 @@ namespace Takai
             return new Vector2(v.Y, -v.X);
         }
 
-        /// <summary>
-        /// Convert an RGB color to HSL
-        /// </summary>
-        /// <param name="color">the RGB color to convert</param>
-        /// <returns>The HSLA representation of the color</returns>
-        public static Vector4 ColorToHSL(Color color)
-        {
-            float r = (color.R / 255f);
-            float g = (color.G / 255f);
-            float b = (color.B / 255f);
-
-            float min = Math.Min(Math.Min(r, g), b);
-            float max = Math.Max(Math.Max(r, g), b);
-            float delta = max - min;
-
-            float h = 0;
-            float s = 0;
-            float L = (max + min) / 2f;
-
-            if (delta != 0)
-            {
-                if (L < 0.5f)
-                {
-                    s = delta / (max + min);
-                }
-                else
-                {
-                    s = delta / (2.0f - max - min);
-                }
-
-
-                if (r == max)
-                    h = (g - b) / delta;
-                else if (g == max)
-                    h = 2f + (b - r) / delta;
-                else if (b == max)
-                    h = 4f + (r - g) / delta;
-            }
-
-            h *= 60;
-            if (h < 0)
-                h += 360;
-
-            return new Vector4(h, s, L, color.A);
-        }
-
-        public static Color ColorFromHSL(Vector4 hsla)
-        {
-            return ColorFromHSL(hsla.X, hsla.Y, hsla.Z, hsla.W);
-        }
-
-        public static Color ColorFromHSL(float hue, float saturation, float lightness, float alpha = 255f)
-        {
-            hue = MathHelper.Clamp(hue, 0, 360);
-            saturation = MathHelper.Clamp(saturation, 0, 1);
-            lightness = MathHelper.Clamp(lightness, 0, 1);
-            alpha /= 255f;
-
-            if (saturation == 0)
-                return new Color(lightness, lightness, lightness, alpha);
-
-            float min, mid, max;
-            if (lightness >= 0.5f)
-            {
-                max = lightness - (lightness * saturation) + saturation;
-                min = lightness + (lightness * saturation) - saturation;
-            }
-            else
-            {
-                max = lightness + (lightness * saturation);
-                min = lightness - (lightness * saturation);
-            }
-
-            var iSextant = (int)Math.Floor(hue / 60f);
-            if (hue > 300)
-                hue -= 360f;
-
-            hue /= 60f;
-            hue -= 2f * (float)Math.Floor(((iSextant + 1f) % 6f) / 2f);
-
-            if (iSextant % 2 == 0)
-                mid = hue * (max - min) + min;
-            else
-                mid = min - hue * (max - min);
-
-            switch (iSextant)
-            {
-                case 1:
-                    return new Color(mid, max, min, alpha);
-                case 2:
-                    return new Color(min, max, mid, alpha);
-                case 3:
-                    return new Color(min, mid, max, alpha);
-                case 4:
-                    return new Color(mid, min, max, alpha);
-                case 5:
-                    return new Color(max, min, mid, alpha);
-                default:
-                    return new Color(max, mid, min, alpha);
-            }
-        }
-
         public static Point Max(Point a, Point b)
         {
             return new Point(
@@ -222,18 +120,6 @@ namespace Takai
         public static int Clamp(int value, int min, int max)
         {
             return (value < min ? min : (value > max ? max : value));
-        }
-
-        public static Vector4 HSLReverseLerp(Vector4 a, Vector4 b, float t)
-        {
-            return new Vector4(
-                (a.X < b.X)
-                    ? MathHelper.Lerp(359 - a.X, b.X, t)
-                    : MathHelper.Lerp(a.X, 359 - b.X, t),
-                MathHelper.Lerp(a.Y, b.Y, t),
-                MathHelper.Lerp(a.Z, b.Z, t),
-                MathHelper.Lerp(a.W, b.W, t)
-            );
         }
 
         public static TimeSpan Max(TimeSpan a, TimeSpan b)

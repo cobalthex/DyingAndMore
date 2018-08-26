@@ -17,8 +17,8 @@ namespace DyingAndMore.Editor
         public TestEditorMode(Editor editor)
             : base("Test", editor)
         {
-            VerticalAlignment = Takai.UI.Alignment.Stretch;
-            HorizontalAlignment = Takai.UI.Alignment.Stretch;
+            VerticalAlignment = Takai.Data.Alignment.Stretch;
+            HorizontalAlignment = Takai.Data.Alignment.Stretch;
 
         }
 

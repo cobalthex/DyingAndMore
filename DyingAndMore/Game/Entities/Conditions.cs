@@ -34,6 +34,8 @@ namespace DyingAndMore.Game.Entities
 
         //taper?
 
+        //todo: move duration into here?
+
         public ConditionInstance Instantiate()
         {
             return new ConditionInstance

@@ -1,5 +1,5 @@
 ConditionClass {
-	HealthPerSecond: -4;
+	HealthPerSecond: -80;
 	ActiveEffect: {
 		Effects: [
             EntityTintEffect {

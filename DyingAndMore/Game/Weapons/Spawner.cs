@@ -52,18 +52,11 @@ namespace DyingAndMore.Game.Weapons
 
     class SpawnerInstance : WeaponInstance
     {
-        public override WeaponClass Class
+        public new SpawnerClass Class
         {
-            get => base.Class;
-            set
-            {
-                System.Diagnostics.Contracts.Contract.Assert(value == null || value is SpawnerClass);
-                base.Class = value;
-                _class = value as SpawnerClass;
-            }
+            get => (SpawnerClass)base.Class;
+            set => base.Class = value;
         }
-
-        private SpawnerClass _class;
 
         /// <summary>
         /// The actual list of entities to spawn
@@ -74,7 +67,7 @@ namespace DyingAndMore.Game.Weapons
         public SpawnerInstance(SpawnerClass @class)
             : base(@class)
         {
-            SpawnQueue = new Queue<EntityClass>(_class.GenerateSpawnList());
+            SpawnQueue = new Queue<EntityClass>(Class.GenerateSpawnList());
         }
 
         public override bool IsDepleted()
@@ -100,6 +93,11 @@ namespace DyingAndMore.Game.Weapons
             spawner.SpawnQueue.Clear();
 
             return true;
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} ({SpawnQueue?.Count ?? 0})";
         }
     }
 }

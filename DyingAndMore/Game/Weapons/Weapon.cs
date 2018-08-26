@@ -69,7 +69,7 @@ namespace DyingAndMore.Game.Weapons
 
         //rate of fire over time, speed up time
 
-        public Takai.UI.Static Hud { get; set; }
+        public Takai.Data.Static Hud { get; set; }
 
         public abstract WeaponInstance Instantiate();
     }
@@ -115,7 +115,7 @@ namespace DyingAndMore.Game.Weapons
         protected bool isUsing = false;
         protected bool wasUsing = false;
 
-        public Takai.UI.Static Hud { get; set; }
+        public Takai.Data.Static Hud { get; set; }
 
         public WeaponInstance() { }
         public WeaponInstance(WeaponClass @class)
