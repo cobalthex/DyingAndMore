@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Takai.Data
+namespace Takai.UI
 {
     /// <summary>
     /// Display a graphic in a variey of ways according to a value

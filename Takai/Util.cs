@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 
 namespace Takai
@@ -100,6 +99,34 @@ namespace Takai
         }
 
         /// <summary>
+        /// Calculate a rectangle that is always of positive size
+        /// </summary>
+        /// <param name="a">One corner of the rectangle</param>
+        /// <param name="b">The other corner of the rectangle</param>
+        /// <returns></returns>
+        public static Rectangle AbsRectangle(Point a, Point b)
+        {
+            Point c = b, d = a;
+            if (a.X < b.X)
+            {
+                c.X = a.X;
+                d.X = b.X;
+            }
+            if (a.Y < b.Y)
+            {
+                c.Y = a.Y;
+                d.Y = b.Y;
+            }
+
+            return new Rectangle(c.X, c.Y, d.X - c.X, d.Y - c.Y);
+        }
+
+        public static Rectangle AbsRectangle(Vector2 a, Vector2 b)
+        {
+            return AbsRectangle(a.ToPoint(), b.ToPoint());
+        }
+
+        /// <summary>
         /// Return a vector orthagonal to this one
         /// </summary>
         /// <param name="v">The vector to use</param>
@@ -167,42 +194,6 @@ namespace Takai
         public static Vector2 Relative(this Rectangle r, Vector2 v)
         {
             return new Vector2(v.X - r.X, v.Y - r.Y);
-        }
-
-        public struct GetSet
-        {
-            public Type type;
-            public Func<object> get;
-            public Action<object> set;
-        }
-        public static GetSet GetMemberAccessors(string memberName, object obj)
-        {
-            var getset = new GetSet();
-
-            if (obj == null)
-                return getset;
-
-            var type = obj.GetType();
-
-            var prop = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-            if (prop != null)
-            {
-                //todo: get delegates working
-                getset.type = prop.PropertyType;
-                getset.get = () => prop.GetValue(obj);
-                getset.set = (value) => prop.SetValue(obj, value);
-                //getset.get = prop.CanRead ? (Func<object>)prop.GetGetMethod(false).CreateDelegate(typeof(Func<object>), obj) : null;
-                //getset.set = prop.CanWrite ? (Action<object>)prop.GetSetMethod(false).CreateDelegate(typeof(Action<object>), obj) : null;
-                return getset;
-            }
-
-            var field = type.GetField(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-            if (field != null)
-            {
-                throw new NotImplementedException(); //todo
-            }
-
-            return getset;
         }
     }
 

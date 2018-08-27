@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Takai.Data;
+using Takai.UI;
 using Xna = Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;

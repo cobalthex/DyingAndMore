@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Takai.UI;
 using Takai.Data;
 using Takai.Input;
 using Takai.Game;
@@ -52,13 +53,17 @@ namespace DyingAndMore.Editor
         }
         private MapInstance _map;
 
-        public Camera Camera { get; set; }
+        public Camera Camera { get; set; } = new Camera();
 
         ModeSelector modes;
         Static renderSettingsConsole;
         Static fpsDisplay;
         Static resizeDialog;
         Static playButton;
+
+        bool isZoomSizing;
+
+        Vector2 savedWorldPos, currentWorldPos;
 
         public EditorConfiguration config;
 
@@ -145,16 +150,18 @@ namespace DyingAndMore.Editor
             if (renderSettingsConsole != null)
                 renderSettingsConsole.UserData = Map.renderSettings;
 
-            //start zoomed out to see the whole map
+            Camera.ActualScale = 0;
+            ZoomWholeMap();
+        }
+
+        public void ZoomWholeMap()
+        {
             var mapSize = new Vector2(Map.Class.Width, Map.Class.Height) * Map.Class.TileSize;
             var xyScale = new Vector2(Takai.Runtime.GraphicsDevice.Viewport.Width - 20,
                                       Takai.Runtime.GraphicsDevice.Viewport.Height - 20) / mapSize;
 
-            Camera = new Camera
-            {
-                Scale = MathHelper.Clamp(System.Math.Min(xyScale.X, xyScale.Y), 0.1f, 1f)
-            };
-            Camera.MoveTo(mapSize / 2);
+            Camera.Scale = MathHelper.Clamp(System.Math.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
+            Camera.Position = mapSize / 2;
         }
 
         void SwitchToGame()
@@ -220,6 +227,20 @@ namespace DyingAndMore.Editor
             Map.MarkRegionActive(Camera);
             Map.Update(time);
 
+
+            if (isZoomSizing)
+            {
+                var dist = Vector2.Distance(savedWorldPos, currentWorldPos);
+                var whRatio = new Vector2(Camera.Viewport.Width, Camera.Viewport.Height);
+                whRatio.Normalize();
+
+                dist *= System.Math.Sign(Vector2.Dot(currentWorldPos - savedWorldPos, whRatio));
+
+                //todo: allow breaking into quadrants
+
+                Map.DrawRect(Takai.Util.AbsRectangle(savedWorldPos, savedWorldPos + dist * whRatio), Color.Aquamarine);
+            }
+
             base.UpdateSelf(time);
         }
 
@@ -279,6 +300,43 @@ namespace DyingAndMore.Editor
                         }
                     }
                 }
+                return false;
+            }
+
+            //todo: switch editor to use input map
+
+            //Zoom to rect
+            if (InputState.IsPress(Keys.Z))
+            {
+                isZoomSizing = true;
+                savedWorldPos = currentWorldPos = Camera.ScreenToWorld(InputState.MouseVector);
+                return false;
+            }
+            if (InputState.IsClick(Keys.Z))
+            {
+                isZoomSizing = false;
+
+                var dist = Vector2.Distance(savedWorldPos, currentWorldPos);
+                var whRatio = new Vector2(Camera.Viewport.Width, Camera.Viewport.Height);
+                whRatio.Normalize();
+
+                var sign = System.Math.Sign(Vector2.Dot(currentWorldPos - savedWorldPos, whRatio));
+                dist *= sign;
+
+                if (dist != 0)
+                {
+                    Vector2 a = savedWorldPos, b = (savedWorldPos + dist * whRatio);
+                    Camera.Scale = Camera.Viewport.Width / (sign * (b - a).X);
+                    Camera.Position = (a + b) / 2;
+                }
+                else
+                    ZoomWholeMap();
+
+                return false;
+            }
+            if (InputState.IsButtonDown(Keys.Z))
+            {
+                currentWorldPos = Camera.ScreenToWorld(InputState.MouseVector);
                 return false;
             }
 

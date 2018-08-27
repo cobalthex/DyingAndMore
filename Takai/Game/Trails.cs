@@ -28,7 +28,7 @@ namespace Takai.Game
         Tile
     };
 
-    public class TrailClass : INamedClass<TrailInstance>
+    public class TrailClass : Data.INamedClass<TrailInstance>
     {
         public string File { get; set; }
         public string Name { get; set; }
@@ -103,7 +103,7 @@ namespace Takai.Game
         }
     }
 
-    public class TrailInstance : IInstance<TrailClass>
+    public class TrailInstance : Data.IInstance<TrailClass>
     {
         //todo: make class readonly across board
         public TrailClass Class

@@ -1,4 +1,5 @@
 ﻿using System;
+using Takai.UI;
 using Takai.Data;
 using Takai.Game;
 
@@ -9,7 +10,7 @@ namespace DyingAndMore.Game
     /// <summary>
     /// A configuration for a game. Akin to a game mode
     /// </summary>
-    public class GameConfiguration : Takai.INamedObject
+    public class GameConfiguration : INamedObject
     {
         public string Name { get; set; }
         public string File { get; set; }
@@ -22,7 +23,7 @@ namespace DyingAndMore.Game
         //fixed vs adaptive difficulty
     }
 
-    public class GameStory : Takai.INamedObject
+    public class GameStory : INamedObject
     {
         public string Name { get; set; }
         public string File { get; set; }

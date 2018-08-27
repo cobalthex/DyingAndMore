@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Takai.Data
+namespace Takai.UI
 {
     /// <summary>
     /// Draw the items in a circle

@@ -10,21 +10,21 @@ namespace DyingAndMore.Editor
         System.TimeSpan lastFluidTime = System.TimeSpan.Zero;
 
         Selectors.FluidSelector selector;
-        Takai.Data.Graphic preview;
+        Takai.UI.Graphic preview;
 
         public FluidsEditorMode(Editor editor)
             : base("Fluids", editor)
         {
-            VerticalAlignment = Takai.Data.Alignment.Stretch;
-            HorizontalAlignment = Takai.Data.Alignment.Stretch;
+            VerticalAlignment = Takai.UI.Alignment.Stretch;
+            HorizontalAlignment = Takai.UI.Alignment.Stretch;
 
-            AddChild(preview = new Takai.Data.Graphic()
+            AddChild(preview = new Takai.UI.Graphic()
             {
                 Sprite = new Takai.Graphics.Sprite(),
                 Position = new Vector2(20),
                 Size = new Vector2(64),
-                HorizontalAlignment = Takai.Data.Alignment.End,
-                VerticalAlignment = Takai.Data.Alignment.Start,
+                HorizontalAlignment = Takai.UI.Alignment.End,
+                VerticalAlignment = Takai.UI.Alignment.Start,
                 BorderColor = Color.White
             });
             preview.Click += delegate
@@ -35,8 +35,8 @@ namespace DyingAndMore.Editor
             selector = new Selectors.FluidSelector(editor)
             {
                 Size = new Vector2(320, 1),
-                VerticalAlignment = Takai.Data.Alignment.Stretch,
-                HorizontalAlignment = Takai.Data.Alignment.End
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                HorizontalAlignment = Takai.UI.Alignment.End
             };
             selector.SelectionChanged += delegate
             {

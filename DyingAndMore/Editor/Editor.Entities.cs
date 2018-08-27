@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Takai.Input;
-using Takai.Data;
+using Takai.UI;
 using Takai;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -249,34 +249,36 @@ namespace DyingAndMore.Editor
         //todo: make work in both editor and game
         void DrawEntityInfo(SpriteBatch spriteBatch)
         {
-            foreach (var ent in editor.Map.ActiveEntities)
-            {
-                var pos = editor.Camera.WorldToScreen(ent.Position) + new Vector2(ent.Radius / 2 * editor.Camera.Scale);
+            //todo: only draw around cursor?
 
-                var sb = new System.Text.StringBuilder();
-                sb.Append($"{ent.Id}: {ent.Name} {{{string.Join(",", ent.ActiveAnimations)}}}\n");
+            //foreach (var ent in editor.Map.ActiveEntities)
+            //{
+            //    var pos = editor.Camera.WorldToScreen(ent.Position) + new Vector2(ent.Radius / 2 * editor.Camera.Scale);
 
-                if (ent is Game.Entities.ActorInstance actor)
-                {
-                    sb.Append($"`f76{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}`x\n");
-                    if (actor.Weapon is Game.Weapons.GunInstance gun)
-                        sb.Append($"`bcf{gun.CurrentAmmo} {gun.State} {gun.Charge:N2}`x\n");
-                    if (actor.Controller is Game.Entities.AIController ai)
-                    {
-                        sb.Append($"`ad4{ai.Target}");
-                        for (int i = 0; i < ai.ChosenBehaviors.Length; ++i)
-                        {
-                            if (ai.ChosenBehaviors[i] != null)
-                            {
-                                sb.Append("\n");
-                                sb.Append(ai.ChosenBehaviors[i].ToString());
-                            }
-                        }
-                        sb.Append("`x\n");
-                    }
-                }
-                DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
-            }
+            //    var sb = new System.Text.StringBuilder();
+            //    sb.Append($"{ent.Id}: {ent.Name} {{{string.Join(",", ent.ActiveAnimations)}}}\n");
+
+            //    if (ent is Game.Entities.ActorInstance actor)
+            //    {
+            //        sb.Append($"`f76{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}`x\n");
+            //        if (actor.Weapon is Game.Weapons.GunInstance gun)
+            //            sb.Append($"`bcf{gun.CurrentAmmo} {gun.State} {gun.Charge:N2}`x\n");
+            //        if (actor.Controller is Game.Entities.AIController ai)
+            //        {
+            //            sb.Append($"`ad4{ai.Target}");
+            //            for (int i = 0; i < ai.ChosenBehaviors.Length; ++i)
+            //            {
+            //                if (ai.ChosenBehaviors[i] != null)
+            //                {
+            //                    sb.Append("\n");
+            //                    sb.Append(ai.ChosenBehaviors[i].ToString());
+            //                }
+            //            }
+            //            sb.Append("`x\n");
+            //        }
+            //    }
+            //    DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
+            //}
         }
     }
 }

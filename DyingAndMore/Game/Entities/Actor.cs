@@ -67,7 +67,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The hud to display when controlling this actor
         /// </summary>
-        public Takai.Data.Static Hud { get; set; }
+        public Takai.UI.Static Hud { get; set; }
 
         public override EntityInstance Instantiate()
         {
@@ -162,7 +162,7 @@ namespace DyingAndMore.Game.Entities
         private Weapons.WeaponInstance _weapon;
 
         [Takai.Data.Serializer.Ignored]
-        public Takai.Data.Static Hud { get; set; }
+        public Takai.UI.Static Hud { get; set; }
 
         public override Dictionary<string, CommandAction> Actions => new Dictionary<string, CommandAction>(base.Actions)
         {

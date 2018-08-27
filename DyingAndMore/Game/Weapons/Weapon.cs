@@ -19,7 +19,7 @@ namespace DyingAndMore.Game.Weapons
     /// <summary>
     /// The base for all weapons
     /// </summary>
-    public abstract class WeaponClass : Takai.INamedClass<WeaponInstance>
+    public abstract class WeaponClass : Takai.Data.INamedClass<WeaponInstance>
     {
         public string Name { get; set; }
 
@@ -69,7 +69,7 @@ namespace DyingAndMore.Game.Weapons
 
         //rate of fire over time, speed up time
 
-        public Takai.Data.Static Hud { get; set; }
+        public Takai.UI.Static Hud { get; set; }
 
         public abstract WeaponInstance Instantiate();
     }
@@ -85,7 +85,7 @@ namespace DyingAndMore.Game.Weapons
         //chambering,
     }
 
-    public abstract class WeaponInstance : Takai.IInstance<WeaponClass>
+    public abstract class WeaponInstance : Takai.Data.IInstance<WeaponClass>
     {
         //rate of fire curve
         //maybe warmup requires certain rate of fire
@@ -115,7 +115,7 @@ namespace DyingAndMore.Game.Weapons
         protected bool isUsing = false;
         protected bool wasUsing = false;
 
-        public Takai.Data.Static Hud { get; set; }
+        public Takai.UI.Static Hud { get; set; }
 
         public WeaponInstance() { }
         public WeaponInstance(WeaponClass @class)

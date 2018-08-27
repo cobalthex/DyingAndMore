@@ -92,7 +92,7 @@
     <Compile Include="Game\Trails.cs" />
     <Compile Include="Graphics\ColorUtil.cs" />
     <Compile Include="Input\InputMap.cs" />
-    <Compile Include="Objects.cs" />
+    <Compile Include="Data\Objects.cs" />
     <Compile Include="Game\Path.cs" />
     <Compile Include="Game\Trigger.cs" />
     <Compile Include="Ranges.cs" />

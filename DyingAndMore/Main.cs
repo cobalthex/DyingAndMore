@@ -40,7 +40,7 @@ namespace DyingAndMore
 #endif
 
         SpriteBatch sbatch;
-        Takai.Data.Static ui;
+        Takai.UI.Static ui;
 
         Takai.FpsGraph fpsGraph;
 
@@ -111,7 +111,7 @@ namespace DyingAndMore
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            Takai.Data.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
+            Takai.UI.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
 
             /*
 #if WINDOWS //UWP launch activation parameters?
@@ -203,8 +203,8 @@ namespace DyingAndMore
             var storySelect = new Game.StorySelect
             {
                 Size = new Vector2(400),
-                HorizontalAlignment = Takai.Data.Alignment.Middle,
-                VerticalAlignment = Takai.Data.Alignment.Middle,
+                HorizontalAlignment = Takai.UI.Alignment.Middle,
+                VerticalAlignment = Takai.UI.Alignment.Middle,
             };
             storySelect.StorySelected += delegate (object _sender, Game.GameStory story)
             {
@@ -215,12 +215,12 @@ namespace DyingAndMore
                 game.LoadNextStoryMap();
                 ui.ReplaceAllChildren(new Game.GameInstance(game));
             };
-            ui = new Takai.Data.Static(storySelect);
+            ui = new Takai.UI.Static(storySelect);
 
             fpsGraph = new Takai.FpsGraph()
             {
                 Bounds = new Rectangle(20, 20, 800, 100),
-                HorizontalAlignment = Takai.Data.Alignment.Middle
+                HorizontalAlignment = Takai.UI.Alignment.Middle
             };
 
             InputState.EnabledGestures =
@@ -248,7 +248,7 @@ namespace DyingAndMore
             }
 
             if (InputState.IsPress(Keys.F10))
-                Takai.Data.Static.DebugFont = (Takai.Data.Static.DebugFont == null ? Takai.Data.Static.DefaultFont : null);
+                Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
 
             if (InputState.IsPress(Keys.F7))
             {
@@ -282,10 +282,10 @@ namespace DyingAndMore
                 if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
                 {
                     var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
-                    var sz = Takai.Data.Static.DefaultFont.MeasureString(text);
-                    Takai.Data.Static.DefaultFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
+                    var sz = Takai.UI.Static.DefaultFont.MeasureString(text);
+                    Takai.UI.Static.DefaultFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
                 }
-                y -= Takai.Data.Static.DefaultFont.MaxCharHeight;
+                y -= Takai.UI.Static.DefaultFont.MaxCharHeight;
             }
 
             sbatch.End();

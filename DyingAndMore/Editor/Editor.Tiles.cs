@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
-using Takai;
 
 namespace DyingAndMore.Editor
 {
@@ -13,15 +11,15 @@ namespace DyingAndMore.Editor
         Vector2 savedWorldPos, lastWorldPos, currentWorldPos;
 
         Selectors.TileSelector selector;
-        Takai.Data.Graphic preview;
+        Takai.UI.Graphic preview;
 
         public TilesEditorMode(Editor editor)
             : base("Tiles", editor)
         {
-            VerticalAlignment = Takai.Data.Alignment.Stretch;
-            HorizontalAlignment = Takai.Data.Alignment.Stretch;
+            VerticalAlignment = Takai.UI.Alignment.Stretch;
+            HorizontalAlignment = Takai.UI.Alignment.Stretch;
 
-            AddChild(preview = new Takai.Data.Graphic()
+            AddChild(preview = new Takai.UI.Graphic()
             {
                 Sprite = new Takai.Graphics.Sprite()
                 {
@@ -31,8 +29,8 @@ namespace DyingAndMore.Editor
                 },
                 Position = new Vector2(20),
                 Size = new Vector2(editor.Map.Class.TileSize),
-                HorizontalAlignment = Takai.Data.Alignment.End,
-                VerticalAlignment = Takai.Data.Alignment.Start,
+                HorizontalAlignment = Takai.UI.Alignment.End,
+                VerticalAlignment = Takai.UI.Alignment.Start,
                 BorderColor = Color.White
             });
             preview.Click += delegate
@@ -43,8 +41,8 @@ namespace DyingAndMore.Editor
             selector = new Selectors.TileSelector(editor)
             {
                 Size = new Vector2(48 * 9, 400),
-                //VerticalAlignment = Takai.UI.Alignment.Stretch,
-                HorizontalAlignment = Takai.Data.Alignment.End
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                HorizontalAlignment = Takai.UI.Alignment.End
             };
             selector.SelectionChanged += delegate
             {
@@ -94,6 +92,8 @@ namespace DyingAndMore.Editor
                     //draw rect
                     if (InputState.IsMod(KeyMod.Shift))
                     {
+                        //todo: use Takai.Util.AbsRectangle
+
                         var start = (savedWorldPos / editor.Map.Class.TileSize).ToPoint();
                         var end = (currentWorldPos / editor.Map.Class.TileSize).ToPoint();
 
