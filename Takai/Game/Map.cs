@@ -35,7 +35,7 @@ namespace Takai.Game
     /// <summary>
     /// The (mostly) static properties of a single map
     /// </summary>
-    public partial class MapClass : INamedClass<MapInstance>
+    public partial class MapClass : Data.INamedClass<MapInstance>
     {
         [Data.Serializer.Ignored]
         public string File { get; set; }
@@ -161,7 +161,7 @@ namespace Takai.Game
     }
 
     [Data.Cache.AlwaysReload] //todo: necessary?
-    public partial class MapInstance : IInstance<MapClass>
+    public partial class MapInstance : Data.IInstance<MapClass>
     {
         private int nextEntityID = 0;
 

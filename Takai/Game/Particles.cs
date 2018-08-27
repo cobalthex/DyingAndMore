@@ -7,7 +7,7 @@ namespace Takai.Game
     /// <summary>
     /// A single type of particle
     /// </summary>
-    public class ParticleClass : INamedObject
+    public class ParticleClass : Data.INamedObject
     {
         public string File { get; set; }
         public string Name { get; set; }

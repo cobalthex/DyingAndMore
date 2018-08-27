@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using P = System.IO.Path;
 
-namespace Takai.Data
+namespace Takai.UI
 {
     //todo: convert to use FileInputBase
     public class FileList : ItemList<string>

@@ -11,7 +11,7 @@ namespace Takai.Game
     /// <summary>
     /// A region that can trigger commands when an entity enters the trigger region
     /// </summary>
-    public class TriggerClass : IClass<TriggerInstance>, Data.Serializer.IReferenceable
+    public class TriggerClass : Data.IClass<TriggerInstance>, Data.Serializer.IReferenceable
     {
         private static int nextId = 1;
 
@@ -61,7 +61,7 @@ namespace Takai.Game
         //todo: entity filters
     }
 
-    public class TriggerInstance : IInstance<TriggerClass>
+    public class TriggerInstance : Data.IInstance<TriggerClass>
     {
         [Data.Serializer.AsReference]
         public TriggerClass Class { get; set; }

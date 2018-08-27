@@ -46,6 +46,11 @@ namespace Takai.Game
         private float actualRotation = 0;
 
         /// <summary>
+        /// The current, actual scale of the camera
+        /// </summary>
+        public float ActualScale { get; set; } = 1;
+
+        /// <summary>
         /// How much the camera should shake every frame (random amount up to this value) in radians
         /// 0 for none
         /// </summary>
@@ -75,7 +80,7 @@ namespace Takai.Game
                 var transform = Matrix.Invert(
                     Matrix.CreateTranslation(-ActualPosition.X, -ActualPosition.Y, 0) *
                     Matrix.CreateRotationZ(actualRotation) *
-                    Matrix.CreateScale(Scale)
+                    Matrix.CreateScale(ActualScale)
                 );
 
                 var a = Vector2.Transform(new Vector2(-centerTransform.X, -centerTransform.Y), transform);
@@ -110,7 +115,7 @@ namespace Takai.Game
             {
                 return Matrix.CreateTranslation(-ActualPosition.X, -ActualPosition.Y, 0) *
                        Matrix.CreateRotationZ(actualRotation) *
-                       Matrix.CreateScale(Scale) *
+                       Matrix.CreateScale(ActualScale) *
                        Matrix.CreateTranslation(new Vector3(GetCameraOrigin(Viewport.Width, Viewport.Height), 0));
             }
         }
@@ -130,18 +135,6 @@ namespace Takai.Game
         {
             Follow = null;
             ActualPosition = Position = position;
-        }
-
-        public void _DebugSetTransform(bool relative, Vector2 position)
-        {
-            if (relative)
-            {
-                ActualPosition += position;
-            }
-            else
-            {
-                ActualPosition = position;
-            }
         }
 
         /// <summary>
@@ -167,8 +160,10 @@ namespace Takai.Game
             else
                 LastPosition = Vector2.Lerp(LastPosition, Position, (1 / dist) * deltaS);
             */
-            actualRotation = MathHelper.Lerp(actualRotation, Rotation, (float)time.ElapsedGameTime.TotalSeconds * (MoveSpeed / 100));
-            ActualPosition = Vector2.Lerp(ActualPosition, Position, (float)time.ElapsedGameTime.TotalSeconds * (MoveSpeed / 100));
+            var deltaTime = (float)time.ElapsedGameTime.TotalSeconds * (MoveSpeed / 100);
+            ActualPosition = Vector2.Lerp(ActualPosition, Position, deltaTime);
+            actualRotation = MathHelper.Lerp(actualRotation, Rotation, deltaTime);
+            ActualScale = MathHelper.Lerp(ActualScale, Scale, deltaTime);
         }
 
         /// <summary>

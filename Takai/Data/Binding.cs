@@ -1,7 +1,45 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Takai.Data
 {
+    public struct GetSet
+    {
+        public Type type;
+        public Func<object> get;
+        public Action<object> set;
+
+        public static GetSet GetMemberAccessors(string memberName, object obj)
+        {
+            var getset = new GetSet();
+
+            if (obj == null)
+                return getset;
+
+            var type = obj.GetType();
+
+            var prop = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            if (prop != null)
+            {
+                //todo: get delegates working
+                getset.type = prop.PropertyType;
+                getset.get = () => prop.GetValue(obj);
+                getset.set = (value) => prop.SetValue(obj, value);
+                //getset.get = prop.CanRead ? (Func<object>)prop.GetGetMethod(false).CreateDelegate(typeof(Func<object>), obj) : null;
+                //getset.set = prop.CanWrite ? (Action<object>)prop.GetSetMethod(false).CreateDelegate(typeof(Action<object>), obj) : null;
+                return getset;
+            }
+
+            var field = type.GetField(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            if (field != null)
+            {
+                throw new NotImplementedException(); //todo
+            }
+
+            return getset;
+        }
+    }
+
     public enum BindingMode
     {
         OneWay, //source supplied only
@@ -21,8 +59,8 @@ namespace Takai.Data
 
         //fallback value?
 
-        Util.GetSet sourceAccessors;
-        Util.GetSet targetAccessors;
+        GetSet sourceAccessors;
+        GetSet targetAccessors;
 
         object cachedValue;
         int cachedHash;
@@ -41,16 +79,16 @@ namespace Takai.Data
             //todo: need to clear values of nulls
         }
 
-        public static Util.GetSet GetAccessors(string binding, object obj)
+        public static GetSet GetAccessors(string binding, object obj)
         {
             //todo: message when binding not found
 
-            Util.GetSet getset;
+            GetSet getset;
 
             if (binding.StartsWith("global.", StringComparison.OrdinalIgnoreCase))
             {
                 var bindName = binding.Substring("global.".Length);
-                getset = new Util.GetSet
+                getset = new GetSet
                 {
                     type = obj.GetType(),
                     get = delegate
@@ -62,7 +100,7 @@ namespace Takai.Data
                 };
             }
             else
-                getset = Util.GetMemberAccessors(binding, obj);
+                getset = GetSet.GetMemberAccessors(binding, obj);
 
             if (getset.get == null && getset.set == null)
                 System.Diagnostics.Debug.WriteLine($"UI binding '{binding}' does not exist in '{obj.GetType()}'");

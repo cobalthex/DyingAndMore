@@ -12,7 +12,7 @@ namespace Takai.Game
     /// <summary>
     /// A collection of effects to play in a map
     /// </summary>
-    public class EffectsClass : INamedClass<EffectsInstance>
+    public class EffectsClass : Data.INamedClass<EffectsInstance>
     {
         public string Name { get; set; }
 
@@ -61,7 +61,7 @@ namespace Takai.Game
     /// <summary>
     /// A collection of effects played at a location in the map
     /// </summary>
-    public struct EffectsInstance : IInstance<EffectsClass>
+    public struct EffectsInstance : Data.IInstance<EffectsClass>
     {
         public EffectsClass Class { get; set; }
 

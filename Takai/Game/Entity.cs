@@ -11,7 +11,7 @@ namespace Takai.Game
     /// <summary>
     /// Describes a single type of entity. Actors, etc. inherit from this
     /// </summary>
-    public partial class EntityClass : INamedClass<EntityInstance>
+    public partial class EntityClass : Data.INamedClass<EntityInstance>
     {
         [Data.Serializer.Ignored]
         public string File { get; set; } = null;
@@ -118,7 +118,7 @@ namespace Takai.Game
     /// <summary>
     /// A single instance of an entity in a map.
     /// </summary>
-    public partial class EntityInstance : IInstance<EntityClass>, Data.Serializer.IReferenceable, ICollisionResolver
+    public partial class EntityInstance : Data.IInstance<EntityClass>, Data.Serializer.IReferenceable, ICollisionResolver
     {
         /// <summary>
         /// A unique ID for each entity in the map

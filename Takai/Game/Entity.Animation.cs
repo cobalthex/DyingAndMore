@@ -14,7 +14,7 @@ namespace Takai.Game
     /// <summary>
     /// Forms the base of any state in the state machine
     /// </summary>
-    public class AnimationClass : INamedClass<AnimationInstance>
+    public class AnimationClass : Data.INamedClass<AnimationInstance>
     {
         [Data.Serializer.Ignored]
         public string File { get; set; } = null;
@@ -62,7 +62,7 @@ namespace Takai.Game
         }
     }
 
-    public struct AnimationInstance : IInstance<AnimationClass>, IDisposable
+    public struct AnimationInstance : Data.IInstance<AnimationClass>, IDisposable
     {
         public AnimationClass Class
         {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Takai.Data
+namespace Takai.UI
 {
     public enum Direction
     {

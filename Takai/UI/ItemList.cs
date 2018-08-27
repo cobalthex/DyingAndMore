@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
 
-namespace Takai.Data
+namespace Takai.UI
 {
     public class SelectionChangedEventArgs : EventArgs
     {

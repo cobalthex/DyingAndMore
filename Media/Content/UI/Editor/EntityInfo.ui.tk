@@ -1,4 +1,5 @@
 Table {
+    BackgroundColor: [0 0 0 192];
     Name: "Entity info";
     Position: [20 20];
     VerticalAlignment: Alignment.Bottom;
@@ -15,7 +16,7 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [400 20];
+            Size: [300 20];
         };
 
         Static { Text: "Class"; };
@@ -27,7 +28,7 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [400 20];
+            Size: [300 20];
         };
 
         Static { Text: "ID"; };
@@ -39,7 +40,7 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [400 20];
+            Size: [300 20];
         };
 
         Static { Text: "Is Alive"; };
@@ -51,7 +52,7 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [400 20];
+            Size: [300 20];
         };
 
         #*
@@ -64,7 +65,7 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [400 20];
+            Size: [300 20];
         };
         *#
 
@@ -110,7 +111,7 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [400 20];
+            Size: [300 20];
         };
 
         Static { Text: "Controller"; };
@@ -122,7 +123,7 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [400 20];
+            Size: [300 20];
         };
         
         Static { Text: "Weapon"; };
@@ -134,7 +135,7 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [400 20];
+            Size: [300 20];
         };
     ];
 }

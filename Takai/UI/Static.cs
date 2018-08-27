@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Takai.Data
+namespace Takai.UI
 {
     /// <summary>
     /// How an element aligns itself inside its parent
@@ -52,7 +52,7 @@ namespace Takai.Data
     /// <summary>
     /// The basic UI element
     /// </summary>
-    public class Static : IDerivedDeserialize
+    public class Static : Data.IDerivedDeserialize
     {
         #region Properties
 
@@ -386,7 +386,7 @@ namespace Takai.Data
         /// <summary>
         /// Bind properties of <see cref="BindingSource"/> to properties of this UI element
         /// </summary>
-        public List<Binding> Bindings
+        public List<Data.Binding> Bindings
         {
             get => _bindings;
             set
@@ -402,7 +402,7 @@ namespace Takai.Data
                 }
             }
         }
-        private List<Binding> _bindings;
+        private List<Data.Binding> _bindings;
 
         //todo: does this need to be stored?
         [Data.Serializer.Ignored]
@@ -1622,7 +1622,7 @@ namespace Takai.Data
                     };
                     input.FileSelected += delegate
                     {
-                        setValue(obj, Takai.Data.Cache.Load<Texture2D>(input.Text));
+                        setValue(obj, Data.Cache.Load<Texture2D>(input.Text));
                     };
                     input.AutoSize();
                     root.AddChild(input);

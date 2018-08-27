@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
-using Takai.Data;
+using Takai.UI;
 
 namespace DyingAndMore.Editor
 {

@@ -1,6 +1,6 @@
-﻿namespace Takai
+﻿namespace Takai.Data
 {
-    public interface INamedObject : Data.ISerializeExternally
+    public interface INamedObject : ISerializeExternally
     {
         string Name { get; set; }
     }
