@@ -4,11 +4,12 @@ GunClass {
 
     MaxAmmo: 5000;
     RoundsPerBurst: 1;
-    ProjectilesPerRound: 6;
+    ProjectilesPerRound: 8;
     MaxBursts: 0;
-    ChargeTime: 0msec;
+    ChargeTime: 30msec;
+    DischargeTime: 300msec;
     CooldownTime: 30msec;
-    ErrorAngle: [-16deg 16deg];
+    ErrorAngle: [-30deg 30deg];
 
     Hud: {
         name: "BFG HUD";

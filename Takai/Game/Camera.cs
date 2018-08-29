@@ -206,5 +206,10 @@ namespace Takai.Game
         {
             return Vector2.Transform(screenPosition, Matrix.Invert(Transform));
         }
+
+        public Vector2 NormalToWorld(Vector2 normal)
+        {
+            return Vector2.TransformNormal(normal, Matrix.Invert(Transform));
+        }
     }
 }

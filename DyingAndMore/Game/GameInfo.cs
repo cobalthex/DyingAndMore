@@ -34,6 +34,16 @@ namespace DyingAndMore.Game
         /// All of the maps in the story
         /// </summary>
         public string[] MapFiles { get; set; } //todo: lazy load map class
+
+        public MapInstance LoadMapIndex(int index)
+        {
+            if (index < 0 || index >= MapFiles.Length)
+                return null;
+
+            var mapClass = Cache.Load<MapClass>(MapFiles[index]);
+            mapClass.InitializeGraphics();
+            return mapClass.Instantiate();
+        }
     }
 
     public class MapChangedEventArgs : EventArgs
@@ -110,9 +120,7 @@ namespace DyingAndMore.Game
 
             try
             {
-                var mapClass = Cache.Load<MapClass>(Story.MapFiles[index + 1]);
-                mapClass.InitializeGraphics();
-                Map = mapClass.Instantiate();
+                Map = Story.LoadMapIndex(index + 1);
                 return LoadMapResult.Success;
             }
             catch
