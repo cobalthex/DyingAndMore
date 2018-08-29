@@ -1,13 +1,18 @@
 ActorClass {
     Name: "Allied NPC";
     MaxHealth: 50;
-    DefaultFactions: Factions [Ally];
+    DefaultFactions: Factions [Player Ally];
 
     DefaultController: AIController {
         Behaviors: [
             ShootBehavior {}
+            TargetEnemyBehavior {};
+            FlowSeekBehavior {};
+            ShootBehavior {};
         ];
     };
+
+    DefaultWeapon: @"Weapons/Flamethrower.wpn.tk";
 
     Animations: {
         Idle: {

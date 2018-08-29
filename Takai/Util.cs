@@ -98,6 +98,11 @@ namespace Takai
             return new Vector2((float)Math.Round(v.X), (float)Math.Round(v.Y));
         }
 
+        public static Vector2 Sign(this Vector2 v)
+        {
+            return new Vector2(Math.Sign(v.X), Math.Sign(v.Y));
+        }
+
         /// <summary>
         /// Calculate a rectangle that is always of positive size
         /// </summary>

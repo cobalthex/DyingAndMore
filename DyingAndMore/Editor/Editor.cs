@@ -178,8 +178,10 @@ namespace DyingAndMore.Editor
 
         void UpdateCamera(GameTime time)
         {
+            var worldMousePos = Camera.ScreenToWorld(InputState.MouseVector);
+
             if (InputState.IsButtonDown(MouseButtons.Middle))
-                Camera.MoveTo(Camera.Position - Vector2.TransformNormal(InputState.MouseDelta(), Matrix.Invert(Camera.Transform)));
+                Camera.MoveTo(Camera.Position - Camera.NormalToWorld(InputState.MouseDelta()));
             else
             {
                 var d = Vector2.Zero;
@@ -196,7 +198,7 @@ namespace DyingAndMore.Editor
                 {
                     d.Normalize();
                     d = d * Camera.MoveSpeed * (float)time.ElapsedGameTime.TotalSeconds; //(camera velocity)
-                    Camera.Position += Vector2.TransformNormal(d, Matrix.Invert(Camera.Transform));
+                    Camera.Position += Camera.NormalToWorld(d);
                 }
             }
 
@@ -207,6 +209,8 @@ namespace DyingAndMore.Editor
                     Camera.Rotation += delta;
                 else
                 {
+                    //todo: this is a little wobbly
+                    Camera.Position += (worldMousePos - Camera.Position) * (1 / Camera.Scale * delta);
                     Camera.Scale += delta;
                     if (System.Math.Abs(Camera.Scale - 1) < 0.1f) //snap to 100% when near
                         Camera.Scale = 1;
@@ -234,7 +238,7 @@ namespace DyingAndMore.Editor
                 var whRatio = new Vector2(Camera.Viewport.Width, Camera.Viewport.Height);
                 whRatio.Normalize();
 
-                dist *= System.Math.Sign(Vector2.Dot(currentWorldPos - savedWorldPos, whRatio));
+                whRatio *= Takai.Util.Sign(currentWorldPos - savedWorldPos);
 
                 //todo: allow breaking into quadrants
 
@@ -320,13 +324,13 @@ namespace DyingAndMore.Editor
                 var whRatio = new Vector2(Camera.Viewport.Width, Camera.Viewport.Height);
                 whRatio.Normalize();
 
-                var sign = System.Math.Sign(Vector2.Dot(currentWorldPos - savedWorldPos, whRatio));
-                dist *= sign;
+                var sign = Takai.Util.Sign(currentWorldPos - savedWorldPos);
+                whRatio *= sign;
 
                 if (dist != 0)
                 {
                     Vector2 a = savedWorldPos, b = (savedWorldPos + dist * whRatio);
-                    Camera.Scale = Camera.Viewport.Width / (sign * (b - a).X);
+                    Camera.Scale = Camera.Viewport.Width / (sign.X * (b - a).X);
                     Camera.Position = (a + b) / 2;
                 }
                 else

@@ -12,13 +12,13 @@ ProjectileClass {
 
     Trail: {
         #MaxPoints: 20;
-        LifeSpan: 0.75sec;
+        LifeSpan: 0.25sec;
         CaptureDelay: 30Hz;
         Color: {
             Values: [
-                [0 [32 0 64 255]];
-                [0.9 [128 32 192 255]];
-                [1 [144 32 144 255]];
+                [0 [32 0 64 128]];
+                [0.9 [128 32 192 128]];
+                [1 [144 32 144 128]];
             ]
         }
         SpriteScale: 2;

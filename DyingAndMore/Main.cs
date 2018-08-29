@@ -208,12 +208,13 @@ namespace DyingAndMore
             };
             storySelect.StorySelected += delegate (object _sender, Game.GameStory story)
             {
-                var game = new Game.Game
-                {
-                    Story = story,
-                };
-                game.LoadNextStoryMap();
-                ui.ReplaceAllChildren(new Game.GameInstance(game));
+                //var game = new Game.Game
+                //{
+                //    Story = story,
+                //};
+                //game.LoadNextStoryMap();
+                //ui.ReplaceAllChildren(new Game.GameInstance(game));
+                ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
             };
             ui = new Takai.UI.Static(storySelect);
 
