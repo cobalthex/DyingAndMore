@@ -199,9 +199,9 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         public virtual void TryUse()
         {
+            isUsing = true;
             if (Class.CanAlwaysCharge || CanUse(Actor.Map.ElapsedTime))
             {
-                isUsing = true;
                 if (State == WeaponState.Idle)
                 {
                     State = WeaponState.Charging;

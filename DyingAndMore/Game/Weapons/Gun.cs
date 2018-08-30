@@ -84,6 +84,8 @@ namespace DyingAndMore.Game.Weapons
 
         public override bool CanUse(TimeSpan elapsedTime)
         {
+            //todo: unit test
+
             return (Class.MaxBursts == 0 || burstCount < Class.MaxBursts)
                 && (burstCount == 0 || currentBurstShotCount > 0 || elapsedTime > StateTime + Class.BurstCooldownTime)
                 && base.CanUse(elapsedTime);
@@ -91,6 +93,7 @@ namespace DyingAndMore.Game.Weapons
 
         public override void Think(TimeSpan deltaTime)
         {
+            Takai.LogBuffer.Append($"{burstCount} {currentBurstShotCount}");
             if (currentBurstShotCount > 0)
             {
                 if (currentBurstShotCount < Class.RoundsPerBurst && !IsDepleted())

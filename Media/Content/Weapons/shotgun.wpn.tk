@@ -1,14 +1,14 @@
 GunClass {
-    Name: "Machine gun";
-    Projectile: @"Weapons/Projectiles/MGPellet.ent.tk";
+    Name: "Shotgun";
+    Projectile: @"Weapons/Projectiles/ShotgunPellet.ent.tk";
 
-    MaxAmmo: 1000;
+    MaxAmmo: 120;
+    MaxBursts: 1;
     RoundsPerBurst: 1;
-    #ProjectilesPerRound: 16;
-    MaxBursts: 0;
+    ProjectilesPerRound: 8;
     ChargeTime: 0msec;
-    DischargeTime: 1800rpm;
-    ErrorAngle: [-2deg 2deg];
+    DischargeTime: 400msec;
+    ErrorAngle: [-20deg 20deg];
 
     DischargeEffect: {
         Effects: [

@@ -1,0 +1,17 @@
+WeaponPickupClass {
+    Name: "Shotgun";
+
+	Weapon: @"Weapons/shotgun.wpn.tk";
+
+    Animations: {
+        Idle: {
+        	Sprite: {
+                texture: @"./TestGuns.png";
+                width: 64;
+                height: 64;
+                ClipRect: [64 64 64 64];
+            };
+        };
+    };
+    DestructionEffect: @"./Pickup.fx.tk";
+}
