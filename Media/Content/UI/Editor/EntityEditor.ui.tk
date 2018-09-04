@@ -39,7 +39,7 @@ List {
             Size: [100 20];
             HorizontalAlignment: Alignment.Middle;
             Text: "Close";
-            Action: "$Close";
+            OnClickCommand: "$Close";
         }
     ];
 }
