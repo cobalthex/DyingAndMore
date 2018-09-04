@@ -11,7 +11,7 @@ namespace DyingAndMore.Game.Weapons
         /// <summary>
         /// Maximum ammo count, use 0 for infinite
         /// </summary>
-        public int MaxAmmo { get; set; } = 100;
+        public int MaxAmmo { get; set; } = 0;
 
         //clip size, shots reloaded per load
 
@@ -93,7 +93,6 @@ namespace DyingAndMore.Game.Weapons
 
         public override void Think(TimeSpan deltaTime)
         {
-            Takai.LogBuffer.Append($"{burstCount} {currentBurstShotCount}");
             if (currentBurstShotCount > 0)
             {
                 if (currentBurstShotCount < Class.RoundsPerBurst && !IsDepleted())

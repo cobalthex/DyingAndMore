@@ -11,8 +11,8 @@ Table {
         Static {
             Bindings: [
                 {
-                    SourceProperty: "Name";
-                    TargetProperty: "Text";
+                    Source: "Name";
+                    Target: "Text";
                 }
             ];
             AutoSizeOnBindingUpdate: true;
@@ -23,8 +23,8 @@ Table {
         Static {
             Bindings: [
                 {
-                    SourceProperty: "ClassName";
-                    TargetProperty: "Text";
+                    Source: "ClassName";
+                    Target: "Text";
                 }
             ];
             AutoSizeOnBindingUpdate: true;
@@ -35,8 +35,8 @@ Table {
         Static {
             Bindings: [
                 {
-                    SourceProperty: "Id";
-                    TargetProperty: "Text";
+                    Source: "Id";
+                    Target: "Text";
                 }
             ];
             AutoSizeOnBindingUpdate: true;
@@ -47,8 +47,8 @@ Table {
         Static {
             Bindings: [
                 {
-                    SourceProperty: "IsAlive";
-                    TargetProperty: "Text";
+                    Source: "IsAlive";
+                    Target: "Text";
                 }
             ];
             AutoSizeOnBindingUpdate: true;
@@ -60,8 +60,8 @@ Table {
         Static {
             Bindings: [
                 {
-                    SourceProperty: "ActiveAnimations";
-                    TargetProperty: "Text";
+                    Source: "ActiveAnimations";
+                    Target: "Text";
                 }
             ];
             AutoSizeOnBindingUpdate: true;
@@ -79,8 +79,8 @@ Table {
                 Static {
                     Bindings: [
                         {
-                            SourceProperty: "CurrentHealth";
-                            TargetProperty: "Text";
+                            Source: "CurrentHealth";
+                            Target: "Text";
                             Mode: BindingMode.OneWay;
                         }
                     ];
@@ -91,8 +91,8 @@ Table {
                 Static {
                     Bindings: [
                         {
-                            SourceProperty: "MaxHealth";
-                            TargetProperty: "Text";
+                            Source: "MaxHealth";
+                            Target: "Text";
                             Mode: BindingMode.OneWay;
                         }
                     ];
@@ -106,8 +106,8 @@ Table {
         Static {
             Bindings: [
                 {
-                    SourceProperty: "Factions";
-                    TargetProperty: "Text";
+                    Source: "Factions";
+                    Target: "Text";
                 }
             ];
             AutoSizeOnBindingUpdate: true;
@@ -118,8 +118,8 @@ Table {
         Static {
             Bindings: [
                 {
-                    SourceProperty: "Controller";
-                    TargetProperty: "Text";
+                    Source: "Controller";
+                    Target: "Text";
                 }
             ];
             AutoSizeOnBindingUpdate: true;
@@ -130,8 +130,8 @@ Table {
         Static {
             Bindings: [
                 {
-                    SourceProperty: "Weapon";
-                    TargetProperty: "Text";
+                    Source: "Weapon";
+                    Target: "Text";
                 }
             ];
             AutoSizeOnBindingUpdate: true;

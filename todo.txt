@@ -18,7 +18,7 @@
 
   Gases:
     ☐  Behavior changing
-    ☐ AI avoidance
+    ☐  AI avoidance
 
   ☐  Variations for enemy skins
 
@@ -41,13 +41,14 @@
   ☐  editorable commands
 
   ☐  named reference objects from files? (necessary?)
-    `$taco Sprite { ... }`
+  `$taco Sprite { ... }`
     visible from code, and deserializer as &var.taco
 
   UI:
     ☐ default buttons (click enter in text box to submit)
     ☐ display scaling
-    ☐ new binding system: 'Bindings: ['varname', 'input'] <- update every frame and refresh when input value changes
+    ☐ tab focus should not be able to escape modal
+    ☐ global commands ($Close should close nearest modal)
 
   ☐  Think only when alive?
 
@@ -81,7 +82,6 @@
 
   ☐ draw one extra sector of fluids?
 
-  ☐ material reflections off entities
 
   Music:
     ☐ background music (one track), play via FadeMusic game action
@@ -89,6 +89,8 @@
  ☐ make polarinput actually polar (via radius, cap at 1)
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
-  ✔  player input system @done (18-07-21 22:11)
+ ✔ material reflections off entities @done (18-09-04 02:04)
+✔ new binding system: 'Bindings: ['varname', 'input'] <- update every frame and refresh when input value changes @done (18-09-04 01:57) @project(UI)
+✔  player input system @done (18-07-21 22:11)
 
  ☐ tracer rounds (every 5 shots)

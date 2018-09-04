@@ -47,6 +47,13 @@ namespace Takai.UI
         }
     }
 
+    /// <summary>
+    /// Command handler for commands issued from UI
+    /// These are called after event handles
+    /// </summary>
+    /// <param name="source">The source UI object issuing the command</param>
+    public delegate void Command(Static source);
+
     //todo: invalidation/dirty states, instead of reflow each time property is updated, mark dirty. On next update, reflow if dirty
 
     /// <summary>
@@ -385,42 +392,17 @@ namespace Takai.UI
 
         /// <summary>
         /// Bind properties of <see cref="BindingSource"/> to properties of this UI element
+        /// Any modifications to this list will require rebinding
         /// </summary>
-        public List<Data.Binding> Bindings
-        {
-            get => _bindings;
-            set
-            {
-                _bindings = value;
-                if (_bindings != null && BindingSource != null)
-                {
-                    foreach (var binding in _bindings)
-                        binding.BindTo(BindingSource, this);
-
-                    if (AutoSizeOnBindingUpdate)
-                        AutoSize();
-                }
-            }
-        }
-        private List<Data.Binding> _bindings;
-
-        //todo: does this need to be stored?
-        [Data.Serializer.Ignored]
-        public object BindingSource
-        {
-            get => _currentBindTarget;
-            set
-            {
-                _currentBindTarget = value;
-                Bindings = Bindings;
-            }
-        }
-        private object _currentBindTarget;
+        public List<Data.Binding> Bindings { get; set; }
 
         /// <summary>
         /// Autosize this element if any of the bindings is refreshed
         /// </summary>
         public bool AutoSizeOnBindingUpdate { get; set; }
+
+        public string OnClickCommand { get; set; }
+        protected Command clickCommandFn;
 
         #endregion
 
@@ -468,13 +450,51 @@ namespace Takai.UI
         /// <param name="recursive">Recurse through all children and set their source aswell</param>
         public void BindTo(object source, bool recursive = true)
         {
+            if (source == null)
+                return;
+
             if (recursive)
             {
                 foreach (var elem in EnumerateRecursive())
-                    elem.BindingSource = source;
+                    elem.BindToThis(source);
             }
             else
-                BindingSource = source;
+                BindToThis(source);
+        }
+
+        protected virtual void BindToThis(object source)
+        {
+            if (Bindings == null)
+                return;
+
+            foreach (var binding in Bindings)
+                binding.BindTo(source, this);
+        }
+
+        /// <summary>
+        /// Bind this (and/or children) to a command on click/submit/etc
+        /// </summary>
+        /// <param name="command">The command to bind to</param>
+        /// <param name="commandFn">The function to call when the command is triggered</param>
+        /// <param name="recursive">Bind this command to any children?</param>
+        public void BindCommands(string command, Command commandFn, bool recursive = true)
+        {
+            if (command == null || commandFn == null)
+                return;
+
+            if (recursive)
+            {
+                foreach (var elem in EnumerateRecursive())
+                    elem.BindCommand(command, commandFn);
+            }
+            else
+                BindCommand(command, commandFn);
+        }
+
+        protected virtual void BindCommand(string command, Command commandFn)
+        {
+            if (OnClickCommand == command)
+                clickCommandFn = commandFn;
         }
 
         #region Hierarchy/cloning
@@ -1302,11 +1322,8 @@ namespace Takai.UI
         /// <param name="spriteBatch">The spritebatch to use</param>
         protected virtual void DrawSelf(SpriteBatch spriteBatch)
         {
-            if (Font != null && Text != null)
-            {
-                var textPos = ((Size - textSize) / 2).ToPoint();
-                DrawText(spriteBatch, textPos);
-            }
+            var textPos = ((Size - textSize) / 2).ToPoint();
+            DrawText(spriteBatch, textPos);
         }
 
         /// <summary>
@@ -1315,6 +1332,9 @@ namespace Takai.UI
         /// <param name="position">The position of the text relative to this element</param>
         protected void DrawText(SpriteBatch spriteBatch, Point position)
         {
+            if (Font == null || Text == null)
+                return;
+
             position += VirtualBounds.Location - VisibleBounds.Location;
             Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleBounds, position, Color);
         }
@@ -1349,6 +1369,8 @@ namespace Takai.UI
             var ce = new ClickEventArgs { position = relativePosition, inputIndex = 0 };
             OnClick(ce);
             Click?.Invoke(this, ce);
+
+            clickCommandFn?.Invoke(this);
         }
 
         public override string ToString()

@@ -2,13 +2,14 @@ GunClass {
     Name: "Shotgun";
     Projectile: @"Weapons/Projectiles/ShotgunPellet.ent.tk";
 
-    MaxAmmo: 120;
-    MaxBursts: 1;
+    MaxAmmo: 1200;
+    MaxBursts: 0;
     RoundsPerBurst: 1;
-    ProjectilesPerRound: 8;
+    ProjectilesPerRound: 16;
     ChargeTime: 0msec;
-    DischargeTime: 400msec;
-    ErrorAngle: [-20deg 20deg];
+    DischargeTime: 1200msec;
+    CanAlwaysCharge: true;
+    ErrorAngle: [-10deg 10deg];
 
     DischargeEffect: {
         Effects: [

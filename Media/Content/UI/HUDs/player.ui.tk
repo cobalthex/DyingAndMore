@@ -10,12 +10,12 @@ Static {
 			Minimum: 0;
 			Bindings: [
                 {
-                    SourceProperty: "CurrentHealth";
-                    TargetProperty: "Value";
+                    Source: "CurrentHealth";
+                    Target: "Value";
                 };
                 {
-                    SourceProperty: "MaxHealth";
-                    TargetProperty: "Maximum";
+                    Source: "MaxHealth";
+                    Target: "Maximum";
                 };
 			];
 
