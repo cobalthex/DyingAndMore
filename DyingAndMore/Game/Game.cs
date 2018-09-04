@@ -346,8 +346,6 @@ namespace DyingAndMore.Game
 
         protected override void UpdateSelf(GameTime time)
         {
-            DataModel.Globals["test"] = time.TotalGameTime;
-
             ElapsedRealTime += time.ElapsedGameTime;
             clockDisplay.Text = $"{GetClockText(ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}x{Map.TimeScale:N1}{(IsPaused ? "\n -- PAUSED --" : "")}";
             clockDisplay.AutoSize();

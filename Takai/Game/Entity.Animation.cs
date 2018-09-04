@@ -132,13 +132,34 @@ namespace Takai.Game
         {
             get
             {
-                yield return baseAnimation;
+                if (baseAnimation.Class != null)
+                    yield return baseAnimation;
                 for (int i = 0; i < overlayAnimations.Count; ++i)
                     yield return overlayAnimations[i];
             }
         }
 
         public string Material => baseAnimation.Class?.Material;
+
+        public bool IsPlayingAnimation(string animationName)
+        {
+            foreach (var animation in ActiveAnimations)
+            {
+                if (animation.Class.Name == animationName)
+                    return true;
+            }
+            return false;
+        }
+        public bool IsPlayingAnimation(AnimationClass animationClass)
+        {
+            foreach (var animation in ActiveAnimations)
+            {
+                if (animation.Class == animationClass)
+                    return true;
+            }
+            return false;
+        }
+
 
         public bool PlayAnimation(string animation, Action completionCallback = null)
         {

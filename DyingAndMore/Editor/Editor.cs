@@ -307,7 +307,7 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
-            //todo: switch editor to use input map
+            //todo: switch editor to use input map6
 
             //Zoom to rect
             if (InputState.IsPress(Keys.Z))

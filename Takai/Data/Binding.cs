@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace Takai.Data
 {
@@ -22,9 +23,13 @@ namespace Takai.Data
             if (prop != null)
             {
                 //todo: get delegates working
+
                 getset.type = prop.PropertyType;
-                getset.get = () => prop.GetValue(obj);
-                getset.set = (value) => prop.SetValue(obj, value);
+                if (prop.CanRead)
+                    getset.get = () => prop.GetValue(obj);
+                if (prop.CanWrite)
+                    getset.set = (value) => prop.SetValue(obj, value);
+
                 //getset.get = prop.CanRead ? (Func<object>)prop.GetGetMethod(false).CreateDelegate(typeof(Func<object>), obj) : null;
                 //getset.set = prop.CanWrite ? (Action<object>)prop.GetSetMethod(false).CreateDelegate(typeof(Action<object>), obj) : null;
                 return getset;
@@ -43,19 +48,33 @@ namespace Takai.Data
     public enum BindingMode
     {
         OneWay, //source supplied only
-        TwoTway,
+        TwoWay,
     }
 
     /// <summary>
     /// Allows binding one object's property (source) to a target
     /// Source has priority if both are modified
+    /// Bind to globals by prefixing with $ (e.g. $MapTime)
     /// </summary>
     public class Binding : ICloneable
     {
+        /// <summary>
+        /// All global variables
+        /// </summary>
+        public static Dictionary<string, object> Globals { get; set; } = new Dictionary<string, object>();
+
+        //todo: globals should be bindings
+
         public BindingMode Mode { get; set; } = BindingMode.OneWay;
 
-        public string SourceProperty { get; set; }
-        public string TargetProperty { get; set; }
+        /// <summary>
+        /// The property from the source object to bind to
+        /// </summary>
+        public string Source { get; set; }
+        /// <summary>
+        /// The property from the target object to bind to
+        /// </summary>
+        public string Target { get; set; }
 
         //fallback value?
 
@@ -70,10 +89,18 @@ namespace Takai.Data
             return MemberwiseClone();
         }
 
-        public virtual void BindTo(object source, object target)
+        /// <summary>
+        /// Bind to an object
+        /// </summary>
+        /// <param name="sourceObj">The backing object to bind against</param>
+        /// <param name="targetObj">The object to send/recieve data to/from the source</param>
+        public virtual void BindTo(object sourceObj, object targetObj)
         {
-            sourceAccessors = GetAccessors(SourceProperty, source);
-            targetAccessors = GetAccessors(TargetProperty, target);
+            if (Source == null || Target == null)
+                return;
+
+            sourceAccessors = GetAccessors(Source, sourceObj);
+            targetAccessors = GetAccessors(Target, targetObj);
             Update();
 
             //todo: need to clear values of nulls
@@ -85,18 +112,18 @@ namespace Takai.Data
 
             GetSet getset;
 
-            if (binding.StartsWith("global.", StringComparison.OrdinalIgnoreCase))
+            if (binding.StartsWith("$", StringComparison.OrdinalIgnoreCase))
             {
-                var bindName = binding.Substring("global.".Length);
+                var bindName = binding.Substring("$".Length);
                 getset = new GetSet
                 {
                     type = obj.GetType(),
                     get = delegate
                     {
-                        DataModel.Globals.TryGetValue(bindName, out var value);
+                        Globals.TryGetValue(bindName, out var value);
                         return value;
                     },
-                    set = (value) => DataModel.Globals[bindName] = value
+                    set = (value) => Globals[bindName] = value
                 };
             }
             else
@@ -134,7 +161,7 @@ namespace Takai.Data
                 return true;
             }
 
-            if (Mode == BindingMode.TwoTway && targetAccessors.get != null && sourceAccessors.set != null)
+            if (Mode == BindingMode.TwoWay && targetAccessors.get != null && sourceAccessors.set != null)
             {
                 var tgtVal = targetAccessors.get();
                 var tgtHash = tgtVal?.GetHashCode() ?? 0;

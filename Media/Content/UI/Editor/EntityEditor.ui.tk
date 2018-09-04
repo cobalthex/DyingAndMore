@@ -1,38 +1,45 @@
-Static {
+List {
     Name: "Entity properties editor";
     IsModal: true;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
-    AutoSize: 20;
-    BackgroundColor: [255 255 255 192];
+    BackgroundColor: [20 20 20 192];
+    Margin: 10;
+    AutoSize: 10;
 
     Children: [
-        ScrollBox {
-            Name: "Props";
-            Size: [300 360];
-            Direction: Direction.Vertical;
+        Scrollbox {
+            Position: [0 0];
+            Size: [380 420];
 
             Children: [
                 List {
+                    Direction: Direction.Vertical;
+                    Margin: 10;
+
                     Children: [
+                        Static { Text: "Name"; }
+                        TextInput {
+                            Bindings: [
+                                Binding {
+                                    Mode: BindingMode.TwoWay;
+                                    Source: "Name";
+                                    Target: "Text";
+                                }
+                            ]
+                        }
 
-                    ]
-                }
-            ]
-        }
+                        Static { Text: "Controller"; }
+                    ];
+                };
+            ];
+        };
 
         Static {
-            Action: "Apply";
-            Text: "Apply";
-            Position: [0 370];
-            Size: [140 30];
-        }
-
-        Static {
-            Action: "Cancel";
-            Text: "Cancel";
-            Position: [160 370];
-            Size: [140 30];
+            Size: [100 20];
+            HorizontalAlignment: Alignment.Middle;
+            Text: "Close";
+            Action: "$Close";
         }
     ];
 }

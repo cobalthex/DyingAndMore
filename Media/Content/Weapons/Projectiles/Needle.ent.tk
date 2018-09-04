@@ -10,6 +10,7 @@ ProjectileClass {
     InheritSourcePhysics: false;
     Damage: 15;
 
+    #*
     Trail: {
         #MaxPoints: 20;
         LifeSpan: 0.25sec;
@@ -31,6 +32,7 @@ ProjectileClass {
             ]
         }
     }
+    *#
 
     Animations: {
         Dead: {

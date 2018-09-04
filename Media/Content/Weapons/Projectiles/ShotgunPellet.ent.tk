@@ -1,15 +1,17 @@
 ProjectileClass {
     Name: "Shotgun pellet";
-    MuzzleVelocity: [4000 5800];
+    MuzzleVelocity: [4000 5000];
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     Range: 2000;
-    Drag: 4.0;
-    MinimumSpeed: 100;
+    Drag: 5.0;
+    MinimumSpeed: 10;
+    Damage: 200;
+    InheritSourcePhysics: true;
 
     Trail: {
-        LifeSpan: 0.15sec;
-        CaptureDelay: 10Hz;
+        LifeSpan: 0.35sec;
+        #CaptureDelay: 100Hz;
         SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
         Color: {
             Values: [

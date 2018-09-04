@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Takai.Graphics;
 
 using NumericBaseType = System.Int64;
@@ -25,6 +24,7 @@ namespace Takai.UI
                     _value = newVal;
                     OnValueChanged(EventArgs.Empty);
                     ValueChanged?.Invoke(this, EventArgs.Empty);
+                    onValueChangedCommandFn?.Invoke(this);
                 }
             }
         }
@@ -81,7 +81,18 @@ namespace Takai.UI
         /// </summary>
         public event EventHandler ValueChanged;
 
+        public string OnValueChangedCommand { get; set; }
+        protected Command onValueChangedCommandFn;
+
         protected virtual void OnValueChanged(EventArgs e) { }
+
+        protected override void BindCommand(string command, Command commandFn)
+        {
+            base.BindCommand(command, commandFn);
+
+            if (command == OnValueChangedCommand)
+                onValueChangedCommandFn = commandFn;
+        }
     }
 
     /// <summary>

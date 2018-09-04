@@ -3,6 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
+    /// <summary>
+    /// A checkbox element.Text is drawn to the right of the checkbox
+    /// </summary>
     public class CheckBox : Static
     {
         /// <summary>
@@ -14,7 +17,9 @@ namespace Takai.UI
 
         public bool IsChecked { get; set; } = false;
 
-        public CheckBox(bool isChecked = false)
+        public CheckBox() : this(false) { }
+
+        public CheckBox(bool isChecked)
         {
             IsChecked = isChecked;
         }
