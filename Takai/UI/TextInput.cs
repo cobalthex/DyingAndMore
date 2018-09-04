@@ -145,6 +145,12 @@ namespace Takai.UI
 
         protected override void OnPress(ClickEventArgs args)
         {
+            if (Text == null)
+            {
+                caret = 0;
+                return;
+            }
+
             var x = args.position.X + ScrollPosition;
             var width = 0;
             for (int i = 0; i < Text.Length; ++i)
@@ -360,6 +366,9 @@ namespace Takai.UI
 
         void InsertAtCaret(char ch)
         {
+            if (Text == null)
+                Text = "";
+
             if (Text.Length >= MaxLength)
                 return;
 

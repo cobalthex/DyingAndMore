@@ -311,7 +311,7 @@ namespace Takai.UI
         /// Can this element be focused
         /// </summary>
         [Data.Serializer.Ignored]
-        public virtual bool CanFocus { get => Click != null; }
+        public virtual bool CanFocus { get => Click != null || clickCommandFn != null; }
 
         /// <summary>
         /// Called whenever the element has its parent changed
@@ -1205,9 +1205,7 @@ namespace Takai.UI
                     (!ignoreSpaceKey && Input.InputState.IsPress(Keys.Space)) ||
                     Input.InputState.IsAnyPress(Buttons.A)) //optionally restrict input to player
                 {
-                    var e = new ClickEventArgs { position = Vector2.Zero };
-                    OnClick(e);
-                    Click?.Invoke(this, e);
+                    TriggerClick(Vector2.Zero);
                     return false;
                 }
             }
@@ -1258,9 +1256,7 @@ namespace Takai.UI
             {
                 if (didPress && VisibleBounds.Contains(mousePosition)) //gesture pos
                 {
-                    var e = new ClickEventArgs { position = (mousePosition - VisibleBounds.Location).ToVector2() };
-                    OnClick(e);
-                    Click?.Invoke(this, e);
+                    TriggerClick((mousePosition - VisibleBounds.Location).ToVector2());
                     didPress = false;
                     return false;
                 }
