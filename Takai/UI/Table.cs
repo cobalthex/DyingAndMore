@@ -54,5 +54,11 @@ namespace Takai.UI
 
             base.Reflow();
         }
+
+        protected override void OnChildResized(Static child)
+        {
+            Reflow();
+            base.OnChildResized(child);
+        }
     }
 }

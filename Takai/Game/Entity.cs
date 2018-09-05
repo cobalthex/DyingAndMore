@@ -301,6 +301,8 @@ namespace Takai.Game
             var clone = (EntityInstance)MemberwiseClone();
             clone.Id = 0;
             clone.Map = null;
+            if (clone.Name != null && !clone.Name.EndsWith(" (Clone)"))
+                clone.Name += " (Clone)";
             return clone;
         }
 

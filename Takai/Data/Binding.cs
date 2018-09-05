@@ -108,7 +108,8 @@ namespace Takai.Data
 
         public static GetSet GetAccessors(string binding, object obj)
         {
-            //todo: message when binding not found
+            if (obj == null)
+                return new GetSet();
 
             GetSet getset;
             if (binding.StartsWith("$", StringComparison.OrdinalIgnoreCase))

@@ -450,9 +450,6 @@ namespace Takai.UI
         /// <param name="recursive">Recurse through all children and set their source aswell</param>
         public void BindTo(object source, bool recursive = true)
         {
-            if (source == null)
-                return;
-
             if (recursive)
             {
                 foreach (var elem in EnumerateRecursive())
@@ -477,7 +474,7 @@ namespace Takai.UI
         /// <param name="command">The command to bind to</param>
         /// <param name="commandFn">The function to call when the command is triggered</param>
         /// <param name="recursive">Bind this command to any children?</param>
-        public void BindCommands(string command, Command commandFn, bool recursive = true)
+        public void BindCommand(string command, Command commandFn, bool recursive = true)
         {
             if (command == null || commandFn == null)
                 return;
@@ -485,13 +482,13 @@ namespace Takai.UI
             if (recursive)
             {
                 foreach (var elem in EnumerateRecursive())
-                    elem.BindCommand(command, commandFn);
+                    elem.BindCommandToThis(command, commandFn);
             }
             else
-                BindCommand(command, commandFn);
+                BindCommandToThis(command, commandFn);
         }
 
-        protected virtual void BindCommand(string command, Command commandFn)
+        protected virtual void BindCommandToThis(string command, Command commandFn)
         {
             if (OnClickCommand == command)
                 clickCommandFn = commandFn;
@@ -1013,6 +1010,7 @@ namespace Takai.UI
 
             OnResize(System.EventArgs.Empty);
             Resize?.Invoke(this, System.EventArgs.Empty);
+            Parent?.OnChildResized(this);
         }
 
         /// <summary>
@@ -1061,6 +1059,12 @@ namespace Takai.UI
                 ? Rectangle.Intersect(Parent.VisibleBounds, VirtualBounds)
                 : VirtualBounds;
         }
+
+        /// <summary>
+        /// Called by a child when it resizes, this element can resize in relation
+        /// </summary>
+        /// <param name="child">The child element that resized</param>
+        protected virtual void OnChildResized(Static child) { }
 
         /// <summary>
         /// Automatically size this element. By default, will size based on text and children

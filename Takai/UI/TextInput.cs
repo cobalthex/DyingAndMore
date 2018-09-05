@@ -132,9 +132,9 @@ namespace Takai.UI
             BorderColor = Color;
         }
 
-        protected override void BindCommand(string command, Command commandFn)
+        protected override void BindCommandToThis(string command, Command commandFn)
         {
-            base.BindCommand(command, commandFn);
+            base.BindCommandToThis(command, commandFn);
 
             if (command == OnSubmitCommand)
                 onSubmitCommandFn = commandFn;
