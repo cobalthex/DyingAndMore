@@ -260,6 +260,8 @@ namespace Takai.UI
             base.OnResize(e);
         }
 
+        //todo: on child resize event for content area
+
         protected void ResizeContentArea()
         {
             //todo:

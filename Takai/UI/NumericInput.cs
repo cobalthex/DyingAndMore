@@ -86,9 +86,9 @@ namespace Takai.UI
 
         protected virtual void OnValueChanged(EventArgs e) { }
 
-        protected override void BindCommand(string command, Command commandFn)
+        protected override void BindCommandToThis(string command, Command commandFn)
         {
-            base.BindCommand(command, commandFn);
+            base.BindCommandToThis(command, commandFn);
 
             if (command == OnValueChangedCommand)
                 onValueChangedCommandFn = commandFn;

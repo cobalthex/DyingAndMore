@@ -210,7 +210,7 @@ namespace DyingAndMore.Editor
                 if (InputState.IsPress(Keys.Space))
                 {
                     entEditor.BindTo(SelectedEntity);
-                    entEditor.BindCommands("$Close", (obj) => entEditor.RemoveFromParent());
+                    entEditor.BindCommand("$Close", (obj) => entEditor.RemoveFromParent());
                     entEditor.FocusFirstAvailable();
                     AddChild(entEditor);
                     return false;
