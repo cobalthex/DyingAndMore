@@ -332,6 +332,9 @@ namespace Takai.UI
         public event System.EventHandler<ClickEventArgs> Click = null;
         protected virtual void OnClick(ClickEventArgs e) { }
 
+        public string OnClickCommand { get; set; }
+        protected Command clickCommandFn;
+
         /// <summary>
         /// Called whenever the size of this element is updated
         /// </summary>
@@ -400,9 +403,6 @@ namespace Takai.UI
         /// Autosize this element if any of the bindings is refreshed
         /// </summary>
         public bool AutoSizeOnBindingUpdate { get; set; }
-
-        public string OnClickCommand { get; set; }
-        protected Command clickCommandFn;
 
         #endregion
 
@@ -714,18 +714,8 @@ namespace Takai.UI
             return current;
         }
 
-        /// <summary>
-        /// Focus the next element in the tree
-        /// </summary>
-        /// <remarks>If this is not the focused element, finds the focused element and calls this function</remarks>
-        protected void FocusNext()
+        private Static FindNextFocus()
         {
-            if (!HasFocus)
-            {
-                FindFocused()?.FocusNext();
-                return;
-            }
-
             /* focus in the following order (13 will wrap around back to 1)
 
             1
@@ -751,10 +741,7 @@ namespace Takai.UI
                 foreach (var child in next.Children)
                 {
                     if (child.CanFocus && child.IsEnabled)
-                    {
-                        child.HasFocus = true;
-                        return;
-                    }
+                        return child;
 
                     if (child.Children.Count > 0)
                     {
@@ -779,29 +766,43 @@ namespace Takai.UI
                 }
 
                 if (next.CanFocus && next.IsEnabled)
-                {
-                    next.HasFocus = true;
-                    return;
-                }
+                    return next;
             }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Focus the next element in the tree
+        /// </summary>
+        /// <remarks>If this is not the focused element, finds the focused element and calls this function</remarks>
+        protected Static FocusNext()
+        {
+            if (!HasFocus)
+                return FindFocused()?.FocusNext();
+
+            var next = FindNextFocus();
+            if (next != null)
+                next.HasFocus = true;
+            return next;
         }
 
         /// <summary>
         /// Focus the previous element, using the reverse order of FocusNext()
         /// </summary>
-        protected void FocusPrevious()
+        protected Static FocusPrevious()
         {
             if (!HasFocus)
-            {
-                FindFocused()?.FocusPrevious();
-                return;
-            }
+                return FindFocused()?.FocusPrevious();
 
             var prev = this;
             while (true)
             {
                 if (prev.Parent == null)
                 {
+                    if (prev.Children.Count == 0)
+                        return null;
+
                     while (prev.Children.Count > 0)
                         prev = prev.Children[prev.Children.Count - 1];
                 }
@@ -823,7 +824,7 @@ namespace Takai.UI
                 if (prev.CanFocus && prev.IsEnabled)
                 {
                     prev.HasFocus = true;
-                    break;
+                    return prev;
                 }
             }
         }
@@ -884,23 +885,25 @@ namespace Takai.UI
         /// <returns>The focused element, null if none</returns>
         public Static FocusFirstAvailable()
         {
-            var next = new Queue<Static>();
-            next.Enqueue(this);
 
-            while (next.Count > 0)
-            {
-                var elem = next.Dequeue();
-                if (elem.CanFocus && elem.IsEnabled)
-                {
-                    elem.HasFocus = true;
-                    return elem;
-                }
+            //bfs
+            //while (next.Count > 0)
+            //{
+            //    var elem = next.Dequeue();
+            //    if (elem.CanFocus && elem.IsEnabled)
+            //    {
+            //        elem.HasFocus = true;
+            //        return elem;
+            //    }
 
-                foreach (var child in elem.Children)
-                    next.Enqueue(child);
-            }
+            //    foreach (var child in elem.Children)
+            //        next.Enqueue(child);
+            //}
 
-            return null;
+            var next = FindNextFocus();
+            if (next != null)
+                next.HasFocus = true;
+            return next;
         }
 
         /// <summary>
