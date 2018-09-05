@@ -36,7 +36,7 @@ List {
         };
 
         Static {
-            Size: [100 20];
+            Size: [100 30];
             HorizontalAlignment: Alignment.Middle;
             Text: "Close";
             OnClickCommand: "$Close";

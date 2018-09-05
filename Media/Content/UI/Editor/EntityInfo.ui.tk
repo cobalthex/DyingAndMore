@@ -16,7 +16,6 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [300 20];
         };
 
         Static { Text: "Class"; };
@@ -28,7 +27,6 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [300 20];
         };
 
         Static { Text: "ID"; };
@@ -40,7 +38,6 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [300 20];
         };
 
         Static { Text: "Is Alive"; };
@@ -52,7 +49,6 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [300 20];
         };
 
         #*
@@ -65,7 +61,6 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [300 20];
         };
         *#
 
@@ -111,7 +106,6 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [300 20];
         };
 
         Static { Text: "Controller"; };
@@ -123,9 +117,8 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [300 20];
         };
-        
+
         Static { Text: "Weapon"; };
         Static {
             Bindings: [
@@ -135,7 +128,6 @@ Table {
                 }
             ];
             AutoSizeOnBindingUpdate: true;
-            Size: [300 20];
         };
     ];
 }

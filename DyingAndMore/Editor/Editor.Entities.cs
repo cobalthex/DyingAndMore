@@ -211,6 +211,7 @@ namespace DyingAndMore.Editor
                 {
                     entEditor.BindTo(SelectedEntity);
                     entEditor.BindCommands("$Close", (obj) => entEditor.RemoveFromParent());
+                    entEditor.FocusFirstAvailable();
                     AddChild(entEditor);
                     return false;
                 }

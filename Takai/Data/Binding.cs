@@ -91,6 +91,7 @@ namespace Takai.Data
 
         /// <summary>
         /// Bind to an object
+        /// Does not call <see cref="Update"/>
         /// </summary>
         /// <param name="sourceObj">The backing object to bind against</param>
         /// <param name="targetObj">The object to send/recieve data to/from the source</param>
@@ -101,7 +102,6 @@ namespace Takai.Data
 
             sourceAccessors = GetAccessors(Source, sourceObj);
             targetAccessors = GetAccessors(Target, targetObj);
-            Update();
 
             //todo: need to clear values of nulls
         }
@@ -111,7 +111,6 @@ namespace Takai.Data
             //todo: message when binding not found
 
             GetSet getset;
-
             if (binding.StartsWith("$", StringComparison.OrdinalIgnoreCase))
             {
                 var bindName = binding.Substring("$".Length);
