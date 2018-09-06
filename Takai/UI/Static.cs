@@ -305,44 +305,6 @@ namespace Takai.UI
         /// </summary>
         public bool IsEnabled { get; set; } = true;
 
-        #region Events
-
-        /// <summary>
-        /// Can this element be focused
-        /// </summary>
-        [Data.Serializer.Ignored]
-        public virtual bool CanFocus { get => Click != null || clickCommandFn != null; }
-
-        /// <summary>
-        /// Called whenever the element has its parent changed
-        /// </summary>
-        public event System.EventHandler<ParentChangedEventArgs> ParentChanged = null;
-        protected virtual void OnParentChanged(ParentChangedEventArgs e) { }
-
-        /// <summary>
-        /// Called whenever the element is pressed.
-        /// </summary>
-        public event System.EventHandler<ClickEventArgs> Press = null;
-        protected virtual void OnPress(ClickEventArgs e) { }
-
-        /// <summary>
-        /// Called whenever the element is clicked (mouse just released).
-        /// By default, whether or not there is a click handler determines if this is focusable
-        /// </summary>
-        public event System.EventHandler<ClickEventArgs> Click = null;
-        protected virtual void OnClick(ClickEventArgs e) { }
-
-        public string OnClickCommand { get; set; }
-        protected Command clickCommandFn;
-
-        /// <summary>
-        /// Called whenever the size of this element is updated
-        /// </summary>
-        public event System.EventHandler Resize = null;
-        protected virtual void OnResize(System.EventArgs e) { }
-
-        #endregion
-
         /// <summary>
         /// Disable the default behavior of the tab key
         /// </summary>
@@ -403,6 +365,44 @@ namespace Takai.UI
         /// Autosize this element if any of the bindings is refreshed
         /// </summary>
         public bool AutoSizeOnBindingUpdate { get; set; }
+
+        #endregion
+
+        #region Events
+
+        /// <summary>
+        /// Can this element be focused
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public virtual bool CanFocus { get => Click != null || clickCommandFn != null; }
+
+        /// <summary>
+        /// Called whenever the element has its parent changed
+        /// </summary>
+        public event System.EventHandler<ParentChangedEventArgs> ParentChanged = null;
+        protected virtual void OnParentChanged(ParentChangedEventArgs e) { }
+
+        /// <summary>
+        /// Called whenever the element is pressed.
+        /// </summary>
+        public event System.EventHandler<ClickEventArgs> Press = null;
+        protected virtual void OnPress(ClickEventArgs e) { }
+
+        /// <summary>
+        /// Called whenever the element is clicked (mouse just released).
+        /// By default, whether or not there is a click handler determines if this is focusable
+        /// </summary>
+        public event System.EventHandler<ClickEventArgs> Click = null;
+        protected virtual void OnClick(ClickEventArgs e) { }
+
+        public string OnClickCommand { get; set; }
+        protected Command clickCommandFn;
+
+        /// <summary>
+        /// Called whenever the size of this element is updated
+        /// </summary>
+        public event System.EventHandler Resize = null;
+        protected virtual void OnResize(System.EventArgs e) { }
 
         #endregion
 
@@ -1002,6 +1002,7 @@ namespace Takai.UI
                 if (child.IsEnabled)
                     child.Reflow();
             }
+
         }
 
         protected void ResizeAndReflow()
@@ -1010,7 +1011,7 @@ namespace Takai.UI
 
             OnResize(System.EventArgs.Empty);
             Resize?.Invoke(this, System.EventArgs.Empty);
-            Parent?.OnChildResized(this);
+            Parent?.OnChildReflow(this);
         }
 
         /// <summary>
@@ -1064,7 +1065,7 @@ namespace Takai.UI
         /// Called by a child when it resizes, this element can resize in relation
         /// </summary>
         /// <param name="child">The child element that resized</param>
-        protected virtual void OnChildResized(Static child) { }
+        protected virtual void OnChildReflow(Static child) { }
 
         /// <summary>
         /// Automatically size this element. By default, will size based on text and children
