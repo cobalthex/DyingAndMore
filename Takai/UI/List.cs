@@ -94,10 +94,10 @@ namespace Takai.UI
             base.Reflow();
         }
 
-        protected override void OnChildResized(Static child)
+        protected override void OnChildReflow(Static child)
         {
             Reflow();
-            base.OnChildResized(child);
+            base.OnChildReflow(child);
         }
     }
 }
