@@ -127,10 +127,11 @@ namespace Takai.Data
                 Serialize = (object value) => LinearStruct,
                 Deserialize = (object value, DeserializationContext cxt) =>
                 {
-                    var v = (List<object>)value;
-                    var x = (float)Convert.ChangeType(v[0], typeof(float));
-                    var y = (float)Convert.ChangeType(v[1], typeof(float));
-                    return new Vector2(x, y);
+                    if (value is double d)
+                        return new Vector2((float)d);
+                    if (value is long l)
+                        return new Vector2((float)l);
+                    return DefaultAction;
                 }
             };
 

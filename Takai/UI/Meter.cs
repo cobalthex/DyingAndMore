@@ -30,9 +30,9 @@ namespace Takai.UI
             sbatch = new SpriteBatch(Runtime.GraphicsDevice);
         }
 
-        public override void AutoSize(float padding = 0)
+        public override void AutoSize()
         {
-            Size = (Sprite?.Size.ToVector2() ?? new Vector2(1)) + new Vector2(padding);
+            Size = (Sprite?.Size.ToVector2() ?? new Vector2(1));
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

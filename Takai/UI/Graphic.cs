@@ -13,9 +13,9 @@ namespace Takai.UI
         /// </summary>
         public bool DrawXIfMissingSprite { get; set; } = false;
 
-        public override void AutoSize(float padding = 0)
+        public override void AutoSize()
         {
-            Size = (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2()) + new Vector2(padding);
+            Size = (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2());
         }
 
         protected override void UpdateSelf(GameTime time)

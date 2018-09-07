@@ -29,9 +29,10 @@ namespace DyingAndMore.Editor
             {
                 Text = "Close",
                 HorizontalAlignment = Alignment.Stretch,
-                BorderColor = Color.White
+                BorderColor = Color.White,
+                Padding = new Vector2(10)
             };
-            closeButton.AutoSize(10);
+            closeButton.AutoSize();
             closeButton.Click += delegate { triggerSettings.RemoveFromParent(); };
 
             var label = new Static { Text = "Name" };

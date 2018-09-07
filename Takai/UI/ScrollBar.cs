@@ -273,7 +273,7 @@ namespace Takai.UI
             foreach (var child in contentArea.Children)
             {
                 if (child.IsEnabled)
-                    bounds = Rectangle.Union(bounds, child.Bounds);
+                    bounds = Rectangle.Union(bounds, child.Dimensions);
             }
 
             horizontalScrollbar.ContentSize = bounds.Width;

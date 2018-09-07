@@ -5,7 +5,7 @@ List {
     VerticalAlignment: Alignment.Middle;
     BackgroundColor: [20 20 20 192];
     Margin: 10;
-    AutoSize: 10;
+    Padding: 10;
 
     Children: [
         Scrollbox {

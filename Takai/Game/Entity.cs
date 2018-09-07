@@ -153,6 +153,10 @@ namespace Takai.Game
         /// The name of this entity's class
         /// </summary>
         public string ClassName => Class?.Name;
+        /// <summary>
+        /// The file that this entity's class was created from
+        /// </summary>
+        public string ClassFile => Class?.File;
 
         /// <summary>
         /// A name for this instance, should be unique

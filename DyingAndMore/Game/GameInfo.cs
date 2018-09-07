@@ -130,6 +130,7 @@ namespace DyingAndMore.Game
         }
     }
 
+    //todo: convert to ItemList?
     public class StorySelect : List
     {
         public event EventHandler<GameStory> StorySelected;
@@ -154,13 +155,14 @@ namespace DyingAndMore.Game
                         {
                             Direction = Direction.Vertical,
                             HorizontalAlignment = Alignment.Stretch,
-                            Margin = 10,
                             BorderColor = Microsoft.Xna.Framework.Color.White,
+                            Margin = 10,
+                            Padding = new Microsoft.Xna.Framework.Vector2(10)
                         };
                         ui.AddChild(new Static(story.Name));
                         ui.AddChild(new Static(story.Description));
                         ui.AddChild(new Static($"{story.MapFiles.Length} map{(story.MapFiles.Length == 1 ? "" : "s")}"));
-                        ui.AutoSize(10);
+                        ui.AutoSize();
                         ui.Click += delegate
                         {
                             StorySelected?.Invoke(this, story);
@@ -173,7 +175,9 @@ namespace DyingAndMore.Game
         }
         private string _directory;
 
-        public StorySelect(string searchDirectory = "Stories")
+        public StorySelect() : this("Stories") { }
+
+        public StorySelect(string searchDirectory)
         {
             Directory = searchDirectory;
         }

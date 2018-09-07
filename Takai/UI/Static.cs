@@ -223,17 +223,32 @@ namespace Takai.UI
         }
         private Vector2 _size = Vector2.One;
 
+        public Vector2 Padding
+        {
+            get => _padding;
+            set
+            {
+                if (_padding != value)
+                {
+                    _padding = value;
+                    ResizeAndReflow();
+                }
+            }
+        }
+        private Vector2 _padding = Vector2.Zero;
+
         /// <summary>
-        /// The bounds of this static, calculated from <see cref="Position"/> and <see cref="Size"/>
+        /// The dimensions of this static, calculated from <see cref="Position"/> and <see cref="Size"/>
+        /// Use <see cref="Bounds"> when calculating sizes of elements
         /// </summary>
-        /// <seealso cref="VirtualBounds"/>
+        /// <seealso cref="AbsoluteDimensions"/>
         /// <seealso cref="VisibleBounds"/>
-        public Rectangle Bounds
+        public Rectangle Dimensions
         {
             get => new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
             set
             {
-                if (Bounds != value)
+                if (Dimensions != value)
                 {
                     _position = new Vector2(value.X, value.Y);
                     _size = new Vector2(value.Width, value.Height);
@@ -243,17 +258,20 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Bounds relative to the outermost container (can be outside the parent)
+        /// dimensions relative to the outermost container (can be outside the parent)
+        /// This is adjusted by (but does not include) <see cref="Padding"/>
+        /// This should be used when drawing inside the element
         /// </summary>
         /// <seealso cref="VisibleBounds"/>
         [Data.Serializer.Ignored]
-        public Rectangle VirtualBounds
+        public Rectangle AbsoluteDimensions
         {
             get;
             private set;
         }
         /// <summary>
-        /// <see cref="VirtualBounds"/> clipped to the parent
+        /// Inclusive bounds <see cref="AbsoluteDimensions"/> clipped to the parent
+        /// This includes <see cref="Padding"/>
         /// </summary>
         [Data.Serializer.Ignored]
         protected Rectangle VisibleBounds
@@ -261,6 +279,17 @@ namespace Takai.UI
             get;
             private set;
         }
+
+        /// <summary>
+        /// The bounds of this object, including <see cref="Padding"/>
+        /// This should be used when determining the inclusive size of an element
+        /// </summary>
+        public Rectangle Bounds => new Rectangle(
+            (int)(Dimensions.X - Padding.X),
+            (int)(Dimensions.Y - Padding.Y),
+            (int)(Dimensions.Width + Padding.X * 2),
+            (int)(Dimensions.Height + Padding.Y * 2)
+        ); //todo: cache?
 
         /// <summary>
         /// Does this element currently have focus?
@@ -425,11 +454,11 @@ namespace Takai.UI
         /// Create a simple static label. Calls <see cref="AutoSize(float)"/>
         /// </summary>
         /// <param name="text">The text to set</param>
-        public Static(string text, float padding = 0)
+        public Static(string text)
             : this()
         {
             Text = text;
-            AutoSize(padding);
+            AutoSize();
         }
 
         /// <summary>
@@ -853,7 +882,7 @@ namespace Takai.UI
                 var top = stack.Pop();
                 if (top != this && top.CanFocus && top.IsEnabled)
                 {
-                    var diff = (top.VirtualBounds.Location - VirtualBounds.Location).ToVector2();
+                    var diff = (top.AbsoluteDimensions.Location - AbsoluteDimensions.Location).ToVector2();
 
                     var dot = Vector2.Dot(direction, Vector2.Normalize(diff));
                     if (dot >= bias)
@@ -968,11 +997,21 @@ namespace Takai.UI
         #region Sizing
 
         /// <summary>
+        /// Is this element in a reflow currently?
+        /// Used to prevent <see cref="OnChildReflow"/> from getting stuck in a loop
+        /// </summary>
+        bool isReflowing = false;
+
+        /// <summary>
         /// Reflow child elements relative to this element
         /// Called whenever this element's position or size is adjusted
         /// </summary>
         public virtual void Reflow()
         {
+            if (isReflowing)
+                return;
+
+            isReflowing = true;
             //todo: ResizeSelf and make stack based?
 
             if (Parent != null &&
@@ -982,12 +1021,13 @@ namespace Takai.UI
                 if (HorizontalAlignment == Alignment.Stretch)
                 {
                     _position.X = 0;
-                    _size.X = Parent.Size.X;
+                    _size.X = Parent.Size.X - Padding.X * 2;
+                    //todo: padding
                 }
                 if (VerticalAlignment == Alignment.Stretch)
                 {
                     _position.Y = 0;
-                    _size.Y = Parent.Size.Y;
+                    _size.Y = Parent.Size.Y - Padding.Y * 2;
                 }
                 CalculateBounds();
 
@@ -1002,6 +1042,9 @@ namespace Takai.UI
                 if (child.IsEnabled)
                     child.Reflow();
             }
+
+            Parent?.OnChildReflow(this);
+            isReflowing = false;
         }
 
         protected void ResizeAndReflow()
@@ -1010,7 +1053,6 @@ namespace Takai.UI
 
             OnResize(System.EventArgs.Empty);
             Resize?.Invoke(this, System.EventArgs.Empty);
-            Parent?.OnChildResized(this);
         }
 
         /// <summary>
@@ -1021,57 +1063,76 @@ namespace Takai.UI
         public virtual Rectangle CalculateBounds(Rectangle container)
         {
             var pos = new Vector2();
+            var size = Size;
 
             switch (HorizontalAlignment)
             {
                 case Alignment.Start:
-                    pos.X = Position.X;
+                case Alignment.Stretch:
+                    pos.X = Position.X + Padding.X;
                     break;
                 case Alignment.Middle:
-                    pos.X = (container.Width - Size.X) / 2 + Position.X;
+                    pos.X = (container.Width - Size.X) / 2 + Position.X; //todo: padding (and Y)
                     break;
                 case Alignment.End:
-                    pos.X = (container.Width - Size.X) - Position.X;
+                    pos.X = container.Width - Size.X - Position.X - Padding.X;
                     break;
             }
             switch (VerticalAlignment)
             {
                 case Alignment.Start:
-                    pos.Y = Position.Y;
+                case Alignment.Stretch:
+                    pos.Y = Position.Y + Padding.Y;
                     break;
                 case Alignment.Middle:
-                    pos.Y = (container.Height - Size.Y) / 2 + Position.Y;
+                    pos.Y = (container.Height - Size.Y) / 2;
                     break;
                 case Alignment.End:
-                    pos.Y = (container.Height - Size.Y) - Position.Y;
+                    pos.Y = (container.Height - Size.Y) - Position.Y - Padding.Y;
                     break;
             }
 
-            return new Rectangle((int)pos.X + container.X, (int)pos.Y + container.Y, (int)Size.X, (int)Size.Y);
+            return new Rectangle(
+                (int)pos.X + container.X,
+                (int)pos.Y + container.Y,
+                (int)size.X,
+                (int)size.Y
+            );
         }
 
         protected void CalculateBounds()
         {
-            VirtualBounds = Parent != null
-                ? CalculateBounds(Parent.VirtualBounds)
-                : new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
+            //todo: rename InternalSize, OffsetInternalSize, ExternalSize (dimensions)
+
+            AbsoluteDimensions = Parent != null
+                ? CalculateBounds(Parent.AbsoluteDimensions)
+                : new Rectangle(
+                    (int)(Position.X + Padding.X),
+                    (int)(Position.Y + Padding.Y),
+                    (int)(Size.X - Padding.X * 2),
+                    (int)(Size.Y - Padding.Y * 2)
+                );
+
+            var virBnd = AbsoluteDimensions;
+            virBnd.Inflate(Padding.X, Padding.Y);
+
             VisibleBounds = Parent != null
-                ? Rectangle.Intersect(Parent.VisibleBounds, VirtualBounds)
-                : VirtualBounds;
+                ? Rectangle.Intersect(Parent.VisibleBounds, virBnd)
+                : Bounds;
         }
 
         /// <summary>
-        /// Called by a child when it resizes, this element can resize in relation
+        /// Called by a child when it reflows, this element can reflow/resize in relation
         /// </summary>
-        /// <param name="child">The child element that resized</param>
-        protected virtual void OnChildResized(Static child) { }
+        /// <param name="child">The child element that reflowed</param>
+        protected virtual void OnChildReflow(Static child) { }
 
         /// <summary>
         /// Automatically size this element. By default, will size based on text and children
         /// This does not affect the position of the element
         /// Padding affects child positioning
         /// </summary>
-        public virtual void AutoSize(float padding = 0)
+        public virtual void AutoSize()
         {
             //todo: maybe make padding an actual property
             var bounds = new Rectangle((int)Position.X, (int)Position.Y, (int)textSize.X, (int)textSize.Y);
@@ -1080,13 +1141,9 @@ namespace Takai.UI
                 if (!child.IsEnabled)
                     continue;
 
-                if (child.HorizontalAlignment != Alignment.Middle)
-                    child.Position += new Vector2(padding, 0);
-                if (child.VerticalAlignment != Alignment.Middle)
-                    child.Position += new Vector2(0, padding);
-                bounds = Rectangle.Union(bounds, child.Bounds);
+                bounds = Rectangle.Union(bounds, child.Dimensions);
             }
-            Size = new Vector2(bounds.Width, bounds.Height) + new Vector2(padding);
+            Size = new Vector2(bounds.Width, bounds.Height);
         }
 
         #endregion
@@ -1303,8 +1360,8 @@ namespace Takai.UI
 
                 if (DebugFont != null && toDraw.VisibleBounds.Contains(Input.InputState.MousePoint))
                 {
-                    var rect = toDraw.VisibleBounds;
-                    rect.Inflate(1, 1);
+                    var rect = toDraw.AbsoluteDimensions;
+                    rect.Inflate(1 + toDraw.Padding.X, 1 + toDraw.Padding.Y);
                     Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, rect);
 
                     string info = $"Name: {(Name ?? "(No name)")}\nBounds: {rect}";
@@ -1338,21 +1395,15 @@ namespace Takai.UI
             if (Font == null || Text == null)
                 return;
 
-            position += VirtualBounds.Location - VisibleBounds.Location;
-            Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleBounds, position, Color);
+            //position += AbsoluteDimensions.Location - VisibleBounds.Location;
+            Font.Draw(spriteBatch, Text, 0, Text.Length, AbsoluteDimensions, position, Color);
         }
 
         public virtual void DerivedDeserialize(Dictionary<string, object> props)
         {
-            if (props.TryGetValue("AutoSize", out var autoSize))
-            {
-                if (autoSize is System.Int64 autoSizeInt)
-                    AutoSize(autoSizeInt);
-                else if (autoSize is double autoSizeFloat)
-                    AutoSize((float)autoSizeFloat);
-                else if (autoSize is bool doAutoSize)
-                    AutoSize();
-            }
+            if (props.TryGetValue("AutoSize", out var autoSize) && autoSize is bool doAutoSize)
+                AutoSize();
+
             else if (!(props.ContainsKey("Bounds") ||
                        props.ContainsKey("Size")))
                 AutoSize();

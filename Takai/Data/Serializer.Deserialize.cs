@@ -472,11 +472,11 @@ namespace Takai.Data
                     SkipIgnored(context.reader);
                     var staticVal = ReadWord(context.reader);
 
-                    var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveIdentifiers ? BindingFlags.IgnoreCase : 0));
+                    var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveIdentifiers ? 0 :  BindingFlags.IgnoreCase));
                     if (field != null)
                         return field.GetValue(null);
 
-                    var prop = type.GetProperty(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveIdentifiers ? BindingFlags.IgnoreCase : 0));
+                    var prop = type.GetProperty(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveIdentifiers ? 0 : BindingFlags.IgnoreCase));
                     if (prop != null)
                         return prop.GetValue(null);
 
@@ -757,7 +757,11 @@ namespace Takai.Data
                 return source;
 
             if (Serializers.TryGetValue(destType, out var deserial) && deserial.Deserialize != null)
-                return deserial.Deserialize(source, context);
+            {
+                var deserialized = deserial.Deserialize(source, context);
+                if (deserialized != DefaultAction)
+                    return deserialized;
+            }
 
             var customDeserial = destTypeInfo.GetCustomAttribute<CustomDeserializeAttribute>(false)?.deserialize;
             if (customDeserial != null)
