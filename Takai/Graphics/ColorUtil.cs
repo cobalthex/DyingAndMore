@@ -5,6 +5,19 @@ namespace Takai.Graphics
 {
     public static class ColorUtil
     {
+        public static Color Random(bool randomAlpha = false)
+        {
+            byte[] randCol = new byte[4];
+            Util.RandomGenerator.NextBytes(randCol);
+
+            return new Color(
+                randCol[0],
+                randCol[1],
+                randCol[2],
+                randomAlpha ? randCol[3] : (byte)255
+            );
+        }
+
         public static Vector4 HSLReverseLerp(Vector4 a, Vector4 b, float t)
         {
             return new Vector4(

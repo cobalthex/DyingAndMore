@@ -71,7 +71,7 @@ namespace Takai.UI
         {
             if (isDropdownOpen)
             {
-                if (Input.InputState.IsPress(Input.MouseButtons.Left) && !dropdown.VirtualBounds.Contains(Input.InputState.MousePoint))
+                if (Input.InputState.IsPress(Input.MouseButtons.Left) && !dropdown.AbsoluteDimensions.Contains(Input.InputState.MousePoint))
                     isDropdownOpen = false;
                 return false;
             }

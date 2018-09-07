@@ -149,9 +149,10 @@ namespace Takai.UI
                 Text = value.ToString(),
                 Font = Font,
                 Color = Color,
+                Padding = new Vector2(ItemPadding) //todo: revisit
                 //HorizontalAlignment = Alignment.Stretch //todo: configurable (item templates?)
             };
-            item.AutoSize(ItemPadding);
+            item.AutoSize();
             item.Click += delegate (object sender, ClickEventArgs e)
             {
                 var which = (Static)sender;

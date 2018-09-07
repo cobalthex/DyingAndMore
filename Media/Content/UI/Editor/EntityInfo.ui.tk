@@ -5,6 +5,7 @@ Table {
     VerticalAlignment: Alignment.Bottom;
     ColumnCount: 2;
     Margin: [10 2];
+    Width: 300;
 
     Children: [
         Static { Text: "Name"; };
@@ -26,6 +27,18 @@ Table {
                     Target: "Text";
                 }
             ];
+            AutoSizeOnBindingUpdate: true;
+        };
+
+        Static { Text: "File"; };
+        Static {
+            Bindings: [
+                {
+                    Source: "ClassFile";
+                    Target: "Text";
+                }
+            ];
+            Size: [60 20];
             AutoSizeOnBindingUpdate: true;
         };
 
@@ -79,8 +92,8 @@ Table {
                             Mode: BindingMode.OneWay;
                         }
                     ];
-                    AutoSizeOnBindingUpdate: true;
                     Size: [60 20];
+                    AutoSizeOnBindingUpdate: true;
                  };
                 Static { Text: "/"; };
                 Static {
@@ -91,8 +104,8 @@ Table {
                             Mode: BindingMode.OneWay;
                         }
                     ];
-                    AutoSizeOnBindingUpdate: true;
                     Size: [60 20];
+                    AutoSizeOnBindingUpdate: true;
                  };
             ];
         };

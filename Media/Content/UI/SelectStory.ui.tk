@@ -1,4 +1,53 @@
+#*
+List {
+	Name: "Lost";
+	Size: [400 400];
+	Padding: [5 5];
+	Margin: 10;
+	BorderColor: color.Red;
+	HorizontalAlignment: Alignment.Middle;
+	VerticalAlignment: Alignment.Middle;
+	BackgroundColor: [80 80 128 255];
+	Direction: Direction.Vertical;
+
+	Children: [
+		Static {
+			Name: "A";
+			Text: "asdf";
+			Padding: [10 10];
+			BorderColor: color.Black;
+			BackgroundColor: [0 238 255 255];
+
+			OnClickCommand: 'asdf';
+		};
+
+		CheckBox {
+			Name: "B";
+			Text: "moo";
+			BorderColor: color.Green;
+			Padding: [20 20];
+			OnClickCommand: 'asdf';
+		}
+
+		TextInput {
+			Name: "C";
+			padding: 10;
+		}
+
+		Static {
+			Name: "D";
+			Text: "xyzzy xyzzy xyzzy xyzzy xyzzy xyzzy xyzzy xyzzy xyzzy xyzzy xyzzy";
+			BackgroundColor: Color.Tomato;
+			Height: 100;
+			HorizontalAlignment: Alignment.Stretch;
+			Padding: [20 20];
+		}
+	]
+}
+*#
+
 StorySelect {
+	Width: 400;
     Margin: 10;
     Direction: Direction.Vertical;
     HorizontalAlignment: Alignment.Middle;

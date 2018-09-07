@@ -89,9 +89,10 @@ namespace DyingAndMore.Editor
             {
                 Text = mode.Name,
                 Font = ActiveFont,
-                Color = InactiveColor
+                Color = InactiveColor,
+                Padding = new Vector2(20)
             };
-            tab.AutoSize(padding: 20);
+            tab.AutoSize();
             tab.Font = InactiveFont;
 
             tab.Click += delegate

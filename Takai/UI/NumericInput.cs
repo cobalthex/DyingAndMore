@@ -174,14 +174,14 @@ namespace Takai.UI
             base.OnValueChanged(e);
         }
 
-        public override void AutoSize(float padding = 0)
+        public override void AutoSize()
         {
-            textInput.AutoSize(padding);
+            textInput.AutoSize();
             var btnSize = textInput.Size.Y;
             upButton.Size = downButton.Size = new Vector2(btnSize);
 
             Size = textInput.Size + new Vector2(btnSize * 2, 0);
-            base.AutoSize(padding);
+            base.AutoSize();
         }
 
         protected override void OnResize(EventArgs e)

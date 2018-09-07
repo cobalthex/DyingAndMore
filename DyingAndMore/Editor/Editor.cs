@@ -106,9 +106,10 @@ namespace DyingAndMore.Editor
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.Middle,
                 Font = smallFont,
-                Text = "> PLAY >"
+                Text = "> PLAY >",
+                Padding = new Vector2(20)
             });
-            playButton.AutoSize(20);
+            playButton.AutoSize();
             playButton.Click += delegate
             {
                 SwitchToGame();

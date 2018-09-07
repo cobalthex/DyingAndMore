@@ -7,6 +7,8 @@ namespace Takai.UI
 {
     public class TextInput : Static
     {
+        //todo: native input prompt
+
         /// <summary>
         /// The char to draw characters in the password field with
         /// </summary>
@@ -166,12 +168,9 @@ namespace Takai.UI
             Caret = Text.Length;
         }
 
-        public override void AutoSize(float padding = 0)
+        public override void AutoSize()
         {
-            Size = new Vector2(
-                200,
-                (Font?.MaxCharHeight ?? 10) + padding
-            );
+            Size = new Vector2(200, (Font?.MaxCharHeight ?? 20));
         }
 
         protected int FindNextWordStart()
@@ -382,8 +381,8 @@ namespace Takai.UI
             if (Font != null)
             {
                 var size = new Point(
-                    System.Math.Min(VisibleBounds.Width - 4, (int)textSize.X),
-                    System.Math.Min(VisibleBounds.Height, (int)textSize.Y)
+                    System.Math.Min(AbsoluteDimensions.Width - 4, (int)textSize.X),
+                    System.Math.Min(AbsoluteDimensions.Height, (int)textSize.Y)
                 );
 
                 DrawText(spriteBatch,
@@ -392,12 +391,12 @@ namespace Takai.UI
                 var tickCount = System.Environment.TickCount;
                 if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
                 {
-                    var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + VisibleBounds.X + 3;
+                    var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + AbsoluteDimensions.X + 3;
                     Graphics.Primitives2D.DrawLine(
                         spriteBatch,
                         Color,
-                        new Vector2(x, VisibleBounds.Top + 4),
-                        new Vector2(x, VisibleBounds.Bottom - 4)
+                        new Vector2(x, AbsoluteDimensions.Top + 4),
+                        new Vector2(x, AbsoluteDimensions.Bottom - 4)
                     );
                 }
             }

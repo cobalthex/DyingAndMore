@@ -30,7 +30,7 @@ namespace Takai.UI
             float t = 0;
 
             int stretched = 0;
-            float size = Direction == Direction.Horizontal ? Size.X : Size.Y;
+            float size = Direction == Direction.Horizontal ? Bounds.Width : Bounds.Height;
             foreach (var child in Children)
             {
                 if (!child.IsEnabled)
@@ -44,9 +44,9 @@ namespace Takai.UI
                 else
                 {
                     if (Direction == Direction.Horizontal)
-                        size -= child.Size.X;
+                        size -= child.Bounds.Width;
                     else if (Direction == Direction.Vertical)
-                        size -= child.Size.Y;
+                        size -= child.Bounds.Height;
                 }
             }
             size /= stretched;
@@ -72,7 +72,7 @@ namespace Takai.UI
                     if (child.HorizontalAlignment == Alignment.Stretch)
                         child.Size = new Vector2(size, child.Size.Y);
 
-                    t += child.Size.X;
+                    t += child.Bounds.Width;
                 }
                 else if (Direction == Direction.Vertical)
                 {
@@ -80,11 +80,13 @@ namespace Takai.UI
                     if (child.VerticalAlignment == Alignment.Stretch)
                         child.Size = new Vector2(child.Size.X, size);
 
-                    t += child.Size.Y;
+                    t += child.Bounds.Height;
                 }
 
                 child.Position = position;
             }
+
+            //AutoSize(); //testing
 
             //todo: stretched elements
 
@@ -94,10 +96,10 @@ namespace Takai.UI
             base.Reflow();
         }
 
-        protected override void OnChildResized(Static child)
+        protected override void OnChildReflow(Static child)
         {
             Reflow();
-            base.OnChildResized(child);
+            base.OnChildReflow(child);
         }
     }
 }

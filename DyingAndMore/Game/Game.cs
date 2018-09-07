@@ -29,9 +29,6 @@ namespace DyingAndMore.Game
         public InputMap<Entities.InputAction> inputs;
         public Camera camera;
 
-        //debug
-        Entities.Controller lastController;
-
         public PlayerInstance(Entities.ActorInstance actor, Rectangle viewport)
         {
             inputs = new InputMap<Entities.InputAction>();

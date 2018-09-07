@@ -10,7 +10,6 @@ ProjectileClass {
     InheritSourcePhysics: false;
     Damage: 15;
 
-    #*
     Trail: {
         #MaxPoints: 20;
         LifeSpan: 0.25sec;
@@ -32,7 +31,6 @@ ProjectileClass {
             ]
         }
     }
-    *#
 
     Animations: {
         Dead: {
@@ -45,7 +43,7 @@ ProjectileClass {
             };
             Material: "Needle";
 
-            #*Effect: {
+            Effect: {
                 Effects: [
                     ParticleEffect {
                         Class: {
@@ -53,27 +51,21 @@ ProjectileClass {
                                 Texture: @"Effects/trailglow.png";
                             };
                             Blend: BlendState.Additive;
-                            ColorOverTime: {
-                                Values: [
-                                    [0 [255 0 255 255]];
-                                    [1 [255 0 255 0]];
-                                ];
-                            };
+                            ColorOverTime: Color.Tomato;
                             ScaleOverTime: {
                                 values: [
                                     [0 1];
                                     [1 0.1];
                                 ];
                             };
-                            InitialSpeed: [-50 -100];
-                            LifeSpan: [0.25sec 0.85sec];
+                            LifeSpan: [0.15sec 0.65sec];
                             Drag: 5;
                         }
                         Count: [-20 1];
                         Spread: [-30deg 30deg];
                     };
                 ]
-            }*#
+            }
         }
     }
 }
