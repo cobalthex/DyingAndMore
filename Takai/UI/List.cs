@@ -30,7 +30,7 @@ namespace Takai.UI
             float t = 0;
 
             int stretched = 0;
-            float size = Direction == Direction.Horizontal ? Bounds.Width : Bounds.Height;
+            float size = Direction == Direction.Horizontal ? ExternalBounds.Width : ExternalBounds.Height;
             foreach (var child in Children)
             {
                 if (!child.IsEnabled)
@@ -44,9 +44,9 @@ namespace Takai.UI
                 else
                 {
                     if (Direction == Direction.Horizontal)
-                        size -= child.Bounds.Width;
+                        size -= child.ExternalBounds.Width;
                     else if (Direction == Direction.Vertical)
-                        size -= child.Bounds.Height;
+                        size -= child.ExternalBounds.Height;
                 }
             }
             size /= stretched;
@@ -72,7 +72,7 @@ namespace Takai.UI
                     if (child.HorizontalAlignment == Alignment.Stretch)
                         child.Size = new Vector2(size, child.Size.Y);
 
-                    t += child.Bounds.Width;
+                    t += child.ExternalBounds.Width;
                 }
                 else if (Direction == Direction.Vertical)
                 {
@@ -80,7 +80,7 @@ namespace Takai.UI
                     if (child.VerticalAlignment == Alignment.Stretch)
                         child.Size = new Vector2(child.Size.X, size);
 
-                    t += child.Bounds.Height;
+                    t += child.ExternalBounds.Height;
                 }
 
                 child.Position = position;
