@@ -181,8 +181,8 @@ namespace DyingAndMore
 
         protected override void OnResize(EventArgs e)
         {
-            assets.Dimensions = new Xna.Rectangle(0, 0, 240, (int)Size.Y);
-            view.Dimensions = new Xna.Rectangle(240, 0, (int)Size.X - 240, (int)Size.Y);
+            assets.InternalBounds = new Xna.Rectangle(0, 0, 240, (int)Size.Y);
+            view.InternalBounds = new Xna.Rectangle(240, 0, (int)Size.X - 240, (int)Size.Y);
         }
     }
 }

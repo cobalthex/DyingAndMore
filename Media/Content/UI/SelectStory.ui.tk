@@ -1,7 +1,7 @@
-#*
+
 List {
 	Name: "Lost";
-	Size: [400 400];
+	Width: 400;
 	Padding: [5 5];
 	Margin: 10;
 	BorderColor: color.Red;
@@ -42,9 +42,19 @@ List {
 			HorizontalAlignment: Alignment.Stretch;
 			Padding: [20 20];
 		}
+
+		Static {
+			Name: "E";
+			Text: "%^&*";
+			BackgroundColor: Color.Orange;
+			Height: 100;
+			Width: 200;
+			HorizontalAlignment: Alignment.Middle;
+			Padding: [20 20];
+		}
 	]
 }
-*#
+
 
 StorySelect {
 	Width: 400;

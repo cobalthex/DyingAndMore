@@ -90,7 +90,7 @@ namespace DyingAndMore.Editor
                 Text = mode.Name,
                 Font = ActiveFont,
                 Color = InactiveColor,
-                Padding = new Vector2(20)
+                Padding = new Vector2(20, 10)
             };
             tab.AutoSize();
             tab.Font = InactiveFont;

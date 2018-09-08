@@ -239,16 +239,16 @@ namespace Takai.UI
 
         /// <summary>
         /// The dimensions of this static, calculated from <see cref="Position"/> and <see cref="Size"/>
-        /// Use <see cref="Bounds"> when calculating sizes of elements
+        /// Use <see cref="ExternalBounds"> when calculating sizes of elements
         /// </summary>
-        /// <seealso cref="AbsoluteDimensions"/>
+        /// <seealso cref="OffsetInternalBounds"/>
         /// <seealso cref="VisibleBounds"/>
-        public Rectangle Dimensions
+        public Rectangle InternalBounds
         {
             get => new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
             set
             {
-                if (Dimensions != value)
+                if (InternalBounds != value)
                 {
                     _position = new Vector2(value.X, value.Y);
                     _size = new Vector2(value.Width, value.Height);
@@ -264,17 +264,7 @@ namespace Takai.UI
         /// </summary>
         /// <seealso cref="VisibleBounds"/>
         [Data.Serializer.Ignored]
-        public Rectangle AbsoluteDimensions
-        {
-            get;
-            private set;
-        }
-        /// <summary>
-        /// Inclusive bounds <see cref="AbsoluteDimensions"/> clipped to the parent
-        /// This includes <see cref="Padding"/>
-        /// </summary>
-        [Data.Serializer.Ignored]
-        protected Rectangle VisibleBounds
+        public Rectangle OffsetInternalBounds
         {
             get;
             private set;
@@ -283,13 +273,26 @@ namespace Takai.UI
         /// <summary>
         /// The bounds of this object, including <see cref="Padding"/>
         /// This should be used when determining the inclusive size of an element
+        /// This is relative to the parent
         /// </summary>
-        public Rectangle Bounds => new Rectangle(
-            (int)(Dimensions.X - Padding.X),
-            (int)(Dimensions.Y - Padding.Y),
-            (int)(Dimensions.Width + Padding.X * 2),
-            (int)(Dimensions.Height + Padding.Y * 2)
+        public Rectangle ExternalBounds => new Rectangle(
+            (int)(InternalBounds.X - Padding.X),
+            (int)(InternalBounds.Y - Padding.Y),
+            (int)(InternalBounds.Width + Padding.X * 2),
+            (int)(InternalBounds.Height + Padding.Y * 2)
         ); //todo: cache?
+
+        /// <summary>
+        /// offset external bounds, clipped to the parent container
+        /// This includes <see cref="Padding"/>
+        /// This is relative to the outermost container
+        /// </summary>
+        [Data.Serializer.Ignored]
+        protected Rectangle VisibleBounds
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Does this element currently have focus?
@@ -882,7 +885,7 @@ namespace Takai.UI
                 var top = stack.Pop();
                 if (top != this && top.CanFocus && top.IsEnabled)
                 {
-                    var diff = (top.AbsoluteDimensions.Location - AbsoluteDimensions.Location).ToVector2();
+                    var diff = (top.OffsetInternalBounds.Location - OffsetInternalBounds.Location).ToVector2();
 
                     var dot = Vector2.Dot(direction, Vector2.Normalize(diff));
                     if (dot >= bias)
@@ -1056,69 +1059,61 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Calculate the bounds of this element based on a parent container
+        /// Calculate all of the bounds to this element relative to its parent
         /// </summary>
-        /// <param name="container">The region that this element is relative to</param>
-        /// <returns>The calculate rectangle relative to the container</returns>
-        public virtual Rectangle CalculateBounds(Rectangle container)
-        {
-            var pos = new Vector2();
-            var size = Size;
-
-            switch (HorizontalAlignment)
-            {
-                case Alignment.Start:
-                case Alignment.Stretch:
-                    pos.X = Position.X + Padding.X;
-                    break;
-                case Alignment.Middle:
-                    pos.X = (container.Width - Size.X) / 2 + Position.X; //todo: padding (and Y)
-                    break;
-                case Alignment.End:
-                    pos.X = container.Width - Size.X - Position.X - Padding.X;
-                    break;
-            }
-            switch (VerticalAlignment)
-            {
-                case Alignment.Start:
-                case Alignment.Stretch:
-                    pos.Y = Position.Y + Padding.Y;
-                    break;
-                case Alignment.Middle:
-                    pos.Y = (container.Height - Size.Y) / 2;
-                    break;
-                case Alignment.End:
-                    pos.Y = (container.Height - Size.Y) - Position.Y - Padding.Y;
-                    break;
-            }
-
-            return new Rectangle(
-                (int)pos.X + container.X,
-                (int)pos.Y + container.Y,
-                (int)size.X,
-                (int)size.Y
-            );
-        }
-
         protected void CalculateBounds()
         {
-            //todo: rename InternalSize, OffsetInternalSize, ExternalSize (dimensions)
+            if (Parent == null)
+            {
+                OffsetInternalBounds = InternalBounds;
+                OffsetInternalBounds.Offset(Padding);
+            }
+            else
+            {
+                var container = Parent.OffsetInternalBounds;
+                var pos = new Vector2();
 
-            AbsoluteDimensions = Parent != null
-                ? CalculateBounds(Parent.AbsoluteDimensions)
-                : new Rectangle(
-                    (int)(Position.X + Padding.X),
-                    (int)(Position.Y + Padding.Y),
-                    (int)(Size.X - Padding.X * 2),
-                    (int)(Size.Y - Padding.Y * 2)
+                switch (HorizontalAlignment)
+                {
+                    case Alignment.Start:
+                    case Alignment.Stretch:
+                        pos.X = Position.X + Padding.X;
+                        break;
+                    case Alignment.Middle:
+                        pos.X = (container.Width - Size.X) / 2 + Position.X;
+                        break;
+                    case Alignment.End:
+                        pos.X = container.Width - Size.X - Position.X - Padding.X;
+                        break;
+                }
+                switch (VerticalAlignment)
+                {
+                    case Alignment.Start:
+                    case Alignment.Stretch:
+                        pos.Y = Position.Y + Padding.Y;
+                        break;
+                    case Alignment.Middle:
+                        pos.Y = (container.Height - Size.Y) / 2 + Position.Y;
+                        break;
+                    case Alignment.End:
+                        pos.Y = (container.Height - Size.Y) - Position.Y - Padding.Y;
+                        break;
+                }
+
+                OffsetInternalBounds = new Rectangle(
+                    (int)pos.X + container.X,
+                    (int)pos.Y + container.Y,
+                    (int)Size.X,
+                    (int)Size.Y
                 );
+            }
 
-            var virBnd = AbsoluteDimensions;
-            virBnd.Inflate(Padding.X, Padding.Y);
+            Rectangle virtualBounds = OffsetInternalBounds;
+            virtualBounds.Inflate(Padding.X, Padding.Y);
 
             VisibleBounds = Parent != null
-                ? Rectangle.Intersect(Parent.VisibleBounds, virBnd)
-                : Bounds;
+                ? Rectangle.Intersect(Parent.VisibleBounds, virtualBounds)
+                : ExternalBounds;
         }
 
         /// <summary>
@@ -1134,14 +1129,16 @@ namespace Takai.UI
         /// </summary>
         public virtual void AutoSize()
         {
-            //todo: maybe make padding an actual property
-            var bounds = new Rectangle((int)Position.X, (int)Position.Y, (int)textSize.X, (int)textSize.Y);
+            var bounds = new Rectangle(
+                (int)Position.X,
+                (int)Position.Y,
+                (int)textSize.X,
+                (int)textSize.Y
+            );
             foreach (var child in Children)
             {
-                if (!child.IsEnabled)
-                    continue;
-
-                bounds = Rectangle.Union(bounds, child.Dimensions);
+                if (child.IsEnabled)
+                    bounds = Rectangle.Union(bounds, child.ExternalBounds);
             }
             Size = new Vector2(bounds.Width, bounds.Height);
         }
@@ -1342,6 +1339,7 @@ namespace Takai.UI
             var draws = new Queue<Static>(Children.Count + 1);
             draws.Enqueue(this);
 
+            Static lastDraw = null;
             while (draws.Count > 0)
             {
                 var toDraw = draws.Dequeue();
@@ -1356,23 +1354,27 @@ namespace Takai.UI
                 if (DebugFont != null && borderColor == Color.Transparent)
                     borderColor = Color.SteelBlue;
 
-                Graphics.Primitives2D.DrawRect(spriteBatch, borderColor, toDraw.VisibleBounds);
-
                 if (DebugFont != null && toDraw.VisibleBounds.Contains(Input.InputState.MousePoint))
-                {
-                    var rect = toDraw.AbsoluteDimensions;
-                    rect.Inflate(1 + toDraw.Padding.X, 1 + toDraw.Padding.Y);
-                    Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, rect);
+                    lastDraw = toDraw;
 
-                    string info = $"Name: {(Name ?? "(No name)")}\nBounds: {rect}";
-                    DebugFont.Draw(spriteBatch, info, (rect.Location + new Point(rect.Width, rect.Height)).ToVector2(), Color.Gold);
-                }
+                Graphics.Primitives2D.DrawRect(spriteBatch, borderColor, toDraw.VisibleBounds);
 
                 foreach (var child in toDraw.Children)
                 {
                     if (child.IsEnabled)
                         draws.Enqueue(child);
                 }
+            }
+
+            if (lastDraw != null)
+            {
+                var rect = lastDraw.OffsetInternalBounds;
+                rect.Inflate(1 + lastDraw.Padding.X, 1 + lastDraw.Padding.Y);
+                Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, rect);
+                Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Gold, 0.5f), lastDraw.OffsetInternalBounds);
+
+                string info = $"Name: {(Name ?? "(No name)")}\nBounds: {lastDraw.OffsetInternalBounds} Padding: {lastDraw.Padding}";
+                DebugFont.Draw(spriteBatch, info, (rect.Location + new Point(rect.Width, rect.Height)).ToVector2(), Color.Gold);
             }
         }
 
@@ -1396,7 +1398,7 @@ namespace Takai.UI
                 return;
 
             //position += AbsoluteDimensions.Location - VisibleBounds.Location;
-            Font.Draw(spriteBatch, Text, 0, Text.Length, AbsoluteDimensions, position, Color);
+            Font.Draw(spriteBatch, Text, 0, Text.Length, OffsetInternalBounds, position, Color);
         }
 
         public virtual void DerivedDeserialize(Dictionary<string, object> props)
