@@ -5,18 +5,19 @@ Table {
 	Padding: [10 10];
 	Margin: 10;
 	ColumnCount: 3;
+	BackgroundColor: [0 120 240];
 
 	Children: [
-		Static { Text: "Column A"; };
-		Static { Text: "Column B"; };
-		Static { Text: "Column C"; };
+		Static { Text: "Column A"; BackgroundColor: [80 200 240]; };
+		Static { Text: "Column B"; BackgroundColor: [80 200 240]; };
+		Static { Text: "Column C"; BackgroundColor: [80 200 240]; };
 
-		Static { Text: "Cell 1A"; };
-		Static { Text: "Cell 1B"; };
-		Static { Text: "Cell 1C"; };
+		Static { Text: "Cell 1A"; BackgroundColor: [80 200 240]; };
+		Static { Text: "Cell 1B"; BackgroundColor: [80 200 240]; };
+		Static { Text: "Cell 1C"; BackgroundColor: [80 200 240]; };
 
-		Static { Text: "Cell 2A"; };
-		Static { Text: "Cell 2B"; };
-		Static { Text: "Cell 2C"; };
+		Static { Text: "Cell 2A"; BackgroundColor: [80 200 240]; };
+		Static { Text: "Cell 2B"; BackgroundColor: [80 200 240]; };
+		Static { Text: "Cell 2C"; BackgroundColor: [80 200 240]; };
 	];
 };
