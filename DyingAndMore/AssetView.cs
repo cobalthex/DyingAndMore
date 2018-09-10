@@ -41,12 +41,12 @@ namespace DyingAndMore
                     HorizontalAlignment = Alignment.Stretch,
                     Padding = new Xna.Vector2(10)
                 };
-                listItem.AutoSize();
+                listItem.SizeToFit();
                 listItem.Click += ListItem_Click;
                 list.AddChild(listItem);
             }
 
-            list.AutoSize();
+            list.SizeToFit();
             assets = new ScrollBox();
             assets.AddChild(list);
             AddChild(assets);
@@ -72,7 +72,7 @@ namespace DyingAndMore
                     VerticalAlignment = Alignment.Middle,
                     Padding = new Xna.Vector2(10)
                 };
-                gfx.AutoSize();
+                gfx.SizeToFit();
                 view.ReplaceAllChildren(gfx);
             }
             else if (asset is Takai.Graphics.BitmapFont fnt)
@@ -134,7 +134,7 @@ namespace DyingAndMore
                     }
                 };
                 list.AddChild(track);
-                list.AutoSize();
+                list.SizeToFit();
 
                 view.ReplaceAllChildren(list);
 
@@ -152,7 +152,7 @@ namespace DyingAndMore
                         VerticalAlignment = Alignment.Middle,
                         Padding = new Xna.Vector2(10)
                     };
-                    gfx.AutoSize();
+                    gfx.SizeToFit();
                     view.ReplaceAllChildren(gfx);
                 }
             }
@@ -174,15 +174,15 @@ namespace DyingAndMore
                     VerticalAlignment = Alignment.Middle,
                     Padding = new Xna.Vector2(10)
                 };
-                text.AutoSize();
+                text.SizeToFit();
                 view.ReplaceAllChildren(text);
             }
         }
 
         protected override void OnResize(EventArgs e)
         {
-            assets.InternalBounds = new Xna.Rectangle(0, 0, 240, (int)Size.Y);
-            view.InternalBounds = new Xna.Rectangle(240, 0, (int)Size.X - 240, (int)Size.Y);
+            assets.LocalDimensions = new Xna.Rectangle(0, 0, 240, (int)Size.Y);
+            view.LocalDimensions = new Xna.Rectangle(240, 0, (int)Size.X - 240, (int)Size.Y);
         }
     }
 }

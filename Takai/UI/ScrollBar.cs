@@ -197,7 +197,7 @@ namespace Takai.UI
     }
 
     //todo: convert scroll bars to use enabled/disabled
-    public class ScrollBox : Static
+    public class ScrollBox : Table
     {
         protected ScrollBar verticalScrollbar = new ScrollBar()
         {
@@ -214,7 +214,8 @@ namespace Takai.UI
 
         public ScrollBox()
         {
-            AddChildren(horizontalScrollbar, verticalScrollbar, contentArea);
+            ColumnCount = 2;
+            AddChildren(contentArea, verticalScrollbar, horizontalScrollbar);
 
             horizontalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
             {
@@ -264,52 +265,15 @@ namespace Takai.UI
 
         protected void ResizeContentArea()
         {
-            //todo:
-            // maybe use contentContainer and contentArea
-            // autosize contentArea and move inside contentContainer
-            // does not disrupt positions of elements inside area
-
-            var bounds = Rectangle.Empty;
+            var contentSize = Rectangle.Empty;
             foreach (var child in contentArea.Children)
-            {
-                if (child.IsEnabled)
-                    bounds = Rectangle.Union(bounds, child.InternalBounds);
-            }
+                contentSize = Rectangle.Union(contentSize, child.AbsoluteBounds);
 
-            horizontalScrollbar.ContentSize = bounds.Width;
-            verticalScrollbar.ContentSize = bounds.Height;
+            horizontalScrollbar.ContentSize = contentSize.Width;
+            verticalScrollbar.ContentSize = contentSize.Height;
 
-            var hsize = Size.X;
-            var vsize = Size.Y;
-
-            if (horizontalScrollbar.ContentSize > hsize)
-                vsize -= horizontalScrollbar.Size.Y;
-            if (verticalScrollbar.ContentSize > vsize)
-                hsize -= verticalScrollbar.Size.X;
-            if (horizontalScrollbar.ContentSize > hsize)
-                vsize -= horizontalScrollbar.Size.Y;
-
-            horizontalScrollbar.Size = new Vector2(
-                hsize,
-                horizontalScrollbar.Size.Y
-            );
-
-            verticalScrollbar.Size = new Vector2(
-                verticalScrollbar.Size.X,
-                vsize
-            );
-
-            if (horizontalScrollbar.IsThumbVisible)
-                base.AddChild(horizontalScrollbar);
-            else
-                base.RemoveChild(horizontalScrollbar);
-
-            if (verticalScrollbar.IsThumbVisible)
-                base.AddChild(verticalScrollbar);
-            else
-                base.RemoveChild(verticalScrollbar);
-
-            contentArea.Size = new Vector2(hsize, vsize);
+            horizontalScrollbar.IsEnabled = !horizontalScrollbar.IsThumbVisible;
+            verticalScrollbar.IsEnabled = !verticalScrollbar.IsThumbVisible;
         }
 
         public override void DerivedDeserialize(Dictionary<string, object> props)

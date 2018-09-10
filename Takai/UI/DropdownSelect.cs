@@ -41,7 +41,7 @@ namespace Takai.UI
         {
             isDropdownOpen = true;
 
-            list.AutoSize();
+            list.SizeToFit();
             dropdown.Size = new Vector2(Size.X, System.Math.Min(list.Size.Y, 200));
 
             var end = new Vector2(VisibleBounds.Right, VisibleBounds.Bottom) + dropdown.Size;
@@ -71,7 +71,7 @@ namespace Takai.UI
         {
             if (isDropdownOpen)
             {
-                if (Input.InputState.IsPress(Input.MouseButtons.Left) && !dropdown.OffsetInternalBounds.Contains(Input.InputState.MousePoint))
+                if (Input.InputState.IsPress(Input.MouseButtons.Left) && !dropdown.AbsoluteDimensions.Contains(Input.InputState.MousePoint))
                     isDropdownOpen = false;
                 return false;
             }

@@ -16,8 +16,11 @@ namespace Takai.UI
         public int ColumnCount { get; set; } = 1;
 
         public Table() { }
-        public Table(params Static[] children)
-            : base(children) { }
+        public Table(int columnCount, params Static[] children)
+            : base(children)
+        {
+            ColumnCount = columnCount;
+        }
 
         public override void Reflow()
         {
@@ -25,16 +28,25 @@ namespace Takai.UI
                 return;
 
             float[] colWidths = new float[ColumnCount];
+            float[] rowHeights = new float[(int)System.Math.Ceiling(Children.Count / (float)ColumnCount)]; //todo: integer only
             for (int i = 0; i < Children.Count; ++i)
             {
-                if (Children[i].IsEnabled)
-                    colWidths[i % ColumnCount] = System.Math.Max(colWidths[i % ColumnCount], Children[i].Size.X);
+                if (!Children[i].IsEnabled)
+                    continue;
+
+                var bounds = Children[i].AbsoluteBounds;
+                if (Children[i].HorizontalAlignment == Alignment.Stretch)
+                    bounds.Width = 1;
+                if (Children[i].HorizontalAlignment == Alignment.Stretch)
+                    bounds.Height = 1;
+
+                colWidths[i % ColumnCount] = System.Math.Max(colWidths[i % ColumnCount], bounds.Width);
+                rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], bounds.Height);
             }
 
-            //todo: base.Reflow() overrides stretch, need to move elsewhere (into method maybe?)
+            //todo: respect table alignment
 
             var offset = Vector2.Zero;
-            float rowHeight = 0;
             for (int i = 0; i < Children.Count; ++i)
             {
                 if (!Children[i].IsEnabled)
@@ -43,22 +55,21 @@ namespace Takai.UI
                 if (i % ColumnCount == 0)
                 {
                     offset.X = 0;
-                    offset.Y += rowHeight + Margin.Y;
-                    rowHeight = 0;
-                }
+                    offset.Y += rowHeights[i / ColumnCount];
 
+                    if (i > 0)
+                        offset.Y += Margin.Y;
+                }
+                else
+                    offset.X += Margin.X;
+
+                //var localPos = Children[i].GetContainerPosition(new Rectangle(off))
+                //Children[i].LocalDimensions;
                 Children[i].Position = offset;
-                rowHeight = System.Math.Max(rowHeight, Children[i].Size.Y);
-                offset.X += colWidths[i % ColumnCount] + Margin.X;
+                offset.X += colWidths[i % ColumnCount];
             }
 
             base.Reflow();
-        }
-
-        protected override void OnChildReflow(Static child)
-        {
-            Reflow();
-            base.OnChildReflow(child);
         }
     }
 }

@@ -162,7 +162,7 @@ namespace DyingAndMore.Game
                         ui.AddChild(new Static(story.Name));
                         ui.AddChild(new Static(story.Description));
                         ui.AddChild(new Static($"{story.MapFiles.Length} map{(story.MapFiles.Length == 1 ? "" : "s")}"));
-                        ui.AutoSize();
+                        ui.SizeToFit();
                         ui.Click += delegate
                         {
                             StorySelected?.Invoke(this, story);

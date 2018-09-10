@@ -30,7 +30,7 @@ namespace Takai.UI
             sbatch = new SpriteBatch(Runtime.GraphicsDevice);
         }
 
-        public override void AutoSize()
+        public override void SizeToFit()
         {
             Size = (Sprite?.Size.ToVector2() ?? new Vector2(1));
         }

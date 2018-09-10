@@ -468,7 +468,6 @@ namespace Takai.Data
         }
 #endif
 
-
         #region Custom Loaders
 
         class UnsupportedLoader : CustomLoader

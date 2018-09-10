@@ -1,0 +1,22 @@
+Table {
+	Size: [600 600];
+	HorizontalAlignment: Alignment.Middle;
+	VerticalAlignment: Alignment.Middle;
+	Padding: [10 10];
+	Margin: 10;
+	ColumnCount: 3;
+
+	Children: [
+		Static { Text: "Column A"; };
+		Static { Text: "Column B"; };
+		Static { Text: "Column C"; };
+
+		Static { Text: "Cell 1A"; };
+		Static { Text: "Cell 1B"; };
+		Static { Text: "Cell 1C"; };
+
+		Static { Text: "Cell 2A"; };
+		Static { Text: "Cell 2B"; };
+		Static { Text: "Cell 2C"; };
+	];
+};

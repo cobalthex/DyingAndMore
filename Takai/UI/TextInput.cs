@@ -168,7 +168,7 @@ namespace Takai.UI
             Caret = Text.Length;
         }
 
-        public override void AutoSize()
+        public override void SizeToFit()
         {
             Size = new Vector2(200, (Font?.MaxCharHeight ?? 20));
         }
@@ -381,8 +381,8 @@ namespace Takai.UI
             if (Font != null)
             {
                 var size = new Point(
-                    System.Math.Min(OffsetInternalBounds.Width - 4, (int)textSize.X),
-                    System.Math.Min(OffsetInternalBounds.Height, (int)textSize.Y)
+                    System.Math.Min(AbsoluteDimensions.Width - 4, (int)textSize.X),
+                    System.Math.Min(AbsoluteDimensions.Height, (int)textSize.Y)
                 );
 
                 DrawText(spriteBatch,
@@ -391,12 +391,12 @@ namespace Takai.UI
                 var tickCount = System.Environment.TickCount;
                 if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
                 {
-                    var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + OffsetInternalBounds.X + 3;
+                    var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + AbsoluteDimensions.X + 3;
                     Graphics.Primitives2D.DrawLine(
                         spriteBatch,
                         Color,
-                        new Vector2(x, OffsetInternalBounds.Top + 4),
-                        new Vector2(x, OffsetInternalBounds.Bottom - 4)
+                        new Vector2(x, AbsoluteDimensions.Top + 4),
+                        new Vector2(x, AbsoluteDimensions.Bottom - 4)
                     );
                 }
             }

@@ -26,14 +26,14 @@ namespace Takai.UI
                 if (!Children[i].IsEnabled)
                     continue;
 
-                var vbnd = Children[i].InternalBounds;
+                var vbnd = Children[i].LocalDimensions;
                 var ccenter = new Vector2(vbnd.Width / 2, vbnd.Height / 2);
 
                 var pos = Util.Direction(i * thetaScale) * Radius;
                 Children[i].Position = center - ccenter + pos;
             }
 
-            CalculateBounds();
+            UpdateBounds();
             foreach (var child in Children)
             {
                 if (child.IsEnabled)

@@ -154,7 +154,7 @@ namespace DyingAndMore.Game.Entities
                     if (Hud != null && _weapon.Hud != null)
                     {
                         Hud.AddChild(_weapon.Hud);
-                        Hud.AutoSize();
+                        Hud.SizeToFit();
                     }
                 }
             }

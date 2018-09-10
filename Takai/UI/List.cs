@@ -30,7 +30,7 @@ namespace Takai.UI
             float t = 0;
 
             int stretched = 0;
-            float size = Direction == Direction.Horizontal ? ExternalBounds.Width : ExternalBounds.Height;
+            float size = Direction == Direction.Horizontal ? AbsoluteBounds.Width : AbsoluteBounds.Height;
             foreach (var child in Children)
             {
                 if (!child.IsEnabled)
@@ -44,9 +44,9 @@ namespace Takai.UI
                 else
                 {
                     if (Direction == Direction.Horizontal)
-                        size -= child.ExternalBounds.Width;
+                        size -= child.AbsoluteBounds.Width;
                     else if (Direction == Direction.Vertical)
-                        size -= child.ExternalBounds.Height;
+                        size -= child.AbsoluteBounds.Height;
                 }
             }
             size /= stretched;
@@ -72,7 +72,7 @@ namespace Takai.UI
                     if (child.HorizontalAlignment == Alignment.Stretch)
                         child.Size = new Vector2(size, child.Size.Y);
 
-                    t += child.ExternalBounds.Width;
+                    t += child.AbsoluteBounds.Width;
                 }
                 else if (Direction == Direction.Vertical)
                 {
@@ -80,7 +80,7 @@ namespace Takai.UI
                     if (child.VerticalAlignment == Alignment.Stretch)
                         child.Size = new Vector2(child.Size.X, size);
 
-                    t += child.ExternalBounds.Height;
+                    t += child.AbsoluteBounds.Height;
                 }
 
                 child.Position = position;
@@ -94,12 +94,6 @@ namespace Takai.UI
             //todo: decide how to handle alignment on main axis, vertical list with child:vertical-middle will put child in middle of list container
 
             base.Reflow();
-        }
-
-        protected override void OnChildReflow(Static child)
-        {
-            Reflow();
-            base.OnChildReflow(child);
         }
     }
 }
