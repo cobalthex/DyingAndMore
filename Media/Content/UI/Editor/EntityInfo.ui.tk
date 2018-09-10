@@ -6,6 +6,8 @@ Table {
     ColumnCount: 2;
     Margin: [10 2];
     Width: 300;
+    Padding: [10 5];    
+    AutoSize: true;
 
     Children: [
         Static { Text: "Name"; };
@@ -38,7 +40,6 @@ Table {
                     Target: "Text";
                 }
             ];
-            Size: [60 20];
             AutoSizeOnBindingUpdate: true;
         };
 
@@ -83,6 +84,7 @@ Table {
         List {
             Direction: Direction.Horizontal;
             Margin: 5;
+            AutoSize: true;
             Children: [
                 Static {
                     Bindings: [
@@ -92,7 +94,6 @@ Table {
                             Mode: BindingMode.OneWay;
                         }
                     ];
-                    Size: [60 20];
                     AutoSizeOnBindingUpdate: true;
                  };
                 Static { Text: "/"; };
@@ -104,7 +105,6 @@ Table {
                             Mode: BindingMode.OneWay;
                         }
                     ];
-                    Size: [60 20];
                     AutoSizeOnBindingUpdate: true;
                  };
             ];

@@ -1037,7 +1037,7 @@ namespace Takai.Data
         {
             var type = target.GetType();
             if (type != source.GetType())
-                throw new ArgumentException("Source object must be the same as target option");
+                throw new ArgumentException("Source object must be the same as target object");
 
             foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {

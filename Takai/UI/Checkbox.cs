@@ -30,10 +30,10 @@ namespace Takai.UI
             IsChecked = isChecked;
         }
 
-        public override void AutoSize()
+        public override void SizeToFit()
         {
-            base.AutoSize();
-            var checkboxSize = System.Math.Min(InternalBounds.Width, InternalBounds.Height);
+            base.SizeToFit();
+            var checkboxSize = System.Math.Min(LocalDimensions.Width, LocalDimensions.Height);
             Size += new Vector2(checkboxSize + Margin, 0);
         }
 
@@ -45,8 +45,8 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var checkboxSize = System.Math.Min(OffsetInternalBounds.Width, OffsetInternalBounds.Height);
-            var checkBounds = new Rectangle(OffsetInternalBounds.X, OffsetInternalBounds.Y, checkboxSize, checkboxSize);
+            var checkboxSize = System.Math.Min(AbsoluteDimensions.Width, AbsoluteDimensions.Height);
+            var checkBounds = new Rectangle(AbsoluteDimensions.X, AbsoluteDimensions.Y, checkboxSize, checkboxSize);
             var checkboxBounds = Rectangle.Intersect(checkBounds, VisibleBounds);
             Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, checkboxBounds);
             checkboxBounds.Inflate(-1, -1);

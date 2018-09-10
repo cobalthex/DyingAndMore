@@ -200,27 +200,29 @@ namespace DyingAndMore
             };
             */
 
-            var selectStoryUI = Takai.Data.Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
-            if (selectStoryUI is Game.StorySelect ss)
-            {
-                ss.StorySelected += delegate (object _sender, Game.GameStory story)
-                {
-                    //var game = new Game.Game
-                    //{
-                    //    Story = story,
-                    //};
-                    //game.LoadNextStoryMap();
-                    //ui.ReplaceAllChildren(new Game.GameInstance(game));
-                    ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
-                };
-            }
-            ui = new Takai.UI.Static(selectStoryUI);
+            ui = new Takai.UI.Static(Takai.Data.Cache.Load<Takai.UI.Static>("UI/test/table.ui.tk"));
+
+            //var selectStoryUI = Takai.Data.Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
+            //if (selectStoryUI is Game.StorySelect ss)
+            //{
+            //    ss.StorySelected += delegate (object _sender, Game.GameStory story)
+            //    {
+            //        //var game = new Game.Game
+            //        //{
+            //        //    Story = story,
+            //        //};
+            //        //game.LoadNextStoryMap();
+            //        //ui.ReplaceAllChildren(new Game.GameInstance(game));
+            //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
+            //    };
+            //}
+            //ui = new Takai.UI.Static(selectStoryUI);
 
             ui.BindCommand("asdf", (s) => s.BackgroundColor = Takai.Graphics.ColorUtil.Random());
 
             fpsGraph = new Takai.FpsGraph()
             {
-                InternalBounds = new Rectangle(20, 20, 800, 100),
+                LocalDimensions = new Rectangle(20, 20, 800, 100),
                 HorizontalAlignment = Takai.UI.Alignment.Middle
             };
 
@@ -267,7 +269,7 @@ namespace DyingAndMore
             InputState.Update(GraphicsDevice.Viewport.Bounds);
 
             ui.Update(gameTime);
-            ui.InternalBounds = GraphicsDevice.Viewport.Bounds;
+            ui.LocalDimensions = GraphicsDevice.Viewport.Bounds;
         }
 
         protected override void Draw(GameTime gameTime)

@@ -9,9 +9,7 @@ List {
 
     Children: [
         Scrollbox {
-            Position: [0 0];
-            Size: [380 420];
-
+            Width: 400;
             Children: [
                 List {
                     Direction: Direction.Vertical;
@@ -36,7 +34,7 @@ List {
         };
 
         Static {
-            Size: [100 30];
+            Padding: [10 5];
             HorizontalAlignment: Alignment.Middle;
             Text: "Close";
             OnClickCommand: "$Close";

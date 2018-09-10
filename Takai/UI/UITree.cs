@@ -55,7 +55,7 @@ namespace Takai.UI
                         Font = Font,
                         Position = new Vector2(20 * top.Key, y)
                     };
-                    disp.AutoSize();
+                    disp.SizeToFit();
                     y += (int)disp.Size.Y;
                     AddChild(disp);
                 }
