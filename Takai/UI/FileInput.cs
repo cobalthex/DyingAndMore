@@ -166,14 +166,14 @@ namespace Takai.UI
             }
         }
 
-        public override void SizeToFit()
+        public override void SizeToContain()
         {
-            textInput.SizeToFit();
+            textInput.SizeToContain();
             var btnSize = textInput.Size.Y;
             pickerButton.Size = new Vector2(btnSize);
 
             Size = textInput.Size + new Vector2(btnSize, 0);
-            base.SizeToFit();
+            base.SizeToContain();
         }
 
         protected override void OnResize(System.EventArgs e)

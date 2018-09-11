@@ -25,33 +25,11 @@ namespace Takai.UI
         public List(params Static[] children)
             : base(children) { }
 
-        public override void Reflow()
+        public override void Reflow(Rectangle container)
         {
+            FitToContainer(container);
+
             float t = 0;
-
-            int stretched = 0;
-            float size = Direction == Direction.Horizontal ? AbsoluteBounds.Width : AbsoluteBounds.Height;
-            foreach (var child in Children)
-            {
-                if (!child.IsEnabled)
-                    continue;
-
-                if ((Direction == Direction.Horizontal
-                && child.HorizontalAlignment == Alignment.Stretch)
-                || (Direction == Direction.Vertical
-                && child.VerticalAlignment == Alignment.Stretch))
-                    ++stretched;
-                else
-                {
-                    if (Direction == Direction.Horizontal)
-                        size -= child.AbsoluteBounds.Width;
-                    else if (Direction == Direction.Vertical)
-                        size -= child.AbsoluteBounds.Height;
-                }
-            }
-            size /= stretched;
-
-            //todo: base.Reflow() overrides stretch, need to move elsewhere (into method maybe?)
 
             //pre-position items into a list
             for (int i = 0; i < Children.Count; ++i)
@@ -65,35 +43,27 @@ namespace Takai.UI
                 if (i > 0)
                     t += Margin;
 
-                Vector2 position = child.Position;
                 if (Direction == Direction.Horizontal)
                 {
-                    position = new Vector2(t, position.Y);
-                    if (child.HorizontalAlignment == Alignment.Stretch)
-                        child.Size = new Vector2(size, child.Size.Y);
-
-                    t += child.AbsoluteBounds.Width;
+                    Children[i].Reflow(new Rectangle(
+                        (int)t + AbsoluteDimensions.X,
+                        AbsoluteDimensions.Y,
+                        (int)Children[i].AbsoluteBounds.Width,
+                        (int)Size.Y
+                    ));
+                    t += Children[i].AbsoluteBounds.Width;
                 }
-                else if (Direction == Direction.Vertical)
+                else
                 {
-                    position = new Vector2(position.X, t);
-                    if (child.VerticalAlignment == Alignment.Stretch)
-                        child.Size = new Vector2(child.Size.X, size);
-
-                    t += child.AbsoluteBounds.Height;
+                    Children[i].Reflow(new Rectangle(
+                        AbsoluteDimensions.X,
+                        (int)t + AbsoluteDimensions.Y,
+                        (int)Size.X,
+                        (int)Children[i].AbsoluteBounds.Height
+                    ));
+                    t += Children[i].AbsoluteBounds.Height;
                 }
-
-                child.Position = position;
             }
-
-            //AutoSize(); //testing
-
-            //todo: stretched elements
-
-            //currently broken:
-            //todo: decide how to handle alignment on main axis, vertical list with child:vertical-middle will put child in middle of list container
-
-            base.Reflow();
         }
     }
 }

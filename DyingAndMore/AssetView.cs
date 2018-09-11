@@ -41,12 +41,12 @@ namespace DyingAndMore
                     HorizontalAlignment = Alignment.Stretch,
                     Padding = new Xna.Vector2(10)
                 };
-                listItem.SizeToFit();
+                listItem.SizeToContain();
                 listItem.Click += ListItem_Click;
                 list.AddChild(listItem);
             }
 
-            list.SizeToFit();
+            list.SizeToContain();
             assets = new ScrollBox();
             assets.AddChild(list);
             AddChild(assets);
@@ -72,7 +72,7 @@ namespace DyingAndMore
                     VerticalAlignment = Alignment.Middle,
                     Padding = new Xna.Vector2(10)
                 };
-                gfx.SizeToFit();
+                gfx.SizeToContain();
                 view.ReplaceAllChildren(gfx);
             }
             else if (asset is Takai.Graphics.BitmapFont fnt)
@@ -134,7 +134,7 @@ namespace DyingAndMore
                     }
                 };
                 list.AddChild(track);
-                list.SizeToFit();
+                list.SizeToContain();
 
                 view.ReplaceAllChildren(list);
 
@@ -152,7 +152,7 @@ namespace DyingAndMore
                         VerticalAlignment = Alignment.Middle,
                         Padding = new Xna.Vector2(10)
                     };
-                    gfx.SizeToFit();
+                    gfx.SizeToContain();
                     view.ReplaceAllChildren(gfx);
                 }
             }
@@ -174,7 +174,7 @@ namespace DyingAndMore
                     VerticalAlignment = Alignment.Middle,
                     Padding = new Xna.Vector2(10)
                 };
-                text.SizeToFit();
+                text.SizeToContain();
                 view.ReplaceAllChildren(text);
             }
         }

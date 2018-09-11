@@ -6,7 +6,7 @@ namespace Takai.UI
     /// <summary>
     /// Displays the full tree of <see cref="Display"/>'s hierarchy
     /// </summary>
-    class UITree : Static
+    public class UITree : Static
     {
         [Data.Serializer.Ignored]
         /// <summary>
@@ -55,7 +55,7 @@ namespace Takai.UI
                         Font = Font,
                         Position = new Vector2(20 * top.Key, y)
                     };
-                    disp.SizeToFit();
+                    disp.SizeToContain();
                     y += (int)disp.Size.Y;
                     AddChild(disp);
                 }

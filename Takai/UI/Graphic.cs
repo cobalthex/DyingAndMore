@@ -13,7 +13,7 @@ namespace Takai.UI
         /// </summary>
         public bool DrawXIfMissingSprite { get; set; } = false;
 
-        public override void SizeToFit()
+        public override void SizeToContain()
         {
             Size = (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2());
         }

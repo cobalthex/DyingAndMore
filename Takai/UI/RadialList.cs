@@ -12,8 +12,10 @@ namespace Takai.UI
         /// </summary>
         public float Radius { get; set; } = 50;
 
-        public override void Reflow()
+        public override void Reflow(Rectangle container)
         {
+            FitToContainer(container);
+
             if (Children.Count == 0)
                 return;
 
@@ -33,7 +35,6 @@ namespace Takai.UI
                 Children[i].Position = center - ccenter + pos;
             }
 
-            UpdateBounds();
             foreach (var child in Children)
             {
                 if (child.IsEnabled)

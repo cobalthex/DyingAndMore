@@ -174,14 +174,14 @@ namespace Takai.UI
             base.OnValueChanged(e);
         }
 
-        public override void SizeToFit()
+        public override void SizeToContain()
         {
-            textInput.SizeToFit();
+            textInput.SizeToContain();
             var btnSize = textInput.Size.Y;
             upButton.Size = downButton.Size = new Vector2(btnSize);
 
             Size = textInput.Size + new Vector2(btnSize * 2, 0);
-            base.SizeToFit();
+            base.SizeToContain();
         }
 
         protected override void OnResize(EventArgs e)
@@ -194,7 +194,7 @@ namespace Takai.UI
             base.OnResize(e);
         }
 
-        public override void Reflow()
+        public override void Reflow(Rectangle container)
         {
             upButton.Position = textInput.Position + new Vector2(textInput.Size.X, 0);
             downButton.Position = upButton.Position + new Vector2(upButton.Size.X, 0);

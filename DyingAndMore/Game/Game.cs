@@ -345,7 +345,7 @@ namespace DyingAndMore.Game
         {
             ElapsedRealTime += time.ElapsedGameTime;
             clockDisplay.Text = $"{GetClockText(ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}x{Map.TimeScale:N1}{(IsPaused ? "\n -- PAUSED --" : "")}";
-            clockDisplay.SizeToFit();
+            clockDisplay.SizeToContain();
 
             if (isDead && time.TotalGameTime > restartTimer)
             {
@@ -393,7 +393,7 @@ namespace DyingAndMore.Game
             }
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
-            fpsDisplay.SizeToFit();
+            fpsDisplay.SizeToContain();
 
             base.UpdateSelf(time);
         }

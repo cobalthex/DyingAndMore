@@ -41,7 +41,7 @@ namespace Takai.UI
         {
             isDropdownOpen = true;
 
-            list.SizeToFit();
+            list.SizeToContain();
             dropdown.Size = new Vector2(Size.X, System.Math.Min(list.Size.Y, 200));
 
             var end = new Vector2(VisibleBounds.Right, VisibleBounds.Bottom) + dropdown.Size;

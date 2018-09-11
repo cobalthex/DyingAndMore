@@ -92,7 +92,7 @@ namespace DyingAndMore.Editor
                 Color = InactiveColor,
                 Padding = new Vector2(20, 10)
             };
-            tab.SizeToFit();
+            tab.SizeToContain();
             tab.Font = InactiveFont;
 
             tab.Click += delegate
@@ -100,7 +100,7 @@ namespace DyingAndMore.Editor
                 Mode = mode;
             };
             tabs.AddChild(tab);
-            tabs.SizeToFit();
+            tabs.SizeToContain();
         }
 
         protected override bool HandleInput(GameTime time)

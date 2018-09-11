@@ -368,14 +368,11 @@ namespace Takai.UI
         public event System.EventHandler<ClickEventArgs> Click = null;
         protected virtual void OnClick(ClickEventArgs e) { }
 
-        public string OnClickCommand { get; set; }
-        protected Command clickCommandFn;
-
-        /// <summary>
-        /// Called whenever the size of this element is updated
-        /// </summary>
         public event System.EventHandler Resize = null;
         protected virtual void OnResize(System.EventArgs e) { }
+
+        public string OnClickCommand { get; set; }
+        protected Command clickCommandFn;
 
         #endregion
 
@@ -465,7 +462,7 @@ namespace Takai.UI
             : this()
         {
             Text = text;
-            SizeToFit();
+            SizeToContain();
         }
 
         /// <summary>
@@ -1025,55 +1022,41 @@ namespace Takai.UI
 
         #region Sizing
 
+        //todo: separate Measure/Arrange steps
+
         /// <summary>
         /// Is this element in a reflow currently?
         /// Used to prevent <see cref="OnChildReflow"/> from getting stuck in a loop
         /// </summary>
         bool isReflowing = false;
 
-        /// <summary>
-        /// Reflow child elements relative to this element
-        /// Called whenever this element's position or size is adjusted
-        /// </summary>
-        public virtual void Reflow()
+        public void Reflow()
         {
             if (isReflowing)
                 return;
-
             isReflowing = true;
-            //todo: ResizeSelf and make stack based?
 
-            if (Parent != null &&
-                (HorizontalAlignment == Alignment.Stretch ||
-                VerticalAlignment == Alignment.Stretch))
-            {
-                if (HorizontalAlignment == Alignment.Stretch)
-                {
-                    _position.X = 0;
-                    _size.X = Parent.Size.X - Padding.X * 2;
-                    //todo: padding
-                }
-                if (VerticalAlignment == Alignment.Stretch)
-                {
-                    _position.Y = 0;
-                    _size.Y = Parent.Size.Y - Padding.Y * 2;
-                }
-                UpdateBounds();
+            Reflow(Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.AbsoluteDimensions);
 
-                OnResize(System.EventArgs.Empty);
-                Resize?.Invoke(this, System.EventArgs.Empty);
-            }
-            else
-                UpdateBounds();
+            Parent?.OnChildReflow(this);
+            isReflowing = false;
+        }
+
+        /// <summary>
+        /// Reflow child elements relative to this element
+        /// Called whenever this element's position or size is adjusted
+        ///
+        /// Any overrides of this should call FitToContainer() first
+        /// </summary>
+        public virtual void Reflow(Rectangle container)
+        {
+            FitToContainer(container);
 
             foreach (var child in Children)
             {
                 if (child.IsEnabled)
-                    child.Reflow();
+                    child.Reflow(AbsoluteDimensions);
             }
-
-            Parent?.OnChildReflow(this);
-            isReflowing = false;
         }
 
         protected void ResizeAndReflow()
@@ -1081,28 +1064,42 @@ namespace Takai.UI
             Reflow();
 
             OnResize(System.EventArgs.Empty);
-            Resize?.Invoke(this, System.EventArgs.Empty);
+            Resize?.Invoke(this, System.EventArgs.Empty); //todo: re-evaluate necessity
         }
 
         /// <summary>
-        /// Calculate all of the bounds to this element relative to its parent
+        /// Calculate all of the bounds to this element in relation to a container (absolutely positioned)
         /// </summary>
-        protected void UpdateBounds()
+        /// <param name="container">The container to fit this to. Should be in absolute coordinates</param>
+        protected void FitToContainer(Rectangle container)
         {
+            //todo: ideally this should take local dimensions for container
+
+            if (HorizontalAlignment == Alignment.Stretch)
+            {
+                _position.X = 0;
+                _size.X = container.Width - Padding.X * 2;
+            }
+            if (VerticalAlignment == Alignment.Stretch)
+            {
+                _position.Y = 0;
+                _size.Y = container.Height - Padding.Y * 2;
+            }
+            //todo: resize events
+
             if (Parent == null)
             {
+                //todo: this can probably be removed and just use container
                 AbsoluteDimensions = LocalDimensions;
                 AbsoluteDimensions.Offset(Padding);
             }
             else
             {
-                var container = Parent.AbsoluteDimensions;
-                var localPos = GetContainerPosition(container, Padding);
                 AbsoluteDimensions = new Rectangle(
-                    (int)(localPos.X + container.X),
-                    (int)(localPos.Y + container.Y),
+                    (int)(container.X + GetLocalOffset(HorizontalAlignment, Position.X, Size.X, Padding.X, container.Width)),
+                    (int)(container.Y + GetLocalOffset(VerticalAlignment, Position.Y, Size.Y, Padding.Y, container.Height)),
                     (int)Size.X,
-                    (int)Size.X
+                    (int)Size.Y
                 );
             }
 
@@ -1118,44 +1115,17 @@ namespace Takai.UI
                 : AbsoluteBounds;
         }
 
-        /// <summary>
-        /// Get the position of this element inside <see cref="container"/>
-        /// </summary>
-        /// <param name="container">The container to fit around</param>
-        /// <param name="padding">Padding to apply</param>
-        /// <returns>The position of this element</returns>
-        public Vector2 GetContainerPosition(Rectangle container, Vector2 padding)
+        public float GetLocalOffset(Alignment alignment, float position, float size, float padding, float containerSize)
         {
-            var pos = new Vector2();
-
-            switch (HorizontalAlignment)
+            switch (alignment)
             {
-                case Alignment.Start:
-                case Alignment.Stretch:
-                    pos.X = Position.X + padding.X;
-                    break;
                 case Alignment.Middle:
-                    pos.X = (container.Width - Size.X) / 2 + Position.X;
-                    break;
+                    return (containerSize - size) / 2 + position;
                 case Alignment.End:
-                    pos.X = container.Width - Size.X - Position.X - padding.X;
-                    break;
+                    return containerSize - size - position - padding;
+                default:
+                    return position + padding;
             }
-            switch (VerticalAlignment)
-            {
-                case Alignment.Start:
-                case Alignment.Stretch:
-                    pos.Y = Position.Y + padding.Y;
-                    break;
-                case Alignment.Middle:
-                    pos.Y = (container.Height - Size.Y) / 2 + Position.Y;
-                    break;
-                case Alignment.End:
-                    pos.Y = (container.Height - Size.Y) - Position.Y - padding.Y;
-                    break;
-            }
-
-            return pos;
         }
 
         /// <summary>
@@ -1170,7 +1140,7 @@ namespace Takai.UI
                 //var bounds = Rectangle.Union(AbsoluteDimensions, child.AbsoluteBounds);
                 //Size = new Vector2(bounds.Width, bounds.Height);
 
-                SizeToFit();
+                SizeToContain();
             }
         }
 
@@ -1179,7 +1149,7 @@ namespace Takai.UI
         /// This does not affect the position of the element
         /// Padding affects child positioning
         /// </summary>
-        public virtual void SizeToFit()
+        public virtual void SizeToContain()
         {
             var bounds = new Rectangle(
                 AbsoluteDimensions.X,
@@ -1278,7 +1248,7 @@ namespace Takai.UI
                 foreach (var binding in Bindings)
                     didUpdateBinding |= binding.Update();
                 if (didUpdateBinding && AutoSizeOnBindingUpdate)
-                    SizeToFit();
+                    SizeToContain();
             }
         }
 
@@ -1477,7 +1447,7 @@ namespace Takai.UI
             if (!(props.ContainsKey("Bounds") ||
                   props.ContainsKey("Size")) ||
                  (!props.TryGetValue("AutoSize", out var doAutosize) || doAutosize as bool? != false))
-                SizeToFit();
+                SizeToContain();
 
             //allow autosizing only one dimension
             if (props.TryGetValue("Width", out var width))
@@ -1552,13 +1522,13 @@ namespace Takai.UI
 
                             //todo: doesn't work
                         };
-                        check.SizeToFit();
+                        check.SizeToContain();
                         root.AddChild(check);
                         maxWidth = System.Math.Max(maxWidth, check.Size.X);
                     }
                 }
                 root.Size = new Vector2(maxWidth, 1);
-                root.SizeToFit();
+                root.SizeToContain();
                 return root;
             }
 
@@ -1601,7 +1571,7 @@ namespace Takai.UI
                         Font = font,
                         Color = color
                     };
-                    label.SizeToFit();
+                    label.SizeToContain();
                     root.AddChild(label);
 
                     maxWidth = System.Math.Max(maxWidth, label.Size.X);
@@ -1620,7 +1590,7 @@ namespace Takai.UI
                     {
                         setValue(obj, check.IsChecked);
                     };
-                    check.SizeToFit();
+                    check.SizeToContain();
                     root.AddChild(check);
                     maxWidth = System.Math.Max(maxWidth, check.Size.X);
                 }
@@ -1641,7 +1611,7 @@ namespace Takai.UI
                     {
                         setValue(obj, (int)input.Value);
                     };
-                    input.SizeToFit();
+                    input.SizeToContain();
                     root.AddChild(input);
                 }
                 else if (memberType == typeof(uint))
@@ -1661,7 +1631,7 @@ namespace Takai.UI
                     {
                         setValue(obj, (uint)input.Value);
                     };
-                    input.SizeToFit();
+                    input.SizeToContain();
                     root.AddChild(input);
                 }
                 else if (memberType == typeof(long))
@@ -1681,7 +1651,7 @@ namespace Takai.UI
                     {
                         setValue(obj, input.Value);
                     };
-                    input.SizeToFit();
+                    input.SizeToContain();
                     root.AddChild(input);
                 }
                 else if (memberType == typeof(string))
@@ -1699,7 +1669,7 @@ namespace Takai.UI
                     {
                         setValue(obj, input.Text);
                     };
-                    input.SizeToFit();
+                    input.SizeToContain();
                     root.AddChild(input);
                 }
                 else if (memberType == typeof(System.IO.FileInfo))
@@ -1716,7 +1686,7 @@ namespace Takai.UI
                     {
                         setValue(obj, new System.IO.FileInfo(input.Text));
                     };
-                    input.SizeToFit();
+                    input.SizeToContain();
                     root.AddChild(input);
                 }
                 else if (memberType == typeof(Texture2D))
@@ -1733,7 +1703,7 @@ namespace Takai.UI
                     {
                         setValue(obj, Data.Cache.Load<Texture2D>(input.Text));
                     };
-                    input.SizeToFit();
+                    input.SizeToContain();
                     root.AddChild(input);
                 }
                 else if (memberType == typeof(System.TimeSpan))
@@ -1753,7 +1723,7 @@ namespace Takai.UI
                     {
                         setValue(obj, System.TimeSpan.FromMilliseconds(input.Value));
                     };
-                    input.SizeToFit();
+                    input.SizeToContain();
 
                     var mSecLabel = new Static()
                     {
@@ -1761,7 +1731,7 @@ namespace Takai.UI
                         Font = font,
                         Color = color
                     };
-                    mSecLabel.SizeToFit();
+                    mSecLabel.SizeToContain();
 
                     var container = new List()
                     {
@@ -1773,18 +1743,18 @@ namespace Takai.UI
                         input,
                         mSecLabel
                     );
-                    container.SizeToFit();
+                    container.SizeToContain();
                     root.AddChild(container);
                 }
                 else
                 {
                     label.Text += $"\n`aab--- ({memberType.Name}) ---\nthird line`x";
-                    label.SizeToFit();
+                    label.SizeToContain();
                 }
             }
 
             root._size = new Vector2(maxWidth, 1);
-            root.SizeToFit();
+            root.SizeToContain();
             return root;
         }
     }
