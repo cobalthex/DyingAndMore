@@ -22,8 +22,10 @@ namespace Takai.UI
             ColumnCount = columnCount;
         }
 
-        public override void Reflow()
+        public override void Reflow(Rectangle container)
         {
+            FitToContainer(container);
+
             if (ColumnCount <= 0)
                 return;
 
@@ -44,32 +46,31 @@ namespace Takai.UI
                 rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], bounds.Height);
             }
 
-            //todo: respect table alignment
-
             var offset = Vector2.Zero;
             for (int i = 0; i < Children.Count; ++i)
             {
                 if (!Children[i].IsEnabled)
                     continue;
 
-                if (i % ColumnCount == 0)
+                if (i > 0)
                 {
-                    offset.X = 0;
-                    offset.Y += rowHeights[i / ColumnCount];
-
-                    if (i > 0)
-                        offset.Y += Margin.Y;
+                    if (i % ColumnCount == 0)
+                    {
+                        offset.X = 0;
+                        offset.Y += rowHeights[i / ColumnCount] + Margin.Y;
+                    }
+                    else
+                        offset.X += Margin.X;
                 }
-                else
-                    offset.X += Margin.X;
 
-                //var localPos = Children[i].GetContainerPosition(new Rectangle(off))
-                //Children[i].LocalDimensions;
-                Children[i].Position = offset;
+                Children[i].Reflow(new Rectangle(
+                    (int)offset.X + AbsoluteDimensions.X,
+                    (int)offset.Y + AbsoluteDimensions.Y,
+                    (int)colWidths[i % ColumnCount],
+                    (int)rowHeights[i / ColumnCount]
+                ));
                 offset.X += colWidths[i % ColumnCount];
             }
-
-            base.Reflow();
         }
     }
 }

@@ -5,19 +5,77 @@ Table {
 	Padding: [10 10];
 	Margin: 10;
 	ColumnCount: 3;
-	BackgroundColor: [0 120 240];
+	BackgroundColor: [40 0 100];
 
 	Children: [
-		Static { Text: "Column A"; BackgroundColor: [80 200 240]; };
-		Static { Text: "Column B"; BackgroundColor: [80 200 240]; };
-		Static { Text: "Column C"; BackgroundColor: [80 200 240]; };
+		Static { Text: "Cell 0A"; Name: "Cell 0A"; BackgroundColor: [40 100 200]; Width: 200px; Padding: [10 5]; };
+		Static { Text: "Cell 0B"; Name: "Cell 0B"; BackgroundColor: [40 100 200]; Width: 200px; Padding: [10 5]; };
+		Static { Text: "Cell 0C"; Name: "Cell 0C"; BackgroundColor: [40 100 200]; Width: 200px; Padding: [10 5]; };
 
-		Static { Text: "Cell 1A"; BackgroundColor: [80 200 240]; };
-		Static { Text: "Cell 1B"; BackgroundColor: [80 200 240]; };
-		Static { Text: "Cell 1C"; BackgroundColor: [80 200 240]; };
+		Static {
+			Text: "Cell 1A";
+			Name: "Cell 1A";
+			Padding: [10 5];
+			BackgroundColor: [40 100 200];
+			HorizontalAlignment: Alignment.End;
+		};
+		Static {
+			Text: "Cell 1B";
+			Name: "Cell 1B";
+			Padding: [10 5];
+			BackgroundColor: [40 100 200];
+			HorizontalAlignment: Alignment.End;
+		};
+		Static {
+			Text: "Cell 1C";
+			Name: "Cell 1C";
+			Padding: [10 5];
+			BackgroundColor: [40 100 200];
+			HorizontalAlignment: Alignment.End;
+		};
 
-		Static { Text: "Cell 2A"; BackgroundColor: [80 200 240]; };
-		Static { Text: "Cell 2B"; BackgroundColor: [80 200 240]; };
-		Static { Text: "Cell 2C"; BackgroundColor: [80 200 240]; };
+		Static {
+			Text: "Cell 2A";
+			Name: "Cell 2A";
+			Padding: [10 5];
+			BackgroundColor: [40 100 200];
+			HorizontalAlignment: Alignment.Middle;
+		};
+		Static {
+			Text: "Cell 2B";
+			Name: "Cell 2B";
+			Padding: [10 5];
+			BackgroundColor: [40 100 200];
+			HorizontalAlignment: Alignment.Middle;
+		};
+		Static {
+			Text: "Cell 2C";
+			Name: "Cell 2C";
+			Padding: [10 5];
+			BackgroundColor: [40 100 200];
+			HorizontalAlignment: Alignment.Middle;
+		};
+
+		Static {
+			Text: "Cell 3A";
+			Name: "Cell 3A";
+			Padding: [10 5];
+			BackgroundColor: [40 100 200];
+			HorizontalAlignment: Alignment.Start;
+		};
+		Static {
+			Text: "Cell 3B";
+			Name: "Cell 3B";
+			Padding: [10 5];
+			BackgroundColor: [40 100 200];
+			HorizontalAlignment: Alignment.Start;
+		};
+		Static {
+			Text: "Cell 3C";
+			Name: "Cell 3C";
+			Padding: [10 5];
+			BackgroundColor: [40 100 200];
+			HorizontalAlignment: Alignment.Start;
+		};
 	];
 };

@@ -109,7 +109,7 @@ namespace DyingAndMore.Editor
                 Text = "> PLAY >",
                 Padding = new Vector2(20)
             });
-            playButton.SizeToFit();
+            playButton.SizeToContain();
             playButton.Click += delegate
             {
                 SwitchToGame();
@@ -226,7 +226,7 @@ namespace DyingAndMore.Editor
         protected override void UpdateSelf(GameTime time)
         {
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
-            fpsDisplay.SizeToFit();
+            fpsDisplay.SizeToContain();
 
             Map.BeginUpdate();
             Map.MarkRegionActive(Camera);

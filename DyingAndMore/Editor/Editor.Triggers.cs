@@ -23,7 +23,7 @@ namespace DyingAndMore.Editor
 
             triggerSettingsNameInput = new TextInput();
             triggerSettingsNameInput.TextChanged += ActiveTriggerTextChanged;
-            triggerSettingsNameInput.SizeToFit();
+            triggerSettingsNameInput.SizeToContain();
 
             var closeButton = new Static
             {
@@ -32,11 +32,11 @@ namespace DyingAndMore.Editor
                 BorderColor = Color.White,
                 Padding = new Vector2(10)
             };
-            closeButton.SizeToFit();
+            closeButton.SizeToContain();
             closeButton.Click += delegate { triggerSettings.RemoveFromParent(); };
 
             var label = new Static { Text = "Name" };
-            label.SizeToFit();
+            label.SizeToContain();
 
             triggerSettings = new List(
                 label,
@@ -49,7 +49,7 @@ namespace DyingAndMore.Editor
                 VerticalAlignment = Alignment.Middle,
                 Margin = 10
             };
-            triggerSettings.SizeToFit();
+            triggerSettings.SizeToContain();
         }
 
         public override void Start()

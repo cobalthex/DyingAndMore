@@ -13,7 +13,7 @@ namespace DyingAndMore.Editor.Selectors
             : base(Editor)
         {
             ItemSize = new Point(64, 64);
-            Padding = 5;
+            Padding = new Vector2(5);
 
             var searchPaths = new[] { "Actors", "Scenery", "Pickups" };
 

@@ -30,9 +30,9 @@ namespace Takai.UI
             IsChecked = isChecked;
         }
 
-        public override void SizeToFit()
+        public override void SizeToContain()
         {
-            base.SizeToFit();
+            base.SizeToContain();
             var checkboxSize = System.Math.Min(LocalDimensions.Width, LocalDimensions.Height);
             Size += new Vector2(checkboxSize + Margin, 0);
         }

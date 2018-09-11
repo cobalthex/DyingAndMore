@@ -168,7 +168,7 @@ namespace Takai.UI
             Caret = Text.Length;
         }
 
-        public override void SizeToFit()
+        public override void SizeToContain()
         {
             Size = new Vector2(200, (Font?.MaxCharHeight ?? 20));
         }

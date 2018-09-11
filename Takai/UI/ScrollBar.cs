@@ -226,7 +226,7 @@ namespace Takai.UI
                         child != verticalScrollbar)
                         child.Position -= new Vector2(e.Delta, 0);
                 }
-                Reflow();
+                contentArea.Reflow();
             };
             verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
             {
@@ -237,7 +237,7 @@ namespace Takai.UI
                         child != verticalScrollbar)
                         child.Position -= new Vector2(0, e.Delta);
                 }
-                Reflow();
+                contentArea.Reflow();
             };
         }
 
@@ -254,11 +254,10 @@ namespace Takai.UI
             base.AddChildren(children);
             ResizeContentArea();
         }
-
-        protected override void OnResize(EventArgs e)
+        public override void Reflow(Rectangle container)
         {
             ResizeContentArea();
-            base.OnResize(e);
+            base.Reflow(container); //todo
         }
 
         //todo: on child resize event for content area

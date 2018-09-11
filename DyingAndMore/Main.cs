@@ -200,23 +200,21 @@ namespace DyingAndMore
             };
             */
 
-            ui = new Takai.UI.Static(Takai.Data.Cache.Load<Takai.UI.Static>("UI/test/table.ui.tk"));
-
-            //var selectStoryUI = Takai.Data.Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
-            //if (selectStoryUI is Game.StorySelect ss)
-            //{
-            //    ss.StorySelected += delegate (object _sender, Game.GameStory story)
-            //    {
-            //        //var game = new Game.Game
-            //        //{
-            //        //    Story = story,
-            //        //};
-            //        //game.LoadNextStoryMap();
-            //        //ui.ReplaceAllChildren(new Game.GameInstance(game));
-            //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
-            //    };
-            //}
-            //ui = new Takai.UI.Static(selectStoryUI);
+            var selectStoryUI = Takai.Data.Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
+            if (selectStoryUI is Game.StorySelect ss)
+            {
+                ss.StorySelected += delegate (object _sender, Game.GameStory story)
+                {
+                    //var game = new Game.Game
+                    //{
+                    //    Story = story,
+                    //};
+                    //game.LoadNextStoryMap();
+                    //ui.ReplaceAllChildren(new Game.GameInstance(game));
+                    ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
+                };
+            }
+            ui = new Takai.UI.Static(selectStoryUI);
 
             ui.BindCommand("asdf", (s) => s.BackgroundColor = Takai.Graphics.ColorUtil.Random());
 
@@ -238,6 +236,8 @@ namespace DyingAndMore
             base.Initialize();
         }
 
+        Takai.UI.UITree uiTree;
+
         protected override void Update(GameTime gameTime)
         {
             if (InputState.IsPress(Keys.Q)
@@ -252,6 +252,11 @@ namespace DyingAndMore
 
             if (InputState.IsPress(Keys.F10))
                 Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
+            if (InputState.IsPress(Keys.F11))
+            {
+                ui.Reflow();
+                uiTree.Display = ui.Children[0];
+            }
 
             if (InputState.IsPress(Keys.F7))
             {

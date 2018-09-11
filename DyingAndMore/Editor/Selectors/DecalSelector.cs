@@ -22,7 +22,7 @@ namespace DyingAndMore.Editor.Selectors
             }
             ItemCount = textures.Count;
             ItemSize = new Point(64, 64);
-            Padding = 5;
+            Padding = new Vector2(5);
         }
 
         public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds)

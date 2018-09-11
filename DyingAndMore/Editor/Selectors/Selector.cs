@@ -6,6 +6,8 @@ using Takai.UI;
 
 namespace DyingAndMore.Editor.Selectors
 {
+    //todo: update to modern UI practices
+
     abstract class Selector : Static
     {
         protected Editor editor;
@@ -17,9 +19,7 @@ namespace DyingAndMore.Editor.Selectors
             get => _itemSize;
             set
             {
-                _itemSize = value;
-                OnResize(System.EventArgs.Empty);
-            }
+                _itemSize = value;            }
         }
         private Point _itemSize = new Point(1, 1);
 
@@ -29,21 +29,9 @@ namespace DyingAndMore.Editor.Selectors
             set
             {
                 _itemCount = value;
-                OnResize(System.EventArgs.Empty);
             }
         }
         private int _itemCount = 0;
-
-        public int Padding
-        {
-            get => _padding;
-            set
-            {
-                _padding = value;
-                OnResize(System.EventArgs.Empty);
-            }
-        }
-        private int _padding = 2;
 
         protected int ItemsPerRow { get; private set; } = 1;
 
@@ -75,19 +63,19 @@ namespace DyingAndMore.Editor.Selectors
             });
         }
 
-        protected override void OnResize(System.EventArgs e)
+        public override void Reflow(Rectangle container) //todo
         {
             ItemsPerRow = Size.X > scrollBar.Size.X
-                        ? (int)((Padding + Size.X - scrollBar.Size.X) / (ItemSize.X + Padding))
+                        ? (int)((Padding.X + Size.X - scrollBar.Size.X) / (ItemSize.X + Padding.X))
                         : 1;
-            scrollBar.ContentSize = (ItemCount / ItemsPerRow) * (ItemSize.Y + Padding) + Padding;
+            scrollBar.ContentSize = (int)((ItemCount / ItemsPerRow) * (ItemSize.Y + Padding.Y) + Padding.Y);
         }
 
         protected override void OnPress(ClickEventArgs e)
         {
             //todo: handle scroll
-            var row = (int)((e.position.Y + scrollBar.ContentPosition - (Padding / 2)) / (ItemSize.Y + Padding)) * ItemsPerRow;
-            var col = (int)((e.position.X - (_padding / 2)) / (_itemSize.X + _padding));
+            var row = (int)((e.position.Y + scrollBar.ContentPosition - (Padding.Y / 2)) / (ItemSize.Y + Padding.Y)) * ItemsPerRow;
+            var col = (int)((e.position.X - (Padding.X / 2)) / (_itemSize.X + Padding.X));
 
             SelectedItem = row + col;
         }
@@ -123,13 +111,13 @@ namespace DyingAndMore.Editor.Selectors
         {
             Takai.Graphics.Primitives2D.DrawFill(spriteBatch, new Color(1, 1, 1, 0.75f), VisibleBounds);
 
-            int start = scrollBar.ContentPosition / (ItemSize.Y + Padding) * ItemsPerRow;
+            int start = (int)(scrollBar.ContentPosition / (ItemSize.Y + Padding.X) * ItemsPerRow);
             start = System.Math.Max(start, 0);
-            for (int i = start; i < System.Math.Min(start + (int)(Size.Y / (ItemSize.Y + Padding) + 2) * ItemsPerRow, ItemCount); ++i)
+            for (int i = start; i < System.Math.Min(start + (int)(Size.Y / (ItemSize.Y + Padding.Y) + 2) * ItemsPerRow, ItemCount); ++i)
             {
                 var rect = new Rectangle(
-                    VisibleBounds.X + Padding + (i % ItemsPerRow) * (ItemSize.X + Padding),
-                    VisibleBounds.Y + Padding + (i / ItemsPerRow) * (ItemSize.Y + Padding) - scrollBar.ContentPosition,
+                    (int)(VisibleBounds.X + Padding.X + (i % ItemsPerRow) * (ItemSize.X + Padding.X)),
+                    (int)(VisibleBounds.Y + Padding.Y + (i / ItemsPerRow) * (ItemSize.Y + Padding.Y) - scrollBar.ContentPosition),
                     ItemSize.X,
                     ItemSize.Y
                 );
