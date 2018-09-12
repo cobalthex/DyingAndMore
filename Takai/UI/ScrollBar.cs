@@ -108,13 +108,18 @@ namespace Takai.UI
 
                 if (VisibleBounds.Contains(InputState.MousePoint) && InputState.HasScrolled())
                 {
-                    ContentPosition -= InputState.ScrollDelta();
+                    ScrollTowards(InputState.ScrollDelta());
                     return false;
                 }
 
                 //todo up/down + pgup/pgdn
             }
             return base.HandleInput(time);
+        }
+
+        public void ScrollTowards(int direction)
+        {
+            ContentPosition -= Math.Sign(direction) * (Font != null ? Font.MaxCharHeight : 20);
         }
 
         protected override void OnPress(ClickEventArgs args)
@@ -199,18 +204,22 @@ namespace Takai.UI
     //todo: convert scroll bars to use enabled/disabled
     public class ScrollBox : Table
     {
-        protected ScrollBar verticalScrollbar = new ScrollBar()
+        protected ScrollBar verticalScrollbar = new ScrollBar
         {
-            HorizontalAlignment = Alignment.End,
+            VerticalAlignment = Alignment.Stretch,
             Size = new Vector2(20, 1),
         };
-        protected ScrollBar horizontalScrollbar = new ScrollBar()
+        protected ScrollBar horizontalScrollbar = new ScrollBar
         {
             Direction = Direction.Horizontal,
-            VerticalAlignment = Alignment.End,
+            HorizontalAlignment = Alignment.Stretch,
             Size = new Vector2(1, 20),
         };
-        protected Static contentArea = new Static();
+        protected Static contentArea = new Static
+        {
+            //HorizontalAlignment = Alignment.Stretch,
+            //VerticalAlignment = Alignment.Stretch
+        };
 
         public ScrollBox()
         {
@@ -264,6 +273,9 @@ namespace Takai.UI
 
         protected void ResizeContentArea()
         {
+            //todo: table needs to handle stretch
+            contentArea.Size = Size - new Vector2(verticalScrollbar.Size.X, horizontalScrollbar.Size.Y);
+
             var contentSize = Rectangle.Empty;
             foreach (var child in contentArea.Children)
                 contentSize = Rectangle.Union(contentSize, child.AbsoluteBounds);
@@ -271,8 +283,8 @@ namespace Takai.UI
             horizontalScrollbar.ContentSize = contentSize.Width;
             verticalScrollbar.ContentSize = contentSize.Height;
 
-            horizontalScrollbar.IsEnabled = !horizontalScrollbar.IsThumbVisible;
-            verticalScrollbar.IsEnabled = !verticalScrollbar.IsThumbVisible;
+            horizontalScrollbar.IsEnabled = horizontalScrollbar.IsThumbVisible;
+            verticalScrollbar.IsEnabled = verticalScrollbar.IsThumbVisible;
         }
 
         public override void DerivedDeserialize(Dictionary<string, object> props)
@@ -286,9 +298,9 @@ namespace Takai.UI
             if (InputState.HasScrolled() && VisibleBounds.Contains(InputState.MousePoint))
             {
                 if (InputState.IsMod(KeyMod.Shift))
-                    horizontalScrollbar.ContentPosition -= InputState.ScrollDelta();
+                    horizontalScrollbar.ScrollTowards(InputState.ScrollDelta());
                 else
-                    verticalScrollbar.ContentPosition -= InputState.ScrollDelta();
+                    verticalScrollbar.ScrollTowards(InputState.ScrollDelta());
                 return false;
             }
 

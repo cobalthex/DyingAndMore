@@ -38,6 +38,7 @@ Table {
 			Text: "Cell 2A";
 			Name: "Cell 2A";
 			Padding: [10 5];
+			Position: [100 20];
 			BackgroundColor: [40 100 200];
 			HorizontalAlignment: Alignment.Middle;
 		};

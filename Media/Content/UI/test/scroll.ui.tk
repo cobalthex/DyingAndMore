@@ -1,0 +1,19 @@
+ScrollBox {
+	Width: 400px;
+	Height: 400px;
+	BorderColor: [0 40 100];
+	HorizontalAlignment: Alignment.Middle;
+	VerticalAlignment: Alignment.Middle;
+
+	Children: [
+		List {
+			Children: [
+				Static { Text: "abc"; Size: [100 100]; BackgroundColor: ColorUtil.RandomColor; };
+				Static { Text: "def"; Size: [200 100]; BackgroundColor: ColorUtil.RandomColor; };
+				Static { Text: "ghi"; Size: [300 100]; BackgroundColor: ColorUtil.RandomColor; };
+				Static { Text: "jkl"; Size: [400 100]; BackgroundColor: ColorUtil.RandomColor; };
+				Static { Text: "mno"; Size: [500 100]; BackgroundColor: ColorUtil.RandomColor; };
+			]
+		}
+	]
+}

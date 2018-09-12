@@ -42,22 +42,24 @@ namespace Takai.UI
                 if (Children[i].HorizontalAlignment == Alignment.Stretch)
                     bounds.Height = 1;
 
-                colWidths[i % ColumnCount] = System.Math.Max(colWidths[i % ColumnCount], bounds.Width);
-                rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], bounds.Height);
+                //todo: centering (maybe right) broken and doesnt correctly clip/position
+
+                colWidths[i % ColumnCount] = System.Math.Max(colWidths[i % ColumnCount], Children[i].Position.X + bounds.Width);
+                rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], Children[i].Position.Y + bounds.Height);
             }
 
             var offset = Vector2.Zero;
             for (int i = 0; i < Children.Count; ++i)
             {
                 if (!Children[i].IsEnabled)
-                    continue;
+                    ;// continue;
 
                 if (i > 0)
                 {
                     if (i % ColumnCount == 0)
                     {
                         offset.X = 0;
-                        offset.Y += rowHeights[i / ColumnCount] + Margin.Y;
+                        offset.Y += rowHeights[(i - 1) / ColumnCount] + Margin.Y;
                     }
                     else
                         offset.X += Margin.X;
