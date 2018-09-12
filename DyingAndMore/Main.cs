@@ -145,59 +145,6 @@ namespace DyingAndMore
                 catch (System.IO.FileNotFoundException) { }
             }
 #endif
-            ui = Takai.Data.Cache.Load<Takai.UI.Static>("UI/NoMap.ui.tk");
-            var mapList = ui.FindChildByName< Takai.UI.FileList>("maps");
-            mapList.SelectionChanged += delegate
-            {
-                if (mapList.SelectedIndex < 0)
-                    return;
-
-                Takai.Game.MapClass map = null;
-                Takai.Game.MapInstance inst = null;
-
-                var loaded = Takai.Data.Cache.Load(mapList.SelectedFile);
-                if (loaded is Takai.Game.MapInstance)
-                {
-                    inst = (Takai.Game.MapInstance)loaded;
-                    map = inst.Class;
-                }
-                else if (loaded is Takai.Game.MapClass)
-                {
-                    map = (Takai.Game.MapClass)loaded;
-                    inst = map.Instantiate();
-                }
-                else
-                    throw new System.ArgumentException("File loaded must be a MapClass or MapInstance");
-
-                map.InitializeGraphics();
-                ui = new Takai.UI.Static(new Editor.Editor(inst));
-            };
-
-            var newMap = ui.FindChildByName("new");
-            newMap.Click += delegate
-            {
-                var newMapUi = Takai.Data.Cache.Load<Takai.UI.Static>("UI/Editor/NewMap.ui.tk");
-                var create = newMapUi.FindChildByName("create");
-                create.Click += delegate
-                {
-                    var name = newMapUi.FindChildByName("name").Text;
-                    var width = newMapUi.FindChildByName<Takai.UI.NumericBase>("width").Value;
-                    var height = newMapUi.FindChildByName<Takai.UI.NumericBase>("height").Value;
-                    var tileset = Takai.Data.Cache.Load<Takai.Game.Tileset>(newMapUi.FindChildByName<Takai.UI.FileInputBase>("tileset").Value);
-
-                    var map = new Takai.Game.MapClass
-                    {
-                        Name = name,
-                        Tiles = new short[height, width],
-                        TileSize = tileset.size,
-                        TilesImage = tileset.texture,
-                    };
-                    map.InitializeGraphics();
-                    ui.ReplaceAllChildren(new Editor.Editor(map.Instantiate()));
-                };
-
-                ui.ReplaceAllChildren(newMapUi);
-            };
             */
 
             var selectStoryUI = Takai.Data.Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
@@ -214,9 +161,8 @@ namespace DyingAndMore
                     ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
                 };
             }
-            ui = new Takai.UI.Static(selectStoryUI);
-
-            ui.BindCommand("asdf", (s) => s.BackgroundColor = Takai.Graphics.ColorUtil.Random());
+            //ui = new Takai.UI.Static(selectStoryUI);
+            ui = new Takai.UI.Static(Takai.Data.Cache.Load<Takai.UI.Static>("UI/test/scroll.ui.tk"));
 
             fpsGraph = new Takai.FpsGraph()
             {
@@ -236,8 +182,6 @@ namespace DyingAndMore
             base.Initialize();
         }
 
-        Takai.UI.UITree uiTree;
-
         protected override void Update(GameTime gameTime)
         {
             if (InputState.IsPress(Keys.Q)
@@ -253,10 +197,7 @@ namespace DyingAndMore
             if (InputState.IsPress(Keys.F10))
                 Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
             if (InputState.IsPress(Keys.F11))
-            {
                 ui.Reflow();
-                uiTree.Display = ui.Children[0];
-            }
 
             if (InputState.IsPress(Keys.F7))
             {

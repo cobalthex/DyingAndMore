@@ -45,23 +45,23 @@ namespace Takai.UI
 
                 if (Direction == Direction.Horizontal)
                 {
-                    Children[i].Reflow(new Rectangle(
-                        (int)t + AbsoluteDimensions.X,
-                        AbsoluteDimensions.Y,
-                        (int)Children[i].AbsoluteBounds.Width,
-                        (int)Size.Y
+                    child.Reflow(new Rectangle(
+                        (int)(t + child.Position.X) + AbsoluteDimensions.X,
+                        (int)child.Position.Y + AbsoluteDimensions.Y,
+                        child.AbsoluteBounds.Width + (int)child.Position.X,
+                        (int)(Size.Y + child.Position.Y)
                     ));
-                    t += Children[i].AbsoluteBounds.Width;
+                    t += child.Position.X + child.AbsoluteBounds.Width;
                 }
                 else
                 {
-                    Children[i].Reflow(new Rectangle(
+                    child.Reflow(new Rectangle(
                         AbsoluteDimensions.X,
                         (int)t + AbsoluteDimensions.Y,
-                        (int)Size.X,
-                        (int)Children[i].AbsoluteBounds.Height
+                        (int)(Size.X + child.Position.X),
+                        child.AbsoluteBounds.Height + (int)child.Position.Y
                     ));
-                    t += Children[i].AbsoluteBounds.Height;
+                    t += child.Position.Y + child.AbsoluteBounds.Height;
                 }
             }
         }

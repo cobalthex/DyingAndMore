@@ -1036,7 +1036,7 @@ namespace Takai.UI
                 return;
             isReflowing = true;
 
-            Reflow(Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.AbsoluteDimensions);
+            Reflow(Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.VisibleBounds);
 
             Parent?.OnChildReflow(this);
             isReflowing = false;
@@ -1110,9 +1110,9 @@ namespace Takai.UI
                 (int)(AbsoluteDimensions.Height + Padding.Y * 2)
             );
 
-            VisibleBounds = Parent != null
-                ? Rectangle.Intersect(Parent.VisibleBounds, AbsoluteBounds)
-                : AbsoluteBounds;
+            VisibleBounds = Rectangle.Intersect(container, AbsoluteBounds);
+            if (Parent != null)
+                VisibleBounds = Rectangle.Intersect(Parent.VisibleBounds, VisibleBounds);
         }
 
         public float GetLocalOffset(Alignment alignment, float position, float size, float padding, float containerSize)
@@ -1397,7 +1397,7 @@ namespace Takai.UI
                 Graphics.Primitives2D.DrawRect(spriteBatch, Color.Red, rect);
                 Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Red, 0.5f), lastDraw.AbsoluteDimensions);
 
-                string info = $"Name: {(Name ?? "(No name)")}\nBounds: {lastDraw.AbsoluteDimensions} Padding: {lastDraw.Padding}";
+                string info = $"Name: {(Name ?? "(No name)")}\nBounds: {lastDraw.AbsoluteDimensions}\nDimensions: {lastDraw.LocalDimensions} Padding: {lastDraw.Padding}";
                 DebugFont.Draw(spriteBatch, info, (rect.Location + new Point(rect.Width, rect.Height)).ToVector2(), Color.Gold);
             }
         }
@@ -1444,8 +1444,9 @@ namespace Takai.UI
 
         public virtual void DerivedDeserialize(Dictionary<string, object> props)
         {
+
             if (!(props.ContainsKey("Bounds") ||
-                  props.ContainsKey("Size")) ||
+                  props.ContainsKey("Size")) &&
                  (!props.TryGetValue("AutoSize", out var doAutosize) || doAutosize as bool? != false))
                 SizeToContain();
 
