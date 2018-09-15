@@ -24,10 +24,14 @@ namespace Takai.UI
 
         public override void Reflow(Rectangle container)
         {
-            FitToContainer(container);
+            AdjustToContainer(container); //todo: this should be done automatically
 
             if (ColumnCount <= 0)
                 return;
+
+            var hStretches = new System.Collections.Generic.List<int>();
+            var vStretches = new System.Collections.Generic.List<int>();
+            var usedArea = new Vector2();
 
             float[] colWidths = new float[ColumnCount];
             float[] rowHeights = new float[(int)System.Math.Ceiling(Children.Count / (float)ColumnCount)]; //todo: integer only
@@ -38,9 +42,15 @@ namespace Takai.UI
 
                 var bounds = Children[i].AbsoluteBounds;
                 if (Children[i].HorizontalAlignment == Alignment.Stretch)
-                    bounds.Width = 1;
-                if (Children[i].HorizontalAlignment == Alignment.Stretch)
-                    bounds.Height = 1;
+                {
+                    hStretches.Add(i % ColumnCount);
+                    bounds.Width = 0;
+                }
+                if (Children[i].VerticalAlignment == Alignment.Stretch)
+                {
+                    vStretches.Add(i / ColumnCount);
+                    bounds.Height = 0;
+                }
 
                 //todo: centering (maybe right) broken and doesnt correctly clip/position
 
@@ -48,11 +58,25 @@ namespace Takai.UI
                 rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], Children[i].Position.Y + bounds.Height);
             }
 
+            if (hStretches.Count > 0 && Size.X > usedArea.X)
+            {
+                float width = (Size.Y - usedArea.X) / hStretches.Count;
+                foreach (var col in hStretches)
+                    colWidths[col] = System.Math.Max(colWidths[col], width); //use remaining width elsewhere?
+            }
+
+            //if (vStretches.Count > 0 && Size.X > usedArea.X)
+            //{
+            //    float width = (Size.Y - usedArea.X) / hStretches.Count;
+            //    foreach (var col in hStretches)
+            //        colWidths[col] = System.Math.Max(colWidths[col], width); //use remaining width elsewhere?
+            //}
+
             var offset = Vector2.Zero;
             for (int i = 0; i < Children.Count; ++i)
             {
                 if (!Children[i].IsEnabled)
-                    ;// continue;
+                    continue;
 
                 if (i > 0)
                 {

@@ -1050,7 +1050,7 @@ namespace Takai.UI
         /// </summary>
         public virtual void Reflow(Rectangle container)
         {
-            FitToContainer(container);
+            AdjustToContainer(container);
 
             foreach (var child in Children)
             {
@@ -1071,7 +1071,7 @@ namespace Takai.UI
         /// Calculate all of the bounds to this element in relation to a container (absolutely positioned)
         /// </summary>
         /// <param name="container">The container to fit this to. Should be in absolute coordinates</param>
-        protected void FitToContainer(Rectangle container)
+        protected void AdjustToContainer(Rectangle container)
         {
             //todo: ideally this should take local dimensions for container
 
@@ -1319,7 +1319,7 @@ namespace Takai.UI
         {
             if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mousePosition))
             {
-                var e = new ClickEventArgs { position = (mousePosition - VisibleBounds.Location).ToVector2() };
+                var e = new ClickEventArgs { position = (mousePosition - AbsoluteBounds.Location).ToVector2() };
                 didPress = true;
                 OnPress(e);
                 Press?.Invoke(this, e);
@@ -1341,7 +1341,7 @@ namespace Takai.UI
             {
                 if (didPress && VisibleBounds.Contains(mousePosition)) //gesture pos
                 {
-                    TriggerClick((mousePosition - VisibleBounds.Location).ToVector2());
+                    TriggerClick((mousePosition - AbsoluteBounds.Location).ToVector2());
                     didPress = false;
                     return false;
                 }
