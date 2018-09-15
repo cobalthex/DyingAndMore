@@ -27,7 +27,7 @@ namespace Takai.UI
 
         public override void Reflow(Rectangle container)
         {
-            FitToContainer(container);
+            AdjustToContainer(container);
 
             float t = 0;
 

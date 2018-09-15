@@ -8,9 +8,9 @@ namespace Takai.UI
 {
     public class ScrollEventArgs : EventArgs
     {
-        public int Delta { get; set; }
+        public float Delta { get; set; }
 
-        public ScrollEventArgs(int delta)
+        public ScrollEventArgs(float delta)
         {
             Delta = delta;
         }
@@ -18,12 +18,10 @@ namespace Takai.UI
 
     public class ScrollBar : Static
     {
-        static float ThumbMargin = 3; //todo: apply correctly
-
         /// <summary>
         /// The size of the content. This determines how big the scroll thumb is
         /// </summary>
-        public int ContentSize
+        public float ContentSize
         {
             get => contentSize;
             set
@@ -32,7 +30,7 @@ namespace Takai.UI
                 ContentPosition = contentPosition;
             }
         }
-        private int contentSize = 1;
+        private float contentSize = 1;
 
         /// <summary>
         /// Is the scrollbar thumb visible
@@ -44,13 +42,13 @@ namespace Takai.UI
         /// <summary>
         /// Where the content is scrolled to
         /// </summary>
-        public int ContentPosition
+        public float ContentPosition
         {
             get => contentPosition;
             set
             {
                 var newPosition = value;
-                int size = (int)(Direction == Direction.Horizontal ? Size.X : Size.Y);
+                var size = Direction == Direction.Horizontal ? Size.X : Size.Y;
 
                 if (size > contentSize)
                     newPosition = 0;
@@ -66,7 +64,7 @@ namespace Takai.UI
                 }
             }
         }
-        private int contentPosition = 0;
+        private float contentPosition = 0;
 
         /// <summary>
         /// Which direction the scrollbar moves
@@ -83,6 +81,7 @@ namespace Takai.UI
         public ScrollBar()
         {
             BorderColor = Color;
+            Padding = new Vector2(2);
         }
 
         protected override bool HandleInput(GameTime time)
@@ -91,7 +90,7 @@ namespace Takai.UI
             {
                 if (DidPressInside(MouseButtons.Left))
                 {
-                    var mouse = InputState.MousePoint - VisibleBounds.Location;
+                    var mouse = InputState.MousePoint - AbsoluteBounds.Location;
                     var deltaMouse = InputState.MouseDelta();
 
                     if (didPressThumb)
@@ -124,6 +123,8 @@ namespace Takai.UI
 
         protected override void OnPress(ClickEventArgs args)
         {
+            //todo: compare against absolute bounds not dimensions
+
             var thumb = GetThumbBounds();
             if (!thumb.Contains(args.position))
             {
@@ -131,47 +132,47 @@ namespace Takai.UI
 
                 //center thumb around mouse
                 if (Direction == Direction.Vertical)
-                    ContentPosition = (int)((args.position.Y - ThumbMargin - GetThumbSize() / 2) * ((float)ContentSize / GetContainerSize()));
+                    ContentPosition = (int)((args.position.Y - GetThumbSize() / 2) * ((float)ContentSize / GetContainerSize()));
                 else if (Direction == Direction.Horizontal)
-                    ContentPosition = (int)((args.position.X - ThumbMargin - GetThumbSize() / 2) * ((float)ContentSize / GetContainerSize()));
+                    ContentPosition = (int)((args.position.X - GetThumbSize() / 2) * ((float)ContentSize / GetContainerSize()));
             }
             didPressThumb = true;
         }
 
-        protected int GetContainerSize()
+        protected float GetContainerSize()
         {
             //todo: precalculate
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return (int)(Size.Y - ThumbMargin * 2);
+                    return Size.Y;
                 case Direction.Horizontal:
-                    return (int)(Size.X - ThumbMargin * 2);
+                    return Size.X;
                 default:
                     return 1;
             }
         }
 
-        protected int GetThumbSize()
+        protected float GetThumbSize()
         {
             //todo: precalculate
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return (int)((Size.Y / ContentSize) * GetContainerSize());
+                    return (Size.Y / ContentSize) * GetContainerSize();
                 case Direction.Horizontal:
-                    return (int)((Size.X / ContentSize) * GetContainerSize());
+                    return (Size.X / ContentSize) * GetContainerSize();
                 default:
                     return 1;
             }
         }
 
-        protected int GetThumbOffset()
+        protected float GetThumbOffset()
         {
-            int containerSize = GetContainerSize();
-            int size = GetThumbSize();
+            var containerSize = GetContainerSize();
+            var size = GetThumbSize();
 
-            return (int)ThumbMargin + Util.Clamp((int)((ContentPosition / (float)ContentSize) * containerSize), 0, containerSize - size);
+            return Util.Clamp((ContentPosition / ContentSize) * containerSize, 0, containerSize - size);
         }
 
         protected Rectangle GetThumbBounds()
@@ -179,9 +180,9 @@ namespace Takai.UI
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return new Rectangle((int)ThumbMargin, GetThumbOffset(), (int)(Size.X - ThumbMargin * 2), GetThumbSize());
+                    return new Rectangle(0, (int)GetThumbOffset(), (int)Size.X, (int)GetThumbSize());
                 case Direction.Horizontal:
-                    return new Rectangle(GetThumbOffset(), (int)ThumbMargin, GetThumbSize(), (int)(Size.Y - ThumbMargin * 2));
+                    return new Rectangle((int)GetThumbOffset(), 0, (int)GetThumbSize(), (int)Size.Y);
                 default:
                     return Rectangle.Empty;
             }
@@ -189,15 +190,12 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var bounds = VisibleBounds;
-            Graphics.Primitives2D.DrawRect(spriteBatch, BorderColor, bounds);
+            if (!IsThumbVisible)
+                return;
 
-            if (IsThumbVisible)
-            {
-                var thumb = GetThumbBounds();
-                thumb.Offset(VisibleBounds.Location);
-                Graphics.Primitives2D.DrawFill(spriteBatch, BorderColor, thumb);
-            }
+            var thumb = GetThumbBounds();
+            thumb.Offset(AbsoluteDimensions.Location);
+            Graphics.Primitives2D.DrawFill(spriteBatch, BorderColor, Rectangle.Intersect(VisibleBounds, thumb));
         }
     }
 
@@ -274,7 +272,7 @@ namespace Takai.UI
         protected void ResizeContentArea()
         {
             //todo: table needs to handle stretch
-            contentArea.Size = Size - new Vector2(verticalScrollbar.Size.X, horizontalScrollbar.Size.Y);
+            contentArea.Size = Size - new Vector2(verticalScrollbar.AbsoluteBounds.Width, horizontalScrollbar.AbsoluteBounds.Height);
 
             var contentSize = Rectangle.Empty;
             foreach (var child in contentArea.Children)
@@ -283,8 +281,8 @@ namespace Takai.UI
             horizontalScrollbar.ContentSize = contentSize.Width;
             verticalScrollbar.ContentSize = contentSize.Height;
 
-            horizontalScrollbar.IsEnabled = horizontalScrollbar.IsThumbVisible;
-            verticalScrollbar.IsEnabled = verticalScrollbar.IsThumbVisible;
+            //horizontalScrollbar.IsEnabled = horizontalScrollbar.IsThumbVisible;
+            //verticalScrollbar.IsEnabled = verticalScrollbar.IsThumbVisible;
         }
 
         public override void DerivedDeserialize(Dictionary<string, object> props)
