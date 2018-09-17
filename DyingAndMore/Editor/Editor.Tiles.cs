@@ -40,8 +40,11 @@ namespace DyingAndMore.Editor
 
             selector = new Selectors.TileSelector(editor)
             {
-                Size = new Vector2(48 * 9, 400),
-                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                //BackgroundColor = new Color(Color.Gray, 0.5f),
+                BackgroundColor = Color.Black,
+                Padding = new Vector2(20, 20),
+                Size = new Vector2(48 * 9 + 22, 400),
+                //VerticalAlignment = Takai.UI.Alignment.Stretch,
                 HorizontalAlignment = Takai.UI.Alignment.End
             };
             selector.SelectionChanged += delegate

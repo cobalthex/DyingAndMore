@@ -1041,7 +1041,7 @@ namespace Takai.Data
 
             foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (prop.CanWrite)
+                if (prop.CanWrite && prop.CanRead)
                     prop.SetValue(target, prop.GetValue(source));
             }
             foreach (var val in type.GetFields(BindingFlags.Public | BindingFlags.Instance))

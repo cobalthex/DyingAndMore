@@ -196,7 +196,7 @@ namespace Takai.Data
 
                 foreach (var prop in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance | (serializeNonPublics ? BindingFlags.NonPublic : 0)))
                 {
-                    if (prop.CanWrite)
+                    if (prop.CanWrite && prop.CanRead)
                         SerializeMember(writer, serializing, prop, prop.GetValue(serializing), prop.PropertyType, indentLevel, serializeExternals, serializeNonPublics);
                 }
 

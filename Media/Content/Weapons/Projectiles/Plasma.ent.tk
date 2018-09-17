@@ -1,6 +1,6 @@
 ProjectileClass {
     Name: "Plasma rocket";
-    MuzzleVelocity: 500;
+    MuzzleVelocity: 1500;
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     Drag: 0.4;
@@ -28,7 +28,7 @@ ProjectileClass {
 
     Trail: {
         MaxPoints: 200;
-        Color: Color [192 64 255 255];
+        Color: Color [240 192 255 255];
         Sprite: @"Effects/Trails/Lightning.png";
         LifeSpan: 0.5sec;
         CaptureDelay: 300hz;
@@ -47,7 +47,7 @@ ProjectileClass {
             Sprite: {
                 Texture: @"./Antibody.png";
             };
-            Effect: @"Effects/Shards.fx.tk";
+            #Effect: @"Effects/Shards.fx.tk";
         }
     }
 }

@@ -3,13 +3,14 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
+using Takai.Data;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace DyingAndMore
 {
 #if WINDOWS //win32 startup
-    [Takai.Data.Serializer.Ignored]
+    [Serializer.Ignored]
     static class Program
     {
         /// <summary>
@@ -83,9 +84,9 @@ namespace DyingAndMore
         {
             Takai.Runtime.Game = this;
 
-            Takai.Data.Serializer.LoadTypesFrom(typeof(DyingAndMoreGame).GetTypeInfo().Assembly);
+            Serializer.LoadTypesFrom(typeof(DyingAndMoreGame).GetTypeInfo().Assembly);
 #if DEBUG
-            Takai.Data.Cache.WatchDirectory(Takai.Data.Cache.Root);
+            Cache.WatchDirectory(Cache.Root);
 #endif
 
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
@@ -111,7 +112,7 @@ namespace DyingAndMore
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            Takai.UI.Static.DefaultFont = Takai.Data.Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
+            Takai.UI.Static.DefaultFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
 
             /*
 #if WINDOWS //UWP launch activation parameters?
@@ -133,7 +134,7 @@ namespace DyingAndMore
             {
                 try
                 {
-                    var map = Takai.Data.Cache.Load<Takai.Game.MapClass>(presetMap);
+                    var map = Cache.Load<Takai.Game.MapClass>(presetMap);
                     map.InitializeGraphics();
                     var instance = map.Instantiate();
                     if (presetMode == "game")
@@ -147,7 +148,7 @@ namespace DyingAndMore
 #endif
             */
 
-            var selectStoryUI = Takai.Data.Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
+            var selectStoryUI = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
             if (selectStoryUI is Game.StorySelect ss)
             {
                 ss.StorySelected += delegate (object _sender, Game.GameStory story)
@@ -161,8 +162,8 @@ namespace DyingAndMore
                     ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
                 };
             }
-            //ui = new Takai.UI.Static(selectStoryUI);
-            ui = new Takai.UI.Static(Takai.Data.Cache.Load<Takai.UI.Static>("UI/test/scroll.ui.tk"));
+            ui = new Takai.UI.Static(selectStoryUI);
+            //ui = new Takai.UI.Static(Cache.Load<Takai.UI.Static>("UI/test/scroll.ui.tk"));
 
             fpsGraph = new Takai.FpsGraph()
             {
