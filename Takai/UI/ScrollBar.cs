@@ -71,6 +71,8 @@ namespace Takai.UI
         /// </summary>
         public Direction Direction { get; set; } = Direction.Vertical;
 
+        public Color ThumbColor { get; set; } = Color.White;
+
         protected bool didPressThumb = false;
 
         public override bool CanFocus => IsThumbVisible;
@@ -78,11 +80,7 @@ namespace Takai.UI
         public event EventHandler<ScrollEventArgs> Scroll;
         protected virtual void OnScroll(ScrollEventArgs e) { }
 
-        public ScrollBar()
-        {
-            BorderColor = Color;
-            Padding = new Vector2(2);
-        }
+        public ScrollBar() { }
 
         protected override bool HandleInput(GameTime time)
         {
@@ -195,57 +193,76 @@ namespace Takai.UI
 
             var thumb = GetThumbBounds();
             thumb.Offset(AbsoluteDimensions.Location);
-            Graphics.Primitives2D.DrawFill(spriteBatch, BorderColor, Rectangle.Intersect(VisibleBounds, thumb));
+            Graphics.Primitives2D.DrawFill(spriteBatch, ThumbColor, Rectangle.Intersect(VisibleBounds, thumb));
         }
     }
 
     //todo: convert scroll bars to use enabled/disabled
     public class ScrollBox : Table
     {
-        protected ScrollBar verticalScrollbar = new ScrollBar
+        /// <summary>
+        /// An optional style to apply to the scrollbars (write-only)
+        /// </summary>
+        public ScrollBar ScrollBarTemplate
         {
-            VerticalAlignment = Alignment.Stretch,
-            Size = new Vector2(20, 1),
-        };
-        protected ScrollBar horizontalScrollbar = new ScrollBar
-        {
-            Direction = Direction.Horizontal,
-            HorizontalAlignment = Alignment.Stretch,
-            Size = new Vector2(1, 20),
-        };
+            set
+            {
+                if (value == null)
+                    return;
+
+                verticalScrollbar = (ScrollBar)value.Clone();
+                verticalScrollbar.VerticalAlignment = Alignment.Stretch;
+                verticalScrollbar.Direction = Direction.Vertical;
+                verticalScrollbar.Size = new Vector2(20);
+
+                verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
+                {
+                    foreach (var child in contentArea.Children)
+                    {
+                        if (child.IsEnabled &&
+                            child != horizontalScrollbar &&
+                            child != verticalScrollbar)
+                            child.Position -= new Vector2(0, e.Delta);
+                    }
+                    contentArea.Reflow(contentArea.AbsoluteBounds);
+                };
+
+                horizontalScrollbar = (ScrollBar)value.Clone();
+                horizontalScrollbar.HorizontalAlignment = Alignment.Stretch;
+                horizontalScrollbar.Direction = Direction.Horizontal;
+                horizontalScrollbar.Size = new Vector2(20);
+
+                horizontalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
+                {
+                    foreach (var child in contentArea.Children)
+                    {
+                        if (child.IsEnabled &&
+                            child != horizontalScrollbar &&
+                            child != verticalScrollbar)
+                            child.Position -= new Vector2(e.Delta, 0);
+                    }
+                    contentArea.Reflow(contentArea.AbsoluteBounds);
+                };
+
+                ReplaceAllChildren(contentArea, verticalScrollbar, horizontalScrollbar);
+            }
+        }
+
+        protected ScrollBar verticalScrollbar;
+        protected ScrollBar horizontalScrollbar;
+
         protected Static contentArea = new Static
         {
-            //HorizontalAlignment = Alignment.Stretch,
-            //VerticalAlignment = Alignment.Stretch
+            HorizontalAlignment = Alignment.Stretch,
+            VerticalAlignment = Alignment.Stretch
         };
 
         public ScrollBox()
         {
+            ScrollBarTemplate = new ScrollBar();
+
             ColumnCount = 2;
             AddChildren(contentArea, verticalScrollbar, horizontalScrollbar);
-
-            horizontalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
-            {
-                foreach (var child in contentArea.Children)
-                {
-                    if (child.IsEnabled &&
-                        child != horizontalScrollbar &&
-                        child != verticalScrollbar)
-                        child.Position -= new Vector2(e.Delta, 0);
-                }
-                contentArea.Reflow();
-            };
-            verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
-            {
-                foreach (var child in contentArea.Children)
-                {
-                    if (child.IsEnabled &&
-                        child != horizontalScrollbar &&
-                        child != verticalScrollbar)
-                        child.Position -= new Vector2(0, e.Delta);
-                }
-                contentArea.Reflow();
-            };
         }
 
         //todo: unified method between all add modes?
@@ -261,19 +278,17 @@ namespace Takai.UI
             base.AddChildren(children);
             ResizeContentArea();
         }
-        public override void Reflow(Rectangle container)
+
+        protected override void OnResize(EventArgs e)
         {
             ResizeContentArea();
-            base.Reflow(container); //todo
+            base.OnResize(e);
         }
 
         //todo: on child resize event for content area
 
         protected void ResizeContentArea()
         {
-            //todo: table needs to handle stretch
-            contentArea.Size = Size - new Vector2(verticalScrollbar.AbsoluteBounds.Width, horizontalScrollbar.AbsoluteBounds.Height);
-
             var contentSize = Rectangle.Empty;
             foreach (var child in contentArea.Children)
                 contentSize = Rectangle.Union(contentSize, child.AbsoluteBounds);

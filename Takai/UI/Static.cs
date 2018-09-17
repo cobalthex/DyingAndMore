@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
 
+//todo: on font/text changed, autosize
+
 namespace Takai.UI
 {
     /// <summary>
@@ -243,6 +245,7 @@ namespace Takai.UI
         /// </summary>
         /// <seealso cref="AbsoluteDimensions"/>
         /// <seealso cref="VisibleBounds"/>
+        [Data.Serializer.Ignored]
         public Rectangle LocalDimensions
         {
             get => new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
@@ -431,11 +434,6 @@ namespace Takai.UI
         /// Any modifications to this list will require rebinding
         /// </summary>
         public List<Data.Binding> Bindings { get; set; }
-
-        /// <summary>
-        /// Autosize this element if any of the bindings is refreshed
-        /// </summary>
-        public bool AutoSizeOnBindingUpdate { get; set; }
 
         #endregion
 
@@ -1247,7 +1245,7 @@ namespace Takai.UI
                 bool didUpdateBinding = false;
                 foreach (var binding in Bindings)
                     didUpdateBinding |= binding.Update();
-                if (didUpdateBinding && AutoSizeOnBindingUpdate)
+                if (didUpdateBinding && AutoSize)
                     SizeToContain();
             }
         }

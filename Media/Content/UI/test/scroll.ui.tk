@@ -1,9 +1,14 @@
 ScrollBox {
-	Width: 400px;
-	Height: 400px;
+	Size: [400 400];
 	BorderColor: [0 40 100];
 	HorizontalAlignment: Alignment.Middle;
 	VerticalAlignment: Alignment.Middle;
+
+	ScrollBarTemplate: {
+		BorderColor: [255 255 255 64];
+		ThumbColor: Color.LightSteelBlue;
+		Padding: [2 2];
+	}
 
 	Children: [
 		List {

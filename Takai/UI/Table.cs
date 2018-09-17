@@ -29,8 +29,8 @@ namespace Takai.UI
             if (ColumnCount <= 0)
                 return;
 
-            var hStretches = new System.Collections.Generic.List<int>();
-            var vStretches = new System.Collections.Generic.List<int>();
+            var hStretches = new System.Collections.Generic.HashSet<int>();
+            var vStretches = new System.Collections.Generic.HashSet<int>();
             var usedArea = new Vector2();
 
             float[] colWidths = new float[ColumnCount];
@@ -56,6 +56,7 @@ namespace Takai.UI
 
                 colWidths[i % ColumnCount] = System.Math.Max(colWidths[i % ColumnCount], Children[i].Position.X + bounds.Width);
                 rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], Children[i].Position.Y + bounds.Height);
+                usedArea += new Vector2(colWidths[i % ColumnCount], rowHeights[i / ColumnCount]);
             }
 
             if (hStretches.Count > 0 && Size.X > usedArea.X)
@@ -65,12 +66,12 @@ namespace Takai.UI
                     colWidths[col] = System.Math.Max(colWidths[col], width); //use remaining width elsewhere?
             }
 
-            //if (vStretches.Count > 0 && Size.X > usedArea.X)
-            //{
-            //    float width = (Size.Y - usedArea.X) / hStretches.Count;
-            //    foreach (var col in hStretches)
-            //        colWidths[col] = System.Math.Max(colWidths[col], width); //use remaining width elsewhere?
-            //}
+            if (vStretches.Count > 0 && Size.Y > usedArea.Y)
+            {
+                float height = (Size.Y - usedArea.Y) / vStretches.Count;
+                foreach (var row in vStretches)
+                    rowHeights[row] = System.Math.Max(rowHeights[row], height); //use remaining height elsewhere?
+            }
 
             var offset = Vector2.Zero;
             for (int i = 0; i < Children.Count; ++i)
