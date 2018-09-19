@@ -32,7 +32,7 @@ namespace DyingAndMore.Editor
                 AddChild(selector);
             };
 
-            selector = new Selectors.FluidSelector(editor)
+            selector = new Selectors.FluidSelector()
             {
                 Size = new Vector2(320, 1),
                 VerticalAlignment = Takai.UI.Alignment.Stretch,

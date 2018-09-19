@@ -8,9 +8,9 @@ namespace DyingAndMore.Editor.Selectors
     class EntSelector : Selector
     {
         public List<Takai.Game.EntityClass> ents = new List<Takai.Game.EntityClass>();
+        System.TimeSpan elapsedTime;
 
-        public EntSelector(Editor Editor)
-            : base(Editor)
+        public EntSelector()
         {
             ItemSize = new Point(64, 64);
             Padding = new Vector2(5);
@@ -45,13 +45,19 @@ namespace DyingAndMore.Editor.Selectors
             ItemCount = ents.Count;
         }
 
+        protected override void UpdateSelf(GameTime time)
+        {
+            elapsedTime = time.TotalGameTime;
+            base.UpdateSelf(time);
+        }
+
         public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds)
         {
             var ent = ents[itemIndex];
 
             if ((ent.Animations.TryGetValue("EditorPreview", out var state) ||
                 ent.Animations.TryGetValue(ent.DefaultBaseAnimation, out state)) && state.Sprite?.Texture != null)
-                state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, editor.Map.ElapsedTime);
+                state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, elapsedTime);
             else
             {
                 bounds.Inflate(-4, -4);

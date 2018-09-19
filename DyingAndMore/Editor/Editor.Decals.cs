@@ -38,7 +38,7 @@ namespace DyingAndMore.Editor
                 AddChild(selector);
             };
 
-            selector = new Selectors.DecalSelector(editor)
+            selector = new Selectors.DecalSelector()
             {
                 Size = new Vector2(320, 1),
                 VerticalAlignment = Alignment.Stretch,
