@@ -342,7 +342,20 @@ namespace Takai.UI
         /// <summary>
         /// Is this element visible and updating. if false, does not take part in reflow/updating/darwing/etc
         /// </summary>
-        public bool IsEnabled { get; set; } = true;
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                if (_isEnabled == value)
+                    return;
+
+                _isEnabled = value;
+                if (_isEnabled)
+                    Reflow();
+            }
+        }
+        private bool _isEnabled = true;
 
         #region Events
 
@@ -637,23 +650,7 @@ namespace Takai.UI
 
         public void AddChildren(params Static[] children)
         {
-            //todo: see below
-            Static lastFocus = null;
-            foreach (var child in children)
-            {
-                if (child.Parent == this)
-                    continue;
-
-                child.SetParentNoReflow(this);
-                this.children.Add(child);
-                if (child.HasFocus)
-                    lastFocus = child;
-            }
-
-            if (lastFocus != null)
-                lastFocus.HasFocus = true;
-
-            Reflow();
+            AddChildren((IEnumerable<Static>)children);
         }
 
         public virtual void AddChildren(IEnumerable<Static> children)

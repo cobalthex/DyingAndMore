@@ -10,8 +10,7 @@ namespace DyingAndMore.Editor.Selectors
     {
         public List<Takai.Game.FluidClass> fluids;
 
-        public FluidSelector(Editor editor)
-            : base(editor)
+        public FluidSelector()
         {
             fluids = new List<Takai.Game.FluidClass>();
             var searchPath = Path.Combine(Takai.Data.Cache.Root, "Fluids");

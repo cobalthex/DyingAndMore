@@ -50,7 +50,7 @@ namespace DyingAndMore.Editor
                 AddChild(selector);
             };
 
-            selector = new Selectors.EntSelector(editor)
+            selector = new Selectors.EntSelector()
             {
                 Size = new Vector2(320, 1),
                 VerticalAlignment = Alignment.Stretch,

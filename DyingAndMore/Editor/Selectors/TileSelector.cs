@@ -6,23 +6,29 @@ namespace DyingAndMore.Editor.Selectors
 {
     class TileSelector : Selector
     {
-        public TileSelector(Editor editor)
-            : base(editor)
+        readonly Takai.Game.Tileset tileset;
+        readonly int tilesPerRow;
+
+        public TileSelector(Takai.Game.Tileset tileset)
         {
-            var tileSz = editor.Map.Class.TileSize;
-            ItemSize = new Point(tileSz, tileSz);
-            ItemCount = editor.Map.Class.TilesPerRow * (editor.Map.Class.TilesImage.Height / tileSz);
+            this.tileset = tileset;
+
+            ItemSize = new Point(tileset.size);
+            tilesPerRow = tileset.TilesPerRow;
+
+            if (tileset.texture != null)
+                ItemCount = tileset.TilesPerRow * (tileset.texture.Height / tileset.size);
         }
 
         public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds)
         {
             var clip = new Rectangle(
-                (itemIndex % editor.Map.Class.TilesPerRow) * ItemSize.X,
-                (itemIndex / editor.Map.Class.TilesPerRow) * ItemSize.Y,
+                (itemIndex % tilesPerRow) * ItemSize.X,
+                (itemIndex / tilesPerRow) * ItemSize.Y,
                 ItemSize.X,
                 ItemSize.Y
             );
-            spriteBatch.Draw(editor.Map.Class.TilesImage, bounds, clip, Color.White);
+            spriteBatch.Draw(tileset.texture, bounds, clip, Color.White);
         }
     }
 }

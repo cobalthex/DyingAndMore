@@ -30,6 +30,14 @@ namespace Takai.Game
     {
         public Texture2D texture; //sprite?
         public int size;
+
+        public int TilesPerRow => texture != null ? texture.Width / size : 1;
+
+        public Tileset(Texture2D texture, int size)
+        {
+            this.texture = texture;
+            this.size = size;
+        }
     }
 
     /// <summary>
@@ -62,13 +70,27 @@ namespace Takai.Game
             set
             {
                 _tileSize = value;
-                TilesPerRow = (TilesImage != null ? (TilesImage.Width / value) : 0);
+                TilesPerRow = (TilesImage != null ? (TilesImage.Width / value) : 1);
                 SectorPixelSize = SectorSize * value;
             }
         }
         private int _tileSize = 1;
         [Data.Serializer.Ignored]
         public int TilesPerRow { get; private set; } = 1;
+
+        /// <summary>
+        /// Encapsulated tileset, calculated on demand
+        /// </summary>
+        [Data.Serializer.ReadOnly]
+        public Tileset Tileset
+        {
+            get => new Tileset(TilesImage, TileSize);
+            set
+            {
+                _tileSize = value.size;
+                TilesImage = value.texture;
+            }
+        }
 
         /// <summary>
         /// The horizontal size of the map in tiles

@@ -9,8 +9,7 @@ namespace DyingAndMore.Editor.Selectors
     {
         public List<Texture2D> textures;
 
-        public DecalSelector(Editor Editor)
-            : base(Editor)
+        public DecalSelector()
         {
             textures = new List<Texture2D>();
             var searchPath = Path.Combine(Takai.Data.Cache.Root, "Decals");

@@ -10,10 +10,6 @@ namespace DyingAndMore.Editor.Selectors
 
     abstract class Selector : Static
     {
-        protected Editor editor;
-
-        protected ScrollBar scrollBar;
-
         public Point ItemSize { get; set; } = new Point(1);
 
         public int ItemCount { get; set; } = 0;
@@ -37,33 +33,21 @@ namespace DyingAndMore.Editor.Selectors
 
         public override bool CanFocus => true;
 
-        public Selector(Editor editor)
+        public override void SizeToContain()
         {
-            this.editor = editor;
-
-            AddChild(scrollBar = new ScrollBar()
-            {
-                Size = new Vector2(20, 1),
-                VerticalAlignment = Alignment.Stretch,
-                HorizontalAlignment = Alignment.End,
-                Direction = Direction.Vertical
-            });
+            var rows = ItemCount > 0 ? (ItemCount - 1) / ItemsPerRow + 1 : 0;
+            Size = ItemMargin + ItemMargin * ItemSize.ToVector2() * new Vector2(ItemsPerRow, rows);
         }
 
         public override void Reflow(Rectangle container) //todo
         {
-            ItemsPerRow = Size.X > scrollBar.Size.X
-                        ? (int)((ItemMargin.X + Size.X - scrollBar.Size.X) / (ItemSize.X + ItemMargin.X))
-                        : 1;
-            scrollBar.ContentSize = (int)((ItemCount / ItemsPerRow) * (ItemSize.Y + ItemMargin.Y) + ItemMargin.Y);
-
+            ItemsPerRow = (int)((ItemMargin.X + Size.X) / (ItemSize.X + ItemMargin.X));
             base.Reflow(container);
         }
 
         protected override void OnPress(ClickEventArgs e)
         {
-            //todo: handle scroll
-            var row = (int)((e.position.Y + scrollBar.ContentPosition - (ItemMargin.Y / 2)) / (ItemSize.Y + ItemMargin.Y)) * ItemsPerRow;
+            var row = (int)((e.position.Y - (ItemMargin.Y / 2)) / (ItemSize.Y + ItemMargin.Y)) * ItemsPerRow;
             var col = (int)((e.position.X - (ItemMargin.X / 2)) / (ItemSize.X + ItemMargin.X));
 
             SelectedItem = row + col;
@@ -71,10 +55,7 @@ namespace DyingAndMore.Editor.Selectors
 
         protected override bool HandleInput(GameTime time)
         {
-            if (InputState.IsClick(Keys.Tab))
-                RemoveFromParent();
-
-            else if (InputState.IsPress(Keys.Left))
+            if (InputState.IsPress(Keys.Left))
                 --SelectedItem;
             else if (InputState.IsPress(Keys.Right))
                 ++SelectedItem;
@@ -82,29 +63,23 @@ namespace DyingAndMore.Editor.Selectors
                 SelectedItem -= ItemsPerRow;
             else if (InputState.IsPress(Keys.Down))
                 SelectedItem += ItemsPerRow;
-
-            else if (VisibleBounds.Contains(InputState.MousePoint))
-            {
-                if (InputState.HasScrolled())
-                    scrollBar.ContentPosition -= InputState.ScrollDelta();
-            }
-
-            else if (InputState.IsPress(MouseButtons.Left))
-                RemoveFromParent();
-
-            base.HandleInput(time);
+            else
+                return base.HandleInput(time);
             return false;
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            int start = (int)(scrollBar.ContentPosition / (ItemSize.Y + ItemMargin.X) * ItemsPerRow);
+            var visPos = VisibleBounds.X - AbsoluteBounds.X;
+
+
+            int start = (int)(visPos / (ItemSize.Y + ItemMargin.X) * ItemsPerRow);
             start = System.Math.Max(start, 0);
             for (int i = start; i < System.Math.Min(start + (int)(Size.Y / (ItemSize.Y + ItemMargin.Y) + 2) * ItemsPerRow, ItemCount); ++i)
             {
                 var rect = new Rectangle(
                     (int)(VisibleBounds.X + ItemMargin.X + (i % ItemsPerRow) * (ItemSize.X + ItemMargin.X)),
-                    (int)(VisibleBounds.Y + ItemMargin.Y + (i / ItemsPerRow) * (ItemSize.Y + ItemMargin.Y) - scrollBar.ContentPosition),
+                    (int)(VisibleBounds.Y + ItemMargin.Y + (i / ItemsPerRow) * (ItemSize.Y + ItemMargin.Y) - visPos),
                     ItemSize.X,
                     ItemSize.Y
                 );

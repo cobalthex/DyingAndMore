@@ -11,6 +11,7 @@ namespace DyingAndMore.Editor
         Vector2 savedWorldPos, lastWorldPos, currentWorldPos;
 
         Selectors.TileSelector selector;
+        Takai.UI.Drawer selectorDrawer;
         Takai.UI.Graphic preview;
 
         public TilesEditorMode(Editor editor)
@@ -38,14 +39,11 @@ namespace DyingAndMore.Editor
                 AddChild(selector);
             };
 
-            selector = new Selectors.TileSelector(editor)
+            selector = new Selectors.TileSelector(editor.Map.Class.Tileset)
             {
-                //BackgroundColor = new Color(Color.Gray, 0.5f),
-                BackgroundColor = Color.Black,
                 Padding = new Vector2(20, 20),
-                Size = new Vector2(48 * 9 + 22, 400),
-                //VerticalAlignment = Takai.UI.Alignment.Stretch,
-                HorizontalAlignment = Takai.UI.Alignment.End
+                HorizontalAlignment = Takai.UI.Alignment.Stretch,
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
             };
             selector.SelectionChanged += delegate
             {
@@ -60,13 +58,24 @@ namespace DyingAndMore.Editor
                 }
             };
             selector.SelectedItem = 0;
+
+            selectorDrawer = new Takai.UI.Drawer
+            {
+                BackgroundColor = Color.Gray,
+                HorizontalAlignment = Takai.UI.Alignment.Right,
+                VerticalAlignment = Takai.UI.Alignment.Stretch,
+                Size = new Vector2(System.Math.Max(400, editor.Map.Class.TileSize * 8), 1),
+                IsEnabled = false
+            };
+            selectorDrawer.AddChild(selector);
+            AddChild(selectorDrawer);
         }
 
         protected override bool HandleInput(GameTime time)
         {
             if (InputState.IsPress(Keys.Tab))
             {
-                AddChild(selector);
+                selectorDrawer.IsEnabled = true;
                 return false;
             }
 
