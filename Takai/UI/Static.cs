@@ -1358,7 +1358,7 @@ namespace Takai.UI
             var draws = new Queue<Static>(Children.Count + 1);
             draws.Enqueue(this);
 
-            Static lastDraw = null;
+            Static debugDraw = null;
             while (draws.Count > 0)
             {
                 var toDraw = draws.Dequeue();
@@ -1374,7 +1374,7 @@ namespace Takai.UI
                     borderColor = Color.SteelBlue;
 
                 if (DebugFont != null && toDraw.VisibleBounds.Contains(Input.InputState.MousePoint))
-                    lastDraw = toDraw;
+                    debugDraw = toDraw;
 
                 Graphics.Primitives2D.DrawRect(spriteBatch, borderColor, toDraw.VisibleBounds);
 
@@ -1385,15 +1385,18 @@ namespace Takai.UI
                 }
             }
 
-            if (lastDraw != null)
+            if (debugDraw != null)
             {
-                var rect = lastDraw.AbsoluteBounds;
+                var rect = debugDraw.AbsoluteBounds;
                 rect.Inflate(1, 1);
                 Graphics.Primitives2D.DrawRect(spriteBatch, Color.Red, rect);
-                Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Red, 0.5f), lastDraw.AbsoluteDimensions);
+                Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Red, 0.5f), debugDraw.AbsoluteDimensions);
 
-                string info = $"Name: {(Name ?? "(No name)")}\nBounds: {lastDraw.AbsoluteDimensions}\nDimensions: {lastDraw.LocalDimensions} Padding: {lastDraw.Padding}";
-                DebugFont.Draw(spriteBatch, info, (rect.Location + new Point(rect.Width, rect.Height)).ToVector2(), Color.Gold);
+                string info = $"{debugDraw.GetType().Name}\nName: {(Name ?? "(No name)")}\nBounds: {debugDraw.AbsoluteDimensions}\nDimensions: {debugDraw.LocalDimensions} Padding: {debugDraw.Padding}";
+                var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);
+                var size = DebugFont.MeasureString(info);
+                drawPos = Util.Clamp(new Rectangle(drawPos.X, drawPos.Y, (int)size.X, (int)size.Y), Runtime.GraphicsDevice.Viewport.Bounds);
+                DebugFont.Draw(spriteBatch, info, drawPos.ToVector2(), Color.Gold);
             }
         }
 

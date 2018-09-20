@@ -36,7 +36,7 @@ namespace DyingAndMore.Editor
             });
             preview.Click += delegate
             {
-                AddChild(selector);
+                selectorDrawer.IsEnabled = true;
             };
 
             selector = new Selectors.TileSelector(editor.Map.Class.Tileset)
@@ -62,7 +62,7 @@ namespace DyingAndMore.Editor
             selectorDrawer = new Takai.UI.Drawer
             {
                 BackgroundColor = Color.Gray,
-                HorizontalAlignment = Takai.UI.Alignment.Right,
+                HorizontalAlignment = Takai.UI.Alignment.Left,
                 VerticalAlignment = Takai.UI.Alignment.Stretch,
                 Size = new Vector2(System.Math.Max(400, editor.Map.Class.TileSize * 8), 1),
                 IsEnabled = false

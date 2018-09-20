@@ -41,7 +41,7 @@ namespace DyingAndMore.Editor.Selectors
 
         public override void Reflow(Rectangle container) //todo
         {
-            ItemsPerRow = (int)((ItemMargin.X + Size.X) / (ItemSize.X + ItemMargin.X));
+            ItemsPerRow = (int)((Size.X - ItemMargin.X) / (ItemSize.X + ItemMargin.X));
             base.Reflow(container);
         }
 
@@ -72,18 +72,17 @@ namespace DyingAndMore.Editor.Selectors
         {
             var visPos = VisibleBounds.X - AbsoluteBounds.X;
 
-
             int start = (int)(visPos / (ItemSize.Y + ItemMargin.X) * ItemsPerRow);
             start = System.Math.Max(start, 0);
             for (int i = start; i < System.Math.Min(start + (int)(Size.Y / (ItemSize.Y + ItemMargin.Y) + 2) * ItemsPerRow, ItemCount); ++i)
             {
                 var rect = new Rectangle(
-                    (int)(VisibleBounds.X + ItemMargin.X + (i % ItemsPerRow) * (ItemSize.X + ItemMargin.X)),
-                    (int)(VisibleBounds.Y + ItemMargin.Y + (i / ItemsPerRow) * (ItemSize.Y + ItemMargin.Y) - visPos),
+                    (int)(AbsoluteDimensions.X + ItemMargin.X + (i % ItemsPerRow) * (ItemSize.X + ItemMargin.X)),
+                    (int)(AbsoluteDimensions.Y + ItemMargin.Y + (i / ItemsPerRow) * (ItemSize.Y + ItemMargin.Y) - visPos),
                     ItemSize.X,
                     ItemSize.Y
                 );
-                rect = Rectangle.Intersect(rect, VisibleBounds);
+                rect = Rectangle.Intersect(Rectangle.Intersect(rect, AbsoluteDimensions), VisibleBounds);
 
                 //Takai.Graphics.Primitives2D.DrawFill(
                 //    spriteBatch,
