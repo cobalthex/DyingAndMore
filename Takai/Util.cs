@@ -132,6 +132,27 @@ namespace Takai
         }
 
         /// <summary>
+        /// Clamp <see cref="rect"/> to <see cref="container"/> without resizing (overflow will happen if rect is larger than container)
+        /// </summary>
+        /// <param name="rect">The rect to contain</param>
+        /// <param name="container">The container to contain the <see cref="rect"/></param>
+        /// <returns>The adjusted position of <see cref="rect"/></returns>
+        public static Point Clamp(Rectangle rect, Rectangle container)
+        {
+            if (rect.X < container.X)
+                rect.X = container.X;
+            else if (rect.Right > container.Right)
+                rect.X = container.Width - rect.Width;
+
+            if (rect.Y < container.Y)
+                rect.Y = container.Y;
+            else if (rect.Bottom > container.Bottom)
+                rect.Y = container.Height - rect.Height;
+
+            return rect.Location;
+        }
+
+        /// <summary>
         /// Return a vector orthagonal to this one
         /// </summary>
         /// <param name="v">The vector to use</param>

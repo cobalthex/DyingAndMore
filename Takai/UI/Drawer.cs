@@ -9,19 +9,24 @@ namespace Takai.UI
     /// </summary>
     public class Drawer : Static
     {
-        //todo: modal, allow click outside
+        bool isSizing = false;
+        Vector2 sizingOffset = Vector2.Zero;
 
-        public Static Splitter { get; protected set; } = new Static
-        {
-            BackgroundColor = Color.CornflowerBlue,
-            Size = new Vector2(8, 1),
-            VerticalAlignment = Alignment.Stretch
-        };
+        public float SplitterWidth { get; set; } = 8;
+        public Color SplitterColor { get; set; } = Color.CornflowerBlue;
 
         public Drawer()
         {
             IsModal = true;
-            AddChild(Splitter);
+        }
+
+        protected override void OnPress(ClickEventArgs e)
+        {
+            isSizing = true;
+        }
+        protected override void OnClick(ClickEventArgs e)
+        {
+            isSizing = false;
         }
 
         protected override bool HandleInput(GameTime time)
@@ -30,37 +35,58 @@ namespace Takai.UI
                 !VisibleBounds.Contains(Input.InputState.MousePoint))
                 IsEnabled = false;
 
+            if (isSizing && Input.InputState.IsButtonDown(Input.MouseButtons.Left))
+            {
+                var mdx = Input.InputState.MouseDelta().X;
+                switch (HorizontalAlignment)
+                {
+                    case Alignment.Left:
+                        Size = new Vector2(System.Math.Max(SplitterWidth, Size.X + mdx), 0);
+                        return false;
+                    case Alignment.Right:
+                        Size = new Vector2(System.Math.Max(SplitterWidth, Size.X - mdx), 0);
+                        return false;
+                }
+            }
+
             return base.HandleInput(time);
         }
 
         public override void Reflow(Rectangle container)
         {
+            AdjustToContainer(container);
+            container = AbsoluteDimensions;
+
             switch (HorizontalAlignment)
             {
                 case Alignment.Left:
-                    Splitter.IsEnabled = true;
-                    container.Width -= Splitter.AbsoluteBounds.Width;
+                    container.Width -= (int)SplitterWidth;
                     break;
                 case Alignment.Right:
-                    Splitter.IsEnabled = true;
-                    container.X += Splitter.AbsoluteBounds.Width;
-                    container.Width -= Splitter.AbsoluteBounds.Width;
-                    break;
-                default:
-                    Splitter.IsEnabled = false;
+                    container.X += (int)SplitterWidth;
+                    container.Width -= (int)SplitterWidth;
                     break;
             }
-            Splitter.HorizontalAlignment = HorizontalAlignment;
-            Splitter.Reflow(container);
 
-            AdjustToContainer(container);
             foreach (var child in Children)
-            {
-                if (child == Splitter)
-                    continue;
+                child.Reflow(container);
+        }
 
-                child.Reflow(AbsoluteDimensions);
+        protected override void DrawSelf(SpriteBatch spriteBatch)
+        {
+            var splitBnds = new Rectangle(AbsoluteDimensions.X, AbsoluteDimensions.Y, (int)SplitterWidth, AbsoluteDimensions.Height);
+            switch (HorizontalAlignment)
+            {
+                case Alignment.Left:
+                    splitBnds.X = AbsoluteDimensions.Right - (int)SplitterWidth;
+                    Graphics.Primitives2D.DrawFill(spriteBatch, SplitterColor, Rectangle.Intersect(VisibleBounds, splitBnds));
+                    break;
+                case Alignment.Right:
+                    Graphics.Primitives2D.DrawFill(spriteBatch, SplitterColor, Rectangle.Intersect(VisibleBounds, splitBnds));
+                    break;
             }
+
+            base.DrawSelf(spriteBatch);
         }
     }
 }

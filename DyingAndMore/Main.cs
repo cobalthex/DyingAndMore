@@ -71,7 +71,7 @@ namespace DyingAndMore
             gdm.PreparingDeviceSettings += delegate (object sender, PreparingDeviceSettingsEventArgs e)
             {
                 //required for splitscreen (currently)
-                //e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
+                e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
             };
 
             IsMouseVisible = true;
@@ -163,7 +163,7 @@ namespace DyingAndMore
                 };
             }
             ui = new Takai.UI.Static(selectStoryUI);
-            //ui = new Takai.UI.Static(Cache.Load<Takai.UI.Static>("UI/test/scroll.ui.tk"));
+            //ui = new Takai.UI.Static(Cache.Load<Takai.UI.Static>("UI/test/Table.ui.tk"));
 
             fpsGraph = new Takai.FpsGraph()
             {
