@@ -41,7 +41,6 @@ namespace DyingAndMore.Editor
 
             selector = new Selectors.TileSelector(editor.Map.Class.Tileset)
             {
-                Padding = new Vector2(20, 20),
                 HorizontalAlignment = Takai.UI.Alignment.Stretch,
                 VerticalAlignment = Takai.UI.Alignment.Stretch,
             };
@@ -56,19 +55,25 @@ namespace DyingAndMore.Editor
                         editor.Map.Class.TileSize
                     );
                 }
+                selectorDrawer.IsEnabled = false;
             };
-            selector.SelectedItem = 0;
 
             selectorDrawer = new Takai.UI.Drawer
             {
                 BackgroundColor = Color.Gray,
-                HorizontalAlignment = Takai.UI.Alignment.Left,
+                HorizontalAlignment = Takai.UI.Alignment.Right,
                 VerticalAlignment = Takai.UI.Alignment.Stretch,
-                Size = new Vector2(System.Math.Max(400, editor.Map.Class.TileSize * 8), 1),
+                Size = new Vector2(System.Math.Max(400, editor.Map.Class.TileSize * 8) + 10, 1),
                 IsEnabled = false
             };
-            selectorDrawer.AddChild(selector);
+            selectorDrawer.AddChild(new Takai.UI.ScrollBox(selector)
+            {
+                HorizontalAlignment = Takai.UI.Alignment.Stretch,
+                VerticalAlignment = Takai.UI.Alignment.Stretch
+            });
             AddChild(selectorDrawer);
+
+            selector.SelectedItem = 0; //initialize preview
         }
 
         protected override bool HandleInput(GameTime time)

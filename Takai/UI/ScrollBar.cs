@@ -265,6 +265,12 @@ namespace Takai.UI
             AddChildren(contentArea, verticalScrollbar, horizontalScrollbar);
         }
 
+        public ScrollBox(params Static[] children)
+            : this()
+        {
+            AddChildren(children);
+        }
+
         //todo: unified method between all add modes?
         public override Static AddChild(Static child)
         {
@@ -275,8 +281,7 @@ namespace Takai.UI
 
         public override void AddChildren(IEnumerable<Static> children)
         {
-            base.AddChildren(children);
-            ResizeContentArea();
+            contentArea.AddChildren(children);
         }
 
         protected override void OnResize(EventArgs e)
