@@ -219,9 +219,7 @@ namespace Takai.UI
                 {
                     foreach (var child in contentArea.Children)
                     {
-                        if (child.IsEnabled &&
-                            child != horizontalScrollbar &&
-                            child != verticalScrollbar)
+                        if (child.IsEnabled)
                             child.Position -= new Vector2(0, e.Delta);
                     }
                     contentArea.Reflow(contentArea.AbsoluteBounds);
@@ -236,9 +234,7 @@ namespace Takai.UI
                 {
                     foreach (var child in contentArea.Children)
                     {
-                        if (child.IsEnabled &&
-                            child != horizontalScrollbar &&
-                            child != verticalScrollbar)
+                        if (child.IsEnabled)
                             child.Position -= new Vector2(e.Delta, 0);
                     }
                     contentArea.Reflow(contentArea.AbsoluteBounds);
@@ -262,7 +258,13 @@ namespace Takai.UI
             ScrollBarTemplate = new ScrollBar();
 
             ColumnCount = 2;
-            AddChildren(contentArea, verticalScrollbar, horizontalScrollbar);
+            base.InternalInsertChild(contentArea);
+            base.InternalInsertChild(verticalScrollbar);
+            base.InternalInsertChild(horizontalScrollbar);
+
+            contentArea.Resize += delegate {
+                ResizeContentArea();
+            }; //switch to onchildreflow?
         }
 
         public ScrollBox(params Static[] children)
@@ -271,17 +273,14 @@ namespace Takai.UI
             AddChildren(children);
         }
 
-        //todo: unified method between all add modes?
-        public override Static AddChild(Static child)
+        public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
-            var added = contentArea.AddChild(child);
-            ResizeContentArea();
-            return added;
+            return contentArea.InternalInsertChild(child, index, reflow, ignoreFocus);
         }
 
-        public override void AddChildren(IEnumerable<Static> children)
+        public override bool InternalRemoveChildIndex(int index)
         {
-            contentArea.AddChildren(children);
+            return contentArea.InternalRemoveChildIndex(index);
         }
 
         protected override void OnResize(EventArgs e)
@@ -294,12 +293,12 @@ namespace Takai.UI
 
         protected void ResizeContentArea()
         {
-            var contentSize = Rectangle.Empty;
+            var contentSize = Vector2.Zero;
             foreach (var child in contentArea.Children)
-                contentSize = Rectangle.Union(contentSize, child.AbsoluteBounds);
+                contentSize = Vector2.Max(contentSize, child.AbsoluteBounds.Size.ToVector2()); //rectangle union local bounds
 
-            horizontalScrollbar.ContentSize = contentSize.Width;
-            verticalScrollbar.ContentSize = contentSize.Height;
+            horizontalScrollbar.ContentSize = contentSize.X;
+            verticalScrollbar.ContentSize = contentSize.Y;
 
             //horizontalScrollbar.IsEnabled = horizontalScrollbar.IsThumbVisible;
             //verticalScrollbar.IsEnabled = verticalScrollbar.IsThumbVisible;

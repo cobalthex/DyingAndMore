@@ -129,12 +129,12 @@ namespace DyingAndMore.Editor
         void AddModes()
         {
             modes.AddMode(new TilesEditorMode(this));
-            modes.AddMode(new DecalsEditorMode(this));
-            modes.AddMode(new FluidsEditorMode(this));
-            modes.AddMode(new EntitiesEditorMode(this));
-            modes.AddMode(new PathsEditorMode(this));
-            modes.AddMode(new TriggersEditorMode(this));
-            modes.AddMode(new TestEditorMode(this));
+            //modes.AddMode(new DecalsEditorMode(this));
+            //modes.AddMode(new FluidsEditorMode(this));
+            //modes.AddMode(new EntitiesEditorMode(this));
+            //modes.AddMode(new PathsEditorMode(this));
+            //modes.AddMode(new TriggersEditorMode(this));
+            //modes.AddMode(new TestEditorMode(this));
         }
 
         protected override void OnParentChanged(ParentChangedEventArgs e)

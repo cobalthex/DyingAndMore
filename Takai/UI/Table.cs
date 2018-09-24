@@ -61,7 +61,7 @@ namespace Takai.UI
 
             if (hStretches.Count > 0 && Size.X > usedArea.X)
             {
-                float width = (Size.Y - usedArea.X) / hStretches.Count;
+                float width = (Size.X - usedArea.X) / hStretches.Count;
                 foreach (var col in hStretches)
                     colWidths[col] = System.Math.Max(colWidths[col], width); //use remaining width elsewhere?
             }
