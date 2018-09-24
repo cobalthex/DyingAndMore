@@ -63,6 +63,9 @@ namespace Takai.UI
     /// </summary>
     public class Static : Data.IDerivedDeserialize
     {
+        private static uint idCounter = 0;
+        public readonly uint Id = ++idCounter;
+
         #region Properties
 
         //private static int idCounter = 0;
@@ -597,20 +600,54 @@ namespace Takai.UI
             return false;
         }
 
-        public virtual Static AddChild(Static child)
+        /// <summary>
+        /// Insert the child into the children without reflowing
+        /// </summary>
+        /// <param name="child">The child element to add</param>
+        /// <param name="index">The insert to add at. Out of bounds are added to the end</param>
+        /// <param name="ignoreFocus">ignore <see cref="HasFocus"/></param>
+        /// <returns>True if the child as added, false otherwise</returns>
+        public virtual bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
+            //todo: maybe have a forward setting (forward all additions to specified child)
+
             if (child.Parent == this)
-                return child;
+                return false;
 
             if (child.Parent != null)
                 child.RemoveFromParent();
 
-            //todo: come up with a common interface for modifying children
             child.SetParentNoReflow(this);
-            children.Add(child);
-            if (child.HasFocus)
+
+            if (index < 0 || index >= children.Count)
+                children.Add(child);
+            else
+                children.Insert(index, child);
+
+            if (child.HasFocus && !ignoreFocus)
                 child.HasFocus = true;
-            Reflow();
+
+            if (reflow)
+                Reflow();
+
+            return true;
+        }
+
+        public virtual bool InternalRemoveChildIndex(int index)
+        {
+            if (index < 0 || index >= Children.Count)
+                return false;
+
+            var child = Children[index];
+            children.RemoveAt(index);
+            if (child.Parent == this)
+                child.SetParentNoReflow(null);
+            return true;
+        }
+
+        public Static AddChild(Static child)
+        {
+            InternalInsertChild(child);
             return child;
         }
 
@@ -620,31 +657,16 @@ namespace Takai.UI
         /// <param name="child">the child to replace with</param>
         /// <param name="index">the index of the child to replace. Throws if out of range</param>
         /// <returns>The staticadded</returns>
-        public virtual Static ReplaceChild(Static child, int index)
+        public Static ReplaceChild(Static child, int index)
         {
-            if (children[index] != null)
-                children[index].Parent = null;
-
-            child.SetParentNoReflow(this);
-            children[index] = child;
-            if (child.HasFocus)
-                child.HasFocus = true;
-            Reflow();
-
+            InternalRemoveChildIndex(index);
+            InternalInsertChild(child, index);
             return child;
         }
 
-        public virtual Static InsertChild(Static child, int index = 0)
+        public Static InsertChild(Static child, int index = 0)
         {
-            if (child.Parent == this)
-                return child;
-
-            child.SetParentNoReflow(this);
-            children.Insert(index, child);
-            if (child.HasFocus) //re-apply throughout tree
-                child.HasFocus = true;
-            Reflow();
-
+            InternalInsertChild(child, index);
             return child;
         }
 
@@ -653,26 +675,23 @@ namespace Takai.UI
             AddChildren((IEnumerable<Static>)children);
         }
 
-        public virtual void AddChildren(IEnumerable<Static> children)
+        public void AddChildren(IEnumerable<Static> children)
         {
             //todo: add disable reflow and then switch this to use InsertChild
+            int count = Children.Count;
 
             Static lastFocus = null;
             foreach (var child in children)
             {
-                if (child.Parent == this)
-                    continue;
-
-                child.SetParentNoReflow(this);
-                this.children.Add(child);
-                if (child.HasFocus)
+                if (InternalInsertChild(child, -1, false, true) && child.HasFocus)
                     lastFocus = child;
             }
 
             if (lastFocus != null)
                 lastFocus.HasFocus = true;
 
-            Reflow();
+            if (Children.Count != count)
+                Reflow();
         }
 
         /// <summary>
@@ -681,29 +700,21 @@ namespace Takai.UI
         /// <param name="child"></param>
         public Static RemoveChild(Static child)
         {
-            return RemoveChildAt(children.IndexOf(child));
+            InternalRemoveChildIndex(children.IndexOf(child));
+            return child;
         }
 
-        public virtual Static RemoveChildAt(int index)
+        public Static RemoveChildAt(int index)
         {
-            if (index < 0 || index >= children.Count)
-                return null;
-
-            var child = children[index];
-            children.RemoveAt(index);
-            if (child.Parent == this)
-                child.SetParentNoReflow(null);
+            var child = Children[index];
+            InternalRemoveChildIndex(index);
             return child;
         }
 
         public void RemoveAllChildren()
         {
-            foreach (var child in children)
-            {
-                if (child.Parent == this)
-                    child.SetParentNoReflow(null);
-            }
-            children.Clear();
+            for (int i = children.Count - 1; i >= 0; --i)
+                InternalRemoveChildIndex(i);
         }
 
         /// <summary>
@@ -712,6 +723,7 @@ namespace Takai.UI
         /// <param name="target">The target element to move them to</param>
         public void MoveAllChildrenTo(Static target)
         {
+            //todo: use internal?
             target.AddChildren(children);
             children.Clear();
         }
@@ -1059,7 +1071,7 @@ namespace Takai.UI
             Reflow();
 
             OnResize(System.EventArgs.Empty);
-            Resize?.Invoke(this, System.EventArgs.Empty); //todo: re-evaluate necessity
+            Resize?.Invoke(this, System.EventArgs.Empty);
         }
 
         /// <summary>
@@ -1070,17 +1082,26 @@ namespace Takai.UI
         {
             //todo: ideally this should take local dimensions for container
 
+            bool didSize = false;
             if (HorizontalAlignment == Alignment.Stretch)
             {
                 _position.X = 0;
+                var w = _size.X;
                 _size.X = container.Width - Padding.X * 2;
+                didSize |= w != _size.X;
             }
             if (VerticalAlignment == Alignment.Stretch)
             {
                 _position.Y = 0;
+                var h = _size.Y;
                 _size.Y = container.Height - Padding.Y * 2;
+                didSize |= h != _size.Y;
             }
-            //todo: resize events
+            if (didSize)
+            {
+                OnResize(System.EventArgs.Empty);
+                Resize?.Invoke(this, System.EventArgs.Empty);
+            }
 
             if (Parent == null)
             {
@@ -1385,19 +1406,26 @@ namespace Takai.UI
                 }
             }
 
-            if (debugDraw != null)
-            {
-                var rect = debugDraw.AbsoluteBounds;
-                rect.Inflate(1, 1);
-                Graphics.Primitives2D.DrawRect(spriteBatch, Color.Red, rect);
-                Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Red, 0.5f), debugDraw.AbsoluteDimensions);
+            debugDraw?.DrawDebugInfo(spriteBatch);
+        }
 
-                string info = $"{debugDraw.GetType().Name}\nName: {(Name ?? "(No name)")}\nBounds: {debugDraw.AbsoluteDimensions}\nDimensions: {debugDraw.LocalDimensions} Padding: {debugDraw.Padding}";
-                var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);
-                var size = DebugFont.MeasureString(info);
-                drawPos = Util.Clamp(new Rectangle(drawPos.X, drawPos.Y, (int)size.X, (int)size.Y), Runtime.GraphicsDevice.Viewport.Bounds);
-                DebugFont.Draw(spriteBatch, info, drawPos.ToVector2(), Color.Gold);
-            }
+        public void DrawDebugInfo(SpriteBatch spriteBatch)
+        {
+            var rect = AbsoluteBounds;
+            rect.Inflate(1, 1);
+            Graphics.Primitives2D.DrawRect(spriteBatch, Color.Red, rect);
+            Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Red, 0.5f), AbsoluteDimensions);
+
+            string info = $"{GetType().Name}\n"
+                        + $"Name: {(Name ?? "(No name)")}\n"
+                        + $"Bounds: {AbsoluteDimensions}\n"
+                        + $"Dimensions: {LocalDimensions}, Padding: {Padding}\n"
+                        + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}";
+
+            var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);
+            var size = DebugFont.MeasureString(info);
+            drawPos = Util.Clamp(new Rectangle(drawPos.X, drawPos.Y, (int)size.X, (int)size.Y), Runtime.GraphicsDevice.Viewport.Bounds);
+            DebugFont.Draw(spriteBatch, info, drawPos.ToVector2(), Color.Gold);
         }
 
         /// <summary>

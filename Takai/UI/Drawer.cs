@@ -37,14 +37,15 @@ namespace Takai.UI
 
             if (isSizing && Input.InputState.IsButtonDown(Input.MouseButtons.Left))
             {
+                var maxx = Parent != null ? Parent.Size.X : Runtime.GraphicsDevice.Viewport.Width;
                 var mdx = Input.InputState.MouseDelta().X;
                 switch (HorizontalAlignment)
                 {
                     case Alignment.Left:
-                        Size = new Vector2(System.Math.Max(SplitterWidth, Size.X + mdx), 0);
+                        Size = new Vector2(MathHelper.Clamp(Size.X + mdx, SplitterWidth, maxx), 0);
                         return false;
                     case Alignment.Right:
-                        Size = new Vector2(System.Math.Max(SplitterWidth, Size.X - mdx), 0);
+                        Size = new Vector2(MathHelper.Clamp(Size.X - mdx, SplitterWidth, maxx), 0);
                         return false;
                 }
             }
