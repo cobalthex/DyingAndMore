@@ -293,12 +293,12 @@ namespace Takai.UI
 
         protected void ResizeContentArea()
         {
-            var contentSize = Vector2.Zero;
+            var contentSize = Rectangle.Empty;
             foreach (var child in contentArea.Children)
-                contentSize = Vector2.Max(contentSize, child.AbsoluteBounds.Size.ToVector2()); //rectangle union local bounds
+                contentSize = Rectangle.Union(contentSize, child.LocalBounds); //rectangle union local bounds
 
-            horizontalScrollbar.ContentSize = contentSize.X;
-            verticalScrollbar.ContentSize = contentSize.Y;
+            horizontalScrollbar.ContentSize = contentSize.Width;
+            verticalScrollbar.ContentSize = contentSize.Height;
 
             //horizontalScrollbar.IsEnabled = horizontalScrollbar.IsThumbVisible;
             //verticalScrollbar.IsEnabled = verticalScrollbar.IsThumbVisible;

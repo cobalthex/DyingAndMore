@@ -246,6 +246,7 @@ namespace Takai.UI
         /// The dimensions of this element, calculated from <see cref="Position"/> and <see cref="Size"/>
         /// Does not account for padding or alignment
         /// </summary>
+        /// <see cref="LocalBounds"/>
         /// <seealso cref="AbsoluteDimensions"/>
         /// <seealso cref="VisibleBounds"/>
         [Data.Serializer.Ignored]
@@ -262,6 +263,17 @@ namespace Takai.UI
                 }
             }
         }
+
+        /// <summary>
+        /// The bounds of this element, including padding.
+        /// </summary>
+        /// <seealso cref="LocalDimensions"/>
+        public Rectangle LocalBounds => new Rectangle(
+            (int)(Position.X - Padding.X),
+            (int)(Position.Y - Padding.Y),
+            (int)(Size.X + Padding.X  * 2),
+            (int)(Size.Y + Padding.Y * 2)
+        );
 
         /// <summary>
         /// dimensions relative to the outermost container (can be outside the parent)
