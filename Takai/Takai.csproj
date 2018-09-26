@@ -39,10 +39,6 @@
     <ApplicationIcon>TakaiTech.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Drawing" />
@@ -132,6 +128,9 @@
   <ItemGroup>
     <PackageReference Include="Concentus.OggFile">
       <Version>1.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="MonoGame.Framework.Portable">
+      <Version>3.7.0.1708</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
