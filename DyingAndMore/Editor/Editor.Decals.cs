@@ -3,20 +3,15 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.UI;
-using Takai;
 
 namespace DyingAndMore.Editor
 {
-    class DecalsEditorMode : EditorMode
+    class DecalsEditorMode :  SelectorEditorMode<Selectors.DecalSelector>
     {
         Takai.Game.Decal selectedDecal = null;
         float startRotation, startScale;
 
         Vector2 currentWorldPos, lastWorldPos;
-
-        Selectors.DecalSelector selector;
-        Graphic preview;
-
         //todo: start,end to update selected
 
         public DecalsEditorMode(Editor editor)
@@ -24,39 +19,21 @@ namespace DyingAndMore.Editor
         {
             VerticalAlignment = Alignment.Stretch;
             HorizontalAlignment = Alignment.Stretch;
+        }
 
-            AddChild(preview = new Graphic()
+        protected override void UpdatePreview(int selectedItem)
+        {
+            if (selectedItem < 0)
             {
-                Sprite = new Takai.Graphics.Sprite(),
-                Position = new Vector2(20),
-                HorizontalAlignment = Alignment.End,
-                VerticalAlignment = Alignment.Start,
-                BorderColor = Color.White
-            });
-            preview.Click += delegate
-            {
-                AddChild(selector);
-            };
+                preview.Sprite.Texture = null;
+                return;
+            }
 
-            selector = new Selectors.DecalSelector()
-            {
-                Size = new Vector2(320, 1),
-                VerticalAlignment = Alignment.Stretch,
-                HorizontalAlignment = Alignment.End
-            };
-            selector.SelectionChanged += delegate
-            {
-                if (selector.SelectedItem < 0)
-                    return;
-
-                var selectedDecal = selector.textures[selector.SelectedItem];
-                preview.Sprite.Texture = selectedDecal;
-                preview.Sprite.ClipRect = selectedDecal.Bounds;
-                preview.Sprite.Size = new Point(selectedDecal.Bounds.Width, selectedDecal.Bounds.Height);
-                preview.Size = Vector2.Clamp(preview.Sprite.Size.ToVector2(),
-                                             new Vector2(32), new Vector2(96));
-            };
-            selector.SelectedItem = 0;
+            var selectedDecal = selector.textures[selectedItem];
+            preview.Sprite.Texture = selectedDecal;
+            preview.Sprite.ClipRect = selectedDecal.Bounds;
+            preview.Sprite.Size = new Point(selectedDecal.Bounds.Width, selectedDecal.Bounds.Height);
+            preview.Size = Vector2.Clamp(preview.Sprite.Size.ToVector2(), new Vector2(32), new Vector2(96));
         }
 
         public override void Start()
@@ -72,12 +49,6 @@ namespace DyingAndMore.Editor
 
         protected override bool HandleInput(GameTime time)
         {
-            if (InputState.IsPress(Keys.Tab))
-            {
-                AddChild(selector);
-                return false;
-            }
-
             lastWorldPos = currentWorldPos;
             currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 

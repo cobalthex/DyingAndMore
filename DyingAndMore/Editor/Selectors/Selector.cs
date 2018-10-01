@@ -6,9 +6,7 @@ using Takai.UI;
 
 namespace DyingAndMore.Editor.Selectors
 {
-    //todo: update to modern UI practices
-
-    abstract class Selector : Static
+    public abstract class Selector : Static
     {
         public Point ItemSize { get; set; } = new Point(1);
 

@@ -139,20 +139,6 @@ namespace DyingAndMore.Game
             Game.LoadNextStoryMap();
         }
 
-        void ToggleUI(Static ui)
-        {
-            if (!ui.RemoveFromParent())
-            {
-                //refresh individual render settings
-                var settings = ui.UserData.GetType();
-                foreach (var child in ui.Children)
-                    ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(ui.UserData);
-
-                AddChild(ui);
-                ui.HasFocus = true;
-            }
-        }
-
         public GameInstance(Game game)
         {
             if (game?.Map == null)
@@ -160,9 +146,6 @@ namespace DyingAndMore.Game
 
             Game = game;
             Current = this; //apply elsewhere?
-
-            HorizontalAlignment = Alignment.Stretch;
-            VerticalAlignment = Alignment.Stretch;
 
             AddChild(hudContainer = new Static
             {
@@ -197,22 +180,28 @@ namespace DyingAndMore.Game
 
             Map = game.Map;
 
-            renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor);
+            AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor));
+            renderSettingsConsole.IsEnabled = false;
             renderSettingsConsole.Position = new Vector2(100, 0);
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;
             renderSettingsConsole.UserData = Map.renderSettings;
 
-            updateSettingsConsole = GeneratePropSheet(Map.updateSettings, DefaultFont, DefaultColor);
+            AddChild(updateSettingsConsole = GeneratePropSheet(Map.updateSettings, DefaultFont, DefaultColor));
+            updateSettingsConsole.IsEnabled = false;
             updateSettingsConsole.Position = new Vector2(100, 0);
             updateSettingsConsole.VerticalAlignment = Alignment.Middle;
             updateSettingsConsole.UserData = Map.updateSettings;
 
-            gameplaySettingsConsole = GeneratePropSheet(GameplaySettings, DefaultFont, DefaultColor);
+            AddChild(gameplaySettingsConsole = GeneratePropSheet(GameplaySettings, DefaultFont, DefaultColor));
+            gameplaySettingsConsole.IsEnabled = false;
             gameplaySettingsConsole.Position = new Vector2(100, 0);
             gameplaySettingsConsole.VerticalAlignment = Alignment.Middle;
             gameplaySettingsConsole.UserData = GameplaySettings;
 
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
+
+            HorizontalAlignment = Alignment.Stretch;
+            VerticalAlignment = Alignment.Stretch;
         }
 
         private void GameMapChanged(object sender, MapChangedEventArgs e)
@@ -229,10 +218,8 @@ namespace DyingAndMore.Game
 
             hudContainer.RemoveAllChildren();
 
-            if (updateSettingsConsole != null)
-                updateSettingsConsole.UserData = Map.updateSettings;
-            if (renderSettingsConsole != null)
-                renderSettingsConsole.UserData = Map.renderSettings;
+            updateSettingsConsole?.BindTo(Map.updateSettings);
+            renderSettingsConsole?.BindTo(Map.renderSettings);
 
             var possiblePlayers = new List<Entities.ActorInstance>();
 
@@ -440,18 +427,18 @@ namespace DyingAndMore.Game
             if (InputState.IsPress(Keys.F2) ||
                 InputState.IsAnyPress(Buttons.Back))
             {
-                ToggleUI(renderSettingsConsole);
+                renderSettingsConsole.IsEnabled ^= true;
                 return false;
             }
             if (InputState.IsPress(Keys.F3) ||
                 InputState.IsAnyPress(Buttons.Back))
             {
-                ToggleUI(updateSettingsConsole);
+                updateSettingsConsole.IsEnabled ^= true;
                 return false;
             }
             if (InputState.IsPress(Keys.F4))
             {
-                ToggleUI(gameplaySettingsConsole);
+                gameplaySettingsConsole.IsEnabled ^= true;
                 return false;
             }
 

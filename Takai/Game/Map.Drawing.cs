@@ -469,7 +469,7 @@ namespace Takai.Game
 
                     Graphics.Primitives2D.DrawFill(
                         c.spriteBatch,
-                        Graphics.ColorUtil.ColorFromHSL(path.heuristic * mult, 1, 0.8f, 1),
+                        Graphics.ColorUtil.ColorFromHSL(path.heuristic * mult, 1, 0.8f, 0.5f),
                         new Rectangle(x * Class.TileSize, y * Class.TileSize, Class.TileSize, Class.TileSize)
                     );
                 }
@@ -482,7 +482,7 @@ namespace Takai.Game
         {
             Class.mapAlphaTest.Projection = c.projection;
             Class.mapAlphaTest.View = c.cameraTransform;
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, Class.stencilWrite, null, Class.mapAlphaTest);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, Class.stencilWrite, null, Class.mapAlphaTest);
 
             for (var y = c.visibleTiles.Top; y < c.visibleTiles.Bottom; ++y)
             {
@@ -507,7 +507,7 @@ namespace Takai.Game
 
         public void DrawFluids(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, Class.reflectionEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, Class.reflectionEffect, c.cameraTransform);
 
             //inactive fluids
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)
@@ -539,7 +539,7 @@ namespace Takai.Game
 
         public void DrawDecals(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, null, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilRead, null, null, c.cameraTransform);
 
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)
             {
@@ -569,7 +569,7 @@ namespace Takai.Game
 
         public void DrawEntities(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, null, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilRead, null, null, c.cameraTransform);
 
             foreach (var ent in activeEntities)
             {
@@ -635,7 +635,7 @@ namespace Takai.Game
             c.spriteBatch.End();
 
             //outlined entities
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, Class.stencilRead, null, Class.outlineEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilRead, null, Class.outlineEffect, c.cameraTransform);
 
             foreach (var ent in _drawEntsOutlined)
             {

@@ -5,15 +5,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DyingAndMore.Editor.Selectors
 {
-    class EntSelector : Selector
+    class EntitySelector : Selector
     {
         public List<Takai.Game.EntityClass> ents = new List<Takai.Game.EntityClass>();
         System.TimeSpan elapsedTime;
 
-        public EntSelector()
+        public EntitySelector()
         {
             ItemSize = new Point(64, 64);
-            Padding = new Vector2(5);
 
             var searchPaths = new[] { "Actors", "Scenery", "Pickups" };
 

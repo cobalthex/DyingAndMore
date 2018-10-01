@@ -124,7 +124,7 @@ namespace Takai.Graphics
             if (h < 0)
                 h += 360;
 
-            return new Vector4(h, s, L, color.A);
+            return new Vector4(h, s, L, color.A / 255f);
         }
 
         public static Color ColorFromHSL(Vector4 hsla)
@@ -132,12 +132,11 @@ namespace Takai.Graphics
             return ColorFromHSL(hsla.X, hsla.Y, hsla.Z, hsla.W);
         }
 
-        public static Color ColorFromHSL(float hue, float saturation, float lightness, float alpha = 255f)
+        public static Color ColorFromHSL(float hue, float saturation, float lightness, float alpha = 1)
         {
             hue = MathHelper.Clamp(hue, 0, 360);
             saturation = MathHelper.Clamp(saturation, 0, 1);
             lightness = MathHelper.Clamp(lightness, 0, 1);
-            alpha /= 255f;
 
             if (saturation == 0)
                 return new Color(lightness, lightness, lightness, alpha);

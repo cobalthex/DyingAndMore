@@ -1230,7 +1230,7 @@ namespace Takai.UI
                 i = toUpdate.Children.Count;
             }
 
-            bool handleInput = Runtime.HasFocus;
+            bool handleInput = true;// Runtime.HasFocus;
             while (true)
             {
                 if (handleInput)
@@ -1243,22 +1243,25 @@ namespace Takai.UI
                     break;
 
                 //iterate through previous children of current level
-                var index = toUpdate.Parent.Children.IndexOf(toUpdate) - 1;
-                if (index >= 0)
+                var i = toUpdate.Parent.children.IndexOf(toUpdate) - 1;
+                for (; i >= 0; --i)
                 {
-                    toUpdate = toUpdate.Parent.Children[index];
+                    toUpdate = toUpdate.Parent.Children[i];
+                    if (!toUpdate.IsEnabled)
+                        continue;
 
                     //find deepest child
-                    for (int i = toUpdate.Children.Count - 1; i >= 0; --i)
+                    for (int j = toUpdate.Children.Count - 1; j >= 0; --j)
                     {
-                        if (!toUpdate.Children[i].IsEnabled)
+                        if (!toUpdate.Children[j].IsEnabled)
                             continue;
 
-                        toUpdate = toUpdate.Children[i];
-                        i = toUpdate.Children.Count;
+                        toUpdate = toUpdate.Children[j];
+                        j = toUpdate.Children.Count;
                     }
+                    break;
                 }
-                else
+                if (i < 0) //todo: does this skip the first child?
                     toUpdate = toUpdate.Parent;
             }
         }
@@ -1496,36 +1499,9 @@ namespace Takai.UI
                 Size = new Vector2(Size.X, Data.Serializer.Cast<float>(height));
         }
 
-        /// <summary>
-        /// Convert a member name to a more english-friendly name
-        /// This includes adding spaces and correct capitalization
-        /// </summary>
-        /// <param name="name">the member name to convert</param>
-        /// <returns>The beautified name</returns>
-        public static string BeautifyMemberName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                return "";
-
-            var builder = new System.Text.StringBuilder(name.Length + 4);
-            builder.Append(char.ToUpper(name[0]));
-            for (int i = 1; i < name.Length; ++i)
-            {
-                if (char.IsUpper(name[i]) && !char.IsUpper(name[i - 1]))
-                {
-                    builder.Append(' ');
-                    builder.Append(char.ToLower(name[i]));
-                }
-                else
-                    builder.Append(name[i]);
-            }
-
-            return builder.ToString();
-        }
-
         public static Static GeneratePropSheet(object obj, Graphics.BitmapFont font, Color color)
         {
-            var root = new List() { Margin = 2 };
+            var root = new List() { Margin = 2, Direction = Direction.Vertical };
             var maxWidth = 0f;
 
             var type = obj.GetType();
@@ -1543,7 +1519,7 @@ namespace Takai.UI
                         var check = new CheckBox()
                         {
                             Name = flag,
-                            Text = BeautifyMemberName(flag),
+                            Text = Util.ToSentenceCase(flag),
                             Font = font,
                             Color = color,
                             IsChecked = @enum.HasFlag(value)
@@ -1578,217 +1554,76 @@ namespace Takai.UI
             //todo: move these into type handlers
             foreach (var member in members)
             {
-                System.Type memberType;
-                object curValue;
-                System.Action<object, object> setValue;
-
-                if (member is FieldInfo fInfo)
-                {
-                    memberType = fInfo.FieldType;
-                    curValue = fInfo.GetValue(obj);
-                    setValue = fInfo.SetValue;
-                }
-                else if (member is PropertyInfo pInfo)
-                {
-                    if (!pInfo.CanWrite)
-                        continue;
-
-                    memberType = pInfo.PropertyType;
-                    curValue = pInfo.GetValue(obj);
-                    setValue = pInfo.SetValue;
-                }
+                System.Type mt;
+                if (member is FieldInfo fi)
+                    mt = fi.FieldType;
+                else if (member is PropertyInfo pi)
+                    mt = pi.PropertyType;
                 else
                     continue;
 
-                Static label = null;
-
-                if (memberType != typeof(bool))
+                if (mt == typeof(bool))
                 {
-                    label = new Static()
+                    var checkbox = new CheckBox
                     {
-                        Text = BeautifyMemberName(member.Name),
+                        Text = Util.ToSentenceCase(member.Name),
+                        Bindings = new List<Data.Binding>
+                        {
+                            new Data.Binding(member.Name, "IsChecked", Data.BindingMode.TwoWay)
+                        },
                         Font = font,
                         Color = color
                     };
-                    label.SizeToContain();
-                    root.AddChild(label);
-
-                    maxWidth = System.Math.Max(maxWidth, label.Size.X);
+                    checkbox.BindTo(obj);
+                    checkbox.SizeToContain();
+                    root.AddChild(checkbox);
+                    continue;
                 }
 
-                if (memberType == typeof(bool))
+                root.AddChild(new Static(Util.ToSentenceCase(member.Name))
                 {
-                    var check = new CheckBox()
+                    Font = font,
+                    Color = color
+                }); //label
+
+                if (Data.Serializer.IsInt(member) ||
+                    Data.Serializer.IsFloat(member))
+                {
+                    var numeric = new NumericInput
                     {
-                        Name = member.Name,
-                        Text = BeautifyMemberName(member.Name),
+                        Bindings = new List<Data.Binding>
+                        {
+                            new Data.Binding(member.Name, "Value", Data.BindingMode.TwoWay)
+                        },
                         Font = font,
                         Color = color
                     };
-                    check.Click += delegate
-                    {
-                        setValue(obj, check.IsChecked);
-                    };
-                    check.SizeToContain();
-                    root.AddChild(check);
-                    maxWidth = System.Math.Max(maxWidth, check.Size.X);
+                    numeric.BindTo(obj);
+                    numeric.SizeToContain();
+                    root.AddChild(numeric);
                 }
-                else if (memberType == typeof(int))
+                else if (mt == typeof(string))
                 {
-                    var input = new NumericInput()
+                    var text = new TextInput
                     {
-                        Minimum = int.MinValue,
-                        Maximum = int.MaxValue,
-                        Value = (int)curValue,
-
-                        Name = member.Name,
-                        HorizontalAlignment = Alignment.Stretch,
+                        Bindings = new List<Data.Binding>
+                        {
+                            new Data.Binding(member.Name, "Text", Data.BindingMode.TwoWay)
+                        },
                         Font = font,
                         Color = color
                     };
-                    input.ValueChanged += delegate
-                    {
-                        setValue(obj, (int)input.Value);
-                    };
-                    input.SizeToContain();
-                    root.AddChild(input);
+                    text.BindTo(obj);
+                    text.SizeToContain();
+                    root.AddChild(text);
                 }
-                else if (memberType == typeof(uint))
+                else if (mt == typeof(Dictionary<,>))
                 {
-                    var input = new NumericInput()
-                    {
-                        Minimum = uint.MinValue,
-                        Maximum = uint.MaxValue,
-                        Value = (long)curValue,
-
-                        Name = member.Name,
-                        HorizontalAlignment = Alignment.Stretch,
-                        Font = font,
-                        Color = color
-                    };
-                    input.ValueChanged += delegate
-                    {
-                        setValue(obj, (uint)input.Value);
-                    };
-                    input.SizeToContain();
-                    root.AddChild(input);
+                    //todo
                 }
-                else if (memberType == typeof(long))
+                else if (mt == typeof(IEnumerable<>))
                 {
-                    var input = new NumericInput()
-                    {
-                        Minimum = long.MinValue,
-                        Maximum = long.MaxValue,
-                        Value = (long)curValue,
-
-                        Name = member.Name,
-                        HorizontalAlignment = Alignment.Stretch,
-                        Font = font,
-                        Color = color
-                    };
-                    input.ValueChanged += delegate
-                    {
-                        setValue(obj, input.Value);
-                    };
-                    input.SizeToContain();
-                    root.AddChild(input);
-                }
-                else if (memberType == typeof(string))
-                {
-                    //todo: file input where applicable (maybe switch vars to use FileInfo class)
-                    var input = new TextInput()
-                    {
-                        Name = member.Name,
-                        Text = (string)curValue,
-                        HorizontalAlignment = Alignment.Stretch,
-                        Font = font,
-                        Color = color
-                    };
-                    input.TextChanged += delegate
-                    {
-                        setValue(obj, input.Text);
-                    };
-                    input.SizeToContain();
-                    root.AddChild(input);
-                }
-                else if (memberType == typeof(System.IO.FileInfo))
-                {
-                    var input = new FileInput()
-                    {
-                        Name = member.Name,
-                        Text = ((System.IO.FileInfo)curValue)?.Name,
-                        HorizontalAlignment = Alignment.Stretch,
-                        Font = font,
-                        Color = color
-                    };
-                    input.FileSelected += delegate
-                    {
-                        setValue(obj, new System.IO.FileInfo(input.Text));
-                    };
-                    input.SizeToContain();
-                    root.AddChild(input);
-                }
-                else if (memberType == typeof(Texture2D))
-                {
-                    var input = new FileInput()
-                    {
-                        Name = member.Name,
-                        Text = ((Texture2D)curValue)?.Name,
-                        HorizontalAlignment = Alignment.Stretch,
-                        Font = font,
-                        Color = color
-                    };
-                    input.FileSelected += delegate
-                    {
-                        setValue(obj, Data.Cache.Load<Texture2D>(input.Text));
-                    };
-                    input.SizeToContain();
-                    root.AddChild(input);
-                }
-                else if (memberType == typeof(System.TimeSpan))
-                {
-                    var input = new NumericInput()
-                    {
-                        Minimum = long.MinValue,
-                        Maximum = long.MaxValue,
-                        Value = (long)((System.TimeSpan)curValue).TotalMilliseconds,
-
-                        Name = member.Name,
-                        HorizontalAlignment = Alignment.Stretch,
-                        Font = font,
-                        Color = color,
-                    };
-                    input.ValueChanged += delegate
-                    {
-                        setValue(obj, System.TimeSpan.FromMilliseconds(input.Value));
-                    };
-                    input.SizeToContain();
-
-                    var mSecLabel = new Static()
-                    {
-                        Text = "msec",
-                        Font = font,
-                        Color = color
-                    };
-                    mSecLabel.SizeToContain();
-
-                    var container = new List()
-                    {
-                        Direction = Direction.Horizontal,
-                        HorizontalAlignment = Alignment.Stretch,
-                        Margin = 10
-                    };
-                    container.AddChildren(
-                        input,
-                        mSecLabel
-                    );
-                    container.SizeToContain();
-                    root.AddChild(container);
-                }
-                else
-                {
-                    label.Text += $"\n`aab--- ({memberType.Name}) ---\nthird line`x";
-                    label.SizeToContain();
+                    //todo: must generate for list not object
                 }
             }
 

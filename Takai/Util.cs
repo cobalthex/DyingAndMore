@@ -225,6 +225,36 @@ namespace Takai
         {
             return new Vector2(v.X - r.X, v.Y - r.Y);
         }
+
+        /// <summary>
+        /// Convert an object name to a more locale-friendly name
+        /// This includes adding spaces and correct capitalization
+        /// </summary>
+        /// <param name="name">the name to convert</param>
+        /// <returns>The formatted name</returns>
+        public static string ToSentenceCase(this string name)
+        {
+            //todo: internationalize
+
+            if (string.IsNullOrWhiteSpace(name))
+                return "";
+
+            var builder = new System.Text.StringBuilder(name.Length + 4);
+            builder.Append(char.ToUpper(name[0]));
+            for (int i = 1; i < name.Length; ++i)
+            {
+                if (char.IsUpper(name[i]) && !char.IsUpper(name[i - 1]))
+                {
+                    builder.Append(' ');
+                    builder.Append(char.ToLower(name[i]));
+                }
+                else
+                    builder.Append(name[i]);
+            }
+
+            return builder.ToString();
+        }
+
     }
 
     public struct Extent

@@ -5,60 +5,33 @@ using Takai;
 
 namespace DyingAndMore.Editor
 {
-    class FluidsEditorMode : EditorMode
+    class FluidsEditorMode : SelectorEditorMode<Selectors.FluidSelector>
     {
         System.TimeSpan lastFluidTime = System.TimeSpan.Zero;
-
-        Selectors.FluidSelector selector;
-        Takai.UI.Graphic preview;
 
         public FluidsEditorMode(Editor editor)
             : base("Fluids", editor)
         {
             VerticalAlignment = Takai.UI.Alignment.Stretch;
             HorizontalAlignment = Takai.UI.Alignment.Stretch;
+        }
 
-            AddChild(preview = new Takai.UI.Graphic()
+        protected override void UpdatePreview(int selectedItem)
+        {
+            if (selectedItem < 0)
             {
-                Sprite = new Takai.Graphics.Sprite(),
-                Position = new Vector2(20),
-                Size = new Vector2(64),
-                HorizontalAlignment = Takai.UI.Alignment.End,
-                VerticalAlignment = Takai.UI.Alignment.Start,
-                BorderColor = Color.White
-            });
-            preview.Click += delegate
-            {
-                AddChild(selector);
-            };
+                preview.Sprite.Texture = null;
+                return;
+            }
 
-            selector = new Selectors.FluidSelector()
-            {
-                Size = new Vector2(320, 1),
-                VerticalAlignment = Takai.UI.Alignment.Stretch,
-                HorizontalAlignment = Takai.UI.Alignment.End
-            };
-            selector.SelectionChanged += delegate
-            {
-                if (selector.SelectedItem < 0)
-                    return;
-
-                var selectedFluid = selector.fluids[selector.SelectedItem]; //todo: can go into selector
-                preview.Sprite.Texture = selectedFluid.Texture;
-                preview.Sprite.ClipRect = selectedFluid.Texture.Bounds;
-                preview.Sprite.Size = new Point(selectedFluid.Texture.Bounds.Width, selectedFluid.Texture.Bounds.Height);
-            };
-            selector.SelectedItem = 0;
+            var selectedFluid = selector.fluids[selector.SelectedItem];
+            preview.Sprite.Texture = selectedFluid.Texture;
+            preview.Sprite.ClipRect = selectedFluid.Texture.Bounds;
+            preview.Sprite.Size = new Point(selectedFluid.Texture.Bounds.Width, selectedFluid.Texture.Bounds.Height);
         }
 
         protected override bool HandleInput(GameTime time)
         {
-            if (InputState.IsPress(Keys.Tab))
-            {
-                AddChild(selector);
-                return false;
-            }
-
             var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 
             if (selector.SelectedItem >= 0 && time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
