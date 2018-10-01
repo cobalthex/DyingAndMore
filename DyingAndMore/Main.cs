@@ -60,7 +60,7 @@ namespace DyingAndMore
                 GraphicsProfile = GraphicsProfile.HiDef,
                 PreferredBackBufferFormat = SurfaceFormat.Color,
                 SynchronizeWithVerticalRetrace = false,
-                PreferMultiSampling = false,
+                PreferMultiSampling = true,
 #if WINDOWS_UAP
                 SynchronizeWithVerticalRetrace = true,
                 IsFullScreen = true,
@@ -71,7 +71,7 @@ namespace DyingAndMore
             gdm.PreparingDeviceSettings += delegate (object sender, PreparingDeviceSettingsEventArgs e)
             {
                 //required for splitscreen (currently)
-                e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
+                //e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
             };
 
             IsMouseVisible = true;

@@ -9,6 +9,8 @@ namespace DyingAndMore.Editor.Selectors
         readonly Takai.Game.Tileset tileset;
         readonly int tilesPerRow;
 
+        public TileSelector() { }
+
         public TileSelector(Takai.Game.Tileset tileset)
         {
             this.tileset = tileset;

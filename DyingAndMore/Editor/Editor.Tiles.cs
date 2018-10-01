@@ -1,89 +1,37 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Takai.Input;
 
 namespace DyingAndMore.Editor
 {
-    class TilesEditorMode : EditorMode
+    class TilesEditorMode : SelectorEditorMode<Selectors.TileSelector>
     {
         bool isPosSaved = false;
         Vector2 savedWorldPos, lastWorldPos, currentWorldPos;
 
-        Selectors.TileSelector selector;
-        Takai.UI.Drawer selectorDrawer;
-        Takai.UI.Graphic preview;
-
         public TilesEditorMode(Editor editor)
-            : base("Tiles", editor)
+            : base("Tiles", editor, new Selectors.TileSelector(editor.Map.Class.Tileset))
         {
             VerticalAlignment = Takai.UI.Alignment.Stretch;
             HorizontalAlignment = Takai.UI.Alignment.Stretch;
+        }
 
-            AddChild(preview = new Takai.UI.Graphic()
-            {
-                Sprite = new Takai.Graphics.Sprite()
-                {
-                    Width = editor.Map.Class.TileSize,
-                    Height = editor.Map.Class.TileSize,
-                    Texture = editor.Map.Class.TilesImage
-                },
-                Position = new Vector2(20),
-                Size = new Vector2(editor.Map.Class.TileSize),
-                HorizontalAlignment = Takai.UI.Alignment.End,
-                VerticalAlignment = Takai.UI.Alignment.Start,
-                BorderColor = Color.White
-            });
-            preview.Click += delegate
-            {
-                selectorDrawer.IsEnabled = true;
-            };
+        protected override void UpdatePreview(int selectedItem)
+        {
+            if (preview.Sprite == null)
+                return;
 
-            selector = new Selectors.TileSelector(editor.Map.Class.Tileset)
-            {
-                HorizontalAlignment = Takai.UI.Alignment.Stretch,
-                VerticalAlignment = Takai.UI.Alignment.Stretch,
-            };
-            selector.SelectionChanged += delegate
-            {
-                if (preview.Sprite != null)
-                {
-                    preview.Sprite.ClipRect = new Rectangle(
-                        (selector.SelectedItem % editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
-                        (selector.SelectedItem / editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
-                        editor.Map.Class.TileSize,
-                        editor.Map.Class.TileSize
-                    );
-                }
-                selectorDrawer.IsEnabled = false;
-            };
-
-            selectorDrawer = new Takai.UI.Drawer
-            {
-                BackgroundColor = Color.Gray,
-                HorizontalAlignment = Takai.UI.Alignment.Right,
-                VerticalAlignment = Takai.UI.Alignment.Stretch,
-                Size = new Vector2(System.Math.Max(400, editor.Map.Class.TileSize * 8) + 10, 1),
-                IsEnabled = false
-            };
-            selectorDrawer.AddChild(new Takai.UI.ScrollBox(selector)
-            {
-                HorizontalAlignment = Takai.UI.Alignment.Stretch,
-                VerticalAlignment = Takai.UI.Alignment.Stretch
-            });
-            AddChild(selectorDrawer);
-
-            selector.SelectedItem = 0; //initialize preview
+            preview.Sprite.ClipRect = new Rectangle(
+                (selector.SelectedItem % editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
+                (selector.SelectedItem / editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
+                editor.Map.Class.TileSize,
+                editor.Map.Class.TileSize
+            );
         }
 
         protected override bool HandleInput(GameTime time)
         {
-            if (InputState.IsPress(Keys.Tab))
-            {
-                selectorDrawer.IsEnabled = true;
-                return false;
-            }
-
             lastWorldPos = currentWorldPos;
             currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 

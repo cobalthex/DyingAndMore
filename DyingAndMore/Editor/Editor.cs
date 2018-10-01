@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DyingAndMore.Editor
 {
-    class EditorMode : Static
+    public abstract class EditorMode : Static
     {
         protected readonly Editor editor;
 
@@ -22,6 +22,78 @@ namespace DyingAndMore.Editor
 
         public virtual void Start() { }
         public virtual void End() { }
+    }
+
+    public abstract class SelectorEditorMode<TSelector> : EditorMode
+        where TSelector : Selectors.Selector, new()
+    {
+        public TSelector selector;
+        public Graphic preview;
+
+        private Drawer selectorDrawer;
+
+        public SelectorEditorMode(string name, Editor editor, TSelector selector = null)
+            : base(name, editor)
+        {
+            AddChild(preview = new Graphic()
+            {
+                Sprite = new Takai.Graphics.Sprite()
+                {
+                    Width = editor.Map.Class.TileSize,
+                    Height = editor.Map.Class.TileSize,
+                    Texture = editor.Map.Class.TilesImage
+                },
+                Position = new Vector2(20),
+                Size = new Vector2(64),
+                HorizontalAlignment = Alignment.End,
+                VerticalAlignment = Alignment.Start,
+                BorderColor = Color.White
+            });
+            preview.Click += delegate
+            {
+                selectorDrawer.IsEnabled = true;
+            };
+
+            this.selector = selector ?? new TSelector();
+            this.selector.HorizontalAlignment = Alignment.Stretch;
+            this.selector.VerticalAlignment = Alignment.Stretch;
+            this.selector.SelectionChanged += delegate
+            {
+                selectorDrawer.IsEnabled = false;
+                UpdatePreview(this.selector.SelectedItem);
+            };
+
+            selectorDrawer = new Drawer
+            {
+                BackgroundColor = Color.Gray,
+                HorizontalAlignment = Alignment.Right,
+                VerticalAlignment = Alignment.Stretch,
+                Size = new Vector2(System.Math.Max(400, editor.Map.Class.TileSize * 8) + 10, 1),
+                IsEnabled = false
+            };
+            selectorDrawer.AddChild(new ScrollBox(this.selector)
+            {
+                HorizontalAlignment = Alignment.Stretch,
+                VerticalAlignment = Alignment.Stretch
+            });
+            AddChild(selectorDrawer);
+
+            this.selector.SelectedItem = 0; //initialize preview
+        }
+
+        protected abstract void UpdatePreview(int selectedItem);
+
+        protected override bool HandleInput(GameTime time)
+        {
+            if (InputState.IsPress(Keys.Tab))
+            {
+                selectorDrawer.IsEnabled = true;
+                return false;
+            }
+
+
+            return base.HandleInput(time);
+        }
     }
 
     public struct EditorConfiguration
@@ -115,26 +187,29 @@ namespace DyingAndMore.Editor
                 SwitchToGame();
             };
 
-            renderSettingsConsole = GeneratePropSheet(map.renderSettings, DefaultFont, DefaultColor);
+            AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor));
+            renderSettingsConsole.IsEnabled = false;
             renderSettingsConsole.Position = new Vector2(100, 0);
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;
 
             resizeDialog = Cache.Load<Static>("UI/Editor/ResizeMap.ui.tk");
 
             swatch.Stop();
-            Takai.LogBuffer.Append($"Loaded editor and map \"{map.Class.Name}\" ({map.Class.File}) in {swatch.ElapsedMilliseconds}msec");
+            Takai.LogBuffer.Append($"Loaded editor and map \"{Map.Class.Name}\" ({Map.Class.File}) in {swatch.ElapsedMilliseconds}msec");
             //todo: move this to mapChanged
+
+            //todo: map zoom/something fucked if window not focused when loading
         }
 
         void AddModes()
         {
             modes.AddMode(new TilesEditorMode(this));
-            //modes.AddMode(new DecalsEditorMode(this));
-            //modes.AddMode(new FluidsEditorMode(this));
-            //modes.AddMode(new EntitiesEditorMode(this));
-            //modes.AddMode(new PathsEditorMode(this));
-            //modes.AddMode(new TriggersEditorMode(this));
-            //modes.AddMode(new TestEditorMode(this));
+            modes.AddMode(new DecalsEditorMode(this));
+            modes.AddMode(new FluidsEditorMode(this));
+            modes.AddMode(new EntitiesEditorMode(this));
+            modes.AddMode(new PathsEditorMode(this));
+            modes.AddMode(new TriggersEditorMode(this));
+            modes.AddMode(new TestEditorMode(this));
         }
 
         protected override void OnParentChanged(ParentChangedEventArgs e)
@@ -144,12 +219,12 @@ namespace DyingAndMore.Editor
 
             Map.updateSettings.SetEditor();
             Map.renderSettings = config.renderSettings.Clone();
+            renderSettingsConsole?.BindTo(Map.renderSettings);
         }
 
         protected void OnMapChanged()
         {
-            if (renderSettingsConsole != null)
-                renderSettingsConsole.UserData = Map.renderSettings;
+            renderSettingsConsole?.BindTo(Map.renderSettings);
 
             Camera.ActualScale = 0;
             ZoomWholeMap();
@@ -260,7 +335,7 @@ namespace DyingAndMore.Editor
 
             if (InputState.IsPress(Keys.F2))
             {
-                ToggleRenderSettingsConsole();
+                renderSettingsConsole.IsEnabled ^= true;
                 return false;
             }
 
@@ -479,23 +554,6 @@ namespace DyingAndMore.Editor
         {
             base.DrawSelf(spriteBatch);
             Map.Draw(Camera);
-        }
-
-        void ToggleRenderSettingsConsole()
-        {
-            if (!renderSettingsConsole.RemoveFromParent())
-            {
-                //refresh individual render settings
-                var settings = typeof(MapInstance.RenderSettings);
-                settings.GetTypeInfo();
-                foreach (var child in renderSettingsConsole.Children)
-                {
-                    if (child.IsEnabled)
-                        ((CheckBox)child).IsChecked = (bool)settings.GetField(child.Name).GetValue(Map.renderSettings);
-                }
-
-                AddChild(renderSettingsConsole);
-            }
         }
     }
 }

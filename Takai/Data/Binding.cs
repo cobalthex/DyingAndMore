@@ -38,7 +38,10 @@ namespace Takai.Data
             var field = type.GetField(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
             if (field != null)
             {
-                throw new NotImplementedException(); //todo
+                getset.type = field.FieldType;
+                if (!field.IsInitOnly)
+                    getset.set = (value) => field.SetValue(obj, value);
+                getset.get = () => field.GetValue(obj);
             }
 
             return getset;
@@ -83,6 +86,14 @@ namespace Takai.Data
 
         object cachedValue;
         int cachedHash;
+
+        public Binding() { }
+        public Binding(string source, string target, BindingMode mode = BindingMode.OneWay)
+        {
+            Source = source;
+            Target = target;
+            Mode = mode;
+        }
 
         public object Clone()
         {

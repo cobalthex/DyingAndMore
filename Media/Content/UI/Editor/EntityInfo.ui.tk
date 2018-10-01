@@ -18,7 +18,7 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSizeOnBindingUpdate: true;
+            AutoSize: true;
         };
 
         Static { Text: "Class"; };
@@ -29,7 +29,7 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSizeOnBindingUpdate: true;
+            AutoSize: true;
         };
 
         Static { Text: "File"; };
@@ -40,7 +40,7 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSizeOnBindingUpdate: true;
+            AutoSize: true;
         };
 
         Static { Text: "ID"; };
@@ -51,7 +51,7 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSizeOnBindingUpdate: true;
+            AutoSize: true;
         };
 
         Static { Text: "Is Alive"; };
@@ -62,7 +62,7 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSizeOnBindingUpdate: true;
+            AutoSize: true;
         };
 
         #*
@@ -74,7 +74,7 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSizeOnBindingUpdate: true;
+            AutoSize: true;
         };
         *#
 
@@ -94,7 +94,7 @@ Table {
                             Mode: BindingMode.OneWay;
                         }
                     ];
-                    AutoSizeOnBindingUpdate: true;
+                    AutoSize: true;
                  };
                 Static { Text: "/"; };
                 Static {
@@ -105,7 +105,7 @@ Table {
                             Mode: BindingMode.OneWay;
                         }
                     ];
-                    AutoSizeOnBindingUpdate: true;
+                    AutoSize: true;
                  };
             ];
         };
@@ -118,7 +118,7 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSizeOnBindingUpdate: true;
+            AutoSize: true;
         };
 
         Static { Text: "Controller"; };
@@ -129,7 +129,7 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSizeOnBindingUpdate: true;
+            AutoSize: true;
         };
 
         Static { Text: "Weapon"; };
@@ -140,7 +140,7 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSizeOnBindingUpdate: true;
+            AutoSize: true;
         };
     ];
 }

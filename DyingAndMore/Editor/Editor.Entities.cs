@@ -10,7 +10,7 @@ namespace DyingAndMore.Editor
 {
     //todo: initial map state should be updated as entities are updated (created/moved/deleted, etc)
 
-    class EntitiesEditorMode : EditorMode
+    class EntitiesEditorMode : SelectorEditorMode<Selectors.EntitySelector>
     {
         public Takai.Game.EntityInstance SelectedEntity
         {
@@ -25,9 +25,6 @@ namespace DyingAndMore.Editor
 
         Vector2 lastWorldPos, currentWorldPos;
 
-        Selectors.EntSelector selector;
-        Graphic preview;
-
         Static entInfo;
         Static entEditor;
 
@@ -37,42 +34,22 @@ namespace DyingAndMore.Editor
             VerticalAlignment = Alignment.Stretch;
             HorizontalAlignment = Alignment.Stretch;
 
-            AddChild(preview = new Graphic()
-            {
-                Position = new Vector2(20),
-                HorizontalAlignment = Alignment.End,
-                VerticalAlignment = Alignment.Start,
-                BorderColor = Color.White,
-                DrawXIfMissingSprite = true,
-            });
-            preview.Click += delegate
-            {
-                AddChild(selector);
-            };
-
-            selector = new Selectors.EntSelector()
-            {
-                Size = new Vector2(320, 1),
-                VerticalAlignment = Alignment.Stretch,
-                HorizontalAlignment = Alignment.End
-            };
-            selector.SelectionChanged += delegate
-            {
-                if (selector.SelectedItem >= 0 && selector.ents[selector.SelectedItem].Animations.TryGetValue("EditorPreview", out var animation))
-                {
-                    preview.Sprite = animation.Sprite;
-                    preview.Size = Vector2.Max(new Vector2(32), preview.Sprite?.Size.ToVector2() ?? new Vector2(32));
-                }
-                else
-                {
-                    preview.Sprite = null;
-                    preview.Size = new Vector2(32);
-                }
-            };
-            selector.SelectedItem = 0;
-
             AddChild(entInfo = Takai.Data.Cache.Load<Static>("UI/Editor/EntityInfo.ui.tk").Clone());
             entEditor = Takai.Data.Cache.Load<Static>("UI/Editor/EntityEditor.ui.tk").Clone();
+        }
+
+        protected override void UpdatePreview(int selectedItem)
+        {
+            if (selectedItem >= 0 && selector.ents[selectedItem].Animations.TryGetValue("EditorPreview", out var animation))
+            {
+                preview.Sprite = animation.Sprite;
+                preview.Size = Vector2.Max(new Vector2(32), preview.Sprite?.Size.ToVector2() ?? new Vector2(32));
+            }
+            else
+            {
+                preview.Sprite = null;
+                preview.Size = new Vector2(32);
+            }
         }
 
         public override void Start()
@@ -93,12 +70,6 @@ namespace DyingAndMore.Editor
 
         protected override bool HandleInput(GameTime time)
         {
-            if (InputState.IsPress(Keys.Tab))
-            {
-                AddChild(selector);
-                return false;
-            }
-
             lastWorldPos = currentWorldPos;
             currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 
