@@ -111,6 +111,8 @@ namespace Takai.UI
                 {
                     _text = value;
                     textSize = Font?.MeasureString(_text) ?? Vector2.One;
+                    if (AutoSize)
+                        SizeToContain();
                 }
             }
         }
@@ -130,6 +132,8 @@ namespace Takai.UI
                 {
                     _font = value;
                     textSize = _font?.MeasureString(Text) ?? Vector2.One;
+                    if (AutoSize)
+                        SizeToContain();
                 }
             }
         }
@@ -1058,6 +1062,7 @@ namespace Takai.UI
             Reflow(Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.VisibleBounds);
 
             Parent?.OnChildReflow(this);
+            Parent?.ChildReflow?.Invoke(this, System.EventArgs.Empty);
             isReflowing = false;
         }
 
@@ -1155,6 +1160,8 @@ namespace Takai.UI
                     return position + padding;
             }
         }
+
+        public event System.EventHandler ChildReflow = null;
 
         /// <summary>
         /// Called by a child when it reflows, this element can reflow/resize in relation
@@ -1278,8 +1285,9 @@ namespace Takai.UI
                 bool didUpdateBinding = false;
                 foreach (var binding in Bindings)
                     didUpdateBinding |= binding.Update();
-                if (didUpdateBinding && AutoSize)
-                    SizeToContain();
+                //if (didUpdateBinding && AutoSize)
+                //    SizeToContain();
+                //should be handled by binding setters
             }
         }
 

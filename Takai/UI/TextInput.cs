@@ -392,12 +392,12 @@ namespace Takai.UI
                 if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
                 {
                     var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + AbsoluteDimensions.X + 3;
-                    Graphics.Primitives2D.DrawLine(
-                        spriteBatch,
-                        Color,
-                        new Vector2(x, AbsoluteDimensions.Top + 4),
-                        new Vector2(x, AbsoluteDimensions.Bottom - 4)
-                    );
+                    if (x < VisibleBounds.Left || x >= VisibleBounds.Right)
+                        return;
+
+                    var top = new Vector2(x, MathHelper.Clamp(AbsoluteDimensions.Top, VisibleBounds.Top, VisibleBounds.Bottom));
+                    var bottom = new Vector2(x, MathHelper.Clamp(AbsoluteDimensions.Bottom, VisibleBounds.Top, VisibleBounds.Bottom));
+                    Graphics.Primitives2D.DrawLine(spriteBatch, Color, top, bottom);
                 }
             }
         }
