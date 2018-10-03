@@ -6,18 +6,22 @@ List {
     BackgroundColor: [20 20 20 192];
     Margin: 10;
     Padding: 10;
+	Height: 500;
 
     Children: [
         Scrollbox {
+			Name: 'b';
             Width: 400;
             Children: [
                 List {
+					Name: 'c';
                     Direction: Direction.Vertical;
                     Margin: 10;
 
                     Children: [
                         Static { Text: "Name"; }
                         TextInput {
+							Name: 'd';
                             Bindings: [
                                 Binding {
                                     Mode: BindingMode.TwoWay;
@@ -28,6 +32,9 @@ List {
                         }
 
                         Static { Text: "Controller"; }
+
+						# actions
+						#
                     ];
                 };
             ];

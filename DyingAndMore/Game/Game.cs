@@ -160,6 +160,7 @@ namespace DyingAndMore.Game
                 Position = new Vector2(20),
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.End,
+                AutoSize = true
             });
             AddChild(crapDisplay = new Static
             {
@@ -176,6 +177,7 @@ namespace DyingAndMore.Game
                 VerticalAlignment = Alignment.Start,
                 HorizontalAlignment = Alignment.Middle,
                 Color = new Color(1, 1, 1, 0.5f),
+                AutoSize = true
             });
 
             Map = game.Map;
@@ -332,7 +334,6 @@ namespace DyingAndMore.Game
         {
             ElapsedRealTime += time.ElapsedGameTime;
             clockDisplay.Text = $"{GetClockText(ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}x{Map.TimeScale:N1}{(IsPaused ? "\n -- PAUSED --" : "")}";
-            clockDisplay.SizeToContain();
 
             if (isDead && time.TotalGameTime > restartTimer)
             {
@@ -380,7 +381,6 @@ namespace DyingAndMore.Game
             }
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
-            fpsDisplay.SizeToContain();
 
             base.UpdateSelf(time);
         }
