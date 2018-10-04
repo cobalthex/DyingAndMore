@@ -163,7 +163,7 @@ namespace DyingAndMore
                 };
             }
             ui = new Takai.UI.Static(selectStoryUI);
-            //ui = new Takai.UI.Static(Cache.Load<Takai.UI.Static>("UI/test/Table.ui.tk"));
+            //ui = new Takai.UI.Static(Cache.Load<Takai.UI.Static>("UI/test/Layout.ui.tk"));
 
             fpsGraph = new Takai.FpsGraph()
             {

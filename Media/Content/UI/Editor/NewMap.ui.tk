@@ -8,6 +8,7 @@
 List {
     BackgroundColor: Color.Gray;
     Margin: 10;
+    Padding: [10 10];
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
     Children: [
@@ -34,7 +35,7 @@ List {
             Children: [;
                 List {
                     Margin: 10;
-                    Children: [;
+                    Children: [
                         Static {
                             Text: "Width";
                             HorizontalAlignment: Alignment.Start;
@@ -50,7 +51,7 @@ List {
 
                 List {
                     Margin: 10;
-                    Children: [;
+                    Children: [
                         Static {
                             Text: "Height";
                             HorizontalAlignment: Alignment.Start;
@@ -77,12 +78,27 @@ List {
             Width: 300;
         }
 
-        Static {
-            Name: "create";
-            Text: "Create";
-            Font: @"Fonts/UILarge.bfnt";
-            Width: 200;
-            HorizontalAlignment: Alignment.Middle;
+        List {
+            Direction: Direction.Horizontal;
+            Margin: 10;
+            HoriziontalAlignment: Alignment.Middle;
+            Children: [
+                Static {
+                    Name: "create";
+                    Text: "Create";
+                    Font: @"Fonts/UILarge.bfnt";
+                    Width: 200;
+                    HorizontalAlignment: Alignment.Middle;
+                }
+
+                Static {
+                    Action: "$Close";
+                    Text: "Cancel";
+                    Font: @"Fonts/UILarge.bfnt";
+                    Width: 200;
+                    HorizontalAlignment: Alignment.Middle;
+                }
+            ]
         }
     ]
 }

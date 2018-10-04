@@ -98,6 +98,8 @@ namespace Takai.UI
                 ));
                 offset.X += colWidths[i % ColumnCount];
             }
+
+            NotifyChildReflow();
         }
     }
 }

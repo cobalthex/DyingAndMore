@@ -3,7 +3,7 @@ List {
     IsModal: true;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
-    BackgroundColor: [20 20 20 192];
+    BackgroundColor: [32 0 128 192];
     Margin: 10;
     Padding: 10;
 	Height: 500;
@@ -12,6 +12,7 @@ List {
         Scrollbox {
 			Name: 'b';
             Width: 400;
+            AutoSize: true;
             Children: [
                 List {
 					Name: 'c';

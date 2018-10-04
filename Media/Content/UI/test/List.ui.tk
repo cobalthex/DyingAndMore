@@ -1,0 +1,37 @@
+List {
+	Name: "1";
+	HorizontalAlignment: Alignment.Middle;
+	VerticalAlignment: Alignment.Middle;
+	Padding: [10 10];
+	Margin: 10;
+	BackgroundColor: [40 0 100];
+	Height: 300;
+
+	Children: [
+		Static {
+			Text: "Ag |||";
+			BackgroundColor: [50 90 50];
+			Padding: [10 10];
+			HorizontalAlignment: Alignment.Left;
+		};
+		Static {
+			Text: "||| By |||";
+			BackgroundColor: [90 90 50];
+			Padding: [10 10];
+			HorizontalAlignment: Alignment.Middle;
+		};
+		Static {
+			Text: "Cq";
+			BackgroundColor: [50 90 90];
+			Padding: [10 10];
+			HorizontalAlignment: Alignment.Stretch;
+			VerticalAlignment: Alignment.Stretch;
+		};
+		Static {
+			Text: "||| Dp";
+			BackgroundColor: [90 50 90];
+			Padding: [10 10];
+			HorizontalAlignment: Alignment.Right;
+		};
+	];
+};
