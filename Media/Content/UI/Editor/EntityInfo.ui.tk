@@ -1,6 +1,6 @@
 Table {
-    BackgroundColor: [32 0 128 192];
     Name: "Entity info";
+    BackgroundColor: [32 0 128 192];
     Position: [20 20];
     VerticalAlignment: Alignment.Bottom;
     ColumnCount: 2;
