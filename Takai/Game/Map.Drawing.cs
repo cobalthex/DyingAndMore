@@ -400,7 +400,7 @@ namespace Takai.Game
 
             if (renderSettings.drawFluidReflectionMask)
             {
-                context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+                context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
                 context.spriteBatch.Draw(Class.reflectionRenderTarget, Vector2.Zero, Color.White);
                 context.spriteBatch.End();
             }
@@ -507,7 +507,7 @@ namespace Takai.Game
 
         public void DrawFluids(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, Class.reflectionEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, null, null, null, Class.reflectionEffect, c.cameraTransform);
 
             //inactive fluids
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)
