@@ -93,6 +93,15 @@ namespace Takai.UI
             if (command == OnValueChangedCommand)
                 onValueChangedCommandFn = commandFn;
         }
+
+        public virtual void IncrementValue(int scale = 1)
+        {
+            Value += Increment * scale;
+        }
+        public void DecrementValue(int scale = 1)
+        {
+            IncrementValue(-scale);
+        }
     }
 
     /// <summary>
@@ -154,17 +163,21 @@ namespace Takai.UI
 
             upButton.Click += delegate
             {
-                Value += Increment;
-                textInput.Text = Value.ToString();
+                IncrementValue();
             };
 
             downButton.Click += delegate
             {
-                Value -= Increment;
-                textInput.Text = Value.ToString();
+                DecrementValue();
             };
 
             AddChildren(textInput, upButton, downButton);
+        }
+
+        public override void IncrementValue(int scale = 1)
+        {
+            base.IncrementValue(scale);
+            textInput.Text = Value.ToString();
         }
 
         protected override void OnValueChanged(EventArgs e)
@@ -181,7 +194,6 @@ namespace Takai.UI
             upButton.Size = downButton.Size = new Vector2(btnSize);
 
             Size = textInput.Size + new Vector2(btnSize * 2, 0);
-            base.SizeToContain();
         }
 
         protected override void OnResize(EventArgs e)
@@ -198,7 +210,26 @@ namespace Takai.UI
         {
             upButton.Position = textInput.Position + new Vector2(textInput.Size.X, 0);
             downButton.Position = upButton.Position + new Vector2(upButton.Size.X, 0);
-            base.Reflow();
+            base.Reflow(container);
+        }
+
+        protected override bool HandleInput(GameTime time)
+        {
+            if (HasFocus)
+            {
+                if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Up))
+                {
+                    IncrementValue();
+                    return false;
+                }
+
+                if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Down))
+                {
+                    DecrementValue();
+                    return false;
+                }
+            }
+            return base.HandleInput(time);
         }
     }
 }

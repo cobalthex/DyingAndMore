@@ -269,13 +269,13 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// The bounds of this element, including padding.
+        /// The bounds of this element, adding size to padding.
         /// </summary>
         /// <seealso cref="LocalDimensions"/>
         public Rectangle LocalBounds => new Rectangle(
-            (int)(Position.X - Padding.X),
-            (int)(Position.Y - Padding.Y),
-            (int)(Size.X + Padding.X  * 2),
+            (int)(Position.X/* - Padding.X*/),
+            (int)(Position.Y/* - Padding.Y*/),
+            (int)(Size.X + Padding.X * 2),
             (int)(Size.Y + Padding.Y * 2)
         );
 
@@ -471,7 +471,9 @@ namespace Takai.UI
 
         private void DeserializeChildren(object objects)
         {
-            var elements = objects as List<object>;
+            if (!(objects is List<object> elements))
+                throw new System.ArgumentException("Children must be a list of UI elements");
+
             foreach (var element in elements)
             {
                 if (element is Static child)
@@ -1061,8 +1063,6 @@ namespace Takai.UI
 
             Reflow(Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.VisibleBounds);
 
-            Parent?.OnChildReflow(this);
-            Parent?.ChildReflow?.Invoke(this, System.EventArgs.Empty);
             isReflowing = false;
         }
 
@@ -1070,7 +1070,8 @@ namespace Takai.UI
         /// Reflow child elements relative to this element
         /// Called whenever this element's position or size is adjusted
         ///
-        /// Any overrides of this should call FitToContainer() first
+        /// Any overrides of this should call <see cref="AdjustToContainer(Rectangle)"/> first
+        /// This should only be called by elements implenting custom layouts
         /// </summary>
         public virtual void Reflow(Rectangle container)
         {
@@ -1081,7 +1082,39 @@ namespace Takai.UI
                 if (child.IsEnabled)
                     child.Reflow(AbsoluteDimensions);
             }
+
+            //todo: this must be called by all overrides, make automatic
+            NotifyChildReflow();
         }
+
+        public event System.EventHandler ChildReflow = null;
+
+        /// <summary>
+        /// Called by a child when it reflows, this element can reflow/resize in relation
+        /// </summary>
+        /// <param name="child">The child element that reflowed</param>
+        protected virtual void OnChildReflow(Static child)
+        {
+            if (AutoSize) //todo: autosize mode (grow only, minimum size, single dimension)
+            {
+                //grow only
+                //var bounds = Rectangle.Union(AbsoluteDimensions, child.AbsoluteBounds);
+                //Size = new Vector2(bounds.Width, bounds.Height);
+
+                SizeToContain();
+            }
+        }
+
+        //todo: this shouldnt need to exist
+        public void NotifyChildReflow()
+        {
+            if (Parent == null)
+                return;
+
+            Parent.OnChildReflow(this);
+            Parent.ChildReflow?.Invoke(this, System.EventArgs.Empty);
+        }
+
 
         protected void ResizeAndReflow()
         {
@@ -1092,9 +1125,9 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Calculate all of the bounds to this element in relation to a container (absolutely positioned)
+        /// Calculate all of the bounds to this element in relation to a container (absolutely positioned).
         /// </summary>
-        /// <param name="container">The container to fit this to. Should be in absolute coordinates</param>
+        /// <param name="container">The container to fit this to, in absolute coordinates</param>
         protected void AdjustToContainer(Rectangle container)
         {
             //todo: ideally this should take local dimensions for container
@@ -1160,25 +1193,6 @@ namespace Takai.UI
                     return position + padding;
             }
         }
-
-        public event System.EventHandler ChildReflow = null;
-
-        /// <summary>
-        /// Called by a child when it reflows, this element can reflow/resize in relation
-        /// </summary>
-        /// <param name="child">The child element that reflowed</param>
-        protected virtual void OnChildReflow(Static child)
-        {
-            if (AutoSize) //todo: autosize mode (grow only, minimum size, single dimension)
-            {
-                //grow only
-                //var bounds = Rectangle.Union(AbsoluteDimensions, child.AbsoluteBounds);
-                //Size = new Vector2(bounds.Width, bounds.Height);
-
-                SizeToContain();
-            }
-        }
-
         /// <summary>
         /// Automatically size this element. By default, will size based on text and children
         /// This does not affect the position of the element
@@ -1187,8 +1201,8 @@ namespace Takai.UI
         public virtual void SizeToContain()
         {
             var bounds = new Rectangle(
-                AbsoluteDimensions.X,
-                AbsoluteDimensions.Y,
+                (int)Position.X,
+                (int)Position.Y,
                 (int)textSize.X,
                 (int)textSize.Y
             );
@@ -1197,7 +1211,13 @@ namespace Takai.UI
                 if (!child.IsEnabled)
                     continue;
 
-                bounds = Rectangle.Union(bounds, child.AbsoluteBounds);
+                var lb = child.AbsoluteBounds; //absolute bounds will have container offset
+                if (child.HorizontalAlignment == Alignment.Stretch)
+                    lb.Width = 0;
+                if (child.VerticalAlignment == Alignment.Stretch)
+                    lb.Height = 0;
+
+                bounds = Rectangle.Union(bounds, lb);
             }
             Size = new Vector2(bounds.Width, bounds.Height);
         }
@@ -1488,7 +1508,7 @@ namespace Takai.UI
 
         public override string ToString()
         {
-            return $"{base.ToString()} \"{Name ?? "(No name)"}\"{(HasFocus ? " *" : "")}";
+            return $"{base.ToString()} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\"";
         }
 
         public virtual void DerivedDeserialize(Dictionary<string, object> props)

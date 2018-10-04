@@ -29,41 +29,80 @@ namespace Takai.UI
         {
             AdjustToContainer(container);
 
-            float t = 0;
+            float usedSize = 0;
+            int stretches = 0;
+            for (int i = 0; i < Children.Count; ++i)
+            {
+                if (!Children[i].IsEnabled)
+                    continue;
 
-            //pre-position items into a list
+                if (Direction == Direction.Horizontal)
+                {
+                    if (Children[i].HorizontalAlignment == Alignment.Stretch)
+                        ++stretches;
+                    else
+                        usedSize += Children[i].LocalBounds.Right;
+                }
+                else
+                {
+                    if (Children[i].VerticalAlignment == Alignment.Stretch)
+                        ++stretches;
+                    else
+                        usedSize += Children[i].LocalBounds.Bottom;
+                }
+            }
+            usedSize += Margin * (Children.Count - 1);
+
+            float stretchSize;
+            if (Direction == Direction.Horizontal)
+                stretchSize = System.Math.Max(0, (LocalDimensions.Width - usedSize) / stretches);
+            else
+                stretchSize = System.Math.Max(0, (LocalDimensions.Height - usedSize) / stretches);
+
+            float t = 0;
             for (int i = 0; i < Children.Count; ++i)
             {
                 var child = Children[i];
                 if (!child.IsEnabled)
                     continue;
 
-                //todo: account for auto size padding (first item offset)
-
                 if (i > 0)
                     t += Margin;
 
+                float size;
                 if (Direction == Direction.Horizontal)
                 {
+                    if (child.HorizontalAlignment == Alignment.Stretch)
+                        size = stretchSize;
+                    else
+                        size = child.LocalBounds.Right;
+
                     child.Reflow(new Rectangle(
                         (int)(t + child.Position.X) + AbsoluteDimensions.X,
                         (int)child.Position.Y + AbsoluteDimensions.Y,
-                        child.AbsoluteBounds.Width + (int)child.Position.X,
-                        (int)(Size.Y + child.Position.Y)
+                        (int)size,
+                        AbsoluteDimensions.Height
                     ));
-                    t += child.Position.X + child.AbsoluteBounds.Width;
+                    t += child.LocalBounds.Right;
                 }
                 else
                 {
+                    if (child.VerticalAlignment == Alignment.Stretch)
+                        size = stretchSize;
+                    else
+                        size = child.LocalBounds.Bottom;
+
                     child.Reflow(new Rectangle(
-                        AbsoluteDimensions.X,
+                        (int)child.Position.X + AbsoluteDimensions.X,
                         (int)t + AbsoluteDimensions.Y,
-                        (int)(Size.X + child.Position.X),
-                        child.AbsoluteBounds.Height + (int)child.Position.Y
+                        AbsoluteDimensions.Width,
+                        (int)size
                     ));
-                    t += child.Position.Y + child.AbsoluteBounds.Height;
+                    t += child.LocalBounds.Bottom;
                 }
             }
+
+            NotifyChildReflow();
         }
     }
 }

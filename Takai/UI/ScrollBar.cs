@@ -262,9 +262,9 @@ namespace Takai.UI
             base.InternalInsertChild(verticalScrollbar);
             base.InternalInsertChild(horizontalScrollbar);
 
-            contentArea.ChildReflow += delegate {
-                ResizeContentArea();
-            };
+            //contentArea.ChildReflow += delegate {
+            //    ResizeContentArea();
+            //};
         }
 
         public ScrollBox(params Static[] children)
