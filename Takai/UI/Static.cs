@@ -247,78 +247,36 @@ namespace Takai.UI
         private Vector2 _padding = Vector2.Zero;
 
         /// <summary>
-        /// The dimensions of this element, calculated from <see cref="Position"/> and <see cref="Size"/>
-        /// Does not account for padding or alignment
+        /// The position and size of this element
         /// </summary>
-        /// <see cref="LocalBounds"/>
-        /// <seealso cref="AbsoluteDimensions"/>
-        /// <seealso cref="VisibleBounds"/>
-        [Data.Serializer.Ignored]
-        public Rectangle LocalDimensions
-        {
-            get => new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
-            set
-            {
-                if (LocalDimensions != value)
-                {
-                    _position = new Vector2(value.X, value.Y);
-                    _size = new Vector2(value.Width, value.Height);
-                    ResizeAndReflow();
-                }
-            }
-        }
+        public Rectangle Dimensions { get; private set; }
 
         /// <summary>
-        /// The bounds of this element, adding size to padding.
+        /// The <see cref="Dimensions"/> of this object with padding
         /// </summary>
-        /// <seealso cref="LocalDimensions"/>
-        public Rectangle LocalBounds => new Rectangle(
-            (int)(Position.X/* - Padding.X*/),
-            (int)(Position.Y/* - Padding.Y*/),
-            (int)(Size.X + Padding.X * 2),
-            (int)(Size.Y + Padding.Y * 2)
-        );
+        public Rectangle Bounds { get; private set; }
 
         /// <summary>
-        /// dimensions relative to the outermost container (can be outside the parent)
-        /// This is adjusted by (but does not include) <see cref="Padding"/>
-        /// This also includes alignment
-        /// This should be used when drawing inside the element
+        /// The <see cref="Bounds"/> of this element offset relative to the screen
         /// </summary>
-        /// <seealso cref="VisibleBounds"/>
-        [Data.Serializer.Ignored]
-        public Rectangle AbsoluteDimensions
-        {
-            get;
-            private set;
-        }
+        public Rectangle OffsetBounds { get; private set; }
 
         /// <summary>
-        /// <see cref="AbsoluteDimensions"/> including padding
-        /// This should be used when determining the inclusive size of an element
+        /// The visible region of this element on the screen
         /// </summary>
         [Data.Serializer.Ignored]
-        public Rectangle AbsoluteBounds
-        {
-            get;
-            private set;
-        }
+        protected Rectangle VisibleBounds { get; private set; }
 
         /// <summary>
-        /// <see cref="AbsoluteBounds"/> clipped to the parent container
+        /// The container that this element fits into
         /// </summary>
-        [Data.Serializer.Ignored]
-        protected Rectangle VisibleBounds
-        {
-            get;
-            private set;
-        }
+        private Rectangle containerBounds;
 
         /// <summary>
         /// Automatically size this element whenever its text changes or a child element changes
         /// Does not resize if bounds change but will overwrite any changes on next size
         /// </summary>
-        public bool AutoSize { get; set; } = false;
+        public bool AutoSize { get; set; } = false; //todo: use float.Infinity for auto size?
 
         /// <summary>
         /// Does this element currently have focus?
@@ -933,7 +891,7 @@ namespace Takai.UI
                 var top = stack.Pop();
                 if (top != this && top.CanFocus && top.IsEnabled)
                 {
-                    var diff = (top.AbsoluteDimensions.Location - AbsoluteDimensions.Location).ToVector2();
+                    var diff = (top.VisibleBounds.Location - VisibleBounds.Location).ToVector2();
 
                     var dot = Vector2.Dot(direction, Vector2.Normalize(diff));
                     if (dot >= bias)
@@ -1047,8 +1005,6 @@ namespace Takai.UI
 
         #region Sizing
 
-        //todo: separate Measure/Arrange steps
-
         /// <summary>
         /// Is this element in a reflow currently?
         /// Used to prevent <see cref="OnChildReflow"/> from getting stuck in a loop
@@ -1057,34 +1013,33 @@ namespace Takai.UI
 
         public void Reflow()
         {
-            if (isReflowing)
+            Reflow(containerBounds);
+        }
+
+        /// <summary>
+        /// Reflow this container, relative to its parent
+        /// </summary>
+        /// <param name="container">Container in relative coordinates</param>
+        public void Reflow(Rectangle container)
+        {
+            if (!IsEnabled)
                 return;
+
             isReflowing = true;
-
-            Reflow(Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.VisibleBounds);
-
+            AdjustToContainer(container);
+            ReflowOverride(container.Size);
+            NotifyChildReflow();
             isReflowing = false;
         }
 
         /// <summary>
         /// Reflow child elements relative to this element
         /// Called whenever this element's position or size is adjusted
-        ///
-        /// Any overrides of this should call <see cref="AdjustToContainer(Rectangle)"/> first
-        /// This should only be called by elements implenting custom layouts
         /// </summary>
-        public virtual void Reflow(Rectangle container)
+        protected virtual void ReflowOverride(Point availableSize)
         {
-            AdjustToContainer(container);
-
             foreach (var child in Children)
-            {
-                if (child.IsEnabled)
-                    child.Reflow(AbsoluteDimensions);
-            }
-
-            //todo: this must be called by all overrides, make automatic
-            NotifyChildReflow();
+                child.Reflow(new Rectangle(0, 0, availableSize.X, availableSize.Y));
         }
 
         public event System.EventHandler ChildReflow = null;
@@ -1125,60 +1080,32 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Calculate all of the bounds to this element in relation to a container (absolutely positioned).
+        /// Calculate all of the bounds to this element in relation to a container.
         /// </summary>
-        /// <param name="container">The container to fit this to, in absolute coordinates</param>
-        protected void AdjustToContainer(Rectangle container)
+        /// <param name="container">The container to fit this to, in relative coordinates</param>
+        private void AdjustToContainer(Rectangle container)
         {
             //todo: ideally this should take local dimensions for container
-
-            bool didSize = false;
-            if (HorizontalAlignment == Alignment.Stretch)
-            {
-                _position.X = 0;
-                var w = _size.X;
-                _size.X = container.Width - Padding.X * 2;
-                didSize |= w != _size.X;
-            }
-            if (VerticalAlignment == Alignment.Stretch)
-            {
-                _position.Y = 0;
-                var h = _size.Y;
-                _size.Y = container.Height - Padding.Y * 2;
-                didSize |= h != _size.Y;
-            }
-            if (didSize)
-            {
-                OnResize(System.EventArgs.Empty);
-                Resize?.Invoke(this, System.EventArgs.Empty);
-            }
-
+            Rectangle parentContainer;
             if (Parent == null)
-            {
-                //todo: this can probably be removed and just use container
-                AbsoluteDimensions = LocalDimensions;
-                AbsoluteDimensions.Offset(Padding);
-            }
+                parentContainer = Runtime.GraphicsDevice.Viewport.Bounds;
             else
-            {
-                AbsoluteDimensions = new Rectangle(
-                    (int)(container.X + GetLocalOffset(HorizontalAlignment, Position.X, Size.X, Padding.X, container.Width)),
-                    (int)(container.Y + GetLocalOffset(VerticalAlignment, Position.Y, Size.Y, Padding.Y, container.Height)),
-                    (int)Size.X,
-                    (int)Size.Y
-                );
-            }
+                parentContainer = Parent.VisibleBounds;
 
-            AbsoluteBounds = new Rectangle(
-                (int)(AbsoluteDimensions.X - Padding.X),
-                (int)(AbsoluteDimensions.Y - Padding.Y),
-                (int)(AbsoluteDimensions.Width + Padding.X * 2),
-                (int)(AbsoluteDimensions.Height + Padding.Y * 2)
+            Dimensions = new Rectangle(
+                (int)GetLocalOffset(HorizontalAlignment, Position.X, Size.X, Padding.X, container.Width),
+                (int)GetLocalOffset(VerticalAlignment, Position.Y, Size.Y, Padding.Y, container.Height),
+                HorizontalAlignment == Alignment.Stretch ? container.Width : (int)Size.X,
+                VerticalAlignment == Alignment.Stretch ? container.Height : (int)Size.Y
             );
+            Bounds = Dimensions;
+            Bounds.Inflate(Padding.X, Padding.X);
 
-            VisibleBounds = Rectangle.Intersect(container, AbsoluteBounds);
-            if (Parent != null)
-                VisibleBounds = Rectangle.Intersect(Parent.VisibleBounds, VisibleBounds);
+            var vb = Bounds;
+            vb.Offset(parentContainer.X, parentContainer.Y);
+            OffsetBounds = vb;
+            VisibleBounds = Rectangle.Intersect(Rectangle.Intersect(vb, container), parentContainer);
+            containerBounds = container;
         }
 
         public float GetLocalOffset(Alignment alignment, float position, float size, float padding, float containerSize)
@@ -1201,8 +1128,8 @@ namespace Takai.UI
         public virtual void SizeToContain()
         {
             var bounds = new Rectangle(
-                (int)Position.X,
-                (int)Position.Y,
+                Dimensions.X,
+                Dimensions.Y,
                 (int)textSize.X,
                 (int)textSize.Y
             );
@@ -1211,7 +1138,8 @@ namespace Takai.UI
                 if (!child.IsEnabled)
                     continue;
 
-                var lb = child.AbsoluteBounds; //absolute bounds will have container offset
+                //todo: this is jank
+                var lb = child.Bounds;
                 if (child.HorizontalAlignment == Alignment.Stretch)
                     lb.Width = 0;
                 if (child.VerticalAlignment == Alignment.Stretch)
@@ -1378,7 +1306,7 @@ namespace Takai.UI
         {
             if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mousePosition))
             {
-                var e = new ClickEventArgs { position = (mousePosition - AbsoluteBounds.Location).ToVector2() };
+                var e = new ClickEventArgs { position = (mousePosition - OffsetBounds.Location).ToVector2() };
                 didPress = true;
                 OnPress(e);
                 Press?.Invoke(this, e);
@@ -1400,7 +1328,7 @@ namespace Takai.UI
             {
                 if (didPress && VisibleBounds.Contains(mousePosition)) //gesture pos
                 {
-                    TriggerClick((mousePosition - AbsoluteBounds.Location).ToVector2());
+                    TriggerClick((mousePosition - OffsetBounds.Location).ToVector2());
                     didPress = false;
                     return false;
                 }
@@ -1454,15 +1382,15 @@ namespace Takai.UI
 
         public void DrawDebugInfo(SpriteBatch spriteBatch)
         {
-            var rect = AbsoluteBounds;
-            rect.Inflate(1, 1);
+            var rect = OffsetBounds;
             Graphics.Primitives2D.DrawRect(spriteBatch, Color.Red, rect);
-            Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Red, 0.5f), AbsoluteDimensions);
+            rect.Inflate(-Padding.X, -Padding.Y);
+            Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Red, 0.5f), rect);
 
             string info = $"{GetType().Name}\n"
                         + $"Name: {(Name ?? "(No name)")}\n"
-                        + $"Bounds: {AbsoluteDimensions}\n"
-                        + $"Dimensions: {LocalDimensions}, Padding: {Padding}\n"
+                        + $"Bounds: {OffsetBounds}\n"
+                        + $"Dimensions: {Dimensions}, Padding: {Padding}\n"
                         + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}";
 
             var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);
@@ -1490,7 +1418,7 @@ namespace Takai.UI
             if (Font == null || Text == null)
                 return;
 
-            position += AbsoluteDimensions.Location - VisibleBounds.Location;
+            position += Padding.ToPoint();
             Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleBounds, position, Color);
         }
 

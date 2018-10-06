@@ -7,6 +7,8 @@ using Takai.UI;
 
 namespace DyingAndMore.Editor
 {
+    //todo: rewrite as tab control
+
     class ModeSelector : Static
     {
         public System.Collections.ObjectModel.ReadOnlyCollection<EditorMode> Modes { get; private set; }

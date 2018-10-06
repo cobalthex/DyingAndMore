@@ -12,7 +12,7 @@ namespace Takai.UI
         /// </summary>
         public float Radius { get; set; } = 50;
 
-        public override void Reflow(Rectangle container)
+        public override void ReflowSelf(Rectangle container)
         {
             AdjustToContainer(container);
 

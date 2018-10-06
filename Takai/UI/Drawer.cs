@@ -53,7 +53,7 @@ namespace Takai.UI
             return base.HandleInput(time);
         }
 
-        public override void Reflow(Rectangle container)
+        public override void ReflowSelf(Rectangle container)
         {
             AdjustToContainer(container);
             container = AbsoluteDimensions;
