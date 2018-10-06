@@ -167,7 +167,8 @@ namespace DyingAndMore
 
             fpsGraph = new Takai.FpsGraph()
             {
-                LocalDimensions = new Rectangle(20, 20, 800, 100),
+                Position = new Vector2(0, 100),
+                Size = new Vector2(800, 100),
                 HorizontalAlignment = Takai.UI.Alignment.Middle
             };
 
@@ -216,7 +217,7 @@ namespace DyingAndMore
             InputState.Update(GraphicsDevice.Viewport.Bounds);
 
             ui.Update(gameTime);
-            ui.LocalDimensions = GraphicsDevice.Viewport.Bounds;
+            ui.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         }
 
         protected override void Draw(GameTime gameTime)

@@ -82,6 +82,7 @@ Table {
 
         Static { Text: "Health"; };
         List {
+            Name: "hp";
             Direction: Direction.Horizontal;
             Margin: 5;
             AutoSize: true;

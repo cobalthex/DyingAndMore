@@ -22,10 +22,8 @@ namespace Takai.UI
             ColumnCount = columnCount;
         }
 
-        public override void Reflow(Rectangle container)
+        protected override void ReflowOverride(Point availableSize)
         {
-            AdjustToContainer(container); //todo: this should be done automatically
-
             if (ColumnCount <= 0)
                 return;
 
@@ -40,7 +38,7 @@ namespace Takai.UI
                 if (!Children[i].IsEnabled)
                     continue;
 
-                var bounds = Children[i].AbsoluteBounds;
+                var bounds = Children[i].Bounds;
                 if (Children[i].HorizontalAlignment == Alignment.Stretch)
                 {
                     hStretches.Add(i % ColumnCount);
@@ -91,8 +89,8 @@ namespace Takai.UI
                 }
 
                 Children[i].Reflow(new Rectangle(
-                    (int)offset.X + AbsoluteDimensions.X,
-                    (int)offset.Y + AbsoluteDimensions.Y,
+                    (int)offset.X,
+                    (int)offset.Y,
                     (int)colWidths[i % ColumnCount],
                     (int)rowHeights[i / ColumnCount]
                 ));

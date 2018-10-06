@@ -206,11 +206,11 @@ namespace Takai.UI
             base.OnResize(e);
         }
 
-        public override void Reflow(Rectangle container)
+        public override void ReflowSelf(Rectangle container)
         {
             upButton.Position = textInput.Position + new Vector2(textInput.Size.X, 0);
             downButton.Position = upButton.Position + new Vector2(upButton.Size.X, 0);
-            base.Reflow(container);
+            base.ReflowSelf(container);
         }
 
         protected override bool HandleInput(GameTime time)

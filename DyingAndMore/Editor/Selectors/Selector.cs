@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.UI;
+using System;
 
 namespace DyingAndMore.Editor.Selectors
 {
@@ -37,10 +38,11 @@ namespace DyingAndMore.Editor.Selectors
             Size = ItemMargin + ItemMargin * ItemSize.ToVector2() * new Vector2(ItemsPerRow, rows);
         }
 
-        public override void Reflow(Rectangle container) //todo
+
+        protected override void OnResize(EventArgs e)
         {
             ItemsPerRow = (int)((Size.X - ItemMargin.X) / (ItemSize.X + ItemMargin.X));
-            base.Reflow(container);
+            base.OnResize(e);
         }
 
         protected override void OnPress(ClickEventArgs e)
@@ -68,34 +70,34 @@ namespace DyingAndMore.Editor.Selectors
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var visPos = VisibleBounds.X - AbsoluteBounds.X;
+            var visPos = VisibleBounds.X - OffsetBounds.X;
+            //todo
+            //int start = (int)(visPos / (ItemSize.Y + ItemMargin.X) * ItemsPerRow);
+            //start = System.Math.Max(start, 0);
+            //for (int i = start; i < System.Math.Min(start + (int)(Size.Y / (ItemSize.Y + ItemMargin.Y) + 2) * ItemsPerRow, ItemCount); ++i)
+            //{
+            //    var rect = new Rectangle(
+            //        (int)(AbsoluteDimensions.X + ItemMargin.X + (i % ItemsPerRow) * (ItemSize.X + ItemMargin.X)),
+            //        (int)(AbsoluteDimensions.Y + ItemMargin.Y + (i / ItemsPerRow) * (ItemSize.Y + ItemMargin.Y) - visPos),
+            //        ItemSize.X,
+            //        ItemSize.Y
+            //    );
+            //    rect = Rectangle.Intersect(Rectangle.Intersect(rect, AbsoluteDimensions), VisibleBounds);
 
-            int start = (int)(visPos / (ItemSize.Y + ItemMargin.X) * ItemsPerRow);
-            start = System.Math.Max(start, 0);
-            for (int i = start; i < System.Math.Min(start + (int)(Size.Y / (ItemSize.Y + ItemMargin.Y) + 2) * ItemsPerRow, ItemCount); ++i)
-            {
-                var rect = new Rectangle(
-                    (int)(AbsoluteDimensions.X + ItemMargin.X + (i % ItemsPerRow) * (ItemSize.X + ItemMargin.X)),
-                    (int)(AbsoluteDimensions.Y + ItemMargin.Y + (i / ItemsPerRow) * (ItemSize.Y + ItemMargin.Y) - visPos),
-                    ItemSize.X,
-                    ItemSize.Y
-                );
-                rect = Rectangle.Intersect(Rectangle.Intersect(rect, AbsoluteDimensions), VisibleBounds);
-
-                //Takai.Graphics.Primitives2D.DrawFill(
-                //    spriteBatch,
-                //    new Color((i * 24) % 255, (i * 32) % 255, (i * 16) % 255),
-                //    rect
-                //);
-                DrawItem(spriteBatch, i, rect);
-                if (i == SelectedItem)
-                {
-                    rect.Inflate(1, 1);
-                    Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.White, rect);
-                    rect.Inflate(1, 1);
-                    Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Black, rect);
-                }
-            }
+            //    //Takai.Graphics.Primitives2D.DrawFill(
+            //    //    spriteBatch,
+            //    //    new Color((i * 24) % 255, (i * 32) % 255, (i * 16) % 255),
+            //    //    rect
+            //    //);
+            //    DrawItem(spriteBatch, i, rect);
+            //    if (i == SelectedItem)
+            //    {
+            //        rect.Inflate(1, 1);
+            //        Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.White, rect);
+            //        rect.Inflate(1, 1);
+            //        Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Black, rect);
+            //    }
+            //}
         }
 
         public abstract void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds);
