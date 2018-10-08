@@ -168,9 +168,9 @@ namespace Takai.UI
             Caret = Text.Length;
         }
 
-        public override void SizeToContain()
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            Size = new Vector2(200, (Font?.MaxCharHeight ?? 20));
+            return new Vector2(200, (Font?.MaxCharHeight ?? 20)); //todo: these values should be better esablished elsewhere
         }
 
         protected int FindNextWordStart()
@@ -355,12 +355,21 @@ namespace Takai.UI
 
         void UpdateScrollPosition()
         {
-            var textWidth = Font?.MeasureString(Text, 0, Caret).X ?? 0;
+            if (Text == null || Font == null)
+            {
+                ScrollPosition = 0;
+                return;
+            }
+
+            var textWidth = Font.MeasureString(Text, 0, Caret).X;
 
             if (textWidth < ScrollPosition)
                 ScrollPosition -= (int)Size.X;
             //todo: scroll position is broken
-            ScrollPosition = (int)MathHelper.Clamp(textWidth, 0, textSize.X - Size.X);
+            var totalTextSize = Font.MeasureString(Text);
+            ScrollPosition = (int)MathHelper.Clamp(textWidth, 0, totalTextSize.X - Size.X);
+
+            //todo: update to new layout system
         }
 
         void InsertAtCaret(char ch)
@@ -378,28 +387,30 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            if (Font != null)
-            {
-                var size = new Point(
-                    System.Math.Min(AbsoluteDimensions.Width - 4, (int)textSize.X),
-                    System.Math.Min(AbsoluteDimensions.Height, (int)textSize.Y)
-                );
+            if (Font == null)
+                return;
 
-                DrawText(spriteBatch,
-                    new Point(-ScrollPosition + 2, (int)(Size.Y - textSize.Y) / 2));
+            //todo
 
-                var tickCount = System.Environment.TickCount;
-                if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
-                {
-                    var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + AbsoluteDimensions.X + 3;
-                    if (x < VisibleBounds.Left || x >= VisibleBounds.Right)
-                        return;
+            //var size = new Point(
+            //    System.Math.Min(Dimensions.Width - 4, (int)textSize.X),
+            //    System.Math.Min(Dimensions.Height, (int)textSize.Y)
+            //);
 
-                    var top = new Vector2(x, MathHelper.Clamp(AbsoluteDimensions.Top, VisibleBounds.Top, VisibleBounds.Bottom));
-                    var bottom = new Vector2(x, MathHelper.Clamp(AbsoluteDimensions.Bottom, VisibleBounds.Top, VisibleBounds.Bottom));
-                    Graphics.Primitives2D.DrawLine(spriteBatch, Color, top, bottom);
-                }
-            }
+            //DrawText(spriteBatch,
+            //    new Point(-ScrollPosition + 2, (int)(Size.Y - textSize.Y) / 2));
+
+            //var tickCount = System.Environment.TickCount;
+            //if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
+            //{
+            //    var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + AbsoluteDimensions.X + 3;
+            //    if (x < VisibleBounds.Left || x >= VisibleBounds.Right)
+            //        return;
+
+            //    var top = new Vector2(x, MathHelper.Clamp(AbsoluteDimensions.Top, VisibleBounds.Top, VisibleBounds.Bottom));
+            //    var bottom = new Vector2(x, MathHelper.Clamp(AbsoluteDimensions.Bottom, VisibleBounds.Top, VisibleBounds.Bottom));
+            //    Graphics.Primitives2D.DrawLine(spriteBatch, Color, top, bottom);
+            //}
         }
     }
 }

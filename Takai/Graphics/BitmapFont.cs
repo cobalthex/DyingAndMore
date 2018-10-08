@@ -8,8 +8,11 @@ using System;
 namespace Takai.Graphics
 {
     [Data.CustomDeserialize(typeof(BitmapFont), "DeserializeFont")]
-    public class BitmapFont : System.IDisposable
+    public class BitmapFont : IDisposable, Data.INamedObject
     {
+        public string Name { get; set; }
+        public string File { get; set; }
+
         /// <summary>
         /// All of the available characters in the font
         /// </summary>

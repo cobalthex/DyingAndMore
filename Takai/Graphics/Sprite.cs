@@ -449,5 +449,10 @@ namespace Takai.Graphics
                 center is bool doCenter && !doCenter))
                 CenterOrigin();
         }
+
+        public override string ToString()
+        {
+            return String.Join(" ", Texture.Name, $"{Width}x{Height} frames:{FrameCount}@{FrameLength.TotalMilliseconds}ms");
+        }
     }
 }

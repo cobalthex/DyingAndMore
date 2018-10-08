@@ -25,7 +25,43 @@ namespace Takai.UI
         public List(params Static[] children)
             : base(children) { }
 
-        protected override void ReflowOverride(Point availableSize)
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
+        {
+            var usedSize = new Vector2();
+            foreach (var child in Children)
+            {
+                if (!child.IsEnabled)
+                    continue;
+
+                var childSize = child.Measure(InfiniteSize);
+                if (Direction == Direction.Horizontal)
+                {
+                    if (child.HorizontalAlignment != Alignment.Stretch)
+                    {
+                        usedSize.X += childSize.X; //todo: better format for this
+                        usedSize.Y = System.Math.Max(usedSize.Y, childSize.Y);
+                    }
+                }
+                else
+                {
+                    if (child.VerticalAlignment != Alignment.Stretch)
+                    {
+                        usedSize.X = System.Math.Max(usedSize.X, childSize.X);
+                        usedSize.Y += childSize.Y;
+                    }
+                }
+            }
+            if (Direction == Direction.Horizontal)
+                usedSize.X += Margin * (Children.Count - 1);
+            else
+                usedSize.Y += Margin * (Children.Count - 1);
+
+            return usedSize;
+
+            //todo: bounds may be affected by Stretch which would prove wrong here
+        }
+
+        protected override void ReflowOverride(Vector2 availableSize)
         {
             float usedSize = 0;
             int stretches = 0;
@@ -39,29 +75,28 @@ namespace Takai.UI
                     if (Children[i].HorizontalAlignment == Alignment.Stretch)
                         ++stretches;
                     else
-                        usedSize += Children[i].Bounds.Right;
+                        usedSize += Children[i].Position.X + Children[i].Bounds.Width;
                 }
                 else
                 {
                     if (Children[i].VerticalAlignment == Alignment.Stretch)
                         ++stretches;
                     else
-                        usedSize += Children[i].Bounds.Bottom;
+                        usedSize += Children[i].Position.Y + Children[i].Bounds.Height;
                 }
             }
             usedSize += Margin * (Children.Count - 1);
 
             float stretchSize;
             if (Direction == Direction.Horizontal)
-                stretchSize = System.Math.Max(0, (Size.X - usedSize) / stretches); //todo: availableSize?
+                stretchSize = System.Math.Max(0, (availableSize.X - usedSize) / stretches); //todo: availableSize?
             else
-                stretchSize = System.Math.Max(0, (Size.Y - usedSize) / stretches);
+                stretchSize = System.Math.Max(0, (availableSize.Y - usedSize) / stretches);
 
             float t = 0;
             for (int i = 0; i < Children.Count; ++i)
             {
-                var child = Children[i];
-                if (!child.IsEnabled)
+                if (!Children[i].IsEnabled)
                     continue;
 
                 if (i > 0)
@@ -70,33 +105,33 @@ namespace Takai.UI
                 float itemSize;
                 if (Direction == Direction.Horizontal)
                 {
-                    if (child.HorizontalAlignment == Alignment.Stretch)
+                    if (Children[i].HorizontalAlignment == Alignment.Stretch)
                         itemSize = stretchSize;
                     else
-                        itemSize = child.Bounds.Right;
+                        itemSize = Children[i].Position.X + Children[i].Bounds.Width;
 
-                    child.Reflow(new Rectangle(
-                        (int)(t + child.Position.X),
-                        (int)child.Position.Y,
+                    Children[i].Reflow(new Rectangle(
+                        (int)(t + Children[i].Position.X),
+                        (int)Children[i].Position.Y,
                         (int)itemSize,
-                        (int)Size.Y
+                        (int)availableSize.Y
                     ));
-                    t += child.Bounds.Right;
+                    t += Children[i].Position.X + Children[i].Bounds.Width;
                 }
                 else
                 {
-                    if (child.VerticalAlignment == Alignment.Stretch)
+                    if (Children[i].VerticalAlignment == Alignment.Stretch)
                         itemSize = stretchSize;
                     else
-                        itemSize = child.Bounds.Bottom;
+                        itemSize = Children[i].Position.Y + Children[i].Bounds.Height;
 
-                    child.Reflow(new Rectangle(
-                        (int)child.Position.X,
-                        (int)(t + child.Position.Y),
-                        (int)Size.X,
+                    Children[i].Reflow(new Rectangle(
+                        (int)Children[i].Position.X,
+                        (int)(t + Children[i].Position.Y),
+                        (int)availableSize.X,
                         (int)itemSize
                     ));
-                    t += child.Bounds.Bottom;
+                    t += Children[i].Position.Y + Children[i].Bounds.Height;
                 }
             }
 

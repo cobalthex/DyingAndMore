@@ -13,26 +13,28 @@ namespace Takai.UI
         /// </summary>
         public bool DrawXIfMissingSprite { get; set; } = false;
 
-        public override void SizeToContain()
+        System.TimeSpan elapsedTime;
+
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            Size = (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2());
+            return (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2());
         }
 
         protected override void UpdateSelf(GameTime time)
         {
-            if (Sprite != null)
-                //Sprite.ElapsedTime += time.ElapsedGameTime;
-                Sprite.ElapsedTime = time.TotalGameTime;
+            elapsedTime = time.TotalGameTime;
             base.UpdateSelf(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
+            //todo: modernize
+
             //todo: custom positioning/sizing
             if (Sprite?.Texture != null)
             {
                 var rect = VisibleBounds;
-                Sprite.Draw(spriteBatch, rect, 0);
+                Sprite.Draw(spriteBatch, rect, 0, Color.White, elapsedTime);
             }
             else if (DrawXIfMissingSprite)
             {
@@ -50,6 +52,8 @@ namespace Takai.UI
 
             if (Sprite == null)
                 return;
+
+            //todo: this should go into measure
 
             //proportional scaling if only one property is given
 

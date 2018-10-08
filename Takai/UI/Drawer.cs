@@ -53,11 +53,9 @@ namespace Takai.UI
             return base.HandleInput(time);
         }
 
-        public override void ReflowSelf(Rectangle container)
+        protected override void ReflowOverride(Vector2 availableSize)
         {
-            AdjustToContainer(container);
-            container = AbsoluteDimensions;
-
+            var container = new Rectangle(0, 0, (int)Size.X, (int)Size.Y); //todo
             switch (HorizontalAlignment)
             {
                 case Alignment.Left:
@@ -75,17 +73,18 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var splitBnds = new Rectangle(AbsoluteDimensions.X, AbsoluteDimensions.Y, (int)SplitterWidth, AbsoluteDimensions.Height);
-            switch (HorizontalAlignment)
-            {
-                case Alignment.Left:
-                    splitBnds.X = AbsoluteDimensions.Right - (int)SplitterWidth;
-                    Graphics.Primitives2D.DrawFill(spriteBatch, SplitterColor, Rectangle.Intersect(VisibleBounds, splitBnds));
-                    break;
-                case Alignment.Right:
-                    Graphics.Primitives2D.DrawFill(spriteBatch, SplitterColor, Rectangle.Intersect(VisibleBounds, splitBnds));
-                    break;
-            }
+            //todo
+            //var splitBnds = new Rectangle(AbsoluteDimensions.X, AbsoluteDimensions.Y, (int)SplitterWidth, AbsoluteDimensions.Height);
+            //switch (HorizontalAlignment)
+            //{
+            //    case Alignment.Left:
+            //        splitBnds.X = AbsoluteDimensions.Right - (int)SplitterWidth;
+            //        Graphics.Primitives2D.DrawFill(spriteBatch, SplitterColor, Rectangle.Intersect(VisibleBounds, splitBnds));
+            //        break;
+            //    case Alignment.Right:
+            //        Graphics.Primitives2D.DrawFill(spriteBatch, SplitterColor, Rectangle.Intersect(VisibleBounds, splitBnds));
+            //        break;
+            //}
 
             base.DrawSelf(spriteBatch);
         }

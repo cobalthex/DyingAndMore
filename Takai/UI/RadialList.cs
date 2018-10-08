@@ -12,9 +12,9 @@ namespace Takai.UI
         /// </summary>
         public float Radius { get; set; } = 50;
 
-        public override void ReflowSelf(Rectangle container)
+        protected override void ReflowOverride(Vector2 availableSize)
         {
-            AdjustToContainer(container);
+            throw new System.NotImplementedException(); //todo
 
             if (Children.Count == 0)
                 return;
@@ -28,7 +28,7 @@ namespace Takai.UI
                 if (!Children[i].IsEnabled)
                     continue;
 
-                var vbnd = Children[i].LocalDimensions;
+                var vbnd = Children[i].Bounds;
                 var ccenter = new Vector2(vbnd.Width / 2, vbnd.Height / 2);
 
                 var pos = Util.Direction(i * thetaScale) * Radius;

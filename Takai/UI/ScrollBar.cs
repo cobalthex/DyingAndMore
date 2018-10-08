@@ -88,7 +88,7 @@ namespace Takai.UI
             {
                 if (DidPressInside(MouseButtons.Left))
                 {
-                    var mouse = InputState.MousePoint - AbsoluteBounds.Location;
+                    var mouse = InputState.MousePoint - OffsetBounds.Location;
                     var deltaMouse = InputState.MouseDelta();
 
                     if (didPressThumb)
@@ -192,7 +192,7 @@ namespace Takai.UI
                 return;
 
             var thumb = GetThumbBounds();
-            thumb.Offset(AbsoluteDimensions.Location);
+            thumb.Offset(OffsetBounds.Location);
             Graphics.Primitives2D.DrawFill(spriteBatch, ThumbColor, Rectangle.Intersect(VisibleBounds, thumb));
         }
     }
@@ -200,6 +200,8 @@ namespace Takai.UI
     //todo: convert scroll bars to use enabled/disabled
     public class ScrollBox : Table
     {
+        //todo: simplify to custom layout?
+
         /// <summary>
         /// An optional style to apply to the scrollbars (write-only)
         /// </summary>
@@ -217,12 +219,8 @@ namespace Takai.UI
 
                 verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
                 {
-                    foreach (var child in contentArea.Children)
-                    {
-                        if (child.IsEnabled)
-                            child.Position -= new Vector2(0, e.Delta);
-                    }
-                    contentArea.Reflow(contentArea.AbsoluteBounds);
+                    //contentArea.Reflow(contentArea.AbsoluteBounds);
+                    contentArea.Position -= new Vector2(0, e.Delta);
                 };
 
                 horizontalScrollbar = (ScrollBar)value.Clone();
@@ -232,12 +230,8 @@ namespace Takai.UI
 
                 horizontalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
                 {
-                    foreach (var child in contentArea.Children)
-                    {
-                        if (child.IsEnabled)
-                            child.Position -= new Vector2(e.Delta, 0);
-                    }
-                    contentArea.Reflow(contentArea.AbsoluteBounds);
+                    //contentArea.Reflow(contentArea.AbsoluteBounds);
+                    contentArea.Position -= new Vector2(e.Delta, 0);
                 };
 
                 ReplaceAllChildren(contentArea, verticalScrollbar, horizontalScrollbar);
@@ -271,6 +265,8 @@ namespace Takai.UI
             : this()
         {
             AddChildren(children);
+
+            //todo: correctly serialize
         }
 
         public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
@@ -293,12 +289,10 @@ namespace Takai.UI
 
         protected void ResizeContentArea()
         {
-            var contentSize = Rectangle.Empty;
-            foreach (var child in contentArea.Children)
-                contentSize = Rectangle.Union(contentSize, child.LocalBounds); //rectangle union local bounds
+            var contentSize = contentArea.Measure(InfiniteSize);
 
-            horizontalScrollbar.ContentSize = contentSize.Width;
-            verticalScrollbar.ContentSize = contentSize.Height;
+            horizontalScrollbar.ContentSize = contentSize.X;
+            verticalScrollbar.ContentSize = contentSize.Y;
 
             //horizontalScrollbar.IsEnabled = horizontalScrollbar.IsThumbVisible;
             //verticalScrollbar.IsEnabled = verticalScrollbar.IsThumbVisible;

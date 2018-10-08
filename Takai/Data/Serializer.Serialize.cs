@@ -196,7 +196,7 @@ namespace Takai.Data
 
                 foreach (var prop in ty.GetProperties(BindingFlags.Public | BindingFlags.Instance | (serializeNonPublics ? BindingFlags.NonPublic : 0)))
                 {
-                    if (prop.CanWrite && prop.CanRead)
+                    if ((prop.CanWrite || prop.IsDefined(typeof(CustomDeserializeAttribute))) && prop.CanRead)
                         SerializeMember(writer, serializing, prop, prop.GetValue(serializing), prop.PropertyType, indentLevel, serializeExternals, serializeNonPublics);
                 }
 
@@ -263,11 +263,12 @@ namespace Takai.Data
             {
                 if (member is PropertyInfo p)
                 {
-                    if (!p.CanWrite)
+                    if (!p.CanWrite || !p.IsDefined(typeof(CustomDeserializeAttribute)) || !p.CanRead)
                         continue;
 
                     if (n++ > 0)
                         writer.Write(' ');
+
                     TextSerialize(writer, p.GetValue(serializing), 0, serializeExternals, serializeNonPublics);
                 }
                 else if (member is FieldInfo f)
@@ -277,6 +278,7 @@ namespace Takai.Data
 
                     if (n++ > 0)
                         writer.Write(' ');
+
                     TextSerialize(writer, f.GetValue(serializing), 0, serializeExternals, serializeNonPublics);
                 }
             }

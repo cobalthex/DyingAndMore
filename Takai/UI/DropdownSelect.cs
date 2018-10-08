@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
+    //todo: modernize
+
     public class DropdownSelect<T> : Static
     {
         protected ScrollBox dropdown = new ScrollBox();
@@ -41,7 +43,6 @@ namespace Takai.UI
         {
             isDropdownOpen = true;
 
-            list.SizeToContain();
             dropdown.Size = new Vector2(Size.X, System.Math.Min(list.Size.Y, 200));
 
             var end = new Vector2(VisibleBounds.Right, VisibleBounds.Bottom) + dropdown.Size;
@@ -71,7 +72,7 @@ namespace Takai.UI
         {
             if (isDropdownOpen)
             {
-                if (Input.InputState.IsPress(Input.MouseButtons.Left) && !dropdown.AbsoluteDimensions.Contains(Input.InputState.MousePoint))
+                if (Input.InputState.IsPress(Input.MouseButtons.Left))
                     isDropdownOpen = false;
                 return false;
             }
@@ -80,7 +81,7 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            DrawText(spriteBatch, new Point(2, 2 + (int)(Size.Y - textSize.Y - 4) / 2));
+            base.DrawSelf(spriteBatch);
             if (isDropdownOpen)
                 dropdown.Draw(spriteBatch);
         }
