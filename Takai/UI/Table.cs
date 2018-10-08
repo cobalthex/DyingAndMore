@@ -22,7 +22,32 @@ namespace Takai.UI
             ColumnCount = columnCount;
         }
 
-        protected override void ReflowOverride(Point availableSize)
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
+        {
+            float[] colWidths = new float[ColumnCount];
+            float[] rowHeights = new float[(int)System.Math.Ceiling(Children.Count / (float)ColumnCount)]; //todo: integer only
+            for (int i = 0; i < Children.Count; ++i)
+            {
+                if (!Children[i].IsEnabled)
+                    continue;
+
+                var csize = Children[i].Measure(InfiniteSize);
+                colWidths[i % ColumnCount] = System.Math.Max(colWidths[i % ColumnCount], csize.X);
+                rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], csize.Y);
+            }
+
+            var usedArea = new Vector2();
+            foreach (var col in colWidths)
+                usedArea.X += col;
+            foreach (var row in rowHeights)
+                usedArea.Y += row;
+
+            usedArea += new Vector2(colWidths.Length, rowHeights.Length) * Margin;
+
+            return usedArea;
+        }
+
+        protected override void ReflowOverride(Vector2 availableSize)
         {
             if (ColumnCount <= 0)
                 return;
@@ -50,23 +75,21 @@ namespace Takai.UI
                     bounds.Height = 0;
                 }
 
-                //todo: centering (maybe right) broken and doesnt correctly clip/position
-
                 colWidths[i % ColumnCount] = System.Math.Max(colWidths[i % ColumnCount], Children[i].Position.X + bounds.Width);
                 rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], Children[i].Position.Y + bounds.Height);
                 usedArea += new Vector2(colWidths[i % ColumnCount], rowHeights[i / ColumnCount]);
             }
 
-            if (hStretches.Count > 0 && Size.X > usedArea.X)
+            if (hStretches.Count > 0 && availableSize.X > usedArea.X)
             {
-                float width = (Size.X - usedArea.X) / hStretches.Count;
+                float width = (availableSize.X - usedArea.X) / hStretches.Count;
                 foreach (var col in hStretches)
                     colWidths[col] = System.Math.Max(colWidths[col], width); //use remaining width elsewhere?
             }
 
-            if (vStretches.Count > 0 && Size.Y > usedArea.Y)
+            if (vStretches.Count > 0 && availableSize.Y > usedArea.Y)
             {
-                float height = (Size.Y - usedArea.Y) / vStretches.Count;
+                float height = (availableSize.Y - usedArea.Y) / vStretches.Count;
                 foreach (var row in vStretches)
                     rowHeights[row] = System.Math.Max(rowHeights[row], height); //use remaining height elsewhere?
             }

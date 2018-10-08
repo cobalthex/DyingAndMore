@@ -28,21 +28,20 @@ namespace DyingAndMore.Editor.Selectors
         }
         private int _selectedItem = 0;
 
-        public event System.EventHandler SelectionChanged;
+        public event EventHandler SelectionChanged;
 
         public override bool CanFocus => true;
 
-        public override void SizeToContain()
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             var rows = ItemCount > 0 ? (ItemCount - 1) / ItemsPerRow + 1 : 0;
-            Size = ItemMargin + ItemMargin * ItemSize.ToVector2() * new Vector2(ItemsPerRow, rows);
+            return ItemMargin + ItemMargin * ItemSize.ToVector2() * new Vector2(ItemsPerRow, rows);
         }
 
-
-        protected override void OnResize(EventArgs e)
+        protected override void ReflowOverride(Vector2 availableSize)
         {
-            ItemsPerRow = (int)((Size.X - ItemMargin.X) / (ItemSize.X + ItemMargin.X));
-            base.OnResize(e);
+            ItemsPerRow = (int)((availableSize.X - ItemMargin.X) / (ItemSize.X + ItemMargin.X));
+            base.ReflowOverride(availableSize);
         }
 
         protected override void OnPress(ClickEventArgs e)

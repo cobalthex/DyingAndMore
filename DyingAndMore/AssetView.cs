@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace DyingAndMore
 {
-    class AssetView : Static
+    class AssetView : List
     {
         Static assets;
         Static view;
@@ -21,12 +21,17 @@ namespace DyingAndMore
             BackgroundColor = Xna.Color.Black;
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
+            Direction = Direction.Horizontal;
 
-            view = new Static();
-            var list = new List()
+            var list = new List
             {
                 Direction = Direction.Vertical,
                 HorizontalAlignment = Alignment.Stretch,
+            };
+            view = new Static
+            {
+                HorizontalAlignment = Alignment.Stretch,
+                VerticalAlignment = Alignment.Stretch
             };
 
             foreach (var obj in Takai.Data.Cache.Objects)
@@ -41,16 +46,16 @@ namespace DyingAndMore
                     HorizontalAlignment = Alignment.Stretch,
                     Padding = new Xna.Vector2(10)
                 };
-                listItem.SizeToContain();
                 listItem.Click += ListItem_Click;
                 list.AddChild(listItem);
             }
 
-            list.SizeToContain();
-            assets = new ScrollBox();
-            assets.AddChild(list);
-            AddChild(assets);
-            AddChild(view);
+            assets = new ScrollBox(list)
+            {
+                VerticalAlignment = Alignment.Stretch,
+                Size = new Xna.Vector2(240, 1),
+            };
+            AddChildren(assets, view);
         }
 
         private void ListItem_Click(object sender, ClickEventArgs e)
@@ -72,7 +77,6 @@ namespace DyingAndMore
                     VerticalAlignment = Alignment.Middle,
                     Padding = new Xna.Vector2(10)
                 };
-                gfx.SizeToContain();
                 view.ReplaceAllChildren(gfx);
             }
             else if (asset is Takai.Graphics.BitmapFont fnt)
@@ -134,7 +138,6 @@ namespace DyingAndMore
                     }
                 };
                 list.AddChild(track);
-                list.SizeToContain();
 
                 view.ReplaceAllChildren(list);
 
@@ -152,7 +155,6 @@ namespace DyingAndMore
                         VerticalAlignment = Alignment.Middle,
                         Padding = new Xna.Vector2(10)
                     };
-                    gfx.SizeToContain();
                     view.ReplaceAllChildren(gfx);
                 }
             }
@@ -174,15 +176,8 @@ namespace DyingAndMore
                     VerticalAlignment = Alignment.Middle,
                     Padding = new Xna.Vector2(10)
                 };
-                text.SizeToContain();
                 view.ReplaceAllChildren(text);
             }
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            assets.LocalDimensions = new Xna.Rectangle(0, 0, 240, (int)Size.Y);
-            view.LocalDimensions = new Xna.Rectangle(240, 0, (int)Size.X - 240, (int)Size.Y);
         }
     }
 }

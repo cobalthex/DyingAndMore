@@ -1,10 +1,9 @@
-﻿using System.Reflection;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.Graphics;
+using System.Reflection;
 
 //todo: on font/text changed, autosize
 
@@ -63,8 +62,16 @@ namespace Takai.UI
     /// </summary>
     public class Static : Data.IDerivedDeserialize
     {
-        private static uint idCounter = 0;
-        public readonly uint Id = ++idCounter;
+        //for testing
+        //private static uint idCounter = 0;
+        //public readonly uint Id = ++idCounter;
+
+        /// <summary>
+        /// Marks a size to automatically expand to fit its contents
+        /// </summary>
+        public const float AutoSize = float.NaN;
+
+        public readonly Vector2 InfiniteSize = new Vector2(float.PositiveInfinity);
 
         #region Properties
 
@@ -110,14 +117,12 @@ namespace Takai.UI
                 if (_text != value)
                 {
                     _text = value;
-                    textSize = Font?.MeasureString(_text) ?? Vector2.One;
-                    if (AutoSize)
-                        SizeToContain();
+                    if (IsAutoSized)
+                        Reflow();
                 }
             }
         }
         private string _text;
-        protected Vector2 textSize;
 
         /// <summary>
         /// The font to draw the text of this element with.
@@ -131,9 +136,8 @@ namespace Takai.UI
                 if (_font != value)
                 {
                     _font = value;
-                    textSize = _font?.MeasureString(Text) ?? Vector2.One;
-                    if (AutoSize)
-                        SizeToContain();
+                    if (IsAutoSized)
+                        Reflow();
                 }
             }
         }
@@ -214,11 +218,10 @@ namespace Takai.UI
         private Vector2 _position = Vector2.Zero;
 
         /// <summary>
-        /// The size of the element
+        /// The size of the element. Use <see cref="float.NaN"/> to auto-size
         /// </summary>
-        /// <remarks>Overriden if Alignment.Stretch is used</remarks>
         [Data.Serializer.ReadOnly]
-        public Vector2 Size
+        public Vector2 Size //todo: NaN for autosize
         {
             get => _size;
             set
@@ -230,7 +233,12 @@ namespace Takai.UI
                 }
             }
         }
-        private Vector2 _size = Vector2.One;
+        private Vector2 _size = new Vector2(float.NaN);
+
+        /// <summary>
+        /// Is one or both of the dimensions autosized?
+        /// </summary>
+        public bool IsAutoSized => float.IsNaN(Size.X) || float.IsNaN(Size.Y);
 
         public Vector2 Padding
         {
@@ -247,18 +255,16 @@ namespace Takai.UI
         private Vector2 _padding = Vector2.Zero;
 
         /// <summary>
-        /// The position and size of this element
+        /// The desired bounds of this object relative to its parent.
+        /// This includes padding and stretching. Calculated by <see cref="Measure"/>
         /// </summary>
-        public Rectangle Dimensions { get; private set; }
-
-        /// <summary>
-        /// The <see cref="Dimensions"/> of this object with padding
-        /// </summary>
+        [Data.Serializer.Ignored]
         public Rectangle Bounds { get; private set; }
 
         /// <summary>
         /// The <see cref="Bounds"/> of this element offset relative to the screen
         /// </summary>
+        [Data.Serializer.Ignored]
         public Rectangle OffsetBounds { get; private set; }
 
         /// <summary>
@@ -271,12 +277,6 @@ namespace Takai.UI
         /// The container that this element fits into
         /// </summary>
         private Rectangle containerBounds;
-
-        /// <summary>
-        /// Automatically size this element whenever its text changes or a child element changes
-        /// Does not resize if bounds change but will overwrite any changes on next size
-        /// </summary>
-        public bool AutoSize { get; set; } = false; //todo: use float.Infinity for auto size?
 
         /// <summary>
         /// Does this element currently have focus?
@@ -417,7 +417,7 @@ namespace Takai.UI
         /// </summary>
         [Data.CustomDeserialize(typeof(Static), "DeserializeChildren")]
         public ReadOnlyCollection<Static> Children { get; private set; } //todo: maybe observable
-        private List<Static> children = new List<Static>();
+        private List<Static> _children = new List<Static>();
 
         /// <summary>
         /// Bind properties of <see cref="BindingSource"/> to properties of this UI element
@@ -441,7 +441,7 @@ namespace Takai.UI
 
         public Static()
         {
-            Children = children.AsReadOnly();
+            Children = _children.AsReadOnly();
         }
 
         /// <summary>
@@ -452,7 +452,6 @@ namespace Takai.UI
             : this()
         {
             Text = text;
-            SizeToContain();
         }
 
         /// <summary>
@@ -545,7 +544,7 @@ namespace Takai.UI
                 {
                     var child = top.Children[i].CloneSelf();
                     child.SetParentNoReflow(top);
-                    top.children[i] = child;
+                    top._children[i] = child;
                     if (child.Children.Count > 0)
                         clones.Push(child);
                 }
@@ -595,10 +594,10 @@ namespace Takai.UI
 
             child.SetParentNoReflow(this);
 
-            if (index < 0 || index >= children.Count)
-                children.Add(child);
+            if (index < 0 || index >= _children.Count)
+                _children.Add(child);
             else
-                children.Insert(index, child);
+                _children.Insert(index, child);
 
             if (child.HasFocus && !ignoreFocus)
                 child.HasFocus = true;
@@ -615,7 +614,7 @@ namespace Takai.UI
                 return false;
 
             var child = Children[index];
-            children.RemoveAt(index);
+            _children.RemoveAt(index);
             if (child.Parent == this)
                 child.SetParentNoReflow(null);
             return true;
@@ -676,7 +675,7 @@ namespace Takai.UI
         /// <param name="child"></param>
         public Static RemoveChild(Static child)
         {
-            InternalRemoveChildIndex(children.IndexOf(child));
+            InternalRemoveChildIndex(_children.IndexOf(child));
             return child;
         }
 
@@ -689,7 +688,7 @@ namespace Takai.UI
 
         public void RemoveAllChildren()
         {
-            for (int i = children.Count - 1; i >= 0; --i)
+            for (int i = _children.Count - 1; i >= 0; --i)
                 InternalRemoveChildIndex(i);
         }
 
@@ -700,8 +699,8 @@ namespace Takai.UI
         public void MoveAllChildrenTo(Static target)
         {
             //todo: use internal?
-            target.AddChildren(children);
-            children.Clear();
+            target.AddChildren(_children);
+            _children.Clear();
         }
 
         public void ReplaceAllChildren(params Static[] newChildren)
@@ -717,6 +716,7 @@ namespace Takai.UI
 
         /// <summary>
         /// Enumerate through all children and their descendents recursively (including this)
+        /// This can be overriden by
         /// </summary>
         /// <param name="includeDisabled">Include elements that havee <see cref="IsEnabled"/> set to false</param>
         /// <returns>An enumerator to all elements</returns>
@@ -1022,12 +1022,12 @@ namespace Takai.UI
         /// <param name="container">Container in relative coordinates</param>
         public void Reflow(Rectangle container)
         {
-            if (!IsEnabled)
+            if (!IsEnabled || isReflowing)
                 return;
 
             isReflowing = true;
             AdjustToContainer(container);
-            ReflowOverride(container.Size);
+            ReflowOverride(VisibleBounds.Size.ToVector2()); //todo: this needs to be visibleDimensions
             NotifyChildReflow();
             isReflowing = false;
         }
@@ -1036,10 +1036,12 @@ namespace Takai.UI
         /// Reflow child elements relative to this element
         /// Called whenever this element's position or size is adjusted
         /// </summary>
-        protected virtual void ReflowOverride(Point availableSize)
+        protected virtual void ReflowOverride(Vector2 availableSize)
         {
+            //todo: this availableSize needs to be Size or stretch
+
             foreach (var child in Children)
-                child.Reflow(new Rectangle(0, 0, availableSize.X, availableSize.Y));
+                child.Reflow(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
         }
 
         public event System.EventHandler ChildReflow = null;
@@ -1050,14 +1052,8 @@ namespace Takai.UI
         /// <param name="child">The child element that reflowed</param>
         protected virtual void OnChildReflow(Static child)
         {
-            if (AutoSize) //todo: autosize mode (grow only, minimum size, single dimension)
-            {
-                //grow only
-                //var bounds = Rectangle.Union(AbsoluteDimensions, child.AbsoluteBounds);
-                //Size = new Vector2(bounds.Width, bounds.Height);
-
-                SizeToContain();
-            }
+            if (IsAutoSized)
+                Reflow();
         }
 
         //todo: this shouldnt need to exist
@@ -1092,19 +1088,25 @@ namespace Takai.UI
             else
                 parentContainer = Parent.VisibleBounds;
 
-            Dimensions = new Rectangle(
-                (int)GetLocalOffset(HorizontalAlignment, Position.X, Size.X, Padding.X, container.Width),
-                (int)GetLocalOffset(VerticalAlignment, Position.Y, Size.Y, Padding.Y, container.Height),
-                HorizontalAlignment == Alignment.Stretch ? container.Width : (int)Size.X,
-                VerticalAlignment == Alignment.Stretch ? container.Height : (int)Size.Y
+            var size = Measure(container.Size.ToVector2()); //todo: this should go elsewhere
+
+            //todo: use Measure() here?
+            var dims = new Rectangle(
+                container.X + (int)GetLocalOffset(HorizontalAlignment, Position.X, size.X, Padding.X, container.Width),
+                container.Y + (int)GetLocalOffset(VerticalAlignment, Position.Y, size.Y, Padding.Y, container.Height),
+                HorizontalAlignment == Alignment.Stretch ? container.Width : (int)size.X,
+                VerticalAlignment == Alignment.Stretch ? container.Height : (int)size.Y
             );
-            Bounds = Dimensions;
+            Bounds = dims;
             Bounds.Inflate(Padding.X, Padding.X);
 
-            var vb = Bounds;
-            vb.Offset(parentContainer.X, parentContainer.Y);
-            OffsetBounds = vb;
-            VisibleBounds = Rectangle.Intersect(Rectangle.Intersect(vb, container), parentContainer);
+            var bnd = Bounds;
+            bnd.Offset(parentContainer.X, parentContainer.Y);
+            OffsetBounds = bnd;
+
+            bnd = Rectangle.Intersect(Bounds, container);
+            bnd.Offset(parentContainer.X, parentContainer.Y);
+            VisibleBounds = Rectangle.Intersect(bnd, parentContainer);
             containerBounds = container;
         }
 
@@ -1120,34 +1122,66 @@ namespace Takai.UI
                     return position + padding;
             }
         }
+
         /// <summary>
-        /// Automatically size this element. By default, will size based on text and children
-        /// This does not affect the position of the element
-        /// Padding affects child positioning
+        /// Calculate the desired size of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
+        /// Sets <see cref="DesiredSize"/> to value calculated
         /// </summary>
-        public virtual void SizeToContain()
+        /// <returns>The desired size of this element, including padding</returns>
+        public Vector2 Measure(Vector2 availableSize)
         {
-            var bounds = new Rectangle(
-                Dimensions.X,
-                Dimensions.Y,
-                (int)textSize.X,
-                (int)textSize.Y
-            );
+            var size = Size;
+            bool isWidthAutoSize = float.IsNaN(size.X);
+            bool isHeightAutoSize = float.IsNaN(size.Y);
+
+            if (isWidthAutoSize && HorizontalAlignment == Alignment.Stretch && availableSize.X < InfiniteSize.X)
+                availableSize.X = availableSize.X - (int)Position.X;
+
+            if (isHeightAutoSize && VerticalAlignment == Alignment.Stretch && availableSize.Y < InfiniteSize.Y)
+                availableSize.Y = availableSize.Y - (int)Position.Y;
+
+            if (isWidthAutoSize || isHeightAutoSize)
+            {
+                var measuredSize = MeasureOverride(availableSize);
+                if (float.IsInfinity(measuredSize.X) || float.IsNaN(measuredSize.X)
+                 || float.IsInfinity(measuredSize.Y) || float.IsNaN(measuredSize.Y))
+                    throw new System.ArgumentOutOfRangeException("Measured size cannot be NaN or infinity");
+
+                if (isWidthAutoSize)
+                    size.X = measuredSize.X;
+                if (isHeightAutoSize)
+                    size.Y = measuredSize.Y;
+            }
+
+            var desired = Position + size + Padding * 2;
+            return desired;
+        }
+
+        /// <summary>
+        /// Measure the preferred size of this object.
+        /// May be overriden to provide custom sizing (this should not include <see cref="Size"/> or <see cref="Padding"/>)
+        /// By default calculates the shrink-wrapped size
+        /// Measurements to children should call <see cref="Measure"/>
+        /// </summary>
+        /// <param name="availableSize">This is the available size of the container,. The returned size can be larger or smaller</param>
+        /// <returns>The preferred size of this element</returns>
+        protected virtual Vector2 MeasureOverride(Vector2 availableSize)
+        {
+            var textSize = Point.Zero;
+            if (Text != null && Font != null)
+                textSize = Font.MeasureString(Text).ToPoint();
+            var bounds = new Rectangle(0, 0, textSize.X, textSize.Y);
+
             foreach (var child in Children)
             {
                 if (!child.IsEnabled)
                     continue;
 
-                //todo: this is jank
-                var lb = child.Bounds;
-                if (child.HorizontalAlignment == Alignment.Stretch)
-                    lb.Width = 0;
-                if (child.VerticalAlignment == Alignment.Stretch)
-                    lb.Height = 0;
-
-                bounds = Rectangle.Union(bounds, lb);
+                var mes = child.Measure(availableSize).ToPoint();
+                bounds = Rectangle.Union(bounds, new Rectangle((int)child.Position.X, (int)child.Position.Y, mes.X, mes.Y));
             }
-            Size = new Vector2(bounds.Width, bounds.Height);
+
+            return new Vector2(bounds.Width, bounds.Height);
         }
 
         #endregion
@@ -1198,7 +1232,7 @@ namespace Takai.UI
                     break;
 
                 //iterate through previous children of current level
-                var i = toUpdate.Parent.children.IndexOf(toUpdate) - 1;
+                var i = toUpdate.Parent._children.IndexOf(toUpdate) - 1;
                 for (; i >= 0; --i)
                 {
                     toUpdate = toUpdate.Parent.Children[i];
@@ -1390,7 +1424,7 @@ namespace Takai.UI
             string info = $"{GetType().Name}\n"
                         + $"Name: {(Name ?? "(No name)")}\n"
                         + $"Bounds: {OffsetBounds}\n"
-                        + $"Dimensions: {Dimensions}, Padding: {Padding}\n"
+                        + $"Position: {Position}: Size {Size}, Padding: {Padding}\n"
                         + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}";
 
             var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);
@@ -1405,8 +1439,7 @@ namespace Takai.UI
         /// <param name="spriteBatch">The spritebatch to use</param>
         protected virtual void DrawSelf(SpriteBatch spriteBatch)
         {
-            var textPos = ((Size - textSize) / 2).ToPoint();
-            DrawText(spriteBatch, textPos);
+            DrawText(spriteBatch, Point.Zero);
         }
 
         /// <summary>
@@ -1424,6 +1457,24 @@ namespace Takai.UI
 
         #endregion
 
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\"";
+        }
+
+        public virtual void DerivedDeserialize(Dictionary<string, object> props)
+        {
+            //allow autosizing only one dimension
+            if (props.TryGetValue("Width", out var width))
+                Size = new Vector2(Data.Serializer.Cast<float>(width), Size.Y);
+
+            if (props.TryGetValue("Height", out var height))
+                Size = new Vector2(Size.X, Data.Serializer.Cast<float>(height));
+        }
+
+        #region Helpers
+
         //todo: better name
         public void TriggerClick(Vector2 relativePosition)
         {
@@ -1434,31 +1485,9 @@ namespace Takai.UI
             clickCommandFn?.Invoke(this);
         }
 
-        public override string ToString()
-        {
-            return $"{base.ToString()} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\"";
-        }
-
-        public virtual void DerivedDeserialize(Dictionary<string, object> props)
-        {
-
-            if (!(props.ContainsKey("Bounds") ||
-                  props.ContainsKey("Size")) &&
-                 (!props.TryGetValue("AutoSize", out var doAutosize) || doAutosize as bool? != false))
-                SizeToContain();
-
-            //allow autosizing only one dimension
-            if (props.TryGetValue("Width", out var width))
-                Size = new Vector2(Data.Serializer.Cast<float>(width), Size.Y);
-
-            if (props.TryGetValue("Height", out var height))
-                Size = new Vector2(Size.X, Data.Serializer.Cast<float>(height));
-        }
-
         public static Static GeneratePropSheet(object obj, Graphics.BitmapFont font, Color color)
         {
             var root = new List() { Margin = 2, Direction = Direction.Vertical };
-            var maxWidth = 0f;
 
             var type = obj.GetType();
             var typeInfo = type.GetTypeInfo();
@@ -1493,13 +1522,9 @@ namespace Takai.UI
 
                             //todo: doesn't work
                         };
-                        check.SizeToContain();
                         root.AddChild(check);
-                        maxWidth = System.Math.Max(maxWidth, check.Size.X);
                     }
                 }
-                root.Size = new Vector2(maxWidth, 1);
-                root.SizeToContain();
                 return root;
             }
 
@@ -1531,7 +1556,6 @@ namespace Takai.UI
                         Color = color
                     };
                     checkbox.BindTo(obj);
-                    checkbox.SizeToContain();
                     root.AddChild(checkbox);
                     continue;
                 }
@@ -1555,7 +1579,6 @@ namespace Takai.UI
                         Color = color
                     };
                     numeric.BindTo(obj);
-                    numeric.SizeToContain();
                     root.AddChild(numeric);
                 }
                 else if (mt == typeof(string))
@@ -1570,7 +1593,6 @@ namespace Takai.UI
                         Color = color
                     };
                     text.BindTo(obj);
-                    text.SizeToContain();
                     root.AddChild(text);
                 }
                 else if (mt == typeof(Dictionary<,>))
@@ -1583,9 +1605,9 @@ namespace Takai.UI
                 }
             }
 
-            root._size = new Vector2(maxWidth, 1);
-            root.SizeToContain();
             return root;
         }
+
+        #endregion
     }
 }

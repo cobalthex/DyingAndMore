@@ -1,0 +1,99 @@
+#*List {
+	BorderColor: Color.LightGray;
+	Direction: Direction.Vertical;
+	HorizontalAlignment: Alignment.Middle;
+	VerticalAlignment: Alignment.Middle;
+	Children: [
+		Static { Text: 1; };
+		Static { Text: 2; };
+		Static { Text: 3; };
+		Static { Text: 4; };
+	]
+};*#
+
+ScrollBox {
+	HorizontalAlignment: Alignment.Stretch;
+	VerticalAlignment: Alignment.Stretch;
+	Padding: 20;
+	Height: 300;
+
+	Children: [
+		Table {
+			Position: 100;
+			Margin: [10 20];
+			ColumnCount: 2;
+
+			Children: [
+
+				Static { Text: "Static"; };
+				Static {
+					Text: "Static";
+					BorderColor: Color.LightGray;
+				};
+				
+				Static { Text: "Button"; };
+				Static {
+					Text: "Button";
+					OnClickAction: "undefined";
+					BorderColor: Color.LightGray;
+				};
+
+				Static { Text: "CheckBox"; };
+				CheckBox {
+					Text: "CheckBox";
+					BorderColor: Color.LightGray;
+				};
+
+				Static { Text: "TrackBar"; };
+				TrackBar {
+					BorderColor: Color.LightGray;
+					Minimum: 0;
+					Maximum: 100;
+					Value: 50;
+					Increment: 1;
+				};
+
+				Static { Text: "Graphic"; };
+				Graphic {
+					Sprite: @"UI/test/test.spr.tk";
+					BorderColor: Color.LightGray;
+				};
+
+				Static { Text: "NumericInput"; };
+				NumericInput {
+					BorderColor: Color.LightGray;
+				};
+
+				# text input
+				# file input
+
+				# meter
+			
+				Static { Text: "Horizontal\nList"; };
+				List {
+					 BorderColor: Color.LightGray;
+					 Direction: Direction.Horizontal;
+					 Children: [
+					 	Static { Text: 1; };
+					 	Static { Text: 2; };
+					 	Static { Text: 3; };
+					 	Static { Text: 4; };
+					 ]
+				};
+
+				Static { Text: "Vertical\nList"; };
+				List {
+					 BorderColor: Color.LightGray;
+					 Direction: Direction.Vertical;
+					 Children: [
+					 	Static { Text: 1; };
+					 	Static { Text: 2; };
+					 	Static { Text: 3; };
+					 	Static { Text: 4; };
+					 ]
+				};
+
+			]
+		}
+	]
+}

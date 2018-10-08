@@ -160,7 +160,6 @@ namespace DyingAndMore.Game
                 Position = new Vector2(20),
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.End,
-                AutoSize = true
             });
             AddChild(crapDisplay = new Static
             {
@@ -177,7 +176,6 @@ namespace DyingAndMore.Game
                 VerticalAlignment = Alignment.Start,
                 HorizontalAlignment = Alignment.Middle,
                 Color = new Color(1, 1, 1, 0.5f),
-                AutoSize = true
             });
 
             Map = game.Map;

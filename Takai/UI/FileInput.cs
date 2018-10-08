@@ -166,15 +166,20 @@ namespace Takai.UI
             }
         }
 
-        public override void SizeToContain()
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            textInput.SizeToContain();
-            var btnSize = textInput.Size.Y;
-            pickerButton.Size = new Vector2(btnSize);
-
-            Size = textInput.Size + new Vector2(btnSize, 0);
-            base.SizeToContain();
+            var sz = textInput.Measure(availableSize);
+            return sz + new Vector2(sz.Y, 0);
         }
+
+        protected override void ReflowOverride(Vector2 availableSize)
+        {
+            var sz = availableSize.ToPoint();
+            //todo: pickerButton bounds?
+            textInput.Reflow(new Rectangle(0, 0, sz.X - pickerButton.Bounds.Width, sz.Y));
+            pickerButton.Reflow(new Rectangle(sz.X - pickerButton.Bounds.Width * 2, 0, pickerButton.Bounds.Width, sz.Y));
+        }
+
 
         protected override void OnResize(System.EventArgs e)
         {

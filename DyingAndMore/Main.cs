@@ -1,11 +1,10 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.Graphics;
-using Takai.Input;
-using Takai.Data;
 using System.Reflection;
-using System.Runtime.InteropServices;
+using Takai.Data;
+using Takai.Input;
 
 namespace DyingAndMore
 {
@@ -59,11 +58,12 @@ namespace DyingAndMore
                 PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
                 GraphicsProfile = GraphicsProfile.HiDef,
                 PreferredBackBufferFormat = SurfaceFormat.Color,
-                SynchronizeWithVerticalRetrace = false,
                 PreferMultiSampling = true,
 #if WINDOWS_UAP
                 SynchronizeWithVerticalRetrace = true,
                 IsFullScreen = true,
+#else
+                SynchronizeWithVerticalRetrace = false,
 #endif
             };
 
@@ -148,22 +148,29 @@ namespace DyingAndMore
 #endif
             */
 
-            var selectStoryUI = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
-            if (selectStoryUI is Game.StorySelect ss)
+            //var selectStoryUI = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
+            //if (selectStoryUI is Game.StorySelect ss)
+            //{
+            //    ss.StorySelected += delegate (object _sender, Game.GameStory story)
+            //    {
+            //        //var game = new Game.Game
+            //        //{
+            //        //    Story = story,
+            //        //};
+            //        //game.LoadNextStoryMap();
+            //        //ui.ReplaceAllChildren(new Game.GameInstance(game));
+            //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
+            //    };
+            //}
+            //ui = new Takai.UI.Static(selectStoryUI);
+            ui = new Takai.UI.Static(Cache.Load<Takai.UI.Static>("UI/test/elements.ui.tk"))
             {
-                ss.StorySelected += delegate (object _sender, Game.GameStory story)
-                {
-                    //var game = new Game.Game
-                    //{
-                    //    Story = story,
-                    //};
-                    //game.LoadNextStoryMap();
-                    //ui.ReplaceAllChildren(new Game.GameInstance(game));
-                    ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
-                };
-            }
-            ui = new Takai.UI.Static(selectStoryUI);
-            //ui = new Takai.UI.Static(Cache.Load<Takai.UI.Static>("UI/test/Layout.ui.tk"));
+                HorizontalAlignment = Takai.UI.Alignment.Stretch,
+                VerticalAlignment = Takai.UI.Alignment.Stretch
+            };
+            ui.Reflow(GraphicsDevice.Viewport.Bounds); //todo: make not necessary
+
+            Takai.UI.Static.DebugFont = Takai.UI.Static.DefaultFont;
 
             fpsGraph = new Takai.FpsGraph()
             {
@@ -217,7 +224,7 @@ namespace DyingAndMore
             InputState.Update(GraphicsDevice.Viewport.Bounds);
 
             ui.Update(gameTime);
-            ui.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            //ui.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         }
 
         protected override void Draw(GameTime gameTime)

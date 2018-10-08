@@ -38,7 +38,6 @@ namespace Takai.UI
 
                 _container = value;
                 ReplaceAllChildren(_container);
-                Container.SizeToContain();
             }
         }
         private Static _container;
@@ -138,8 +137,6 @@ namespace Takai.UI
             }
 
             //todo: Items binding setter
-
-            Container.SizeToContain();
         }
 
         protected Static CreateItem(T value)
@@ -152,7 +149,6 @@ namespace Takai.UI
                 Padding = new Vector2(ItemPadding) //todo: revisit
                 //HorizontalAlignment = Alignment.Stretch //todo: configurable (item templates?)
             };
-            item.SizeToContain();
             item.Click += delegate (object sender, ClickEventArgs e)
             {
                 var which = (Static)sender;

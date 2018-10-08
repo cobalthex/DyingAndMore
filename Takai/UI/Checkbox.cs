@@ -16,7 +16,7 @@ namespace Takai.UI
         /// <summary>
         /// The margin between the checkbox and text
         /// </summary>
-        static int Margin { get; set; } = 15;
+        static int Margin { get; set; } = 10;
 
         /// <summary>
         /// Is this checkbox currently checked?
@@ -30,11 +30,10 @@ namespace Takai.UI
             IsChecked = isChecked;
         }
 
-        public override void SizeToContain()
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            base.SizeToContain();
-            var checkboxSize = System.Math.Min(LocalDimensions.Width, LocalDimensions.Height);
-            Size += new Vector2(checkboxSize + Margin, 0);
+            var size = base.MeasureOverride(availableSize);
+            return size + new Vector2(size.Y + Margin, 0);
         }
 
         protected override void OnClick(ClickEventArgs args)
@@ -45,8 +44,10 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var checkboxSize = System.Math.Min(AbsoluteDimensions.Width, AbsoluteDimensions.Height);
-            var checkBounds = new Rectangle(AbsoluteDimensions.X, AbsoluteDimensions.Y, checkboxSize, checkboxSize);
+            //todo: modernize
+
+            var checkboxSize = (int)System.Math.Min(Bounds.Width, Bounds.Height);
+            var checkBounds = new Rectangle(OffsetBounds.X + (int)Padding.X, OffsetBounds.Y + (int)Padding.Y, checkboxSize, checkboxSize);
             var checkboxBounds = Rectangle.Intersect(checkBounds, VisibleBounds);
             Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, checkboxBounds);
             checkboxBounds.Inflate(-1, -1);

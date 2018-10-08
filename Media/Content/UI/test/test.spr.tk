@@ -1,0 +1,7 @@
+Sprite {
+	FrameCount: 10;
+	FrameLength: 100msec;
+	Size: [34 49];
+	Texture: @"./Animation.png";
+	IsLooping: true;
+};

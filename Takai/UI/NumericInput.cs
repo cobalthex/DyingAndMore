@@ -136,9 +136,21 @@ namespace Takai.UI
             AllowSpecialCharacters = false,
             MaxLength = 20,
             BorderColor = Color.Transparent,
+            HorizontalAlignment = Alignment.Stretch,
+            VerticalAlignment = Alignment.Stretch
         };
-        protected Static upButton = new Static { Text = "+" };
-        protected Static downButton = new Static { Text = "-" };
+        protected Static upButton = new Static
+        {
+            Text = "+",
+            HorizontalAlignment = Alignment.Stretch,
+            VerticalAlignment = Alignment.Stretch
+        };
+        protected Static downButton = new Static
+        {
+            Text = "-",
+            HorizontalAlignment = Alignment.Stretch,
+            VerticalAlignment = Alignment.Stretch
+        };
 
         public NumericInput()
         {
@@ -187,13 +199,10 @@ namespace Takai.UI
             base.OnValueChanged(e);
         }
 
-        public override void SizeToContain()
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            textInput.SizeToContain();
-            var btnSize = textInput.Size.Y;
-            upButton.Size = downButton.Size = new Vector2(btnSize);
-
-            Size = textInput.Size + new Vector2(btnSize * 2, 0);
+            var inputSz = textInput.Measure(availableSize);
+            return inputSz + new Vector2(inputSz.Y * 2, 0);
         }
 
         protected override void OnResize(EventArgs e)
@@ -201,16 +210,16 @@ namespace Takai.UI
             var btnSize = Size.Y;
             textInput.Size = new Vector2(Size.X - btnSize * 2, Size.Y);
             upButton.Size = downButton.Size = new Vector2(btnSize);
-            upButton.Position = new Vector2(Size.X - btnSize * 2, 0);
-            downButton.Position = new Vector2(Size.X - btnSize, 0);
             base.OnResize(e);
         }
 
-        public override void ReflowSelf(Rectangle container)
+        protected override void ReflowOverride(Vector2 availableSize)
         {
-            upButton.Position = textInput.Position + new Vector2(textInput.Size.X, 0);
-            downButton.Position = upButton.Position + new Vector2(upButton.Size.X, 0);
-            base.ReflowSelf(container);
+            var sz = availableSize.ToPoint(); //todo
+            var buttonSize = (int)Math.Max(upButton.Bounds.Width, downButton.Bounds.Height);
+            textInput.Reflow(new Rectangle(0, 0, sz.X - buttonSize * 2, sz.Y));
+            upButton.Reflow(new Rectangle(sz.X - buttonSize * 2, 0, buttonSize, sz.Y));
+            downButton.Reflow(new Rectangle(sz.X - buttonSize, 0, buttonSize, sz.Y));
         }
 
         protected override bool HandleInput(GameTime time)
