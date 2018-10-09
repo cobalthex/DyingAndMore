@@ -205,14 +205,6 @@ namespace Takai.UI
             return inputSz + new Vector2(inputSz.Y * 2, 0);
         }
 
-        protected override void OnResize(EventArgs e)
-        {
-            var btnSize = Size.Y;
-            textInput.Size = new Vector2(Size.X - btnSize * 2, Size.Y);
-            upButton.Size = downButton.Size = new Vector2(btnSize);
-            base.OnResize(e);
-        }
-
         protected override void ReflowOverride(Vector2 availableSize)
         {
             var sz = availableSize.ToPoint(); //todo
@@ -220,6 +212,14 @@ namespace Takai.UI
             textInput.Reflow(new Rectangle(0, 0, sz.X - buttonSize * 2, sz.Y));
             upButton.Reflow(new Rectangle(sz.X - buttonSize * 2, 0, buttonSize, sz.Y));
             downButton.Reflow(new Rectangle(sz.X - buttonSize, 0, buttonSize, sz.Y));
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            var btnSize = Size.Y;
+            textInput.Size = new Vector2(Size.X - btnSize * 2, Size.Y);
+            upButton.Size = downButton.Size = new Vector2(btnSize);
+            base.OnResize(e);
         }
 
         protected override bool HandleInput(GameTime time)

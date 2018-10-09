@@ -82,6 +82,14 @@ namespace Takai.UI
 
         public ScrollBar() { }
 
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
+        {
+            if (Direction == Direction.Horizontal)
+                return new Vector2(float.IsInfinity(availableSize.X) ? 20 : availableSize.X, 20);
+            else
+                return new Vector2(20, float.IsInfinity(availableSize.Y) ? 20 : availableSize.Y);
+        }
+
         protected override bool HandleInput(GameTime time)
         {
             if (IsThumbVisible)
@@ -143,9 +151,9 @@ namespace Takai.UI
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return Size.Y;
+                    return Bounds.Height;
                 case Direction.Horizontal:
-                    return Size.X;
+                    return Bounds.Width;
                 default:
                     return 1;
             }
@@ -153,13 +161,14 @@ namespace Takai.UI
 
         protected float GetThumbSize()
         {
-            //todo: precalculate
+            //todo: cache in Measure
+
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return (Size.Y / ContentSize) * GetContainerSize();
+                    return (Bounds.Height / ContentSize) * GetContainerSize();
                 case Direction.Horizontal:
-                    return (Size.X / ContentSize) * GetContainerSize();
+                    return (Bounds.Width / ContentSize) * GetContainerSize(); //todo: this should be inclusive size
                 default:
                     return 1;
             }
@@ -178,9 +187,9 @@ namespace Takai.UI
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return new Rectangle(0, (int)GetThumbOffset(), (int)Size.X, (int)GetThumbSize());
+                    return new Rectangle(0, (int)GetThumbOffset(), (int)Bounds.Width, (int)GetThumbSize());
                 case Direction.Horizontal:
-                    return new Rectangle((int)GetThumbOffset(), 0, (int)GetThumbSize(), (int)Size.Y);
+                    return new Rectangle((int)GetThumbOffset(), 0, (int)GetThumbSize(), (int)Bounds.Height);
                 default:
                     return Rectangle.Empty;
             }
@@ -215,7 +224,6 @@ namespace Takai.UI
                 verticalScrollbar = (ScrollBar)value.Clone();
                 verticalScrollbar.VerticalAlignment = Alignment.Stretch;
                 verticalScrollbar.Direction = Direction.Vertical;
-                verticalScrollbar.Size = new Vector2(20);
 
                 verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
                 {
@@ -226,7 +234,6 @@ namespace Takai.UI
                 horizontalScrollbar = (ScrollBar)value.Clone();
                 horizontalScrollbar.HorizontalAlignment = Alignment.Stretch;
                 horizontalScrollbar.Direction = Direction.Horizontal;
-                horizontalScrollbar.Size = new Vector2(20);
 
                 horizontalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
                 {
