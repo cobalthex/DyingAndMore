@@ -12,14 +12,14 @@
 };*#
 
 ScrollBox {
-	HorizontalAlignment: Alignment.Stretch;
-	VerticalAlignment: Alignment.Stretch;
+	Name: "Container";
+	#HorizontalAlignment: Alignment.Stretch;
+	#VerticalAlignment: Alignment.Stretch;
+	Size: 400;
 	Padding: 20;
-	Height: 300;
 
 	Children: [
 		Table {
-			Position: 100;
 			Margin: [10 20];
 			ColumnCount: 2;
 
@@ -64,8 +64,15 @@ ScrollBox {
 					BorderColor: Color.LightGray;
 				};
 
-				# text input
-				# file input
+				Static { Text: "TextInput"; };
+				TextInput {
+					BorderColor: Color.LightGray;
+				};
+
+				Static { Text: "FileInput"; };
+				FileInput {
+					BorderColor: Color.LightGray;
+				};
 
 				# meter
 			

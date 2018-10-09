@@ -1083,29 +1083,30 @@ namespace Takai.UI
         {
             //todo: ideally this should take local dimensions for container
             Rectangle parentContainer;
+            var offsetParent = Point.Zero;
             if (Parent == null)
                 parentContainer = Runtime.GraphicsDevice.Viewport.Bounds;
             else
+            {
+                offsetParent = Parent.OffsetBounds.Location;
                 parentContainer = Parent.VisibleBounds;
+            }
 
-            var size = Measure(container.Size.ToVector2()); //todo: this should go elsewhere
-
-            //todo: use Measure() here?
-            var dims = new Rectangle(
-                container.X + (int)GetLocalOffset(HorizontalAlignment, Position.X, size.X, Padding.X, container.Width),
-                container.Y + (int)GetLocalOffset(VerticalAlignment, Position.Y, size.Y, Padding.Y, container.Height),
-                HorizontalAlignment == Alignment.Stretch ? container.Width : (int)size.X,
-                VerticalAlignment == Alignment.Stretch ? container.Height : (int)size.Y
+            var measuredSize = Measure(container.Size.ToVector2()); //todo: this should go elsewhere
+            var localPos = new Vector2(
+                GetLocalOffset(HorizontalAlignment, Position.X, measuredSize.X, Padding.X, container.Width),
+                GetLocalOffset(VerticalAlignment, Position.Y, measuredSize.Y, Padding.Y, container.Height)
             );
-            Bounds = dims;
-            Bounds.Inflate(Padding.X, Padding.X);
+            var bnd = new Rectangle((int)localPos.X, (int)localPos.Y, (int)(measuredSize.X - Padding.X * 2), (int)(measuredSize.Y - Padding.Y * 2));
+            bnd.Offset(container.Location);
+            Bounds = bnd;
 
-            var bnd = Bounds;
-            bnd.Offset(parentContainer.X, parentContainer.Y);
+            bnd.Offset(offsetParent);
             OffsetBounds = bnd;
 
             bnd = Rectangle.Intersect(Bounds, container);
-            bnd.Offset(parentContainer.X, parentContainer.Y);
+            bnd.Offset(offsetParent);
+            bnd.Inflate(Padding.X, Padding.Y); //testing
             VisibleBounds = Rectangle.Intersect(bnd, parentContainer);
             containerBounds = container;
         }
@@ -1133,12 +1134,22 @@ namespace Takai.UI
             var size = Size;
             bool isWidthAutoSize = float.IsNaN(size.X);
             bool isHeightAutoSize = float.IsNaN(size.Y);
+            bool isHStretch = HorizontalAlignment == Alignment.Stretch;
+            bool isVStretch = VerticalAlignment == Alignment.Stretch;
 
-            if (isWidthAutoSize && HorizontalAlignment == Alignment.Stretch && availableSize.X < InfiniteSize.X)
-                availableSize.X = availableSize.X - (int)Position.X;
+            if (availableSize.X < InfiniteSize.X)
+            {
+                availableSize.X -= Padding.X * 2;
+                if (isWidthAutoSize && isHStretch)
+                    availableSize.X -= (int)Position.X;
+            }
 
-            if (isHeightAutoSize && VerticalAlignment == Alignment.Stretch && availableSize.Y < InfiniteSize.Y)
-                availableSize.Y = availableSize.Y - (int)Position.Y;
+            if (availableSize.Y < InfiniteSize.Y)
+            {
+                availableSize.Y -= Padding.Y * 2;
+                if (isHeightAutoSize && isVStretch)
+                    availableSize.Y -= (int)Position.Y;
+            }
 
             if (isWidthAutoSize || isHeightAutoSize)
             {
@@ -1147,9 +1158,14 @@ namespace Takai.UI
                  || float.IsInfinity(measuredSize.Y) || float.IsNaN(measuredSize.Y))
                     throw new System.ArgumentOutOfRangeException("Measured size cannot be NaN or infinity");
 
-                if (isWidthAutoSize)
+                if (HorizontalAlignment == Alignment.Stretch)
+                    size.X = availableSize.X;
+                else if (isWidthAutoSize)
                     size.X = measuredSize.X;
-                if (isHeightAutoSize)
+
+                if (VerticalAlignment == Alignment.Stretch)
+                    size.Y = availableSize.Y;
+                else if (isHeightAutoSize)
                     size.Y = measuredSize.Y;
             }
 
@@ -1417,9 +1433,10 @@ namespace Takai.UI
         public void DrawDebugInfo(SpriteBatch spriteBatch)
         {
             var rect = OffsetBounds;
+            Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.OrangeRed, 0.5f), rect);
+
+            rect.Inflate(Padding.X, Padding.Y);
             Graphics.Primitives2D.DrawRect(spriteBatch, Color.Red, rect);
-            rect.Inflate(-Padding.X, -Padding.Y);
-            Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Red, 0.5f), rect);
 
             string info = $"{GetType().Name}\n"
                         + $"Name: {(Name ?? "(No name)")}\n"
@@ -1451,12 +1468,11 @@ namespace Takai.UI
             if (Font == null || Text == null)
                 return;
 
-            position += Padding.ToPoint();
+            position += Padding.ToPoint() - (VisibleBounds.Location - OffsetBounds.Location);
             Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleBounds, position, Color);
         }
 
         #endregion
-
 
         public override string ToString()
         {
