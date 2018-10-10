@@ -1003,7 +1003,83 @@ namespace Takai.UI
 
         #endregion
 
-        #region Sizing
+        #region Layout
+
+        /// <summary>
+        /// Calculate the desired size of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
+        /// Sets <see cref="DesiredSize"/> to value calculated
+        /// </summary>
+        /// <returns>The desired size of this element, including padding</returns>
+        public Vector2 Measure(Vector2 availableSize)
+        {
+            var size = Size;
+            bool isWidthAutoSize = float.IsNaN(size.X);
+            bool isHeightAutoSize = float.IsNaN(size.Y);
+            bool isHStretch = HorizontalAlignment == Alignment.Stretch;
+            bool isVStretch = VerticalAlignment == Alignment.Stretch;
+
+            if (availableSize.X < InfiniteSize.X)
+            {
+                availableSize.X -= Padding.X * 2;
+                if (isWidthAutoSize && isHStretch)
+                    availableSize.X -= (int)Position.X;
+            }
+
+            if (availableSize.Y < InfiniteSize.Y)
+            {
+                availableSize.Y -= Padding.Y * 2;
+                if (isHeightAutoSize && isVStretch)
+                    availableSize.Y -= (int)Position.Y;
+            }
+
+            if (isWidthAutoSize || isHeightAutoSize)
+            {
+                var measuredSize = MeasureOverride(availableSize);
+                //if (float.IsInfinity(measuredSize.X) || float.IsNaN(measuredSize.X)
+                // || float.IsInfinity(measuredSize.Y) || float.IsNaN(measuredSize.Y))
+                //    throw new System.ArgumentOutOfRangeException("Measured size cannot be NaN or infinity");
+
+                if (HorizontalAlignment == Alignment.Stretch)
+                    size.X = availableSize.X;
+                else if (isWidthAutoSize)
+                    size.X = measuredSize.X;
+
+                if (VerticalAlignment == Alignment.Stretch)
+                    size.Y = availableSize.Y;
+                else if (isHeightAutoSize)
+                    size.Y = measuredSize.Y;
+            }
+
+            var desired = Position + size + Padding * 2;
+            return desired;
+        }
+
+        /// <summary>
+        /// Measure the preferred size of this object.
+        /// May be overriden to provide custom sizing (this should not include <see cref="Size"/> or <see cref="Padding"/>)
+        /// By default calculates the shrink-wrapped size
+        /// Measurements to children should call <see cref="Measure"/>
+        /// </summary>
+        /// <param name="availableSize">This is the available size of the container,. The returned size can be larger or smaller</param>
+        /// <returns>The preferred size of this element</returns>
+        protected virtual Vector2 MeasureOverride(Vector2 availableSize)
+        {
+            var textSize = Point.Zero;
+            if (Text != null && Font != null)
+                textSize = Font.MeasureString(Text).ToPoint();
+            var bounds = new Rectangle(0, 0, textSize.X, textSize.Y);
+
+            foreach (var child in Children)
+            {
+                if (!child.IsEnabled)
+                    continue;
+
+                var mes = child.Measure(availableSize).ToPoint();
+                bounds = Rectangle.Union(bounds, new Rectangle((int)child.Position.X, (int)child.Position.Y, mes.X, mes.Y));
+            }
+
+            return new Vector2(bounds.Width, bounds.Height);
+        }
 
         /// <summary>
         /// Is this element in a reflow currently?
@@ -1081,7 +1157,6 @@ namespace Takai.UI
         /// <param name="container">The container to fit this to, in relative coordinates</param>
         private void AdjustToContainer(Rectangle container)
         {
-            //todo: ideally this should take local dimensions for container
             Rectangle parentContainer;
             var offsetParent = Point.Zero;
             if (Parent == null)
@@ -1122,82 +1197,6 @@ namespace Takai.UI
                 default:
                     return position + padding;
             }
-        }
-
-        /// <summary>
-        /// Calculate the desired size of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
-        /// Sets <see cref="DesiredSize"/> to value calculated
-        /// </summary>
-        /// <returns>The desired size of this element, including padding</returns>
-        public Vector2 Measure(Vector2 availableSize)
-        {
-            var size = Size;
-            bool isWidthAutoSize = float.IsNaN(size.X);
-            bool isHeightAutoSize = float.IsNaN(size.Y);
-            bool isHStretch = HorizontalAlignment == Alignment.Stretch;
-            bool isVStretch = VerticalAlignment == Alignment.Stretch;
-
-            if (availableSize.X < InfiniteSize.X)
-            {
-                availableSize.X -= Padding.X * 2;
-                if (isWidthAutoSize && isHStretch)
-                    availableSize.X -= (int)Position.X;
-            }
-
-            if (availableSize.Y < InfiniteSize.Y)
-            {
-                availableSize.Y -= Padding.Y * 2;
-                if (isHeightAutoSize && isVStretch)
-                    availableSize.Y -= (int)Position.Y;
-            }
-
-            if (isWidthAutoSize || isHeightAutoSize)
-            {
-                var measuredSize = MeasureOverride(availableSize);
-                if (float.IsInfinity(measuredSize.X) || float.IsNaN(measuredSize.X)
-                 || float.IsInfinity(measuredSize.Y) || float.IsNaN(measuredSize.Y))
-                    throw new System.ArgumentOutOfRangeException("Measured size cannot be NaN or infinity");
-
-                if (HorizontalAlignment == Alignment.Stretch)
-                    size.X = availableSize.X;
-                else if (isWidthAutoSize)
-                    size.X = measuredSize.X;
-
-                if (VerticalAlignment == Alignment.Stretch)
-                    size.Y = availableSize.Y;
-                else if (isHeightAutoSize)
-                    size.Y = measuredSize.Y;
-            }
-
-            var desired = Position + size + Padding * 2;
-            return desired;
-        }
-
-        /// <summary>
-        /// Measure the preferred size of this object.
-        /// May be overriden to provide custom sizing (this should not include <see cref="Size"/> or <see cref="Padding"/>)
-        /// By default calculates the shrink-wrapped size
-        /// Measurements to children should call <see cref="Measure"/>
-        /// </summary>
-        /// <param name="availableSize">This is the available size of the container,. The returned size can be larger or smaller</param>
-        /// <returns>The preferred size of this element</returns>
-        protected virtual Vector2 MeasureOverride(Vector2 availableSize)
-        {
-            var textSize = Point.Zero;
-            if (Text != null && Font != null)
-                textSize = Font.MeasureString(Text).ToPoint();
-            var bounds = new Rectangle(0, 0, textSize.X, textSize.Y);
-
-            foreach (var child in Children)
-            {
-                if (!child.IsEnabled)
-                    continue;
-
-                var mes = child.Measure(availableSize).ToPoint();
-                bounds = Rectangle.Union(bounds, new Rectangle((int)child.Position.X, (int)child.Position.Y, mes.X, mes.Y));
-            }
-
-            return new Vector2(bounds.Width, bounds.Height);
         }
 
         #endregion
