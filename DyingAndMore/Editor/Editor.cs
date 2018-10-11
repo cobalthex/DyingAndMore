@@ -293,7 +293,7 @@ namespace DyingAndMore.Editor
             }
 
             Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 10f); //todo: make ranges global and move to some game settings
-            Camera.Viewport = VisibleBounds;
+            Camera.Viewport = VisibleContentArea;
             Camera.Update(time);
         }
 

@@ -176,8 +176,8 @@ namespace Takai.UI
         {
             var sz = availableSize.ToPoint();
             //todo: pickerButton bounds?
-            textInput.Reflow(new Rectangle(0, 0, sz.X - pickerButton.Bounds.Width, sz.Y));
-            pickerButton.Reflow(new Rectangle(sz.X - pickerButton.Bounds.Width * 2, 0, pickerButton.Bounds.Width, sz.Y));
+            textInput.Reflow(new Rectangle(0, 0, sz.X - pickerButton.ContentArea.Width, sz.Y));
+            pickerButton.Reflow(new Rectangle(sz.X - pickerButton.ContentArea.Width * 2, 0, pickerButton.ContentArea.Width, sz.Y));
         }
 
 

@@ -37,7 +37,7 @@ namespace Takai.UI
         /// </summary>
         [Data.Serializer.Ignored]
         public bool IsThumbVisible =>
-            (Direction == Direction.Horizontal ? Size.X : Size.Y) < ContentSize;
+            (Direction == Direction.Horizontal ? ContentArea.Width : ContentArea.Height) < ContentSize;
 
         /// <summary>
         /// Where the content is scrolled to
@@ -48,7 +48,7 @@ namespace Takai.UI
             set
             {
                 var newPosition = value;
-                var size = Direction == Direction.Horizontal ? Size.X : Size.Y;
+                var size = Direction == Direction.Horizontal ? ContentArea.Width : ContentArea.Height;
 
                 if (size > contentSize)
                     newPosition = 0;
@@ -96,7 +96,7 @@ namespace Takai.UI
             {
                 if (DidPressInside(MouseButtons.Left))
                 {
-                    var mouse = InputState.MousePoint - OffsetBounds.Location;
+                    var mouse = InputState.MousePoint - OffsetContentArea.Location;
                     var deltaMouse = InputState.MouseDelta();
 
                     if (didPressThumb)
@@ -111,7 +111,7 @@ namespace Takai.UI
                 else
                     didPressThumb = false;
 
-                if (VisibleBounds.Contains(InputState.MousePoint) && InputState.HasScrolled())
+                if (VisibleContentArea.Contains(InputState.MousePoint) && InputState.HasScrolled())
                 {
                     ScrollTowards(InputState.ScrollDelta());
                     return false;
@@ -151,9 +151,9 @@ namespace Takai.UI
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return Bounds.Height;
+                    return ContentArea.Height;
                 case Direction.Horizontal:
-                    return Bounds.Width;
+                    return ContentArea.Width;
                 default:
                     return 1;
             }
@@ -166,9 +166,9 @@ namespace Takai.UI
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return (Bounds.Height / ContentSize) * GetContainerSize();
+                    return (ContentArea.Height / ContentSize) * GetContainerSize();
                 case Direction.Horizontal:
-                    return (Bounds.Width / ContentSize) * GetContainerSize(); //todo: this should be inclusive size
+                    return (ContentArea.Width / ContentSize) * GetContainerSize(); //todo: this should be inclusive size
                 default:
                     return 1;
             }
@@ -187,9 +187,9 @@ namespace Takai.UI
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return new Rectangle(0, (int)GetThumbOffset(), (int)Bounds.Width, (int)GetThumbSize());
+                    return new Rectangle(0, (int)GetThumbOffset(), (int)ContentArea.Width, (int)GetThumbSize());
                 case Direction.Horizontal:
-                    return new Rectangle((int)GetThumbOffset(), 0, (int)GetThumbSize(), (int)Bounds.Height);
+                    return new Rectangle((int)GetThumbOffset(), 0, (int)GetThumbSize(), (int)ContentArea.Height);
                 default:
                     return Rectangle.Empty;
             }
@@ -201,8 +201,8 @@ namespace Takai.UI
                 return;
 
             var thumb = GetThumbBounds();
-            thumb.Offset(OffsetBounds.Location);
-            Graphics.Primitives2D.DrawFill(spriteBatch, ThumbColor, Rectangle.Intersect(VisibleBounds, thumb));
+            thumb.Offset(OffsetContentArea.Location);
+            Graphics.Primitives2D.DrawFill(spriteBatch, ThumbColor, Rectangle.Intersect(VisibleContentArea, thumb));
         }
     }
 
@@ -221,27 +221,39 @@ namespace Takai.UI
                 if (value == null)
                     return;
 
+                var vsp = verticalScrollbar?.ChildIndex ?? -1;
                 verticalScrollbar = (ScrollBar)value.Clone();
                 verticalScrollbar.VerticalAlignment = Alignment.Stretch;
                 verticalScrollbar.Direction = Direction.Vertical;
 
                 verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
                 {
-                    //contentArea.Reflow(contentArea.AbsoluteBounds);
                     contentArea.Position -= new Vector2(0, e.Delta);
                 };
 
+                var hsp = horizontalScrollbar?.ChildIndex ?? -1;
                 horizontalScrollbar = (ScrollBar)value.Clone();
                 horizontalScrollbar.HorizontalAlignment = Alignment.Stretch;
                 horizontalScrollbar.Direction = Direction.Horizontal;
 
                 horizontalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
                 {
-                    //contentArea.Reflow(contentArea.AbsoluteBounds);
                     contentArea.Position -= new Vector2(e.Delta, 0);
                 };
 
-                ReplaceAllChildren(contentArea, verticalScrollbar, horizontalScrollbar);
+                if (vsp >= 0)
+                {
+                    base.InternalRemoveChildIndex(vsp);
+                    base.InternalInsertChild(verticalScrollbar, vsp, false);
+                }
+                if (hsp >= 0)
+                {
+                    base.InternalRemoveChildIndex(hsp);
+                    base.InternalInsertChild(horizontalScrollbar, hsp, false);
+                }
+
+                if (vsp >= 0 || hsp >= 0)
+                    Reflow();
             }
         }
 
@@ -286,34 +298,16 @@ namespace Takai.UI
             return contentArea.InternalRemoveChildIndex(index);
         }
 
-        protected override void OnResize(EventArgs e)
+        protected override void ReflowOverride(Vector2 availableSize)
         {
-            ResizeContentArea();
-            base.OnResize(e);
-        }
-
-        //todo: on child resize event for content area
-
-        protected void ResizeContentArea()
-        {
-            var contentSize = contentArea.Measure(InfiniteSize);
-
-            horizontalScrollbar.ContentSize = contentSize.X;
-            verticalScrollbar.ContentSize = contentSize.Y;
-
-            //horizontalScrollbar.IsEnabled = horizontalScrollbar.IsThumbVisible;
-            //verticalScrollbar.IsEnabled = verticalScrollbar.IsThumbVisible;
-        }
-
-        public override void DerivedDeserialize(Dictionary<string, object> props)
-        {
-            base.DerivedDeserialize(props);
-            ResizeContentArea();
+            horizontalScrollbar.ContentSize = contentArea.MeasuredSize.X;
+            verticalScrollbar.ContentSize = contentArea.MeasuredSize.Y;
+            base.ReflowOverride(availableSize);
         }
 
         protected override bool HandleInput(GameTime time)
         {
-            if (InputState.HasScrolled() && VisibleBounds.Contains(InputState.MousePoint))
+            if (InputState.HasScrolled() && VisibleContentArea.Contains(InputState.MousePoint))
             {
                 if (InputState.IsMod(KeyMod.Shift))
                     horizontalScrollbar.ScrollTowards(InputState.ScrollDelta());

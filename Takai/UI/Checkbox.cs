@@ -46,9 +46,9 @@ namespace Takai.UI
         {
             //todo: modernize
 
-            var checkboxSize = (int)System.Math.Min(Bounds.Width, Bounds.Height);
-            var checkBounds = new Rectangle(OffsetBounds.X + (int)Padding.X, OffsetBounds.Y + (int)Padding.Y, checkboxSize, checkboxSize);
-            var checkboxBounds = Rectangle.Intersect(checkBounds, VisibleBounds);
+            var checkboxSize = (int)System.Math.Min(ContentArea.Width, ContentArea.Height);
+            var checkBounds = new Rectangle(OffsetContentArea.X, OffsetContentArea.Y, checkboxSize, checkboxSize);
+            var checkboxBounds = Rectangle.Intersect(checkBounds, VisibleContentArea);
             Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, checkboxBounds);
             checkboxBounds.Inflate(-1, -1);
             Graphics.Primitives2D.DrawRect(spriteBatch, CheckColor, checkboxBounds);
@@ -56,7 +56,7 @@ namespace Takai.UI
             if (IsChecked)
             {
                 checkBounds.Inflate(-4, -4);
-                Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, Rectangle.Intersect(checkBounds, VisibleBounds));
+                Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, Rectangle.Intersect(checkBounds, VisibleContentArea));
             }
 
             DrawText(spriteBatch, new Point(checkboxSize + Margin, 0));

@@ -12,12 +12,12 @@ namespace Takai.UI
         {
             if (DidPressInside(Input.MouseButtons.Left))
             {
-                var relPos = (Input.InputState.MousePoint - OffsetBounds.Location).ToVector2();
-                Value = (int)((relPos.X / Bounds.Width) * (Maximum - Minimum)) + Minimum;
+                var relPos = (Input.InputState.MousePoint - OffsetContentArea.Location).ToVector2();
+                Value = (int)((relPos.X / ContentArea.Width) * (Maximum - Minimum)) + Minimum;
                 return false;
             }
 
-            if (VisibleBounds.Contains(Input.InputState.MousePoint) && Input.InputState.HasScrolled())
+            if (VisibleContentArea.Contains(Input.InputState.MousePoint) && Input.InputState.HasScrolled())
             {
                 Value += Increment * System.Math.Sign(Input.InputState.ScrollDelta());
                 return false;
@@ -35,24 +35,24 @@ namespace Takai.UI
         {
             //todo: clip to visible bounds
 
-            var pos = OffsetBounds.Location.ToVector2();
+            var pos = OffsetContentArea.Location.ToVector2();
 
-            var y = (OffsetBounds.Height - 1) / 2;
+            var y = (OffsetContentArea.Height - 1) / 2;
 
             Graphics.Primitives2D.DrawLine(spriteBatch, Color,
-                pos + new Vector2(0, y), pos + new Vector2(Bounds.Width, y));
+                pos + new Vector2(0, y), pos + new Vector2(ContentArea.Width, y));
             ++y;
             Graphics.Primitives2D.DrawLine(spriteBatch, Color,
-                pos + new Vector2(0, y), pos + new Vector2(Bounds.Width, y));
+                pos + new Vector2(0, y), pos + new Vector2(ContentArea.Width, y));
 
             var sliderPos = (Value - Minimum) / (float)(Maximum - Minimum);
-            var x = sliderPos * Bounds.Width;
+            var x = sliderPos * ContentArea.Width;
 
             Graphics.Primitives2D.DrawLine(spriteBatch, Color,
-                pos + new Vector2(x, 0), pos + new Vector2(x,Bounds.Height));
+                pos + new Vector2(x, 0), pos + new Vector2(x,ContentArea.Height));
             ++x;
             Graphics.Primitives2D.DrawLine(spriteBatch, Color,
-                pos + new Vector2(x, 0), pos + new Vector2(x,Bounds.Height));
+                pos + new Vector2(x, 0), pos + new Vector2(x,ContentArea.Height));
         }
     }
 }

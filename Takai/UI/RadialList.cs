@@ -28,7 +28,7 @@ namespace Takai.UI
                 if (!Children[i].IsEnabled)
                     continue;
 
-                var vbnd = Children[i].Bounds;
+                var vbnd = Children[i].ContentArea;
                 var ccenter = new Vector2(vbnd.Width / 2, vbnd.Height / 2);
 
                 var pos = Util.Direction(i * thetaScale) * Radius;

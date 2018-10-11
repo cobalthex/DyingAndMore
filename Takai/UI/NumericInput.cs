@@ -208,7 +208,7 @@ namespace Takai.UI
         protected override void ReflowOverride(Vector2 availableSize)
         {
             var sz = availableSize.ToPoint(); //todo
-            var buttonSize = (int)Math.Max(upButton.Bounds.Width, downButton.Bounds.Height);
+            var buttonSize = (int)Math.Max(upButton.ContentArea.Width, downButton.ContentArea.Height);
             textInput.Reflow(new Rectangle(0, 0, sz.X - buttonSize * 2, sz.Y));
             upButton.Reflow(new Rectangle(sz.X - buttonSize * 2, 0, buttonSize, sz.Y));
             downButton.Reflow(new Rectangle(sz.X - buttonSize, 0, buttonSize, sz.Y));
