@@ -45,12 +45,12 @@ namespace Takai.UI
 
             dropdown.Size = new Vector2(Size.X, System.Math.Min(list.Size.Y, 200));
 
-            var end = new Vector2(VisibleBounds.Right, VisibleBounds.Bottom) + dropdown.Size;
+            var end = new Vector2(VisibleContentArea.Right, VisibleContentArea.Bottom) + dropdown.Size;
             if (end.X > Runtime.GraphicsDevice.Viewport.Width ||
                 end.Y > Runtime.GraphicsDevice.Viewport.Height)
-                dropdown.Position = VisibleBounds.Location.ToVector2() - new Vector2(0, dropdown.Size.Y);
+                dropdown.Position = VisibleContentArea.Location.ToVector2() - new Vector2(0, dropdown.Size.Y);
             else
-                dropdown.Position = VisibleBounds.Location.ToVector2() + new Vector2(0, Size.Y); //todo: smarter placement
+                dropdown.Position = VisibleContentArea.Location.ToVector2() + new Vector2(0, Size.Y); //todo: smarter placement
         }
 
         protected override void OnClick(ClickEventArgs e)

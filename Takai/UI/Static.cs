@@ -255,28 +255,35 @@ namespace Takai.UI
         private Vector2 _padding = Vector2.Zero;
 
         /// <summary>
-        /// The desired bounds of this object relative to its parent.
-        /// This includes padding and stretching. Calculated by <see cref="Measure"/>
+        /// The last size returned by this element's <see cref="Measure"/>
+        /// This includes padding and position
         /// </summary>
-        [Data.Serializer.Ignored]
-        public Rectangle Bounds { get; private set; }
+        public Vector2 MeasuredSize { get; private set; }
 
         /// <summary>
-        /// The <see cref="Bounds"/> of this element offset relative to the screen
+        /// The bounds of the content area, as determined by <see cref="Reflow"/>
         /// </summary>
         [Data.Serializer.Ignored]
-        public Rectangle OffsetBounds { get; private set; }
+        public Rectangle ContentArea { get; private set; }
 
         /// <summary>
-        /// The visible region of this element on the screen
+        /// The <see cref="ContentArea"/> of this element offset relative to the screen
         /// </summary>
         [Data.Serializer.Ignored]
+        public Rectangle OffsetContentArea { get; private set; }
+
+        /// <summary>
+        /// The visible region of this element on the screen, includes padding
+        /// </summary>
+        [Data.Serializer.Ignored]
+        protected Rectangle VisibleContentArea { get; private set; }
+
         protected Rectangle VisibleBounds { get; private set; }
 
         /// <summary>
         /// The container that this element fits into
         /// </summary>
-        private Rectangle containerBounds;
+        private Rectangle containerBounds; //todo: re-evaluate necessity
 
         /// <summary>
         /// Does this element currently have focus?
@@ -574,6 +581,11 @@ namespace Takai.UI
             }
             return false;
         }
+
+        /// <summary>
+        /// The index of this child in its parents, -1 if no parent
+        /// </summary>
+        public int ChildIndex => Parent?.Children.IndexOf(this) ?? -1;
 
         /// <summary>
         /// Insert the child into the children without reflowing
@@ -891,7 +903,7 @@ namespace Takai.UI
                 var top = stack.Pop();
                 if (top != this && top.CanFocus && top.IsEnabled)
                 {
-                    var diff = (top.VisibleBounds.Location - VisibleBounds.Location).ToVector2();
+                    var diff = (top.VisibleContentArea.Location - VisibleContentArea.Location).ToVector2();
 
                     var dot = Vector2.Dot(direction, Vector2.Normalize(diff));
                     if (dot >= bias)
@@ -1006,8 +1018,9 @@ namespace Takai.UI
         #region Layout
 
         /// <summary>
-        /// Calculate the desired size of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
-        /// Sets <see cref="DesiredSize"/> to value calculated
+        /// Calculate the desired containing region of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
+        /// Sets <see cref="MeasuredSize"/> to value calculated
+        /// This returns a size that is large enough to include the offset element with padding
         /// </summary>
         /// <returns>The desired size of this element, including padding</returns>
         public Vector2 Measure(Vector2 availableSize)
@@ -1035,23 +1048,19 @@ namespace Takai.UI
             if (isWidthAutoSize || isHeightAutoSize)
             {
                 var measuredSize = MeasureOverride(availableSize);
-                //if (float.IsInfinity(measuredSize.X) || float.IsNaN(measuredSize.X)
-                // || float.IsInfinity(measuredSize.Y) || float.IsNaN(measuredSize.Y))
-                //    throw new System.ArgumentOutOfRangeException("Measured size cannot be NaN or infinity");
+                if (float.IsInfinity(measuredSize.X) || float.IsNaN(measuredSize.X)
+                 || float.IsInfinity(measuredSize.Y) || float.IsNaN(measuredSize.Y))
+                    throw new System.ArgumentOutOfRangeException("Measured size cannot be NaN or infinity");
 
-                if (HorizontalAlignment == Alignment.Stretch)
-                    size.X = availableSize.X;
-                else if (isWidthAutoSize)
+                if (isWidthAutoSize)
                     size.X = measuredSize.X;
 
-                if (VerticalAlignment == Alignment.Stretch)
-                    size.Y = availableSize.Y;
-                else if (isHeightAutoSize)
+                if (isHeightAutoSize)
                     size.Y = measuredSize.Y;
             }
 
-            var desired = Position + size + Padding * 2;
-            return desired;
+            MeasuredSize = Position + size + Padding * 2;
+            return MeasuredSize;
         }
 
         /// <summary>
@@ -1103,7 +1112,7 @@ namespace Takai.UI
 
             isReflowing = true;
             AdjustToContainer(container);
-            ReflowOverride(VisibleBounds.Size.ToVector2()); //todo: this needs to be visibleDimensions
+            ReflowOverride(VisibleContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions
             NotifyChildReflow();
             isReflowing = false;
         }
@@ -1157,32 +1166,43 @@ namespace Takai.UI
         /// <param name="container">The container to fit this to, in relative coordinates</param>
         private void AdjustToContainer(Rectangle container)
         {
-            Rectangle parentContainer;
+            Rectangle parentContentArea;
+            Rectangle parentBounds;
             var offsetParent = Point.Zero;
             if (Parent == null)
-                parentContainer = Runtime.GraphicsDevice.Viewport.Bounds;
+                parentBounds = parentContentArea = Runtime.GraphicsDevice.Viewport.Bounds;
             else
             {
-                offsetParent = Parent.OffsetBounds.Location;
-                parentContainer = Parent.VisibleBounds;
+                offsetParent = Parent.OffsetContentArea.Location;
+                parentContentArea = Parent.VisibleContentArea;
+                parentBounds = Parent.VisibleBounds;
             }
 
             var measuredSize = Measure(container.Size.ToVector2()); //todo: this should go elsewhere
+
+            //todo: should this go into Measure?
+            if (HorizontalAlignment == Alignment.Stretch)
+                measuredSize.X = container.Width;
+            if (VerticalAlignment == Alignment.Stretch)
+                measuredSize.Y = container.Height;
+
             var localPos = new Vector2(
                 GetLocalOffset(HorizontalAlignment, Position.X, measuredSize.X, Padding.X, container.Width),
                 GetLocalOffset(VerticalAlignment, Position.Y, measuredSize.Y, Padding.Y, container.Height)
             );
-            var bnd = new Rectangle((int)localPos.X, (int)localPos.Y, (int)(measuredSize.X - Padding.X * 2), (int)(measuredSize.Y - Padding.Y * 2));
-            bnd.Offset(container.Location);
-            Bounds = bnd;
+            var bounds = new Rectangle((int)localPos.X, (int)localPos.Y, (int)(measuredSize.X), (int)(measuredSize.Y));
 
-            bnd.Offset(offsetParent);
-            OffsetBounds = bnd;
+            bounds.Width -= (int)(Padding.X * 2 + Position.X);
+            bounds.Height -= (int)(Padding.Y * 2 + Position.Y);
+            bounds.Offset(container.Location);
+            ContentArea = bounds;
 
-            bnd = Rectangle.Intersect(Bounds, container);
-            bnd.Offset(offsetParent);
-            bnd.Inflate(Padding.X, Padding.Y); //testing
-            VisibleBounds = Rectangle.Intersect(bnd, parentContainer);
+            var tmp = bounds;
+            tmp.Offset(offsetParent);
+            OffsetContentArea = tmp;
+            VisibleContentArea = Rectangle.Intersect(tmp, parentContentArea);
+            VisibleBounds = Rectangle.Intersect(tmp, parentBounds);
+
             containerBounds = container;
         }
 
@@ -1332,7 +1352,7 @@ namespace Takai.UI
             }
 
             //todo: improve
-            if (Input.InputState.IsPress(0) && VisibleBounds.Contains(Input.InputState.touches[0].Position))
+            if (Input.InputState.IsPress(0) && VisibleContentArea.Contains(Input.InputState.touches[0].Position))
             {
                 var e = new ClickEventArgs { position = Vector2.Zero };
                 OnClick(e);
@@ -1353,9 +1373,9 @@ namespace Takai.UI
 
         bool HandleMouseInput(Point mousePosition, Input.MouseButtons button)
         {
-            if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mousePosition))
+            if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleContentArea.Contains(mousePosition))
             {
-                var e = new ClickEventArgs { position = (mousePosition - OffsetBounds.Location).ToVector2() };
+                var e = new ClickEventArgs { position = (mousePosition - OffsetContentArea.Location).ToVector2() };
                 didPress = true;
                 OnPress(e);
                 Press?.Invoke(this, e);
@@ -1375,9 +1395,9 @@ namespace Takai.UI
             else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
             //else if (Input.InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
-                if (didPress && VisibleBounds.Contains(mousePosition)) //gesture pos
+                if (didPress && VisibleContentArea.Contains(mousePosition)) //gesture pos
                 {
-                    TriggerClick((mousePosition - OffsetBounds.Location).ToVector2());
+                    TriggerClick((mousePosition - OffsetContentArea.Location).ToVector2());
                     didPress = false;
                     return false;
                 }
@@ -1431,7 +1451,7 @@ namespace Takai.UI
 
         public void DrawDebugInfo(SpriteBatch spriteBatch)
         {
-            var rect = OffsetBounds;
+            var rect = OffsetContentArea;
             Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.OrangeRed, 0.5f), rect);
 
             rect.Inflate(Padding.X, Padding.Y);
@@ -1439,13 +1459,14 @@ namespace Takai.UI
 
             string info = $"{GetType().Name}\n"
                         + $"Name: {(Name ?? "(No name)")}\n"
-                        + $"Bounds: {OffsetBounds}\n"
+                        + $"Bounds: {OffsetContentArea}\n"
                         + $"Position: {Position}: Size {Size}, Padding: {Padding}\n"
                         + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}";
 
             var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);
             var size = DebugFont.MeasureString(info);
             drawPos = Util.Clamp(new Rectangle(drawPos.X, drawPos.Y, (int)size.X, (int)size.Y), Runtime.GraphicsDevice.Viewport.Bounds);
+            drawPos -= new Point(10);
             DebugFont.Draw(spriteBatch, info, drawPos.ToVector2(), Color.Gold);
         }
 
@@ -1459,16 +1480,31 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Draw this element's text. Position specifies the base location
+        /// Draw text clipped to the visible region of this element
         /// </summary>
-        /// <param name="position">The position of the text relative to this element</param>
+        /// <param name="spriteBatch">The spritebatch to use</param>
+        /// <param name="position">The relative position (to the element) to draw this text</param>
         protected void DrawText(SpriteBatch spriteBatch, Point position)
         {
             if (Font == null || Text == null)
                 return;
 
-            position += Padding.ToPoint() - (VisibleBounds.Location - OffsetBounds.Location);
-            Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleBounds, position, Color);
+            position += (VisibleContentArea.Location - OffsetContentArea.Location);
+            Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleContentArea, position, Color);
+        }
+
+        /// <summary>
+        /// Draw a line clipped to the visible region of this element
+        /// </summary>
+        /// <param name="spriteBatch">The spritebatch to use</param>
+        /// <param name="a">The start of the line</param>
+        /// <param name="b">The end of the line</param>
+        protected void DrawLine(SpriteBatch spriteBatch, Color color, Vector2 a, Vector2 b)
+        {
+            //todo: clip
+            //todo: convert other usages to use this
+            var offsetPos = OffsetContentArea.Location.ToVector2();
+            Graphics.Primitives2D.DrawLine(spriteBatch, color, a + offsetPos, b + offsetPos);
         }
 
         #endregion

@@ -70,6 +70,8 @@ namespace Takai.UI
         /// </summary>
         protected string visibleText = "";
 
+        protected Vector2 textSize;
+
         /// <summary>
         /// Hide visual input
         /// </summary>
@@ -348,6 +350,8 @@ namespace Takai.UI
         protected void UpdateVisibleText()
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
+            textSize = Font.MeasureString(visibleText);
+
             OnTextChanged(System.EventArgs.Empty);
             TextChanged?.Invoke(this, System.EventArgs.Empty);
             onTextChangedCommandFn?.Invoke(this);
@@ -366,8 +370,7 @@ namespace Takai.UI
             if (textWidth < ScrollPosition)
                 ScrollPosition -= (int)Size.X;
             //todo: scroll position is broken
-            var totalTextSize = Font.MeasureString(Text);
-            ScrollPosition = (int)MathHelper.Clamp(textWidth, 0, totalTextSize.X - Size.X);
+            ScrollPosition = (int)MathHelper.Clamp(textWidth, 0, textSize.X - Size.X);
 
             //todo: update to new layout system
         }
@@ -390,27 +393,14 @@ namespace Takai.UI
             if (Font == null)
                 return;
 
-            //todo
+            DrawText(spriteBatch, new Point(0/*-ScrollPosition*/ + 2, (int)(ContentArea.Height - textSize.Y) / 2));
 
-            //var size = new Point(
-            //    System.Math.Min(Dimensions.Width - 4, (int)textSize.X),
-            //    System.Math.Min(Dimensions.Height, (int)textSize.Y)
-            //);
-
-            //DrawText(spriteBatch,
-            //    new Point(-ScrollPosition + 2, (int)(Size.Y - textSize.Y) / 2));
-
-            //var tickCount = System.Environment.TickCount;
-            //if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
-            //{
-            //    var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition + AbsoluteDimensions.X + 3;
-            //    if (x < VisibleBounds.Left || x >= VisibleBounds.Right)
-            //        return;
-
-            //    var top = new Vector2(x, MathHelper.Clamp(AbsoluteDimensions.Top, VisibleBounds.Top, VisibleBounds.Bottom));
-            //    var bottom = new Vector2(x, MathHelper.Clamp(AbsoluteDimensions.Bottom, VisibleBounds.Top, VisibleBounds.Bottom));
-            //    Graphics.Primitives2D.DrawLine(spriteBatch, Color, top, bottom);
-            //}
+            var tickCount = System.Environment.TickCount;
+            if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
+            {
+                var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition;
+                DrawLine(spriteBatch, Color, new Vector2(x, 0), new Vector2(x, ContentArea.Height));
+            }
         }
     }
 }

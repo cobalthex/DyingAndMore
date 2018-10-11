@@ -32,7 +32,7 @@ namespace Takai.UI
         protected override bool HandleInput(GameTime time)
         {
             if (Input.InputState.IsClick(Input.MouseButtons.Left) && //todo: this is hacky
-                !VisibleBounds.Contains(Input.InputState.MousePoint))
+                !VisibleContentArea.Contains(Input.InputState.MousePoint))
                 IsEnabled = false;
 
             if (isSizing && Input.InputState.IsButtonDown(Input.MouseButtons.Left))

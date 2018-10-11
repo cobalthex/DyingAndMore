@@ -1,5 +1,5 @@
 #*List {
-	BorderColor: Color.LightGray;
+	BorderColor: [192 192 192 128];
 	Direction: Direction.Vertical;
 	HorizontalAlignment: Alignment.Middle;
 	VerticalAlignment: Alignment.Middle;
@@ -18,86 +18,117 @@ ScrollBox {
 	Size: 400;
 	Padding: 20;
 
+	ScrollBarTemplate: {
+		Padding: 0;
+		BorderColor: Color.Gray;
+		ThumbColor: [192 192 192 128];
+	}
+
 	Children: [
 		Table {
+			Name: "Form";
 			Margin: [10 20];
 			ColumnCount: 2;
+			BorderColor: [255 220 0 255];
+			CellColor: [0 255 192 32];
 
 			Children: [
 
 				Static { Text: "Static"; };
 				Static {
+					Name: "Static";
 					Text: "Static";
-					BorderColor: Color.LightGray;
+					BorderColor: [192 192 192 128];
+					HorizontalAlignment: Alignment.Stretch;
+					Padding: 10;
+					Position: 10;
 				};
 				
 				Static { Text: "Button"; };
 				Static {
+					Name: "Button";
 					Text: "Button";
 					OnClickAction: "undefined";
-					BorderColor: Color.LightGray;
+					BorderColor: [192 192 192 128];
+					Padding: 10;
 				};
 
 				Static { Text: "CheckBox"; };
 				CheckBox {
+					Name: "CheckBox";
 					Text: "CheckBox";
-					BorderColor: Color.LightGray;
+					BorderColor: [192 192 192 128];
+					Padding: 10;
 				};
 
 				Static { Text: "TrackBar"; };
 				TrackBar {
-					BorderColor: Color.LightGray;
+					Name: "TrackBar";
+					BorderColor: [192 192 192 128];
 					Minimum: 0;
 					Maximum: 100;
 					Value: 50;
 					Increment: 1;
+					Padding: 10;
 				};
 
 				Static { Text: "Graphic"; };
 				Graphic {
+					Name: "Graphic";
 					Sprite: @"UI/test/test.spr.tk";
-					BorderColor: Color.LightGray;
+					BorderColor: [192 192 192 128];
+					Padding: 10;
 				};
 
 				Static { Text: "NumericInput"; };
 				NumericInput {
-					BorderColor: Color.LightGray;
+					Name: "NumericInput";
+					BorderColor: [192 192 192 128];
+					Padding: 10;
 				};
 
 				Static { Text: "TextInput"; };
 				TextInput {
-					BorderColor: Color.LightGray;
+					Name: "TextInput";
+					BorderColor: [192 192 192 128];
+					Padding: 10;
 				};
 
 				Static { Text: "FileInput"; };
 				FileInput {
-					BorderColor: Color.LightGray;
+					Name: "FileInput";
+					BorderColor: [192 192 192 128];
+					Padding: 10;
 				};
 
 				# meter
 			
 				Static { Text: "Horizontal\nList"; };
 				List {
-					 BorderColor: Color.LightGray;
-					 Direction: Direction.Horizontal;
-					 Children: [
-					 	Static { Text: 1; };
-					 	Static { Text: 2; };
-					 	Static { Text: 3; };
-					 	Static { Text: 4; };
-					 ]
+					Name: "HorizontalList";
+					BorderColor: [192 192 192 128];
+					Direction: Direction.Horizontal;
+					Children: [
+						Static { Text: 1; };
+						Static { Text: 2; };
+						Static { Text: 3; };
+						Static { Text: 4; };
+					]
+					Padding: 10;
 				};
 
 				Static { Text: "Vertical\nList"; };
 				List {
-					 BorderColor: Color.LightGray;
-					 Direction: Direction.Vertical;
-					 Children: [
-					 	Static { Text: 1; };
-					 	Static { Text: 2; };
-					 	Static { Text: 3; };
-					 	Static { Text: 4; };
-					 ]
+					Name: "VerticalList";
+					BorderColor: [192 192 192 128];
+					Direction: Direction.Vertical;
+					Children: [
+						Static { Text: 1; };
+						Static { Text: 2; };
+						Static { Text: 3; };
+						Static { Text: 4; };
+					]
+					Padding: 10;
 				};
 
 			]

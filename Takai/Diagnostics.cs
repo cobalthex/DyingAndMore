@@ -133,7 +133,7 @@ namespace Takai
 
         protected override void DrawSelf(SpriteBatch sbatch)
         {
-            var bounds = VisibleBounds;
+            var bounds = VisibleContentArea;
             var average = (sum / n);
 
             var min = 0;// average - average / 2;

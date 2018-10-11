@@ -33,12 +33,12 @@ namespace Takai.UI
             //todo: custom positioning/sizing
             if (Sprite?.Texture != null)
             {
-                var rect = VisibleBounds;
+                var rect = VisibleContentArea;
                 Sprite.Draw(spriteBatch, rect, 0, Color.White, elapsedTime);
             }
             else if (DrawXIfMissingSprite)
             {
-                var rect = VisibleBounds;
+                var rect = VisibleContentArea;
                 rect.Inflate(-4, -4);
                 Graphics.Primitives2D.DrawX(spriteBatch, Color.Tomato, rect);
             }

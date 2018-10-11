@@ -69,7 +69,7 @@ namespace DyingAndMore.Editor.Selectors
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var visPos = VisibleBounds.X - OffsetBounds.X;
+            var visPos = VisibleContentArea.X - OffsetContentArea.X;
             //todo
             //int start = (int)(visPos / (ItemSize.Y + ItemMargin.X) * ItemsPerRow);
             //start = System.Math.Max(start, 0);

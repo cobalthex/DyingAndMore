@@ -43,7 +43,7 @@ namespace Takai.UI
             maskEffect.Parameters["Range"].SetValue(Range);
             maskEffect.Parameters["Mask"].SetValue(Mask.Texture);
             sbatch.Begin(SpriteSortMode.Deferred, null, null, null, null, maskEffect);
-            Sprite.Draw(sbatch, VisibleBounds, 0, Color, Sprite.ElapsedTime);
+            Sprite.Draw(sbatch, VisibleContentArea, 0, Color, Sprite.ElapsedTime);
             sbatch.End();
         }
     }
