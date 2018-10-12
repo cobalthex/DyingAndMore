@@ -584,6 +584,7 @@ namespace Takai.Game
                         state.Class?.Sprite?.Draw(
                             c.spriteBatch,
                             ent.Position,
+                            state.Class.Sprite.ClipRect,
                             angle,
                             ent.TintColor,
                             1,
@@ -652,6 +653,7 @@ namespace Takai.Game
                     sprite.Draw(
                         c.spriteBatch,
                         ent.Position,
+                        sprite.ClipRect,
                         angle,
                         ent.OutlineColor,
                         1,
@@ -678,6 +680,7 @@ namespace Takai.Game
                     (
                         c.spriteBatch,
                         p.Value[i].position,
+                        p.Key.Sprite.ClipRect,
                         p.Value[i].angle + p.Value[i].spin + p.Value[i].spawnAngle,
                         p.Value[i].color,
                         p.Value[i].scale,

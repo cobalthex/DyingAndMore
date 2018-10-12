@@ -75,14 +75,14 @@ namespace Takai.UI
                     if (Children[i].HorizontalAlignment == Alignment.Stretch)
                         ++stretches;
                     else
-                        usedSize += Children[i].Position.X + Children[i].ContentArea.Width;
+                        usedSize += Children[i].Position.X + Children[i].MeasuredSize.X;
                 }
                 else
                 {
                     if (Children[i].VerticalAlignment == Alignment.Stretch)
                         ++stretches;
                     else
-                        usedSize += Children[i].Position.Y + Children[i].ContentArea.Height;
+                        usedSize += Children[i].Position.Y + Children[i].MeasuredSize.Y;
                 }
             }
             usedSize += Margin * (Children.Count - 1);
@@ -108,7 +108,7 @@ namespace Takai.UI
                     if (Children[i].HorizontalAlignment == Alignment.Stretch)
                         itemSize = stretchSize;
                     else
-                        itemSize = Children[i].Position.X + Children[i].ContentArea.Width;
+                        itemSize = Children[i].Position.X + Children[i].MeasuredSize.X;
 
                     Children[i].Reflow(new Rectangle(
                         (int)(t + Children[i].Position.X),
@@ -116,14 +116,14 @@ namespace Takai.UI
                         (int)itemSize,
                         (int)availableSize.Y
                     ));
-                    t += Children[i].Position.X + Children[i].ContentArea.Width;
+                    t += Children[i].Position.X + Children[i].MeasuredSize.X;
                 }
                 else
                 {
                     if (Children[i].VerticalAlignment == Alignment.Stretch)
                         itemSize = stretchSize;
                     else
-                        itemSize = Children[i].Position.Y + Children[i].ContentArea.Height;
+                        itemSize = Children[i].Position.Y + Children[i].MeasuredSize.Y;
 
                     Children[i].Reflow(new Rectangle(
                         (int)Children[i].Position.X,
@@ -131,7 +131,7 @@ namespace Takai.UI
                         (int)availableSize.X,
                         (int)itemSize
                     ));
-                    t += Children[i].Position.Y + Children[i].ContentArea.Height;
+                    t += Children[i].Position.Y + Children[i].MeasuredSize.Y;
                 }
             }
 

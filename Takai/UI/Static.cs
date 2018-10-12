@@ -117,12 +117,15 @@ namespace Takai.UI
                 if (_text != value)
                 {
                     _text = value;
+                    if (Font != null && _text != null)
+                        textSize = Font.MeasureString(_text);
                     if (IsAutoSized)
                         Reflow();
                 }
             }
         }
         private string _text;
+        protected Vector2 textSize;
 
         /// <summary>
         /// The font to draw the text of this element with.
@@ -136,6 +139,8 @@ namespace Takai.UI
                 if (_font != value)
                 {
                     _font = value;
+                    if (_font != null && Text != null)
+                        textSize = Font.MeasureString(Text);
                     if (IsAutoSized)
                         Reflow();
                 }
@@ -1201,6 +1206,7 @@ namespace Takai.UI
             tmp.Offset(offsetParent);
             OffsetContentArea = tmp;
             VisibleContentArea = Rectangle.Intersect(tmp, parentContentArea);
+            tmp.Inflate(Padding.X, Padding.Y);
             VisibleBounds = Rectangle.Intersect(tmp, parentBounds);
 
             containerBounds = container;
@@ -1476,7 +1482,7 @@ namespace Takai.UI
         /// <param name="spriteBatch">The spritebatch to use</param>
         protected virtual void DrawSelf(SpriteBatch spriteBatch)
         {
-            DrawText(spriteBatch, Point.Zero);
+            DrawText(spriteBatch, ((new Vector2(ContentArea.Width, ContentArea.Height) - textSize) / 2).ToPoint());
         }
 
         /// <summary>
@@ -1489,7 +1495,7 @@ namespace Takai.UI
             if (Font == null || Text == null)
                 return;
 
-            position += (VisibleContentArea.Location - OffsetContentArea.Location);
+            position += (OffsetContentArea.Location - VisibleContentArea.Location);
             Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleContentArea, position, Color);
         }
 

@@ -70,8 +70,6 @@ namespace Takai.UI
         /// </summary>
         protected string visibleText = "";
 
-        protected Vector2 textSize;
-
         /// <summary>
         /// Hide visual input
         /// </summary>
@@ -350,7 +348,6 @@ namespace Takai.UI
         protected void UpdateVisibleText()
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
-            textSize = Font.MeasureString(visibleText);
 
             OnTextChanged(System.EventArgs.Empty);
             TextChanged?.Invoke(this, System.EventArgs.Empty);
