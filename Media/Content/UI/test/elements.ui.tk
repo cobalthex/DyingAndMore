@@ -1,3 +1,5 @@
+
+
 #*List {
 	BorderColor: [192 192 192 128];
 	Direction: Direction.Vertical;
@@ -15,8 +17,11 @@ ScrollBox {
 	Name: "Container";
 	#HorizontalAlignment: Alignment.Stretch;
 	#VerticalAlignment: Alignment.Stretch;
+	HorizontalAlignment: Alignment.Middle;
+	VerticalAlignment: Alignment.Middle;
 	Size: 400;
-	Padding: 20;
+	#Padding: 20;
+	BorderColor: Color.Gray;
 
 	ScrollBarTemplate: {
 		Padding: 0;
@@ -29,8 +34,8 @@ ScrollBox {
 			Name: "Form";
 			Margin: [10 20];
 			ColumnCount: 2;
-			BorderColor: [255 220 0 255];
-			CellColor: [0 255 192 32];
+			#BorderColor: [255 220 0 255];
+			#CellColor: [0 255 192 32];
 
 			Children: [
 
@@ -48,7 +53,7 @@ ScrollBox {
 				Static {
 					Name: "Button";
 					Text: "Button";
-					OnClickAction: "undefined";
+					OnClickCommand: "undefined";
 					BorderColor: [192 192 192 128];
 					Padding: 10;
 				};

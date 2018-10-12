@@ -117,6 +117,18 @@ namespace Takai.UI
                     return false;
                 }
 
+                if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Left) ||
+                    InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Up))
+                    ContentPosition -= (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Right) ||
+                    InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Down))
+                    ContentPosition += (float)(400 * time.ElapsedGameTime.TotalSeconds);
+
+                if (InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.PageUp))
+                    ContentPosition -= GetContainerSize() / 2;
+                if (InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.PageDown))
+                    ContentPosition += GetContainerSize() / 2;
+
                 //todo up/down + pgup/pgdn
             }
             return base.HandleInput(time);

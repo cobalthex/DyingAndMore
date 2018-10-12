@@ -33,8 +33,13 @@ namespace Takai.UI
             //todo: custom positioning/sizing
             if (Sprite?.Texture != null)
             {
-                var rect = VisibleContentArea;
-                Sprite.Draw(spriteBatch, rect, 0, Color.White, elapsedTime);
+                var clip = VisibleContentArea;
+                clip.X -= OffsetContentArea.X;
+                clip.Y -= OffsetContentArea.Y;
+                var dest = VisibleContentArea;
+                dest.X += clip.X / 2;
+                dest.Y += clip.Y / 2;
+                Sprite.Draw(spriteBatch, dest, clip, 0, Color.White, elapsedTime);
             }
             else if (DrawXIfMissingSprite)
             {

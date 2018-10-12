@@ -23,6 +23,8 @@ namespace Takai.UI
         /// </summary>
         public bool IsChecked { get; set; } = false;
 
+        public override bool CanFocus => true;
+
         public CheckBox() : this(false) { }
 
         public CheckBox(bool isChecked)

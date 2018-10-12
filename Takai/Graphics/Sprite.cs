@@ -123,24 +123,19 @@ namespace Takai.Graphics
         /// </summary>
         public int Width
         {
-            get { return width; }
+            get { return _width; }
             set
             {
-                width = value;
-                framesPerRow = Math.Max(1, ClipRect.Width / width);
+                _width = value;
+                framesPerRow = Math.Max(1, ClipRect.Width / _width);
             }
         }
-        private int width = 1;
+        private int _width = 1;
 
         /// <summary>
         /// The height of the graphic (the height of one frame)
         /// </summary>
-        public int Height
-        {
-            get { return height; }
-            set { height = value; }
-        }
-        private int height = 1;
+        public int Height { get; set; }
 
         /// <summary>
         /// Width and height represented as a point
@@ -168,7 +163,7 @@ namespace Takai.Graphics
             set
             {
                 clipRect = value;
-                framesPerRow = Math.Max(1, value.Width / width);
+                framesPerRow = Math.Max(1, value.Width / _width);
             }
         }
         private Rectangle clipRect = Rectangle.Empty;
@@ -286,7 +281,7 @@ namespace Takai.Graphics
         /// <returns>The centered origin</returns>
         public Vector2 CenterOrigin()
         {
-            Origin = new Vector2(width / 2, height / 2);
+            Origin = new Vector2(_width / 2, Height / 2);
             return Origin;
         }
 
@@ -301,10 +296,12 @@ namespace Takai.Graphics
         /// </summary>
         /// <param name="frame">Which frame of the animation to use (No bounds checking)</param>
         /// <returns>The clipping rectangle of the requested frame</returns>
-        public Rectangle GetFrameRect(int frame)
+        public Rectangle GetFrameRect(int frame, Rectangle clipRect)
         {
             var src = new Rectangle(ClipRect.X + (frame % framesPerRow) * Width, ClipRect.Y + (frame / framesPerRow) * Height, Width, Height);
-            return Rectangle.Intersect(src, ClipRect);
+            clipRect.X += src.X;
+            clipRect.Y += src.Y;
+            return Rectangle.Intersect(Rectangle.Intersect(src, ClipRect), clipRect);
         }
 
         /// <summary>
@@ -335,20 +332,20 @@ namespace Takai.Graphics
             Draw(spriteBatch, new Rectangle(
                 (int)position.X - (int)Origin.X,
                 (int)position.Y - (int)Origin.Y,
-                width,
-                height
-            ), angle, Color.White, ElapsedTime);
+                Width,
+                Height
+            ), ClipRect, angle, Color.White, ElapsedTime);
         }
         public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle)
         {
-            Draw(spriteBatch, bounds, angle, Color.White, ElapsedTime);
+            Draw(spriteBatch, bounds, ClipRect, angle, Color.White, ElapsedTime);
         }
 
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle, Color color, float scale = 1)
         {
-            Draw(spriteBatch, position, angle, color, scale, ElapsedTime);
+            Draw(spriteBatch, position, ClipRect, angle, color, scale, ElapsedTime);
         }
-        public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle, Color color, float scale, TimeSpan elapsedTime)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, Rectangle clipRect, float angle, Color color, float scale, TimeSpan elapsedTime)
         {
             var elapsed = (float)(elapsedTime.TotalSeconds / FrameLength.TotalSeconds);
             var cf = IsLooping ? ((int)elapsed % FrameCount) : Util.Clamp((int)elapsed, 0, FrameCount - 1);
@@ -356,11 +353,29 @@ namespace Takai.Graphics
             var fd = elapsed % 1;
 
             var tween = GetTween(fd, Tween);
-            spriteBatch.Draw(Texture, position, GetFrameRect(cf), Color.Lerp(color, Color.Transparent, tween.current), angle, Origin, scale, SpriteEffects.None, 0);
-            spriteBatch.Draw(Texture, position, GetFrameRect(nf), Color.Lerp(color, Color.Transparent, tween.next), angle, Origin, scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(Texture,
+                position,
+                GetFrameRect(cf, clipRect),
+                Color.Lerp(color, Color.Transparent, tween.current),
+                angle,
+                Origin,
+                scale,
+                SpriteEffects.None,
+                0
+            );
+            spriteBatch.Draw(Texture,
+                position,
+                GetFrameRect(nf, clipRect),
+                Color.Lerp(color, Color.Transparent, tween.next),
+                angle,
+                Origin,
+                scale,
+                SpriteEffects.None,
+                0
+            );
         }
 
-        public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle, Color color, TimeSpan elapsedTime)
+        public void Draw(SpriteBatch spriteBatch, Rectangle bounds, Rectangle clipRect, float angle, Color color, TimeSpan elapsedTime)
         {
             var elapsed = (float)(elapsedTime.TotalSeconds / FrameLength.TotalSeconds);
             var cf = IsLooping ? ((int)elapsed % FrameCount) : Util.Clamp((int)elapsed, 0, FrameCount - 1);
@@ -370,12 +385,30 @@ namespace Takai.Graphics
             if (ShrinkToFit) //todo: fit/contain
                 bounds = GetFitRect(Width, Height, bounds);
 
-            bounds.X += (int)(Origin.X / width * bounds.Width);
-            bounds.Y += (int)(Origin.Y / height * bounds.Height);
+            bounds.X += (int)(Origin.X / Width * bounds.Width);
+            bounds.Y += (int)(Origin.Y / Height * bounds.Height);
 
             var tween = GetTween(fd, Tween);
-            spriteBatch.Draw(Texture, bounds, GetFrameRect(cf), Color.Lerp(color, Color.Transparent, tween.current), angle, Origin, SpriteEffects.None, 0);
-            spriteBatch.Draw(Texture, bounds, GetFrameRect(nf), Color.Lerp(color, Color.Transparent, tween.next), angle, Origin, SpriteEffects.None, 0);
+            spriteBatch.Draw(
+                Texture,
+                bounds,
+                GetFrameRect(cf, clipRect),
+                Color.Lerp(color, Color.Transparent, tween.current),
+                angle,
+                Origin,
+                SpriteEffects.None,
+                0
+            );
+            spriteBatch.Draw(
+                Texture,
+                bounds,
+                GetFrameRect(nf, clipRect),
+                Color.Lerp(color, Color.Transparent, tween.next),
+                angle,
+                Origin,
+                SpriteEffects.None,
+                0
+            );
         }
 
         public struct TweenValues
