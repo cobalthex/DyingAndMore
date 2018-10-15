@@ -33,22 +33,18 @@ namespace Takai.UI
                 if (!child.IsEnabled)
                     continue;
 
-                var childSize = child.Measure(InfiniteSize);
+                var childSize = child.Measure(new Vector2(InfiniteSize));
                 if (Direction == Direction.Horizontal)
                 {
                     if (child.HorizontalAlignment != Alignment.Stretch)
-                    {
                         usedSize.X += childSize.X; //todo: better format for this
-                        usedSize.Y = System.Math.Max(usedSize.Y, childSize.Y);
-                    }
+                    usedSize.Y = System.Math.Max(usedSize.Y, childSize.Y);
                 }
                 else
                 {
                     if (child.VerticalAlignment != Alignment.Stretch)
-                    {
-                        usedSize.X = System.Math.Max(usedSize.X, childSize.X);
                         usedSize.Y += childSize.Y;
-                    }
+                    usedSize.X = System.Math.Max(usedSize.X, childSize.X);
                 }
             }
             if (Direction == Direction.Horizontal)
@@ -59,6 +55,12 @@ namespace Takai.UI
             return usedSize;
 
             //todo: bounds may be affected by Stretch which would prove wrong here
+        }
+
+        protected override void OnChildReflow(Static child)
+        {
+            if (IsAutoSized)
+                Reflow();
         }
 
         protected override void ReflowOverride(Vector2 availableSize)
@@ -75,14 +77,14 @@ namespace Takai.UI
                     if (Children[i].HorizontalAlignment == Alignment.Stretch)
                         ++stretches;
                     else
-                        usedSize += Children[i].Position.X + Children[i].MeasuredSize.X;
+                        usedSize += Children[i].MeasuredSize.X;
                 }
                 else
                 {
                     if (Children[i].VerticalAlignment == Alignment.Stretch)
                         ++stretches;
                     else
-                        usedSize += Children[i].Position.Y + Children[i].MeasuredSize.Y;
+                        usedSize += Children[i].MeasuredSize.Y;
                 }
             }
             usedSize += Margin * (Children.Count - 1);
@@ -116,7 +118,7 @@ namespace Takai.UI
                         (int)itemSize,
                         (int)availableSize.Y
                     ));
-                    t += Children[i].Position.X + Children[i].MeasuredSize.X;
+                    t += itemSize;
                 }
                 else
                 {
@@ -131,7 +133,7 @@ namespace Takai.UI
                         (int)availableSize.X,
                         (int)itemSize
                     ));
-                    t += Children[i].Position.Y + Children[i].MeasuredSize.Y;
+                    t += itemSize;
                 }
             }
 

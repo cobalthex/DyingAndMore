@@ -148,29 +148,32 @@ namespace DyingAndMore
 #endif
             */
 
-            //var selectStoryUI = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
-            //if (selectStoryUI is Game.StorySelect ss)
-            //{
-            //    ss.StorySelected += delegate (object _sender, Game.GameStory story)
-            //    {
-            //        //var game = new Game.Game
-            //        //{
-            //        //    Story = story,
-            //        //};
-            //        //game.LoadNextStoryMap();
-            //        //ui.ReplaceAllChildren(new Game.GameInstance(game));
-            //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
-            //    };
-            //}
-            //ui = new Takai.UI.Static(selectStoryUI);
-            ui = new Takai.UI.Static(Cache.Load<Takai.UI.Static>("UI/test/elements.ui.tk"))
+            var selectStoryUI = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
+            if (selectStoryUI is Game.StorySelect ss)
+            {
+                ss.StorySelected += delegate (object _sender, Game.GameStory story)
+                {
+                    //var game = new Game.Game
+                    //{
+                    //    Story = story,
+                    //};
+                    //game.LoadNextStoryMap();
+                    //ui.ReplaceAllChildren(new Game.GameInstance(game));
+                    ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
+                };
+            }
+            ui = new Takai.UI.Static(selectStoryUI)
             {
                 HorizontalAlignment = Takai.UI.Alignment.Stretch,
                 VerticalAlignment = Takai.UI.Alignment.Stretch
             };
-            ui.Reflow(GraphicsDevice.Viewport.Bounds); //todo: make not necessary
+            //ui = new Takai.UI.Static(Cache.Load<Takai.UI.Static>("UI/test/elements.ui.tk"))
+            //{
+            //    HorizontalAlignment = Takai.UI.Alignment.Stretch,
+            //    VerticalAlignment = Takai.UI.Alignment.Stretch
+            //};
 
-            Takai.UI.Static.DebugFont = Takai.UI.Static.DefaultFont;
+            //Takai.UI.Static.DebugFont = Takai.UI.Static.DefaultFont;
 
             fpsGraph = new Takai.FpsGraph()
             {

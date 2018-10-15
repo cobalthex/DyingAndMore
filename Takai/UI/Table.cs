@@ -23,6 +23,11 @@ namespace Takai.UI
 
         float[] columnWidths = new float[0], rowHeights = new float[0];
 
+        System.Collections.Generic.HashSet<int> hStretches = new System.Collections.Generic.HashSet<int>();
+        System.Collections.Generic.HashSet<int> vStretches =  new System.Collections.Generic.HashSet<int>();
+
+        Vector2 usedArea = new Vector2();
+
         public Table() { }
         public Table(int columnCount, params Static[] children)
             : base(children)
@@ -30,27 +35,49 @@ namespace Takai.UI
             ColumnCount = columnCount;
         }
 
+        protected override void OnChildReflow(Static child)
+        {
+            if (IsAutoSized)
+                Reflow();
+        }
+
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            float[] colWidths = new float[ColumnCount];
-            float[] rowHeights = new float[(int)System.Math.Ceiling(Children.Count / (float)ColumnCount)]; //todo: integer only
+            System.Array.Resize(ref columnWidths, ColumnCount);
+            System.Array.Clear(columnWidths, 0, columnWidths.Length);
+            System.Array.Resize(ref rowHeights, (int)System.Math.Ceiling(Children.Count / (float)ColumnCount)); //todo: use integer division
+            System.Array.Clear(rowHeights, 0, rowHeights.Length);
+
+            usedArea = Vector2.Zero;
+            hStretches.Clear();
+            vStretches.Clear();
             for (int i = 0; i < Children.Count; ++i)
             {
                 if (!Children[i].IsEnabled)
                     continue;
 
-                var csize = Children[i].Measure(InfiniteSize);
-                colWidths[i % ColumnCount] = System.Math.Max(colWidths[i % ColumnCount], csize.X);
+                var csize = Children[i].Measure(new Vector2(InfiniteSize)); //needed up here for children to correctly size
+                if (Children[i].HorizontalAlignment == Alignment.Stretch)
+                {
+                    hStretches.Add(i % ColumnCount);
+                    csize.X = 0;
+                }
+                if (Children[i].VerticalAlignment == Alignment.Stretch)
+                {
+                    vStretches.Add(i / ColumnCount);
+                    csize.Y = 0;
+                }
+
+                columnWidths[i % ColumnCount] = System.Math.Max(columnWidths[i % ColumnCount], csize.X);
                 rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], csize.Y);
             }
 
-            var usedArea = new Vector2();
-            foreach (var col in colWidths)
+            foreach (var col in columnWidths)
                 usedArea.X += col;
             foreach (var row in rowHeights)
                 usedArea.Y += row;
 
-            usedArea += new Vector2(colWidths.Length - 1, rowHeights.Length - 1) * Margin;
+            usedArea += new Vector2(columnWidths.Length - 1, rowHeights.Length - 1) * Margin;
 
             return usedArea;
         }
@@ -60,48 +87,24 @@ namespace Takai.UI
             if (ColumnCount <= 0)
                 return;
 
-            var hStretches = new System.Collections.Generic.HashSet<int>();
-            var vStretches = new System.Collections.Generic.HashSet<int>();
-            var usedArea = new Vector2();
-
-            System.Array.Resize(ref columnWidths, ColumnCount);
-            System.Array.Clear(columnWidths, 0, columnWidths.Length);
-            System.Array.Resize(ref rowHeights, (int)System.Math.Ceiling(Children.Count / (float)ColumnCount)); //todo: use integer division
-            System.Array.Clear(rowHeights, 0, rowHeights.Length);
-            for (int i = 0; i < Children.Count; ++i)
-            {
-                if (!Children[i].IsEnabled)
-                    continue;
-
-                var bounds = Children[i].MeasuredSize;
-                if (Children[i].HorizontalAlignment == Alignment.Stretch)
-                {
-                    hStretches.Add(i % ColumnCount);
-                    bounds.X = 0; //this should be automatic, and correctly handle fixed size in stretch environment
-                }
-                if (Children[i].VerticalAlignment == Alignment.Stretch)
-                {
-                    vStretches.Add(i / ColumnCount);
-                    bounds.Y = 0;
-                }
-
-                columnWidths[i % ColumnCount] = System.Math.Max(columnWidths[i % ColumnCount], bounds.X);
-                rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], bounds.Y);
-                usedArea += new Vector2(columnWidths[i % ColumnCount], rowHeights[i / ColumnCount]);
-            }
-
-            if (hStretches.Count > 0 && availableSize.X > usedArea.X)
+            if (hStretches.Count > 0)
             {
                 float width = (availableSize.X - usedArea.X) / hStretches.Count;
                 foreach (var col in hStretches)
+                {
+                    usedArea.X += System.Math.Max(0, width - columnWidths[col]);
                     columnWidths[col] = System.Math.Max(columnWidths[col], width); //use remaining width elsewhere?
+                }
             }
 
             if (vStretches.Count > 0 && availableSize.Y > usedArea.Y)
             {
                 float height = (availableSize.Y - usedArea.Y) / vStretches.Count;
                 foreach (var row in vStretches)
+                {
+                    usedArea.Y += System.Math.Max(0, height - rowHeights[row]);
                     rowHeights[row] = System.Math.Max(rowHeights[row], height); //use remaining height elsewhere?
+                }
             }
 
             var offset = Vector2.Zero;

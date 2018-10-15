@@ -295,6 +295,7 @@ namespace Takai.Graphics
         /// Get the clip rect for a single frame of the image
         /// </summary>
         /// <param name="frame">Which frame of the animation to use (No bounds checking)</param>
+        /// <param name="clipRect">A second clip rect to clip the frame bounds</param>
         /// <returns>The clipping rectangle of the requested frame</returns>
         public Rectangle GetFrameRect(int frame, Rectangle clipRect)
         {

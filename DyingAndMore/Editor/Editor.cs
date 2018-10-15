@@ -14,6 +14,8 @@ namespace DyingAndMore.Editor
     {
         protected readonly Editor editor;
 
+        public override bool CanFocus => true;
+
         public EditorMode(string name, Editor editor)
         {
             Name = name;
@@ -56,7 +58,6 @@ namespace DyingAndMore.Editor
 
             this.selector = selector ?? new TSelector();
             this.selector.HorizontalAlignment = Alignment.Stretch;
-            this.selector.VerticalAlignment = Alignment.Stretch;
             this.selector.SelectionChanged += delegate
             {
                 selectorDrawer.IsEnabled = false;
@@ -65,10 +66,10 @@ namespace DyingAndMore.Editor
 
             selectorDrawer = new Drawer
             {
+                Size = new Vector2(360, AutoSize),
                 BackgroundColor = Color.Gray,
                 HorizontalAlignment = Alignment.Right,
                 VerticalAlignment = Alignment.Stretch,
-                Size = new Vector2(System.Math.Max(400, editor.Map.Class.TileSize * 8) + 10, 1),
                 IsEnabled = false
             };
             selectorDrawer.AddChild(new ScrollBox(this.selector)
@@ -90,7 +91,6 @@ namespace DyingAndMore.Editor
                 selectorDrawer.IsEnabled = true;
                 return false;
             }
-
 
             return base.HandleInput(time);
         }
@@ -174,7 +174,6 @@ namespace DyingAndMore.Editor
             AddChild(playButton = new Static
             {
                 Name = "Play button",
-                Position = new Vector2(20),
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.Middle,
                 Font = smallFont,
@@ -291,10 +290,6 @@ namespace DyingAndMore.Editor
                         Camera.Scale = 1;
                 }
             }
-
-            Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 10f); //todo: make ranges global and move to some game settings
-            Camera.Viewport = VisibleContentArea;
-            Camera.Update(time);
         }
 
         protected override void UpdateSelf(GameTime time)
@@ -304,7 +299,6 @@ namespace DyingAndMore.Editor
             Map.BeginUpdate();
             Map.MarkRegionActive(Camera);
             Map.Update(time);
-
 
             if (isZoomSizing)
             {
@@ -318,6 +312,10 @@ namespace DyingAndMore.Editor
 
                 Map.DrawRect(Takai.Util.AbsRectangle(savedWorldPos, savedWorldPos + dist * whRatio), Color.Aquamarine);
             }
+
+            Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 10f); //todo: make ranges global and move to some game settings
+            Camera.Viewport = VisibleContentArea;
+            Camera.Update(time);
 
             base.UpdateSelf(time);
         }

@@ -25,7 +25,7 @@ namespace DyingAndMore.Editor.Selectors
                     try
                     {
                         var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(file);
-                        if (ent.Animations != null) //+ other classes
+                        if (ent.Animations != null)
                             ents.Add(ent);
                     }
                     catch (System.Exception e)

@@ -7,7 +7,6 @@ Table {
     Margin: [10 2];
     Width: 300;
     Padding: [10 5];
-    AutoSize: true;
 
     Children: [
         Static { Text: "Name"; };
@@ -16,9 +15,9 @@ Table {
                 {
                     Source: "Name";
                     Target: "Text";
+                    DefaultValue: "[none]";
                 }
             ];
-            AutoSize: true;
         };
 
         Static { Text: "Class"; };
@@ -29,7 +28,6 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSize: true;
         };
 
         Static { Text: "File"; };
@@ -40,7 +38,6 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSize: true;
         };
 
         Static { Text: "ID"; };
@@ -51,7 +48,6 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSize: true;
         };
 
         Static { Text: "Is Alive"; };
@@ -62,7 +58,6 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSize: true;
         };
 
         #*
@@ -74,7 +69,6 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSize: true;
         };
         *#
 
@@ -85,7 +79,6 @@ Table {
             Name: "hp";
             Direction: Direction.Horizontal;
             Margin: 5;
-            AutoSize: true;
             Children: [
                 Static {
                     Bindings: [
@@ -95,7 +88,6 @@ Table {
                             Mode: BindingMode.OneWay;
                         }
                     ];
-                    AutoSize: true;
                  };
                 Static { Text: "/"; };
                 Static {
@@ -106,7 +98,6 @@ Table {
                             Mode: BindingMode.OneWay;
                         }
                     ];
-                    AutoSize: true;
                  };
             ];
         };
@@ -119,7 +110,6 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSize: true;
         };
 
         Static { Text: "Controller"; };
@@ -130,7 +120,6 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSize: true;
         };
 
         Static { Text: "Weapon"; };
@@ -141,7 +130,6 @@ Table {
                     Target: "Text";
                 }
             ];
-            AutoSize: true;
         };
     ];
 }
