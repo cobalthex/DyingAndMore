@@ -92,7 +92,8 @@ namespace DyingAndMore.Editor
                 Text = mode.Name,
                 Font = ActiveFont,
                 Color = InactiveColor,
-                Padding = new Vector2(20, 10)
+                Padding = new Vector2(20, 10),
+                VerticalAlignment = Alignment.Middle
             };
             tab.Font = InactiveFont;
 
@@ -101,6 +102,12 @@ namespace DyingAndMore.Editor
                 Mode = mode;
             };
             tabs.AddChild(tab);
+        }
+
+        protected override void OnChildReflow(Static child)
+        {
+            Reflow();
+            base.OnChildReflow(child);
         }
 
         protected override bool HandleInput(GameTime time)

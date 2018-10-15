@@ -6,13 +6,11 @@ List {
     BackgroundColor: [32 0 128 192];
     Margin: 10;
     Padding: 10;
-	Height: 500;
 
     Children: [
         Scrollbox {
 			Name: 'b';
-            Width: 400;
-            AutoSize: true;
+            Size: 400;
             Children: [
                 List {
 					Name: 'c';
@@ -23,6 +21,7 @@ List {
                         Static { Text: "Name"; }
                         TextInput {
 							Name: 'd';
+                            HorizontalAlignment: Alignment.Stretch;
                             Bindings: [
                                 Binding {
                                     Mode: BindingMode.TwoWay;

@@ -17,11 +17,11 @@ namespace Takai.UI
         /// <summary>
         /// How long to wait before repeating key presses
         /// </summary>
-        public static System.TimeSpan InitialKeyRepeatDelay = System.TimeSpan.FromMilliseconds(500);
+        public static System.TimeSpan InitialKeyRepeatDelay = System.TimeSpan.FromMilliseconds(400);
         /// <summary>
         /// How long to wait between each key repetition
         /// </summary>
-        public static int KeyRepeatDelayInMSec = 50;
+        public static System.TimeSpan KeyRepeatDelay = System.TimeSpan.FromMilliseconds(40);
 
         /// <summary>
         /// The maximum number of characters allowed in this textbox
@@ -216,6 +216,8 @@ namespace Takai.UI
 
         protected override bool HandleInput(GameTime time)
         {
+            bool keyed = false;
+
             if (HasFocus && !(InputState.IsMod(KeyMod.Alt) ||
                               InputState.IsMod(KeyMod.Windows)))
             {
@@ -241,11 +243,18 @@ namespace Takai.UI
 
                 foreach (var key in keys)
                 {
-                    if (!InputState.IsPress(key) && //ignore held keys
-                        ((lastRepeatKey != Keys.None && key != lastRepeatKey) || //and ignore other keys if there is a repeat
-                            (time.TotalGameTime < keyRepeatTime + InitialKeyRepeatDelay || //or the repeat hasn't started yet
-                             System.Environment.TickCount < lastInputTick + KeyRepeatDelayInMSec))) //or the repeat is delayed
-                        continue;
+                    if (!InputState.IsPress(key)) //ignore if currently key held
+                    {
+                        if (lastRepeatKey != Keys.None && key != lastRepeatKey) //and ignore other keys if there is a repeat
+                            continue;
+
+                        if (time.TotalGameTime < keyRepeatTime + InitialKeyRepeatDelay || //or the repeat hasn't started yet
+                             System.Environment.TickCount < lastInputTick + (int)KeyRepeatDelay.TotalMilliseconds) //or the repeat is delayed
+                        {
+                            keyed = true;
+                            continue;
+                        }
+                    }
 
                     if (key == Keys.Enter)
                     {
@@ -339,10 +348,14 @@ namespace Takai.UI
                         else if (key == Keys.OemPeriod)
                             InsertAtCaret(isShift ? '>' : '.');
                     }
+                    else
+                        continue;
+
+                    keyed = true;
                 }
             }
 
-            return base.HandleInput(time); //todo: check for changes and return false if any
+            return keyed ? false : base.HandleInput(time);
         }
 
         protected void UpdateVisibleText()
@@ -365,11 +378,8 @@ namespace Takai.UI
             var textWidth = Font.MeasureString(Text, 0, Caret).X;
 
             if (textWidth < ScrollPosition)
-                ScrollPosition -= (int)Size.X;
-            //todo: scroll position is broken
-            ScrollPosition = (int)MathHelper.Clamp(textWidth, 0, textSize.X - Size.X);
-
-            //todo: update to new layout system
+                ScrollPosition -= (int)ContentArea.Width;
+            ScrollPosition = (int)MathHelper.Clamp(textWidth, 0, textSize.X - ContentArea.Width);
         }
 
         void InsertAtCaret(char ch)

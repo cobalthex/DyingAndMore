@@ -70,8 +70,7 @@ namespace Takai.UI
         /// Marks a size to automatically expand to fit its contents
         /// </summary>
         public const float AutoSize = float.NaN;
-
-        public readonly Vector2 InfiniteSize = new Vector2(float.PositiveInfinity);
+        public const float InfiniteSize = float.PositiveInfinity;
 
         #region Properties
 
@@ -233,6 +232,9 @@ namespace Takai.UI
             {
                 if (_size != value)
                 {
+                    if (float.IsInfinity(value.X) || float.IsInfinity(value.Y))
+                        System.Diagnostics.Debug.WriteLine($"{this}: Size=Infinity will always render as collapse");
+
                     _size = value;
                     ResizeAndReflow();
                 }
@@ -620,7 +622,7 @@ namespace Takai.UI
                 child.HasFocus = true;
 
             if (reflow)
-                Reflow();
+                child.Reflow(containerBounds);
 
             return true;
         }
@@ -1036,14 +1038,14 @@ namespace Takai.UI
             bool isHStretch = HorizontalAlignment == Alignment.Stretch;
             bool isVStretch = VerticalAlignment == Alignment.Stretch;
 
-            if (availableSize.X < InfiniteSize.X)
+            if (availableSize.X < InfiniteSize)
             {
                 availableSize.X -= Padding.X * 2;
                 if (isWidthAutoSize && isHStretch)
                     availableSize.X -= (int)Position.X;
             }
 
-            if (availableSize.Y < InfiniteSize.Y)
+            if (availableSize.Y < InfiniteSize)
             {
                 availableSize.Y -= Padding.Y * 2;
                 if (isHeightAutoSize && isVStretch)
@@ -1055,7 +1057,7 @@ namespace Takai.UI
                 var measuredSize = MeasureOverride(availableSize);
                 if (float.IsInfinity(measuredSize.X) || float.IsNaN(measuredSize.X)
                  || float.IsInfinity(measuredSize.Y) || float.IsNaN(measuredSize.Y))
-                    throw new System.ArgumentOutOfRangeException("Measured size cannot be NaN or infinity");
+                    throw new System.NotFiniteNumberException("Measured size cannot be NaN or infinity");
 
                 if (isWidthAutoSize)
                     size.X = measuredSize.X;
@@ -1078,10 +1080,7 @@ namespace Takai.UI
         /// <returns>The preferred size of this element</returns>
         protected virtual Vector2 MeasureOverride(Vector2 availableSize)
         {
-            var textSize = Point.Zero;
-            if (Text != null && Font != null)
-                textSize = Font.MeasureString(Text).ToPoint();
-            var bounds = new Rectangle(0, 0, textSize.X, textSize.Y);
+            var bounds = new Rectangle(0, 0, (int)textSize.X, (int)textSize.Y);
 
             foreach (var child in Children)
             {
@@ -1100,9 +1099,13 @@ namespace Takai.UI
         /// Used to prevent <see cref="OnChildReflow"/> from getting stuck in a loop
         /// </summary>
         bool isReflowing = false;
+        bool hasReflowed = false;
 
         public void Reflow()
         {
+            if (!hasReflowed) //if never reflowed, there is no container set so stretched objects will not have any size
+                containerBounds = Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.ContentArea;
+
             Reflow(containerBounds);
         }
 
@@ -1117,9 +1120,10 @@ namespace Takai.UI
 
             isReflowing = true;
             AdjustToContainer(container);
-            ReflowOverride(VisibleContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions
+            ReflowOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions
             NotifyChildReflow();
             isReflowing = false;
+            hasReflowed = true;
         }
 
         /// <summary>
@@ -1140,11 +1144,7 @@ namespace Takai.UI
         /// Called by a child when it reflows, this element can reflow/resize in relation
         /// </summary>
         /// <param name="child">The child element that reflowed</param>
-        protected virtual void OnChildReflow(Static child)
-        {
-            if (IsAutoSized)
-                Reflow();
-        }
+        protected virtual void OnChildReflow(Static child) { }
 
         //todo: this shouldnt need to exist
         public void NotifyChildReflow()
@@ -1187,9 +1187,9 @@ namespace Takai.UI
 
             //todo: should this go into Measure?
             if (HorizontalAlignment == Alignment.Stretch)
-                measuredSize.X = container.Width;
+                measuredSize.X = float.IsNaN(Size.X) ? container.Width : Size.X;
             if (VerticalAlignment == Alignment.Stretch)
-                measuredSize.Y = container.Height;
+                measuredSize.Y = float.IsNaN(Size.Y) ? container.Height : Size.Y;
 
             var localPos = new Vector2(
                 GetLocalOffset(HorizontalAlignment, Position.X, measuredSize.X, Padding.X, container.Width),
@@ -1217,9 +1217,10 @@ namespace Takai.UI
             switch (alignment)
             {
                 case Alignment.Middle:
-                    return (containerSize - size) / 2 + position;
+                case Alignment.Stretch: // stretched items will either fill full area or center in available space
+                    return (containerSize - size + padding * 2) / 2 + position;
                 case Alignment.End:
-                    return containerSize - size - position - padding;
+                    return containerSize - size; //size includes padding and position
                 default:
                     return position + padding;
             }
@@ -1358,7 +1359,7 @@ namespace Takai.UI
             }
 
             //todo: improve
-            if (Input.InputState.IsPress(0) && VisibleContentArea.Contains(Input.InputState.touches[0].Position))
+            if (Input.InputState.IsPress(0) && VisibleBounds.Contains(Input.InputState.touches[0].Position))
             {
                 var e = new ClickEventArgs { position = Vector2.Zero };
                 OnClick(e);
@@ -1379,9 +1380,9 @@ namespace Takai.UI
 
         bool HandleMouseInput(Point mousePosition, Input.MouseButtons button)
         {
-            if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleContentArea.Contains(mousePosition))
+            if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mousePosition))
             {
-                var e = new ClickEventArgs { position = (mousePosition - OffsetContentArea.Location).ToVector2() };
+                var e = new ClickEventArgs { position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding };
                 didPress = true;
                 OnPress(e);
                 Press?.Invoke(this, e);
@@ -1401,9 +1402,9 @@ namespace Takai.UI
             else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
             //else if (Input.InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
-                if (didPress && VisibleContentArea.Contains(mousePosition)) //gesture pos
+                if (didPress && VisibleBounds.Contains(mousePosition)) //gesture pos
                 {
-                    TriggerClick((mousePosition - OffsetContentArea.Location).ToVector2());
+                    TriggerClick((mousePosition - OffsetContentArea.Location).ToVector2() + Padding);
                     didPress = false;
                     return false;
                 }
@@ -1415,6 +1416,8 @@ namespace Takai.UI
 
         /// <summary>
         /// Draw this element, its decorators, and any children
+        ///
+        /// Draws depth-first, parent-most first
         /// </summary>
         /// <param name="spriteBatch">The spritebatch to use</param>
         public virtual void Draw(SpriteBatch spriteBatch)
@@ -1422,13 +1425,13 @@ namespace Takai.UI
             if (!IsEnabled)
                 return;
 
-            var draws = new Queue<Static>(Children.Count + 1);
-            draws.Enqueue(this);
+            var draws = new Stack<Static>(Children.Count + 1);
+            draws.Push(this);
 
             Static debugDraw = null;
             while (draws.Count > 0)
             {
-                var toDraw = draws.Dequeue();
+                var toDraw = draws.Pop();
 
                 Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
                 if (BackgroundSprite != null)
@@ -1445,10 +1448,10 @@ namespace Takai.UI
 
                 Graphics.Primitives2D.DrawRect(spriteBatch, borderColor, toDraw.VisibleBounds);
 
-                foreach (var child in toDraw.Children)
+                for (int i = toDraw.Children.Count - 1; i >= 0; --i)
                 {
-                    if (child.IsEnabled)
-                        draws.Enqueue(child);
+                    if (toDraw.Children[i].IsEnabled)
+                        draws.Push(toDraw.Children[i]);
                 }
             }
 

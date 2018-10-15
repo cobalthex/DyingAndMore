@@ -4,10 +4,10 @@ List {
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
 	Margin: 10;
-	AutoSize: 20;
+	Padding: 10;
 
 	IsModal: True;
-	BackgroundColor: [255 255 255 192];
+	BackgroundColor: [0 0 0 220];
 
     Children: [
     	Static {
@@ -59,17 +59,21 @@ List {
 
     	List {
 			Direction: Direction.Horizontal;
-			HorizontalAlignment: Alignment.Middle;
+			HorizontalAlignment: Alignment.Stretch;
 			Margin: 10;
+			BorderColor: [0 192 255 255];
 
 			Children: [
 				Static {
 					name: "resize";
 					Text: "Resize";
+					HorizontalAlignment: Alignment.Stretch;
+					BorderColor: [255 192 0 255];
 				}
 				Static {
 					name: "cancel";
 					Text: "Cancel";
+					HorizontalAlignment: Alignment.Stretch;
 				}
 			]
 		}

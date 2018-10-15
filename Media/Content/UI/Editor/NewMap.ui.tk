@@ -21,48 +21,40 @@ List {
 
         Static {
             Text: "Name";
-            HorizontalAlignment: Alignment.Start;
         }
         TextInput {
             Name: "name";
-            Width: 300;
-            MaxLength: 32;
+            MaxLength: 64;
+            HorizontalAlignment: Alignment.Stretch;
         }
 
-        List {
+        Table {
             Direction: Direction [ Horizontal ];
+            HorizontalAlignment: Alignment.Stretch;
             Margin: 10;
-            Children: [;
-                List {
-                    Margin: 10;
-                    Children: [
-                        Static {
-                            Text: "Width";
-                            HorizontalAlignment: Alignment.Start;
-                        }
-                        NumericInput {
-                            Name: "width";
-                            Minimum: 1;
-                            Maximum: 256;
-                            Width: 145;
-                        }
-                    ]
+            ColumnCount: 2;
+            Children: [
+                Static {
+                    Text: "Width";
+                }
+                Static {
+                    Text: "Height";
+                    HorizontalAlignment: Alignment.Start;
                 }
 
-                List {
-                    Margin: 10;
-                    Children: [
-                        Static {
-                            Text: "Height";
-                            HorizontalAlignment: Alignment.Start;
-                        }
-                        NumericInput {
-                            Name: "height";
-                            Minimum: 1;
-                            Maximum: 256;
-                            Width: 145;
-                        }
-                    ]
+                NumericInput {
+                    Name: "width";
+                    Minimum: 1;
+                    Maximum: 256;
+                    HorizontalAlignment: Alignment.Stretch;
+                    Width: 120;
+                }
+                NumericInput {
+                    Name: "height";
+                    Minimum: 1;
+                    Maximum: 256;
+                    HorizontalAlignment: Alignment.Stretch;
+                    Width: 120;
                 }
             ]
         }
@@ -75,28 +67,26 @@ List {
         FileInput {
             Name: "tileset";
             Filter: "Tilesets (*.tiles.tk)|*.tiles.tk";
-            Width: 300;
+            HorizontalAlignment: Alignment.Stretch;
         }
 
         List {
             Direction: Direction.Horizontal;
             Margin: 10;
-            HoriziontalAlignment: Alignment.Middle;
+            HorizontalAlignment: Alignment.Stretch;
             Children: [
                 Static {
                     Name: "create";
                     Text: "Create";
                     Font: @"Fonts/UILarge.bfnt";
-                    Width: 200;
-                    HorizontalAlignment: Alignment.Middle;
+                    HorizontalAlignment: Alignment.Stretch;
                 }
 
                 Static {
                     Action: "$Close";
                     Text: "Cancel";
                     Font: @"Fonts/UILarge.bfnt";
-                    Width: 200;
-                    HorizontalAlignment: Alignment.Middle;
+                    HorizontalAlignment: Alignment.Stretch;
                 }
             ]
         }

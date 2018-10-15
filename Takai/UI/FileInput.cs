@@ -85,11 +85,15 @@ namespace Takai.UI
 
         protected TextInput textInput = new TextInput
         {
+            HorizontalAlignment = Alignment.Stretch,
+            VerticalAlignment = Alignment.Stretch,
             BorderColor = Color.Transparent
         };
         protected Static pickerButton = new Static
         {
-            Text = "..."
+            VerticalAlignment = Alignment.Stretch,
+            Text = "...",
+            Padding = new Vector2(5, 0)
         };
 
         public virtual string InitialDirectory { get; set; } = "";
@@ -176,8 +180,8 @@ namespace Takai.UI
         {
             var sz = availableSize.ToPoint();
             //todo: pickerButton bounds?
-            textInput.Reflow(new Rectangle(0, 0, sz.X - pickerButton.ContentArea.Width, sz.Y));
-            pickerButton.Reflow(new Rectangle(sz.X - pickerButton.ContentArea.Width * 2, 0, pickerButton.ContentArea.Width, sz.Y));
+            textInput.Reflow(new Rectangle(0, 0, sz.X - (int)pickerButton.MeasuredSize.X, sz.Y));
+            pickerButton.Reflow(new Rectangle(sz.X - (int)pickerButton.MeasuredSize.X, 0, (int)pickerButton.MeasuredSize.X, sz.Y));
         }
 
 

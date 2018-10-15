@@ -79,7 +79,10 @@ namespace Takai.Data
         /// </summary>
         public string Target { get; set; }
 
-        //fallback value?
+        /// <summary>
+        /// The value used when there bound value is null
+        /// </summary>
+        public object DefaultValue { get; set; }
 
         GetSet sourceAccessors;
         GetSet targetAccessors;
@@ -114,7 +117,14 @@ namespace Takai.Data
             sourceAccessors = GetAccessors(Source, sourceObj);
             targetAccessors = GetAccessors(Target, targetObj);
 
-            //todo: need to clear values of nulls
+            //set initial value
+            var srcVal = sourceAccessors.get?.Invoke() ?? null;
+            if (targetAccessors.set != null)
+            {
+                if (srcVal == null)
+                    srcVal = DefaultValue;
+                targetAccessors.set(Serializer.Cast(targetAccessors.type, srcVal));
+            }
         }
 
         public static GetSet GetAccessors(string binding, object obj)
@@ -141,7 +151,7 @@ namespace Takai.Data
                 getset = GetSet.GetMemberAccessors(binding, obj);
 
             if (getset.get == null && getset.set == null)
-                System.Diagnostics.Debug.WriteLine($"UI binding '{binding}' does not exist in '{obj.GetType()}'");
+                System.Diagnostics.Debug.WriteLine($"Binding '{binding}' does not exist in '{obj.GetType()}'");
 
             return getset;
         }
@@ -163,7 +173,10 @@ namespace Takai.Data
 
             if (!srcMatches)
             {
-                targetAccessors.set(Serializer.Cast(targetAccessors.type, srcVal));
+                var bindVal = srcVal;
+                if (bindVal == null)
+                    bindVal = DefaultValue;
+                targetAccessors.set(Serializer.Cast(targetAccessors.type, bindVal));
                 cachedValue = srcVal;
                 cachedHash = srcHash;
                 OnUpdated();
@@ -180,7 +193,10 @@ namespace Takai.Data
 
                 if (!tgtMatches)
                 {
-                    sourceAccessors.set(Serializer.Cast(sourceAccessors.type, tgtVal));
+                    var bindVal = tgtVal;
+                    if (bindVal == null)
+                        bindVal = DefaultValue;
+                    sourceAccessors.set(Serializer.Cast(sourceAccessors.type, bindVal));
                     cachedValue = tgtVal;
                     cachedHash = tgtHash;
                     OnUpdated();
