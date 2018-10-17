@@ -33,26 +33,15 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            //todo: clip to visible bounds
-
-            var pos = OffsetContentArea.Location.ToVector2();
-
             var y = (OffsetContentArea.Height - 1) / 2;
+            DrawHLine(spriteBatch, Color, y, 0, ContentArea.Width);
+            DrawHLine(spriteBatch, Color, y + 1, 0, ContentArea.Width);
 
-            Graphics.Primitives2D.DrawLine(spriteBatch, Color,
-                pos + new Vector2(0, y), pos + new Vector2(ContentArea.Width, y));
-            ++y;
-            Graphics.Primitives2D.DrawLine(spriteBatch, Color,
-                pos + new Vector2(0, y), pos + new Vector2(ContentArea.Width, y));
 
             var sliderPos = (Value - Minimum) / (float)(Maximum - Minimum);
             var x = sliderPos * ContentArea.Width;
-
-            Graphics.Primitives2D.DrawLine(spriteBatch, Color,
-                pos + new Vector2(x, 0), pos + new Vector2(x,ContentArea.Height));
-            ++x;
-            Graphics.Primitives2D.DrawLine(spriteBatch, Color,
-                pos + new Vector2(x, 0), pos + new Vector2(x,ContentArea.Height));
+            DrawVLine(spriteBatch, Color, x, 0, ContentArea.Height);
+            DrawVLine(spriteBatch, Color, x + 1, 0, ContentArea.Height);
         }
     }
 }

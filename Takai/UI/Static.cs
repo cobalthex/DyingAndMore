@@ -62,9 +62,18 @@ namespace Takai.UI
     /// </summary>
     public class Static : Data.IDerivedDeserialize
     {
-        //for testing
-        //private static uint idCounter = 0;
-        //public readonly uint Id = ++idCounter;
+#if DEBUG
+        /// <summary>
+        /// A unique ID for this element. Only present in DEBUG
+        /// </summary>
+        public uint Id { get; private set; } = GenerateId();
+
+        private static uint idCounter = 0;
+        private static uint GenerateId()
+        {
+            return ++idCounter;
+        }
+#endif
 
         /// <summary>
         /// Marks a size to automatically expand to fit its contents
@@ -546,34 +555,27 @@ namespace Takai.UI
         /// Does not add to parent
         /// </summary>
         /// <returns>The cloned static</returns>
-        public Static Clone()
+        public virtual Static Clone()
         {
-            var clone = CloneSelf();
+            var clone = (Static)MemberwiseClone();
+#if DEBUG
+            clone.Id = GenerateId();
+#endif
             clone.SetParentNoReflow(null);
-            Stack<Static> clones = new Stack<Static>(new[] { clone });
-            while (clones.Count > 0)
+            for (int i = 0; i < clone.Children.Count; ++i)
             {
-                var top = clones.Pop();
-                for (int i = 0; i < top.Children.Count; ++i)
-                {
-                    var child = top.Children[i].CloneSelf();
-                    child.SetParentNoReflow(top);
-                    top._children[i] = child;
-                    if (child.Children.Count > 0)
-                        clones.Push(child);
-                }
+                var child = clone.Children[i].Clone();
+                child.SetParentNoReflow(clone);
+                clone._children[i] = child;
             }
+            FinalizeClone();
             return clone;
         }
 
         /// <summary>
-        /// Clone this item, should not modify parent or children
+        /// Allows this element the opportunity to refresh any references after it and its children have been cloned
         /// </summary>
-        /// <returns>The cloned item</returns>
-        protected virtual Static CloneSelf()
-        {
-            return (Static)MemberwiseClone();
-        }
+        protected virtual void FinalizeClone() { }
 
         /// <summary>
         /// Remove this element from its parent. If parent is null, does nothing
@@ -1044,6 +1046,8 @@ namespace Takai.UI
                 if (isWidthAutoSize && isHStretch)
                     availableSize.X -= (int)Position.X;
             }
+            else if (!float.IsNaN(size.X))
+                availableSize.X = size.X;
 
             if (availableSize.Y < InfiniteSize)
             {
@@ -1051,10 +1055,12 @@ namespace Takai.UI
                 if (isHeightAutoSize && isVStretch)
                     availableSize.Y -= (int)Position.Y;
             }
+            else if (!float.IsNaN(size.Y))
+                availableSize.Y = size.Y;
 
+            var measuredSize = MeasureOverride(availableSize);
             if (isWidthAutoSize || isHeightAutoSize)
             {
-                var measuredSize = MeasureOverride(availableSize);
                 if (float.IsInfinity(measuredSize.X) || float.IsNaN(measuredSize.X)
                  || float.IsInfinity(measuredSize.Y) || float.IsNaN(measuredSize.Y))
                     throw new System.NotFiniteNumberException("Measured size cannot be NaN or infinity");
@@ -1446,7 +1452,16 @@ namespace Takai.UI
                 if (DebugFont != null && toDraw.VisibleBounds.Contains(Input.InputState.MousePoint))
                     debugDraw = toDraw;
 
-                Graphics.Primitives2D.DrawRect(spriteBatch, borderColor, toDraw.VisibleBounds);
+                if (borderColor.A > 0)
+                {
+                    var offsetRect = toDraw.OffsetContentArea;
+                    offsetRect.Inflate(toDraw.Padding.X, toDraw.Padding.Y);
+                    var offset = offsetRect.Location.ToVector2();
+                    DrawHLine(spriteBatch, borderColor, 0, 0, offsetRect.Width, offset, toDraw.VisibleBounds);
+                    DrawVLine(spriteBatch, borderColor, offsetRect.Width, 0, offsetRect.Height, offset, toDraw.VisibleBounds);
+                    DrawHLine(spriteBatch, borderColor, offsetRect.Height, 0, offsetRect.Width, offset, toDraw.VisibleBounds);
+                    DrawVLine(spriteBatch, borderColor, 0, 0, offsetRect.Height, offset, toDraw.VisibleBounds);
+                }
 
                 for (int i = toDraw.Children.Count - 1; i >= 0; --i)
                 {
@@ -1467,6 +1482,9 @@ namespace Takai.UI
             Graphics.Primitives2D.DrawRect(spriteBatch, Color.Red, rect);
 
             string info = $"{GetType().Name}\n"
+#if DEBUG
+                        + $"ID: {Id}\n"
+#endif
                         + $"Name: {(Name ?? "(No name)")}\n"
                         + $"Bounds: {OffsetContentArea}\n"
                         + $"Position: {Position}: Size {Size}, Padding: {Padding}\n"
@@ -1510,17 +1528,52 @@ namespace Takai.UI
         /// <param name="b">The end of the line</param>
         protected void DrawLine(SpriteBatch spriteBatch, Color color, Vector2 a, Vector2 b)
         {
-            //todo: clip
-            //todo: convert other usages to use this
-            var offsetPos = OffsetContentArea.Location.ToVector2();
-            Graphics.Primitives2D.DrawLine(spriteBatch, color, a + offsetPos, b + offsetPos);
+            throw new System.NotImplementedException();
+        }
+
+        protected void DrawVLine(SpriteBatch spriteBatch, Color color, float x, float y1, float y2)
+        {
+            DrawVLine(spriteBatch, color, x, y1, y2, OffsetContentArea.Location.ToVector2(), VisibleContentArea);
+        }
+        private void DrawVLine(SpriteBatch spriteBatch, Color color, float x, float y1, float y2, Vector2 offset, Rectangle visibleClip)
+        {
+            x += offset.X;
+            if (x < visibleClip.Left || x > visibleClip.Right)
+                return;
+
+            y1 = Util.Clamp(y1 + offset.Y, visibleClip.Top, visibleClip.Bottom);
+            y2 = Util.Clamp(y2 + offset.Y, visibleClip.Top, visibleClip.Bottom);
+
+            if (y1 == y2)
+                return;
+
+            Graphics.Primitives2D.DrawLine(spriteBatch, color, new Vector2(x, y1), new Vector2(x, y2));
+        }
+
+        protected void DrawHLine(SpriteBatch spriteBatch, Color color, float y, float x1, float x2)
+        {
+            DrawHLine(spriteBatch, color, y, x1, x2, OffsetContentArea.Location.ToVector2(), VisibleContentArea);
+        }
+        private void DrawHLine(SpriteBatch spriteBatch, Color color, float y, float x1, float x2, Vector2 offset, Rectangle visibleClip)
+        {
+            y += offset.Y;
+            if (y < visibleClip.Top || y > visibleClip.Bottom)
+                return;
+
+            x1 = Util.Clamp(x1 + offset.X, visibleClip.Left, visibleClip.Right);
+            x2 = Util.Clamp(x2 + offset.X, visibleClip.Left, visibleClip.Right);
+
+            if (x1 == x2)
+                return;
+
+            Graphics.Primitives2D.DrawLine(spriteBatch, color, new Vector2(x1, y), new Vector2(x2, y));
         }
 
         #endregion
 
         public override string ToString()
         {
-            return $"{base.ToString()} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\"";
+            return $"{base.ToString()} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\" {(IsEnabled ? "👁" : "❌")}";
         }
 
         public virtual void DerivedDeserialize(Dictionary<string, object> props)

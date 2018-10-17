@@ -32,6 +32,12 @@ namespace DyingAndMore.Editor.Selectors
 
         public override bool CanFocus => true;
 
+        public Selector()
+        {
+            HorizontalAlignment = Alignment.Stretch;
+            VerticalAlignment = Alignment.Stretch;
+        }
+
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             return new Vector2(ItemsPerRow * ItemSize.X, ItemCount / ItemsPerRow * ItemSize.Y);

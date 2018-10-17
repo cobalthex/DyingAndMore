@@ -233,16 +233,6 @@ namespace Takai.UI
                 if (value == null)
                     return;
 
-                var vsp = verticalScrollbar?.ChildIndex ?? -1;
-                verticalScrollbar = (ScrollBar)value.Clone();
-                verticalScrollbar.VerticalAlignment = Alignment.Stretch;
-                verticalScrollbar.Direction = Direction.Vertical;
-
-                verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
-                {
-                    contentArea.Position -= new Vector2(0, e.Delta);
-                };
-
                 var hsp = horizontalScrollbar?.ChildIndex ?? -1;
                 horizontalScrollbar = (ScrollBar)value.Clone();
                 horizontalScrollbar.HorizontalAlignment = Alignment.Stretch;
@@ -250,7 +240,17 @@ namespace Takai.UI
 
                 horizontalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
                 {
-                    contentArea.Position -= new Vector2(e.Delta, 0);
+                    contentContainer.Position -= new Vector2(e.Delta, 0);
+                };
+
+                var vsp = verticalScrollbar?.ChildIndex ?? -1;
+                verticalScrollbar = (ScrollBar)value.Clone();
+                verticalScrollbar.VerticalAlignment = Alignment.Stretch;
+                verticalScrollbar.Direction = Direction.Vertical;
+
+                verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
+                {
+                    contentContainer.Position -= new Vector2(0, e.Delta);
                 };
 
                 if (vsp >= 0)
@@ -269,10 +269,16 @@ namespace Takai.UI
             }
         }
 
+        protected override void FinalizeClone()
+        {
+            contentContainer = Children[0];
+            verticalScrollbar = (ScrollBar)Children[1];
+            horizontalScrollbar = (ScrollBar)Children[2];
+        }
+
         protected ScrollBar verticalScrollbar;
         protected ScrollBar horizontalScrollbar;
-
-        protected Static contentArea = new Static
+        protected Static contentContainer = new Static
         {
             HorizontalAlignment = Alignment.Stretch,
             VerticalAlignment = Alignment.Stretch
@@ -283,13 +289,9 @@ namespace Takai.UI
             ScrollBarTemplate = new ScrollBar();
 
             ColumnCount = 2;
-            base.InternalInsertChild(contentArea);
+            base.InternalInsertChild(contentContainer);
             base.InternalInsertChild(verticalScrollbar);
             base.InternalInsertChild(horizontalScrollbar);
-
-            //contentArea.ChildReflow += delegate {
-            //    ResizeContentArea();
-            //};
         }
 
         public ScrollBox(params Static[] children)
@@ -302,18 +304,23 @@ namespace Takai.UI
 
         public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
-            return contentArea.InternalInsertChild(child, index, reflow, ignoreFocus);
+            return contentContainer.InternalInsertChild(child, index, reflow, ignoreFocus);
         }
 
         public override bool InternalRemoveChildIndex(int index)
         {
-            return contentArea.InternalRemoveChildIndex(index);
+            return contentContainer.InternalRemoveChildIndex(index);
         }
 
         protected override void ReflowOverride(Vector2 availableSize)
         {
-            horizontalScrollbar.ContentSize = contentArea.MeasuredSize.X;
-            verticalScrollbar.ContentSize = contentArea.MeasuredSize.Y;
+            horizontalScrollbar.ContentSize = contentContainer.MeasuredSize.X;
+            verticalScrollbar.ContentSize = contentContainer.MeasuredSize.Y;
+
+            horizontalScrollbar.IsEnabled = contentContainer.MeasuredSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X;
+            verticalScrollbar.IsEnabled = contentContainer.MeasuredSize.Y > availableSize.Y - verticalScrollbar.MeasuredSize.Y;
+
+            Measure(availableSize);
             base.ReflowOverride(availableSize);
         }
 
@@ -322,10 +329,18 @@ namespace Takai.UI
             if (InputState.HasScrolled() && VisibleContentArea.Contains(InputState.MousePoint))
             {
                 if (InputState.IsMod(KeyMod.Shift))
-                    horizontalScrollbar.ScrollTowards(InputState.ScrollDelta());
-                else
+                {
+                    if (horizontalScrollbar.IsEnabled)
+                    {
+                        horizontalScrollbar.ScrollTowards(InputState.ScrollDelta());
+                        return false;
+                    }
+                }
+                else if (verticalScrollbar.IsEnabled)
+                {
                     verticalScrollbar.ScrollTowards(InputState.ScrollDelta());
-                return false;
+                    return false;
+                }
             }
 
             return base.HandleInput(time);

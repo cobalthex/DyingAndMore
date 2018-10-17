@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
@@ -11,8 +12,10 @@ namespace Takai.UI
         public Vector2 Margin { get; set; } = Vector2.Zero;
 
         /// <summary>
-        /// The number of columns, data is divided by the columns
-        /// If zero, reflow ignored
+        /// The number of columns, data is divided by the columns.
+        /// If zero, reflow ignored.
+        ///
+        /// Note: disabled children are counted as occupied cells (but do not take up space)
         /// </summary>
         public int ColumnCount { get; set; } = 1;
 
@@ -21,12 +24,13 @@ namespace Takai.UI
         /// </summary>
         public Color CellColor { get; set; }
 
-        float[] columnWidths = new float[0], rowHeights = new float[0];
+        float[] columnWidths = new float[0];
+        float[] rowHeights = new float[0];
 
-        System.Collections.Generic.HashSet<int> hStretches = new System.Collections.Generic.HashSet<int>();
-        System.Collections.Generic.HashSet<int> vStretches =  new System.Collections.Generic.HashSet<int>();
+        HashSet<int> hStretches = new HashSet<int>();
+        HashSet<int> vStretches =  new HashSet<int>();
 
-        Vector2 usedArea = new Vector2();
+        Vector2 unstretchedArea = new Vector2();
 
         public Table() { }
         public Table(int columnCount, params Static[] children)
@@ -43,43 +47,63 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            System.Array.Resize(ref columnWidths, ColumnCount);
-            System.Array.Clear(columnWidths, 0, columnWidths.Length);
-            System.Array.Resize(ref rowHeights, (int)System.Math.Ceiling(Children.Count / (float)ColumnCount)); //todo: use integer division
-            System.Array.Clear(rowHeights, 0, rowHeights.Length);
+            if (ColumnCount <= 0)
+                return new Vector2();
 
-            usedArea = Vector2.Zero;
+            if (ColumnCount > columnWidths.Length)
+                columnWidths = new float[ColumnCount];
+            else
+                System.Array.Clear(columnWidths, 0, ColumnCount);
+
+            var rowCount = Util.CeilDiv(Children.Count, ColumnCount);
+            if (rowCount > rowHeights.Length)
+                rowHeights = new float[rowCount];
+            else
+                System.Array.Clear(rowHeights, 0, rowCount);
+
+            var measuredArea = new Vector2();
+            unstretchedArea = Vector2.Zero;
             hStretches.Clear();
             vStretches.Clear();
+
             for (int i = 0; i < Children.Count; ++i)
             {
-                if (!Children[i].IsEnabled)
+                if (!Children[i].IsEnabled) //disabled children still occupy cells
                     continue;
 
                 var csize = Children[i].Measure(new Vector2(InfiniteSize)); //needed up here for children to correctly size
                 if (Children[i].HorizontalAlignment == Alignment.Stretch)
                 {
                     hStretches.Add(i % ColumnCount);
-                    csize.X = 0;
+                    //csize.X = 0;
                 }
                 if (Children[i].VerticalAlignment == Alignment.Stretch)
                 {
                     vStretches.Add(i / ColumnCount);
-                    csize.Y = 0;
+                    //csize.Y = 0;
                 }
 
                 columnWidths[i % ColumnCount] = System.Math.Max(columnWidths[i % ColumnCount], csize.X);
                 rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], csize.Y);
             }
 
-            foreach (var col in columnWidths)
-                usedArea.X += col;
-            foreach (var row in rowHeights)
-                usedArea.Y += row;
+            for (int i = 0; i < columnWidths.Length; ++i)
+            {
+                measuredArea.X += columnWidths[i];
+                if (!hStretches.Contains(i))
+                    unstretchedArea.X += columnWidths[i];
+            }
+            for (int i = 0; i < rowHeights.Length; ++i)
+            {
+                measuredArea.Y += rowHeights[i];
+                if (!vStretches.Contains(i))
+                    unstretchedArea.Y += rowHeights[i];
+            }
 
-            usedArea += new Vector2(columnWidths.Length - 1, rowHeights.Length - 1) * Margin;
+            var margins = new Vector2(columnWidths.Length - 1, rowHeights.Length - 1) * Margin;
+            unstretchedArea += margins;
 
-            return usedArea;
+            return measuredArea + margins;
         }
 
         protected override void ReflowOverride(Vector2 availableSize)
@@ -89,22 +113,16 @@ namespace Takai.UI
 
             if (hStretches.Count > 0)
             {
-                float width = (availableSize.X - usedArea.X) / hStretches.Count;
+                float width = (availableSize.X - unstretchedArea.X) / hStretches.Count;
                 foreach (var col in hStretches)
-                {
-                    usedArea.X += System.Math.Max(0, width - columnWidths[col]);
-                    columnWidths[col] = System.Math.Max(columnWidths[col], width); //use remaining width elsewhere?
-                }
+                    columnWidths[col] = width; //use remaining width elsewhere?
             }
 
-            if (vStretches.Count > 0 && availableSize.Y > usedArea.Y)
+            if (vStretches.Count > 0 && availableSize.Y > unstretchedArea.Y)
             {
-                float height = (availableSize.Y - usedArea.Y) / vStretches.Count;
+                float height = (availableSize.Y - unstretchedArea.Y) / vStretches.Count;
                 foreach (var row in vStretches)
-                {
-                    usedArea.Y += System.Math.Max(0, height - rowHeights[row]);
-                    rowHeights[row] = System.Math.Max(rowHeights[row], height); //use remaining height elsewhere?
-                }
+                    rowHeights[row] = height; //use remaining height elsewhere?
             }
 
             var offset = Vector2.Zero;
