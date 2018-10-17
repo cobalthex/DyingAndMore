@@ -9,19 +9,19 @@ List {
 
     Children: [
         Scrollbox {
-			Name: 'b';
             Size: 400;
             Children: [
                 List {
-					Name: 'c';
+                    name: "z";
                     Direction: Direction.Vertical;
+                    HorizontalAlignment: Alignment.Stretch;
                     Margin: 10;
 
                     Children: [
                         Static { Text: "Name"; }
                         TextInput {
-							Name: 'd';
                             HorizontalAlignment: Alignment.Stretch;
+                            Padding: [4 2];
                             Bindings: [
                                 Binding {
                                     Mode: BindingMode.TwoWay;
@@ -32,7 +32,6 @@ List {
                         }
 
                         Static { Text: "Controller"; }
-
 						# actions
 						#
                     ];

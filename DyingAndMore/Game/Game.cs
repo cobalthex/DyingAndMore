@@ -248,8 +248,6 @@ namespace DyingAndMore.Game
                     hudContainer.AddChild(possiblePlayers[i].Hud);
             }
 
-            OnResize(EventArgs.Empty);
-
             players[0].inputs = Cache.Load<InputMap<Entities.InputAction>>("Player1.input.tk", "Config");
             ((Entities.InputController)players[0].actor.Controller).Inputs = players[0].inputs;
         }
@@ -305,12 +303,12 @@ namespace DyingAndMore.Game
             Map.renderSettings.SetDefault();
         }
 
-        protected override void OnResize(EventArgs e)
+        protected override void ReflowOverride(Vector2 availableSize)
         {
-            base.OnResize(e);
+            //todo: should this go in MeasureOverride?
 
-            var wx = 0.01f * Size.X;
-            var wy = 0.01f * Size.Y;
+            var wx = 0.01f * availableSize.X;
+            var wy = 0.01f * availableSize.Y;
 
             for (int i = 0; i < players.Count; ++i)
             {
@@ -318,7 +316,6 @@ namespace DyingAndMore.Game
                 if (players.Count <= viewportLayouts.Length && i < viewportLayouts[players.Count].Length)
                     viewport = viewportLayouts[players.Count][i];
 
-                //todo: move to resize method (for window resize support too)
                 viewport.X = (int)(viewport.X * wx);
                 viewport.Y = (int)(viewport.Y * wy);
                 viewport.Width = (int)(viewport.Width * wx);
@@ -326,6 +323,8 @@ namespace DyingAndMore.Game
 
                 players[i].camera.Viewport = viewport;
             }
+
+            base.ReflowOverride(availableSize);
         }
 
         protected override void UpdateSelf(GameTime time)

@@ -400,13 +400,13 @@ namespace Takai.UI
             if (Font == null)
                 return;
 
-            DrawText(spriteBatch, new Point(0/*-ScrollPosition*/ + 2, (int)(ContentArea.Height - textSize.Y) / 2));
+            DrawText(spriteBatch, new Point(-ScrollPosition, (int)(ContentArea.Height - textSize.Y) / 2));
 
             var tickCount = System.Environment.TickCount;
             if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
             {
                 var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition;
-                DrawLine(spriteBatch, Color, new Vector2(x, 0), new Vector2(x, ContentArea.Height));
+                DrawVLine(spriteBatch, Color, x + 1, 0, ContentArea.Height);
             }
         }
     }
