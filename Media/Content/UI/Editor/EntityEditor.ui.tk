@@ -23,17 +23,38 @@ List {
                             HorizontalAlignment: Alignment.Stretch;
                             Padding: [4 2];
                             Bindings: [
-                                Binding {
+                                {
                                     Mode: BindingMode.TwoWay;
                                     Source: "Name";
                                     Target: "Text";
-                                }
-                            ]
-                        }
+                                };
+                            ];
+                        };
 
-                        Static { Text: "Controller"; }
-						# actions
-						#
+						Static { Text: "Actor Properties"; };
+						List {
+							Children: [
+								Static { Text: "Current Health"; };
+								NumericInput {
+									Bindings: [
+										{
+											Mode: BindingMode.TwoWay;
+											Source: "CurrentHealth";
+											Target: "Value";
+										};
+									];
+									Minimum: 0;
+									Maximum: 2E9;
+								};
+
+								#weapon
+
+								#conditions
+								#actions
+
+								Static { Text: "Controller"; };
+							];
+						};
                     ];
                 };
             ];
@@ -44,6 +65,6 @@ List {
             HorizontalAlignment: Alignment.Middle;
             Text: "Close";
             OnClickCommand: "$Close";
-        }
+        };
     ];
 }

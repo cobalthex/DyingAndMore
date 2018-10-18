@@ -221,8 +221,6 @@ namespace Takai.UI
     //todo: convert scroll bars to use enabled/disabled
     public class ScrollBox : Table
     {
-        //todo: simplify to custom layout?
-
         /// <summary>
         /// An optional style to apply to the scrollbars (write-only)
         /// </summary>
@@ -269,13 +267,6 @@ namespace Takai.UI
             }
         }
 
-        protected override void FinalizeClone()
-        {
-            contentContainer = Children[0];
-            verticalScrollbar = (ScrollBar)Children[1];
-            horizontalScrollbar = (ScrollBar)Children[2];
-        }
-
         protected ScrollBar verticalScrollbar;
         protected ScrollBar horizontalScrollbar;
         protected Static contentContainer = new Static
@@ -283,6 +274,22 @@ namespace Takai.UI
             HorizontalAlignment = Alignment.Stretch,
             VerticalAlignment = Alignment.Stretch
         };
+
+        /// <summary>
+        /// The curently scrolled position of this scrollbox.
+        /// X = horizontal, Y = vertical
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public Vector2 ScrollPosition
+        {
+            get => new Vector2(horizontalScrollbar.ContentPosition, verticalScrollbar.ContentPosition);
+            set
+            {
+                //InternalSetScrollPosition and reflow after?
+                horizontalScrollbar.ContentPosition = value.X;
+                verticalScrollbar.ContentPosition = value.Y;
+            }
+        }
 
         public ScrollBox()
         {
@@ -300,6 +307,13 @@ namespace Takai.UI
             AddChildren(children);
 
             //todo: correctly serialize
+        }
+
+        protected override void FinalizeClone()
+        {
+            contentContainer = Children[0];
+            verticalScrollbar = (ScrollBar)Children[1];
+            horizontalScrollbar = (ScrollBar)Children[2];
         }
 
         public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
