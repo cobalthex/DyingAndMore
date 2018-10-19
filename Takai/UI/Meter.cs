@@ -42,8 +42,8 @@ namespace Takai.UI
             maskEffect.Parameters["Cutoff"].SetValue(NormalizedValue);
             maskEffect.Parameters["Range"].SetValue(Range);
             maskEffect.Parameters["Mask"].SetValue(Mask.Texture);
-            sbatch.Begin(SpriteSortMode.Deferred, null, null, null, null, maskEffect);
-            Sprite.Draw(sbatch, VisibleContentArea, Sprite.ClipRect, 0, Color, Sprite.ElapsedTime);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, maskEffect);
+            DrawSprite(spriteBatch, Sprite, new Rectangle(0, 0, ContentArea.Width - 1, ContentArea.Height - 1));
             sbatch.End();
         }
     }

@@ -20,12 +20,12 @@ GunClass {
                 Minimum: 0;
                 Bindings: [
                     {
-                        SourceProperty: "CurrentAmmo";
-                        TargetProperty: "Value";
+                        Source: "CurrentAmmo";
+                        Target: "Value";
                     };
                     {
-                        SourceProperty: "MaxAmmo";
-                        TargetProperty: "Maximum";
+                        Source: "MaxAmmo";
+                        Target: "Maximum";
                     };
                 ];
 
@@ -41,7 +41,7 @@ GunClass {
                     Width: 76;
                     Height: 76;
                 }
-            }
+            };
         ];
     }
 

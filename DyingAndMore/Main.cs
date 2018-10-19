@@ -89,7 +89,7 @@ namespace DyingAndMore
             Cache.WatchDirectory(Cache.Root);
 #endif
 
-            GraphicsDevice.BlendState = BlendState.AlphaBlend;
+            GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
             gdm.ApplyChanges();
 
@@ -148,31 +148,44 @@ namespace DyingAndMore
 #endif
             */
 
-            var selectStoryUI = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
-            if (selectStoryUI is Game.StorySelect ss)
+            ui = new Takai.UI.FileList
             {
-                ss.StorySelected += delegate (object _sender, Game.GameStory story)
+                HorizontalAlignment = Takai.UI.Alignment.Middle,
+                VerticalAlignment = Takai.UI.Alignment.Middle,
+                BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
+                FilterRegex = "\\.map.tk$",
+            };
+            ((Takai.UI.FileList)ui).SelectionChanged += delegate (object s, Takai.UI.SelectionChangedEventArgs se)
+            {
+                var fl = (Takai.UI.FileList)s;
+                if (System.IO.File.Exists(fl.SelectedFile))
                 {
-                    //var game = new Game.Game
-                    //{
-                    //    Story = story,
-                    //};
-                    //game.LoadNextStoryMap();
-                    //ui.ReplaceAllChildren(new Game.GameInstance(game));
-                    ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
-                };
-            }
-            ui = new Takai.UI.Static(selectStoryUI)
+                    var map = Cache.Load<Takai.Game.MapClass>(fl.SelectedFile);
+                    map.InitializeGraphics();
+                    ui.ReplaceAllChildren(new Editor.Editor(map.Instantiate()));
+                }
+            };
+            //var ui = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
+            //if (ui is Game.StorySelect ss)
+            //{
+            //    ss.StorySelected += delegate (object _sender, Game.GameStory story)
+            //    {
+            //        //var game = new Game.Game
+            //        //{
+            //        //    Story = story,
+            //        //};
+            //        //game.LoadNextStoryMap();
+            //        //ui.ReplaceAllChildren(new Game.GameInstance(game));
+            //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
+            //    };
+            //}
+            //ui = Cache.Load<Takai.UI.Static>("UI/test/elements.ui.tk");
+
+            ui = new Takai.UI.Static(ui)
             {
                 HorizontalAlignment = Takai.UI.Alignment.Stretch,
                 VerticalAlignment = Takai.UI.Alignment.Stretch
             };
-            //ui = new Takai.UI.Static(Cache.Load<Takai.UI.Static>("UI/test/elements.ui.tk"))
-            //{
-            //    HorizontalAlignment = Takai.UI.Alignment.Stretch,
-            //    VerticalAlignment = Takai.UI.Alignment.Stretch
-            //};
-
             //Takai.UI.Static.DebugFont = Takai.UI.Static.DefaultFont;
 
             fpsGraph = new Takai.FpsGraph()

@@ -34,6 +34,7 @@ ScrollBox {
 			Name: "Form";
 			Margin: [10 20];
 			ColumnCount: 2;
+			HorizontalAlignment: Alignment.Stretch;
 			#BorderColor: [255 220 0 255];
 			#CellColor: [0 255 192 32];
 

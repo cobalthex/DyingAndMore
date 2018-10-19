@@ -11,7 +11,7 @@ namespace Takai
     /// An append-only ring buffer
     /// </summary>
     /// <typeparam name="T">The type of data to store</typeparam>
-    public class RingBuffer<T> : IReadOnlyList<T>
+    public class RingBuffer<T> : IEnumerable<T>
     {
         protected T[] entries = null;
         protected int next = 0;
@@ -44,12 +44,14 @@ namespace Takai
 
         public IEnumerator<T> GetEnumerator()
         {
-            return ((IReadOnlyList<T>)entries).GetEnumerator();
+            for (int i = 0; i < entries.Length; ++i)
+                yield return entries[(i + next) % entries.Length];
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IReadOnlyList<T>)entries).GetEnumerator();
+            for (int i = 0; i < entries.Length; ++i)
+                yield return entries[i + next];
         }
     }
 
@@ -99,10 +101,13 @@ namespace Takai
 
         RingBuffer<FpsTick> buffer;
 
-        public float min = float.MaxValue;
-        public float max = 0;
-        public float sum = 60;
-        int n = 1;
+        public float Average { get; private set; }
+
+        /// <summary>
+        /// How often to sample (maximum sample rate, may be lower if Update is called less often)
+        /// </summary>
+        public TimeSpan SampleRate { get; set; } = TimeSpan.FromMilliseconds(10);
+        TimeSpan lastSampleTime = TimeSpan.MinValue;
 
         public FpsGraph(int maxTicks = 256)
         {
@@ -112,32 +117,33 @@ namespace Takai
         public void Clear()
         {
             buffer.Clear();
-            min = float.MaxValue;
-            max = 0;
         }
 
         protected override void UpdateSelf(GameTime time)
         {
+            base.UpdateSelf(time);
+
+            if (time.TotalGameTime < lastSampleTime + SampleRate)
+                return;
+
             var tick = new FpsTick(1000 / (float)time.ElapsedGameTime.TotalMilliseconds, time.TotalGameTime);
             buffer.Append(tick);
-            var avg = (sum / n);
-            if (Math.Abs(tick.fps - avg) < avg * 2)
-            {
-                min = Math.Min(min, tick.fps);
-                max = Math.Max(max, tick.fps);
-                sum += tick.fps;
-                ++n;
-            } //todo: normalizing over time
-            base.UpdateSelf(time);
+
+            var diff = (tick.fps - Average) / buffer.Count;
+            Average += diff;
+
+            lastSampleTime = time.TotalGameTime;
         }
 
         protected override void DrawSelf(SpriteBatch sbatch)
         {
             var bounds = VisibleContentArea;
-            var average = (sum / n);
+            var average = this.Average;
 
-            var min = 0;// average - average / 2;
-            var max = 120;// average + average / 2;
+            var min = average - average / 2;
+            var max = average + average / 2;
+
+            //todo: rewrite
 
             var smax = Font.MeasureString(max.ToString("N2"));
             Font.Draw(sbatch, max.ToString("N2"), bounds.Location.ToVector2(), Color.Aquamarine);
@@ -146,9 +152,9 @@ namespace Takai
 
             float dy = (max - min);
 
-            float y = bounds.Bottom - ((sum / n) - min) / dy * bounds.Height;
+            float y = bounds.Bottom - ((dy / buffer.Count) - min) / dy * bounds.Height;
             var savg = Font.MeasureString(average.ToString("N2"));
-            Font.Draw(sbatch, average.ToString("N2"), new Vector2(bounds.Left + smax.X - savg.X, y - (savg.Y / 2)), Color.RoyalBlue);
+            Font.Draw(sbatch, average.ToString("N2"), new Vector2(bounds.Left + smax.X - savg.X, bounds.Top + (bounds.Height - savg.Y) / 2), Color.RoyalBlue);
 
             var advance = ((int)(smax.X - 1) / 5 + 1) * 5;
             bounds.X += advance + 5;
@@ -156,12 +162,13 @@ namespace Takai
             P2D.DrawRect(sbatch, Color.White, bounds);
             bounds.Inflate(-5, -5);
 
-            P2D.DrawLine(sbatch, Color.RoyalBlue, new Vector2(bounds.Left, y), new Vector2(bounds.Right, y));
+            P2D.DrawLine(sbatch, Color.RoyalBlue, new Vector2(bounds.Left, bounds.Center.Y), new Vector2(bounds.Right, bounds.Center.Y));
 
             float step = (float)bounds.Width / buffer.Count;
 
             float x = bounds.Left;
             var last = new Vector2(x, bounds.Bottom - (average - min) / dy * bounds.Height);
+
             foreach (var entry in buffer)
             {
                 if (entry.time == TimeSpan.Zero || entry.time == TimeSpan.Zero)

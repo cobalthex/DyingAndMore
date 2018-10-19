@@ -295,14 +295,14 @@ namespace Takai.Graphics
         /// Get the clip rect for a single frame of the image
         /// </summary>
         /// <param name="frame">Which frame of the animation to use (No bounds checking)</param>
-        /// <param name="clipRect">A second clip rect to clip the frame bounds</param>
+        /// <param name="relativeClip">A second clip rect to clip the frame bounds</param>
         /// <returns>The clipping rectangle of the requested frame</returns>
-        public Rectangle GetFrameRect(int frame, Rectangle clipRect)
+        public Rectangle GetFrameRect(int frame, Rectangle relativeClip)
         {
             var src = new Rectangle(ClipRect.X + (frame % framesPerRow) * Width, ClipRect.Y + (frame / framesPerRow) * Height, Width, Height);
-            clipRect.X += src.X;
-            clipRect.Y += src.Y;
-            return Rectangle.Intersect(Rectangle.Intersect(src, ClipRect), clipRect);
+            relativeClip.X += src.X;
+            relativeClip.Y += src.Y;
+            return Rectangle.Intersect(Rectangle.Intersect(src, ClipRect), relativeClip);
         }
 
         /// <summary>
@@ -335,18 +335,22 @@ namespace Takai.Graphics
                 (int)position.Y - (int)Origin.Y,
                 Width,
                 Height
-            ), ClipRect, angle, Color.White, ElapsedTime);
+            ), Texture.Bounds, angle, Color.White, ElapsedTime);
         }
         public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle)
         {
-            Draw(spriteBatch, bounds, ClipRect, angle, Color.White, ElapsedTime);
+            Draw(spriteBatch, bounds, Texture.Bounds, angle, Color.White, ElapsedTime);
         }
 
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle, Color color, float scale = 1)
         {
-            Draw(spriteBatch, position, ClipRect, angle, color, scale, ElapsedTime);
+            Draw(spriteBatch, position, Texture.Bounds, angle, color, scale, ElapsedTime);
         }
-        public void Draw(SpriteBatch spriteBatch, Vector2 position, Rectangle clipRect, float angle, Color color, float scale, TimeSpan elapsedTime)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, float angle, Color color, float scale, TimeSpan elapsedTime)
+        {
+            Draw(spriteBatch, position, Texture.Bounds, angle, color, scale, elapsedTime);
+        }
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, Rectangle relativeClip, float angle, Color color, float scale, TimeSpan elapsedTime)
         {
             var elapsed = (float)(elapsedTime.TotalSeconds / FrameLength.TotalSeconds);
             var cf = IsLooping ? ((int)elapsed % FrameCount) : Util.Clamp((int)elapsed, 0, FrameCount - 1);
@@ -356,7 +360,7 @@ namespace Takai.Graphics
             var tween = GetTween(fd, Tween);
             spriteBatch.Draw(Texture,
                 position,
-                GetFrameRect(cf, clipRect),
+                GetFrameRect(cf, relativeClip),
                 Color.Lerp(color, Color.Transparent, tween.current),
                 angle,
                 Origin,
@@ -366,7 +370,7 @@ namespace Takai.Graphics
             );
             spriteBatch.Draw(Texture,
                 position,
-                GetFrameRect(nf, clipRect),
+                GetFrameRect(nf, relativeClip),
                 Color.Lerp(color, Color.Transparent, tween.next),
                 angle,
                 Origin,
@@ -376,7 +380,11 @@ namespace Takai.Graphics
             );
         }
 
-        public void Draw(SpriteBatch spriteBatch, Rectangle bounds, Rectangle clipRect, float angle, Color color, TimeSpan elapsedTime)
+        public void Draw(SpriteBatch spriteBatch, Rectangle bounds, float angle, Color color, TimeSpan elapsedTime)
+        {
+            Draw(spriteBatch, bounds, Texture.Bounds, angle, color, elapsedTime);
+        }
+        public void Draw(SpriteBatch spriteBatch, Rectangle bounds, Rectangle relativeClip, float angle, Color color, TimeSpan elapsedTime)
         {
             var elapsed = (float)(elapsedTime.TotalSeconds / FrameLength.TotalSeconds);
             var cf = IsLooping ? ((int)elapsed % FrameCount) : Util.Clamp((int)elapsed, 0, FrameCount - 1);
@@ -393,7 +401,7 @@ namespace Takai.Graphics
             spriteBatch.Draw(
                 Texture,
                 bounds,
-                GetFrameRect(cf, clipRect),
+                GetFrameRect(cf, relativeClip),
                 Color.Lerp(color, Color.Transparent, tween.current),
                 angle,
                 Origin,
@@ -403,7 +411,7 @@ namespace Takai.Graphics
             spriteBatch.Draw(
                 Texture,
                 bounds,
-                GetFrameRect(nf, clipRect),
+                GetFrameRect(nf, relativeClip),
                 Color.Lerp(color, Color.Transparent, tween.next),
                 angle,
                 Origin,

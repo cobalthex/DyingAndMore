@@ -92,7 +92,9 @@ namespace Takai.UI
 
         protected override bool HandleInput(GameTime time)
         {
-            if (IsThumbVisible)
+            //todo: should bubble focus
+
+            if (IsThumbVisible && HasFocus)
             {
                 if (DidPressInside(MouseButtons.Left))
                 {
@@ -117,19 +119,48 @@ namespace Takai.UI
                     return false;
                 }
 
-                if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Left) ||
-                    InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Up))
-                    ContentPosition -= (float)(400 * time.ElapsedGameTime.TotalSeconds);
-                if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Right) ||
-                    InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Down))
-                    ContentPosition += (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                if (IsThumbVisible)
+                {
+                    if (Direction == Direction.Vertical)
+                    {
+                        if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Up))
+                        {
+                            contentPosition -= (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                            return false;
+                        }
 
-                if (InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.PageUp))
-                    ContentPosition -= GetContainerSize() / 2;
-                if (InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.PageDown))
-                    ContentPosition += GetContainerSize() / 2;
+                        if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Down))
+                        {
+                            contentPosition += (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                            return false;
+                        }
+                    }
 
-                //todo up/down + pgup/pgdn
+                    else if (Direction == Direction.Horizontal)
+                    {
+                        if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Left))
+                        {
+                            contentPosition -= (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                            return false;
+                        }
+
+                        if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Right))
+                        {
+                            contentPosition += (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                            return false;
+                        }
+                    }
+                    else if (InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.PageUp))
+                    {
+                        ContentPosition -= GetContainerSize() / 2;
+                        return false;
+                    }
+                    else if (InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.PageDown))
+                    {
+                        ContentPosition += GetContainerSize() / 2;
+                        return false;
+                    }
+                }
             }
             return base.HandleInput(time);
         }
@@ -291,6 +322,8 @@ namespace Takai.UI
             }
         }
 
+        public override bool CanFocus => true;
+
         public ScrollBox()
         {
             ScrollBarTemplate = new ScrollBar();
@@ -355,6 +388,12 @@ namespace Takai.UI
                     verticalScrollbar.ScrollTowards(InputState.ScrollDelta());
                     return false;
                 }
+            }
+
+            if (HasFocus)
+            {
+                //todo: refer scroll input to horizontal/vertical
+                return false;
             }
 
             return base.HandleInput(time);

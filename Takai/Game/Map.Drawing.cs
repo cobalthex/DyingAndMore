@@ -80,6 +80,12 @@ namespace Takai.Game
         }
         private Texture2D _tilesImage;
 
+        /// <summary>
+        /// The font used to draw debug information
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public Graphics.BitmapFont DebugFont { get; set; }
+
         //todo: curves (and volumetric curves) (things like rivers/flows)
 
         /// <summary>
@@ -409,7 +415,7 @@ namespace Takai.Game
             {
                 //todo: transform correctly
 
-                context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, Class.stencilRead, null, Class.fluidEffect);
+                context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, Class.stencilRead, null, Class.fluidEffect);
                 Class.fluidEffect.Parameters["Mask"].SetValue(Class.reflectionRenderTarget);
                 Class.fluidEffect.Parameters["Reflection"].SetValue(renderSettings.drawReflections ? Class.reflectedRenderTarget : null);
                 context.spriteBatch.Draw(Class.fluidsRenderTarget, Vector2.Zero, Color.White);
@@ -507,7 +513,7 @@ namespace Takai.Game
 
         public void DrawFluids(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, null, null, null, Class.reflectionEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, Class.reflectionEffect, c.cameraTransform);
 
             //inactive fluids
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)
@@ -571,7 +577,7 @@ namespace Takai.Game
         {
             c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, Class.stencilRead, null, null, c.cameraTransform);
 
-            foreach (var ent in activeEntities)
+            foreach (var ent in EnumerateEntitiesInSectors(c.visibleSectors))
             {
                 if (ent.OutlineColor.A > 0)
                     _drawEntsOutlined.Add(ent);
@@ -584,7 +590,6 @@ namespace Takai.Game
                         state.Class?.Sprite?.Draw(
                             c.spriteBatch,
                             ent.Position,
-                            state.Class.Sprite.ClipRect,
                             angle,
                             ent.TintColor,
                             1,
@@ -631,6 +636,12 @@ namespace Takai.Game
 
                 if (renderSettings.drawEntityForwardVectors)
                     DrawArrow(ent.Position, ent.Forward, ent.Radius * 1.3f, Color.Gold);
+
+                if (renderSettings.drawDebugInfo && Class.DebugFont != null)
+                {
+                    var textPos = ent.Position + new Vector2(ent.Radius + 10);
+                    Class.DebugFont.Draw(c.spriteBatch, ent.GetDebugInfo(), textPos, Color.Gold);
+                }
             }
 
             c.spriteBatch.End();
@@ -653,7 +664,6 @@ namespace Takai.Game
                     sprite.Draw(
                         c.spriteBatch,
                         ent.Position,
-                        sprite.ClipRect,
                         angle,
                         ent.OutlineColor,
                         1,
@@ -680,7 +690,6 @@ namespace Takai.Game
                     (
                         c.spriteBatch,
                         p.Value[i].position,
-                        p.Key.Sprite.ClipRect,
                         p.Value[i].angle + p.Value[i].spin + p.Value[i].spawnAngle,
                         p.Value[i].color,
                         p.Value[i].scale,

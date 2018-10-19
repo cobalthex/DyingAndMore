@@ -124,6 +124,9 @@ namespace Takai.Data
                 if (srcVal == null)
                     srcVal = DefaultValue;
                 targetAccessors.set(Serializer.Cast(targetAccessors.type, srcVal));
+                cachedValue = srcVal;
+                if (srcVal != null)
+                    cachedHash = srcVal.GetHashCode();
             }
         }
 

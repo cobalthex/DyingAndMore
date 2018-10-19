@@ -3,27 +3,32 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
-    //scroll base?
     public class TrackBar : NumericBase
     {
+        //todo: vertical
+
         public override bool CanFocus => true;
 
         protected override bool HandleInput(GameTime time)
         {
+            if (!HasFocus)
+                return base.HandleInput(time);
+
             if (DidPressInside(Input.MouseButtons.Left))
             {
                 var relPos = (Input.InputState.MousePoint - OffsetContentArea.Location).ToVector2();
                 Value = (int)((relPos.X / ContentArea.Width) * (Maximum - Minimum)) + Minimum;
-                return false;
             }
+            else if (VisibleContentArea.Contains(Input.InputState.MousePoint) && Input.InputState.HasScrolled())
+                IncrementValue(System.Math.Sign(Input.InputState.ScrollDelta()));
+            else if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Left))
+                DecrementValue();
+            else if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Right))
+                IncrementValue();
+            else
+                return base.HandleInput(time);
 
-            if (VisibleContentArea.Contains(Input.InputState.MousePoint) && Input.InputState.HasScrolled())
-            {
-                Value += Increment * System.Math.Sign(Input.InputState.ScrollDelta());
-                return false;
-            }
-
-            return base.HandleInput(time);
+            return false;
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)

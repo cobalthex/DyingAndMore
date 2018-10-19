@@ -1439,7 +1439,8 @@ namespace Takai.UI
             {
                 var toDraw = draws.Pop();
 
-                Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
+                if (toDraw.BackgroundColor.A > 0)
+                    Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
                 if (BackgroundSprite != null)
                     BackgroundSprite.Draw(spriteBatch, toDraw.VisibleBounds, 0);
 
@@ -1567,6 +1568,20 @@ namespace Takai.UI
                 return;
 
             Graphics.Primitives2D.DrawLine(spriteBatch, color, new Vector2(x1, y), new Vector2(x2, y));
+        }
+
+        protected void DrawSprite(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle destRect)
+        {
+            if (sprite?.Texture == null)
+                return;
+
+            var clip = VisibleContentArea;
+            clip.X -= OffsetContentArea.X;
+            clip.Y -= OffsetContentArea.Y;
+            destRect.X += VisibleContentArea.X;
+            destRect.Y += VisibleContentArea.Y;
+            destRect.Inflate(-clip.X / 2, -clip.Y / 2);
+            sprite.Draw(spriteBatch, destRect, clip, 0, Color.White, sprite.ElapsedTime);
         }
 
         #endregion

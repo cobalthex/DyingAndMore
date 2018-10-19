@@ -10,7 +10,7 @@ ActorClass {
         Effects: [
             HealthEffect {
                 MaxDamage: 3000;
-                Radius: 20;
+                Radius: 50;
                 CanAffectSource: true;
             }
             ParticleEffect {
