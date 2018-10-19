@@ -32,7 +32,7 @@ namespace Takai.UI
             set
             {
                 _basePath = P.GetFullPath(value);
-                if (!Path.StartsWith(_basePath))
+                if (Path == null || !Path.StartsWith(_basePath))
                     Path = _basePath;
             }
         }

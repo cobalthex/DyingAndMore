@@ -291,6 +291,13 @@ namespace DyingAndMore.Game.Entities
             TintColorDuration = TimeSpan.FromMilliseconds(50);
         }
 
+        public override string GetDebugInfo()
+        {
+            return $"{base.GetDebugInfo()}\n" +
+                   $"Health: {CurrentHealth}/{MaxHealth}\n" +
+                   $"Weapon: {Weapon}";
+        }
+
         #region Helpers
 
         /// <summary>

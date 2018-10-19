@@ -13,8 +13,6 @@ namespace Takai.UI
         /// </summary>
         public bool DrawXIfMissingSprite { get; set; } = false;
 
-        System.TimeSpan elapsedTime;
-
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             return (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2());
@@ -22,7 +20,8 @@ namespace Takai.UI
 
         protected override void UpdateSelf(GameTime time)
         {
-            elapsedTime = time.TotalGameTime;
+            if (Sprite != null)
+                Sprite.ElapsedTime = time.TotalGameTime;
             base.UpdateSelf(time);
         }
 
@@ -32,15 +31,7 @@ namespace Takai.UI
 
             //todo: custom positioning/sizing
             if (Sprite?.Texture != null)
-            {
-                var clip = VisibleContentArea;
-                clip.X -= OffsetContentArea.X;
-                clip.Y -= OffsetContentArea.Y;
-                var dest = VisibleContentArea;
-                dest.X += clip.X / 2;
-                dest.Y += clip.Y / 2;
-                Sprite.Draw(spriteBatch, dest, clip, 0, Color.White, elapsedTime);
-            }
+                DrawSprite(spriteBatch, Sprite, new Rectangle(0, 0, ContentArea.Width - 1, ContentArea.Height - 1));
             else if (DrawXIfMissingSprite)
             {
                 var rect = VisibleContentArea;

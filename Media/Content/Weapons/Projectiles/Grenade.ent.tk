@@ -1,13 +1,14 @@
 ProjectileClass {
     Name: "Grenade";
-    MuzzleVelocity: 500;
+    MuzzleVelocity: 1500;
     DestroyIfOffscreen: False;
     IgnoreTrace: False;
-    Drag: 3;
+    Drag: 1;
     CanDamageSource: true;
     Damage: 0;
+    InheritSourcePhysics: true;
 
-    LifeSpan: 1sec;
+    LifeSpan: 0.5sec;
     MinimumSpeed: -1000;
 
     Trail: {
@@ -25,8 +26,8 @@ ProjectileClass {
     FadeEffect: {
         Effects: [
             HealthEffect {
-                MaxDamage: 100000;
-                Radius: 20;
+                MaxDamage: 1000;
+                Radius: 100;
             };
 
             ForceEffect {

@@ -32,6 +32,7 @@ Static {
 				Height: 88;
 			}
 		}
+
 		Graphic {
 			Name: "Health frame";
 			Position: [0 62];

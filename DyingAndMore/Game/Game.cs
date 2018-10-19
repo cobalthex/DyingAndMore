@@ -199,6 +199,7 @@ namespace DyingAndMore.Game
             gameplaySettingsConsole.UserData = GameplaySettings;
 
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
+            Map.Class.DebugFont = DefaultFont;
 
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
@@ -337,6 +338,7 @@ namespace DyingAndMore.Game
                 Map = Map.Class.Instantiate();
                 isDead = false;
                 OnParentChanged(new ParentChangedEventArgs(null));
+                Reflow();
                 return;
             }
 
@@ -544,17 +546,17 @@ namespace DyingAndMore.Game
                     Color.Cyan
                 );
 
-                var v = new Vector2(player.camera.Viewport.Width, player.camera.Viewport.Height);
-                foreach (var touch in player.inputs.Touches)
-                {
-                    Takai.Graphics.Primitives2D.DrawLine(spriteBatch, Color.CornflowerBlue,
-                        new Vector2(touch.boundsPercent.min.X, touch.boundsPercent.min.Y) * v,
-                        new Vector2(touch.boundsPercent.max.X, touch.boundsPercent.min.Y) * v,
-                        new Vector2(touch.boundsPercent.max.X, touch.boundsPercent.max.Y) * v,
-                        new Vector2(touch.boundsPercent.min.X, touch.boundsPercent.max.Y) * v,
-                        new Vector2(touch.boundsPercent.min.X, touch.boundsPercent.min.Y) * v
-                    );
-                }
+                //var v = new Vector2(player.camera.Viewport.Width, player.camera.Viewport.Height);
+                //foreach (var touch in player.inputs.Touches)
+                //{
+                //    Takai.Graphics.Primitives2D.DrawLine(spriteBatch, Color.CornflowerBlue,
+                //        new Vector2(touch.boundsPercent.min.X, touch.boundsPercent.min.Y) * v,
+                //        new Vector2(touch.boundsPercent.max.X, touch.boundsPercent.min.Y) * v,
+                //        new Vector2(touch.boundsPercent.max.X, touch.boundsPercent.max.Y) * v,
+                //        new Vector2(touch.boundsPercent.min.X, touch.boundsPercent.max.Y) * v,
+                //        new Vector2(touch.boundsPercent.min.X, touch.boundsPercent.min.Y) * v
+                //    );
+                //}
             }
 
             var particleCount = 0;
@@ -570,23 +572,6 @@ namespace DyingAndMore.Game
                 new Vector2(20, 200),
                 Color.Orange
             );
-
-            if (Map.renderSettings.drawDebugInfo)
-            {
-                //todo: move text rendering to map (Map.DrawText(text, font))
-
-
-
-                //foreach (var sound in Map.Sounds)
-                //{
-                //    DefaultFont.Draw(
-                //        spriteBatch,
-                //        $"Vol:{sound.Instance.Volume:N2} Pan:{sound.Instance.Pan:N2} Pit:{sound.Instance.Pitch:N2}",
-                //        Map.ActiveCamera.WorldToScreen(sound.Position) + new Vector2(0, 50),
-                //        Color.Aquamarine
-                //    );
-                //}
-            }
         }
     }
 }

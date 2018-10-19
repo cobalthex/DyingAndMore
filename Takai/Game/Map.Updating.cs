@@ -93,7 +93,7 @@ namespace Takai.Game
         protected List<EntityInstance> entsToDestroy = new List<EntityInstance>(8);
 
         /// <summary>
-        /// Ents to add to the map during the next Update()
+        /// Ents to update during the next Update()
         /// </summary>
         protected HashSet<EntityInstance> activeEntities = new HashSet<EntityInstance>();
         protected HashSet<EntityInstance> possibleOffscreenEntities = new HashSet<EntityInstance>();

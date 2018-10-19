@@ -480,6 +480,11 @@ namespace Takai.Game
 
             return true;
         }
+
+        public virtual string GetDebugInfo()
+        {
+            return $"Name: {(Name ?? "(none)")}\nAlive: {IsAlive}";
+        }
     }
 }
 
