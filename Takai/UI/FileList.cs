@@ -5,10 +5,13 @@ using P = System.IO.Path;
 namespace Takai.UI
 {
     //todo: convert to use FileInputBase
-    public class FileList : ItemList<string>
+    public class FileList : ItemList<FileSystemInfo>
     {
         public string FilterRegex { get; set; }
 
+        /// <summary>
+        /// The current directory to list the contents of
+        /// </summary>
         public string Path
         {
             get => _path;
@@ -39,24 +42,36 @@ namespace Takai.UI
         private string _basePath = P.GetFullPath(".");
 
         [Data.Serializer.Ignored]
-        public string SelectedFile => P.Combine(Path, SelectedItem);
+        public string SelectedFile => P.Combine(Path, SelectedItem.Name);
+
+        public FileList()
+        {
+            var template = new Static
+            {
+                Bindings = new System.Collections.Generic.List<Data.Binding> {
+                    new Data.Binding("Name", "Name"),
+                    new Data.Binding("Name", "Text")
+                }
+            };
+            ItemTemplate = template;
+        }
 
         protected void RefreshList(string path)
         {
             Items.Clear();
 
-            if (Path != BasePath)
-                Items.Add("« Previous");
+            //if (Path != BasePath)
+            //    Items.Add("« Previous");
 
             //display folders first
             foreach (var entry in Directory.EnumerateDirectories(path))
-                Items.Add(P.GetFileName(entry) + P.DirectorySeparatorChar);
+                Items.Add(new DirectoryInfo(entry));
 
             var regex = new Regex(FilterRegex ?? "", RegexOptions.IgnoreCase | RegexOptions.Singleline);
             foreach (var entry in Directory.EnumerateFiles(path))
             {
                 if (regex.IsMatch(entry))
-                    Items.Add(P.GetFileName(entry));
+                    Items.Add(new FileInfo(entry));
             }
         }
 
@@ -66,10 +81,10 @@ namespace Takai.UI
                 return;
 
             var entry = Items[e.newIndex];
-            if (entry == "« Previous")
-                Path = Directory.GetParent(Path).FullName;
-            else if (entry[entry.Length - 1] == P.DirectorySeparatorChar)
-                Path = P.Combine(Path, entry);
+            //if (entry == "« Previous")
+            //    Path = Directory.GetParent(Path).FullName;
+            /*else */if (entry is DirectoryInfo di)
+                Path = P.Combine(Path, di.Name);
         }
     }
 }

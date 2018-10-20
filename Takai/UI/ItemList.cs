@@ -21,7 +21,37 @@ namespace Takai.UI
         public ObservableCollection<T> Items { get; set; } = new ObservableCollection<T>();
 
         /// <summary>
-        /// Where to render the items to. This element wil autosize whenever the container is resized
+        /// The template used to render each item.
+        /// Values are bound using bindings
+        /// Items are recreated whenever this is modified
+        /// </summary>
+        public Static ItemTemplate
+        {
+            get => _itemTemplate;
+            set
+            {
+                if (value == _itemTemplate)
+                    return;
+
+                System.Diagnostics.Contracts.Contract.Assume(value != null, nameof(ItemTemplate) + " cannot be null");
+                _itemTemplate = value;
+
+                int focusIndex = -1;
+                var focused = FindFocusedNoParent();
+                if (focused != null && focused.Parent == this)
+                    focusIndex = focused.ChildIndex;
+
+                Container.RemoveAllChildren();
+                var newChildren = new System.Collections.Generic.List<Static>(Items.Count);
+                for (int i = 0; i < Items.Count; ++i)
+                    newChildren.Add(CreateItem(Items[i]));
+                Container.AddChildren(newChildren);
+            }
+        }
+        private Static _itemTemplate = null;
+
+        /// <summary>
+        /// Where to render the items to
         /// </summary>
         public Static Container
         {
@@ -31,7 +61,7 @@ namespace Takai.UI
                 if (Container == value)
                     return;
 
-                System.Diagnostics.Contracts.Contract.Assume(value != null, "Container cannot be null");
+                System.Diagnostics.Contracts.Contract.Assume(value != null, nameof(Container) + " cannot be null");
 
                 if (_container != null)
                     _container.MoveAllChildrenTo(value);
@@ -40,7 +70,11 @@ namespace Takai.UI
                 ReplaceAllChildren(_container);
             }
         }
-        private Static _container;
+        private Static _container = new List
+        {
+            HorizontalAlignment = Alignment.Stretch,
+            VerticalAlignment = Alignment.Stretch
+        };
 
         public bool AllowSelection { get; set; } = true;
 
@@ -97,10 +131,7 @@ namespace Takai.UI
         public ItemList()
         {
             Items.CollectionChanged += Items_CollectionChanged;
-            Container = new List()
-            {
-                HorizontalAlignment = Alignment.Stretch
-            };
+            AddChild(Container);
         }
 
         protected void Items_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -135,20 +166,20 @@ namespace Takai.UI
                 for (int i = 0; i < e.NewItems.Count; ++i)
                     Container.InsertChild(CreateItem((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
-
-            //todo: Items binding setter
         }
 
+        /// <summary>
+        /// Create a new list item
+        /// </summary>
+        /// <param name="value">The item value to use for binding</param>
+        /// <returns>The item created</returns>
         protected Static CreateItem(T value)
         {
-            var item = new Static()
-            {
-                Text = value.ToString(),
-                Font = Font,
-                Color = Color,
-                Padding = new Vector2(ItemPadding) //todo: revisit
-                //HorizontalAlignment = Alignment.Stretch //todo: configurable (item templates?)
-            };
+            if (ItemTemplate == null)
+                throw new NullReferenceException("ItemTemplate cannot be null");
+
+            var item = ItemTemplate.Clone();
+            item.BindTo(value);
             item.Click += delegate (object sender, ClickEventArgs e)
             {
                 var which = (Static)sender;

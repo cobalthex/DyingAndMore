@@ -963,17 +963,13 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Find the element in this tree that has focus (recursively)
+        /// Find the focused element searching this and its children
         /// </summary>
-        /// <returns>The focused element, or null if there is none</returns>
-        public Static FindFocused()
+        /// <returns>The focused element, or null if none</returns>
+        public Static FindFocusedNoParent()
         {
-            var parent = this;
-            while (parent.Parent != null)
-                parent = parent.Parent;
-
             var next = new Stack<Static>();
-            next.Push(parent);
+            next.Push(this);
 
             while (next.Count > 0)
             {
@@ -986,6 +982,19 @@ namespace Takai.UI
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Find the element in this tree that has focus (recursively)
+        /// </summary>
+        /// <returns>The focused element, or null if there is none</returns>
+        public Static FindFocused()
+        {
+            var parent = this;
+            while (parent.Parent != null)
+                parent = parent.Parent;
+
+            return parent.FindFocusedNoParent();
         }
 
         /// <summary>

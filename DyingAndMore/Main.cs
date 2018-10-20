@@ -150,6 +150,7 @@ namespace DyingAndMore
 
             ui = new Takai.UI.FileList
             {
+                //Size = new Vector2(400, 600),
                 HorizontalAlignment = Takai.UI.Alignment.Middle,
                 VerticalAlignment = Takai.UI.Alignment.Middle,
                 BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
