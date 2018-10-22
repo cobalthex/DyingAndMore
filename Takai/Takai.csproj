@@ -114,6 +114,7 @@
     <Compile Include="UI\RadialList.cs" />
     <Compile Include="UI\ScrollBar.cs" />
     <Compile Include="UI\Static.cs" />
+    <Compile Include="UI\TabPanel.cs" />
     <Compile Include="UI\TextInput.cs" />
     <Compile Include="UI\TrackBar.cs" />
     <Compile Include="UI\UITree.cs" />

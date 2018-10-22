@@ -99,9 +99,10 @@ namespace DyingAndMore.Game
         Static crapDisplay;
         Static clockDisplay;
 
-        Static renderSettingsConsole;
-        Static updateSettingsConsole;
-        Static gameplaySettingsConsole;
+        TabPanel settingsConsole;
+        Static renderSettingsPane;
+        Static updateSettingsPane;
+        Static gameplaySettingsPane;
 
         Static hudContainer;
 
@@ -130,6 +131,10 @@ namespace DyingAndMore.Game
                     Map = Game.Map = inst;
             },
             ["CompleteMap"] = (ignored) => CompleteMap(),
+            ["Cleanup"] = delegate (object ignored)
+            {
+                Map.CleanupAll(MapInstance.CleanupOptions.All);
+            },
         };
 
         public void CompleteMap()
@@ -180,23 +185,28 @@ namespace DyingAndMore.Game
 
             Map = game.Map;
 
-            AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor));
-            renderSettingsConsole.IsEnabled = false;
-            renderSettingsConsole.Position = new Vector2(100, 0);
-            renderSettingsConsole.VerticalAlignment = Alignment.Middle;
-            renderSettingsConsole.UserData = Map.renderSettings;
+            AddChild(settingsConsole = new TabPanel
+            {
+                Name = "Settings Console",
+                IsEnabled = false,
+                Position = new Vector2(100, 200),
+                Padding = new Vector2(10, 5),
+                Margin = 10,
+                BackgroundColor = new Color(40, 40, 40),
+                BorderColor = Color.Gray
+            });
 
-            AddChild(updateSettingsConsole = GeneratePropSheet(Map.updateSettings, DefaultFont, DefaultColor));
-            updateSettingsConsole.IsEnabled = false;
-            updateSettingsConsole.Position = new Vector2(100, 0);
-            updateSettingsConsole.VerticalAlignment = Alignment.Middle;
-            updateSettingsConsole.UserData = Map.updateSettings;
+            renderSettingsPane = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor);
+            renderSettingsPane.Name = "Render Settings";
+            settingsConsole.AddChild(renderSettingsPane);
 
-            AddChild(gameplaySettingsConsole = GeneratePropSheet(GameplaySettings, DefaultFont, DefaultColor));
-            gameplaySettingsConsole.IsEnabled = false;
-            gameplaySettingsConsole.Position = new Vector2(100, 0);
-            gameplaySettingsConsole.VerticalAlignment = Alignment.Middle;
-            gameplaySettingsConsole.UserData = GameplaySettings;
+            updateSettingsPane = GeneratePropSheet(Map.updateSettings, DefaultFont, DefaultColor);
+            updateSettingsPane.Name = "Update Settings";
+            settingsConsole.AddChild(updateSettingsPane);
+
+            gameplaySettingsPane = GeneratePropSheet(GameplaySettings, DefaultFont, DefaultColor);
+            gameplaySettingsPane.Name = "Gameplay Settings";
+            settingsConsole.AddChild(gameplaySettingsPane);
 
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
             Map.Class.DebugFont = DefaultFont;
@@ -219,8 +229,8 @@ namespace DyingAndMore.Game
 
             hudContainer.RemoveAllChildren();
 
-            updateSettingsConsole?.BindTo(Map.updateSettings);
-            renderSettingsConsole?.BindTo(Map.renderSettings);
+            updateSettingsPane?.BindTo(Map.updateSettings);
+            renderSettingsPane?.BindTo(Map.renderSettings);
 
             var possiblePlayers = new List<Entities.ActorInstance>();
 
@@ -311,20 +321,22 @@ namespace DyingAndMore.Game
             var wx = 0.01f * availableSize.X;
             var wy = 0.01f * availableSize.Y;
 
-            for (int i = 0; i < players.Count; ++i)
+            if (players != null)
             {
-                var viewport = new Rectangle();
-                if (players.Count <= viewportLayouts.Length && i < viewportLayouts[players.Count].Length)
-                    viewport = viewportLayouts[players.Count][i];
+                for (int i = 0; i < players.Count; ++i)
+                {
+                    var viewport = new Rectangle();
+                    if (players.Count <= viewportLayouts.Length && i < viewportLayouts[players.Count].Length)
+                        viewport = viewportLayouts[players.Count][i];
 
-                viewport.X = (int)(viewport.X * wx);
-                viewport.Y = (int)(viewport.Y * wy);
-                viewport.Width = (int)(viewport.Width * wx);
-                viewport.Height = (int)(viewport.Height * wy);
+                    viewport.X = (int)(viewport.X * wx);
+                    viewport.Y = (int)(viewport.Y * wy);
+                    viewport.Width = (int)(viewport.Width * wx);
+                    viewport.Height = (int)(viewport.Height * wy);
 
-                players[i].camera.Viewport = viewport;
+                    players[i].camera.Viewport = viewport;
+                }
             }
-
             base.ReflowOverride(availableSize);
         }
 
@@ -426,18 +438,7 @@ namespace DyingAndMore.Game
             if (InputState.IsPress(Keys.F2) ||
                 InputState.IsAnyPress(Buttons.Back))
             {
-                renderSettingsConsole.IsEnabled ^= true;
-                return false;
-            }
-            if (InputState.IsPress(Keys.F3) ||
-                InputState.IsAnyPress(Buttons.Back))
-            {
-                updateSettingsConsole.IsEnabled ^= true;
-                return false;
-            }
-            if (InputState.IsPress(Keys.F4))
-            {
-                gameplaySettingsConsole.IsEnabled ^= true;
+                settingsConsole.IsEnabled ^= true;
                 return false;
             }
 

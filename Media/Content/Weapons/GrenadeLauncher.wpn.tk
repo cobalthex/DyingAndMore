@@ -1,4 +1,5 @@
 GunClass {
+	Name: "Grenade launcher";
     Projectile: @"Weapons/Projectiles/Grenade.ent.tk";
 
     MaxAmmo: 200;

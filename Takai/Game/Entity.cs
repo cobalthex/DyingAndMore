@@ -87,7 +87,7 @@ namespace Takai.Game
 
         public override string ToString()
         {
-            return (Name ?? base.ToString());
+            return $"{GetType().Name} ({Name})";
         }
     }
 
@@ -356,7 +356,7 @@ namespace Takai.Game
 
         public override string ToString()
         {
-            return (Class?.Name ?? base.ToString()) + $"({Id})";
+            return $"{GetType().Name} ({Class?.Name}) {{{Id}}}";
         }
 
         /// <summary>

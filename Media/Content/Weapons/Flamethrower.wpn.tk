@@ -1,4 +1,5 @@
 GunClass {
+    Name: "Flamethrower";
     MaxAmmo: 20000;
 
     DischargeEffect: {
@@ -70,11 +71,11 @@ GunClass {
 
                     CollisionEffect: {
                         Effects: [
-                            #*HealthEffect {
+                            HealthEffect {
                                 MaxDamage: 3;
                                 Radius: 0;
                                 CanAffectSource: false;
-                            }*#
+                            }
                             ConditionEffect {
                                 Condition: @"Actors/Conditions/fire.cond.tk";
                                 Radius: 10;

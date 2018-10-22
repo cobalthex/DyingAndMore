@@ -46,13 +46,27 @@ namespace Takai.UI
 
         public FileList()
         {
-            var template = new Static
+            var template = new List
+            {
+                HorizontalAlignment = Alignment.Stretch,
+                Direction = Direction.Horizontal,
+                Padding = new Microsoft.Xna.Framework.Vector2(10),
+                Margin = 10
+            };
+            template.AddChild(new Static
             {
                 Bindings = new System.Collections.Generic.List<Data.Binding> {
-                    new Data.Binding("Name", "Name"),
                     new Data.Binding("Name", "Text")
                 }
-            };
+            });
+            template.AddChild(new Static
+            {
+                HorizontalAlignment = Alignment.Right,
+                Color = Microsoft.Xna.Framework.Color.DimGray,
+                Bindings = new System.Collections.Generic.List<Data.Binding> {
+                    new Data.Binding("LastWriteTime", "Text")
+                }
+            });
             ItemTemplate = template;
         }
 
@@ -83,7 +97,8 @@ namespace Takai.UI
             var entry = Items[e.newIndex];
             //if (entry == "« Previous")
             //    Path = Directory.GetParent(Path).FullName;
-            /*else */if (entry is DirectoryInfo di)
+            /*else */
+            if (entry is DirectoryInfo di)
                 Path = P.Combine(Path, di.Name);
         }
     }

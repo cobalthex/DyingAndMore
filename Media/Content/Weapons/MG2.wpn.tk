@@ -1,4 +1,5 @@
 GunClass {
+    Name: "Machine Gun (2)";
     Projectile: @"Weapons/Projectiles/MGPellet2.ent.tk";
 
     MaxAmmo: 1000;

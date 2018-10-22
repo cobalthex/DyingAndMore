@@ -289,12 +289,15 @@ namespace Takai.UI
         public Rectangle OffsetContentArea { get; private set; }
 
         /// <summary>
-        /// The visible region of this element on the screen, includes padding
+        /// The visible region of this element on the screen, excluding padding
         /// </summary>
         [Data.Serializer.Ignored]
-        protected Rectangle VisibleContentArea { get; private set; }
+        public Rectangle VisibleContentArea { get; private set; }
 
-        protected Rectangle VisibleBounds { get; private set; }
+        /// <summary>
+        /// The visible region of this element, including padding
+        /// </summary>
+        public Rectangle VisibleBounds { get; private set; }
 
         /// <summary>
         /// The container that this element fits into
@@ -562,13 +565,15 @@ namespace Takai.UI
             clone.Id = GenerateId();
 #endif
             clone.SetParentNoReflow(null);
-            for (int i = 0; i < clone.Children.Count; ++i)
+            clone._children = new List<Static>(_children);
+            clone.Children = clone._children.AsReadOnly();
+            for (int i = 0; i < clone._children.Count; ++i)
             {
-                var child = clone.Children[i].Clone();
+                var child = clone._children[i].Clone();
                 child.SetParentNoReflow(clone);
                 clone._children[i] = child;
             }
-            FinalizeClone();
+            clone.FinalizeClone();
             return clone;
         }
 
@@ -624,7 +629,7 @@ namespace Takai.UI
                 child.HasFocus = true;
 
             if (reflow)
-                child.Reflow(containerBounds);
+                Reflow();
 
             return true;
         }
@@ -1597,7 +1602,11 @@ namespace Takai.UI
 
         public override string ToString()
         {
-            return $"{base.ToString()} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\" {(IsEnabled ? "👁" : "❌")}";
+            string extraInfo = "";
+#if DEBUG
+            extraInfo = $" ID:{Id}";
+#endif
+            return $"{base.ToString()} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\" {(IsEnabled ? "👁" : "❌")}{extraInfo}";
         }
 
         public virtual void DerivedDeserialize(Dictionary<string, object> props)

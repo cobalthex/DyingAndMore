@@ -83,7 +83,7 @@ namespace Takai.UI
         /// </summary>
         public T SelectedItem
         {
-            get => Items[SelectedIndex];
+            get => SelectedIndex < 0 ? default(T) : Items[SelectedIndex];
             set => SelectedIndex = Items.IndexOf(value);
         }
 
@@ -159,7 +159,7 @@ namespace Takai.UI
             }
             else if (e.Action == NotifyCollectionChangedAction.Move)
             {
-                ; //todo
+                throw new NotImplementedException("todo");
             }
             else if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -183,7 +183,7 @@ namespace Takai.UI
             item.Click += delegate (object sender, ClickEventArgs e)
             {
                 var which = (Static)sender;
-                SelectedIndex = Container.Children.IndexOf(which);
+                SelectedIndex = which.ChildIndex;
             };
             return item;
         }
