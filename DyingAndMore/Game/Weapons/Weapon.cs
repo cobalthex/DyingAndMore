@@ -72,6 +72,11 @@ namespace DyingAndMore.Game.Weapons
         public Takai.UI.Static Hud { get; set; }
 
         public abstract WeaponInstance Instantiate();
+
+        public override string ToString()
+        {
+            return $"{GetType().Name} ({Name})";
+        }
     }
 
     public enum WeaponState
@@ -270,7 +275,7 @@ namespace DyingAndMore.Game.Weapons
 
         public override string ToString()
         {
-            return Class?.Name ?? GetType().Name;
+            return $"{GetType().Name} ({Class?.Name})";
         }
     }
 }

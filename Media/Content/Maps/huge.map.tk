@@ -10,12 +10,6 @@ MapClass {
                 Name: Null;
             }
             EntitySpawn {
-                Class: @"Actors/Ally.ent.tk";
-                Position: [600 600];
-                Forward: [-1 0];
-                Name: "A helping friend";
-            }
-            EntitySpawn {
                 Class: @"Pickups/MG.ent.tk";
                 Position: [400 600];
                 Forward: [-1 0];

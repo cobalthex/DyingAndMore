@@ -1,4 +1,5 @@
 GunClass {
+    Name: "Needler";
     Projectile: @"Weapons/Projectiles/Needle.ent.tk";
 
     MaxAmmo: 400;

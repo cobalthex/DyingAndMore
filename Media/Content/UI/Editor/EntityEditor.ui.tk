@@ -32,29 +32,35 @@ List {
                         };
 
 						Static { Text: "Actor Properties"; };
-						List {
-							Children: [
-								Static { Text: "Current Health"; };
-								NumericInput {
-									Bindings: [
-										{
-											Mode: BindingMode.TwoWay;
-											Source: "CurrentHealth";
-											Target: "Value";
-										};
-									];
-									Minimum: 0;
-									Maximum: 2E9;
+						Static { Text: "Current Health"; };
+						NumericInput {
+							Bindings: [
+								Binding {
+									Mode: BindingMode.TwoWay;
+									Source: "CurrentHealth";
+									Target: "Value";
 								};
-
-								#weapon
-
-								#conditions
-								#actions
-
-								Static { Text: "Controller"; };
 							];
+							Minimum: 0;
+							Maximum: 2E9;
 						};
+
+						#weapon
+                        Static { Text: "Weapon"; };
+                        WeaponSelect { 
+                            Bindings: [
+                                Binding {
+                                    Mode: BindingMode.TwoWay;
+                                    Source: "Weapon";
+                                    Target: "Instance";
+                                }
+                            ];
+                        };
+
+						#conditions
+						#actions
+
+						Static { Text: "Controller"; };
                     ];
                 };
             ];

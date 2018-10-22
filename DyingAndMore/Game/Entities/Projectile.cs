@@ -1,14 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
 {
+    /// <summary>
+    /// Allows for modifying the direction of a traveling object
+    /// </summary>
+    /// <param name="distance">How far the projectile has traveled since it spawned</param>
+    /// <param name="direction">The current direction of the projectile</param>
+    /// <returns>The new direction of the object</returns>
+    public delegate Vector2 DirectionModifier(float distance, Vector2 direction);
+
     //move projectiles to actors or even generic entities (behaviors for projectile specifics) ?
 
     public class ProjectileClass : EntityClass
     {
+        public static DirectionModifier WaveDirectionMod => delegate (float distance, Vector2 direction)
+        {
+            var tangent = (float)Math.Sin(distance / 100000) * MathHelper.PiOver2;
+            return Vector2.TransformNormal(direction, Matrix.CreateRotationZ(tangent));
+        };
+
         /// <summary>
         /// Initial speed of the projectile
         /// </summary>
@@ -56,6 +69,11 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public float MagnetismAnglePerSecond { get; set; }
 
+        /// <summary>
+        /// A modifier to modify the direction of the projectile as it travels
+        /// </summary>
+        public DirectionModifier DirectionMod { get; set; } = null;
+
         public ProjectileClass()
         {
             DestroyIfOffscreen = true;
@@ -95,17 +113,16 @@ namespace DyingAndMore.Game.Entities
 
         public ProjectileInstance() { }
         public ProjectileInstance(ProjectileClass @class)
-            : base(@class)
-        {
-
-        }
+            : base(@class) { }
 
         public override void Think(TimeSpan deltaTime)
         {
+            var cdist = Vector2.Distance(origin, Position);
+
             if (IsAlive &&
                 (ForwardSpeed() < Class.MinimumSpeed ||
                 (Class.LifeSpan > TimeSpan.Zero && Map.ElapsedTime > SpawnTime + Class.LifeSpan) ||
-                (Class.Range != 0 && Vector2.DistanceSquared(origin, Position) > Class.Range * Class.Range)))
+                (Class.Range != 0 && cdist > Class.Range)))
             {
                 DisableNextDestructionEffect = true;
                 if (Class.FadeEffect != null)
@@ -139,6 +156,13 @@ namespace DyingAndMore.Game.Entities
                 {
                     CurrentMagnet = FindTarget();
                     nextTargetSearchTime = Map.RealTime.TotalGameTime + TimeSpan.FromMilliseconds(50); //store delay in editor config?
+                }
+
+                if (Class.DirectionMod != null)
+                {
+                    var newDirection = Class.DirectionMod(cdist, Forward);
+                    Forward = newDirection;
+                    Velocity = Forward * Velocity.Length();
                 }
             }
 

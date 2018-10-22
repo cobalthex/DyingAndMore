@@ -1,4 +1,5 @@
 GunClass {
+	Name: "Test boss gun";
     Projectile: @"Weapons/Projectiles/Missile.ent.tk";
 
     MaxAmmo: 1000;

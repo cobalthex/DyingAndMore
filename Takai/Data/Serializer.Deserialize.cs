@@ -10,6 +10,8 @@ using System.Linq.Expressions;
 using TFloat = System.Double;
 using TInt = System.Int64;
 
+//todo: proper lazy load support for ext references
+
 namespace Takai.Data
 {
     /// <summary>
@@ -807,8 +809,6 @@ namespace Takai.Data
                 var genericType = destType.GetGenericTypeDefinition();
                 var genericArgs = destType.GetGenericArguments();
 
-                //if (genericType is typeof(Lazy<>))
-
                 //implicit cast (limited support)
                 if (genericArgs.Length == 1 && !sourceTypeInfo.IsGenericType)
                 {
@@ -818,6 +818,14 @@ namespace Takai.Data
                         var genericCvt = Cast(genericArgs[0], source, context);
                         return implCast.Invoke(null, new[] { genericCvt });
                     }
+                }
+
+                if (genericType == typeof(Lazy<>))
+                {
+                    //since the value has already been provided, this simply passes it through
+                    var val = Cast(genericArgs[0], source, context);
+                    var expr = Expression.Lambda(typeof(Func<>).MakeGenericType(genericArgs[0]), Expression.Constant(val)).Compile();
+                    return Activator.CreateInstance(destType, expr);
                 }
 
                 //todo: support any number of items in tuple
@@ -900,6 +908,12 @@ namespace Takai.Data
             {
                 var dest = CreateType(destType);
                 return ParseDictionary(destType, dest, (Dictionary<string, object>)source, context);
+            }
+
+            if (sourceTypeInfo.IsGenericType && sourceType.GetGenericTypeDefinition() == typeof(Lazy<>))
+            {
+                var lazyVal = sourceType.GetProperty("Value").GetValue(source);
+                return Cast(destType, lazyVal, context);
             }
 
             //implicit cast (limited support)

@@ -91,11 +91,12 @@ namespace Takai.Data
         int cachedHash;
 
         public Binding() { }
-        public Binding(string source, string target, BindingMode mode = BindingMode.OneWay)
+        public Binding(string source, string target, BindingMode mode = BindingMode.OneWay, object defaultValue = null)
         {
             Source = source;
             Target = target;
             Mode = mode;
+            DefaultValue = defaultValue;
         }
 
         public object Clone()

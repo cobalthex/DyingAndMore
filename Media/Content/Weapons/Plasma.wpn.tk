@@ -1,4 +1,5 @@
 GunClass {
+	Name: "Plasma gun";
     Projectile: @"Weapons/Projectiles/Plasma.ent.tk";
 
     MaxAmmo: 1000;

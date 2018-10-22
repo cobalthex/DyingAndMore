@@ -1,12 +1,13 @@
 ProjectileClass {
     Name: "Missile";
-    MuzzleVelocity: 500;
+    MuzzleVelocity: 300;
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
-    Drag: 0.4;
-    MinimumSpeed: 300;
+    #Drag: 0.4;
+    MinimumSpeed: -3000000;
     CanDamageSource: true;
-    InheritSourcePhysics: true;    
+    #InheritSourcePhysics: true;    
+    DirectionMod: ProjectileClass.WaveDirectionMod;
 
     Range: 400;
     #*FadeEffect: {
@@ -40,7 +41,7 @@ ProjectileClass {
                 [1 4];
             ]
         };
-        Jitter: [-3 3];
+        #Jitter: [-3 3];
     }
 
     Animations: {
@@ -48,7 +49,7 @@ ProjectileClass {
             Sprite: {
                 Texture: @"./Antibody.png";
             };
-            Effect: @"Effects/trail.fx.tk";
+            #Effect: @"Effects/trail.fx.tk";
         }
     }
 }
