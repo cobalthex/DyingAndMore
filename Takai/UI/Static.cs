@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
-//todo: on font/text changed, autosize
-
 namespace Takai.UI
 {
     /// <summary>
@@ -327,7 +325,7 @@ namespace Takai.UI
                         next = defocusing.Pop();
                         next._hasFocus = false;
 
-                        foreach (var child in next.Children)
+                        foreach (var child in next.InternalChildren)
                             defocusing.Push(child);
                     }
                 }
@@ -439,11 +437,11 @@ namespace Takai.UI
         private Static _parent = null;
 
         /// <summary>
-        /// A readonly collection of all of the children in this element (including disabled children)
+        /// Children internal to this element (such as the text input of a numeric input)
+        /// These are not serialized and cannot be modified externally
+        /// Any public enumeration should use <see cref="TotalChildCount"/> and <see cref="GetChildAt"/> or <see cref="EnumerateChildren"/>
         /// </summary>
-        [Data.CustomDeserialize(typeof(Static), "DeserializeChildren")]
-        public ReadOnlyCollection<Static> Children { get; private set; } //todo: maybe observable
-        private List<Static> _children = new List<Static>();
+        protected List<Static> InternalChildren { get; private set; } = new List<Static>();
 
         /// <summary>
         /// Bind properties of <see cref="BindingSource"/> to properties of this UI element
@@ -453,22 +451,7 @@ namespace Takai.UI
 
         #endregion
 
-        private void DeserializeChildren(object objects)
-        {
-            if (!(objects is List<object> elements))
-                throw new System.ArgumentException("Children must be a list of UI elements");
-
-            foreach (var element in elements)
-            {
-                if (element is Static child)
-                    AddChild(child);
-            }
-        }
-
-        public Static()
-        {
-            Children = _children.AsReadOnly();
-        }
+        public Static() { }
 
         /// <summary>
         /// Create a simple static label. Calls <see cref="AutoSize(float)"/>
@@ -483,12 +466,11 @@ namespace Takai.UI
         /// <summary>
         /// Create a new element
         /// </summary>
-        /// <param name="children">Optionally add children to this element</param>
-        public Static(params Static[] children)
+        /// <param name="children">Optionally (internal) children to add to this element</param>
+        protected Static(params Static[] children)
             : this()
         {
-            foreach (var child in children)
-                AddChild(child);
+            InternalChildren.AddRange(children);
         }
 
         /// <summary>
@@ -544,6 +526,50 @@ namespace Takai.UI
 
         #region Hierarchy/cloning
 
+        //public ReadOnlyCollection<Static> GetInternalChildren()
+        //{
+        //    return InternalChildren.AsReadOnly();
+        //}
+
+        /// <summary>
+        /// The total number of children including internal and external children
+        /// </summary>
+        protected virtual int TotalChildCount => InternalChildren.Count;
+
+        /// <summary>
+        /// Get a child element at an index, internal or otherwise
+        /// Useful for enumerating child items.
+        /// Internal children should come first
+        /// </summary>
+        /// <param name="index">The index to retrieve</param>
+        /// <returns>The element at the specified index</returns>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        protected virtual Static GetChildAt(int index)
+        {
+            return InternalChildren[index];
+        }
+
+        /// <summary>
+        /// Get the index of the child element, returns -1 if not found
+        /// </summary>
+        /// <param name="child">The child to find</param>
+        /// <returns>The index of the child, -1 if not found</returns>
+        protected virtual int GetChildIndex(Static child)
+        {
+            return InternalChildren.IndexOf(child);
+        }
+
+        /// <summary>
+        /// Enumerate only this element's children.
+        /// This should be used by inheritors in Measure/Reflow
+        /// </summary>
+        /// <returns>The child elements</returns>
+        public IEnumerable<Static> EnumerateChildren()
+        {
+            for (int i = 0; i < TotalChildCount; ++i)
+                yield return GetChildAt(i);
+        }
+
         private void SetParentNoReflow(Static newParent)
         {
             var changed = new ParentChangedEventArgs(_parent);
@@ -565,20 +591,35 @@ namespace Takai.UI
             clone.Id = GenerateId();
 #endif
             clone.SetParentNoReflow(null);
-            clone._children = new List<Static>(_children);
-            clone.Children = clone._children.AsReadOnly();
-            for (int i = 0; i < clone._children.Count; ++i)
+            clone.InternalChildren = new List<Static>(InternalChildren.Count);
+            foreach (var child in InternalChildren)
             {
-                var child = clone._children[i].Clone();
-                child.SetParentNoReflow(clone);
-                clone._children[i] = child;
+                var newChild = child.Clone();
+                newChild.SetParentNoReflow(clone);
+                clone.InternalChildren.Add(newChild);
             }
             clone.FinalizeClone();
+            clone.BindEvents();
             return clone;
         }
 
         /// <summary>
-        /// Allows this element the opportunity to refresh any references after it and its children have been cloned
+        /// Clear and bind all events here. Called on creation and <see cref="Clone"/>.
+        /// Children are cloned before this is called.
+        /// This is called after <see cref="FinalizeClone"/>.
+        /// </summary>
+        protected virtual void BindEvents()
+        {
+            ChildReflow = null;
+            ParentChanged = null;
+            Click = null;
+            Press = null;
+            Resize = null;
+        }
+
+        /// <summary>
+        /// Allows this element the opportunity to refresh any references after it and its children have been cloned.
+        /// Called before <see cref="BindEvents"/>
         /// </summary>
         protected virtual void FinalizeClone() { }
 
@@ -588,157 +629,19 @@ namespace Takai.UI
         /// <returns>True if the element was removed from its parent or false if parent was null</returns>
         public bool RemoveFromParent()
         {
-            if (Parent != null)
-            {
-                Parent.RemoveChild(this);
-                return true;
-            }
+            throw new System.NotImplementedException();
+            //if (Parent != null)
+            //{
+            //    Parent.RemoveChild(this);
+            //    return true;
+            //}
             return false;
         }
 
         /// <summary>
         /// The index of this child in its parents, -1 if no parent
         /// </summary>
-        public int ChildIndex => Parent?.Children.IndexOf(this) ?? -1;
-
-        /// <summary>
-        /// Insert the child into the children without reflowing
-        /// </summary>
-        /// <param name="child">The child element to add</param>
-        /// <param name="index">The insert to add at. Out of bounds are added to the end</param>
-        /// <param name="ignoreFocus">ignore <see cref="HasFocus"/></param>
-        /// <returns>True if the child as added, false otherwise</returns>
-        public virtual bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
-        {
-            //todo: maybe have a forward setting (forward all additions to specified child)
-
-            if (child.Parent == this)
-                return false;
-
-            if (child.Parent != null)
-                child.RemoveFromParent();
-
-            child.SetParentNoReflow(this);
-
-            if (index < 0 || index >= _children.Count)
-                _children.Add(child);
-            else
-                _children.Insert(index, child);
-
-            if (child.HasFocus && !ignoreFocus)
-                child.HasFocus = true;
-
-            if (reflow)
-                Reflow();
-
-            return true;
-        }
-
-        public virtual bool InternalRemoveChildIndex(int index)
-        {
-            if (index < 0 || index >= Children.Count)
-                return false;
-
-            var child = Children[index];
-            _children.RemoveAt(index);
-            if (child.Parent == this)
-                child.SetParentNoReflow(null);
-            return true;
-        }
-
-        public Static AddChild(Static child)
-        {
-            InternalInsertChild(child);
-            return child;
-        }
-
-        /// <summary>
-        /// Replace the child at a specific index
-        /// </summary>
-        /// <param name="child">the child to replace with</param>
-        /// <param name="index">the index of the child to replace. Throws if out of range</param>
-        /// <returns>The staticadded</returns>
-        public Static ReplaceChild(Static child, int index)
-        {
-            InternalRemoveChildIndex(index);
-            InternalInsertChild(child, index);
-            return child;
-        }
-
-        public Static InsertChild(Static child, int index = 0)
-        {
-            InternalInsertChild(child, index);
-            return child;
-        }
-
-        public void AddChildren(params Static[] children)
-        {
-            AddChildren((IEnumerable<Static>)children);
-        }
-
-        public void AddChildren(IEnumerable<Static> children)
-        {
-            //todo: add disable reflow and then switch this to use InsertChild
-            int count = Children.Count;
-
-            Static lastFocus = null;
-            foreach (var child in children)
-            {
-                if (InternalInsertChild(child, -1, false, true) && child.HasFocus)
-                    lastFocus = child;
-            }
-
-            if (lastFocus != null)
-                lastFocus.HasFocus = true;
-
-            if (Children.Count != count)
-                Reflow();
-        }
-
-        /// <summary>
-        /// Remove an element from this element. Does not search children
-        /// </summary>
-        /// <param name="child"></param>
-        public Static RemoveChild(Static child)
-        {
-            InternalRemoveChildIndex(_children.IndexOf(child));
-            return child;
-        }
-
-        public Static RemoveChildAt(int index)
-        {
-            var child = Children[index];
-            InternalRemoveChildIndex(index);
-            return child;
-        }
-
-        public void RemoveAllChildren()
-        {
-            for (int i = _children.Count - 1; i >= 0; --i)
-                InternalRemoveChildIndex(i);
-        }
-
-        /// <summary>
-        /// Move all children from this element to another
-        /// </summary>
-        /// <param name="target">The target element to move them to</param>
-        public void MoveAllChildrenTo(Static target)
-        {
-            //todo: use internal?
-            target.AddChildren(_children);
-            _children.Clear();
-        }
-
-        public void ReplaceAllChildren(params Static[] newChildren)
-        {
-            RemoveAllChildren();
-            AddChildren(newChildren);
-        }
-        public void ReplaceAllChildren(IEnumerable<Static> newChildren)
-        {
-            RemoveAllChildren();
-            AddChildren(newChildren);
-        }
+        public int ChildIndex => Parent?.InternalChildren.IndexOf(this) ?? -1;
 
         /// <summary>
         /// Enumerate through all children and their descendents recursively (including this)
@@ -755,7 +658,7 @@ namespace Takai.UI
                 var top = enumeration.Pop();
                 yield return top;
 
-                foreach (var child in top.Children)
+                foreach (var child in top.InternalChildren)
                 {
                     if (child.IsEnabled)
                         enumeration.Push(child);
@@ -799,12 +702,12 @@ namespace Takai.UI
             while (next != null)
             {
                 var current = next;
-                foreach (var child in next.Children)
+                foreach (var child in next.InternalChildren)
                 {
                     if (child.CanFocus && child.IsEnabled)
                         return child;
 
-                    if (child.Children.Count > 0)
+                    if (child.InternalChildren.Count > 0)
                     {
                         next = child;
                         break;
@@ -816,10 +719,10 @@ namespace Takai.UI
 
                 while (next.Parent != null)
                 {
-                    var index = next.Parent.Children.IndexOf(next) + 1;
-                    if (index < next.Parent.Children.Count)
+                    var index = next.Parent.InternalChildren.IndexOf(next) + 1;
+                    if (index < next.Parent.InternalChildren.Count)
                     {
-                        next = next.Parent.Children[index];
+                        next = next.Parent.InternalChildren[index];
                         break;
                     }
                     else
@@ -861,21 +764,21 @@ namespace Takai.UI
             {
                 if (prev.Parent == null)
                 {
-                    if (prev.Children.Count == 0)
+                    if (prev.InternalChildren.Count == 0)
                         return null;
 
-                    while (prev.Children.Count > 0)
-                        prev = prev.Children[prev.Children.Count - 1];
+                    while (prev.InternalChildren.Count > 0)
+                        prev = prev.InternalChildren[prev.InternalChildren.Count - 1];
                 }
                 else
                 {
-                    var index = prev.Parent.Children.IndexOf(prev) - 1;
+                    var index = prev.Parent.InternalChildren.IndexOf(prev) - 1;
                     if (index >= 0)
                     {
-                        prev = prev.Parent.Children[index];
+                        prev = prev.Parent.InternalChildren[index];
 
-                        while (prev.Children.Count > 0)
-                            prev = prev.Children[prev.Children.Count - 1];
+                        while (prev.InternalChildren.Count > 0)
+                            prev = prev.InternalChildren[prev.InternalChildren.Count - 1];
                     }
                     else
                         prev = prev.Parent;
@@ -927,7 +830,7 @@ namespace Takai.UI
                         prox[mag] = top;
                     }
                 }
-                foreach (var child in top.Children)
+                foreach (var child in top.InternalChildren)
                     stack.Push(child);
             }
 
@@ -982,7 +885,7 @@ namespace Takai.UI
                 if (elem.HasFocus)
                     return elem;
 
-                foreach (var child in elem.Children)
+                foreach (var child in elem.InternalChildren)
                     next.Push(child);
             }
 
@@ -1024,7 +927,7 @@ namespace Takai.UI
                     elem.Name.Equals(name, caseSensitive ? System.StringComparison.Ordinal : System.StringComparison.OrdinalIgnoreCase))
                     return elem;
 
-                foreach (var child in elem.Children)
+                foreach (var child in elem.InternalChildren)
                     next.Push(child);
             }
 
@@ -1102,7 +1005,7 @@ namespace Takai.UI
         {
             var bounds = new Rectangle(0, 0, (int)textSize.X, (int)textSize.Y);
 
-            foreach (var child in Children)
+            foreach (var child in EnumerateChildren())
             {
                 if (!child.IsEnabled)
                     continue;
@@ -1154,7 +1057,7 @@ namespace Takai.UI
         {
             //todo: this availableSize needs to be Size or stretch
 
-            foreach (var child in Children)
+            foreach (var child in EnumerateChildren())
                 child.Reflow(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
         }
 
@@ -1272,13 +1175,13 @@ namespace Takai.UI
 
             //find deepest darkest child
             var toUpdate = this;
-            for (int i = toUpdate.Children.Count - 1; i >= 0; --i)
+            for (int i = toUpdate.TotalChildCount - 1; i >= 0; --i)
             {
-                if (!toUpdate.Children[i].IsEnabled)
+                if (!toUpdate.GetChildAt(i).IsEnabled)
                     continue;
 
-                toUpdate = toUpdate.Children[i];
-                i = toUpdate.Children.Count;
+                toUpdate = toUpdate.GetChildAt(i);
+                i = toUpdate.TotalChildCount;
             }
 
             bool handleInput = true;// Runtime.HasFocus;
@@ -1294,21 +1197,21 @@ namespace Takai.UI
                     break;
 
                 //iterate through previous children of current level
-                var i = toUpdate.Parent._children.IndexOf(toUpdate) - 1;
+                var i = toUpdate.Parent.InternalChildren.IndexOf(toUpdate) - 1;
                 for (; i >= 0; --i)
                 {
-                    toUpdate = toUpdate.Parent.Children[i];
+                    toUpdate = toUpdate.Parent.InternalChildren[i];
                     if (!toUpdate.IsEnabled)
                         continue;
 
                     //find deepest child
-                    for (int j = toUpdate.Children.Count - 1; j >= 0; --j)
+                    for (int j = toUpdate.TotalChildCount - 1; j >= 0; --j)
                     {
-                        if (!toUpdate.Children[j].IsEnabled)
+                        if (!toUpdate.GetChildAt(j).IsEnabled)
                             continue;
 
-                        toUpdate = toUpdate.Children[j];
-                        j = toUpdate.Children.Count;
+                        toUpdate = toUpdate.GetChildAt(j);
+                        j = toUpdate.TotalChildCount;
                     }
                     break;
                 }
@@ -1445,7 +1348,7 @@ namespace Takai.UI
             if (!IsEnabled)
                 return;
 
-            var draws = new Stack<Static>(Children.Count + 1);
+            var draws = new Stack<Static>(TotalChildCount + 1);
             draws.Push(this);
 
             Static debugDraw = null;
@@ -1478,10 +1381,10 @@ namespace Takai.UI
                     DrawVLine(spriteBatch, borderColor, 0, 0, offsetRect.Height, offset, toDraw.VisibleBounds);
                 }
 
-                for (int i = toDraw.Children.Count - 1; i >= 0; --i)
+                for (int i = toDraw.TotalChildCount - 1; i >= 0; --i)
                 {
-                    if (toDraw.Children[i].IsEnabled)
-                        draws.Push(toDraw.Children[i]);
+                    if (toDraw.GetChildAt(i).IsEnabled)
+                        draws.Push(toDraw.GetChildAt(i));
                 }
             }
 
@@ -1668,7 +1571,7 @@ namespace Takai.UI
 
                             //todo: doesn't work
                         };
-                        root.AddChild(check);
+                        root.Children.Add(check);
                     }
                 }
                 return root;
@@ -1702,11 +1605,11 @@ namespace Takai.UI
                         Color = color
                     };
                     checkbox.BindTo(obj);
-                    root.AddChild(checkbox);
+                    root.Children.Add(checkbox);
                     continue;
                 }
 
-                root.AddChild(new Static(Util.ToSentenceCase(member.Name))
+                root.Children.Add(new Static(Util.ToSentenceCase(member.Name))
                 {
                     Font = font,
                     Color = color
@@ -1725,7 +1628,7 @@ namespace Takai.UI
                         Color = color
                     };
                     numeric.BindTo(obj);
-                    root.AddChild(numeric);
+                    root.Children.Add(numeric);
                 }
                 else if (mt == typeof(string))
                 {
@@ -1739,7 +1642,7 @@ namespace Takai.UI
                         Color = color
                     };
                     text.BindTo(obj);
-                    root.AddChild(text);
+                    root.Children.Add(text);
                 }
                 else if (mt == typeof(Dictionary<,>))
                 {

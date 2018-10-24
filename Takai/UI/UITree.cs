@@ -44,7 +44,7 @@ namespace Takai.UI
                     if (elem == this)
                         continue;
 
-                    foreach (var child in elem.Children)
+                    foreach (var child in elem.InternalChildren)
                         stack.Push(new KeyValuePair<int, Static>(top.Key + 1, child));
 
                     var disp = new Static

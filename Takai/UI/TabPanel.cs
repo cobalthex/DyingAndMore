@@ -16,7 +16,7 @@
                 if (value == null)
                     throw new System.ArgumentNullException("TabBar cannot be null");
 
-                value.ReplaceAllChildren(_tabBar.Children);
+                value.ReplaceAllChildren(_tabBar.InternalChildren);
                 _tabBar = value;
             }
         }
@@ -38,9 +38,9 @@
                 _tabIndex = value;
 
                 if (lastTabIndex >= 0)
-                    Children[lastTabIndex + 1].IsEnabled = false;
+                    InternalChildren[lastTabIndex + 1].IsEnabled = false;
                 if (_tabIndex >= 0)
-                    Children[_tabIndex + 1].IsEnabled = true;
+                    InternalChildren[_tabIndex + 1].IsEnabled = true;
                 Reflow();
             }
         }
@@ -73,7 +73,7 @@
             };
             TabBar.InsertChild(tabHeader, index);
 
-            if (Children.Count > 1)
+            if (InternalChildren.Count > 1)
                 child.IsEnabled = false;
             return base.InternalInsertChild(child, index, reflow, ignoreFocus);
         }
