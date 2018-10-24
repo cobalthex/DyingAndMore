@@ -16,26 +16,26 @@ namespace Takai.UI
         {
             throw new System.NotImplementedException(); //todo
 
-            if (Children.Count == 0)
+            if (InternalChildren.Count == 0)
                 return;
 
             var center = Size / 2;
 
-            var thetaScale = MathHelper.TwoPi / Children.Count;
+            var thetaScale = MathHelper.TwoPi / InternalChildren.Count;
 
-            for (int i = 0; i < Children.Count; ++i)
+            for (int i = 0; i < InternalChildren.Count; ++i)
             {
-                if (!Children[i].IsEnabled)
+                if (!InternalChildren[i].IsEnabled)
                     continue;
 
-                var vbnd = Children[i].ContentArea;
+                var vbnd = InternalChildren[i].ContentArea;
                 var ccenter = new Vector2(vbnd.Width / 2, vbnd.Height / 2);
 
                 var pos = Util.Direction(i * thetaScale) * Radius;
-                Children[i].Position = center - ccenter + pos;
+                InternalChildren[i].Position = center - ccenter + pos;
             }
 
-            foreach (var child in Children)
+            foreach (var child in InternalChildren)
             {
                 if (child.IsEnabled)
                     child.Reflow();

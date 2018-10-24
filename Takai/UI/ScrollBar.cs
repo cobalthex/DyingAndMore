@@ -344,9 +344,9 @@ namespace Takai.UI
 
         protected override void FinalizeClone()
         {
-            contentContainer = Children[0];
-            verticalScrollbar = (ScrollBar)Children[1];
-            horizontalScrollbar = (ScrollBar)Children[2];
+            contentContainer = InternalChildren[0];
+            verticalScrollbar = (ScrollBar)InternalChildren[1];
+            horizontalScrollbar = (ScrollBar)InternalChildren[2];
         }
 
         public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)

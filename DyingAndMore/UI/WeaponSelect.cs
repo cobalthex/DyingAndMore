@@ -19,6 +19,8 @@ namespace DyingAndMore.UI
 
                 _instance = value;
                 SelectedItem = _instance?.Class;
+                if (SelectedItem != null)
+                    preview.BindTo(SelectedItem);
             }
         }
         private WeaponInstance _instance;
@@ -50,7 +52,6 @@ namespace DyingAndMore.UI
         protected override void OnSelectedItemChanged(SelectionChangedEventArgs e)
         {
             _instance = null;
-            System.Diagnostics.Debug.WriteLine(SelectedItem);
             base.OnSelectedItemChanged(e);
         }
     }

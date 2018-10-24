@@ -75,7 +75,7 @@ namespace Takai.UI
                     break;
             }
 
-            foreach (var child in Children)
+            foreach (var child in InternalChildren)
                 child.Reflow(container);
         }
 

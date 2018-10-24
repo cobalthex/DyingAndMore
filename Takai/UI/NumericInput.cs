@@ -129,6 +129,7 @@ namespace Takai.UI
 
         protected TextInput textInput = new TextInput
         {
+            Name = "zz342134",
             Text = "0",
             AllowLetters = false,
             AllowNumbers = true,
@@ -154,13 +155,6 @@ namespace Takai.UI
 
         public NumericInput()
         {
-            Resize += delegate
-            {
-                var height = Size.Y;
-                textInput.Size = new Vector2(Size.X - height * 2, height);
-                upButton.Size = downButton.Size = new Vector2(height);
-            };
-
             textInput.TextChanged += delegate
             {
                 if (NumericBaseType.TryParse(textInput.Text, out var val))
@@ -184,6 +178,42 @@ namespace Takai.UI
             };
 
             AddChildren(textInput, upButton, downButton);
+        }
+
+        protected override void FinalizeClone()
+        {
+            //todo: make not gross
+            textInput = (TextInput)InternalChildren[0];
+            upButton = InternalChildren[1];
+            downButton = InternalChildren[2];
+
+
+            base.FinalizeClone();
+        }
+
+        protected override void BindEvents()
+        {
+            textInput.TextChanged += delegate
+            {
+                if (NumericBaseType.TryParse(textInput.Text, out var val))
+                {
+                    Value = val;
+                    if (Value != val)
+                        textInput.Text = Value.ToString();
+                }
+            };
+
+            upButton.Click += delegate
+            {
+                IncrementValue();
+            };
+
+            downButton.Click += delegate
+            {
+                DecrementValue();
+            };
+
+            base.BindEvents();
         }
 
         public override void IncrementValue(int scale = 1)
