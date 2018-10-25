@@ -34,20 +34,20 @@ namespace DyingAndMore.Editor
 
                 for (int i = 0; i < tabs.Children.Count; ++i)
                 {
-                    if (!tabs.InternalChildren[i].IsEnabled)
+                    if (!tabs.Children[i].IsEnabled)
                         continue;
 
                     if (i == mode)
                     {
-                        tabs.InternalChildren[i].Font = ActiveFont;
-                        tabs.InternalChildren[i].Color = ActiveColor;
+                        tabs.Children[i].Font = ActiveFont;
+                        tabs.Children[i].Color = ActiveColor;
                         modes[i].Start();
                         InsertChild(modes[i]);
                     }
                     else
                     {
-                        tabs.InternalChildren[i].Font = InactiveFont;
-                        tabs.InternalChildren[i].Color = InactiveColor;
+                        tabs.Children[i].Font = InactiveFont;
+                        tabs.Children[i].Color = InactiveColor;
 
                         if (i == lastMode)
                         {
