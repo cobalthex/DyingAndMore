@@ -55,7 +55,7 @@ namespace Takai.UI
             else
                 System.Array.Clear(columnWidths, 0, ColumnCount);
 
-            var rowCount = Util.CeilDiv(InternalChildren.Count, ColumnCount);
+            var rowCount = Util.CeilDiv(Children.Count, ColumnCount);
             if (rowCount > rowHeights.Length)
                 rowHeights = new float[rowCount];
             else
@@ -66,18 +66,18 @@ namespace Takai.UI
             hStretches.Clear();
             vStretches.Clear();
 
-            for (int i = 0; i < InternalChildren.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                if (!InternalChildren[i].IsEnabled) //disabled children still occupy cells
+                if (!Children[i].IsEnabled) //disabled children still occupy cells
                     continue;
 
-                var csize = InternalChildren[i].Measure(new Vector2(InfiniteSize)); //needed up here for children to correctly size
-                if (InternalChildren[i].HorizontalAlignment == Alignment.Stretch)
+                var csize = Children[i].Measure(new Vector2(InfiniteSize)); //needed up here for children to correctly size
+                if (Children[i].HorizontalAlignment == Alignment.Stretch)
                 {
                     hStretches.Add(i % ColumnCount);
                     //csize.X = 0;
                 }
-                if (InternalChildren[i].VerticalAlignment == Alignment.Stretch)
+                if (Children[i].VerticalAlignment == Alignment.Stretch)
                 {
                     vStretches.Add(i / ColumnCount);
                     //csize.Y = 0;
@@ -126,9 +126,9 @@ namespace Takai.UI
             }
 
             var offset = Vector2.Zero;
-            for (int i = 0; i < InternalChildren.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                if (!InternalChildren[i].IsEnabled)
+                if (!Children[i].IsEnabled)
                     continue;
 
                 if (i > 0)
@@ -142,7 +142,7 @@ namespace Takai.UI
                         offset.X += Margin.X;
                 }
 
-                InternalChildren[i].Reflow(new Rectangle(
+                Children[i].Reflow(new Rectangle(
                     (int)offset.X,
                     (int)offset.Y,
                     (int)columnWidths[i % ColumnCount],
@@ -161,7 +161,7 @@ namespace Takai.UI
             if (CellColor.A > 0)
             {
                 Vector2 offset = Vector2.Zero;
-                for (int i = 0; i < InternalChildren.Count; ++i)
+                for (int i = 0; i < Children.Count; ++i)
                 {
                     if (i > 0)
                     {

@@ -45,9 +45,11 @@ namespace Takai.UI
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
             };
+
+            AttachEvents();
         }
 
-        private void BindEvents() //make this virtual and put in Static? (would aleve some likely bugs with Clone())
+        private void AttachEvents() //make this virtual and put in Static? (would aleve some likely bugs with Clone())
         {
             dropdownContainer.Click += delegate (object sender, ClickEventArgs e)
             {
@@ -57,7 +59,7 @@ namespace Takai.UI
             list.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
             {
                 var childIndex = preview?.ChildIndex ?? -1;
-                ReplaceChild(preview = list.Container.InternalChildren[SelectedIndex].Clone(), childIndex);
+                ReplaceChild(preview = list.Container.Children[SelectedIndex].Clone(), childIndex);
                 preview.BindTo(SelectedItem);
                 CloseDropDown();
                 OnSelectedItemChanged(e);
@@ -66,6 +68,7 @@ namespace Takai.UI
 
         protected override void FinalizeClone()
         {
+            AttachEvents();
             base.FinalizeClone();
         }
 

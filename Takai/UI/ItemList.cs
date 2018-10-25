@@ -53,7 +53,7 @@ namespace Takai.UI
         /// <summary>
         /// Where to render the items to
         /// </summary>
-        public Container Container
+        public Static Container
         {
             get => _container;
             set
@@ -70,7 +70,7 @@ namespace Takai.UI
                 ReplaceAllChildren(_container);
             }
         }
-        private Container _container = new List
+        private Static _container = new List
         {
             HorizontalAlignment = Alignment.Stretch,
             VerticalAlignment = Alignment.Stretch

@@ -104,11 +104,6 @@ namespace Takai.Data
             return MemberwiseClone();
         }
 
-#if DEBUG
-        object sourceObj;
-        object targetObj;
-#endif
-
         /// <summary>
         /// Bind to an object
         /// Does not call <see cref="Update"/>
@@ -117,11 +112,6 @@ namespace Takai.Data
         /// <param name="targetObj">The object to send/recieve data to/from the source</param>
         public virtual void BindTo(object sourceObj, object targetObj)
         {
-#if DEBUG
-            this.sourceObj = sourceObj;
-            this.targetObj = targetObj;
-#endif
-
             if (Source == null || Target == null)
                 return;
 
