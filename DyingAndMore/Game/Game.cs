@@ -349,7 +349,7 @@ namespace DyingAndMore.Game
             {
                 Map = Map.Class.Instantiate();
                 isDead = false;
-                OnParentChanged(new ParentChangedEventArgs(null));
+                OnParentChanged(new ParentChangedEventArgs(this, null));
                 Reflow();
                 return;
             }

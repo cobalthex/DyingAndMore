@@ -98,7 +98,7 @@ namespace Takai.UI
         /// <summary>
         /// Called whenever the text has changed
         /// </summary>
-        public event System.EventHandler TextChanged = null;
+        public event UIEventHandler TextChanged = null;
         protected virtual void OnTextChanged(System.EventArgs e) { }
 
         public string OnTextChangedCommand { get; set; }
@@ -107,7 +107,7 @@ namespace Takai.UI
         /// <summary>
         /// Called whenever the enter key is pressed
         /// </summary>
-        public event System.EventHandler Submit = null;
+        public event UIEventHandler Submit = null;
         protected virtual void OnSubmit(System.EventArgs e) { }
 
         public string OnSubmitCommand { get; set; }
@@ -259,7 +259,7 @@ namespace Takai.UI
                     if (key == Keys.Enter)
                     {
                         OnSubmit(System.EventArgs.Empty);
-                        Submit?.Invoke(this, System.EventArgs.Empty);
+                        Submit?.Invoke(this, new UIEventArgs(this));
                         onSubmitCommandFn?.Invoke(this);
                     }
 
@@ -363,7 +363,7 @@ namespace Takai.UI
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
 
             OnTextChanged(System.EventArgs.Empty);
-            TextChanged?.Invoke(this, System.EventArgs.Empty);
+            TextChanged?.Invoke(this, new UIEventArgs(this));
             onTextChangedCommandFn?.Invoke(this);
         }
 

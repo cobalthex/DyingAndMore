@@ -26,7 +26,22 @@ namespace Takai.UI
         Bottom = End,
     }
 
-    public class ClickEventArgs : System.EventArgs
+    public class UIEventArgs : System.EventArgs
+    {
+        public Static Source { get; set; }
+        public bool Handled { get; set; }
+
+        public UIEventArgs(Static source)
+        {
+            Source = source;
+            Handled = false;
+        }
+    }
+
+    public delegate void UIEventHandler(object sender, UIEventArgs e);
+    public delegate void UIEventHandler<TEventArgs>(object sender, TEventArgs e) where TEventArgs : UIEventArgs;
+
+    public class ClickEventArgs : UIEventArgs
     {
         /// <summary>
         /// The relative position of the click inside the element
@@ -36,13 +51,17 @@ namespace Takai.UI
 
         public int inputIndex;
         //input device
+
+        public ClickEventArgs(Static source)
+            : base(source) { }
     }
 
-    public class ParentChangedEventArgs : System.EventArgs
+    public class ParentChangedEventArgs : UIEventArgs
     {
         public Static Previous { get; set; }
 
-        public ParentChangedEventArgs(Static previousParent)
+        public ParentChangedEventArgs(Static source, Static previousParent)
+            : base(source)
         {
             Previous = previousParent;
         }
@@ -360,34 +379,34 @@ namespace Takai.UI
         }
         private bool _isEnabled = true;
 
-        #region Events
-
         /// <summary>
         /// Can this element be focused
         /// </summary>
         [Data.Serializer.Ignored]
         public virtual bool CanFocus { get => Click != null || clickCommandFn != null; }
 
+        #region Events
+
         /// <summary>
         /// Called whenever the element has its parent changed
         /// </summary>
-        public event System.EventHandler<ParentChangedEventArgs> ParentChanged = null;
+        public event UIEventHandler<ParentChangedEventArgs> ParentChanged = null;
         protected virtual void OnParentChanged(ParentChangedEventArgs e) { }
 
         /// <summary>
         /// Called whenever the element is pressed.
         /// </summary>
-        public event System.EventHandler<ClickEventArgs> Press = null;
+        public event UIEventHandler<ClickEventArgs> Press = null;
         protected virtual void OnPress(ClickEventArgs e) { }
 
         /// <summary>
         /// Called whenever the element is clicked (mouse just released).
         /// By default, whether or not there is a click handler determines if this is focusable
         /// </summary>
-        public event System.EventHandler<ClickEventArgs> Click = null;
+        public event UIEventHandler<ClickEventArgs> Click = null;
         protected virtual void OnClick(ClickEventArgs e) { }
 
-        public event System.EventHandler Resize = null;
+        public event UIEventHandler Resize = null;
         protected virtual void OnResize(System.EventArgs e) { }
 
         public string OnClickCommand { get; set; }
@@ -437,6 +456,11 @@ namespace Takai.UI
             }
         }
         private Static _parent = null;
+
+        /// <summary>
+        /// Children that cannot be accessed publically but are still enumerable. Primarily used for composite elements
+        /// </summary>
+        protected List<Static> InternalChildren { get; private set; } = new List<Static>(); //todo
 
         /// <summary>
         /// A readonly collection of all of the children in this element (including disabled children)
@@ -491,62 +515,11 @@ namespace Takai.UI
                 AddChild(child);
         }
 
-        /// <summary>
-        /// Bind this UI element to an object
-        /// </summary>
-        /// <param name="source">The source object for the bindings</param>
-        /// <param name="recursive">Recurse through all children and set their source aswell</param>
-        public void BindTo(object source, bool recursive = true)
-        {
-            if (recursive)
-            {
-                foreach (var elem in EnumerateRecursive())
-                    elem.BindToThis(source);
-            }
-            else
-                BindToThis(source);
-        }
-
-        protected virtual void BindToThis(object source)
-        {
-            if (Bindings == null)
-                return;
-
-            foreach (var binding in Bindings)
-                binding.BindTo(source, this);
-        }
-
-        /// <summary>
-        /// Bind this (and/or children) to a command on click/submit/etc
-        /// </summary>
-        /// <param name="command">The command to bind to</param>
-        /// <param name="commandFn">The function to call when the command is triggered</param>
-        /// <param name="recursive">Bind this command to any children?</param>
-        public void BindCommand(string command, Command commandFn, bool recursive = true)
-        {
-            if (command == null || commandFn == null)
-                return;
-
-            if (recursive)
-            {
-                foreach (var elem in EnumerateRecursive())
-                    elem.BindCommandToThis(command, commandFn);
-            }
-            else
-                BindCommandToThis(command, commandFn);
-        }
-
-        protected virtual void BindCommandToThis(string command, Command commandFn)
-        {
-            if (OnClickCommand == command)
-                clickCommandFn = commandFn;
-        }
-
         #region Hierarchy/cloning
 
         private void SetParentNoReflow(Static newParent)
         {
-            var changed = new ParentChangedEventArgs(_parent);
+            var changed = new ParentChangedEventArgs(this, _parent);
             _parent = newParent;
 
             OnParentChanged(changed);
@@ -1158,7 +1131,7 @@ namespace Takai.UI
                 child.Reflow(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
         }
 
-        public event System.EventHandler ChildReflow = null;
+        public event UIEventHandler ChildReflow = null;
 
         /// <summary>
         /// Called by a child when it reflows, this element can reflow/resize in relation
@@ -1173,7 +1146,7 @@ namespace Takai.UI
                 return;
 
             Parent.OnChildReflow(this);
-            Parent.ChildReflow?.Invoke(this, System.EventArgs.Empty);
+            Parent.ChildReflow?.Invoke(this, new UIEventArgs(this));
         }
 
 
@@ -1182,7 +1155,7 @@ namespace Takai.UI
             Reflow();
 
             OnResize(System.EventArgs.Empty);
-            Resize?.Invoke(this, System.EventArgs.Empty);
+            Resize?.Invoke(this, new UIEventArgs(this));
         }
 
         /// <summary>
@@ -1244,6 +1217,73 @@ namespace Takai.UI
                 default:
                     return position + padding;
             }
+        }
+
+        #endregion
+
+        #region Event/Command/Binding Handling
+
+        /// <summary>
+        /// Bind this UI element to an object
+        /// </summary>
+        /// <param name="source">The source object for the bindings</param>
+        /// <param name="recursive">Recurse through all children and set their source aswell</param>
+        public void BindTo(object source, bool recursive = true)
+        {
+            if (recursive)
+            {
+                foreach (var elem in EnumerateRecursive())
+                    elem.BindToThis(source);
+            }
+            else
+                BindToThis(source);
+        }
+
+        protected virtual void BindToThis(object source)
+        {
+            if (Bindings == null)
+                return;
+
+            foreach (var binding in Bindings)
+                binding.BindTo(source, this);
+        }
+
+        /// <summary>
+        /// Bind this (and/or children) to a command on click/submit/etc
+        /// </summary>
+        /// <param name="command">The command to bind to</param>
+        /// <param name="commandFn">The function to call when the command is triggered</param>
+        /// <param name="recursive">Bind this command to any children?</param>
+        public void BindCommand(string command, Command commandFn, bool recursive = true)
+        {
+            if (command == null || commandFn == null)
+                return;
+
+            if (recursive)
+            {
+                foreach (var elem in EnumerateRecursive())
+                    elem.BindCommandToThis(command, commandFn);
+            }
+            else
+                BindCommandToThis(command, commandFn);
+        }
+
+        protected virtual void BindCommandToThis(string command, Command commandFn)
+        {
+            if (OnClickCommand == command)
+                clickCommandFn = commandFn;
+        }
+
+        //these need to take the event type
+        protected void BubbleEvent(UIEventArgs eventArgs)
+        {
+            //start here and bubble up tree (parents)
+        }
+
+        protected void TunnelEvent(UIEventArgs eventArgs)
+        {
+            //start at root until here
+            //maybe this happens during update automatically
         }
 
         #endregion
@@ -1381,7 +1421,7 @@ namespace Takai.UI
             //todo: improve
             if (Input.InputState.IsPress(0) && VisibleBounds.Contains(Input.InputState.touches[0].Position))
             {
-                var e = new ClickEventArgs { position = Vector2.Zero };
+                var e = new ClickEventArgs(this) { position = Vector2.Zero };
                 OnClick(e);
                 Click?.Invoke(this, e);
 
@@ -1402,7 +1442,7 @@ namespace Takai.UI
         {
             if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mousePosition))
             {
-                var e = new ClickEventArgs { position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding };
+                var e = new ClickEventArgs(this) { position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding };
                 didPress = true;
                 OnPress(e);
                 Press?.Invoke(this, e);
@@ -1624,7 +1664,7 @@ namespace Takai.UI
         //todo: better name
         public void TriggerClick(Vector2 relativePosition)
         {
-            var ce = new ClickEventArgs { position = relativePosition, inputIndex = 0 };
+            var ce = new ClickEventArgs(this) { position = relativePosition, inputIndex = 0 };
             OnClick(ce);
             Click?.Invoke(this, ce);
 

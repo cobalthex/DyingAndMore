@@ -6,7 +6,7 @@ ProjectileClass {
     #Drag: 0.4;
     MinimumSpeed: -3000000;
     CanDamageSource: true;
-    #InheritSourcePhysics: true;    
+    #InheritSourcePhysics: true;
     DirectionMod: ProjectileClass.WaveDirectionMod;
 
     Range: 400;
