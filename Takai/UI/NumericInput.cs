@@ -23,7 +23,7 @@ namespace Takai.UI
                 {
                     _value = newVal;
                     OnValueChanged(EventArgs.Empty);
-                    ValueChanged?.Invoke(this, EventArgs.Empty);
+                    ValueChanged?.Invoke(this, new UIEventArgs(this));
                     onValueChangedCommandFn?.Invoke(this);
                 }
             }
@@ -79,7 +79,7 @@ namespace Takai.UI
         /// <summary>
         /// called whenever this numeric's value has changed
         /// </summary>
-        public event EventHandler ValueChanged;
+        public event UIEventHandler ValueChanged;
 
         public string OnValueChangedCommand { get; set; }
         protected Command onValueChangedCommandFn;
