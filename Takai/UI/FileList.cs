@@ -68,6 +68,8 @@ namespace Takai.UI
                 }
             });
             ItemTemplate = template;
+
+            SelectionChanged += OnSelectionChanged;
         }
 
         protected void RefreshList(string path)
@@ -89,10 +91,10 @@ namespace Takai.UI
             }
         }
 
-        protected override void OnSelectionChanged(SelectionChangedEventArgs e)
+        protected UIEventResult OnSelectionChanged(Static sender, SelectionChangedEventArgs e)
         {
             if (e.newIndex < 0)
-                return;
+                return UIEventResult.Handled;
 
             var entry = Items[e.newIndex];
             //if (entry == "« Previous")
@@ -100,6 +102,8 @@ namespace Takai.UI
             /*else */
             if (entry is DirectoryInfo di)
                 Path = P.Combine(Path, di.Name);
+
+            return UIEventResult.Handled;
         }
     }
 }

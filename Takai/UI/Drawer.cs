@@ -18,17 +18,19 @@ namespace Takai.UI
         public Drawer()
         {
             IsModal = true;
-        }
 
-        protected override void OnPress(ClickEventArgs e)
-        {
-            isSizing = true;
-        }
-        protected override void OnClick(ClickEventArgs e)
-        {
-            isSizing = false;
-        }
+            Press += delegate (Static sender, ClickEventArgs e)
+            {
+                isSizing = true;
+                return UIEventResult.Handled;
+            };
 
+            Click += delegate (Static sender, ClickEventArgs e)
+            {
+                isSizing = false;
+                return UIEventResult.Handled;
+            };
+        }
 
         protected override void OnChildReflow(Static child)
         {

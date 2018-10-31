@@ -113,6 +113,7 @@ namespace Takai.UI
             textInput.TextChanged += delegate
             {
                 Value = textInput.Text;
+                return UIEventResult.Handled;
             };
 
             pickerButton.Click += delegate
@@ -122,7 +123,7 @@ namespace Takai.UI
                 if (Input.InputState.IsMod(Input.KeyMod.Alt))
                 {
                     System.Diagnostics.Process.Start(Path.GetDirectoryName(Text));
-                    return;
+                    return UIEventResult.Handled;
                 }
 #endif
 
@@ -148,6 +149,7 @@ namespace Takai.UI
 #elif WINDOWS_UAP
                 //todo
 #endif
+                return UIEventResult.Handled;
             };
 
             AddChildren(textInput, pickerButton);
@@ -182,16 +184,6 @@ namespace Takai.UI
             //todo: pickerButton bounds?
             textInput.Reflow(new Rectangle(0, 0, sz.X - (int)pickerButton.MeasuredSize.X, sz.Y));
             pickerButton.Reflow(new Rectangle(sz.X - (int)pickerButton.MeasuredSize.X, 0, (int)pickerButton.MeasuredSize.X, sz.Y));
-        }
-
-
-        protected override void OnResize(System.EventArgs e)
-        {
-            var btnSize = Size.Y;
-            textInput.Size = new Vector2(Size.X - btnSize, Size.Y);
-            pickerButton.Size = new Vector2(btnSize);
-            pickerButton.Position = new Vector2(Size.X - btnSize, 0);
-            base.OnResize(e);
         }
     }
 }

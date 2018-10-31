@@ -22,8 +22,7 @@ namespace Takai.UI
                 if (_value != newVal)
                 {
                     _value = newVal;
-                    OnValueChanged(EventArgs.Empty);
-                    ValueChanged?.Invoke(this, new UIEventArgs(this));
+                    RouteEvent(ValueChanged, new UIEventArgs(this));
                     onValueChangedCommandFn?.Invoke(this);
                 }
             }
@@ -79,12 +78,10 @@ namespace Takai.UI
         /// <summary>
         /// called whenever this numeric's value has changed
         /// </summary>
-        public event UIEventHandler ValueChanged;
+        public UIEvent<UIEventArgs> ValueChanged;
 
         public string OnValueChangedCommand { get; set; }
         protected Command onValueChangedCommandFn;
-
-        protected virtual void OnValueChanged(EventArgs e) { }
 
         protected override void BindCommandToThis(string command, Command commandFn)
         {
@@ -154,33 +151,38 @@ namespace Takai.UI
 
         public NumericInput()
         {
-            Resize += delegate
-            {
-                var height = Size.Y;
-                textInput.Size = new Vector2(Size.X - height * 2, height);
-                upButton.Size = downButton.Size = new Vector2(height);
-            };
-
-            textInput.TextChanged += delegate
+            textInput.TextChanged += delegate (Static sender, UIEventArgs e)
             {
                 if (NumericBaseType.TryParse(textInput.Text, out var val))
                 {
                     Value = val;
                     if (Value != val)
                         textInput.Text = Value.ToString();
+                    return UIEventResult.Handled;
                 }
+
+                return UIEventResult.Continue;
             };
 
             BorderColor = Color;
 
-            upButton.Click += delegate
+            upButton.Click += delegate (Static sender, ClickEventArgs e)
             {
                 IncrementValue();
+                return UIEventResult.Handled;
             };
 
-            downButton.Click += delegate
+            downButton.Click += delegate (Static sender, ClickEventArgs e)
             {
                 DecrementValue();
+                return UIEventResult.Handled;
+            };
+
+            ValueChanged += delegate (Static sender, UIEventArgs e)
+            {
+                textInput.Text = Value.ToString();
+                textInput.ScrollPosition = 0;
+                return UIEventResult.Handled;
             };
 
             AddChildren(textInput, upButton, downButton);
@@ -191,14 +193,7 @@ namespace Takai.UI
             base.IncrementValue(scale);
             textInput.Text = Value.ToString();
         }
-
-        protected override void OnValueChanged(EventArgs e)
-        {
-            textInput.Text = Value.ToString();
-            textInput.ScrollPosition = 0;
-            base.OnValueChanged(e);
-        }
-
+        
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             var inputSz = textInput.Measure(availableSize);
@@ -212,14 +207,6 @@ namespace Takai.UI
             textInput.Reflow(new Rectangle(0, 0, sz.X - buttonSize * 2, sz.Y));
             upButton.Reflow(new Rectangle(sz.X - buttonSize * 2, 0, buttonSize, sz.Y));
             downButton.Reflow(new Rectangle(sz.X - buttonSize, 0, buttonSize, sz.Y));
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            var btnSize = Size.Y;
-            textInput.Size = new Vector2(Size.X - btnSize * 2, Size.Y);
-            upButton.Size = downButton.Size = new Vector2(btnSize);
-            base.OnResize(e);
         }
 
         protected override bool HandleInput(GameTime time)

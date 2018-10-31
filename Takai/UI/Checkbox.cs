@@ -30,6 +30,12 @@ namespace Takai.UI
         public CheckBox(bool isChecked)
         {
             IsChecked = isChecked;
+
+            Click += delegate (Static sender, ClickEventArgs e)
+            {
+                IsChecked ^= true;
+                return UIEventResult.Handled;
+            };
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
@@ -37,13 +43,7 @@ namespace Takai.UI
             var size = base.MeasureOverride(availableSize);
             return size + new Vector2(size.Y + Margin, 0);
         }
-
-        protected override void OnClick(ClickEventArgs args)
-        {
-            IsChecked ^= true;
-            base.OnClick(args);
-        }
-
+        
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             //todo: modernize

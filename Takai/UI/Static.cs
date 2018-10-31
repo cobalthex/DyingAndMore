@@ -29,17 +29,80 @@ namespace Takai.UI
     public class UIEventArgs : System.EventArgs
     {
         public Static Source { get; set; }
-        public bool Handled { get; set; }
 
         public UIEventArgs(Static source)
         {
             Source = source;
-            Handled = false;
         }
     }
 
-    public delegate void UIEventHandler(object sender, UIEventArgs e);
-    public delegate void UIEventHandler<TEventArgs>(object sender, TEventArgs e) where TEventArgs : UIEventArgs;
+    public enum UIEventResult
+    {
+        Continue,
+        Handled,
+    }
+
+    public delegate UIEventResult UIEventHandler(Static sender, UIEventArgs e);
+    public delegate UIEventResult UIEventHandler<TEventArgs>(Static sender, TEventArgs e) where TEventArgs : UIEventArgs;
+
+    [Data.Serializer.Ignored]
+    public struct UIEvent<TEventArgs> where TEventArgs : UIEventArgs //todo: this could probably be a struct
+    {
+        public enum RouteDirection
+        {
+            Bubble,
+            Tunnel
+        }
+
+        public RouteDirection Direction { get; set; }
+
+        private List<UIEventHandler<TEventArgs>> handlers;
+
+        public int HandlerCount => handlers?.Count ?? 0;
+
+        public void AddHandler(UIEventHandler<TEventArgs> handler)
+        {
+            if (handlers == null)
+                handlers = new List<UIEventHandler<TEventArgs>>(1);
+            handlers.Add(handler);
+        }
+
+        public void RemoveHandler(UIEventHandler<TEventArgs> handler)
+        {
+            if (handlers != null)
+                handlers.Remove(handler);
+        }
+
+        public void RemoveAllHandlers()
+        {
+            handlers.Clear();
+        }
+
+        public static UIEvent<TEventArgs> operator +(UIEvent<TEventArgs> e, UIEventHandler<TEventArgs> handler)
+        {
+            e.AddHandler(handler);
+            return e;
+        }
+        public static UIEvent<TEventArgs> operator -(UIEvent<TEventArgs> e, UIEventHandler<TEventArgs> handler)
+        {
+            e.RemoveHandler(handler);
+            return e;
+        }
+
+        public UIEventResult Invoke(Static sender, TEventArgs e)
+        {
+            if (handlers == null)
+                return UIEventResult.Continue;
+
+            foreach (var handler in handlers)
+            {
+                if (handler.Invoke(sender, e) == UIEventResult.Handled)
+                    return UIEventResult.Handled;
+            }
+
+            return UIEventResult.Continue;
+        }
+    }
 
     public class ClickEventArgs : UIEventArgs
     {
@@ -85,7 +148,7 @@ namespace Takai.UI
         /// <summary>
         /// A unique ID for this element. Only present in DEBUG
         /// </summary>
-        public uint Id { get; private set; } = GenerateId();
+        public uint DebugId { get; private set; } = GenerateId();
 
         private static uint idCounter = 0;
         private static uint GenerateId()
@@ -101,9 +164,6 @@ namespace Takai.UI
         public const float InfiniteSize = float.PositiveInfinity;
 
         #region Properties
-
-        //private static int idCounter = 0;
-        //private readonly int id = (++idCounter);
 
         /// <summary>
         /// A font to use for drawing debug info.
@@ -383,36 +443,7 @@ namespace Takai.UI
         /// Can this element be focused
         /// </summary>
         [Data.Serializer.Ignored]
-        public virtual bool CanFocus { get => Click != null || clickCommandFn != null; }
-
-        #region Events
-
-        /// <summary>
-        /// Called whenever the element has its parent changed
-        /// </summary>
-        public event UIEventHandler<ParentChangedEventArgs> ParentChanged = null;
-        protected virtual void OnParentChanged(ParentChangedEventArgs e) { }
-
-        /// <summary>
-        /// Called whenever the element is pressed.
-        /// </summary>
-        public event UIEventHandler<ClickEventArgs> Press = null;
-        protected virtual void OnPress(ClickEventArgs e) { }
-
-        /// <summary>
-        /// Called whenever the element is clicked (mouse just released).
-        /// By default, whether or not there is a click handler determines if this is focusable
-        /// </summary>
-        public event UIEventHandler<ClickEventArgs> Click = null;
-        protected virtual void OnClick(ClickEventArgs e) { }
-
-        public event UIEventHandler Resize = null;
-        protected virtual void OnResize(System.EventArgs e) { }
-
-        public string OnClickCommand { get; set; }
-        protected Command clickCommandFn;
-
-        #endregion
+        public virtual bool CanFocus { get => Click.HandlerCount > 0 || clickCommandFn != null; }
 
         /// <summary>
         /// Disable the default behavior of the tab key
@@ -477,6 +508,28 @@ namespace Takai.UI
 
         #endregion
 
+        #region Events
+
+        /// <summary>
+        /// Called whenever the element has its parent changed
+        /// </summary>
+        public UIEvent<ParentChangedEventArgs> ParentChanged;
+
+        /// <summary>
+        /// Called whenever the element is pressed.
+        /// </summary>
+        public UIEvent<ClickEventArgs> Press;
+
+        /// <summary>
+        /// Called whenever the element is clicked (touch just released).
+        /// </summary>
+        public UIEvent<ClickEventArgs> Click;
+
+        public string OnClickCommand { get; set; }
+        protected Command clickCommandFn;
+
+        #endregion
+
         private void DeserializeChildren(object objects)
         {
             if (!(objects is List<object> elements))
@@ -522,8 +575,7 @@ namespace Takai.UI
             var changed = new ParentChangedEventArgs(this, _parent);
             _parent = newParent;
 
-            OnParentChanged(changed);
-            ParentChanged?.Invoke(this, changed);
+            RouteEvent(ParentChanged, changed);
         }
 
         /// <summary>
@@ -535,7 +587,7 @@ namespace Takai.UI
         {
             var clone = (Static)MemberwiseClone();
 #if DEBUG
-            clone.Id = GenerateId();
+            clone.DebugId = GenerateId();
 #endif
             clone.SetParentNoReflow(null);
             clone._children = new List<Static>(_children);
@@ -1153,9 +1205,7 @@ namespace Takai.UI
         protected void ResizeAndReflow()
         {
             Reflow();
-
-            OnResize(System.EventArgs.Empty);
-            Resize?.Invoke(this, new UIEventArgs(this));
+            //todo: invalidate meausure here
         }
 
         /// <summary>
@@ -1275,15 +1325,9 @@ namespace Takai.UI
         }
 
         //these need to take the event type
-        protected void BubbleEvent(UIEventArgs eventArgs)
+        protected void RouteEvent<TEventArgs>(UIEvent<TEventArgs> @event, TEventArgs args) where TEventArgs : UIEventArgs
         {
-            //start here and bubble up tree (parents)
-        }
-
-        protected void TunnelEvent(UIEventArgs eventArgs)
-        {
-            //start at root until here
-            //maybe this happens during update automatically
+            @event.Invoke(this, args);
         }
 
         #endregion
@@ -1421,9 +1465,7 @@ namespace Takai.UI
             //todo: improve
             if (Input.InputState.IsPress(0) && VisibleBounds.Contains(Input.InputState.touches[0].Position))
             {
-                var e = new ClickEventArgs(this) { position = Vector2.Zero };
-                OnClick(e);
-                Click?.Invoke(this, e);
+                TriggerClick(Vector2.Zero);
 
                 if (CanFocus)
                 {
@@ -1440,26 +1482,25 @@ namespace Takai.UI
 
         bool HandleMouseInput(Point mousePosition, Input.MouseButtons button)
         {
-            if (Input.InputState.IsPress(Input.MouseButtons.Left) && VisibleBounds.Contains(mousePosition))
+            if (Input.InputState.IsPress(button) && VisibleBounds.Contains(mousePosition))
             {
-                var e = new ClickEventArgs(this) { position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding };
-                didPress = true;
-                OnPress(e);
-                Press?.Invoke(this, e);
+                var ce = new ClickEventArgs(this) { position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding, inputIndex = 0 };
+                RouteEvent(Press, ce);
 
                 if (CanFocus)
                 {
                     HasFocus = true;
+                    didPress = true;
                     return false;
                 }
             }
 
             //input capture
             //todo: maybe add setting
-            else if (DidPressInside(Input.MouseButtons.Left))
+            else if (DidPressInside(button))
                 return false;
 
-            else if (Input.InputState.IsButtonUp(Input.MouseButtons.Left))
+            else if (Input.InputState.IsButtonUp(button))
             //else if (Input.InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
                 if (didPress && VisibleBounds.Contains(mousePosition)) //gesture pos
@@ -1538,7 +1579,7 @@ namespace Takai.UI
 
             string info = $"{GetType().Name}\n"
 #if DEBUG
-                        + $"ID: {Id}\n"
+                        + $"ID: {DebugId}\n"
 #endif
                         + $"Name: {(Name ?? "(No name)")}\n"
                         + $"Bounds: {OffsetContentArea}\n"
@@ -1644,7 +1685,7 @@ namespace Takai.UI
         {
             string extraInfo = "";
 #if DEBUG
-            extraInfo = $" ID:{Id}";
+            extraInfo = $" ID:{DebugId}";
 #endif
             return $"{base.ToString()} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\" {(IsEnabled ? "👁" : "❌")}{extraInfo}";
         }
@@ -1662,12 +1703,11 @@ namespace Takai.UI
         #region Helpers
 
         //todo: better name
+
         public void TriggerClick(Vector2 relativePosition)
         {
             var ce = new ClickEventArgs(this) { position = relativePosition, inputIndex = 0 };
-            OnClick(ce);
-            Click?.Invoke(this, ce);
-
+            RouteEvent(Click, ce);
             clickCommandFn?.Invoke(this);
         }
 
@@ -1695,8 +1735,10 @@ namespace Takai.UI
                             Color = color,
                             IsChecked = @enum.HasFlag(value)
                         };
-                        check.Click += delegate (object sender, ClickEventArgs e)
+                        check.Click += delegate (Static sender, ClickEventArgs e)
                         {
+                            throw new System.NotImplementedException(); //verify that the code below works
+
                             var chkbx = (CheckBox)sender;
                             var parsed = System.Convert.ToUInt64(System.Enum.Parse(type, chkbx.Name));
                             var n = System.Convert.ToUInt64(@enum);
@@ -1706,7 +1748,7 @@ namespace Takai.UI
                             else
                                 obj = System.Enum.ToObject(type, n & ~parsed);
 
-                            //todo: doesn't work
+                            return UIEventResult.Handled;
                         };
                         root.AddChild(check);
                     }

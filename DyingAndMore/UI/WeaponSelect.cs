@@ -45,13 +45,15 @@ namespace DyingAndMore.UI
                 }
                 catch { }
             }
+
+            
         }
 
-        protected override void OnSelectedItemChanged(SelectionChangedEventArgs e)
+        protected UIEventResult OnSelectedItemChanged(Static sender, SelectionChangedEventArgs e)
         {
             _instance = null;
             System.Diagnostics.Debug.WriteLine(SelectedItem);
-            base.OnSelectedItemChanged(e);
+            return UIEventResult.Handled;
         }
     }
 }

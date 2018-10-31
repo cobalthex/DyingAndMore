@@ -6,11 +6,12 @@ using Takai.Input;
 
 namespace Takai.UI
 {
-    public class ScrollEventArgs : EventArgs
+    public class ScrollEventArgs : UIEventArgs
     {
         public float Delta { get; set; }
 
-        public ScrollEventArgs(float delta)
+        public ScrollEventArgs(Static source, float delta)
+            : base(source)
         {
             Delta = delta;
         }
@@ -57,10 +58,9 @@ namespace Takai.UI
 
                 if (newPosition != contentPosition)
                 {
-                    var e = new ScrollEventArgs(newPosition - contentPosition);
+                    var e = new ScrollEventArgs(this, newPosition - contentPosition);
                     contentPosition = newPosition;
-                    OnScroll(e);
-                    Scroll?.Invoke(this, e);
+                    RouteEvent(Scroll, e);
                 }
             }
         }
@@ -77,10 +77,12 @@ namespace Takai.UI
 
         public override bool CanFocus => IsThumbVisible;
 
-        public event EventHandler<ScrollEventArgs> Scroll;
-        protected virtual void OnScroll(ScrollEventArgs e) { }
+        public UIEvent<ScrollEventArgs> Scroll;
 
-        public ScrollBar() { }
+        public ScrollBar()
+        {
+            Press += OnPress;
+        }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
@@ -170,22 +172,25 @@ namespace Takai.UI
             ContentPosition -= Math.Sign(direction) * (Font != null ? Font.MaxCharHeight : 20);
         }
 
-        protected override void OnPress(ClickEventArgs args)
+        static UIEventResult OnPress(Static sender, ClickEventArgs args)
         {
             //todo: compare against absolute bounds not dimensions
 
-            var thumb = GetThumbBounds();
+            var sbar = (ScrollBar)sender;
+
+            var thumb = sbar.GetThumbBounds();
             if (!thumb.Contains(args.position))
             {
                 //todo: maybe scroll to mouse over time
 
                 //center thumb around mouse
-                if (Direction == Direction.Vertical)
-                    ContentPosition = (int)((args.position.Y - GetThumbSize() / 2) * ((float)ContentSize / GetContainerSize()));
-                else if (Direction == Direction.Horizontal)
-                    ContentPosition = (int)((args.position.X - GetThumbSize() / 2) * ((float)ContentSize / GetContainerSize()));
+                if (sbar.Direction == Direction.Vertical)
+                    sbar.ContentPosition = (int)((args.position.Y - sbar.GetThumbSize() / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
+                else if (sbar.Direction == Direction.Horizontal)
+                    sbar.ContentPosition = (int)((args.position.X - sbar.GetThumbSize() / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
             }
-            didPressThumb = true;
+            sbar.didPressThumb = true;
+            return UIEventResult.Handled;
         }
 
         protected float GetContainerSize()
@@ -267,9 +272,10 @@ namespace Takai.UI
                 horizontalScrollbar.HorizontalAlignment = Alignment.Stretch;
                 horizontalScrollbar.Direction = Direction.Horizontal;
 
-                horizontalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
+                horizontalScrollbar.Scroll += delegate (Static sender, ScrollEventArgs e)
                 {
                     contentContainer.Position -= new Vector2(e.Delta, 0);
+                    return UIEventResult.Handled;
                 };
 
                 var vsp = verticalScrollbar?.ChildIndex ?? -1;
@@ -277,9 +283,10 @@ namespace Takai.UI
                 verticalScrollbar.VerticalAlignment = Alignment.Stretch;
                 verticalScrollbar.Direction = Direction.Vertical;
 
-                verticalScrollbar.Scroll += delegate (object sender, ScrollEventArgs e)
+                verticalScrollbar.Scroll += delegate (Static sender, ScrollEventArgs e)
                 {
                     contentContainer.Position -= new Vector2(0, e.Delta);
+                    return UIEventResult.Handled;
                 };
 
                 if (vsp >= 0)

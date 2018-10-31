@@ -64,7 +64,6 @@
     </Shaders>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssetView.cs" />
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />

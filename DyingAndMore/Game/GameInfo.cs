@@ -165,6 +165,7 @@ namespace DyingAndMore.Game
                         ui.Click += delegate
                         {
                             StorySelected?.Invoke(this, story);
+                            return UIEventResult.Handled;
                         };
                         AddChild(ui);
                     }
