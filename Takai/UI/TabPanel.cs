@@ -66,10 +66,10 @@
         public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
             var tabHeader = new Static(child.Name);
-            tabHeader.Click += delegate (object sender, ClickEventArgs e)
+            tabHeader.Click += delegate (Static sender, ClickEventArgs e)
             {
-                var tab = (Static)sender;
-                ((TabPanel)(tab.Parent.Parent)).TabIndex = tab.ChildIndex; //todo: this is fragile
+                ((TabPanel)(sender.Parent.Parent)).TabIndex = sender.ChildIndex; //todo: this is fragile
+                return UIEventResult.Handled;
             };
             TabBar.InsertChild(tabHeader, index);
 

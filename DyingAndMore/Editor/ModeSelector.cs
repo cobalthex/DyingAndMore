@@ -100,6 +100,7 @@ namespace DyingAndMore.Editor
             tab.Click += delegate
             {
                 Mode = mode;
+                return UIEventResult.Handled;
             };
             tabs.AddChild(tab);
         }

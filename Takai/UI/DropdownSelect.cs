@@ -27,6 +27,8 @@ namespace Takai.UI
 
         public override bool CanFocus => true;
 
+        public UIEvent<SelectionChangedEventArgs> SelectionChanged;
+
         public DropdownSelect()
         {
             list = new ItemList<T>()
@@ -51,18 +53,26 @@ namespace Takai.UI
 
         private void AttachEvents() //make this virtual and put in Static? (would aleve some likely bugs with Clone())
         {
-            dropdownContainer.Click += delegate (object sender, ClickEventArgs e)
+            Click += delegate (Static sender, ClickEventArgs e)
             {
-                ((Static)sender).RemoveFromParent();
+                OpenDropdown();
+                return UIEventResult.Handled;
             };
 
-            list.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
+            dropdownContainer.Click += delegate (Static sender, ClickEventArgs e)
+            {
+                ((Static)sender).RemoveFromParent();
+                return UIEventResult.Handled;
+            };
+
+            list.SelectionChanged += delegate (Static sender, SelectionChangedEventArgs e)
             {
                 var childIndex = preview?.ChildIndex ?? -1;
                 ReplaceChild(preview = list.Container.Children[SelectedIndex].Clone(), childIndex);
                 preview.BindTo(SelectedItem);
                 CloseDropDown();
-                OnSelectedItemChanged(e);
+                RouteEvent(SelectionChanged, e);
+                return UIEventResult.Handled;
             };
         }
 
@@ -96,13 +106,5 @@ namespace Takai.UI
         {
             dropdownContainer.RemoveFromParent();
         }
-
-        protected override void OnClick(ClickEventArgs e)
-        {
-            OpenDropdown();
-            base.OnClick(e);
-        }
-
-        protected virtual void OnSelectedItemChanged(SelectionChangedEventArgs e) { }
     }
 }

@@ -47,7 +47,7 @@ List {
 
 						#weapon
                         Static { Text: "Weapon"; };
-                        WeaponSelect { 
+                        WeaponSelect {
                             Bindings: [
                                 Binding {
                                     Mode: BindingMode.TwoWay;

@@ -54,6 +54,7 @@ namespace DyingAndMore.Editor
             preview.Click += delegate
             {
                 selectorDrawer.IsEnabled = true;
+                return UIEventResult.Handled;
             };
 
             this.selector = selector ?? new TSelector();
@@ -62,6 +63,7 @@ namespace DyingAndMore.Editor
             {
                 selectorDrawer.IsEnabled = false;
                 UpdatePreview(this.selector.SelectedItem);
+                return UIEventResult.Handled;
             };
 
             selectorDrawer = new Drawer
@@ -183,7 +185,9 @@ namespace DyingAndMore.Editor
             playButton.Click += delegate
             {
                 SwitchToGame();
+                return UIEventResult.Handled;
             };
+            ParentChanged += OnParentChanged;
 
             AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor));
             renderSettingsConsole.IsEnabled = false;
@@ -210,14 +214,16 @@ namespace DyingAndMore.Editor
             modes.AddMode(new TestEditorMode(this));
         }
 
-        protected override void OnParentChanged(ParentChangedEventArgs e)
+        protected UIEventResult OnParentChanged(Static sender, ParentChangedEventArgs e)
         {
             if (Parent == null)
-                return;
+                return UIEventResult.Continue;
 
             Map.updateSettings.SetEditor();
             Map.renderSettings = config.renderSettings.Clone();
             renderSettingsConsole?.BindTo(Map.renderSettings);
+
+            return UIEventResult.Handled;
         }
 
         protected void OnMapChanged()
@@ -488,7 +494,7 @@ namespace DyingAndMore.Editor
                 {
                     var resizeMap = Cache.Load<Static>("UI/Editor/NewMap.ui.tk");
 
-                    resizeMap.FindChildByName("create").Click += delegate (object sender, ClickEventArgs e)
+                    resizeMap.FindChildByName("create").Click += delegate (Static sender, ClickEventArgs e)
                     {
                         var name = resizeMap.FindChildByName("name").Text;
                         var width = resizeMap.FindChildByName<NumericBase>("width").Value;
@@ -505,6 +511,8 @@ namespace DyingAndMore.Editor
                         map.InitializeGraphics();
                         Map = map.Instantiate();
                         resizeMap.RemoveFromParent();
+
+                        return UIEventResult.Handled;
                     };
 
                     AddChild(resizeMap);
@@ -527,11 +535,13 @@ namespace DyingAndMore.Editor
                     {
                         Map.Resize((int)widthInput.Value, (int)heightInput.Value);
                         resizeDialog.RemoveFromParent();
+                        return UIEventResult.Handled;
                     };
 
                     cancelBtn.Click += delegate
                     {
                         resizeDialog.RemoveFromParent();
+                        return UIEventResult.Handled;
                     };
 
                     AddChild(resizeDialog);

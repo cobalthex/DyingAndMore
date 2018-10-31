@@ -213,6 +213,8 @@ namespace DyingAndMore.Game
 
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
+
+            ParentChanged += OnParentChanged;
         }
 
         private void GameMapChanged(object sender, MapChangedEventArgs e)
@@ -305,13 +307,14 @@ namespace DyingAndMore.Game
                     + $"{time.Milliseconds:D3}";
         }
 
-        protected override void OnParentChanged(ParentChangedEventArgs e)
+        protected UIEventResult OnParentChanged(Static sender, ParentChangedEventArgs e)
         {
             if (Parent == null)
-                return;
+                return UIEventResult.Continue;
 
             Map.updateSettings.SetGame();
             Map.renderSettings.SetDefault();
+            return UIEventResult.Handled;
         }
 
         protected override void ReflowOverride(Vector2 availableSize)
@@ -349,7 +352,7 @@ namespace DyingAndMore.Game
             {
                 Map = Map.Class.Instantiate();
                 isDead = false;
-                OnParentChanged(new ParentChangedEventArgs(this, null));
+                OnParentChanged(this, new ParentChangedEventArgs(this, null));
                 Reflow();
                 return;
             }

@@ -31,7 +31,7 @@ namespace DyingAndMore.Editor
                 BorderColor = Color.White,
                 Padding = new Vector2(10)
             };
-            closeButton.Click += delegate { triggerSettings.RemoveFromParent(); };
+            closeButton.Click += delegate { triggerSettings.RemoveFromParent(); return UIEventResult.Handled; };
 
             var label = new Static { Text = "Name" };
 
@@ -58,12 +58,13 @@ namespace DyingAndMore.Editor
             editor.Map.renderSettings.drawTriggers = false;
         }
 
-        void ActiveTriggerTextChanged(object sender, System.EventArgs e)
+        UIEventResult ActiveTriggerTextChanged(object sender, System.EventArgs e)
         {
             if (activeTrigger?.Class == null)
-                return;
+                return UIEventResult.Continue;
 
             activeTrigger.Class.Name = ((TextInput)sender).Text;
+            return UIEventResult.Handled;
         }
 
         protected override bool HandleInput(GameTime time)

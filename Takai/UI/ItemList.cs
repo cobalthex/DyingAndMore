@@ -5,10 +5,12 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.UI
 {
-    public class SelectionChangedEventArgs : EventArgs
+    public class SelectionChangedEventArgs : UIEventArgs
     {
         public int oldIndex;
         public int newIndex;
+
+        public SelectionChangedEventArgs(Static source) : base(source) { }
     }
 
     /// <summary>
@@ -109,15 +111,14 @@ namespace Takai.UI
                         Container.Children[value].BorderColor = Static.FocusedBorderColor;
                     }
 
-                    var changed = new SelectionChangedEventArgs
+                    var changed = new SelectionChangedEventArgs(this)
                     {
                         oldIndex = _selectedIndex,
                         newIndex = value
                     };
 
                     _selectedIndex = value;
-                    OnSelectionChanged(changed);
-                    SelectionChanged?.Invoke(this, changed);
+                    RouteEvent(SelectionChanged, changed);
                 }
             }
         }
@@ -125,8 +126,7 @@ namespace Takai.UI
 
         public float ItemPadding = 10;
 
-        public EventHandler<SelectionChangedEventArgs> SelectionChanged { get; set; }
-        protected virtual void OnSelectionChanged(SelectionChangedEventArgs e) { }
+        public UIEvent<SelectionChangedEventArgs> SelectionChanged;
 
         public ItemList()
         {
@@ -180,10 +180,10 @@ namespace Takai.UI
 
             var item = ItemTemplate.Clone();
             item.BindTo(value);
-            item.Click += delegate (object sender, ClickEventArgs e)
+            item.Click += delegate (Static sender, ClickEventArgs e)
             {
-                var which = (Static)sender;
-                SelectedIndex = which.ChildIndex;
+                SelectedIndex = sender.ChildIndex;
+                return UIEventResult.Handled;
             };
             return item;
         }

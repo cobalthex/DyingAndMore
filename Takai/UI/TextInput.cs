@@ -132,6 +132,8 @@ namespace Takai.UI
         {
             ignoreSpaceKey = true;
             BorderColor = Color;
+
+            Press += OnInputBoxPressed;
         }
 
         protected override void BindCommandToThis(string command, Command commandFn)
@@ -145,15 +147,15 @@ namespace Takai.UI
                 onTextChangedCommandFn = commandFn;
         }
 
-        protected override void OnPress(ClickEventArgs args)
+        protected UIEventResult OnInputBoxPressed(Static sender, ClickEventArgs e)
         {
             if (Text == null)
             {
                 caret = 0;
-                return;
+                return UIEventResult.Handled;
             }
 
-            var x = args.position.X + ScrollPosition;
+            var x = e.position.X + ScrollPosition;
             var width = 0;
             for (int i = 0; i < Text.Length; ++i)
             {
@@ -161,11 +163,13 @@ namespace Takai.UI
                 if (width + (cw / 2) > x)
                 {
                     Caret = i;
-                    return;
+                    return UIEventResult.Handled;
                 }
                 width += cw + Font.Tracking.X;
             }
             Caret = Text.Length;
+
+            return UIEventResult.Handled;
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
