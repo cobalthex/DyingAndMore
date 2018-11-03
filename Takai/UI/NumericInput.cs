@@ -23,7 +23,7 @@ namespace Takai.UI
                 {
                     _value = newVal;
                     RouteEvent(ValueChanged, new UIEventArgs(this));
-                    onValueChangedCommandFn?.Invoke(this);
+                    Commander.Invoke(OnValueChangedCommand, this);
                 }
             }
         }
@@ -81,15 +81,6 @@ namespace Takai.UI
         public UIEvent<UIEventArgs> ValueChanged;
 
         public string OnValueChangedCommand { get; set; }
-        protected Command onValueChangedCommandFn;
-
-        protected override void BindCommandToThis(string command, Command commandFn)
-        {
-            base.BindCommandToThis(command, commandFn);
-
-            if (command == OnValueChangedCommand)
-                onValueChangedCommandFn = commandFn;
-        }
 
         public virtual void IncrementValue(int scale = 1)
         {

@@ -94,7 +94,7 @@ namespace Takai.UI
         protected UIEventResult OnSelectionChanged(Static sender, SelectionChangedEventArgs e)
         {
             if (e.newIndex < 0)
-                return UIEventResult.Handled;
+                return UIEventResult.Continue;
 
             var entry = Items[e.newIndex];
             //if (entry == "« Previous")
@@ -103,7 +103,7 @@ namespace Takai.UI
             if (entry is DirectoryInfo di)
                 Path = P.Combine(Path, di.Name);
 
-            return UIEventResult.Handled;
+            return UIEventResult.Continue;
         }
     }
 }
