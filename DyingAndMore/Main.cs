@@ -148,25 +148,25 @@ namespace DyingAndMore
 #endif
             */
 
-            //ui = new Takai.UI.FileList
-            //{
-            //    //Size = new Vector2(400, 600),
-            //    HorizontalAlignment = Takai.UI.Alignment.Middle,
-            //    VerticalAlignment = Takai.UI.Alignment.Middle,
-            //    BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
-            //    FilterRegex = "\\.map.tk$",
-            //};
-            //((Takai.UI.FileList)ui).SelectionChanged += delegate (Takai.UI.Static s, Takai.UI.SelectionChangedEventArgs se)
-            //{
-            //    var fl = (Takai.UI.FileList)s;
-            //    if (System.IO.File.Exists(fl.SelectedFile))
-            //    {
-            //        var map = Cache.Load<Takai.Game.MapClass>(fl.SelectedFile);
-            //        map.InitializeGraphics();
-            //        ui.ReplaceAllChildren(new Editor.Editor(map.Instantiate()));
-            //    }
-            //    return Takai.UI.UIEventResult.Handled;
-            //};
+            ui = new Takai.UI.FileList
+            {
+                //Size = new Vector2(400, 600),
+                HorizontalAlignment = Takai.UI.Alignment.Middle,
+                VerticalAlignment = Takai.UI.Alignment.Middle,
+                BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
+                FilterRegex = "\\.map.tk$",
+            };
+            ((Takai.UI.FileList)ui).SelectionChanged += delegate (Takai.UI.Static s, Takai.UI.SelectionChangedEventArgs se)
+            {
+                var fl = (Takai.UI.FileList)s;
+                if (System.IO.File.Exists(fl.SelectedFile))
+                {
+                    var map = Cache.Load<Takai.Game.MapClass>(fl.SelectedFile);
+                    map.InitializeGraphics();
+                    ui.ReplaceAllChildren(new Editor.Editor(map.Instantiate()));
+                }
+                return Takai.UI.UIEventResult.Handled;
+            };
             //var ui = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)
             //{
@@ -181,7 +181,7 @@ namespace DyingAndMore
             //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
             //    };
             //}
-            ui = Cache.Load<Takai.UI.Static>("UI/test/elements.ui.tk");
+            //ui = Cache.Load<Takai.UI.Static>("UI/test/elements.ui.tk");
 
             ui = new Takai.UI.Static(ui)
             {

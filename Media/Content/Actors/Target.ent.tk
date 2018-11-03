@@ -10,6 +10,12 @@ ActorClass {
         };
     };
 
+    DefaultController: AIController {
+        Behaviors: [
+            MagnetBehavior { };
+        ];
+    };
+
     FieldOfView: 0.667pi;
     IsPhysical: True;
     IgnoreTrace: False;

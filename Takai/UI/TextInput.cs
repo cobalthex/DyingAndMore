@@ -99,19 +99,15 @@ namespace Takai.UI
         /// Called whenever the text has changed
         /// </summary>
         public event UIEventHandler TextChanged = null;
-        protected virtual void OnTextChanged(System.EventArgs e) { }
 
         public string OnTextChangedCommand { get; set; }
-        protected Command onTextChangedCommandFn;
 
         /// <summary>
         /// Called whenever the enter key is pressed
         /// </summary>
         public event UIEventHandler Submit = null;
-        protected virtual void OnSubmit(System.EventArgs e) { }
 
         public string OnSubmitCommand { get; set; }
-        protected Command onSubmitCommandFn;
 
         /// <summary>
         /// When the last character was inputted (in system ticks)
@@ -135,18 +131,7 @@ namespace Takai.UI
 
             Press += OnInputBoxPressed;
         }
-
-        protected override void BindCommandToThis(string command, Command commandFn)
-        {
-            base.BindCommandToThis(command, commandFn);
-
-            if (command == OnSubmitCommand)
-                onSubmitCommandFn = commandFn;
-
-            if (command == OnTextChangedCommand)
-                onTextChangedCommandFn = commandFn;
-        }
-
+        
         protected UIEventResult OnInputBoxPressed(Static sender, ClickEventArgs e)
         {
             if (Text == null)
@@ -262,9 +247,8 @@ namespace Takai.UI
 
                     if (key == Keys.Enter)
                     {
-                        OnSubmit(System.EventArgs.Empty);
                         Submit?.Invoke(this, new UIEventArgs(this));
-                        onSubmitCommandFn?.Invoke(this);
+                        Commander.Invoke(OnSubmitCommand, this);
                     }
 
                     else if (key == Keys.Left && Caret > 0)
@@ -366,9 +350,8 @@ namespace Takai.UI
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
 
-            OnTextChanged(System.EventArgs.Empty);
             TextChanged?.Invoke(this, new UIEventArgs(this));
-            onTextChangedCommandFn?.Invoke(this);
+            Commander.Invoke(OnTextChangedCommand, this);
         }
 
         void UpdateScrollPosition()

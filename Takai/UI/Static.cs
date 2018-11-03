@@ -130,13 +130,6 @@ namespace Takai.UI
         }
     }
 
-    /// <summary>
-    /// Command handler for commands issued from UI
-    /// These are called after event handles
-    /// </summary>
-    /// <param name="source">The source UI object issuing the command</param>
-    public delegate void Command(Static source);
-
     //todo: invalidation/dirty states, instead of reflow each time property is updated, mark dirty. On next update, reflow if dirty
 
     /// <summary>
@@ -443,7 +436,7 @@ namespace Takai.UI
         /// Can this element be focused
         /// </summary>
         [Data.Serializer.Ignored]
-        public virtual bool CanFocus { get => Click.HandlerCount > 0 || clickCommandFn != null; }
+        public virtual bool CanFocus { get => Click.HandlerCount > 0 || OnClickCommand != null; }
 
         /// <summary>
         /// Disable the default behavior of the tab key
@@ -526,7 +519,6 @@ namespace Takai.UI
         public UIEvent<ClickEventArgs> Click;
 
         public string OnClickCommand { get; set; }
-        protected Command clickCommandFn;
 
         #endregion
 
@@ -1297,33 +1289,7 @@ namespace Takai.UI
             foreach (var binding in Bindings)
                 binding.BindTo(source, this);
         }
-
-        /// <summary>
-        /// Bind this (and/or children) to a command on click/submit/etc
-        /// </summary>
-        /// <param name="command">The command to bind to</param>
-        /// <param name="commandFn">The function to call when the command is triggered</param>
-        /// <param name="recursive">Bind this command to any children?</param>
-        public void BindCommand(string command, Command commandFn, bool recursive = true)
-        {
-            if (command == null || commandFn == null)
-                return;
-
-            if (recursive)
-            {
-                foreach (var elem in EnumerateRecursive())
-                    elem.BindCommandToThis(command, commandFn);
-            }
-            else
-                BindCommandToThis(command, commandFn);
-        }
-
-        protected virtual void BindCommandToThis(string command, Command commandFn)
-        {
-            if (OnClickCommand == command)
-                clickCommandFn = commandFn;
-        }
-
+        
         //these need to take the event type
         protected void RouteEvent<TEventArgs>(UIEvent<TEventArgs> @event, TEventArgs args) where TEventArgs : UIEventArgs
         {
@@ -1708,7 +1674,7 @@ namespace Takai.UI
         {
             var ce = new ClickEventArgs(this) { position = relativePosition, inputIndex = 0 };
             RouteEvent(Click, ce);
-            clickCommandFn?.Invoke(this);
+            Commander.Invoke(OnClickCommand, this);
         }
 
         public static Static GeneratePropSheet(object obj, Graphics.BitmapFont font, Color color)
