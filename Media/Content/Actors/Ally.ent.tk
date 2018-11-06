@@ -1,7 +1,7 @@
 ActorClass {
     Name: "Allied NPC";
     MaxHealth: 50;
-    DefaultFactions: Factions [Player Ally];
+    DefaultFactions: Factions [Ally];
 
     DefaultController: AIController {
         Behaviors: [

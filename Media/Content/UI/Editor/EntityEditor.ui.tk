@@ -31,36 +31,50 @@ List {
                             ];
                         };
 
-						Static { Text: "Actor Properties"; };
-						Static { Text: "Current Health"; };
-						NumericInput {
-							Bindings: [
-								Binding {
-									Mode: BindingMode.TwoWay;
-									Source: "CurrentHealth";
-									Target: "Value";
-								};
-							];
-							Minimum: 0;
-							Maximum: 2E9;
-						};
+                        List {
+                            margin: 10;
+                            Children: [
+        						Static { Text: "Actor Properties"; };
+        						Static { Text: "Current Health"; };
+        						NumericInput {
+        							Bindings: [
+        								Binding {
+        									Mode: BindingMode.TwoWay;
+        									Source: "CurrentHealth";
+        									Target: "Value";
+        								};
+        							];
+        							Minimum: 0;
+        							Maximum: 2E9;
+        						};
 
-						#weapon
-                        Static { Text: "Weapon"; };
-                        WeaponSelect {
-                            Bindings: [
-                                Binding {
-                                    Mode: BindingMode.TwoWay;
-                                    Source: "Weapon";
-                                    Target: "Instance";
-                                }
+        						#weapon
+                                Static { Text: "Weapon"; };
+                                WeaponSelect {
+                                    Bindings: [
+                                        Binding {
+                                            Mode: BindingMode.TwoWay;
+                                            Source: "Weapon";
+                                            Target: "Instance";
+                                        }
+                                    ];
+                                };
+
+        						#conditions
+        						#actions
+
+        						Static { Text: "Controller"; };
+                                Static {
+                                    Bindings: [
+                                        Binding {
+                                            Source: "Controller.@type";
+                                            Target: "Text";
+                                            DefaultValue: "[None]";
+                                        }
+                                    ];
+                                };
                             ];
                         };
-
-						#conditions
-						#actions
-
-						Static { Text: "Controller"; };
                     ];
                 };
             ];
@@ -70,7 +84,7 @@ List {
             Padding: [10 5];
             HorizontalAlignment: Alignment.Middle;
             Text: "Close";
-            OnClickCommand: "$Close";
+            OnClickCommand: "$CloseModal";
         };
     ];
 }

@@ -6,20 +6,67 @@ namespace Takai.Data
 {
     public struct GetSet
     {
+        /// <summary>
+        /// The maximum number of nested object queries allowed.
+        /// Nothing will be returned if &lt; 1
+        /// </summary>
+        public static int MaxIndirection = 2;
+
         public Type type;
         public Func<object> get;
         public Action<object> set;
 
-        public static GetSet GetMemberAccessors(string memberName, object obj)
+        public static GetSet GetMemberAccessors(object obj, string memberName)
         {
+            if (memberName == null || obj == null)
+                return new GetSet();
+
+            var objType = obj.GetType();
+
+            PropertyInfo prop;
+            FieldInfo field;
+
+            var indirections = memberName.Split(new[] { '.' }, MaxIndirection);
+            for (int i = 0; i < indirections.Length - 1; ++i)
+            {
+                prop = objType.GetProperty(indirections[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly);
+                if (prop != null)
+                {
+                    obj = prop.GetValue(obj);
+                    if (obj == null)
+                        return new GetSet();
+
+                    objType = obj.GetType();
+                    continue;
+                }
+
+                field = objType.GetField(indirections[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly);
+                if (field != null)
+                {
+                    obj = field.GetValue(obj);
+                    if (obj == null)
+                        return new GetSet();
+
+                    objType = obj.GetType();
+                    continue;
+                }
+
+                return new GetSet(); //not found
+            }
+
+            memberName = indirections[indirections.Length - 1];
+
             var getset = new GetSet();
 
-            if (obj == null)
+            //special case (can only be at the end)
+            if (memberName.Equals("@type", StringComparison.OrdinalIgnoreCase))
+            {
+                getset.type = typeof(string);
+                getset.get = () => objType.Name;
                 return getset;
+            }
 
-            var type = obj.GetType();
-
-            var prop = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            prop = objType.GetProperty(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
             if (prop != null)
             {
                 //todo: get delegates working
@@ -35,7 +82,7 @@ namespace Takai.Data
                 return getset;
             }
 
-            var field = type.GetField(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            field = objType.GetField(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
             if (field != null)
             {
                 getset.type = field.FieldType;
@@ -84,6 +131,17 @@ namespace Takai.Data
         /// </summary>
         public object DefaultValue { get; set; }
 
+        /// <summary>
+        /// Is this binding currently returning the default value?
+        /// </summary>
+        public bool HasDefaultValue { get; protected set; }
+
+        /// <summary>
+        /// If not null, the bound value must equal this to be displayed
+        /// (DefaultValue is displayed if conditoin not met)
+        /// </summary>
+        public object ConditionObject { get; set; }
+
         GetSet sourceAccessors;
         GetSet targetAccessors;
 
@@ -122,7 +180,10 @@ namespace Takai.Data
             var srcVal = sourceAccessors.get?.Invoke() ?? null;
             if (targetAccessors.set != null)
             {
-                if (srcVal == null)
+                if (ConditionObject != null && srcVal != ConditionObject)
+                    srcVal = null;
+
+                if (HasDefaultValue = (srcVal == null))
                     srcVal = DefaultValue;
                 targetAccessors.set(Serializer.Cast(targetAccessors.type, srcVal));
                 cachedValue = srcVal;
@@ -152,7 +213,7 @@ namespace Takai.Data
                 };
             }
             else
-                getset = GetSet.GetMemberAccessors(binding, obj);
+                getset = GetSet.GetMemberAccessors(obj, binding);
 
             if (getset.get == null && getset.set == null)
                 System.Diagnostics.Debug.WriteLine($"Binding '{binding}' does not exist in '{obj.GetType()}'");
@@ -178,7 +239,11 @@ namespace Takai.Data
             if (!srcMatches)
             {
                 var bindVal = srcVal;
-                if (bindVal == null)
+
+                if (ConditionObject != null && bindVal != ConditionObject)
+                    bindVal = null;
+
+                if (HasDefaultValue = (bindVal == null))
                     bindVal = DefaultValue;
                 targetAccessors.set(Serializer.Cast(targetAccessors.type, bindVal));
                 cachedValue = srcVal;
@@ -198,7 +263,11 @@ namespace Takai.Data
                 if (!tgtMatches)
                 {
                     var bindVal = tgtVal;
-                    if (bindVal == null)
+
+                    if (ConditionObject != null && bindVal != ConditionObject)
+                        bindVal = null;
+
+                    if (ConditionObject != null && bindVal != ConditionObject)
                         bindVal = DefaultValue;
                     sourceAccessors.set(Serializer.Cast(sourceAccessors.type, bindVal));
                     cachedValue = tgtVal;

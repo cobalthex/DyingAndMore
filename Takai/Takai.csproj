@@ -101,7 +101,7 @@
     <Compile Include="Data\Binding.cs" />
     <Compile Include="UI\Animation.cs" />
     <Compile Include="UI\CheckBox.cs" />
-    <Compile Include="UI\CommandRouter.cs" />
+    <Compile Include="UI\Commands.cs" />
     <Compile Include="UI\Drawer.cs" />
     <Compile Include="UI\DropdownSelect.cs" />
     <Compile Include="UI\FileInput.cs" />

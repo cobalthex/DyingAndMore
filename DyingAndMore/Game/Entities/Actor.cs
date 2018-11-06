@@ -109,8 +109,6 @@ namespace DyingAndMore.Game.Entities
         }
         private Controller _controller;
 
-        public float MaxHealth => Class.MaxHealth;
-
         /// <summary>
         /// The current health of the actor
         /// </summary>
@@ -294,7 +292,7 @@ namespace DyingAndMore.Game.Entities
         public override string GetDebugInfo()
         {
             return $"{base.GetDebugInfo()}\n" +
-                   $"Health: {CurrentHealth}/{MaxHealth}\n" +
+                   $"Health: {CurrentHealth}/{Class?.MaxHealth}\n" +
                    $"Weapon: {Weapon}";
         }
 

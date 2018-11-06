@@ -1,30 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Takai
+namespace Takai.UI
 {
     /// <summary>
     /// Command handler for commands issued from UI
     /// These are called after event handles
     /// </summary>
     /// <param name="source">The source UI object issuing the command</param>
-    public delegate void CommandHandler(object source);
+    public delegate void UICommandHandler(Static source);
 
     public static class Commander
     {
-        static Dictionary<string, List<CommandHandler>> allHandlers;
+        static Dictionary<string, List<UICommandHandler>> allHandlers = new Dictionary<string, List<UICommandHandler>>();
 
-        public static void AddHandler(string command, CommandHandler handler)
+        static Commander()
+        {
+            AddDefaultHandlers();
+        }
+
+        public static void AddHandler(string command, UICommandHandler handler)
         {
             if (command == null)
                 throw new ArgumentNullException("Command handler cannot be null");
 
             if (!allHandlers.TryGetValue(command, out var handlers))
-                allHandlers[command] = handlers = new List<CommandHandler>();
+                allHandlers[command] = handlers = new List<UICommandHandler>();
             handlers.Add(handler);
         }
 
-        public static bool RemoveHandler(string command, CommandHandler handler)
+        public static bool RemoveHandler(string command, UICommandHandler handler)
         {
             if (allHandlers.TryGetValue(command, out var handlers))
                 return handlers.Remove(handler);
@@ -41,7 +46,7 @@ namespace Takai
             allHandlers.Clear();
         }
 
-        public static bool Invoke(string command, object source)
+        public static bool Invoke(string command, Static source)
         {
             if (command == null)
                 return false;
@@ -54,6 +59,18 @@ namespace Takai
             }
 
             return false;
+        }
+
+        public static void AddDefaultHandlers()
+        {
+            AddHandler("$CloseModal", delegate (Static source)
+            {
+                while (source != null && !source.IsModal)
+                    source = source.Parent;
+
+                if (source.IsModal)
+                    source.RemoveFromParent();
+            });
         }
     }
 }

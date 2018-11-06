@@ -14,7 +14,7 @@ Static {
                     Target: "Value";
                 };
                 {
-                    Source: "MaxHealth";
+                    Source: "Class.MaxHealth";
                     Target: "Maximum";
                 };
 			];
