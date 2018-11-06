@@ -20,11 +20,21 @@ Table {
             ];
         };
 
+        Static { Text: "Type"; }
+        Static {
+            Bindings: [
+                Binding {
+                    Source: "@type";
+                    Target: "Text";
+                }
+            ];
+        };
+
         Static { Text: "Class"; };
         Static {
             Bindings: [
                 {
-                    Source: "ClassName";
+                    Source: "Class.Name";
                     Target: "Text";
                 }
             ];
@@ -34,7 +44,7 @@ Table {
         Static {
             Bindings: [
                 {
-                    Source: "ClassFile";
+                    Source: "Class.File";
                     Target: "Text";
                 }
             ];
@@ -93,7 +103,7 @@ Table {
                 Static {
                     Bindings: [
                         {
-                            Source: "MaxHealth";
+                            Source: "Class.MaxHealth";
                             Target: "Text";
                             Mode: BindingMode.OneWay;
                         }

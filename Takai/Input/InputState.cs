@@ -422,6 +422,9 @@ namespace Takai.Input
                 case KeyMod.Windows:
                     return (IsButtonDown(Keys.LeftWindows) || IsButtonDown(Keys.RightWindows));
 
+                case KeyMod.None:
+                    return !(IsMod(KeyMod.Control) || IsMod(KeyMod.Shift) || IsMod(KeyMod.Alt) || IsMod(KeyMod.Windows));
+
                 default:
                     return false;
             }

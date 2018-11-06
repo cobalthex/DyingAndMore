@@ -44,7 +44,7 @@ namespace Takai.Game
         /// Commands that are executed when an entity enters this trigger region.
         /// Any <see cref="EntityCommand"/> that have the target as null will trigger against the entity entering
         /// </summary>
-        public List<Command> OnEnterCommands { get; set; }
+        public List<GameCommand> OnEnterCommands { get; set; }
 
         /// <summary>
         /// Play effects when an entity enters the trigger region

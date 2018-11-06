@@ -5,7 +5,7 @@ using Takai.Game;
 
 namespace DyingAndMore.Game
 {
-    class GameCommand : Command
+    class GameCommand : Takai.Game.GameCommand
     {
         public override void Invoke()
         {

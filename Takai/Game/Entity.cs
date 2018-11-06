@@ -150,15 +150,6 @@ namespace Takai.Game
         private EntityClass _class;
 
         /// <summary>
-        /// The name of this entity's class
-        /// </summary>
-        public string ClassName => Class?.Name;
-        /// <summary>
-        /// The file that this entity's class was created from
-        /// </summary>
-        public string ClassFile => Class?.File;
-
-        /// <summary>
         /// A name for this instance, should be unique
         /// </summary>
         public string Name { get; set; } = null;
@@ -257,7 +248,7 @@ namespace Takai.Game
         /// <summary>
         /// Event handlers for this entity. Set by <see cref="EntityClass.Events"/>
         /// </summary>
-        public Dictionary<string, List<Command>> EventHandlers { get; set; }
+        public Dictionary<string, List<GameCommand>> EventHandlers { get; set; }
 
         /// <summary>
         /// Actions that this entity can perform

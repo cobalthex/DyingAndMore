@@ -1,6 +1,6 @@
 ﻿namespace Takai.Game
 {
-    public abstract class Command
+    public abstract class GameCommand
     {
         public string ActionName { get; set; }
         public object ActionParameter { get; set; }
@@ -14,7 +14,7 @@
 
     //todo: command delays?
 
-    public class EntityCommand : Command
+    public class EntityCommand : GameCommand
     {
         public EntityInstance Target { get; set; }
 
