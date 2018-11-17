@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
-//todo: on font/text changed, autosize
-
 namespace Takai.UI
 {
     /// <summary>
@@ -17,13 +15,15 @@ namespace Takai.UI
         Start,
         Middle,
         End,
-        Stretch, //Special case, overrides position and size
+        Stretch,
 
         Left = Start,
         Top = Start,
 
         Right = End,
         Bottom = End,
+
+        Center = Middle,
     }
 
     public class UIEventArgs : System.EventArgs
@@ -33,74 +33,6 @@ namespace Takai.UI
         public UIEventArgs(Static source)
         {
             Source = source;
-        }
-    }
-
-    public enum UIEventResult
-    {
-        Continue,
-        Handled,
-    }
-
-    public delegate UIEventResult UIEventHandler(Static sender, UIEventArgs e);
-    public delegate UIEventResult UIEventHandler<TEventArgs>(Static sender, TEventArgs e) where TEventArgs : UIEventArgs;
-
-    [Data.Serializer.Ignored]
-    public struct UIEvent<TEventArgs> where TEventArgs : UIEventArgs //todo: this could probably be a struct
-    {
-        public enum RouteDirection
-        {
-            Bubble,
-            Tunnel
-        }
-
-        public RouteDirection Direction { get; set; }
-
-        private List<UIEventHandler<TEventArgs>> handlers;
-
-        public int HandlerCount => handlers?.Count ?? 0;
-
-        public void AddHandler(UIEventHandler<TEventArgs> handler)
-        {
-            if (handlers == null)
-                handlers = new List<UIEventHandler<TEventArgs>>(1);
-            handlers.Add(handler);
-        }
-
-        public void RemoveHandler(UIEventHandler<TEventArgs> handler)
-        {
-            if (handlers != null)
-                handlers.Remove(handler);
-        }
-
-        public void RemoveAllHandlers()
-        {
-            handlers.Clear();
-        }
-
-        public static UIEvent<TEventArgs> operator +(UIEvent<TEventArgs> e, UIEventHandler<TEventArgs> handler)
-        {
-            e.AddHandler(handler);
-            return e;
-        }
-        public static UIEvent<TEventArgs> operator -(UIEvent<TEventArgs> e, UIEventHandler<TEventArgs> handler)
-        {
-            e.RemoveHandler(handler);
-            return e;
-        }
-
-        public UIEventResult Invoke(Static sender, TEventArgs e)
-        {
-            if (handlers == null)
-                return UIEventResult.Continue;
-
-            foreach (var handler in handlers)
-            {
-                if (handler.Invoke(sender, e) == UIEventResult.Handled)
-                    return UIEventResult.Handled;
-            }
-
-            return UIEventResult.Continue;
         }
     }
 
@@ -130,6 +62,84 @@ namespace Takai.UI
         }
     }
 
+    public enum UIEventResult
+    {
+        Continue,
+        Handled,
+    }
+
+    public delegate UIEventResult UIEventHandler(Static sender, UIEventArgs e);
+    public delegate UIEventResult UIEventHandler<TEventArgs>(Static sender, TEventArgs e) where TEventArgs : UIEventArgs;
+
+    [Data.Serializer.Ignored]
+    public struct UIEvent//todo: this could probably be a struct
+    {
+        public enum RouteDirection
+        {
+            Bubble,
+            Tunnel
+        }
+
+        public RouteDirection Direction { get; set; }
+
+        private List<UIEventHandler> handlers;
+
+        public int HandlerCount => handlers?.Count ?? 0;
+
+        public UIEvent(bool allocHandlers)
+        {
+            Direction = RouteDirection.Bubble;
+
+            if (allocHandlers)
+                handlers = new List<UIEventHandler>();
+            else
+                handlers = null;
+        }
+
+        public void AddHandler(UIEventHandler handler)
+        {
+            if (handlers == null)
+                handlers = new List<UIEventHandler>(1);
+            handlers.Add(handler);
+        }
+
+        public bool RemoveHandler(UIEventHandler handler)
+        {
+            return handlers != null &&
+                handlers.Remove(handler);
+        }
+
+        public void RemoveAllHandlers()
+        {
+            handlers.Clear();
+        }
+
+        public static UIEvent operator +(UIEvent e, UIEventHandler handler)
+        {
+            e.AddHandler(handler);
+            return e;
+        }
+        public static UIEvent operator -(UIEvent e, UIEventHandler handler)
+        {
+            e.RemoveHandler(handler);
+            return e;
+        }
+
+        public UIEventResult Invoke(Static sender, UIEventArgs e)
+        {
+            if (handlers == null)
+                return UIEventResult.Continue;
+
+            foreach (var handler in handlers)
+            {
+                if (handler.Invoke(sender, e) == UIEventResult.Handled)
+                    return UIEventResult.Handled;
+            }
+
+            return UIEventResult.Continue;
+        }
+    }
+
     //todo: invalidation/dirty states, instead of reflow each time property is updated, mark dirty. On next update, reflow if dirty
 
     /// <summary>
@@ -146,6 +156,7 @@ namespace Takai.UI
         private static uint idCounter = 0;
         private static uint GenerateId()
         {
+            //a method here allows for easier debuggin
             return ++idCounter;
         }
 #endif
@@ -436,7 +447,7 @@ namespace Takai.UI
         /// Can this element be focused
         /// </summary>
         [Data.Serializer.Ignored]
-        public virtual bool CanFocus { get => Click.HandlerCount > 0 || OnClickCommand != null; }
+        public virtual bool CanFocus => false; //todo
 
         /// <summary>
         /// Disable the default behavior of the tab key
@@ -501,22 +512,67 @@ namespace Takai.UI
 
         #endregion
 
-        #region Events
+        #region Events/Commands
+
+        private Dictionary<string, UIEvent> uiEvents;
+
+        public void On(string @event, UIEventHandler handler)
+        {
+            if (uiEvents == null)
+                uiEvents = new Dictionary<string, UIEvent>(System.StringComparer.OrdinalIgnoreCase);
+
+            if (!uiEvents.TryGetValue(@event, out var handlers))
+                handlers = new UIEvent(true);
+            handlers.AddHandler(handler);
+        }
+
+        public bool Off(string @event, UIEventHandler handler)
+        {
+            if (uiEvents == null)
+                return false;
+
+            if (!uiEvents.TryGetValue(@event, out var handlers))
+                return false;
+
+            return handlers.RemoveHandler(handler);
+        }
 
         /// <summary>
-        /// Called whenever the element has its parent changed
+        /// Bind this UI element to an object
         /// </summary>
-        public UIEvent<ParentChangedEventArgs> ParentChanged;
+        /// <param name="source">The source object for the bindings</param>
+        /// <param name="recursive">Recurse through all children and set their source aswell</param>
+        public void BindTo(object source, bool recursive = true)
+        {
+            if (recursive)
+            {
+                foreach (var elem in EnumerateRecursive())
+                    elem.BindToThis(source);
+            }
+            else
+                BindToThis(source);
+        }
 
-        /// <summary>
-        /// Called whenever the element is pressed.
-        /// </summary>
-        public UIEvent<ClickEventArgs> Press;
+        protected virtual void BindToThis(object source)
+        {
+            if (Bindings == null)
+                return;
 
-        /// <summary>
-        /// Called whenever the element is clicked (touch just released).
-        /// </summary>
-        public UIEvent<ClickEventArgs> Click;
+            foreach (var binding in Bindings)
+                binding.BindTo(source, this);
+        }
+
+        protected void RouteEvent(string @event, UIEventArgs args)
+        {
+            var target = this;
+            while (target != null && target.uiEvents != null && target.uiEvents.TryGetValue(@event, out var handlers))
+            {
+                if (handlers.Invoke(target, args) == UIEventResult.Handled)
+                    break;
+
+                target = target.Parent; //todo: handle tunneling
+            }
+        }
 
         public string OnClickCommand { get; set; }
 
@@ -564,10 +620,9 @@ namespace Takai.UI
 
         private void SetParentNoReflow(Static newParent)
         {
-            var changed = new ParentChangedEventArgs(this, _parent);
+            var oldParent = _parent;
             _parent = newParent;
-
-            RouteEvent(ParentChanged, changed);
+            RouteEvent("ParentChanged", new ParentChangedEventArgs(this, oldParent));
         }
 
         /// <summary>
@@ -1263,41 +1318,6 @@ namespace Takai.UI
 
         #endregion
 
-        #region Event/Command/Binding Handling
-
-        /// <summary>
-        /// Bind this UI element to an object
-        /// </summary>
-        /// <param name="source">The source object for the bindings</param>
-        /// <param name="recursive">Recurse through all children and set their source aswell</param>
-        public void BindTo(object source, bool recursive = true)
-        {
-            if (recursive)
-            {
-                foreach (var elem in EnumerateRecursive())
-                    elem.BindToThis(source);
-            }
-            else
-                BindToThis(source);
-        }
-
-        protected virtual void BindToThis(object source)
-        {
-            if (Bindings == null)
-                return;
-
-            foreach (var binding in Bindings)
-                binding.BindTo(source, this);
-        }
-        
-        //these need to take the event type
-        protected void RouteEvent<TEventArgs>(UIEvent<TEventArgs> @event, TEventArgs args) where TEventArgs : UIEventArgs
-        {
-            @event.Invoke(this, args);
-        }
-
-        #endregion
-
         #region Updating/Drawing
 
         /// <summary>
@@ -1451,7 +1471,7 @@ namespace Takai.UI
             if (Input.InputState.IsPress(button) && VisibleBounds.Contains(mousePosition))
             {
                 var ce = new ClickEventArgs(this) { position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding, inputIndex = 0 };
-                RouteEvent(Press, ce);
+                RouteEvent("Press", ce);
 
                 if (CanFocus)
                 {
@@ -1673,7 +1693,7 @@ namespace Takai.UI
         public void TriggerClick(Vector2 relativePosition)
         {
             var ce = new ClickEventArgs(this) { position = relativePosition, inputIndex = 0 };
-            RouteEvent(Click, ce);
+            RouteEvent("Click", ce);
             Commander.Invoke(OnClickCommand, this);
         }
 
@@ -1701,7 +1721,7 @@ namespace Takai.UI
                             Color = color,
                             IsChecked = @enum.HasFlag(value)
                         };
-                        check.Click += delegate (Static sender, ClickEventArgs e)
+                        check.On("Click", delegate (Static sender, UIEventArgs e)
                         {
                             throw new System.NotImplementedException(); //verify that the code below works
 
@@ -1715,7 +1735,7 @@ namespace Takai.UI
                                 obj = System.Enum.ToObject(type, n & ~parsed);
 
                             return UIEventResult.Handled;
-                        };
+                        });
                         root.AddChild(check);
                     }
                 }

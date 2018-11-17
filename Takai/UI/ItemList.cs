@@ -118,7 +118,7 @@ namespace Takai.UI
                     };
 
                     _selectedIndex = value;
-                    RouteEvent(SelectionChanged, changed);
+                    RouteEvent("SelectionChanged", changed);
                 }
             }
         }
@@ -126,12 +126,23 @@ namespace Takai.UI
 
         public float ItemPadding = 10;
 
-        public UIEvent<SelectionChangedEventArgs> SelectionChanged;
-
         public ItemList()
         {
             Items.CollectionChanged += Items_CollectionChanged;
             AddChild(Container);
+
+            On("InternalChangeSelection", delegate (Static sender, UIEventArgs e)
+            {
+                var sce = (SelectionChangedEventArgs)e;
+                SelectedIndex = sce.newIndex;
+                return UIEventResult.Handled;
+            });
+        }
+
+        protected override void FinalizeClone()
+        {
+            Container = Container?.Clone();
+            base.FinalizeClone();
         }
 
         protected void Items_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -180,11 +191,15 @@ namespace Takai.UI
 
             var item = ItemTemplate.Clone();
             item.BindTo(value);
-            item.Click += delegate (Static sender, ClickEventArgs e)
+            item.On("Click", delegate (Static sender, UIEventArgs e)
             {
-                SelectedIndex = sender.ChildIndex;
-                return UIEventResult.Handled;
-            };
+                var sce = new SelectionChangedEventArgs(sender)
+                {
+                    newIndex = sender.ChildIndex
+                };
+                RouteEvent("InternalChangeSelection", sce);
+                return UIEventResult.Continue;
+            });
             return item;
         }
     }

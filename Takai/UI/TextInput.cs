@@ -95,19 +95,7 @@ namespace Takai.UI
         /// </summary>
         public bool AllowLetters { get; set; } = true;
 
-        /// <summary>
-        /// Called whenever the text has changed
-        /// </summary>
-        public event UIEventHandler TextChanged = null;
-
         public string OnTextChangedCommand { get; set; }
-
-        /// <summary>
-        /// Called whenever the enter key is pressed
-        /// </summary>
-        public event UIEventHandler Submit = null;
-
-        public string OnSubmitCommand { get; set; }
 
         /// <summary>
         /// When the last character was inputted (in system ticks)
@@ -129,18 +117,20 @@ namespace Takai.UI
             ignoreSpaceKey = true;
             BorderColor = Color;
 
-            Press += OnInputBoxPressed;
+            On("Press", OnInputBoxPressed);
         }
-        
-        protected UIEventResult OnInputBoxPressed(Static sender, ClickEventArgs e)
+
+        protected UIEventResult OnInputBoxPressed(Static sender, UIEventArgs e)
         {
+            var ce = (ClickEventArgs)e;
+
             if (Text == null)
             {
                 caret = 0;
-                return UIEventResult.Handled;
+                return UIEventResult.Continue;
             }
 
-            var x = e.position.X + ScrollPosition;
+            var x = ce.position.X + ScrollPosition;
             var width = 0;
             for (int i = 0; i < Text.Length; ++i)
             {
@@ -148,13 +138,13 @@ namespace Takai.UI
                 if (width + (cw / 2) > x)
                 {
                     Caret = i;
-                    return UIEventResult.Handled;
+                    return UIEventResult.Continue;
                 }
                 width += cw + Font.Tracking.X;
             }
             Caret = Text.Length;
 
-            return UIEventResult.Handled;
+            return UIEventResult.Continue;
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
@@ -247,8 +237,7 @@ namespace Takai.UI
 
                     if (key == Keys.Enter)
                     {
-                        Submit?.Invoke(this, new UIEventArgs(this));
-                        Commander.Invoke(OnSubmitCommand, this);
+                        //todo
                     }
 
                     else if (key == Keys.Left && Caret > 0)
@@ -350,7 +339,7 @@ namespace Takai.UI
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
 
-            TextChanged?.Invoke(this, new UIEventArgs(this));
+            RouteEvent("TextChanged", new UIEventArgs(this));
             Commander.Invoke(OnTextChangedCommand, this);
         }
 
