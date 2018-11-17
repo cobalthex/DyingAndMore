@@ -46,7 +46,7 @@ namespace DyingAndMore.UI
                 catch { }
             }
 
-            
+
         }
 
         protected UIEventResult OnSelectedItemChanged(Static sender, SelectionChangedEventArgs e)

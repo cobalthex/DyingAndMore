@@ -27,8 +27,6 @@ namespace Takai.UI
 
         public override bool CanFocus => true;
 
-        public UIEvent<SelectionChangedEventArgs> SelectionChanged;
-
         public DropdownSelect()
         {
             list = new ItemList<T>()
@@ -42,43 +40,40 @@ namespace Takai.UI
                 BackgroundColor = new Color(32, 0, 128)
             };
 
-            dropdownContainer = new Static(dropdown)
+            dropdownContainer = new Static
             {
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
             };
 
-            AttachEvents();
-        }
-
-        private void AttachEvents() //make this virtual and put in Static? (would aleve some likely bugs with Clone())
-        {
-            Click += delegate (Static sender, ClickEventArgs e)
+            On("Click", delegate (Static sender, UIEventArgs e)
             {
-                OpenDropdown();
+                if (dropdownContainer.Parent != null)
+                    CloseDropDown();
+                else
+                    OpenDropdown();
+
                 return UIEventResult.Handled;
-            };
+            });
 
-            dropdownContainer.Click += delegate (Static sender, ClickEventArgs e)
+            On("SelectionChanged", delegate (Static sender, UIEventArgs e)
             {
-                ((Static)sender).RemoveFromParent();
-                return UIEventResult.Handled;
-            };
+                var sourceList = (ItemList<T>)e.Source;
 
-            list.SelectionChanged += delegate (Static sender, SelectionChangedEventArgs e)
-            {
                 var childIndex = preview?.ChildIndex ?? -1;
-                ReplaceChild(preview = list.Container.Children[SelectedIndex].Clone(), childIndex);
-                preview.BindTo(SelectedItem);
+                ReplaceChild(preview = sourceList.Container.Children[sourceList.SelectedIndex].Clone(), childIndex);
+                preview.BindTo(sourceList.SelectedItem);
                 CloseDropDown();
-                RouteEvent(SelectionChanged, e);
-                return UIEventResult.Handled;
-            };
+                return UIEventResult.Continue;
+            });
         }
 
         protected override void FinalizeClone()
         {
-            AttachEvents();
+            list = (ItemList<T>)list?.Clone();
+            dropdown = (ScrollBox)dropdown?.Clone();
+            preview = preview?.Clone();
+
             base.FinalizeClone();
         }
 
@@ -99,6 +94,7 @@ namespace Takai.UI
             else
                 dropdown.Position = VisibleContentArea.Location.ToVector2() + new Vector2(0, MeasuredSize.Y); //todo: smarter placement
 
+            dropdownContainer.AddChild(dropdown);
             GetRoot().AddChild(dropdownContainer);
         }
 

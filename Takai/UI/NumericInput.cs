@@ -22,7 +22,7 @@ namespace Takai.UI
                 if (_value != newVal)
                 {
                     _value = newVal;
-                    RouteEvent(ValueChanged, new UIEventArgs(this));
+                    RouteEvent("ValueChanged", new UIEventArgs(this));
                     Commander.Invoke(OnValueChangedCommand, this);
                 }
             }
@@ -75,11 +75,6 @@ namespace Takai.UI
         /// </summary>
         public NumericBaseType Increment { get; set; } = 1;
 
-        /// <summary>
-        /// called whenever this numeric's value has changed
-        /// </summary>
-        public UIEvent<UIEventArgs> ValueChanged;
-
         public string OnValueChangedCommand { get; set; }
 
         public virtual void IncrementValue(int scale = 1)
@@ -97,86 +92,87 @@ namespace Takai.UI
     /// </summary>
     public class NumericInput : NumericBase
     {
-        public override BitmapFont Font
-        {
-            get => textInput.Font;
-            set
-            {
-                textInput.Font = upButton.Font = downButton.Font = value;
-            }
-        }
-
-        public override Color Color
-        {
-            get => textInput.Color;
-            set
-            {
-                textInput.Color = upButton.Color = downButton.Color = value;
-            }
-        }
-
-        protected TextInput textInput = new TextInput
-        {
-            Text = "0",
-            AllowLetters = false,
-            AllowNumbers = true,
-            AllowSpaces = false,
-            AllowSpecialCharacters = false,
-            MaxLength = 20,
-            BorderColor = Color.Transparent,
-            HorizontalAlignment = Alignment.Stretch,
-            VerticalAlignment = Alignment.Stretch
-        };
-        protected Static upButton = new Static
-        {
-            Text = "+",
-            HorizontalAlignment = Alignment.Stretch,
-            VerticalAlignment = Alignment.Stretch
-        };
-        protected Static downButton = new Static
-        {
-            Text = "-",
-            HorizontalAlignment = Alignment.Stretch,
-            VerticalAlignment = Alignment.Stretch
-        };
+        TextInput textInput;
 
         public NumericInput()
         {
-            textInput.TextChanged += delegate (Static sender, UIEventArgs e)
+            textInput = new TextInput
             {
-                if (NumericBaseType.TryParse(textInput.Text, out var val))
+                Text = "0",
+                AllowLetters = false,
+                AllowNumbers = true,
+                AllowSpaces = false,
+                AllowSpecialCharacters = false,
+                MaxLength = 20,
+                BorderColor = Color.Transparent,
+                HorizontalAlignment = Alignment.Stretch,
+                VerticalAlignment = Alignment.Stretch
+            };
+
+            On("TextChanged", delegate (Static sender, UIEventArgs e)
+            {
+                var input = (TextInput)e.Source;
+                if (NumericBaseType.TryParse(input.Text, out var val))
                 {
                     Value = val;
                     if (Value != val)
-                        textInput.Text = Value.ToString();
-                    return UIEventResult.Handled;
+                        input.Text = Value.ToString();
                 }
-
                 return UIEventResult.Continue;
-            };
+            });
 
             BorderColor = Color;
 
-            upButton.Click += delegate (Static sender, ClickEventArgs e)
+            var upButton = new Static
+            {
+                Text = "+",
+                HorizontalAlignment = Alignment.Stretch,
+                VerticalAlignment = Alignment.Stretch
+            };
+            var downButton = new Static
+            {
+                Text = "-",
+                HorizontalAlignment = Alignment.Stretch,
+                VerticalAlignment = Alignment.Stretch
+            };
+
+            upButton.On("Click", delegate (Static sender, UIEventArgs e)
+            {
+                RouteEvent("InternalIncrementValue", new UIEventArgs(sender));
+                return UIEventResult.Continue;
+            });
+            downButton.On("Click", delegate (Static sender, UIEventArgs e)
+            {
+                RouteEvent("InternalDecrementValue", new UIEventArgs(sender));
+                return UIEventResult.Continue;
+            });
+
+            On("InternalIncrementValue", delegate (Static sender, UIEventArgs e)
             {
                 IncrementValue();
                 return UIEventResult.Handled;
-            };
+            });
 
-            downButton.Click += delegate (Static sender, ClickEventArgs e)
+            On("InternalDecrementValue", delegate (Static sender, UIEventArgs e)
             {
                 DecrementValue();
                 return UIEventResult.Handled;
-            };
+            });
 
-            ValueChanged += delegate (Static sender, UIEventArgs e)
+            On("ValueChanged", delegate (Static sender, UIEventArgs e)
             {
                 textInput.Text = Value.ToString();
                 textInput.ScrollPosition = 0;
-                return UIEventResult.Handled;
-            };
+                return UIEventResult.Continue;
+            });
 
             AddChildren(textInput, upButton, downButton);
+        }
+
+        protected override void FinalizeClone()
+        {
+            textInput = (TextInput)Children[textInput.ChildIndex];
+            base.FinalizeClone();
         }
 
         public override void IncrementValue(int scale = 1)
@@ -184,20 +180,27 @@ namespace Takai.UI
             base.IncrementValue(scale);
             textInput.Text = Value.ToString();
         }
-        
+
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             var inputSz = textInput.Measure(availableSize);
-            return inputSz + new Vector2(inputSz.Y * 2, 0);
+            return inputSz + new Vector2(inputSz.Y * (Children.Count - 1), 0);
         }
 
         protected override void ReflowOverride(Vector2 availableSize)
         {
-            var sz = availableSize.ToPoint(); //todo
-            var buttonSize = (int)Math.Max(upButton.MeasuredSize.X, downButton.MeasuredSize.Y);
-            textInput.Reflow(new Rectangle(0, 0, sz.X - buttonSize * 2, sz.Y));
-            upButton.Reflow(new Rectangle(sz.X - buttonSize * 2, 0, buttonSize, sz.Y));
-            downButton.Reflow(new Rectangle(sz.X - buttonSize, 0, buttonSize, sz.Y));
+            var buttonSize = textInput.MeasuredSize.Y;
+            var shift = (int)(availableSize.X - buttonSize * (Children.Count - 1));
+            int n = 0;
+            foreach (var child in Children)
+            {
+                if (child == textInput)
+                    child.Reflow(new Rectangle(0, 0, shift, (int)availableSize.Y));
+                else
+                    child.Reflow(new Rectangle(shift + (int)(n++ * buttonSize), 0, (int)buttonSize, (int)availableSize.Y));
+            }
+
+            //todo: this is ugly
         }
 
         protected override bool HandleInput(GameTime time)
