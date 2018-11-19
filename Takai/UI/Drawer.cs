@@ -19,17 +19,17 @@ namespace Takai.UI
         {
             IsModal = true;
 
-            Press += delegate (Static sender, ClickEventArgs e)
+            On(PressEvent, delegate
             {
                 isSizing = true;
                 return UIEventResult.Handled;
-            };
+            });
 
-            Click += delegate (Static sender, ClickEventArgs e)
+            On(ClickEvent, delegate
             {
                 isSizing = false;
                 return UIEventResult.Handled;
-            };
+            });
         }
 
         protected override void OnChildReflow(Static child)

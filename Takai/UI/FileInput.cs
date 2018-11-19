@@ -3,7 +3,6 @@
 using System.Windows.Forms;
 #endif
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
@@ -110,13 +109,19 @@ namespace Takai.UI
         {
             Direction = Direction.Horizontal;
 
-            textInput.TextChanged += delegate
+            On(TextInput.TextChangedEvent, delegate
             {
                 Value = textInput.Text;
                 return UIEventResult.Handled;
-            };
+            });
 
-            pickerButton.Click += delegate
+            pickerButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
+            {
+                RouteEvent(sender, "_SelectFile", new UIEventArgs(sender));
+                return UIEventResult.Handled;
+            });
+
+            On("_SelectFile", delegate
             {
 #if WINDOWS
 #if DEBUG
@@ -150,7 +155,7 @@ namespace Takai.UI
                 //todo
 #endif
                 return UIEventResult.Handled;
-            };
+            });
 
             AddChildren(textInput, pickerButton);
 

@@ -56,6 +56,13 @@
             : this()
         {
             AddChildren(TabBar);
+
+            On("_SelectTab", delegate (Static sender, UIEventArgs e)
+            {
+                var sce = (SelectionChangedEventArgs)e;
+                TabIndex = sce.newIndex;
+                return UIEventResult.Handled;
+            });
         }
 
         protected override void FinalizeClone()
@@ -66,11 +73,11 @@
         public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
             var tabHeader = new Static(child.Name);
-            tabHeader.Click += delegate (Static sender, ClickEventArgs e)
+            tabHeader.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                ((TabPanel)(sender.Parent.Parent)).TabIndex = sender.ChildIndex; //todo: this is fragile
+                RouteEvent(sender, "_SelectTab", new SelectionChangedEventArgs(sender, -1, sender.ChildIndex));
                 return UIEventResult.Handled;
-            };
+            });
             TabBar.InsertChild(tabHeader, index);
 
             if (Children.Count > 1)

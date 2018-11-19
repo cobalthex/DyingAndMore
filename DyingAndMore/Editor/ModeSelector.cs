@@ -81,6 +81,13 @@ namespace DyingAndMore.Editor
             });
 
             Modes = modes.AsReadOnly();
+
+            On("_SetMode", delegate (Static sender, UIEventArgs e)
+            {
+                var sce = (SelectionChangedEventArgs)e;
+                ModeIndex = sce.newIndex;
+                return UIEventResult.Handled;
+            });
         }
 
         public void AddMode(EditorMode mode)
@@ -97,11 +104,11 @@ namespace DyingAndMore.Editor
             };
             tab.Font = InactiveFont;
 
-            tab.Click += delegate
+            tab.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                Mode = mode;
+                RouteEvent(sender, "_SetMode", new SelectionChangedEventArgs(sender, -1, sender.ChildIndex));
                 return UIEventResult.Handled;
-            };
+            });
             tabs.AddChild(tab);
         }
 

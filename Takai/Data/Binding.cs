@@ -8,13 +8,15 @@ namespace Takai.Data
     {
         /// <summary>
         /// The maximum number of nested object queries allowed.
-        /// Nothing will be returned if &lt; 1
+        /// Nothing returned if &lt; 1
         /// </summary>
-        public static int MaxIndirection = 2;
+        public static int MaxIndirection = 1;
 
         public Type type;
         public Func<object> get;
         public Action<object> set;
+
+        private const BindingFlags LookupFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly; //todo: DeclaredOnly breaks some things
 
         public static GetSet GetMemberAccessors(object obj, string memberName)
         {
@@ -26,10 +28,10 @@ namespace Takai.Data
             PropertyInfo prop;
             FieldInfo field;
 
-            var indirections = memberName.Split(new[] { '.' }, MaxIndirection);
+            var indirections = memberName.Split(new[] { '.' }, MaxIndirection + 1);
             for (int i = 0; i < indirections.Length - 1; ++i)
             {
-                prop = objType.GetProperty(indirections[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly);
+                prop = objType.GetProperty(indirections[i], LookupFlags);
                 if (prop != null)
                 {
                     obj = prop.GetValue(obj);
@@ -40,7 +42,7 @@ namespace Takai.Data
                     continue;
                 }
 
-                field = objType.GetField(indirections[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly);
+                field = objType.GetField(indirections[i], LookupFlags);
                 if (field != null)
                 {
                     obj = field.GetValue(obj);
@@ -66,7 +68,7 @@ namespace Takai.Data
                 return getset;
             }
 
-            prop = objType.GetProperty(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            prop = objType.GetProperty(memberName, LookupFlags);
             if (prop != null)
             {
                 //todo: get delegates working
@@ -82,7 +84,7 @@ namespace Takai.Data
                 return getset;
             }
 
-            field = objType.GetField(memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            field = objType.GetField(memberName, LookupFlags);
             if (field != null)
             {
                 getset.type = field.FieldType;

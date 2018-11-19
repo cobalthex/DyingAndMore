@@ -117,7 +117,7 @@ namespace Takai.UI
             ignoreSpaceKey = true;
             BorderColor = Color;
 
-            On("Press", OnInputBoxPressed);
+            On(PressEvent, OnInputBoxPressed);
         }
 
         protected UIEventResult OnInputBoxPressed(Static sender, UIEventArgs e)
@@ -339,7 +339,7 @@ namespace Takai.UI
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
 
-            RouteEvent("TextChanged", new UIEventArgs(this));
+            RouteEvent(TextChangedEvent, new UIEventArgs(this));
             Commander.Invoke(OnTextChangedCommand, this);
         }
 

@@ -156,17 +156,18 @@ namespace DyingAndMore
                 BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
                 FilterRegex = "\\.map.tk$",
             };
-            ((Takai.UI.FileList)ui).SelectionChanged += delegate (Takai.UI.Static s, Takai.UI.SelectionChangedEventArgs se)
+            ui.On(Takai.UI.Static.SelectionChangedEvent, delegate (Takai.UI.Static s, Takai.UI.UIEventArgs ee)
             {
                 var fl = (Takai.UI.FileList)s;
                 if (System.IO.File.Exists(fl.SelectedFile))
                 {
                     var map = Cache.Load<Takai.Game.MapClass>(fl.SelectedFile);
                     map.InitializeGraphics();
+
                     ui.ReplaceAllChildren(new Editor.Editor(map.Instantiate()));
                 }
                 return Takai.UI.UIEventResult.Handled;
-            };
+            });
             //var ui = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)
             //{
@@ -225,7 +226,7 @@ namespace DyingAndMore
                 Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
             if (InputState.IsPress(Keys.F11))
                 ui.Reflow();
-            
+
             if (InputState.IsPress(Keys.F8))
             {
                 if (!fpsGraph.RemoveFromParent())

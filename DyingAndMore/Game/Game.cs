@@ -214,7 +214,7 @@ namespace DyingAndMore.Game
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
 
-            ParentChanged += OnParentChanged;
+            On(ParentChangedEvent, OnParentChanged);
         }
 
         private void GameMapChanged(object sender, MapChangedEventArgs e)
@@ -307,7 +307,7 @@ namespace DyingAndMore.Game
                     + $"{time.Milliseconds:D3}";
         }
 
-        protected UIEventResult OnParentChanged(Static sender, ParentChangedEventArgs e)
+        protected UIEventResult OnParentChanged(Static sender, UIEventArgs e)
         {
             if (Parent == null)
                 return UIEventResult.Continue;

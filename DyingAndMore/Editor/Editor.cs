@@ -51,20 +51,27 @@ namespace DyingAndMore.Editor
                 VerticalAlignment = Alignment.Start,
                 BorderColor = Color.White
             });
-            preview.Click += delegate
+            preview.On(ClickEvent, delegate (Static sender, UIEventArgs e)
+            {
+                RouteEvent(sender, "_OpenSelector", new UIEventArgs(sender));
+                return UIEventResult.Handled;
+            });
+
+            On("_OpenSelector", delegate
             {
                 selectorDrawer.IsEnabled = true;
                 return UIEventResult.Handled;
-            };
+            });
 
             this.selector = selector ?? new TSelector();
             this.selector.HorizontalAlignment = Alignment.Stretch;
-            this.selector.SelectionChanged += delegate
+
+            On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
             {
                 selectorDrawer.IsEnabled = false;
                 UpdatePreview(this.selector.SelectedItem);
                 return UIEventResult.Handled;
-            };
+            });
 
             selectorDrawer = new Drawer
             {
@@ -82,6 +89,13 @@ namespace DyingAndMore.Editor
             AddChild(selectorDrawer);
 
             this.selector.SelectedItem = 0; //initialize preview
+        }
+
+        protected override void FinalizeClone()
+        {
+            preview = (Graphic)Children[0];
+            selectorDrawer = (Drawer)Children[1];
+            base.FinalizeClone();
         }
 
         protected abstract void UpdatePreview(int selectedItem);
@@ -182,12 +196,7 @@ namespace DyingAndMore.Editor
                 Text = "> PLAY >",
                 Padding = new Vector2(20)
             });
-            playButton.Click += delegate
-            {
-                SwitchToGame();
-                return UIEventResult.Handled;
-            };
-            ParentChanged += OnParentChanged;
+            On(ParentChangedEvent, OnParentChanged);
 
             AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor));
             renderSettingsConsole.IsEnabled = false;
@@ -201,6 +210,8 @@ namespace DyingAndMore.Editor
             //todo: move this to mapChanged
 
             //todo: map zoom/something fucked if window not focused when loading
+
+            On(ClickEvent, OnClick);
         }
 
         void AddModes()
@@ -214,7 +225,7 @@ namespace DyingAndMore.Editor
             modes.AddMode(new TestEditorMode(this));
         }
 
-        protected UIEventResult OnParentChanged(Static sender, ParentChangedEventArgs e)
+        protected UIEventResult OnParentChanged(Static sender, UIEventArgs e)
         {
             if (Parent == null)
                 return UIEventResult.Continue;
@@ -224,6 +235,17 @@ namespace DyingAndMore.Editor
             renderSettingsConsole?.BindTo(Map.renderSettings);
 
             return UIEventResult.Handled;
+        }
+
+        protected UIEventResult OnClick(Static sender, UIEventArgs e)
+        {
+            if (e.Source.Name == "Play button")
+            {
+                SwitchToGame();
+                return UIEventResult.Handled;
+            }
+
+            return UIEventResult.Continue;
         }
 
         protected void OnMapChanged()
@@ -492,58 +514,39 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsPress(Keys.N))
                 {
-                    var resizeMap = Cache.Load<Static>("UI/Editor/NewMap.ui.tk");
+                    throw new System.NotImplementedException(); //todo: use bindings here
 
-                    resizeMap.FindChildByName("create").Click += delegate (Static sender, ClickEventArgs e)
-                    {
-                        var name = resizeMap.FindChildByName("name").Text;
-                        var width = resizeMap.FindChildByName<NumericBase>("width").Value;
-                        var height = resizeMap.FindChildByName<NumericBase>("height").Value;
-                        var tileset = Cache.Load<Tileset>(resizeMap.FindChildByName<FileInputBase>("tileset").Value);
+                    var newMap = Cache.Load<Static>("UI/Editor/NewMap.ui.tk");
+                    AddChild(newMap);
 
-                        var map = new MapClass
-                        {
-                            Name = name,
-                            Tiles = new short[height, width],
-                            TileSize = tileset.size,
-                            TilesImage = tileset.texture,
-                        };
-                        map.InitializeGraphics();
-                        Map = map.Instantiate();
-                        resizeMap.RemoveFromParent();
 
-                        return UIEventResult.Handled;
-                    };
+                    //newMap.FindChildByName("create").Click += delegate (Static sender, ClickEventArgs e)
+                    //{
+                    //    var name = resizeMap.FindChildByName("name").Text;
+                    //    var width = resizeMap.FindChildByName<NumericBase>("width").Value;
+                    //    var height = resizeMap.FindChildByName<NumericBase>("height").Value;
+                    //    var tileset = Cache.Load<Tileset>(resizeMap.FindChildByName<FileInputBase>("tileset").Value);
 
-                    AddChild(resizeMap);
+                    //    var map = new MapClass
+                    //    {
+                    //        Name = name,
+                    //        Tiles = new short[height, width],
+                    //        TileSize = tileset.size,
+                    //        TilesImage = tileset.texture,
+                    //    };
+                    //    map.InitializeGraphics();
+                    //    Map = map.Instantiate();
+                    //    resizeMap.RemoveFromParent();
+
+                    //    return UIEventResult.Handled;
+                    //};
+
                 }
 
                 if (InputState.IsPress(Keys.R))
                 {
-                    var widthInput = (NumericInput)resizeDialog.FindChildByName("width");
-                    var heightInput = (NumericInput)resizeDialog.FindChildByName("height");
-
-                    widthInput.Maximum = heightInput.Maximum = config.maxMapSize;
-
-                    widthInput.Value = Map.Class.Width;
-                    heightInput.Value = Map.Class.Height;
-
-                    var resizeBtn = resizeDialog.FindChildByName("resize", false);
-                    var cancelBtn = resizeDialog.FindChildByName("cancel", false);
-
-                    resizeBtn.Click += delegate
-                    {
-                        Map.Resize((int)widthInput.Value, (int)heightInput.Value);
-                        resizeDialog.RemoveFromParent();
-                        return UIEventResult.Handled;
-                    };
-
-                    cancelBtn.Click += delegate
-                    {
-                        resizeDialog.RemoveFromParent();
-                        return UIEventResult.Handled;
-                    };
-
+                    resizeDialog.BindTo(Map);
+                    //todo: listen to commands
                     AddChild(resizeDialog);
                 }
             }
