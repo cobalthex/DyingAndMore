@@ -19,6 +19,9 @@ namespace Takai.UI
 
     public class ScrollBar : Static
     {
+        public const string HScrollEvent = "HScroll";
+        public const string VScrollEvent = "VScroll";
+
         /// <summary>
         /// The size of the content. This determines how big the scroll thumb is
         /// </summary>
@@ -60,7 +63,7 @@ namespace Takai.UI
                 {
                     var e = new ScrollEventArgs(this, newPosition - contentPosition);
                     contentPosition = newPosition;
-                    RouteEvent(Scroll, e);
+                    RouteEvent(Direction == Direction.Horizontal ? HScrollEvent : VScrollEvent, e);
                 }
             }
         }
@@ -77,11 +80,9 @@ namespace Takai.UI
 
         public override bool CanFocus => IsThumbVisible;
 
-        public UIEvent<ScrollEventArgs> Scroll;
-
         public ScrollBar()
         {
-            Press += OnPress;
+            On(PressEvent, OnPress);
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
@@ -172,22 +173,23 @@ namespace Takai.UI
             ContentPosition -= Math.Sign(direction) * (Font != null ? Font.MaxCharHeight : 20);
         }
 
-        static UIEventResult OnPress(Static sender, ClickEventArgs args)
+        static UIEventResult OnPress(Static sender, UIEventArgs e)
         {
             //todo: compare against absolute bounds not dimensions
 
+            var pe = (ClickEventArgs)e;
             var sbar = (ScrollBar)sender;
 
             var thumb = sbar.GetThumbBounds();
-            if (!thumb.Contains(args.position))
+            if (!thumb.Contains(pe.position))
             {
                 //todo: maybe scroll to mouse over time
 
                 //center thumb around mouse
                 if (sbar.Direction == Direction.Vertical)
-                    sbar.ContentPosition = (int)((args.position.Y - sbar.GetThumbSize() / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
+                    sbar.ContentPosition = (int)((pe.position.Y - sbar.GetThumbSize() / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
                 else if (sbar.Direction == Direction.Horizontal)
-                    sbar.ContentPosition = (int)((args.position.X - sbar.GetThumbSize() / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
+                    sbar.ContentPosition = (int)((pe.position.X - sbar.GetThumbSize() / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
             }
             sbar.didPressThumb = true;
             return UIEventResult.Handled;
@@ -272,22 +274,24 @@ namespace Takai.UI
                 horizontalScrollbar.HorizontalAlignment = Alignment.Stretch;
                 horizontalScrollbar.Direction = Direction.Horizontal;
 
-                horizontalScrollbar.Scroll += delegate (Static sender, ScrollEventArgs e)
-                {
-                    contentContainer.Position -= new Vector2(e.Delta, 0);
-                    return UIEventResult.Handled;
-                };
-
                 var vsp = verticalScrollbar?.ChildIndex ?? -1;
                 verticalScrollbar = (ScrollBar)value.Clone();
                 verticalScrollbar.VerticalAlignment = Alignment.Stretch;
                 verticalScrollbar.Direction = Direction.Vertical;
 
-                verticalScrollbar.Scroll += delegate (Static sender, ScrollEventArgs e)
+                On(ScrollBar.HScrollEvent, delegate (Static sender, UIEventArgs e)
                 {
-                    contentContainer.Position -= new Vector2(0, e.Delta);
+                    var se = (ScrollEventArgs)e;
+                    contentContainer.Position -= new Vector2(se.Delta, 0);
                     return UIEventResult.Handled;
-                };
+                });
+
+                On(ScrollBar.VScrollEvent, delegate (Static sender, UIEventArgs e)
+                {
+                    var se = (ScrollEventArgs)e;
+                    contentContainer.Position -= new Vector2(0, se.Delta);
+                    return UIEventResult.Handled;
+                });
 
                 if (vsp >= 0)
                 {

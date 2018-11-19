@@ -22,16 +22,15 @@ namespace DyingAndMore.Editor
             HorizontalAlignment = Alignment.Stretch;
 
             triggerSettingsNameInput = new TextInput();
-            triggerSettingsNameInput.TextChanged += ActiveTriggerTextChanged;
 
             var closeButton = new Static
             {
+                OnClickCommand = "$CloseModal",
                 Text = "Close",
                 HorizontalAlignment = Alignment.Stretch,
                 BorderColor = Color.White,
                 Padding = new Vector2(10)
             };
-            closeButton.Click += delegate { triggerSettings.RemoveFromParent(); return UIEventResult.Handled; };
 
             var label = new Static { Text = "Name" };
 
@@ -44,7 +43,8 @@ namespace DyingAndMore.Editor
                 BackgroundColor = new Color(20, 20, 20, 255),
                 HorizontalAlignment = Alignment.Middle,
                 VerticalAlignment = Alignment.Middle,
-                Margin = 10
+                Margin = 10,
+                IsModal = true
             };
         }
 
@@ -56,15 +56,6 @@ namespace DyingAndMore.Editor
         public override void End()
         {
             editor.Map.renderSettings.drawTriggers = false;
-        }
-
-        UIEventResult ActiveTriggerTextChanged(object sender, System.EventArgs e)
-        {
-            if (activeTrigger?.Class == null)
-                return UIEventResult.Continue;
-
-            activeTrigger.Class.Name = ((TextInput)sender).Text;
-            return UIEventResult.Handled;
         }
 
         protected override bool HandleInput(GameTime time)

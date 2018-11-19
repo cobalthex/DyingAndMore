@@ -22,7 +22,7 @@ namespace Takai.UI
                 if (_value != newVal)
                 {
                     _value = newVal;
-                    RouteEvent("ValueChanged", new UIEventArgs(this));
+                    RouteEvent(ValueChangedEvent, new UIEventArgs(this));
                     Commander.Invoke(OnValueChangedCommand, this);
                 }
             }
@@ -109,7 +109,7 @@ namespace Takai.UI
                 VerticalAlignment = Alignment.Stretch
             };
 
-            On("TextChanged", delegate (Static sender, UIEventArgs e)
+            On(TextChangedEvent, delegate (Static sender, UIEventArgs e)
             {
                 var input = (TextInput)e.Source;
                 if (NumericBaseType.TryParse(input.Text, out var val))
@@ -136,30 +136,30 @@ namespace Takai.UI
                 VerticalAlignment = Alignment.Stretch
             };
 
-            upButton.On("Click", delegate (Static sender, UIEventArgs e)
+            upButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                RouteEvent("InternalIncrementValue", new UIEventArgs(sender));
+                RouteEvent(sender, "_IncrementValue", new UIEventArgs(sender));
                 return UIEventResult.Continue;
             });
-            downButton.On("Click", delegate (Static sender, UIEventArgs e)
+            downButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                RouteEvent("InternalDecrementValue", new UIEventArgs(sender));
+                RouteEvent(sender, "_DecrementValue", new UIEventArgs(sender));
                 return UIEventResult.Continue;
             });
 
-            On("InternalIncrementValue", delegate (Static sender, UIEventArgs e)
+            On("_IncrementValue", delegate (Static sender, UIEventArgs e)
             {
                 IncrementValue();
                 return UIEventResult.Handled;
             });
 
-            On("InternalDecrementValue", delegate (Static sender, UIEventArgs e)
+            On("_DecrementValue", delegate (Static sender, UIEventArgs e)
             {
                 DecrementValue();
                 return UIEventResult.Handled;
             });
 
-            On("ValueChanged", delegate (Static sender, UIEventArgs e)
+            On(ValueChangedEvent, delegate (Static sender, UIEventArgs e)
             {
                 textInput.Text = Value.ToString();
                 textInput.ScrollPosition = 0;

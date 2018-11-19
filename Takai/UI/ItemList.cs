@@ -10,7 +10,11 @@ namespace Takai.UI
         public int oldIndex;
         public int newIndex;
 
-        public SelectionChangedEventArgs(Static source) : base(source) { }
+        public SelectionChangedEventArgs(Static source, int oldIndex, int newIndex) : base(source)
+        {
+            this.oldIndex = oldIndex;
+            this.newIndex = newIndex;
+        }
     }
 
     /// <summary>
@@ -111,14 +115,9 @@ namespace Takai.UI
                         Container.Children[value].BorderColor = Static.FocusedBorderColor;
                     }
 
-                    var changed = new SelectionChangedEventArgs(this)
-                    {
-                        oldIndex = _selectedIndex,
-                        newIndex = value
-                    };
-
+                    var changed = new SelectionChangedEventArgs(this, _selectedIndex, value);
                     _selectedIndex = value;
-                    RouteEvent("SelectionChanged", changed);
+                    RouteEvent(SelectionChangedEvent, changed);
                 }
             }
         }
@@ -131,7 +130,7 @@ namespace Takai.UI
             Items.CollectionChanged += Items_CollectionChanged;
             AddChild(Container);
 
-            On("InternalChangeSelection", delegate (Static sender, UIEventArgs e)
+            On("_ChangeSelection", delegate (Static sender, UIEventArgs e)
             {
                 var sce = (SelectionChangedEventArgs)e;
                 SelectedIndex = sce.newIndex;
@@ -191,13 +190,10 @@ namespace Takai.UI
 
             var item = ItemTemplate.Clone();
             item.BindTo(value);
-            item.On("Click", delegate (Static sender, UIEventArgs e)
+            item.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                var sce = new SelectionChangedEventArgs(sender)
-                {
-                    newIndex = sender.ChildIndex
-                };
-                RouteEvent("InternalChangeSelection", sce);
+                var sce = new SelectionChangedEventArgs(sender, -1, sender.ChildIndex);
+                RouteEvent(sender, "_ChangeSelection", sce);
                 return UIEventResult.Continue;
             });
             return item;

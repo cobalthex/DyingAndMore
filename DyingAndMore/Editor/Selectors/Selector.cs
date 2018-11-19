@@ -23,12 +23,10 @@ namespace DyingAndMore.Editor.Selectors
             set
             {
                 _selectedItem = Takai.Util.Clamp(value, 0, ItemCount - 1);
-                RouteEvent(SelectionChanged, new UIEventArgs(this));
+                RouteEvent(SelectionChangedEvent, new UIEventArgs(this));
             }
         }
         private int _selectedItem = 0;
-
-        public UIEvent<UIEventArgs> SelectionChanged;
 
         public override bool CanFocus => true;
 
@@ -36,7 +34,7 @@ namespace DyingAndMore.Editor.Selectors
         {
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
-            Press += OnPress;
+            On(PressEvent, OnPress);
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
@@ -50,10 +48,12 @@ namespace DyingAndMore.Editor.Selectors
             base.ReflowOverride(availableSize);
         }
 
-        protected UIEventResult OnPress(Static sender, ClickEventArgs e)
+        protected UIEventResult OnPress(Static sender, UIEventArgs e)
         {
-            var row = (int)((e.position.Y - (ItemMargin.Y / 2)) / (ItemSize.Y + ItemMargin.Y)) * ItemsPerRow;
-            var col = (int)((e.position.X - (ItemMargin.X / 2)) / (ItemSize.X + ItemMargin.X));
+            var ce = (ClickEventArgs)e;
+
+            var row = (int)((ce.position.Y - (ItemMargin.Y / 2)) / (ItemSize.Y + ItemMargin.Y)) * ItemsPerRow;
+            var col = (int)((ce.position.X - (ItemMargin.X / 2)) / (ItemSize.X + ItemMargin.X));
 
             SelectedItem = row + col;
             return UIEventResult.Handled;

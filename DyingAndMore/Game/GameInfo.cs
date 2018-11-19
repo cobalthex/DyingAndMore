@@ -130,10 +130,21 @@ namespace DyingAndMore.Game
         }
     }
 
+    public class SelectedStoryEventArgs : UIEventArgs
+    {
+        public GameStory story;
+
+        public SelectedStoryEventArgs(Static source, GameStory story)
+            : base(source)
+        {
+            this.story = story;
+        }
+    }
+
     //todo: convert to ItemList?
     public class StorySelect : List
     {
-        public event EventHandler<GameStory> StorySelected;
+        public const string SelectedStoryEvent = "SelectStory";
 
         public string Directory
         {
@@ -162,11 +173,11 @@ namespace DyingAndMore.Game
                         ui.AddChild(new Static(story.Name));
                         ui.AddChild(new Static(story.Description));
                         ui.AddChild(new Static($"{story.MapFiles.Length} map{(story.MapFiles.Length == 1 ? "" : "s")}"));
-                        ui.Click += delegate
+                        ui.On(ClickEvent, delegate (Static sender, UIEventArgs e)
                         {
-                            StorySelected?.Invoke(this, story);
+                            RouteEvent(SelectedStoryEvent, new SelectedStoryEventArgs(sender, story));
                             return UIEventResult.Handled;
-                        };
+                        });
                         AddChild(ui);
                     }
                     catch { }

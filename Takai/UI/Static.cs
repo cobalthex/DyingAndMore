@@ -147,6 +147,14 @@ namespace Takai.UI
     /// </summary>
     public class Static : Data.IDerivedDeserialize
     {
+        //some standard/common events
+        public const string PressEvent = "Press";
+        public const string ClickEvent = "Click";
+        public const string ParentChangedEvent = "ParentChanged";
+        public const string TextChangedEvent = "TextChanged";
+        public const string ValueChangedEvent = "ValueChanged";
+        public const string SelectionChangedEvent = "SelectionChanged";
+
 #if DEBUG
         /// <summary>
         /// A unique ID for this element. Only present in DEBUG
@@ -447,7 +455,7 @@ namespace Takai.UI
         /// Can this element be focused
         /// </summary>
         [Data.Serializer.Ignored]
-        public virtual bool CanFocus => false; //todo
+        public virtual bool CanFocus => true; //false; //todo
 
         /// <summary>
         /// Disable the default behavior of the tab key
@@ -493,11 +501,6 @@ namespace Takai.UI
         private Static _parent = null;
 
         /// <summary>
-        /// Children that cannot be accessed publically but are still enumerable. Primarily used for composite elements
-        /// </summary>
-        protected List<Static> InternalChildren { get; private set; } = new List<Static>(); //todo
-
-        /// <summary>
         /// A readonly collection of all of the children in this element (including disabled children)
         /// </summary>
         [Data.CustomDeserialize(typeof(Static), "DeserializeChildren")]
@@ -522,7 +525,7 @@ namespace Takai.UI
                 uiEvents = new Dictionary<string, UIEvent>(System.StringComparer.OrdinalIgnoreCase);
 
             if (!uiEvents.TryGetValue(@event, out var handlers))
-                handlers = new UIEvent(true);
+                uiEvents[@event] = handlers = new UIEvent(true);
             handlers.AddHandler(handler);
         }
 
@@ -564,10 +567,16 @@ namespace Takai.UI
 
         protected void RouteEvent(string @event, UIEventArgs args)
         {
-            var target = this;
-            while (target != null && target.uiEvents != null && target.uiEvents.TryGetValue(@event, out var handlers))
+            RouteEvent(this, @event, args);
+        }
+
+        protected void RouteEvent(Static source, string @event, UIEventArgs args)
+        {
+            var target = source;
+            while (target != null)
             {
-                if (handlers.Invoke(target, args) == UIEventResult.Handled)
+                if (target.uiEvents != null && target.uiEvents.TryGetValue(@event, out var handlers) &&
+                    handlers.Invoke(target, args) == UIEventResult.Handled)
                     break;
 
                 target = target.Parent; //todo: handle tunneling
@@ -622,7 +631,7 @@ namespace Takai.UI
         {
             var oldParent = _parent;
             _parent = newParent;
-            RouteEvent("ParentChanged", new ParentChangedEventArgs(this, oldParent));
+            RouteEvent(ParentChangedEvent, new ParentChangedEventArgs(this, oldParent));
         }
 
         /// <summary>
@@ -753,6 +762,10 @@ namespace Takai.UI
             //todo: add disable reflow and then switch this to use InsertChild
             int count = Children.Count;
 
+            //todo: set parent normally?
+            foreach (var child in children)
+                child.SetParentNoReflow(null);
+
             Static lastFocus = null;
             foreach (var child in children)
             {
@@ -816,7 +829,7 @@ namespace Takai.UI
         /// Enumerate through all children and their descendents recursively (including this)
         /// This can be overriden by
         /// </summary>
-        /// <param name="includeDisabled">Include elements that havee <see cref="IsEnabled"/> set to false</param>
+        /// <param name="includeDisabled">Include elements that havee <see cref="IsEnabled"/> set to false (ignoring this)</param>
         /// <returns>An enumerator to all elements</returns>
         public IEnumerable<Static> EnumerateRecursive(bool includeDisabled = false)
         {
@@ -1471,7 +1484,7 @@ namespace Takai.UI
             if (Input.InputState.IsPress(button) && VisibleBounds.Contains(mousePosition))
             {
                 var ce = new ClickEventArgs(this) { position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding, inputIndex = 0 };
-                RouteEvent("Press", ce);
+                RouteEvent(PressEvent, ce);
 
                 if (CanFocus)
                 {
@@ -1693,7 +1706,7 @@ namespace Takai.UI
         public void TriggerClick(Vector2 relativePosition)
         {
             var ce = new ClickEventArgs(this) { position = relativePosition, inputIndex = 0 };
-            RouteEvent("Click", ce);
+            RouteEvent(ClickEvent, ce);
             Commander.Invoke(OnClickCommand, this);
         }
 
@@ -1721,7 +1734,7 @@ namespace Takai.UI
                             Color = color,
                             IsChecked = @enum.HasFlag(value)
                         };
-                        check.On("Click", delegate (Static sender, UIEventArgs e)
+                        check.On(ClickEvent, delegate (Static sender, UIEventArgs e)
                         {
                             throw new System.NotImplementedException(); //verify that the code below works
 

@@ -28,7 +28,12 @@ List {
 						}
 
 						NumericInput {
-							Name: "width";
+							Bindings: [
+								{
+									Source: "Class.Width";
+									Target: "Value";
+								}
+							];
 							Minimum: 1;
 							Maximum: 65536;
 							Value: 20;
@@ -46,7 +51,12 @@ List {
 						}
 
 						NumericInput {
-							Name: "height";
+							Bindings: [
+								{
+									Source: "Class.Height";
+									Target: "Value";
+								}
+							];
 							Minimum: 1;
 							Maximum: 65536;
 							Value: 20;
@@ -65,13 +75,13 @@ List {
 
 			Children: [
 				Static {
-					name: "resize";
+					OnClickCommand: "ResizeMap";
 					Text: "Resize";
 					HorizontalAlignment: Alignment.Stretch;
 					BorderColor: [255 192 0 255];
 				}
 				Static {
-					name: "cancel";
+					OnClickCommand: "$CloseModal";
 					Text: "Cancel";
 					HorizontalAlignment: Alignment.Stretch;
 				}

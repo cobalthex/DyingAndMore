@@ -31,11 +31,11 @@ namespace Takai.UI
         {
             IsChecked = isChecked;
 
-            Click += delegate (Static sender, ClickEventArgs e)
+            On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
                 IsChecked ^= true;
                 return UIEventResult.Handled;
-            };
+            });
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
@@ -43,7 +43,7 @@ namespace Takai.UI
             var size = base.MeasureOverride(availableSize);
             return size + new Vector2(size.Y + Margin, 0);
         }
-        
+
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             //todo: modernize
