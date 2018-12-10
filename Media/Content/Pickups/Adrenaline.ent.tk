@@ -1,0 +1,35 @@
+WeaponPickupClass {
+    RespawnTime: 3sec;
+    DestroyOnDeath: false;
+
+    Animations: {
+        Dead: {
+            Name:"Dead";
+            EnterEffect: @"./Pickup.fx.tk";
+        };
+        Idle: {
+            Name:"Idle";
+            EnterEffect: @"./PickupSpawn.fx.tk";
+        	Sprite: {
+                texture: @"./Adrenaline.png";
+                width: 42;
+                height: 42;
+                FrameCount: 7;
+                FrameLength: 1000;
+                IsLooping: True;
+                Tween: TweenStyle.Overlap;
+            };
+            Light: {
+                Highlight: {
+                    texture: @"./Adrenaline.l.png";
+                    width: 42;
+                    height: 42;
+                    FrameCount: 7;
+                    FrameLength: 100;
+                    IsLooping: True;
+                    Tween: TweenStyle.Sequential;
+                };
+            }
+        };
+    };
+}

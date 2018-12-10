@@ -132,7 +132,7 @@
       <Version>1.0.3</Version>
     </PackageReference>
     <PackageReference Include="MonoGame.Framework.Portable">
-      <Version>3.7.0.1708</Version>
+      <Version>3.7.1.189</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

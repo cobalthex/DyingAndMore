@@ -308,7 +308,8 @@ namespace Takai.Data
             {
                 var target = objects[realFile].reference.Target;
                 if (target is Texture2D texDst &&
-                    obj.reference.Target is Texture2D texSrc)
+                    obj.reference.Target is Texture2D texSrc &&
+                    (texSrc.Width == texDst.Width && texSrc.Height == texDst.Height))
                 {
                     UInt32[] texData = new UInt32[texSrc.Width * texSrc.Height];
                     texSrc.GetData(texData);

@@ -95,7 +95,7 @@ namespace Takai.UI
                 dropdown.Position = VisibleContentArea.Location.ToVector2() + new Vector2(0, MeasuredSize.Y); //todo: smarter placement
 
             dropdownContainer.AddChild(dropdown);
-            GetRoot().AddChild(dropdownContainer);
+            root.AddChild(dropdownContainer);
         }
 
         public void CloseDropDown()

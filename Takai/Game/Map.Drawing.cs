@@ -6,6 +6,12 @@ using XnaEffect = Microsoft.Xna.Framework.Graphics.Effect;
 
 namespace Takai.Game
 {
+    public struct Light
+    {
+        public Graphics.Sprite highlight;
+        public Graphics.Sprite glow;
+    }
+
     public partial class MapClass
     {
         internal struct TrailVertex : IVertexType
@@ -49,6 +55,7 @@ namespace Takai.Game
         internal XnaEffect colorEffect;
         internal XnaEffect circleEffect;
         internal XnaEffect basicEffect;
+        internal XnaEffect lightmapEffect;
         internal RasterizerState shapeRaster;
 
         internal TrailVertex[] trailVerts;
@@ -62,11 +69,21 @@ namespace Takai.Game
             new VertexPositionColor(new Vector3( 1,  1, 0), Color.Transparent)
         };
 
-        internal static RasterizerState wireframeRaster = new RasterizerState
+        internal static readonly RasterizerState wireframeRaster = new RasterizerState
         {
             FillMode = FillMode.WireFrame,
             CullMode = CullMode.None,
             MultiSampleAntiAlias = true,
+        };
+
+        internal static readonly BlendState MultiplyBlendState = new BlendState
+        {
+            ColorBlendFunction = BlendFunction.Add,
+            ColorSourceBlend = Blend.SourceAlpha,
+            ColorDestinationBlend = Blend.InverseSourceAlpha,
+            AlphaSourceBlend = Blend.SourceAlpha,
+            AlphaDestinationBlend = Blend.InverseSourceAlpha,
+            AlphaBlendFunction = BlendFunction.Add
         };
 
         public Texture2D TilesImage
@@ -146,6 +163,7 @@ namespace Takai.Game
             outlineEffect = Data.Cache.Load<XnaEffect>("Shaders/Outline.mgfx");
             fluidEffect = Data.Cache.Load<XnaEffect>("Shaders/Fluid.mgfx");
             reflectionEffect = Data.Cache.Load<XnaEffect>("Shaders/Reflection.mgfx");
+            lightmapEffect = Data.Cache.Load<XnaEffect>("Shaders/Lightmap.mgfx");
 
             trailVerts = new TrailVertex[0];
         }
@@ -170,9 +188,18 @@ namespace Takai.Game
         public MapRenderStats RenderStats => _renderStats;
         protected MapRenderStats _renderStats;
 
+        protected struct RenderedLight
+        {
+            public Light light;
+            public Vector2 position;
+            public float angle;
+            public System.TimeSpan spriteElapsedTime;
+        }
+
         //a collection of primatives to draw next frame (for one frame)
         protected List<VertexPositionColor> renderedLines = new List<VertexPositionColor>(32);
         protected List<VertexPositionColorTexture> renderedCircles = new List<VertexPositionColorTexture>(32);
+        protected List<RenderedLight> renderedLights = new List<RenderedLight>(128);
 
         protected int renderedTrailPointCount = 0;
 
@@ -188,6 +215,7 @@ namespace Takai.Game
             public bool drawFluidReflectionMask;
             public bool drawDecals;
             public bool drawParticles;
+            public bool drawLights;
             public bool drawTrails;
             public bool drawTrailMesh;
             public bool drawTriggers;
@@ -225,6 +253,7 @@ namespace Takai.Game
                 drawReflections = true;
                 drawDecals = true;
                 drawParticles = true;
+                drawLights = true;
                 drawTrails = true;
                 drawLines = true;
                 drawScreenEffects = true;
@@ -432,6 +461,9 @@ namespace Takai.Game
 
             #endregion
 
+            if (renderSettings.drawLights)
+                DrawLights(ref context);
+
             if (renderSettings.drawTriggers)
                 DrawTriggers(ref context);
 
@@ -441,6 +473,7 @@ namespace Takai.Game
             if (renderSettings.drawGrids)
                 DrawGrids(ref context);
 
+            renderedLights.Clear();
             renderedLines.Clear();
             renderedCircles.Clear();
 
@@ -595,6 +628,17 @@ namespace Takai.Game
                             1,
                             state.ElapsedTime
                         );
+
+                        if (state.Class.Light.highlight != null || state.Class.Light.glow != null)
+                        {
+                            renderedLights.Add(new RenderedLight
+                            {
+                                light = state.Class.Light,
+                                angle = angle,
+                                position = ent.Position,
+                                spriteElapsedTime = state.ElapsedTime
+                            });
+                        }
                     }
                 }
 
@@ -669,6 +713,17 @@ namespace Takai.Game
                         1,
                         state.ElapsedTime
                     );
+
+                    if (state.Class.Light.highlight != null || state.Class.Light.glow != null)
+                    {
+                        renderedLights.Add(new RenderedLight
+                        {
+                            light = state.Class.Light,
+                            angle = angle,
+                            position = ent.Position,
+                            spriteElapsedTime = state.ElapsedTime
+                        });
+                    }
                 }
             }
 
@@ -679,7 +734,7 @@ namespace Takai.Game
         {
             foreach (var p in Particles)
             {
-                c.spriteBatch.Begin(SpriteSortMode.BackToFront, p.Key.Blend, null, Class.stencilRead, null, null, c.cameraTransform);
+                c.spriteBatch.Begin(SpriteSortMode.Texture, p.Key.Blend, null, Class.stencilRead, null, null, c.cameraTransform);
 
                 for (int i = 0; i < p.Value.Count; ++i)
                 {
@@ -704,9 +759,23 @@ namespace Takai.Game
             }
         }
 
+        public void DrawLights(ref RenderContext c)
+        {
+            //draw glow maps first, then highlights on top
+
+            c.spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, null, null, null, null, c.cameraTransform); //todo: blend state
+            foreach (var light in renderedLights)
+                light.light.glow?.Draw(c.spriteBatch, light.position, light.angle, Color.White, 1, light.spriteElapsedTime);
+            c.spriteBatch.End();
+
+            c.spriteBatch.Begin(SpriteSortMode.Texture, BlendState.Additive, null, null, null, null, c.cameraTransform);
+            foreach (var light in renderedLights)
+                light.light.highlight?.Draw(c.spriteBatch, light.position, light.angle, Color.White, 1, light.spriteElapsedTime);
+            c.spriteBatch.End();
+        }
+
         public void DrawTrails(ref RenderContext c)
         {
-            //auto taper widths?
             if (renderedTrailPointCount < 2)
                 return;
 

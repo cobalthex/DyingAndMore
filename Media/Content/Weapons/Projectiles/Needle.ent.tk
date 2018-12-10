@@ -6,7 +6,7 @@ ProjectileClass {
     Range: 100000;
     Drag: 0.0;
     MinimumSpeed: 100;
-    MagnetismAnglePerSecond: 400deg;
+    MagnetismAnglePerSecond: 800deg;
     InheritSourcePhysics: false;
     Damage: 15;
 

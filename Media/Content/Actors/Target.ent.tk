@@ -12,7 +12,12 @@ ActorClass {
 
     DefaultController: AIController {
         Behaviors: [
-            MagnetBehavior { };
+            TargetEnemyBehavior {
+            };
+            MagnetBehavior {
+                Strength: 100000;
+                Radius: 400;
+            };
         ];
     };
 
