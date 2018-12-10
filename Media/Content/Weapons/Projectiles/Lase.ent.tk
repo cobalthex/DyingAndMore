@@ -1,0 +1,29 @@
+ProjectileClass {
+    Name: "Laser lazilette";
+    MuzzleVelocity: 2000;
+    DestroyIfOffscreen: True;
+    IgnoreTrace: True;
+    Range: 2000;
+    Drag: 0;
+    MinimumSpeed: 100;
+
+    Animations: {
+        Idle: {
+            Sprite: {
+                Texture: @"./Lase.png";
+                Origin: [13 4];
+            };
+            Light: {
+                Highlight: {
+                    Texture: @"./Lase.lh.png";
+                    Origin: [13 4];
+                };
+                Glow: {
+                    Texture: @"./Lase.lg.png";
+                    Origin: [26 9];
+                };
+            }
+            Material: "Light";
+        }
+    }
+}

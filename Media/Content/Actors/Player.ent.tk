@@ -3,6 +3,17 @@ ActorClass {
     MaxHealth: 5000;
     DefaultFactions: Factions [Player Ally];
 
+    FieldOfView: 2.356194;
+    MaxSpeed: 300;
+    MoveForce: 200;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    AlwaysDrawUpright: False;
+
+    #DefaultWeapon: @"Weapons/Flamethrower.wpn.tk";
+
+    Hud: @"UI/HUDs/player.ui.tk";
+
     Animations: {
         Idle: {
             Name: "Idle";
@@ -24,15 +35,4 @@ ActorClass {
             Material: "Player";
         };
     };
-
-    FieldOfView: 2.356194;
-    MaxSpeed: [400 400];
-    MoveForce: 600;
-    IsPhysical: True;
-    IgnoreTrace: False;
-    AlwaysDrawUpright: False;
-
-    #DefaultWeapon: @"Weapons/Flamethrower.wpn.tk";
-
-    Hud: @"UI/HUDs/player.ui.tk";
 }

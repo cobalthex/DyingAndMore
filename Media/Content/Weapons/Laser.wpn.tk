@@ -1,0 +1,14 @@
+GunClass {
+    Name: "Laserlator";
+    Projectile: @"./Projectiles/Lase.ent.tk";
+
+    MaxAmmo: 4000;
+    #RoundsPerBurst: 3;
+    ProjectilesPerRound: 1;
+    #MaxBursts: 3;
+    #BurstCooldownTime: 400msec;
+    ChargeTime: 0msec;
+    DischargeTime: 400rpm;
+    CooldownTime: 2sec;
+    CanAlwaysCharge: true;
+}

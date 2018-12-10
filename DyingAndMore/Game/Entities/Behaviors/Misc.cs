@@ -4,8 +4,6 @@ using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Entities.Behaviors
 {
-
-
     class TargetEnemyBehavior : Behavior
     {
         //break out into individual targets that get added to the behavior list

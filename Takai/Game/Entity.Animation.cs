@@ -29,6 +29,8 @@ namespace Takai.Game
         //todo: sprite loop frame?
         public Graphics.Sprite Sprite { get; set; }
 
+        public Light Light { get; set; }
+
         /// <summary>
         /// The name of the material for this animation. Mainly for physics
         /// </summary>

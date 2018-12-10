@@ -1,6 +1,7 @@
 GunClass {
     Name: "Flamethrower";
     MaxAmmo: 20000;
+    SpawnOffset: 15;
 
     DischargeEffect: {
         Effects: [
@@ -33,7 +34,7 @@ GunClass {
                         #AlphaSourceBlend: Blend.Zero;
                         #AlphaDestinationBlend: Blend.One;
                     };
-                    InitialSpeed: [600 1200];
+                    InitialSpeed: [800 1200];
                     Drag: 1.0;
                     LifeSpan: [600msec 1200msec];
                     ColorOverTime: {

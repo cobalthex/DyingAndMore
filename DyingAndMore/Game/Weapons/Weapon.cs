@@ -63,6 +63,12 @@ namespace DyingAndMore.Game.Weapons
         /// </summary>
         public bool CanAlwaysCharge { get; set; } = false;
 
+        /// <summary>
+        /// Offset from the entity to spawn the effects, projectiles, etc
+        /// </summary>
+        public float SpawnOffset { get; set; } = 2;
+
+
         //charge percentage (for things like chaingun)
 
         //overheating
@@ -248,7 +254,7 @@ namespace DyingAndMore.Game.Weapons
             if (Class.DischargeEffect != null)
             {
                 var fx = Class.DischargeEffect.Instantiate(Actor);
-                fx.Position += (Actor.Forward * (Actor.Radius));
+                fx.Position += (Actor.Forward * (Actor.Radius + Class.SpawnOffset));
                 Actor.Map.Spawn(fx);
             }
         }

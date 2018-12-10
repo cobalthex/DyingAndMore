@@ -1,0 +1,18 @@
+WeaponPickupClass {
+    Name: "Laser test gun";
+
+	Weapon: @"Weapons/Laser.wpn.tk";
+
+    Animations: {
+        Idle: {
+        	Sprite: {
+                texture: @"./TestGuns.png";
+                width: 64;
+                height: 64;
+                ClipRect: [64 64 64 64];
+            };
+        };
+    };
+
+    DestructionEffect: @"./Pickup.fx.tk";
+}
