@@ -1,44 +1,582 @@
-MapClass {
-    Name: "Large empty map";
-    TileSize: 48;
-    InitialState: InitialMapState {
-        Entities: [
-            EntitySpawn {
-                Class: @"Actors/Player.ent.tk";
-                Position: [240 240];
-                Forward: [1 0];
-                Name: Null;
-            }
-            EntitySpawn {
-                Class: @"Pickups/MG.ent.tk";
-                Position: [400 600];
-                Forward: [-1 0];
-                Name: "A helping friend";
-            }
-        ];
-        Fluids: [];
-        Decals: [];
-        Triggers: [
-            TriggerClass {
-                Id: 1;
-                Name: Null;
-                Region: [1924 1913 231 198];
-                MaxUses: 0;
-                Filter: ActorTriggerFilter {
-                    Factions: Factions.Player;
-                };
-                OnEnterCommands: [
-                    GameCommand {
-                        ActionName: "CompleteMap";
-                    };
-                ];
-            }
-        ];
+MapInstance {
+    Class: MapClass {
+        Name: "Large empty map";
+        TileSize: 48;
+        MaterialInteractions: @"Materials/Test.mtl.tk";
+        TilesMaterial: "Tiles";
+        TilesImage: "Tilesets/Tiles2.png";
+        Width: 46;
+        Height: 46;
+        Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
     };
-    MaterialInteractions: @"Materials/Test.mtl.tk";
-    TilesMaterial: "Tiles";
-    TilesImage: "Tilesets/Tiles2.png";
-    Width: 46;
-    Height: 46;
-    Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    Trails: [];
+    Sounds: [];
+    ElapsedTime: 60680.3387;
+    TimeScale: 1;
+    currentScreenFade: ScreenFade {
+        Duration: 0;
+        Colors: Null;
+        Blend: Null;
+    };
+    currentScreenFadeElapsedTime: 60680.3387;
+    Entities: [
+        ActorInstance {
+            Class: @"Actors/Player.ent.tk";
+            Factions: Factions [Player Ally];
+            Controller: Null;
+            CurrentHealth: 5000;
+            Conditions: {
+            };
+            MaxSpeed: 300;
+            Weapon: Null;
+            Id: 1;
+            Class: @"Actors/Player.ent.tk";
+            Name: Null;
+            Position: [1242 -715.0907];
+            Forward: [0.7071068 0.7071068];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 3541.6689;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 5000;
+            Class: @"Actors/Rhinovirus.ent.tk";
+            Class: @"Actors/Rhinovirus.ent.tk";
+            Weapon: GunInstance {
+                Class: @"Weapons/Boss.wpn.tk";
+                CurrentAmmo: 1000;
+                Class: @"Weapons/Boss.wpn.tk";
+                StateTime: 0;
+                State: WeaponState.Idle;
+                Charge: 0;
+            };
+            Controller: AIController {
+                Behaviors: [
+                    ShootBehavior {
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 1000;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy Boss];
+            Id: 2;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 11.97188;
+            Position: [1713.709 414.0001];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 5500.6192;
+            EventHandlers: Null;
+        }
+        WeaponPickupInstance {
+            Weapon: GunInstance {
+                CurrentAmmo: 1000;
+                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/mg.wpn.tk";
+                StateTime: 0;
+                State: WeaponState.Idle;
+                Charge: 0;
+            };
+            Class: @"Pickups/MG.ent.tk";
+            NextRespawnTime: 0;
+            Id: 3;
+            Class: @"Pickups/MG.ent.tk";
+            Name: Null;
+            Position: [278.5084 368.8356];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 34677.4092;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 5000;
+            Class: @"Actors/Player.ent.tk";
+            Class: @"Actors/Player.ent.tk";
+            Weapon: Null;
+            Controller: Null;
+            Factions: Factions [Player Ally];
+            Id: 4;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 300;
+            Position: [127.9629 268.472];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 37945.3948;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 40;
+            Class: @"Actors/Astrovirus.ent.tk";
+            Class: @"Actors/Astrovirus.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 11;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 74.51001;
+            Position: [1568.181 228.3265];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 54161.4027;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 40;
+            Class: @"Actors/Astrovirus.ent.tk";
+            Class: @"Actors/Astrovirus.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 10;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 86.11726;
+            Position: [1618.363 158.072];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 53892.1048;
+            EventHandlers: Null;
+        }
+        WeaponPickupInstance {
+            Weapon: GunInstance {
+                CurrentAmmo: 5000;
+                Class: @"Weapons/bfg.wpn.tk";
+                Class: @"Weapons/bfg.wpn.tk";
+                StateTime: 0;
+                State: WeaponState.Idle;
+                Charge: 0;
+            };
+            Class: @"Pickups/Bfg.ent.tk";
+            Class: @"Pickups/Bfg.ent.tk";
+            Id: 9;
+            Name: Null;
+            NextRespawnTime: 0;
+            Position: [529.4174 -554.5098];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 51223.0461;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 40;
+            Class: @"Actors/Astrovirus.ent.tk";
+            Class: @"Actors/Astrovirus.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 12;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 94.79087;
+            Position: [1502.945 363.8174];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 54471.0382;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 40;
+            Class: @"Actors/Astrovirus.ent.tk";
+            Class: @"Actors/Astrovirus.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 13;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 167.589;
+            Position: [1492.908 439.0901];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 54768.0931;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 40;
+            Class: @"Actors/Astrovirus.ent.tk";
+            Class: @"Actors/Astrovirus.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 14;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 123.6194;
+            Position: [1553.126 539.4537];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 55074.5063;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 40;
+            Class: @"Actors/Astrovirus.ent.tk";
+            Class: @"Actors/Astrovirus.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                    FocusBehavior {
+                        MaxTurn: 13.96263;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 15;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 74.19637;
+            Position: [1623.381 639.8174];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 55347.4487;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 20;
+            Class: @"Actors/InfectedCell.ent.tk";
+            Class: @"Actors/InfectedCell.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    FlowKamikazeBehavior {
+                        Bias: 1;
+                        Effect: @"Effects/Damage.fx.tk";
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 16;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 239.0199;
+            Position: [1482.872 213.272];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 57364.3965;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 20;
+            Class: @"Actors/InfectedCell.ent.tk";
+            Class: @"Actors/InfectedCell.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    FlowKamikazeBehavior {
+                        Bias: 1;
+                        Effect: @"Effects/Damage.fx.tk";
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 17;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 292.5055;
+            Position: [1432.69 293.5629];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 57694.3819;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 20;
+            Class: @"Actors/InfectedCell.ent.tk";
+            Class: @"Actors/InfectedCell.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    FlowKamikazeBehavior {
+                        Bias: 1;
+                        Effect: @"Effects/Damage.fx.tk";
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 18;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 241.2084;
+            Position: [1387.526 408.981];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 58037.3493;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 20;
+            Class: @"Actors/InfectedCell.ent.tk";
+            Class: @"Actors/InfectedCell.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    FlowKamikazeBehavior {
+                        Bias: 1;
+                        Effect: @"Effects/Damage.fx.tk";
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 19;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 368.0401;
+            Position: [1402.581 484.2538];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 58366.3293;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 20;
+            Class: @"Actors/InfectedCell.ent.tk";
+            Class: @"Actors/InfectedCell.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    FlowKamikazeBehavior {
+                        Bias: 1;
+                        Effect: @"Effects/Damage.fx.tk";
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 20;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 213.3666;
+            Position: [1442.726 569.5629];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 58696.5285;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 20;
+            Class: @"Actors/InfectedCell.ent.tk";
+            Class: @"Actors/InfectedCell.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    FlowSeekBehavior {
+                    }
+                    FlowKamikazeBehavior {
+                        Bias: 1;
+                        Effect: @"Effects/Damage.fx.tk";
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 21;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 278.6436;
+            Position: [1502.945 659.8901];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 59014.0837;
+            EventHandlers: Null;
+        }
+    ];
+    Triggers: [];
 }

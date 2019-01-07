@@ -10,24 +10,24 @@ namespace DyingAndMore.Game.Weapons
         /// Spawns are generated from this template. All classes will be spawned with a random number between its range
         /// Spawn order is randomized
         /// </summary>
-        public List<Tuple<EntityClass, Takai.Range<int>>> Spawns { get; set; }
+        public List<ActorSpawn> Spawns { get; set; }
 
         /// <summary>
         /// Generate a list of entities based on the templates provided in <see cref="Spawns"/>. Does not create clones
         /// </summary>
         /// <returns>The list of (references to original) entities</returns>
-        public List<EntityClass> GenerateSpawnList()
+        public List<Entities.ActorClass> GenerateSpawnList()
         {
-            var spawns = new List<EntityClass>();
+            var spawns = new List<Entities.ActorClass>();
 
             if (Spawns == null)
                 return spawns;
 
-            foreach (var ent in Spawns)
+            foreach (var spawn in Spawns)
             {
-                int count = Takai.Util.RandomGenerator.Next(ent.Item2.min, ent.Item2.max);
+                int count = Takai.RangeHelpers.Random(spawn.count);
                 for (int i = 0; i < count; ++i)
-                    spawns.Add(ent.Item1);
+                    spawns.Add(spawn.actor);
             }
 
             //randomize spawns
@@ -61,14 +61,11 @@ namespace DyingAndMore.Game.Weapons
         /// <summary>
         /// The actual list of entities to spawn
         /// </summary>
-        public Queue<EntityClass> SpawnQueue { get; set; }
+        protected Queue<EntityClass> SpawnQueue { get; set; }
 
         public SpawnerInstance() { }
         public SpawnerInstance(SpawnerClass @class)
-            : base(@class)
-        {
-            SpawnQueue = new Queue<EntityClass>(Class.GenerateSpawnList());
-        }
+            : base(@class) { }
 
         public override bool IsDepleted()
         {
@@ -77,6 +74,9 @@ namespace DyingAndMore.Game.Weapons
 
         protected override void OnDischarge()
         {
+            if (SpawnQueue == null)
+                SpawnQueue = new Queue<EntityClass>(Class.GenerateSpawnList());
+
             var next = SpawnQueue.Dequeue();
             Actor.Map.Spawn(next, Actor.Position + Actor.Forward * (Actor.Radius + 10), Actor.Forward, Actor. Forward * 100);
             base.OnDischarge();

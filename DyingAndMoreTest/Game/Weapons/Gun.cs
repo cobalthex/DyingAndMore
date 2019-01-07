@@ -29,7 +29,7 @@ namespace DyingAndMoreTest
                     ["GunDischargeWeapon"] = new Takai.Game.AnimationClass()
                 }
             }).Instantiate();
-            var map = Takai.Game.MapClass.CreateCanvasMap(10, false);
+            var map = Takai.Game.MapBaseClass.CreateCanvasMap(10, false);
             map.Spawn(gunInstance.Actor);
         }
 

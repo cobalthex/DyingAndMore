@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
-    public partial class MapClass
+    public partial class MapBaseClass
     {
         internal void Resize(int newWidth, int newHeight)
         {
@@ -17,9 +17,9 @@ namespace Takai.Game
         /// <param name="size">The width and height of the map (in pixels)</param>
         /// <param name="initializeGraphics">Call <see cref="InitializeGraphics"/></param>
         /// <returns>the created map</returns>
-        public static MapInstance CreateCanvasMap(int size = 10000, bool initializeGraphics = true)
+        public static MapBaseInstance CreateCanvasMap(int size = 10000, bool initializeGraphics = true)
         {
-            var map = new MapClass
+            var map = new MapBaseClass
             {
                 TileSize = size,
             };
@@ -52,7 +52,7 @@ namespace Takai.Game
         }
     }
 
-    public partial class MapInstance
+    public partial class MapBaseInstance
     {
         [Data.Serializer.Ignored]
         public Random Random { get; private set; } = new Random(); //todo: may not be necessary
@@ -68,7 +68,13 @@ namespace Takai.Game
 
             Class.Resize(newWidth, newHeight);
 
-            Sectors = Sectors.Resize((newHeight - 1) / MapClass.SectorSize + 1, (newWidth - 1) / MapClass.SectorSize + 1);
+            var newSectorsX = (newWidth - 1) / MapBaseClass.SectorSize + 1;
+            var newSectorsY = (newHeight - 1) / MapBaseClass.SectorSize + 1;
+
+            if (Sectors == null)
+                Sectors = new MapSector[newSectorsY, newSectorsX];
+            else
+                Sectors = Sectors.Resize(newSectorsY, newSectorsX);
 
             for (int y = 0; y < Sectors.GetLength(0); ++y)
             {
@@ -525,11 +531,11 @@ namespace Takai.Game
             };
         }
 
-        public TriggerInstance FindTriggerByName(string name)
+        public Trigger FindTriggerByName(string name)
         {
             foreach (var sector in Sectors)
             {
-                var found = sector.triggers.Find((t) => t.Class.Name == name);
+                var found = sector.triggers.Find((t) => t.Name == name);
                 if (found != null)
                     return found;
             }

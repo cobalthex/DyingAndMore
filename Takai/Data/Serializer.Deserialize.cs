@@ -352,6 +352,9 @@ namespace Takai.Data
                     context.reader.Read();
                 }
 
+                if (unit.Equals("infinity", StringComparison.OrdinalIgnoreCase))
+                    return word.Equals("-", StringComparison.Ordinal) ? float.NegativeInfinity : float.PositiveInfinity;
+
                 if (TInt.TryParse(word, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out var @int))
                 {
                     if (unit.Length > 0)
@@ -399,6 +402,11 @@ namespace Takai.Data
                     return @float;
                 }
             }
+
+            if (word.Equals("nan", StringComparison.OrdinalIgnoreCase))
+                return float.NaN;
+            if (word.Equals("infinity", StringComparison.OrdinalIgnoreCase))
+                return float.PositiveInfinity;
 
             if (word.ToLower() == "null")
                 return null;

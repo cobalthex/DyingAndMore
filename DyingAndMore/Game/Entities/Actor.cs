@@ -58,6 +58,8 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public Range<float> MoveForce { get; set; }
 
+        //todo: make defaults a list, possibly controlled by difficulty/configuration
+
         //inherited
         public Range<float> MaxSpeed { get; set; }
         public Weapons.WeaponClass DefaultWeapon { get; set; } = null;
@@ -81,7 +83,18 @@ namespace DyingAndMore.Game.Entities
         public new ActorClass Class
         {
             get => (ActorClass)base.Class;
-            set => base.Class = value;
+            set
+            {
+                base.Class = value;
+                if (base.Class != null)
+                {
+                    if (Class.Hud != null)
+                    {
+                        Hud = Class.Hud.Clone();
+                        Hud.BindTo(this);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -156,6 +169,9 @@ namespace DyingAndMore.Game.Entities
         }
         private Weapons.WeaponInstance _weapon;
 
+        [Takai.Data.Serializer.Ignored] //todo: reload from map.squads
+        public Squad Squad { get; internal set; }
+
         [Takai.Data.Serializer.Ignored]
         public Takai.UI.Static Hud { get; set; }
 
@@ -170,24 +186,20 @@ namespace DyingAndMore.Game.Entities
 
         public ActorInstance() : this(null) { }
         public ActorInstance(ActorClass @class)
-            : base(@class)
+            : base(null)
         {
-            if (Class != null) //todo: move this stuff to class prop?
-            {
-                MaxSpeed = Class.MaxSpeed.Random();
-                CurrentHealth = Class.MaxHealth;
-                Weapon = Class.DefaultWeapon?.Instantiate();
-                Factions = Class.DefaultFactions;
+            Class = @class;
 
-                if (Class.DefaultController != null)
-                    Controller = Class.DefaultController.Clone();
+            if (Class == null)
+                return;
 
-                if (Class.Hud != null)
-                {
-                    Hud = Class.Hud.Clone();
-                    Hud.BindTo(this);
-                }
-            }
+            MaxSpeed = Class.MaxSpeed.Random();
+            CurrentHealth = Class.MaxHealth;
+            Weapon = Class.DefaultWeapon?.Instantiate();
+            Factions = Class.DefaultFactions;
+
+            if (Class.DefaultController != null)
+                Controller = Class.DefaultController.Clone();
         }
 
         public override EntityInstance Clone()

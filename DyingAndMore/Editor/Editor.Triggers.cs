@@ -10,7 +10,7 @@ namespace DyingAndMore.Editor
         bool isNewTrigger = false;
         Vector2 savedWorldPos;
 
-        Takai.Game.TriggerInstance activeTrigger = null;
+        Takai.Game.Trigger activeTrigger = null;
 
         Static triggerSettings;
         TextInput triggerSettingsNameInput;
@@ -64,7 +64,7 @@ namespace DyingAndMore.Editor
 
             if (activeTrigger != null && InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Space))
             {
-                triggerSettingsNameInput.Text = activeTrigger.Class.Name;
+                triggerSettingsNameInput.Text = activeTrigger.Name;
                 triggerSettingsNameInput.HasFocus = true;
                 AddChild(triggerSettings);
                 return false;
@@ -81,10 +81,10 @@ namespace DyingAndMore.Editor
             {
                 if (!isNewTrigger)
                 {
-                    activeTrigger = new Takai.Game.TriggerClass
+                    activeTrigger = new Takai.Game.Trigger
                     {
                         Region = new Rectangle((int)currentWorldPos.X, (int)currentWorldPos.Y, 1, 1)
-                    }.Instantiate();
+                    };
                     isNewTrigger = true;
                 }
                 else if (activeTrigger != null)
@@ -106,7 +106,7 @@ namespace DyingAndMore.Editor
                     }
 
                     var diff = end - start;
-                    activeTrigger.Class.Region = new Rectangle(start.X, start.Y, diff.X, diff.Y);
+                    activeTrigger.Region = new Rectangle(start.X, start.Y, diff.X, diff.Y);
                 }
             }
 
@@ -116,7 +116,7 @@ namespace DyingAndMore.Editor
                 {
                     if (activeTrigger != null)
                     {
-                        if (activeTrigger.Class.Region.Width >= 10 && activeTrigger.Class.Region.Height >= 10)
+                        if (activeTrigger.Region.Width >= 10 && activeTrigger.Region.Height >= 10)
                             editor.Map.AddTrigger(activeTrigger);
                         else
                             activeTrigger = null;
@@ -153,7 +153,7 @@ namespace DyingAndMore.Editor
 
             for (int i = sector.triggers.Count - 1; i >= 0; --i)
             {
-                if (sector.triggers[i].Class.Region.Contains(Position.ToPoint()))
+                if (sector.triggers[i].Region.Contains(Position.ToPoint()))
                 {
                     activeTrigger = sector.triggers[i];
                     return;
@@ -167,9 +167,9 @@ namespace DyingAndMore.Editor
         {
             if (activeTrigger != null)
             {
-                editor.Map.DrawRect(activeTrigger.Class.Region, Color.GreenYellow);
-                var textPos = new Vector2(activeTrigger.Class.Region.X + 5, activeTrigger.Class.Region.Y + 5);
-                DefaultFont?.Draw(spriteBatch, activeTrigger.Class.Name, editor.Camera.WorldToScreen(textPos), Color.White);
+                editor.Map.DrawRect(activeTrigger.Region, Color.GreenYellow);
+                var textPos = new Vector2(activeTrigger.Region.X + 5, activeTrigger.Region.Y + 5);
+                DefaultFont?.Draw(spriteBatch, activeTrigger.Name, editor.Camera.WorldToScreen(textPos), Color.White);
             }
             base.DrawSelf(spriteBatch);
         }

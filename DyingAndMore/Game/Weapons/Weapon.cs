@@ -106,7 +106,23 @@ namespace DyingAndMore.Game.Weapons
         [Takai.Data.Serializer.Ignored]
         public Entities.ActorInstance Actor { get; set; }
 
-        public virtual WeaponClass Class { get; set; }
+        public virtual WeaponClass Class
+        {
+            get => _class;
+            set
+            {
+                _class = value;
+                if (_class != null)
+                {
+                    if (_class.Hud != null)
+                    {
+                        Hud = _class.Hud.Clone();
+                        Hud.BindTo(this);
+                    }
+                }
+            }
+        }
+        private WeaponClass _class;
 
         public TimeSpan StateTime { get; set; } = TimeSpan.Zero;
 
@@ -126,20 +142,13 @@ namespace DyingAndMore.Game.Weapons
         protected bool isUsing = false;
         protected bool wasUsing = false;
 
+        [Takai.Data.Serializer.Ignored]
         public Takai.UI.Static Hud { get; set; }
 
         public WeaponInstance() { }
         public WeaponInstance(WeaponClass @class)
         {
             Class = @class;
-            if (Class != null)
-            {
-                if (Class.Hud != null) //todo: move this stuff to class prop?
-                {
-                    Hud = Class.Hud.Clone();
-                    Hud.BindTo(this);
-                }
-            }
         }
 
         public virtual WeaponInstance Clone()
@@ -149,6 +158,7 @@ namespace DyingAndMore.Game.Weapons
             clone.isUsing = false;
             if (Hud != null)
             {
+                //todo: does MemberwiseClone do this already?
                 clone.Hud = Hud.Clone();
                 clone.Hud.BindTo(clone);
             }

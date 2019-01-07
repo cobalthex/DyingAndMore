@@ -66,7 +66,7 @@ namespace Takai.Game
         public EffectsClass Class { get; set; }
 
         [Data.Serializer.Ignored]
-        public MapInstance Map { get; set; }
+        public MapBaseInstance Map { get; set; }
 
         public Vector2 Position { get; set; }
         public Vector2 Direction { get; set; }
