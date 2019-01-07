@@ -11,14 +11,8 @@ namespace Takai.Game
     /// <summary>
     /// A region that can trigger commands when an entity enters the trigger region
     /// </summary>
-    public class TriggerClass : Data.IClass<TriggerInstance>, Data.Serializer.IReferenceable
+    public class Trigger
     {
-        private static int nextId = 1;
-
-        /// <summary>
-        /// A unique ID for serialization
-        /// </summary>
-        public int Id { get; set; } = nextId++;
 
         /// <summary>
         /// A name to identify this trigger
@@ -30,10 +24,6 @@ namespace Takai.Game
         /// </summary>
         public Rectangle Region { get; set; } = new Rectangle(0, 0, 1, 1);
 
-        /// <summary>
-        /// How many times this trigger can be used, 0 for infinite
-        /// </summary>
-        public int MaxUses { get; set; } = 0;
 
         /// <summary>
         /// Restrict who can activate this trigger (by default, anyone)
@@ -51,20 +41,10 @@ namespace Takai.Game
         /// </summary>
         public EffectsClass OnEnterEffects { get; set; }
 
-        //todo: create effects via GameCommand or create commands via effects
-
-        public TriggerInstance Instantiate()
-        {
-            return new TriggerInstance(this);
-        }
-
-        //todo: entity filters
-    }
-
-    public class TriggerInstance : Data.IInstance<TriggerClass>
-    {
-        [Data.Serializer.AsReference]
-        public TriggerClass Class { get; set; }
+        /// <summary>
+        /// How many times this trigger can be used, 0 for infinite
+        /// </summary>
+        public int MaxUses { get; set; } = 0;
 
         /// <summary>
         /// How many times this trigger has been entered (by filtered entities)
@@ -78,12 +58,6 @@ namespace Takai.Game
 
         //todo: on map create, place any entities into triggers without(?) calling OnEnter
 
-        public TriggerInstance() : this(null) { }
-        public TriggerInstance(TriggerClass @class)
-        {
-            Class = @class;
-        }
-
         /// <summary>
         /// Try and enter this trigger region. Trigger must be enabled. Does not check entity bounds
         /// </summary>
@@ -91,31 +65,31 @@ namespace Takai.Game
         /// <returns>True if the entity entered the trigger region</returns>
         public bool TryEnter(EntityInstance entity)
         {
-            if ((Class.MaxUses > 0 && UseCount >= Class.MaxUses) ||
-                (Class.Filter != null && !Class.Filter.CanTrigger(entity)) ||
+            if ((MaxUses > 0 && UseCount >= MaxUses) ||
+                (Filter != null && !Filter.CanTrigger(entity)) ||
                 !ContainedEntities.Add(entity))
                 return false;
 
             ++UseCount;
 
-            if (Class.OnEnterCommands != null)
+            if (OnEnterCommands != null)
             {
-                foreach (var command in Class.OnEnterCommands)
+                foreach (var command in OnEnterCommands)
                 {
                     if (command is EntityCommand ec && ec.Target == null)
                         ec.Invoke(entity);
                     else
-                        command.Invoke();
+                        command.Invoke(entity.Map);
                 }
             }
 
-            if (Class.OnEnterEffects != null && entity.Map != null)
+            if (OnEnterEffects != null && entity.Map != null)
             {
-                var fx = Class.OnEnterEffects.Instantiate(null, entity);
+                var fx = OnEnterEffects.Instantiate(null, entity);
                 entity.Map.Spawn(fx);
             }
 
-            System.Diagnostics.Debug.WriteLine($"{entity} entered trigger {Class.Name}");
+            System.Diagnostics.Debug.WriteLine($"{entity} entered trigger {Name}");
             return true;
         }
 
@@ -128,7 +102,7 @@ namespace Takai.Game
         {
             if (ContainedEntities.Remove(entity))
             {
-                System.Diagnostics.Debug.WriteLine($"{entity} left trigger {Class.Name}");
+                System.Diagnostics.Debug.WriteLine($"{entity} left trigger {Name}");
                 return true;
             }
             return false;

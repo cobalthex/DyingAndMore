@@ -71,6 +71,9 @@ namespace Takai.Game
         /// </summary>
         public EffectsClass DestructionEffect { get; set; }
 
+        /// <summary>
+        /// A trail that is applied on spawn
+        /// </summary>
         public TrailClass Trail { get; set; }
 
         /// <summary>
@@ -133,21 +136,7 @@ namespace Takai.Game
         /// <summary>
         /// The class that this instance inherits from
         /// </summary>
-        public virtual EntityClass Class
-        {
-            get => _class;
-            set
-            {
-                _class = value;
-                if (Class != null)
-                {
-                    PlayAnimation(Class.DefaultBaseAnimation);
-                    if (Class.Trail != null)
-                        Trail = Class.Trail.Instantiate();
-                }
-            }
-        }
-        private EntityClass _class;
+        public virtual EntityClass Class { get; set; }
 
         /// <summary>
         /// A name for this instance, should be unique
@@ -231,7 +220,7 @@ namespace Takai.Game
         /// The map the entity is in
         /// </summary>
         [Data.Serializer.Ignored]
-        public MapInstance Map { get; internal set; } = null;
+        public MapBaseInstance Map { get; internal set; } = null;
 
         /// <summary>
         /// When this entity was last spawned (in map time). Zero if destroyed or not spawned
@@ -289,6 +278,12 @@ namespace Takai.Game
         public EntityInstance(EntityClass @class)
         {
             Class = @class;
+            if (Class == null)
+                return;
+
+            PlayAnimation(Class.DefaultBaseAnimation);
+            if (Class.Trail != null)
+                Trail = Class.Trail.Instantiate();
         }
 
         public virtual EntityInstance Clone()
@@ -451,7 +446,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="map">The map to check</param>
         /// <returns>True if this entity is alive and in this map</returns>
-        public bool IsAliveIn(MapInstance map)
+        public bool IsAliveIn(MapBaseInstance map)
         {
             return IsAlive && Map == map;
         }
@@ -467,7 +462,7 @@ namespace Takai.Game
                 return false;
 
             foreach (var command in commands)
-                command.Invoke();
+                command.Invoke(Map);
 
             return true;
         }

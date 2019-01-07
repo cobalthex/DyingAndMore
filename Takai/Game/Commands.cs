@@ -5,7 +5,7 @@
         public string ActionName { get; set; }
         public object ActionParameter { get; set; }
 
-        public abstract void Invoke();
+        public abstract void Invoke(MapBaseInstance map);
     }
 
     public delegate void CommandAction(object parameter);
@@ -13,12 +13,12 @@
     //todo: data model command, map command
 
     //todo: command delays?
-
+    
     public class EntityCommand : GameCommand
     {
         public EntityInstance Target { get; set; }
 
-        public override void Invoke()
+        public override void Invoke(MapBaseInstance map)
         {
             if (ActionName == null ||
                 Target?.Actions == null ||

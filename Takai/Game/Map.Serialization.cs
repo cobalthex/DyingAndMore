@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Game
 {
-    public partial class MapClass : Data.IDerivedSerialize, Data.IDerivedDeserialize
+    public partial class MapBaseClass : Data.IDerivedSerialize, Data.IDerivedDeserialize
     {
         /// <summary>
         /// Build the tiles mask
@@ -102,8 +102,50 @@ namespace Takai.Game
         }
     }
 
-    public partial class MapInstance : Data.IDerivedSerialize, Data.IDerivedDeserialize
+    public partial class MapBaseInstance : Data.IDerivedSerialize, Data.IDerivedDeserialize
     {
+        public void SaveAsIntermediateMap(string file)
+        {
+            if (Class == null)
+            {
+                Save(file);
+                return;
+            }
+
+            string cachedMapFile = Class.File;
+            Save(file);
+            Class.File = file;
+        }
+
+        /// <summary>
+        /// Package the map into an archive
+        /// </summary>
+        /// <param name="file">The file to package the map into. Typical extension is .d2map</param>
+        public void PackageMap(string file)
+        {
+            System.Diagnostics.Contracts.Contract.Requires(Class != null);
+
+            //write MapClass as map.tk and MapInstance as state.tk to file
+            using (var arc = new System.IO.Compression.ZipArchive(System.IO.File.Create(file), System.IO.Compression.ZipArchiveMode.Create, false, System.Text.Encoding.UTF8))
+            {
+                var entry = arc.CreateEntry("map.tk", System.IO.Compression.CompressionLevel.Optimal);
+                using (var stream = new System.IO.StreamWriter(entry.Open(), System.Text.Encoding.UTF8, 4096, false))
+                    Data.Serializer.TextSerialize(stream, Class, 0);
+
+                var lastMapFile = Class.File;
+                Class.File = "./map.tk";
+                entry = arc.CreateEntry("state.tk", System.IO.Compression.CompressionLevel.Optimal);
+                using (var stream = new System.IO.StreamWriter(entry.Open(), System.Text.Encoding.UTF8, 4096, false))
+                    Data.Serializer.TextSerialize(stream, this, 0);
+                Class.File = lastMapFile;
+            }
+        }
+
+        public static MapBaseInstance FromPackage(string file)
+        {
+            return Data.Cache.Load<MapBaseInstance>("state.tk", file);
+        }
+
         /// <summary>
         /// Save this map instance as a save state
         /// </summary>
@@ -112,63 +154,10 @@ namespace Takai.Game
         {
             Data.Serializer.TextSerialize(file, this);
         }
-
-        public InitialMapState CreateInitialState()
-        {
-            var mapState = new InitialMapState
-            {
-                Entities = Enumerable.Select(AllEntities, e => new InitialMapState.EntitySpawn()
-                {
-                    Class = e.Class,
-                    Position = e.Position,
-                    Forward = e.Forward,
-                    Name = e.Name
-                }).ToList(),
-                Fluids = new List<FluidInstance>(),
-                Decals = new List<Decal>()
-            };
-
-            var triggers = new HashSet<TriggerClass>();
-
-            mapState.Fluids.AddRange(LiveFluids);
-            foreach (var sector in Sectors)
-            {
-                mapState.Fluids.AddRange(sector.fluids);
-                mapState.Decals.AddRange(sector.decals);
-
-                foreach (var trigger in sector.triggers)
-                {
-                    if (trigger.Class != null)
-                        triggers.Add(trigger.Class);
-                }
-            }
-
-            mapState.Triggers = new List<TriggerClass>(triggers);
-
-            return mapState;
-        }
-
-        /// <summary>
-        /// Save this instance as a new map, setting the default state of the class to this
-        /// </summary>
-        /// <param name="file">The file to save to</param>
-        public void SaveAsMap(string file)
-        {
-            //create default state
-            Class.InitialState = CreateInitialState();
-            Class.File = null;
-
-            //todo: less hacky (make class ReadOnly and custom serialize?
-            var cls = Class;
-            _class = null;
-            Data.Serializer.TextSerialize(file, cls);
-            _class = cls;
-            Class.File = file;
-        }
-
+        
         public Dictionary<string, object> DerivedSerialize()
         {
-            var triggers = new HashSet<TriggerInstance>();
+            var triggers = new HashSet<Trigger>();
 
             foreach (var sector in Sectors)
             {
@@ -190,12 +179,6 @@ namespace Takai.Game
                     Spawn(ent);
             }
 
-            if (Class?.InitialState != null)
-            {
-                foreach (var decal in Class.InitialState.Decals)
-                    AddDecal(decal);
-            }
-
             //fluids should be serialized? (maybe only some fluids are serialized)
             //decals load from initial state
             //triggers load from class
@@ -208,7 +191,7 @@ namespace Takai.Game
 
             if (props.TryGetValue("Triggers", out var triggers)) //todo: load from class?
             {
-                foreach (var trigger in Data.Serializer.Cast<List<TriggerInstance>>(triggers))
+                foreach (var trigger in Data.Serializer.Cast<List<Trigger>>(triggers))
                     AddTrigger(trigger);
             }
 

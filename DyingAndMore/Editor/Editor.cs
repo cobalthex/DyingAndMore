@@ -117,7 +117,7 @@ namespace DyingAndMore.Editor
 #pragma warning disable 0649
         public int maxMapSize;
         public float snapAngle;
-        public MapInstance.RenderSettings renderSettings;
+        public MapBaseInstance.RenderSettings renderSettings;
 #pragma warning restore 0649
     }
 
@@ -125,7 +125,7 @@ namespace DyingAndMore.Editor
     {
         public static Editor Current { get; set; }
 
-        public MapInstance Map
+        public MapBaseInstance Map
         {
             get => _map;
             set
@@ -139,7 +139,7 @@ namespace DyingAndMore.Editor
                 OnMapChanged();
             }
         }
-        private MapInstance _map;
+        private MapBaseInstance _map;
 
         public Camera Camera { get; set; } = new Camera();
 
@@ -157,7 +157,7 @@ namespace DyingAndMore.Editor
 
         public System.Collections.Generic.List<VectorCurve> Paths { get; set; } = new System.Collections.Generic.List<VectorCurve>();
 
-        public Editor(MapInstance map)
+        public Editor(MapBaseInstance map)
         {
             var swatch = System.Diagnostics.Stopwatch.StartNew();
             config = Cache.Load<EditorConfiguration>("Editor.conf.tk", "Config");
@@ -460,7 +460,7 @@ namespace DyingAndMore.Editor
                         {
                             try
                             {
-                                Map.SaveAsMap(sfd.FileName);
+                                Map.Save(sfd.FileName);
                             }
                             catch
                             {
@@ -487,7 +487,7 @@ namespace DyingAndMore.Editor
                             {
                                 if (ofd.FileName.EndsWith(".d2sav"))
                                 {
-                                    var instance = Cache.Load<MapInstance>(ofd.FileName);
+                                    var instance = Cache.Load<MapBaseInstance>(ofd.FileName);
                                     if (instance.Class != null)
                                     {
                                         instance.Class.InitializeGraphics();
@@ -496,7 +496,7 @@ namespace DyingAndMore.Editor
                                 }
                                 else
                                 {
-                                    var mapClass = Cache.Load<MapClass>(ofd.FileName);
+                                    var mapClass = Cache.Load<MapBaseClass>(ofd.FileName);
                                     mapClass.InitializeGraphics();
                                     Parent.ReplaceAllChildren(new Editor(mapClass.Instantiate()));
                                 }

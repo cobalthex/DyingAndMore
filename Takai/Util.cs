@@ -7,6 +7,14 @@ namespace Takai
     {
         public static readonly Random RandomGenerator = new Random();
 
+        public static T Random<T>(this System.Collections.Generic.IList<T> list) //distribution?
+        {
+            if (list.Count < 1)
+                return default(T);
+
+            return list[Util.RandomGenerator.Next(list.Count)];
+        }
+
         /// <summary>
         /// Return a gaussian distribution of a random double
         /// </summary>

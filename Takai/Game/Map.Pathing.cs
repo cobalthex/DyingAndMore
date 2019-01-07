@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
-    public partial class MapClass
+    public partial class MapBaseClass
     {
         public bool CanPath(Point tile)
         {
@@ -14,7 +14,7 @@ namespace Takai.Game
         }
     }
 
-    public partial class MapInstance
+    public partial class MapBaseInstance
     {
         public struct AStarPathNode
         {

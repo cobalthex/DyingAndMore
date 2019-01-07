@@ -22,7 +22,7 @@ namespace Takai.Game
         }
     }
 
-    public partial class MapInstance
+    public partial class MapBaseInstance
     {
         public struct MapUpdateStats
         {
@@ -128,52 +128,9 @@ namespace Takai.Game
                     activeEntities.UnionWith(Sectors[y, x].entities);
         }
 
-        /// <summary>
-        /// Update the map state
-        /// Updates the active set and then the contents of the active set
-        /// Does not update ElapsedTime. Call <see cref="Tick"/>
-        /// </summary>
-        /// <param name="realTime">(Real) game time</param>
-        /// <param name="camera">Where on the map to view</param>
-        /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
-        public void Update(GameTime realTime)
+        protected virtual void UpdateEntities(TimeSpan deltaTime)
         {
-            RealTime = realTime;
-            _updateStats = new MapUpdateStats();
-
-            var deltaTicks = (long)(realTime.ElapsedGameTime.Ticks * (double)TimeScale);
-            var deltaTime = TimeSpan.FromTicks(deltaTicks);
             var deltaSeconds = (float)deltaTime.TotalSeconds;
-            ElapsedTime += deltaTime;
-
-            //if (deltaTicks == 0)
-            //    return;
-
-            #region moving/live fluids
-
-            for (int i = 0; i < LiveFluids.Count; ++i)
-            {
-                var fluid = LiveFluids[i];
-                var deltaV = fluid.velocity * deltaSeconds;
-                fluid.position += deltaV;
-                fluid.velocity -= deltaV * fluid.Class.Drag;
-
-                //todo: maybe add collision detection for better fluid simulation (combine drag when colliding)
-
-                if (Math.Abs(fluid.velocity.X) < 1 && Math.Abs(fluid.velocity.Y) < 1)
-                {
-                    Spawn(fluid.Class, fluid.position, Vector2.Zero); //this will move the Fluid to the static area of the map
-                    LiveFluids[i] = LiveFluids[LiveFluids.Count - 1];
-                    LiveFluids.RemoveAt(LiveFluids.Count - 1);
-                    --i;
-                }
-                else
-                    LiveFluids[i] = fluid;
-            }
-
-            #endregion
-
-            #region entities
 
             if (updateSettings.allowEntityDeletion)
             {
@@ -373,7 +330,7 @@ namespace Takai.Game
 
                             foreach (var trigger in Sectors[y, x].triggers)
                             {
-                                if (trigger.Class.Region.Intersects(eaabb))
+                                if (trigger.Region.Intersects(eaabb))
                                     trigger.TryEnter(entity);
                                 else
                                     trigger.TryExit(entity);
@@ -395,6 +352,57 @@ namespace Takai.Game
                     entity.Think(deltaTime);
             }
 
+
+        }
+
+        /// <summary>
+        /// Update the map state
+        /// Updates the active set and then the contents of the active set
+        /// Does not update ElapsedTime. Call <see cref="Tick"/>
+        /// </summary>
+        /// <param name="realTime">(Real) game time</param>
+        /// <param name="camera">Where on the map to view</param>
+        /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
+        public virtual void Update(GameTime realTime)
+        {
+            RealTime = realTime;
+            _updateStats = new MapUpdateStats();
+
+            var deltaTicks = (long)(realTime.ElapsedGameTime.Ticks * (double)TimeScale);
+            var deltaTime = TimeSpan.FromTicks(deltaTicks);
+            var deltaSeconds = (float)deltaTime.TotalSeconds;
+            ElapsedTime += deltaTime;
+
+            //if (deltaTicks == 0)
+            //    return;
+
+            #region moving/live fluids
+
+            for (int i = 0; i < LiveFluids.Count; ++i)
+            {
+                var fluid = LiveFluids[i];
+                var deltaV = fluid.velocity * deltaSeconds;
+                fluid.position += deltaV;
+                fluid.velocity -= deltaV * fluid.Class.Drag;
+
+                //todo: maybe add collision detection for better fluid simulation (combine drag when colliding)
+
+                if (Math.Abs(fluid.velocity.X) < 1 && Math.Abs(fluid.velocity.Y) < 1)
+                {
+                    Spawn(fluid.Class, fluid.position, Vector2.Zero); //this will move the Fluid to the static area of the map
+                    LiveFluids[i] = LiveFluids[LiveFluids.Count - 1];
+                    LiveFluids.RemoveAt(LiveFluids.Count - 1);
+                    --i;
+                }
+                else
+                    LiveFluids[i] = fluid;
+            }
+
+            #endregion
+
+            #region entities
+
+            UpdateEntities(deltaTime);
             _updateStats.updatedEntities = activeEntities.Count;
 
             #endregion

@@ -12,7 +12,7 @@ namespace Takai.Game
         public Graphics.Sprite glow;
     }
 
-    public partial class MapClass
+    public partial class MapBaseClass
     {
         internal struct TrailVertex : IVertexType
         {
@@ -176,7 +176,7 @@ namespace Takai.Game
         public BlendState Blend { get; set; }
     }
 
-    public partial class MapInstance
+    public partial class MapBaseInstance
     {
         public struct MapRenderStats
         {
@@ -272,7 +272,7 @@ namespace Takai.Game
         /// The current fade. Ignored if duration <= 0 (counts down)
         /// </summary>
         public ScreenFade currentScreenFade;
-        public System.TimeSpan currentScreenFadeElapsedTime;
+        public System.TimeSpan currentScreenFadeElapsedTime; //todo: refactor
 
         /// <summary>
         /// Draw a line next frame
@@ -336,7 +336,7 @@ namespace Takai.Game
 
 
         private List<EntityInstance> _drawEntsOutlined = new List<EntityInstance>();
-        private HashSet<TriggerInstance> _drawTriggers = new HashSet<TriggerInstance>();
+        private HashSet<Trigger> _drawTriggers = new HashSet<Trigger>();
 
         public struct RenderContext
         {
@@ -356,7 +356,7 @@ namespace Takai.Game
         /// </summary>
         /// <param name="camera">Where and what to draw</param>
         /// <param name="postEffect">An optional fullscreen post effect to render with</param>
-        public void Draw(Camera camera)
+        public virtual void Draw(Camera camera)
         {
             _renderStats = new MapRenderStats
             {
@@ -546,7 +546,7 @@ namespace Takai.Game
 
         public void DrawFluids(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, Class.reflectionEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, Class.reflectionEffect, c.cameraTransform);
 
             //inactive fluids
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)
@@ -782,11 +782,11 @@ namespace Takai.Game
             var vertexCount = renderedTrailPointCount * 2;
             if (Class.trailVerts.Length < vertexCount)
             {
-                Class.trailVerts = new MapClass.TrailVertex[vertexCount];
+                Class.trailVerts = new MapBaseClass.TrailVertex[vertexCount];
                 Class.trailVBuffer?.Dispose();
                 Class.trailVBuffer = new DynamicVertexBuffer(
                     Runtime.GraphicsDevice,
-                    MapClass.TrailVertex.VertexDeclaration,
+                    MapBaseClass.TrailVertex.VertexDeclaration,
                     Class.trailVerts.Length,
                     BufferUsage.WriteOnly
                 );
@@ -825,12 +825,12 @@ namespace Takai.Game
                     var p = trail.AllPoints[i1];
                     var norm = p.direction.Ortho();
 
-                    Class.trailVerts[next + 0] = new MapClass.TrailVertex(
+                    Class.trailVerts[next + 0] = new MapBaseClass.TrailVertex(
                         p.location - norm * wid,
                         col,
                         new Vector3(x + spriteFrame.X, spriteFrame.Y, 0/*todo*/)
                     );
-                    Class.trailVerts[next + 1] = new MapClass.TrailVertex(
+                    Class.trailVerts[next + 1] = new MapBaseClass.TrailVertex(
                         p.location + norm * wid,
                         col,
                         new Vector3(x + spriteFrame.X, spriteFrame.Y + spriteFrameSize.Y, 0)
@@ -875,7 +875,7 @@ namespace Takai.Game
             if (renderSettings.drawTrailMesh)
             {
                 Class.colorEffect.Parameters["Transform"].SetValue(c.viewTransform);
-                Runtime.GraphicsDevice.RasterizerState = MapClass.wireframeRaster;
+                Runtime.GraphicsDevice.RasterizerState = MapBaseClass.wireframeRaster;
                 foreach (EffectPass pass in Class.colorEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
@@ -984,7 +984,7 @@ namespace Takai.Game
 
             c.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, null, c.cameraTransform);
             foreach (var trigger in _drawTriggers)
-                Graphics.Primitives2D.DrawFill(c.spriteBatch, new Color(Color.LimeGreen, 0.25f), trigger.Class.Region);
+                Graphics.Primitives2D.DrawFill(c.spriteBatch, new Color(Color.LimeGreen, 0.25f), trigger.Region);
             c.spriteBatch.End();
         }
 

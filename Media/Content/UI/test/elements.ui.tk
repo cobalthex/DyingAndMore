@@ -49,7 +49,7 @@ ScrollBox {
 					Padding: 10;
 					Position: 10;
 				};
-				
+
 				Static { Text: "Button"; };
 				Static {
 					Name: "Button";

@@ -71,7 +71,7 @@ namespace DyingAndMore.Game
         }
         private Game _game;
 
-        public MapInstance Map
+        public MapBaseInstance Map
         {
             get => _map;
             set
@@ -85,7 +85,7 @@ namespace DyingAndMore.Game
                 OnMapChanged();
             }
         }
-        private MapInstance _map;
+        private MapBaseInstance _map;
 
         public bool IsPaused { get; set; }
 
@@ -113,19 +113,19 @@ namespace DyingAndMore.Game
         {
             ["LoadMap"] = delegate (object map)
             {
-                MapInstance inst = null;
+                MapBaseInstance inst = null;
                 if (map is string mapName)
                 {
                     var loaded = Cache.Load(mapName);
-                    if (loaded is MapInstance loadedInst)
+                    if (loaded is MapBaseInstance loadedInst)
                         inst = loadedInst;
-                    else if (loaded is MapClass loadedClass)
+                    else if (loaded is MapBaseClass loadedClass)
                         inst = loadedClass.Instantiate();
                 }
-                else if (map is MapClass mapClass)
+                else if (map is MapBaseClass mapClass)
                     inst = mapClass.Instantiate();
                 else
-                    inst = map as MapInstance;
+                    inst = map as MapBaseInstance;
 
                 if (inst != null)
                     Map = Game.Map = inst;
@@ -133,7 +133,7 @@ namespace DyingAndMore.Game
             ["CompleteMap"] = (ignored) => CompleteMap(),
             ["Cleanup"] = delegate (object ignored)
             {
-                Map.CleanupAll(MapInstance.CleanupOptions.All);
+                Map.CleanupAll(MapBaseInstance.CleanupOptions.All);
             },
         };
 
@@ -148,6 +148,8 @@ namespace DyingAndMore.Game
         {
             if (game?.Map == null)
                 throw new ArgumentNullException("There must be a map to play");
+
+            game.Map.PackageMap("Maps/test.d2map");
 
             Game = game;
             Current = this; //apply elsewhere?
@@ -314,6 +316,8 @@ namespace DyingAndMore.Game
 
             Map.updateSettings.SetGame();
             Map.renderSettings.SetDefault();
+            updateSettingsPane?.BindTo(Map.updateSettings);
+            renderSettingsPane?.BindTo(Map.renderSettings);
             return UIEventResult.Handled;
         }
 

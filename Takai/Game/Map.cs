@@ -3,26 +3,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
+//todo: Map pack file format:
+// zip archive: [map.tk, state.tk] <- map = MapClass, state = MapInstance. all saves refer back to map.zip/map.tk
+
 namespace Takai.Game
 {
-    public class InitialMapState
-    {
-        public struct EntitySpawn
-        {
-            public EntityClass Class { get; set; }
-            public Vector2 Position { get; set; }
-            public Vector2 Forward { get; set; }
-            public string Name { get; set; }
-
-            //Initial state
-        }
-
-        public List<EntitySpawn> Entities { get; set; }
-        public List<FluidInstance> Fluids { get; set; }
-        public List<Decal> Decals { get; set; }
-        public List<TriggerClass> Triggers { get; set; }
-    }
-
     /// <summary>
     /// An intermediate struct encapsulating tileset properties
     /// </summary>
@@ -43,7 +28,7 @@ namespace Takai.Game
     /// <summary>
     /// The (mostly) static properties of a single map
     /// </summary>
-    public partial class MapClass : Data.INamedClass<MapInstance>
+    public partial class MapBaseClass : Data.INamedClass<MapBaseInstance>
     {
         [Data.Serializer.Ignored]
         public string File { get; set; }
@@ -119,49 +104,13 @@ namespace Takai.Game
             get { return new Rectangle(0, 0, Width * TileSize, Height * TileSize); }
         }
 
-        /// <summary>
-        /// The initial state of this map. This is what is first created when this map is played
-        /// </summary>
-        public InitialMapState InitialState { get; set; } //todo: lazy
-
         public MaterialInteractions MaterialInteractions { get; set; } = new MaterialInteractions();
 
         public string TilesMaterial { get; set; } = "Tiles";
-
-        public MapInstance Instantiate()
+        
+        public virtual MapBaseInstance Instantiate()
         {
-            var instance = new MapInstance(this);
-
-            if (InitialState != null)
-            {
-                if (InitialState.Entities != null)
-                {
-                    foreach (var ent in InitialState.Entities)
-                    {
-                        if (ent.Class != null)
-                            instance.Spawn(ent.Class, ent.Position, ent.Forward, Vector2.Zero, ent.Name);
-                    }
-                }
-
-                if (InitialState.Fluids != null)
-                {
-                    foreach (var fluid in InitialState.Fluids)
-                        instance.Spawn(fluid);
-                }
-
-                if (InitialState.Decals != null)
-                {
-                    foreach (var decal in InitialState.Decals)
-                        instance.AddDecal(decal);
-                }
-
-                if (InitialState.Triggers != null)
-                {
-                    foreach (var trigger in InitialState.Triggers)
-                        instance.AddTrigger(trigger.Instantiate());
-                }
-            }
-
+            var instance = new MapBaseInstance(this);
             return instance;
         }
     }
@@ -179,11 +128,11 @@ namespace Takai.Game
         //static
         public List<FluidInstance> fluids = new List<FluidInstance>();
         public List<Decal> decals = new List<Decal>();
-        public List<TriggerInstance> triggers = new List<TriggerInstance>(); //triggers may be in one or more sectors, list as it shouldn't be modified during runtime
+        public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors, list as it shouldn't be modified during runtime
     }
 
     [Data.Cache.AlwaysReload] //todo: necessary?
-    public partial class MapInstance : Data.IInstance<MapClass>
+    public partial class MapBaseInstance : Data.IInstance<MapBaseClass>
     {
         private int nextEntityID = 0;
 
@@ -191,7 +140,7 @@ namespace Takai.Game
         /// The map backing this instance. Cannot be null
         /// Changing the class will reset the map
         /// </summary>
-        public MapClass Class
+        public MapBaseClass Class
         {
             get => _class;
             set
@@ -199,22 +148,15 @@ namespace Takai.Game
                 if (value != null && value != _class)
                 {
                     _class = value;
-
-                    Sectors = new MapSector[
-                        Util.CeilDiv(_class.Height, MapClass.SectorSize),
-                        Util.CeilDiv(_class.Width, MapClass.SectorSize)
-                    ];
-
-                    for (int y = 0; y < Sectors.GetLength(0); ++y)
-                        for (int x = 0; x < Sectors.GetLength(1); ++x)
-                            Sectors[y, x] = new MapSector();
-
                     _allEntities.Clear();
+                    Sectors = null;
+                    Resize(Class.Width, Class.Height);
+                    
                 }
             }
         }
-        private MapClass _class;
-
+        private MapBaseClass _class;
+        
         /// <summary>
         /// Grid based spacial storage for objects in the map
         /// </summary>
@@ -251,16 +193,14 @@ namespace Takai.Game
         /// </summary>
         public List<SoundInstance> Sounds { get; set; } = new List<SoundInstance>();
 
-        public MapInstance() { }
+        public MapBaseInstance() { }
 
-        public MapInstance(MapClass @class)
+        public MapBaseInstance(MapBaseClass @class)
         {
-            System.Diagnostics.Contracts.Contract.Assert(@class != null);
             Class = @class;
-            Resize(Class.Width, Class.Height);
         }
 
-        ~MapInstance()
+        ~MapBaseInstance()
         {
             foreach (var sound in Sounds)
                 sound.Instance?.Dispose();
@@ -473,18 +413,18 @@ namespace Takai.Game
         /// Add a trigger to the map
         /// </summary>
         /// <param name="trigger">The trigger to add</param>
-        public void AddTrigger(TriggerInstance trigger)
+        public void AddTrigger(Trigger trigger)
         {
-            var sectors = GetOverlappingSectors(trigger.Class.Region);
+            var sectors = GetOverlappingSectors(trigger.Region);
             for (var y = sectors.Top; y < sectors.Bottom; ++y)
             {
                 for (var x = sectors.Left; x < sectors.Right; ++x)
                     Sectors[y, x].triggers.Add(trigger);
             }
         }
-        public void Destroy(TriggerInstance trigger)
+        public void Destroy(Trigger trigger)
         {
-            var sectors = GetOverlappingSectors(trigger.Class.Region);
+            var sectors = GetOverlappingSectors(trigger.Region);
             for (var y = sectors.Top; y < sectors.Bottom; ++y)
             {
                 for (var x = sectors.Left; x < sectors.Right; ++x)

@@ -154,17 +154,33 @@ namespace DyingAndMore
                 HorizontalAlignment = Takai.UI.Alignment.Middle,
                 VerticalAlignment = Takai.UI.Alignment.Middle,
                 BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
-                FilterRegex = "\\.map.tk$",
+                FilterRegex = "\\.(map\\.tk|d2map\\.zip)$",
             };
             ui.On(Takai.UI.Static.SelectionChangedEvent, delegate (Takai.UI.Static s, Takai.UI.UIEventArgs ee)
             {
                 var fl = (Takai.UI.FileList)s;
                 if (System.IO.File.Exists(fl.SelectedFile))
                 {
-                    var map = Cache.Load<Takai.Game.MapClass>(fl.SelectedFile);
-                    map.InitializeGraphics();
+                    if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
+                    {
+                        var packmap = Takai.Game.MapBaseInstance.FromPackage(fl.SelectedFile);
+                        packmap.Class.InitializeGraphics();
+                        ui.ReplaceAllChildren(new Editor.Editor(packmap));
+                        return Takai.UI.UIEventResult.Handled;
+                    }
 
-                    ui.ReplaceAllChildren(new Editor.Editor(map.Instantiate()));
+                    var map = Cache.Load(fl.SelectedFile);
+                    if (map is Takai.Game.MapBaseClass mc)
+                    {
+                        mc.InitializeGraphics();
+                        ui.ReplaceAllChildren(new Editor.Editor(mc.Instantiate()));
+
+                    }
+                    else if (map is Takai.Game.MapBaseInstance mi)
+                    {
+                        mi.Class.InitializeGraphics();
+                        ui.ReplaceAllChildren(new Editor.Editor(mi));
+                    }
                 }
                 return Takai.UI.UIEventResult.Handled;
             });

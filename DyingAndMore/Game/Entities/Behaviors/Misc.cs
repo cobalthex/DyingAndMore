@@ -133,7 +133,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
     }
 
     /// <summary>
-    /// Move along the flow map towards one of the <see cref="Takai.Game.MapInstance.PathOrigins"/>
+    /// Move along the flow map towards one of the <see cref="Takai.Game.MapBaseInstance.PathOrigins"/>
     /// </summary>
     class FlowSeekBehavior : Behavior
     {
