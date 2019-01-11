@@ -1,5 +1,7 @@
 ﻿using Takai.Game;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using System;
 
 namespace DyingAndMore
 {
@@ -21,17 +23,6 @@ namespace DyingAndMore
         {
             if (@class == null)
                 return;
-
-            if (Squads != null)
-            {
-                foreach (var squad in Squads)
-                {
-                    if (squad.Value.DontSpawnAutomatically)
-                        continue;
-
-                    Spawn(squad.Value);
-                }
-            }
         }
         
         /// <summary>
@@ -40,8 +31,25 @@ namespace DyingAndMore
         /// <param name="squad">The squad to spawn</param>
         public void Spawn(Game.Squad squad)
         {
-            squad.HasSpawned = true;
-            
+            if (Squads == null)
+                Squads = new Dictionary<string, Game.Squad>();
+            Squads[squad.Name] = squad;
+
+            squad.OnSpawn(this);
+        }
+        
+        protected override void UpdateEntities(TimeSpan deltaTime)
+        {
+            if (updateSettings.isEntityLogicEnabled)
+            {
+                if (Squads != null)
+                {
+                    foreach (var squad in Squads)
+                        squad.Value.Update(this, deltaTime);
+                }
+            }
+
+            base.UpdateEntities(deltaTime);
         }
     }
 }

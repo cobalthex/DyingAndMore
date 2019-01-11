@@ -5,7 +5,7 @@ ActorClass {
     MaxSpeed: [10 20];
     MoveForce: 4;
 
-    DefaultController: AIController {
+    DefaultController: [AIController {
         Behaviors: [
             ShootBehavior {};
             FocusBehavior {};
@@ -14,9 +14,9 @@ ActorClass {
                 SightDistance: 1000;
             };
         ];
-    }
+    }];
 
-    DefaultWeapon: @"Weapons/Boss.wpn.tk";
+    DefaultWeapon: [@"Weapons/Boss.wpn.tk"];
 
     Animations: {
     	Idle: {

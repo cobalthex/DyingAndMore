@@ -260,6 +260,34 @@ namespace Takai.Game
             }
             return ents;
         }
+        
+        /// <summary>
+        /// Test a region to see if it contains any entities
+        /// </summary>
+        /// <param name="position">the point to search from</param>
+        /// <param name="searchRadius">how far out to search before stopping. 0 for infinite</param>
+        /// <returns>True if any entities are in the region</returns>
+        public bool TestRegionForEntities(Vector2 position, float searchRadius = 0)
+        {
+            var radiusSq = searchRadius * searchRadius;
+
+            var rect = new Rectangle(
+                (int)(position.X - searchRadius),
+                (int)(position.Y - searchRadius),
+                (int)(searchRadius * 2),
+                (int)(searchRadius * 2)
+            );
+            var sectors = GetOverlappingSectors(rect);
+
+            foreach (var ent in EnumerateEntitiesInSectors(sectors))
+            {
+                var dist = Vector2.DistanceSquared(ent.Position, position);
+                if ((searchRadius == 0 || dist <= radiusSq) && dist <= ent.RadiusSq + radiusSq)
+                    return true;
+            }
+
+            return false;
+        }
 
         public enum CleanupOptions
         {

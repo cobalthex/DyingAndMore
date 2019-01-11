@@ -9,10 +9,19 @@ namespace Takai
 
         public static T Random<T>(this System.Collections.Generic.IList<T> list) //distribution?
         {
-            if (list.Count < 1)
+            if (list == null || list.Count < 1)
                 return default(T);
 
             return list[Util.RandomGenerator.Next(list.Count)];
+        }
+
+        public static Vector2 RandomCircle(Vector2 position, float radius)
+        {
+            //todo: replace all other locations with this (particles?)
+            return position + new Vector2(
+                (float)Math.Cos(RandomGenerator.NextDouble() * MathHelper.TwoPi),
+                (float)Math.Sin(RandomGenerator.NextDouble() * MathHelper.TwoPi)
+            ) * radius;
         }
 
         /// <summary>

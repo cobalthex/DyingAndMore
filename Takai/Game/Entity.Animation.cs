@@ -64,6 +64,8 @@ namespace Takai.Game
         }
     }
 
+    //todo: redesign to work with serialization (e.g. CompletionCallback)
+
     public struct AnimationInstance : Data.IInstance<AnimationClass>, IDisposable
     {
         public AnimationClass Class
@@ -142,6 +144,11 @@ namespace Takai.Game
         }
 
         public string Material => baseAnimation.Class?.Material;
+
+        public bool IsPlayingAnyAnimations()
+        {
+            return baseAnimation.Class != null && overlayAnimations.Count > 0;
+        }
 
         public bool IsPlayingAnimation(string animationName)
         {
@@ -296,6 +303,8 @@ namespace Takai.Game
                 if (baseAnimation.Class.Effect != null && Map != null)
                     Map.Spawn(baseAnimation.Class.Effect.Instantiate(this));
             }
+            else // if (overlayAnimations.Count == 0)
+                PlayAnimation(Class.DefaultBaseAnimation); //make sure there is always an animation playing
 
             for (int i = 0; i < overlayAnimations.Count; ++i)
             {

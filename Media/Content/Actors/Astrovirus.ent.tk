@@ -10,14 +10,14 @@ ActorClass {
     IgnoreTrace: false;
     AlwaysDrawUpright: true;
 
-    DefaultController: AIController {
+    DefaultController: [AIController {
         Behaviors: [
             FlowSeekBehavior { };
 
             TargetEnemyBehavior { };
             FocusBehavior { };
         ];
-    };
+    }];
 
 	Animations: {
         Idle: {

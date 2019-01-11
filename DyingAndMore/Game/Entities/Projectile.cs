@@ -211,14 +211,14 @@ namespace DyingAndMore.Game.Entities
             return best;
         }
 
-        public override void OnSpawn()
+        public override void OnSpawn(MapBaseInstance map)
         {
             origin = Position;
             if (Class.InheritSourcePhysics && Source != null) //todo: this should be part of entity spawning?
             {
                 Velocity += Source.Velocity;
             }
-            base.OnSpawn();
+            base.OnSpawn(map);
         }
 
         public override void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime)

@@ -62,9 +62,10 @@ namespace DyingAndMore.Game.Entities
 
         //inherited
         public Range<float> MaxSpeed { get; set; }
-        public Weapons.WeaponClass DefaultWeapon { get; set; } = null;
         public Factions DefaultFactions { get; set; } = Factions.None;
-        public Controller DefaultController { get; set; } = null;
+
+        public Weapons.WeaponClass[] DefaultWeapon { get; set; } = null; //picks randomly
+        public Controller[] DefaultController { get; set; } = null; //picks randomly
 
         /// <summary>
         /// The hud to display when controlling this actor
@@ -195,11 +196,12 @@ namespace DyingAndMore.Game.Entities
 
             MaxSpeed = Class.MaxSpeed.Random();
             CurrentHealth = Class.MaxHealth;
-            Weapon = Class.DefaultWeapon?.Instantiate();
             Factions = Class.DefaultFactions;
 
+            if (Class.DefaultWeapon != null)
+                Weapon = Util.Random(Class.DefaultWeapon).Instantiate();
             if (Class.DefaultController != null)
-                Controller = Class.DefaultController.Clone();
+                Controller = Util.Random(Class.DefaultController).Clone();
         }
 
         public override EntityInstance Clone()

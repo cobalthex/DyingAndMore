@@ -65,7 +65,7 @@ namespace Takai.Game
             */
         }
 
-        public Dictionary<string, object> DerivedSerialize()
+        public virtual Dictionary<string, object> DerivedSerialize()
         {
             return new Dictionary<string, object>
             {
@@ -75,7 +75,7 @@ namespace Takai.Game
             };
         }
 
-        public void DerivedDeserialize(Dictionary<string, object> props)
+        public virtual void DerivedDeserialize(Dictionary<string, object> props)
         {
             var tiles = Data.Serializer.Cast<List<short>>(props["Tiles"]);
 
@@ -155,7 +155,7 @@ namespace Takai.Game
             Data.Serializer.TextSerialize(file, this);
         }
         
-        public Dictionary<string, object> DerivedSerialize()
+        public virtual Dictionary<string, object> DerivedSerialize()
         {
             var triggers = new HashSet<Trigger>();
 
@@ -171,12 +171,12 @@ namespace Takai.Game
             };
         }
 
-        public void DerivedDeserialize(Dictionary<string, object> props)
+        public virtual void DerivedDeserialize(Dictionary<string, object> props)
         {
             if (props.TryGetValue("Entities", out var ents))
             {
                 foreach (var ent in Data.Serializer.Cast<List<EntityInstance>>(ents))
-                    Spawn(ent);
+                    Spawn(ent, false);
             }
 
             //fluids should be serialized? (maybe only some fluids are serialized)

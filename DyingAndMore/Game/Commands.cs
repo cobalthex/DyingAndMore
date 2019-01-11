@@ -15,15 +15,16 @@ namespace DyingAndMore.Game
         }
     }
 
-    class SpawnEncounterCommand : Takai.Game.GameCommand
+    class SpawnSquadCommand : Takai.Game.GameCommand
     {
-        public string EncounterName;
+        public string SquadName { get; set; } = null;
 
         public override void Invoke(MapBaseInstance map)
         {
-            var mclass = (MapClass)map.Class;
-            if (mclass.Encounters.TryGetValue(EncounterName, out var encounter))
-                ((MapInstance)map).Spawn(encounter);
+            var minst = (MapInstance)map;
+            var squad = minst.Squads[SquadName];
+            if (squad != null)
+                minst.Spawn(squad);
         }
     }
 }

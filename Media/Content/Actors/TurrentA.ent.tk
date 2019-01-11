@@ -2,13 +2,13 @@ ActorClass {
 	Name: "Fake laser weapon";
 	MaxHealth: 5000;
 
-    DefaultController: AIController {
+    DefaultController: [AIController {
         Behaviors: [
             DebugShootBehavior {};
         ];
-    }
+    }];
 
-    DefaultWeapon: GunClass {
+    DefaultWeapon: [GunClass {
         MaxAmmo: 0;
         Projectile: {
             Trail: @"Effects/Trails/laser.trail.tk";
@@ -17,7 +17,7 @@ ActorClass {
             Drag: 0;
         };
         DischargeTime: 100msec;
-    };
+    }];
 
     Animations: {
     	Idle: {

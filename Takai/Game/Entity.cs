@@ -4,6 +4,12 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
+    public interface ISpawnable
+    {
+        void OnSpawn(MapBaseInstance map);
+        void OnDestroy(MapBaseInstance map);
+    }
+
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
     [System.Runtime.InteropServices.ComVisible(true)]
     public class EntityAsReferenceAttribute : Attribute { }
@@ -121,7 +127,11 @@ namespace Takai.Game
     /// <summary>
     /// A single instance of an entity in a map.
     /// </summary>
-    public partial class EntityInstance : Data.IInstance<EntityClass>, Data.Serializer.IReferenceable, ICollisionResolver
+    public partial class EntityInstance 
+        : Data.IInstance<EntityClass>
+        , Data.Serializer.IReferenceable
+        , ICollisionResolver
+        , ISpawnable
     {
         /// <summary>
         /// A unique ID for each entity in the map
@@ -405,11 +415,12 @@ namespace Takai.Game
         public virtual void OnFluidCollision(FluidClass fluid, TimeSpan deltaTime) { }
 
         /// <summary>
-        /// Called when this instance is spawned. Also called on deserialization
+        /// Called when this instance is spawned
         /// </summary>
-        public virtual void OnSpawn()
+        public virtual void OnSpawn(MapBaseInstance map)
         {
-            PlayAnimation(Class.DefaultBaseAnimation);
+            if (baseAnimation.Class == null)
+                PlayAnimation(Class.DefaultBaseAnimation);
 
             var fx = Class.SpawnEffect?.Instantiate(this);
             if (fx.HasValue)
@@ -421,7 +432,7 @@ namespace Takai.Game
         /// <summary>
         /// Called when this instance is marked for deletion
         /// </summary>
-        public virtual void OnDestroy()
+        public virtual void OnDestroy(MapBaseInstance map)
         {
             if (Trail != null && Velocity != Vector2.Zero)
                 Trail.AddPoint(Position, Vector2.Normalize(Velocity));
