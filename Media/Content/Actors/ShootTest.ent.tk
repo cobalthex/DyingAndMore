@@ -11,15 +11,15 @@ ActorClass {
 
     DefaultFactions: Factions [Enemy];
 
-    DefaultController: AIController {
+    DefaultController: [AIController {
         Behaviors: [
             TargetEnemyBehavior {};
             FlowSeekBehavior {};
             ShootBehavior {};
         ];
-    };
+    }];
 
-    DefaultWeapon: @"Weapons/Plasma.wpn.tk";
+    DefaultWeapon: [@"Weapons/Plasma.wpn.tk"];
 
     Animations: {
         Idle: {

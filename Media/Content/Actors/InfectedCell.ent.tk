@@ -11,7 +11,7 @@ ActorClass {
     AlwaysDrawUpright: true;
     DestroyOnDeath: true;
 
-    DefaultController: AIController {
+    DefaultController: [AIController {
         Behaviors: [
             FlowSeekBehavior { };
 
@@ -22,7 +22,7 @@ ActorClass {
                 Effect: @"Effects/Damage.fx.tk";
             };
         ];
-    };
+    }];
 
     DestructionEffect: @"Effects/Splatter.fx.tk";
 

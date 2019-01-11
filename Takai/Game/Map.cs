@@ -237,6 +237,11 @@ namespace Takai.Game
         /// <param name="instance">The instance to add</param>
         public void Spawn(EntityInstance instance)
         {
+            Spawn(instance, true);
+        }
+
+        protected void Spawn(EntityInstance instance, bool callSpawnEvents)
+        {
             if (instance.Map != this && instance.Map != null)
                 instance.Map.Destroy(instance);
 
@@ -249,7 +254,9 @@ namespace Takai.Game
             else
                 instance.Id = (++nextEntityID);
             instance.SpawnTime = ElapsedTime;
-            instance.OnSpawn();
+
+            if (callSpawnEvents)
+                instance.OnSpawn(this);
 
             _allEntities.Add(instance);
 
@@ -277,7 +284,7 @@ namespace Takai.Game
                 foreach (var trigger in sector.triggers)
                     trigger.TryExit(instance);
 
-            instance.OnDestroy();
+            instance.OnDestroy(this);
             instance.SpawnTime = TimeSpan.Zero;
             //instance.Id = 0;
             instance.Map = null;

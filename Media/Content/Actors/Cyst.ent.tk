@@ -2,10 +2,10 @@ ActorClass {
     Name: "Cyst";
     MaxHealth: 1000;
     DefaultFactions: Factions.Enemy;
-    DefaultController: ArtilleryController {
+    DefaultController: [ArtilleryController {
         CanRotate: false;
         MaxRange: 400;
-    };
+    }];
     FieldOfView: 60deg;
 
     DefaultBaseAnimation: "Idle";
@@ -65,13 +65,13 @@ ActorClass {
     AlwaysDrawUpright: False;
     DestroyOnDeath: False;
 
-    DefaultWeapon: SpawnerClass {
+    DefaultWeapon: [SpawnerClass {
         AnimationClass: "Spawner";
         ChargeTime: 500msec;
 		DischargeTime: 2sec;
 		UnderchargeAction: UnderchargeAction.Discharge;
         Spawns: [
-            [@"Actors/InfectedCell.ent.tk" [3 5]]
+            #[@"Actors/InfectedCell.ent.tk" [3 5]]
         ]
-    }
+    }];
 }

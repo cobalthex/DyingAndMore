@@ -10,7 +10,7 @@ namespace DyingAndMore.Game.Weapons
         /// Spawns are generated from this template. All classes will be spawned with a random number between its range
         /// Spawn order is randomized
         /// </summary>
-        public List<ActorSpawn> Spawns { get; set; }
+        public List<Entities.ActorClass> Spawns { get; set; }
 
         /// <summary>
         /// Generate a list of entities based on the templates provided in <see cref="Spawns"/>. Does not create clones
@@ -20,15 +20,17 @@ namespace DyingAndMore.Game.Weapons
         {
             var spawns = new List<Entities.ActorClass>();
 
-            if (Spawns == null)
-                return spawns;
+            //todo: broken
 
-            foreach (var spawn in Spawns)
-            {
-                int count = Takai.RangeHelpers.Random(spawn.count);
-                for (int i = 0; i < count; ++i)
-                    spawns.Add(spawn.actor);
-            }
+            //if (Spawns == null)
+            //    return spawns;
+
+            //foreach (var spawn in Spawns)
+            //{
+            //    int count = Takai.RangeHelpers.Random(spawn.count);
+            //    for (int i = 0; i < count; ++i)
+            //        spawns.Add(spawn.actor);
+            //}
 
             //randomize spawns
             int n = spawns.Count;

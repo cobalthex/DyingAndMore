@@ -10,7 +10,7 @@ ActorClass {
         };
     };
 
-    DefaultController: AIController {
+    DefaultController: [AIController {
         Behaviors: [
             TargetEnemyBehavior {
             };
@@ -19,7 +19,7 @@ ActorClass {
                 Radius: 400;
             };
         ];
-    };
+    }];
 
     FieldOfView: 0.667pi;
     IsPhysical: True;

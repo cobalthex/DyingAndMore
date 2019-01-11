@@ -125,7 +125,10 @@ namespace Takai.Data
             {
                 var method = ty.GetMethod(custSerial.methodName, CustomSerializeAttribute.Flags);
                 var serialized = method?.Invoke(serializing, null);
-                TextSerialize(writer, serialized, indentLevel, serializeExternals);
+                if (serialized == LinearStruct)
+                    SerializeLinear(writer, serializing, serializeExternals, serializeNonPublics);
+                else
+                    TextSerialize(writer, serialized, indentLevel, serializeExternals);
             }
 
             //todo: maybe remove and just add a bunch of custom serializers

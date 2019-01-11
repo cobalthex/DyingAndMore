@@ -26,71 +26,24 @@ MapInstance {
     };
     currentScreenFadeElapsedTime: 39973.0026;
     Entities: [
-        WeaponPickupInstance {
-            Weapon: GunInstance {
-                CurrentAmmo: 5000;
-                Class: @"Weapons/bfg.wpn.tk";
-                StateTime: 0;
-                State: WeaponState.Idle;
-                Charge: 0;
-            };
-            NextRespawnTime: 0;
-            Id: 1;
-            Class: @"Pickups/Bfg.ent.tk";
-            Name: Null;
-            Position: [775.6545 427.4449];
-            Forward: [1 0];
-            Velocity: [0 0];
-            OutlineColor: [0 0 0 0];
-            TintColor: [255 255 255 255];
-            TintColorDuration: 0;
-            Trail: Null;
-            SpawnTime: 9112.6728;
-            EventHandlers: Null;
-        }
-        WeaponPickupInstance {
-            Weapon: GunInstance {
-                CurrentAmmo: 5000;
-                Class: @"Weapons/bfg.wpn.tk";
-                StateTime: 0;
-                State: WeaponState.Idle;
-                Charge: 0;
-            };
-            Class: @"Pickups/Bfg.ent.tk";
-            Id: 2;
-            Name: Null;
-            NextRespawnTime: 0;
-            Position: [770.6464 873.1686];
-            Forward: [1 0];
-            Velocity: [0 0];
-            OutlineColor: [0 0 0 0];
-            TintColor: [255 255 255 255];
-            TintColorDuration: 0;
-            Trail: Null;
-            SpawnTime: 15081.0262;
-            EventHandlers: Null;
-        }
-        ActorInstance {
-            Factions: Factions [Player Ally];
-            Controller: Null;
-            CurrentHealth: 5000;
-            Conditions: {
-            };
-            MaxSpeed: 300;
-            Weapon: Null;
-            Id: 3;
-            Class: @"Actors/Player.ent.tk";
-            Name: Null;
-            Position: [377.508 637.7864];
-            Forward: [1 0];
-            Velocity: [0 0];
-            OutlineColor: [0 0 0 0];
-            TintColor: [255 255 255 255];
-            TintColorDuration: 0;
-            Trail: Null;
-            SpawnTime: 21477.6051;
-            EventHandlers: Null;
-        }
     ];
     Triggers: [];
+    Squads: {
+        test: {
+            Name: "test";
+            LeaderTemplate: [@"Actors/Rhinovirus.ent.tk"];
+            UnitsTemplate: [@"Actors/InfectedCell.ent.tk" @"Actors/Astrovirus.ent.tk"];
+
+            SpawnPosition: [2000 800];
+            SpawnRadius: 150;
+
+            InitialLiveCount: 2;
+            MinLiveCount: 0;
+            MaxLiveCount: 4;
+            MaxSpawnCount: 18;
+
+            SpawnDelay: 4sec;
+            ResetDelay: 30sec;
+        }
+    }
 }

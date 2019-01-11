@@ -36,6 +36,9 @@ namespace DyingAndMore.Editor
 
             AddChild(entInfo = Takai.Data.Cache.Load<Static>("UI/Editor/EntityInfo.ui.tk").Clone());
             entEditor = Takai.Data.Cache.Load<Static>("UI/Editor/EntityEditor.ui.tk").Clone();
+
+            On(PressEvent, OnPress);
+            On(ClickEvent, OnClick);
         }
 
         protected override void UpdatePreview(int selectedItem)
@@ -66,6 +69,17 @@ namespace DyingAndMore.Editor
                 SelectedEntity = null;
             }
             editor.Map.renderSettings.drawEntityForwardVectors = false;
+        }
+
+        protected UIEventResult OnPress(Static sender, UIEventArgs e)
+        {
+            return UIEventResult.Continue;
+        }
+
+        protected UIEventResult OnClick(Static sender, UIEventArgs e)
+        {
+            //todo: put spawning in here
+            return UIEventResult.Continue;
         }
 
         protected override bool HandleInput(GameTime time)

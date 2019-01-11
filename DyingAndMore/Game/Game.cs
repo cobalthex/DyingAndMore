@@ -262,9 +262,11 @@ namespace DyingAndMore.Game
                 if (possiblePlayers[i].Weapon?.Hud != null)
                     hudContainer.AddChild(possiblePlayers[i].Hud);
             }
-
-            players[0].inputs = Cache.Load<InputMap<Entities.InputAction>>("Player1.input.tk", "Config");
-            ((Entities.InputController)players[0].actor.Controller).Inputs = players[0].inputs;
+            if (players.Count > 0)
+            {
+                players[0].inputs = Cache.Load<InputMap<Entities.InputAction>>("Player1.input.tk", "Config");
+                ((Entities.InputController)players[0].actor.Controller).Inputs = players[0].inputs;
+            }
         }
 
         /// <summary>

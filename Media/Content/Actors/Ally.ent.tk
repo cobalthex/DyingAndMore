@@ -3,16 +3,16 @@ ActorClass {
     MaxHealth: 50;
     DefaultFactions: Factions [Ally];
 
-    DefaultController: AIController {
+    DefaultController: [AIController {
         Behaviors: [
             ShootBehavior {}
             TargetEnemyBehavior {};
             FlowSeekBehavior {};
             ShootBehavior {};
         ];
-    };
+    }];
 
-    DefaultWeapon: @"Weapons/Flamethrower.wpn.tk";
+    DefaultWeapon: [@"Weapons/Flamethrower.wpn.tk"];
 
     Animations: {
         Idle: {
