@@ -10,10 +10,6 @@ namespace Takai.Game
         void OnDestroy(MapBaseInstance map);
     }
 
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
-    [System.Runtime.InteropServices.ComVisible(true)]
-    public class EntityAsReferenceAttribute : Attribute { }
-
     /// <summary>
     /// Describes a single type of entity. Actors, etc. inherit from this
     /// </summary>
@@ -127,9 +123,9 @@ namespace Takai.Game
     /// <summary>
     /// A single instance of an entity in a map.
     /// </summary>
-    public partial class EntityInstance 
+    public partial class EntityInstance
         : Data.IInstance<EntityClass>
-        , Data.Serializer.IReferenceable
+        , Data.IReferenceable
         , ICollisionResolver
         , ISpawnable
     {
@@ -446,7 +442,7 @@ namespace Takai.Game
             else
                 DisableNextDestructionEffect = false;
         }
-
+        
         public float ForwardSpeed()
         {
             return Vector2.Dot(Forward, Velocity);

@@ -50,7 +50,7 @@ namespace DyingAndMore.Editor.Selectors
 
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
         {
-            var ce = (ClickEventArgs)e;
+            var ce = (PointerEventArgs)e;
 
             var row = (int)((ce.position.Y - (ItemMargin.Y / 2)) / (ItemSize.Y + ItemMargin.Y)) * ItemsPerRow;
             var col = (int)((ce.position.X - (ItemMargin.X / 2)) / (ItemSize.X + ItemMargin.X));

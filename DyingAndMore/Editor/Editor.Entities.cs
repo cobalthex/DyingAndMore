@@ -23,7 +23,7 @@ namespace DyingAndMore.Editor
         }
         Takai.Game.EntityInstance _selectedEntity;
 
-        Vector2 lastWorldPos, currentWorldPos;
+        Vector2 currentWorldPos;
 
         Static entInfo;
         Static entEditor;
@@ -37,8 +37,12 @@ namespace DyingAndMore.Editor
             AddChild(entInfo = Takai.Data.Cache.Load<Static>("UI/Editor/EntityInfo.ui.tk").Clone());
             entEditor = Takai.Data.Cache.Load<Static>("UI/Editor/EntityEditor.ui.tk").Clone();
 
+            ignoreEnterKey = true;
+            ignoreSpaceKey = true;
+
             On(PressEvent, OnPress);
             On(ClickEvent, OnClick);
+            On(DragEvent, OnDrag);
         }
 
         protected override void UpdatePreview(int selectedItem)
@@ -57,7 +61,6 @@ namespace DyingAndMore.Editor
 
         public override void Start()
         {
-            lastWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
             editor.Map.renderSettings.drawEntityForwardVectors = true;
         }
 
@@ -73,24 +76,11 @@ namespace DyingAndMore.Editor
 
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
         {
-            return UIEventResult.Continue;
-        }
+            var pea = (PointerEventArgs)e;
+            
+            var inputSearchRadius = pea.device == DeviceType.Touch ? 30 : 20;
 
-        protected UIEventResult OnClick(Static sender, UIEventArgs e)
-        {
-            //todo: put spawning in here
-            return UIEventResult.Continue;
-        }
-
-        protected override bool HandleInput(GameTime time)
-        {
-            lastWorldPos = currentWorldPos;
-            currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
-
-            if (SelectedEntity != null)
-                SelectedEntity.OutlineColor = Color.Transparent;
-
-            if (InputState.IsPress(MouseButtons.Left))
+            if (pea.button == 0)
             {
 #if WINDOWS
                 //load entity from file
@@ -107,12 +97,12 @@ namespace DyingAndMore.Editor
                             SelectedEntity = editor.Map.Spawn(ent, currentWorldPos, Vector2.UnitX, Vector2.Zero);
                     }
 
-                    return false;
+                    return UIEventResult.Handled;
                 }
 #endif
 
-                var searchRadius = 30; //increase if touch
-                var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, searchRadius);
+
+                var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, inputSearchRadius);
                 if (selected.Count < 1)
                 {
                     if (editor.Map.Class.Bounds.Contains(currentWorldPos) && selector.ents.Count > 0)
@@ -131,17 +121,22 @@ namespace DyingAndMore.Editor
                         editor.Map.Spawn(SelectedEntity);
                     }
                 }
-
-                return false;
             }
-            else if (InputState.IsPress(MouseButtons.Right))
+
+            else if (pea.button == (int)MouseButtons.Right) //mouse only?
             {
-                var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, 1);
+                var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, inputSearchRadius);
                 SelectedEntity = selected.Count > 0 ? selected[0] : null;
-
-                return false;
             }
-            else if (InputState.IsClick(MouseButtons.Right)/* || isDoubleTapping*/)
+
+            return UIEventResult.Continue;
+        }
+
+        protected UIEventResult OnClick(Static sender, UIEventArgs e)
+        {
+            var pea = (PointerEventArgs)e;
+
+            if (pea.button == (int)MouseButtons.Right) //mouse only? 
             {
                 var searchRadius = /*isTapping*/ false ? 10 : 1;
                 var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, searchRadius);
@@ -149,38 +144,49 @@ namespace DyingAndMore.Editor
                 {
                     editor.Map.Destroy(SelectedEntity);
                     SelectedEntity = null;
-
-                    return false;
                 }
             }
 
-            else if (SelectedEntity != null)
+            return UIEventResult.Continue;
+        }
+
+        protected UIEventResult OnDrag(Static sender, UIEventArgs e)
+        {
+            var pea = (DragEventArgs)e;
+
+            if (pea.button == 0 && SelectedEntity != null)
             {
-                SelectedEntity.OutlineColor = Color.YellowGreen;
+                var delta = editor.Camera.NormalToWorld(pea.delta);
+                MoveEnt(SelectedEntity, SelectedEntity.Position + delta, SelectedEntity.Position);
+                return UIEventResult.Handled;
+            }
 
-                if (InputState.IsButtonDown(MouseButtons.Left))
-                {
-                    var delta = currentWorldPos - lastWorldPos;
-                    MoveEnt(SelectedEntity, _selectedEntity.Position + delta);
+            return UIEventResult.Continue;
+        }
 
-                    return false;
-                }
+        protected override bool HandleInput(GameTime time)
+        {
+            currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 
+            if (SelectedEntity != null)
+            {
                 if (InputState.IsButtonDown(Keys.R))
                 {
                     //todo: sector modification?
                     var diff = currentWorldPos - SelectedEntity.Position;
+                    Vector2 newForward;
                     if (InputState.IsMod(KeyMod.Shift))
                     {
                         var theta = (float)System.Math.Atan2(diff.Y, diff.X);
                         theta = (float)System.Math.Round(theta / editor.config.snapAngle) * editor.config.snapAngle;
-                        SelectedEntity.Forward = new Vector2(
+                        newForward = new Vector2(
                             (float)System.Math.Cos(theta),
                             (float)System.Math.Sin(theta)
                         );
                     }
                     else
-                        SelectedEntity.Forward = Vector2.Normalize(diff);
+                        newForward = diff;
+                    MoveEnt(SelectedEntity, SelectedEntity.Position, newForward);
                     return false;
                 }
 
@@ -204,18 +210,20 @@ namespace DyingAndMore.Editor
             return base.HandleInput(time);
         }
 
-        void MoveEnt(Takai.Game.EntityInstance ent, Vector2 newPosition)
+        void MoveEnt(Takai.Game.EntityInstance ent, Vector2 newPosition, Vector2 newForward)
         {
             var sectors = editor.Map.GetOverlappingSectors(ent.AxisAlignedBounds);
 
-            //todo: standarize somewhere?
+            //todo: move to Map
 
             for (int y = sectors.Top; y < sectors.Bottom; ++y)
             {
                 for (int x = sectors.Left; x < sectors.Right; ++x)
                     editor.Map.Sectors[y, x].entities.Remove(ent);
             }
+
             ent.Position = newPosition;
+            ent.Forward = Vector2.Normalize(newForward);
 
             sectors = editor.Map.GetOverlappingSectors(ent.AxisAlignedBounds);
             for (int y = sectors.Top; y < sectors.Bottom; ++y)

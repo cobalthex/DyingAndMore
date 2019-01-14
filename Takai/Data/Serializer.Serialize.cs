@@ -241,7 +241,7 @@ namespace Takai.Data
             if (value == null)
                 writer.Write("Null");
             else if (member.IsDefined(typeof(AsReferenceAttribute)) && value is IReferenceable ir)
-                writer.Write($"*{(Serializer.WriteFullTypeNames ? valueType.FullName : valueType.Name)}.{ir.Id}"); //todo: serialize externals?
+                writer.Write($"*{(Serializer.WriteFullTypeNames ? valueType.FullName : valueType.Name)}.{ir.Name}"); //todo: serialize externals?
             else
             {
                 //custom-defined serializer

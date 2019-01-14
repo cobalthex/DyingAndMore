@@ -41,14 +41,14 @@ MapInstance {
     };
     Trails: [];
     Sounds: [];
-    ElapsedTime: 83261.6573;
+    ElapsedTime: 121516.6685;
     TimeScale: 1;
     currentScreenFade: ScreenFade {
         Duration: 0;
         Colors: Null;
         Blend: Null;
     };
-    currentScreenFadeElapsedTime: 83261.6573;
+    currentScreenFadeElapsedTime: 121516.6685;
     Entities: [
         ActorInstance {
             Class: @"Actors/Player.ent.tk";
@@ -69,7 +69,7 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 81212;
+            SpawnTime: 83262;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
@@ -93,7 +93,7 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 81212;
+            SpawnTime: 83262;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
@@ -106,9 +106,9 @@ MapInstance {
                 Charge: 0;
             };
             Class: @"Pickups/GrenadeLauncher.ent.tk";
+            Class: @"Pickups/GrenadeLauncher.ent.tk";
             NextRespawnTime: 0;
             Id: 3;
-            Class: @"Pickups/GrenadeLauncher.ent.tk";
             Name: Null;
             Position: [356.291 220.8001];
             Forward: [1 0];
@@ -117,7 +117,51 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 81212;
+            SpawnTime: 83262;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            Class: @"Actors/Cyst.ent.tk";
+            CurrentHealth: 1000;
+            Factions: Factions [Enemy];
+            Controller: ArtilleryController {
+                MaxRange: 400;
+                CanRotate: False;
+                ShowSweepLines: True;
+                trackedActor: Null;
+            };
+            Conditions: {
+            };
+            MaxSpeed: 0;
+            Weapon: SpawnerInstance {
+                Class: SpawnerClass {
+                    Name: Null;
+                    AnimationClass: "Spawner";
+                    UnderchargeAction: UnderchargeAction.Discharge;
+                    OverchargeAction: OverchargeAction.Discharge;
+                    DischargeEffect: Null;
+                    ChargeTime: 500;
+                    DischargeTime: 2000;
+                    CooldownTime: 0;
+                    CanAlwaysCharge: False;
+                    SpawnOffset: 2;
+                    Hud: Null;
+                };
+                Squad: *Squad.test;
+                StateTime: 0;
+                State: WeaponState.Idle;
+                Charge: 0;
+            };
+            Id: 4;
+            Name: Null;
+            Position: [1346.714 20.77004];
+            Forward: [-4.371139E-08 1];
+            Velocity: [0 0];
+            OutlineColor: [154 205 50 255];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 94830.5008;
             EventHandlers: Null;
         }
     ];

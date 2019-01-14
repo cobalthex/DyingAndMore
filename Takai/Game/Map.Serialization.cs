@@ -158,16 +158,19 @@ namespace Takai.Game
         public virtual Dictionary<string, object> DerivedSerialize()
         {
             var triggers = new HashSet<Trigger>();
+            var fluids = new List<FluidInstance>(LiveFluids); //todo: optimize
 
             foreach (var sector in Sectors)
             {
                 triggers.UnionWith(sector.triggers);
+                fluids.AddRange(sector.fluids);
             }
 
             return new Dictionary<string, object>
             {
                 ["Entities"] = AllEntities,
-                ["Triggers"] = triggers
+                ["Triggers"] = triggers,
+                ["Fluids"] = fluids
             };
         }
 
@@ -178,10 +181,6 @@ namespace Takai.Game
                 foreach (var ent in Data.Serializer.Cast<List<EntityInstance>>(ents))
                     Spawn(ent, false);
             }
-
-            //fluids should be serialized? (maybe only some fluids are serialized)
-            //decals load from initial state
-            //triggers load from class
 
             if (props.TryGetValue("Fluids", out var fluids)) //todo: load from class?
             {
@@ -196,6 +195,8 @@ namespace Takai.Game
             }
 
             Resize(Class.Width, Class.Height); //builds spacial info, etc
+
+            Class?.InitializeGraphics(); //todo: this is a hack fix7
         }
     }
 }

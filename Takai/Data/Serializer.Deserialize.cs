@@ -280,7 +280,7 @@ namespace Takai.Data
                 }
 
                 if (loaded is IReferenceable ir)
-                    context.resolverCache[loaded.GetType().Name + "." + ir.Id] = loaded; //todo: better id naming and only allow one?
+                    context.resolverCache[loaded.GetType().Name + "." + ir.Name] = loaded; //todo: better id naming and only allow one?
                 return loaded;
             }
 
@@ -515,7 +515,7 @@ namespace Takai.Data
 
                     if (dest is IReferenceable ir)
                     {
-                        string id = dest.GetType().Name + "." + ir.Id;
+                        string id = dest.GetType().Name + "." + ir.Name;
                         context.resolverCache[id] = dest; //todo: better id naming and only allow one?
                     }
 
@@ -1063,12 +1063,12 @@ namespace Takai.Data
 
             foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (prop.CanWrite && prop.CanRead)
+                if (prop.CanWrite && prop.CanRead && !prop.IsDefined(typeof(IgnoredAttribute)))
                     prop.SetValue(target, prop.GetValue(source));
             }
             foreach (var val in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (!val.IsInitOnly)
+                if (!val.IsInitOnly && !val.IsDefined(typeof(IgnoredAttribute)))
                     val.SetValue(target, val.GetValue(source));
             }
         }

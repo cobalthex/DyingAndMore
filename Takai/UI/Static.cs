@@ -36,7 +36,7 @@ namespace Takai.UI
         }
     }
 
-    public class ClickEventArgs : UIEventArgs
+    public class PointerEventArgs : UIEventArgs
     {
         /// <summary>
         /// The relative position of the click inside the element
@@ -44,10 +44,19 @@ namespace Takai.UI
         /// </summary>
         public Vector2 position;
 
-        public int inputIndex;
-        //input device
+        public int button; //maps to relevent enum for device
+        public Input.DeviceType device;
+        public int deviceIndex; //e.g. player index
 
-        public ClickEventArgs(Static source)
+        public PointerEventArgs(Static source)
+            : base(source) { }
+    }
+
+    public class DragEventArgs : PointerEventArgs
+    {
+        public Vector2 delta;
+
+        public DragEventArgs(Static source)
             : base(source) { }
     }
 
@@ -150,6 +159,7 @@ namespace Takai.UI
         //some standard/common events
         public const string PressEvent = "Press";
         public const string ClickEvent = "Click";
+        public const string DragEvent = "Drag";
         public const string ParentChangedEvent = "ParentChanged";
         public const string TextChangedEvent = "TextChanged";
         public const string ValueChangedEvent = "ValueChanged";
@@ -1452,11 +1462,19 @@ namespace Takai.UI
                         return false;
                 }
 
-                if ((!ignoreEnterKey && Input.InputState.IsPress(Keys.Enter)) ||
-                    (!ignoreSpaceKey && Input.InputState.IsPress(Keys.Space)) ||
-                    Input.InputState.IsAnyPress(Buttons.A)) //optionally restrict input to player
+                if (!ignoreEnterKey && Input.InputState.IsPress(Keys.Enter))
                 {
-                    TriggerClick(Vector2.Zero);
+                    TriggerClick(Vector2.Zero, (int)Keys.Enter, Input.DeviceType.Keyboard);
+                    return false;
+                }
+                if (!ignoreSpaceKey && Input.InputState.IsPress(Keys.Space))
+                {
+                    TriggerClick(Vector2.Zero, (int)Keys.Space, Input.DeviceType.Keyboard);
+                    return false;
+                }
+                if (Input.InputState.IsAnyPress(Buttons.A, out var player))
+                {
+                    TriggerClick(Vector2.Zero, (int)Keys.Enter, Input.DeviceType.Gamepad, (int)player);
                     return false;
                 }
             }
@@ -1464,7 +1482,7 @@ namespace Takai.UI
             //todo: improve
             if (Input.InputState.IsPress(0) && VisibleBounds.Contains(Input.InputState.touches[0].Position))
             {
-                TriggerClick(Vector2.Zero);
+                TriggerClick(Vector2.Zero, 0, Input.DeviceType.Touch);
 
                 if (CanFocus)
                 {
@@ -1483,8 +1501,13 @@ namespace Takai.UI
         {
             if (Input.InputState.IsPress(button) && VisibleBounds.Contains(mousePosition))
             {
-                var ce = new ClickEventArgs(this) { position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding, inputIndex = 0 };
-                RouteEvent(PressEvent, ce);
+                var pea = new PointerEventArgs(this)
+                {
+                    position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
+                    button = (int)button,
+                    device = Input.DeviceType.Mouse
+                };
+                RouteEvent(PressEvent, pea);
 
                 if (CanFocus)
                 {
@@ -1497,14 +1520,33 @@ namespace Takai.UI
             //input capture
             //todo: maybe add setting
             else if (DidPressInside(button))
+            {
+                var lastMousePosition = Input.InputState.LastMouseVector;
+                var newMousePosition = Input.InputState.MouseVector;
+                if (lastMousePosition != newMousePosition)
+                {
+                    var pea = new DragEventArgs(this)
+                    {
+                        delta = newMousePosition - lastMousePosition,
+                        position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
+                        button = (int)button,
+                        device = Input.DeviceType.Mouse
+                    };
+                    RouteEvent(DragEvent, pea);
+                }
                 return false;
+            }
 
             else if (Input.InputState.IsButtonUp(button))
             //else if (Input.InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
                 if (didPress && VisibleBounds.Contains(mousePosition)) //gesture pos
                 {
-                    TriggerClick((mousePosition - OffsetContentArea.Location).ToVector2() + Padding);
+                    TriggerClick(
+                        (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
+                        (int)button,
+                        Input.DeviceType.Mouse
+                    );
                     didPress = false;
                     return false;
                 }
@@ -1703,9 +1745,15 @@ namespace Takai.UI
 
         //todo: better name
 
-        public void TriggerClick(Vector2 relativePosition)
+        public void TriggerClick(Vector2 relativePosition, int button = 0, Input.DeviceType device = Input.DeviceType.Mouse, int deviceIndex = 0)
         {
-            var ce = new ClickEventArgs(this) { position = relativePosition, inputIndex = 0 };
+            var ce = new PointerEventArgs(this)
+            {
+                position = relativePosition,
+                button = 0,
+                device = device,
+                deviceIndex = deviceIndex
+            };
             RouteEvent(ClickEvent, ce);
             Commander.Invoke(OnClickCommand, this);
         }

@@ -67,6 +67,7 @@
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
+    <Compile Include="Editor\Editor.Squads.cs" />
     <Compile Include="Editor\Editor.Test.cs" />
     <Compile Include="Editor\Editor.Triggers.cs" />
     <Compile Include="Editor\Editor.Paths.cs" />
