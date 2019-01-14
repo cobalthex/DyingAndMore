@@ -177,7 +177,7 @@ namespace Takai.UI
         {
             //todo: compare against absolute bounds not dimensions
 
-            var pe = (ClickEventArgs)e;
+            var pe = (PointerEventArgs)e;
             var sbar = (ScrollBar)sender;
 
             var thumb = sbar.GetThumbBounds();

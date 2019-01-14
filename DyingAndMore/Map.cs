@@ -15,6 +15,7 @@ namespace DyingAndMore
 
     public class MapInstance : MapBaseInstance
     {
+        [Takai.Data.Serializer.AsReference]
         public Dictionary<string, Game.Squad> Squads { get; set; }
 
         public MapInstance() : this(null) { }
@@ -37,6 +38,8 @@ namespace DyingAndMore
 
             squad.OnSpawn(this);
         }
+
+        //todo: squads should be clustered?
         
         protected override void UpdateEntities(TimeSpan deltaTime)
         {

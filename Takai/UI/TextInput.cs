@@ -122,7 +122,7 @@ namespace Takai.UI
 
         protected UIEventResult OnInputBoxPressed(Static sender, UIEventArgs e)
         {
-            var ce = (ClickEventArgs)e;
+            var ce = (PointerEventArgs)e;
 
             if (Text == null)
             {

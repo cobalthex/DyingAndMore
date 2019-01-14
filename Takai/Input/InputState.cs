@@ -7,8 +7,8 @@ namespace Takai.Input
     public enum MouseButtons
     {
         Left,
-        Middle,
         Right,
+        Middle,
         X4,
         X5,
     }
@@ -363,11 +363,20 @@ namespace Takai.Input
 
         public static bool IsAnyPress(Buttons button)
         {
+            return IsAnyPress(button, out var player);
+        }
+
+        public static bool IsAnyPress(Buttons button, out PlayerIndex player)
+        {
             for (int i = 0; i < gamePadState.Length; ++i)
             {
                 if (IsPress(button, (PlayerIndex)i))
+                {
+                    player = (PlayerIndex)i;
                     return true;
+                }
             }
+            player = (PlayerIndex)(-1);
             return false;
         }
 

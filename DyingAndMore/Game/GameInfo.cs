@@ -35,22 +35,22 @@ namespace DyingAndMore.Game
         /// </summary>
         public string[] MapFiles { get; set; } //todo: lazy load map class
 
-        public MapBaseInstance LoadMapIndex(int index)
+        public MapInstance LoadMapIndex(int index)
         {
             if (index < 0 || index >= MapFiles.Length)
                 return null;
 
-            var mapClass = Cache.Load<MapBaseClass>(MapFiles[index]);
+            var mapClass = Cache.Load<MapClass>(MapFiles[index]);
             mapClass.InitializeGraphics();
-            return mapClass.Instantiate();
+            return (MapInstance)mapClass.Instantiate();
         }
     }
 
     public class MapChangedEventArgs : EventArgs
     {
-        public MapBaseInstance PreviousMap { get; set; }
+        public MapInstance PreviousMap { get; set; }
 
-        public MapChangedEventArgs(MapBaseInstance previousMap)
+        public MapChangedEventArgs(MapInstance previousMap)
         {
             PreviousMap = previousMap;
         }
@@ -65,7 +65,7 @@ namespace DyingAndMore.Game
         /// <summary>
         /// The current map
         /// </summary>
-        public MapBaseInstance Map
+        public MapInstance Map
         {
             get => _map;
             set
@@ -78,7 +78,7 @@ namespace DyingAndMore.Game
                 }
             }
         }
-        private MapBaseInstance _map;
+        private MapInstance _map;
 
         /// <summary>
         /// The current story this game is playing through. <see cref="Map"/> should be part of this story

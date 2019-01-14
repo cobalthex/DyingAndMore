@@ -163,20 +163,20 @@ namespace DyingAndMore
                 {
                     if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
                     {
-                        var packmap = Takai.Game.MapBaseInstance.FromPackage(fl.SelectedFile);
+                        var packmap = (MapInstance)Takai.Game.MapBaseInstance.FromPackage(fl.SelectedFile);
                         packmap.Class.InitializeGraphics();
                         ui.ReplaceAllChildren(new Editor.Editor(packmap));
                         return Takai.UI.UIEventResult.Handled;
                     }
 
                     var map = Cache.Load(fl.SelectedFile);
-                    if (map is Takai.Game.MapBaseClass mc)
+                    if (map is MapClass mc)
                     {
                         mc.InitializeGraphics();
-                        ui.ReplaceAllChildren(new Editor.Editor(mc.Instantiate()));
+                        ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
 
                     }
-                    else if (map is Takai.Game.MapBaseInstance mi)
+                    else if (map is MapInstance mi)
                     {
                         mi.Class.InitializeGraphics();
                         ui.ReplaceAllChildren(new Editor.Editor(mi));

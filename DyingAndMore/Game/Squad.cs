@@ -20,7 +20,7 @@ namespace DyingAndMore.Game
         public Microsoft.Xna.Framework.Vector2 SpawnPosition { get; set; }
         public float SpawnRadius { get; set; }
 
-        public Takai.Range<int> InitialLiveCount { get; set; } = 0; //0 for don't spawn automatically
+        public bool DontSpawnAutomatically { get; set; }
         public int MinLiveCount { get; set; } = 0;
         public int MaxLiveCount { get; set; } = 1;
         public int MaxSpawnCount { get; set; } = 0; //0 for infinite (spawns forever)
@@ -33,6 +33,8 @@ namespace DyingAndMore.Game
         public TimeSpan ResetDelay { get; set; }
 
         public bool DisableSpawningIfLeaderIsDead { get; set; }
+
+        //spawn only off screen?
 
         //live data below
 
@@ -56,12 +58,18 @@ namespace DyingAndMore.Game
 
         public virtual void OnSpawn(MapBaseInstance map)
         {
+            //todo: this should be be called once, e.g. not every trigger enter
+            //maybe control via MapInstance.Spawn() ?
+
+            if (Units.Count > 0)
+                return;
+
             if (LeaderTemplate != null)
                 Leader = SpawnUnit(map, LeaderTemplate);
             
             if (UnitsTemplate != null)
             {
-                for (int i = 0; i < Takai.RangeHelpers.Random(InitialLiveCount) - 1; ++i) //- 1 for leader
+                for (int i = 0; i < MinLiveCount - 1; ++i) //- 1 for leader
                     SpawnUnit(map, UnitsTemplate);
             }
 
@@ -96,20 +104,23 @@ namespace DyingAndMore.Game
 
         public void Update(MapBaseInstance map, TimeSpan deltaTime)
         {
-            //todo: reset delay
-            if (TotalSpawnCount == 0 && InitialLiveCount.max > 0)
-                OnSpawn(map);
-
-            else if (ResetDelay > TimeSpan.Zero &&
-                     TotalSpawnCount >= MaxSpawnCount &&
-                     Units.Count == 0 &&
-                     map.ElapsedTime >= LastSpawnTime + ResetDelay)
+            if (!DontSpawnAutomatically)
             {
-                Leader = null;
-                TotalSpawnCount = 0;
-                OnSpawn(map);
+                if (LastSpawnTime == TimeSpan.Zero)
+                    OnSpawn(map);
 
+                else if (ResetDelay > TimeSpan.Zero &&
+                         TotalSpawnCount >= MaxSpawnCount &&
+                         Units.Count == 0 &&
+                         map.ElapsedTime >= LastSpawnTime + ResetDelay)
+                {
+                    Leader = null;
+                    TotalSpawnCount = 0;
+                    OnSpawn(map);
+                }
             }
+            else if (LastSpawnTime == TimeSpan.Zero)
+                return;
 
             //udpate live count (remove dead units)
             for (int i = 0; i < Units.Count; ++i)

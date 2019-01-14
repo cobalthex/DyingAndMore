@@ -55,7 +55,8 @@ namespace DyingAndMore.Editor.Selectors
             var ent = ents[itemIndex];
 
             if ((ent.Animations.TryGetValue("EditorPreview", out var state) ||
-                ent.Animations.TryGetValue(ent.DefaultBaseAnimation, out state)) && state.Sprite?.Texture != null)
+                 ent.Animations.TryGetValue(ent.DefaultBaseAnimation, out state)) && 
+                state.Sprite?.Texture != null)
                 state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, elapsedTime);
             else
             {

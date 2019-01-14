@@ -71,7 +71,7 @@ namespace DyingAndMore.Game
         }
         private Game _game;
 
-        public MapBaseInstance Map
+        public MapInstance Map
         {
             get => _map;
             set
@@ -85,7 +85,7 @@ namespace DyingAndMore.Game
                 OnMapChanged();
             }
         }
-        private MapBaseInstance _map;
+        private MapInstance _map;
 
         public bool IsPaused { get; set; }
 
@@ -113,19 +113,19 @@ namespace DyingAndMore.Game
         {
             ["LoadMap"] = delegate (object map)
             {
-                MapBaseInstance inst = null;
+                MapInstance inst = null;
                 if (map is string mapName)
                 {
                     var loaded = Cache.Load(mapName);
-                    if (loaded is MapBaseInstance loadedInst)
+                    if (loaded is MapInstance loadedInst)
                         inst = loadedInst;
-                    else if (loaded is MapBaseClass loadedClass)
-                        inst = loadedClass.Instantiate();
+                    else if (loaded is MapClass loadedClass)
+                        inst = (MapInstance)loadedClass.Instantiate();
                 }
-                else if (map is MapBaseClass mapClass)
-                    inst = mapClass.Instantiate();
+                else if (map is MapClass mapClass)
+                    inst = (MapInstance)mapClass.Instantiate();
                 else
-                    inst = map as MapBaseInstance;
+                    inst = map as MapInstance;
 
                 if (inst != null)
                     Map = Game.Map = inst;
@@ -356,7 +356,7 @@ namespace DyingAndMore.Game
 
             if (isDead && time.TotalGameTime > restartTimer)
             {
-                Map = Map.Class.Instantiate();
+                Map = (MapInstance)Map.Class.Instantiate();
                 isDead = false;
                 OnParentChanged(this, new ParentChangedEventArgs(this, null));
                 Reflow();

@@ -36,7 +36,7 @@
     ☐  proper collidable shapes
     ☐  collision graph (necessary?) Dictionary<Collider, HashSet<Collider>>
 
-  ☐  unified entity system? (basic entities) vs ecs esque design
+  ✘  unified entity system? (basic entities) vs ecs esque design @cancelled (19-01-13 03:23)
 
   ☐  editorable commands
 
@@ -53,15 +53,13 @@
     ☐ cache previous focus in modal?
     ☐ special modal element?
     Refactor:
-      ☐ DropdownSelect
-      ☐ Reflow on all elements
-      ☐ Inputs
+      ✔ DropdownSelect @done (19-01-13 03:23)
+      ✔ Reflow on all elements @done (19-01-13 03:23)
+      ✔ Inputs @done (19-01-13 03:23)
 
   ☐  Think only when alive?
 
   ☐  Update cache hotloader to use Deserialize into object
-
-  ☐  doors
 
   ☐  vehicles/turrets
 

@@ -1,9 +1,11 @@
 ﻿namespace Takai.Data
 {
-    public interface INamedObject : ISerializeExternally
+    public interface IReferenceable
     {
         string Name { get; set; }
     }
+
+    public interface INamedObject : IReferenceable, ISerializeExternally { }
 
     public interface IClass<TInstance>
     {

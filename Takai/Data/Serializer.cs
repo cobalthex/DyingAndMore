@@ -71,14 +71,6 @@ namespace Takai.Data
 
         //todo: serialize if has value?
 
-        public interface IReferenceable
-        {
-            /// <summary>
-            /// A unique ID for every instance of the implementing type. No stipulations on how IDs are chosen
-            /// </summary>
-            int Id { get; set; }
-        }
-
         public const bool WriteFullTypeNames = false;
         public const bool CaseSensitiveIdentifiers = false;
 
