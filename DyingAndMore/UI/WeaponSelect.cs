@@ -31,7 +31,7 @@ namespace DyingAndMore.UI
             {
                 Bindings = new List<Takai.Data.Binding>
                 {
-                    new Takai.Data.Binding("Name", "Text", Takai.Data.BindingMode.OneWay)
+                    new Takai.Data.Binding("Name", "Text", Takai.Data.BindingDirection.OneWay)
                 }
             };
 

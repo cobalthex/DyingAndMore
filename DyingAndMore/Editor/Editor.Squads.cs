@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Takai.UI;
 
 namespace DyingAndMore.Editor
 {
@@ -9,11 +10,101 @@ namespace DyingAndMore.Editor
 
         public Takai.Graphics.Sprite SquadIcon { get; set; }
 
+        protected Static renameUI;
+
+        bool creatingSquad;
+        Vector2 createOrigin;
+
         public SquadsEditorMode(Editor editor)
             : base("Squads", editor)
         {
+            renameUI = Takai.Data.Cache.Load<Static>("UI/Editor/Name.ui.tk").CloneHierarchy();
+
             SquadIcon = new Takai.Graphics.Sprite(Takai.Data.Cache.Load<Texture2D>("UI/Editor/squad.png"));
             SquadIcon.CenterOrigin();
+
+            On(PressEvent, OnPress);
+            On(ClickEvent, OnClick);
+            On(DragEvent, OnDrag);
+        }
+
+        protected UIEventResult OnPress(Static sender, UIEventArgs e)
+        {
+            var pea = (PointerEventArgs)e;
+
+            var worldPos = editor.Camera.ScreenToWorld(pea.position);
+
+            if (pea.button == 0)
+            {
+                foreach (var squad in editor.Map.Squads)
+                {
+                    if (Vector2.DistanceSquared(squad.Value.SpawnPosition, worldPos) <= (squad.Value.SpawnRadius * squad.Value.SpawnRadius))
+                    {
+                        SelectedSquad = squad.Value;
+                        return UIEventResult.Handled;
+                    }
+                }
+
+                SelectedSquad = null;
+                creatingSquad = true;
+                createOrigin = worldPos;
+            }
+
+            return UIEventResult.Continue;
+        }
+
+        protected UIEventResult OnClick(Static sender, UIEventArgs e)
+        {
+            var pea = (PointerEventArgs)e;
+
+            if (creatingSquad)
+            {
+                creatingSquad = false;
+                if (SelectedSquad != null)
+                {
+                    renameUI.BindTo(SelectedSquad);
+                    renameUI.On("Click", delegate (Static _sender, UIEventArgs _e)
+                    {
+                        //todo: this is magicarp
+                        if (_e.Source.OnClickCommand == "$Close")
+                        {
+                            renameUI.RemoveFromParent();
+                            editor.Map.Spawn(SelectedSquad);
+                            //SelectedSquad = creatingSquad;
+                            return UIEventResult.Handled;
+                        }
+
+                        return UIEventResult.Continue;
+                    });
+                    AddChild(renameUI);
+                }
+            }
+
+            return UIEventResult.Continue;
+        }
+
+        protected UIEventResult OnDrag(Static sender, UIEventArgs e)
+        {
+            var dea = (DragEventArgs)e;
+
+            if (dea.button == 0)
+            {
+                if (creatingSquad)
+                {
+                    var worldPos = editor.Camera.ScreenToWorld(dea.position);
+                    if (SelectedSquad == null)
+                        SelectedSquad = new Game.Squad { SpawnPosition = createOrigin };
+                    SelectedSquad.SpawnRadius = Vector2.Distance(worldPos, createOrigin);
+                }
+
+                else if (SelectedSquad != null)
+                {
+                    SelectedSquad.SpawnPosition += editor.Camera.LocalToWorld(dea.delta);
+                    return UIEventResult.Handled;
+                }
+            }
+
+            return UIEventResult.Continue;
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -24,12 +115,12 @@ namespace DyingAndMore.Editor
 
             foreach (var squad in editor.Map.Squads)
             {
-                editor.Map.DrawCircle(squad.Value.SpawnPosition, squad.Value.SpawnRadius, Color.Cyan);
+                editor.Map.DrawCircle(squad.Value.SpawnPosition, squad.Value.SpawnRadius, SelectedSquad == squad.Value ? Color.Gold : Color.Cyan);
                 SquadIcon.Draw(
-                    spriteBatch, 
+                    spriteBatch,
                     editor.Camera.WorldToScreen(squad.Value.SpawnPosition),
                     0,
-                    Color.White, 
+                    Color.White,
                     clampScale
                 );
 
@@ -42,6 +133,9 @@ namespace DyingAndMore.Editor
                     Color.White
                 );
             }
+
+            if (creatingSquad && SelectedSquad != null)
+                editor.Map.DrawCircle(SelectedSquad.SpawnPosition, SelectedSquad.SpawnRadius, new Color(Color.LightGoldenrodYellow, 0.6f));
         }
     }
 }

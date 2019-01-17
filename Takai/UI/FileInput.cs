@@ -117,7 +117,7 @@ namespace Takai.UI
 
             pickerButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                RouteEvent(sender, "_SelectFile", new UIEventArgs(sender));
+                BubbleEvent(sender, "_SelectFile", new UIEventArgs(sender));
                 return UIEventResult.Handled;
             });
 

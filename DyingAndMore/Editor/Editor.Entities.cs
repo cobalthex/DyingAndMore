@@ -31,14 +31,8 @@ namespace DyingAndMore.Editor
         public EntitiesEditorMode(Editor editor)
             : base("Entities", editor)
         {
-            VerticalAlignment = Alignment.Stretch;
-            HorizontalAlignment = Alignment.Stretch;
-
-            AddChild(entInfo = Takai.Data.Cache.Load<Static>("UI/Editor/EntityInfo.ui.tk").Clone());
-            entEditor = Takai.Data.Cache.Load<Static>("UI/Editor/EntityEditor.ui.tk").Clone();
-
-            ignoreEnterKey = true;
-            ignoreSpaceKey = true;
+            AddChild(entInfo = Takai.Data.Cache.Load<Static>("UI/Editor/EntityInfo.ui.tk").CloneHierarchy());
+            entEditor = Takai.Data.Cache.Load<Static>("UI/Editor/EntityEditor.ui.tk").CloneHierarchy();
 
             On(PressEvent, OnPress);
             On(ClickEvent, OnClick);
@@ -77,7 +71,7 @@ namespace DyingAndMore.Editor
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
         {
             var pea = (PointerEventArgs)e;
-            
+
             var inputSearchRadius = pea.device == DeviceType.Touch ? 30 : 20;
 
             if (pea.button == 0)
@@ -106,7 +100,7 @@ namespace DyingAndMore.Editor
                 if (selected.Count < 1)
                 {
                     if (editor.Map.Class.Bounds.Contains(currentWorldPos) && selector.ents.Count > 0)
-                        SelectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedItem], currentWorldPos, Vector2.UnitX, Vector2.Zero);
+                        SelectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedIndex], currentWorldPos, Vector2.UnitX, Vector2.Zero);
                     else
                         SelectedEntity = null;
                 }
@@ -136,7 +130,7 @@ namespace DyingAndMore.Editor
         {
             var pea = (PointerEventArgs)e;
 
-            if (pea.button == (int)MouseButtons.Right) //mouse only? 
+            if (pea.button == (int)MouseButtons.Right) //mouse only?
             {
                 var searchRadius = /*isTapping*/ false ? 10 : 1;
                 var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, searchRadius);
@@ -152,11 +146,11 @@ namespace DyingAndMore.Editor
 
         protected UIEventResult OnDrag(Static sender, UIEventArgs e)
         {
-            var pea = (DragEventArgs)e;
+            var dea = (DragEventArgs)e;
 
-            if (pea.button == 0 && SelectedEntity != null)
+            if (dea.button == 0 && SelectedEntity != null)
             {
-                var delta = editor.Camera.NormalToWorld(pea.delta);
+                var delta = editor.Camera.LocalToWorld(dea.delta);
                 MoveEnt(SelectedEntity, SelectedEntity.Position + delta, SelectedEntity.Position);
                 return UIEventResult.Handled;
             }

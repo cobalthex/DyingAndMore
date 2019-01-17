@@ -18,9 +18,6 @@ namespace DyingAndMore.Editor
         public TriggersEditorMode(Editor editor)
             : base("Triggers", editor)
         {
-            VerticalAlignment = Alignment.Stretch;
-            HorizontalAlignment = Alignment.Stretch;
-
             triggerSettingsNameInput = new TextInput();
 
             var closeButton = new Static

@@ -24,7 +24,7 @@ namespace Takai.Data
     public static class Cache
     {
         /// <summary>
-        /// If Calling Load&lt;T&gt; always force load
+        /// ForceLoad is always true when calling Load
         /// </summary>
         public class AlwaysReloadAttribute : Attribute { }
 
@@ -124,7 +124,7 @@ namespace Takai.Data
         }
 
         //todo: somehow provide ability to load files from zip without loading in as zip/...
-        
+
         /// <summary>
         /// Load a single file into the cache
         /// </summary>
@@ -354,7 +354,9 @@ namespace Takai.Data
         /// <returns>The loaded object, casted to <typeparamref name="T"/></returns>
         public static T Load<T>(string file, string root = null, bool forceLoad = false)
         {
-            var loaded = Load(file, root, forceLoad || typeof(T).GetTypeInfo().IsDefined(typeof(AlwaysReloadAttribute), true));
+            var tti = typeof(T).GetTypeInfo();
+
+            var loaded = Load(file, root, forceLoad || tti.IsDefined(typeof(AlwaysReloadAttribute), true));
             return Serializer.Cast<T>(loaded);
         }
 

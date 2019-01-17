@@ -10,6 +10,8 @@ namespace DyingAndMore.Editor.Selectors
         public List<Takai.Game.EntityClass> ents = new List<Takai.Game.EntityClass>();
         System.TimeSpan elapsedTime;
 
+        public Takai.Game.EntityClass SelectedEntity => SelectedIndex == -1 ? null : ents[SelectedIndex];
+
         public EntitySelector()
         {
             ItemSize = new Point(64, 64);
@@ -55,7 +57,7 @@ namespace DyingAndMore.Editor.Selectors
             var ent = ents[itemIndex];
 
             if ((ent.Animations.TryGetValue("EditorPreview", out var state) ||
-                 ent.Animations.TryGetValue(ent.DefaultBaseAnimation, out state)) && 
+                 ent.Animations.TryGetValue(ent.DefaultBaseAnimation, out state)) &&
                 state.Sprite?.Texture != null)
                 state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, elapsedTime);
             else

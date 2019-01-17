@@ -11,8 +11,6 @@ namespace DyingAndMore.Editor
         public PathsEditorMode(Editor editor)
             : base("Paths", editor)
         {
-            VerticalAlignment = Takai.UI.Alignment.Stretch;
-            HorizontalAlignment = Takai.UI.Alignment.Stretch;
         }
 
         public override void Start()

@@ -42,7 +42,7 @@ namespace Takai.UI
         private string _basePath = P.GetFullPath(".");
 
         [Data.Serializer.Ignored]
-        public string SelectedFile => P.Combine(Path, SelectedItem.Name);
+        public string SelectedFile => SelectedItem == null ? null : P.Combine(Path, SelectedItem.Name);
 
         public FileList()
         {
@@ -51,7 +51,6 @@ namespace Takai.UI
                 HorizontalAlignment = Alignment.Stretch,
                 Direction = Direction.Horizontal,
                 Padding = new Microsoft.Xna.Framework.Vector2(10),
-                Margin = 10
             };
             template.AddChild(new Static
             {
@@ -59,6 +58,16 @@ namespace Takai.UI
                     new Data.Binding("Name", "Text")
                 }
             });
+            template.AddChild(new Static(P.DirectorySeparatorChar.ToString())
+            {
+                Bindings = new System.Collections.Generic.List<Data.Binding> {
+                    new Data.Binding("@type", "IsEnabled")
+                    {
+                        Converter = new Data.ConditionalConverter(typeof(DirectoryInfo))
+                    }
+                }
+            });
+            template.AddChild(new Static { Size = new Microsoft.Xna.Framework.Vector2(10, 1) });
             template.AddChild(new Static
             {
                 HorizontalAlignment = Alignment.Right,
@@ -76,9 +85,6 @@ namespace Takai.UI
         {
             Items.Clear();
 
-            //if (Path != BasePath)
-            //    Items.Add("« Previous");
-
             //display folders first
             foreach (var entry in Directory.EnumerateDirectories(path))
                 Items.Add(new DirectoryInfo(entry));
@@ -89,6 +95,21 @@ namespace Takai.UI
                 if (regex.IsMatch(entry))
                     Items.Add(new FileInfo(entry));
             }
+
+            if (Path != BasePath)
+            {
+                var prevItem = ItemTemplate.CloneHierarchy();
+                prevItem.On("Click", delegate (Static sender, UIEventArgs e)
+                {
+                    Path = Directory.GetParent(Path).FullName;
+                    return UIEventResult.Handled;
+                });
+
+                //don't hard code this
+                foreach (var child in prevItem.FindChildrenWithBinding("Name", null))
+                    child.Text = "..";
+                Container.InsertChild(prevItem, 0);
+            }
         }
 
         protected UIEventResult OnSelectionChanged(Static sender, UIEventArgs e)
@@ -98,10 +119,11 @@ namespace Takai.UI
             if (sce.newIndex < 0)
                 return UIEventResult.Continue;
 
-            var entry = Items[sce.newIndex];
-            //if (entry == "« Previous")
-            //    Path = Directory.GetParent(Path).FullName;
-            /*else */
+            var index = sce.newIndex;
+            if (Path != BasePath)
+                --index;
+
+            var entry = Items[index];
             if (entry is DirectoryInfo di)
                 Path = P.Combine(Path, di.Name);
 

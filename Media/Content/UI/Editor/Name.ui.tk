@@ -1,0 +1,49 @@
+List {
+	IsModal: true;
+	Padding: 10;
+	Margin: 10;
+	Direction: Direction.Vertical;
+	HorizontalAlignment: Alignment.Center;
+	VerticalAlignment: Alignment.Center;
+	BackgroundColor: [60 60 60 255];
+
+	Children: [
+		List {
+			Direction: Direction.Horizontal;
+			Children: [
+				Static { Text: "Enter a "; };
+				#Static { Text: " new "; }; #todo: conditional bindings
+				Static {
+					Bindings: [
+						Binding {
+							Source: "@typename";
+							Target: "Text";
+							Converter: TextCaseConverter {
+								DesiredCase: TextCase.Lowercase;
+							};
+						};
+					];
+				};
+				Static { Text: " name"; };
+			];
+		};
+
+		TextInput {
+			HasFocus: true;
+			HorizontalAlignment: Alignment.Stretch;
+			Bindings: [
+				Binding {
+					Direction: BindingDirection.TwoWay;
+					Source: "Name";
+					Target: "Text";
+				};
+			];
+		};
+
+		Static {
+			Text: "Create squad";
+			HorizontalAlignment: Alignment.Center;
+			OnClickCommand: "$Close";
+		}
+	];
+};

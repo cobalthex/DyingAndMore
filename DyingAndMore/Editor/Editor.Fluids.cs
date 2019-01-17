@@ -12,8 +12,6 @@ namespace DyingAndMore.Editor
         public FluidsEditorMode(Editor editor)
             : base("Fluids", editor)
         {
-            VerticalAlignment = Takai.UI.Alignment.Stretch;
-            HorizontalAlignment = Takai.UI.Alignment.Stretch;
         }
 
         protected override void UpdatePreview(int selectedItem)
@@ -24,7 +22,7 @@ namespace DyingAndMore.Editor
                 return;
             }
 
-            var selectedFluid = selector.fluids[selector.SelectedItem];
+            var selectedFluid = selector.fluids[selector.SelectedIndex];
             preview.Sprite.Texture = selectedFluid.Texture;
             preview.Sprite.ClipRect = selectedFluid.Texture.Bounds;
             preview.Sprite.Size = new Point(selectedFluid.Texture.Bounds.Width, selectedFluid.Texture.Bounds.Height);
@@ -34,9 +32,9 @@ namespace DyingAndMore.Editor
         {
             var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 
-            if (selector.SelectedItem >= 0 && time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
+            if (selector.SelectedIndex >= 0 && time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
             {
-            var selectedFluid = selector.fluids[selector.SelectedItem];
+            var selectedFluid = selector.fluids[selector.SelectedIndex];
                 lastFluidTime = time.TotalGameTime;
 
                 if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Class.Bounds.Contains(currentWorldPos.ToPoint()))

@@ -20,6 +20,12 @@ namespace DyingAndMore.Editor
         {
             Name = name;
             this.editor = editor;
+
+            ignoreEnterKey = true;
+            ignoreSpaceKey = true;
+
+            VerticalAlignment = Alignment.Stretch;
+            HorizontalAlignment = Alignment.Stretch;
         }
 
         public virtual void Start() { }
@@ -53,7 +59,7 @@ namespace DyingAndMore.Editor
             });
             preview.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                RouteEvent(sender, "_OpenSelector", new UIEventArgs(sender));
+                BubbleEvent(sender, "_OpenSelector", new UIEventArgs(sender));
                 return UIEventResult.Handled;
             });
 
@@ -69,7 +75,7 @@ namespace DyingAndMore.Editor
             On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
             {
                 selectorDrawer.IsEnabled = false;
-                UpdatePreview(this.selector.SelectedItem);
+                UpdatePreview(this.selector.SelectedIndex);
                 return UIEventResult.Handled;
             });
 
@@ -88,7 +94,7 @@ namespace DyingAndMore.Editor
             });
             AddChild(selectorDrawer);
 
-            this.selector.SelectedItem = 0; //initialize preview
+            this.selector.SelectedIndex = 0; //initialize preview
         }
 
         protected override void FinalizeClone()
@@ -284,7 +290,7 @@ namespace DyingAndMore.Editor
             var worldMousePos = Camera.ScreenToWorld(InputState.MouseVector);
 
             if (InputState.IsButtonDown(MouseButtons.Middle))
-                Camera.MoveTo(Camera.Position - Camera.NormalToWorld(InputState.MouseDelta()));
+                Camera.MoveTo(Camera.Position - Camera.LocalToWorld(InputState.MouseDelta()));
             else
             {
                 var d = Vector2.Zero;
@@ -301,7 +307,7 @@ namespace DyingAndMore.Editor
                 {
                     d.Normalize();
                     d = d * Camera.MoveSpeed * (float)time.ElapsedGameTime.TotalSeconds; //(camera velocity)
-                    Camera.Position += Camera.NormalToWorld(d);
+                    Camera.Position += Camera.LocalToWorld(d);
                 }
             }
 

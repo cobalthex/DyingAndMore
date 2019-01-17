@@ -24,7 +24,7 @@ List {
                             Padding: [4 2];
                             Bindings: [
                                 {
-                                    Mode: BindingMode.TwoWay;
+                                    Direction: BindingDirection.TwoWay;
                                     Source: "Name";
                                     Target: "Text";
                                 };
@@ -39,7 +39,7 @@ List {
         						NumericInput {
         							Bindings: [
         								Binding {
-        									Mode: BindingMode.TwoWay;
+        									Direction: BindingDirection.TwoWay;
         									Source: "CurrentHealth";
         									Target: "Value";
         								};
@@ -53,7 +53,7 @@ List {
                                 WeaponSelect {
                                     Bindings: [
                                         Binding {
-                                            Mode: BindingMode.TwoWay;
+                                            Direction: BindingDirection.TwoWay;
                                             Source: "Weapon";
                                             Target: "Instance";
                                         }
@@ -67,7 +67,7 @@ List {
                                 Static {
                                     Bindings: [
                                         Binding {
-                                            Source: "Controller.@type";
+                                            Source: "Controller.@typename";
                                             Target: "Text";
                                             DefaultValue: "[None]";
                                         }

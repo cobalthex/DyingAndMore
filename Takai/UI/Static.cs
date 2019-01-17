@@ -154,7 +154,7 @@ namespace Takai.UI
     /// <summary>
     /// The basic UI element
     /// </summary>
-    public class Static : Data.IDerivedDeserialize
+    public class Static : Data.IDerivedDeserialize, System.ICloneable
     {
         //some standard/common events
         public const string PressEvent = "Press";
@@ -539,6 +539,19 @@ namespace Takai.UI
             handlers.AddHandler(handler);
         }
 
+        public void On(IEnumerable<string> events, UIEventHandler handler)
+        {
+            if (uiEvents == null)
+                uiEvents = new Dictionary<string, UIEvent>(System.StringComparer.OrdinalIgnoreCase);
+
+            foreach (var @event in events)
+            {
+                if (!uiEvents.TryGetValue(@event, out var handlers))
+                    uiEvents[@event] = handlers = new UIEvent(true);
+                handlers.AddHandler(handler);
+            }
+        }
+
         public bool Off(string @event, UIEventHandler handler)
         {
             if (uiEvents == null)
@@ -548,6 +561,24 @@ namespace Takai.UI
                 return false;
 
             return handlers.RemoveHandler(handler);
+        }
+
+        public bool Off(IEnumerable<string> events, UIEventHandler handler)
+        {
+            if (uiEvents == null)
+                return false;
+
+            bool removed = false;
+            foreach (var @event in events)
+            {
+                if (uiEvents.TryGetValue(@event, out var handlers))
+                {
+                    handlers.RemoveHandler(handler);
+                    removed = true;
+                }
+            }
+
+            return removed;
         }
 
         /// <summary>
@@ -575,25 +606,36 @@ namespace Takai.UI
                 binding.BindTo(source, this);
         }
 
-        protected void RouteEvent(string @event, UIEventArgs args)
+        protected void BubbleEvent(string @event, UIEventArgs args)
         {
-            RouteEvent(this, @event, args);
+            BubbleEvent(this, @event, args);
         }
 
-        protected void RouteEvent(Static source, string @event, UIEventArgs args)
+        protected void BubbleEvent(Static source, string @event, UIEventArgs args)
         {
             var target = source;
             while (target != null)
             {
-                if (target.uiEvents != null && target.uiEvents.TryGetValue(@event, out var handlers) &&
-                    handlers.Invoke(target, args) == UIEventResult.Handled)
+                if ((target.uiEvents != null && target.uiEvents.TryGetValue(@event, out var handlers) &&
+                    handlers.Invoke(target, args) == UIEventResult.Handled) ||
+                    target.IsModal) //no events are routed to the parent when modal
                     break;
 
-                target = target.Parent; //todo: handle tunneling
+                target = target.Parent;
             }
         }
 
-        public string OnClickCommand { get; set; }
+        //protected void TunnelEvent(string @event, UIEventArgs args)
+        //{
+        //    TunnelEvent(this, @event, args);
+        //}
+
+        //protected void TunnelEvent(Static source, string @event, UIEventArgs args)
+        //{
+        //    //from root to source
+        //}
+
+        public string OnClickCommand { get; set; } //todo: use events? (Commands { Click } --- event args might crash )
 
         #endregion
 
@@ -641,7 +683,12 @@ namespace Takai.UI
         {
             var oldParent = _parent;
             _parent = newParent;
-            RouteEvent(ParentChangedEvent, new ParentChangedEventArgs(this, oldParent));
+            BubbleEvent(ParentChangedEvent, new ParentChangedEventArgs(this, oldParent));
+        }
+
+        object System.ICloneable.Clone()
+        {
+            return CloneHierarchy();
         }
 
         /// <summary>
@@ -649,7 +696,7 @@ namespace Takai.UI
         /// Does not add to parent
         /// </summary>
         /// <returns>The cloned static</returns>
-        public virtual Static Clone()
+        public virtual Static CloneHierarchy()
         {
             var clone = (Static)MemberwiseClone();
 #if DEBUG
@@ -660,7 +707,7 @@ namespace Takai.UI
             clone.Children = clone._children.AsReadOnly();
             for (int i = 0; i < clone._children.Count; ++i)
             {
-                var child = clone._children[i].Clone();
+                var child = clone._children[i].CloneHierarchy();
                 child.SetParentNoReflow(clone);
                 clone._children[i] = child;
             }
@@ -1131,6 +1178,38 @@ namespace Takai.UI
             return (T)FindChildByName(name, caseSensitive, typeof(T));
         }
 
+        /// <summary>
+        /// Enumerate children with a matching binding source/target
+        /// Searches siblings before nested children
+        /// </summary>
+        /// <param name="bindingSource">The name of the source binding to use, ignored if null</param>
+        /// <param name="bindingTarget">The name of the target binding to use, ignored if null</param>
+        /// <returns>A list of children with a matching binding</returns>
+        public IEnumerable<Static> FindChildrenWithBinding(string bindingSource, string bindingTarget)
+        {
+            if (bindingSource == null && bindingTarget == null)
+                throw new System.ArgumentException("bindingSource and bindingTarget cannot both be null");
+
+            var stack = new Stack<Static>(Children);
+            while (stack.Count > 0)
+            {
+                var top = stack.Pop();
+
+                if (top.Bindings != null)
+                {
+                    foreach (var binding in top.Bindings)
+                    {
+                        if ((bindingSource == null || binding.Source == bindingSource) &&
+                            (bindingTarget == null || binding.Target == bindingTarget))
+                            yield return top;
+                    }
+                }
+
+                foreach (var child in top.Children)
+                    stack.Push(child);
+            }
+        }
+
         #endregion
 
         #region Layout
@@ -1507,7 +1586,7 @@ namespace Takai.UI
                     button = (int)button,
                     device = Input.DeviceType.Mouse
                 };
-                RouteEvent(PressEvent, pea);
+                BubbleEvent(PressEvent, pea);
 
                 if (CanFocus)
                 {
@@ -1532,7 +1611,7 @@ namespace Takai.UI
                         button = (int)button,
                         device = Input.DeviceType.Mouse
                     };
-                    RouteEvent(DragEvent, pea);
+                    BubbleEvent(DragEvent, pea);
                 }
                 return false;
             }
@@ -1623,6 +1702,7 @@ namespace Takai.UI
                         + $"ID: {DebugId}\n"
 #endif
                         + $"Name: {(Name ?? "(No name)")}\n"
+                        + $"Children: {Children?.Count ?? 0}\n"
                         + $"Bounds: {OffsetContentArea}\n"
                         + $"Position: {Position}: Size {Size}, Padding: {Padding}\n"
                         + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}";
@@ -1754,7 +1834,7 @@ namespace Takai.UI
                 device = device,
                 deviceIndex = deviceIndex
             };
-            RouteEvent(ClickEvent, ce);
+            BubbleEvent(ClickEvent, ce);
             Commander.Invoke(OnClickCommand, this);
         }
 
@@ -1825,7 +1905,7 @@ namespace Takai.UI
                         Text = Util.ToSentenceCase(member.Name),
                         Bindings = new List<Data.Binding>
                         {
-                            new Data.Binding(member.Name, "IsChecked", Data.BindingMode.TwoWay)
+                            new Data.Binding(member.Name, "IsChecked", Data.BindingDirection.TwoWay)
                         },
                         Font = font,
                         Color = color
@@ -1848,7 +1928,7 @@ namespace Takai.UI
                     {
                         Bindings = new List<Data.Binding>
                         {
-                            new Data.Binding(member.Name, "Value", Data.BindingMode.TwoWay)
+                            new Data.Binding(member.Name, "Value", Data.BindingDirection.TwoWay)
                         },
                         Font = font,
                         Color = color
@@ -1862,7 +1942,7 @@ namespace Takai.UI
                     {
                         Bindings = new List<Data.Binding>
                         {
-                            new Data.Binding(member.Name, "Text", Data.BindingMode.TwoWay)
+                            new Data.Binding(member.Name, "Text", Data.BindingDirection.TwoWay)
                         },
                         Font = font,
                         Color = color
