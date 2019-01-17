@@ -63,7 +63,7 @@ namespace Takai.UI
                 {
                     var e = new ScrollEventArgs(this, newPosition - contentPosition);
                     contentPosition = newPosition;
-                    RouteEvent(Direction == Direction.Horizontal ? HScrollEvent : VScrollEvent, e);
+                    BubbleEvent(Direction == Direction.Horizontal ? HScrollEvent : VScrollEvent, e);
                 }
             }
         }
@@ -270,12 +270,12 @@ namespace Takai.UI
                     return;
 
                 var hsp = horizontalScrollbar?.ChildIndex ?? -1;
-                horizontalScrollbar = (ScrollBar)value.Clone();
+                horizontalScrollbar = (ScrollBar)value.CloneHierarchy();
                 horizontalScrollbar.HorizontalAlignment = Alignment.Stretch;
                 horizontalScrollbar.Direction = Direction.Horizontal;
 
                 var vsp = verticalScrollbar?.ChildIndex ?? -1;
-                verticalScrollbar = (ScrollBar)value.Clone();
+                verticalScrollbar = (ScrollBar)value.CloneHierarchy();
                 verticalScrollbar.VerticalAlignment = Alignment.Stretch;
                 verticalScrollbar.Direction = Direction.Vertical;
 

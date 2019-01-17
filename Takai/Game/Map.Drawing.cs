@@ -442,9 +442,9 @@ namespace Takai.Game
 
             if (renderSettings.drawFluids)
             {
-                //todo: transform correctly
+                //todo: reflections aren't scaled correctly
 
-                context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, Class.stencilRead, null, Class.fluidEffect);
+                context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, Class.stencilRead, null, Class.fluidEffect);
                 Class.fluidEffect.Parameters["Mask"].SetValue(Class.reflectionRenderTarget);
                 Class.fluidEffect.Parameters["Reflection"].SetValue(renderSettings.drawReflections ? Class.reflectedRenderTarget : null);
                 context.spriteBatch.Draw(Class.fluidsRenderTarget, Vector2.Zero, Color.White);
@@ -546,7 +546,7 @@ namespace Takai.Game
 
         public void DrawFluids(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, Class.reflectionEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, null, null, null, Class.reflectionEffect, c.cameraTransform);
 
             //inactive fluids
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)

@@ -17,8 +17,6 @@ namespace DyingAndMore.Editor
         public DecalsEditorMode(Editor editor)
             : base("Decals", editor)
         {
-            VerticalAlignment = Alignment.Stretch;
-            HorizontalAlignment = Alignment.Stretch;
         }
 
         protected override void UpdatePreview(int selectedItem)
@@ -57,7 +55,7 @@ namespace DyingAndMore.Editor
                 if (!SelectDecal(currentWorldPos) && editor.Map.Class.Bounds.Contains(currentWorldPos))
                 {
                     //add new decal under cursor
-                    selectedDecal = editor.Map.AddDecal(selector.textures[selector.SelectedItem], currentWorldPos);
+                    selectedDecal = editor.Map.AddDecal(selector.textures[selector.SelectedIndex], currentWorldPos);
                     var pos = (currentWorldPos / editor.Map.Class.SectorPixelSize).ToPoint();
                     return false;
                 }

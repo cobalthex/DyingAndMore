@@ -22,7 +22,7 @@ namespace Takai.UI
                 if (_value != newVal)
                 {
                     _value = newVal;
-                    RouteEvent(ValueChangedEvent, new UIEventArgs(this));
+                    BubbleEvent(ValueChangedEvent, new UIEventArgs(this));
                     Commander.Invoke(OnValueChangedCommand, this);
                 }
             }
@@ -138,12 +138,12 @@ namespace Takai.UI
 
             upButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                RouteEvent(sender, "_IncrementValue", new UIEventArgs(sender));
+                BubbleEvent(sender, "_IncrementValue", new UIEventArgs(sender));
                 return UIEventResult.Continue;
             });
             downButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                RouteEvent(sender, "_DecrementValue", new UIEventArgs(sender));
+                BubbleEvent(sender, "_DecrementValue", new UIEventArgs(sender));
                 return UIEventResult.Continue;
             });
 

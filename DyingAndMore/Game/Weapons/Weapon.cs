@@ -116,7 +116,7 @@ namespace DyingAndMore.Game.Weapons
                 {
                     if (_class.Hud != null)
                     {
-                        Hud = _class.Hud.Clone();
+                        Hud = _class.Hud.CloneHierarchy();
                         Hud.BindTo(this);
                     }
                 }
@@ -159,7 +159,7 @@ namespace DyingAndMore.Game.Weapons
             if (Hud != null)
             {
                 //todo: does MemberwiseClone do this already?
-                clone.Hud = Hud.Clone();
+                clone.Hud = Hud.CloneHierarchy();
                 clone.Hud.BindTo(clone);
             }
             return clone;

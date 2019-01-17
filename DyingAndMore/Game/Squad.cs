@@ -6,7 +6,7 @@ using Takai.Game;
 namespace DyingAndMore.Game
 {
     /// <summary>
-    /// Represents a group of actors that can coordinate. 
+    /// Represents a group of actors that can coordinate.
     /// Squads can spawn a variable number of members and are optionally directed by a leader.
     /// Squads can respawn per rules set in this class
     /// </summary>
@@ -27,7 +27,7 @@ namespace DyingAndMore.Game
         public TimeSpan SpawnDelay { get; set; }
 
         /// <summary>
-        /// How long to wait before resetting the spawn count. 
+        /// How long to wait before resetting the spawn count.
         /// All units must be dead and at MaxSpawnCount
         /// </summary>
         public TimeSpan ResetDelay { get; set; }
@@ -43,10 +43,10 @@ namespace DyingAndMore.Game
         /// </summary>
         public ActorInstance Leader { get; set; }
         public List<ActorInstance> Units { get; set; } = new List<ActorInstance>(); //includes leader
-        
+
         public int TotalSpawnCount { get; set; } = 0;
         public TimeSpan LastSpawnTime { get; set; } = TimeSpan.Zero;
-        
+
         protected ActorInstance SpawnUnit(MapBaseInstance map, List<ActorClass> template)
         {
             var unit = (ActorInstance)Takai.Util.Random(template).Instantiate();
@@ -66,7 +66,7 @@ namespace DyingAndMore.Game
 
             if (LeaderTemplate != null)
                 Leader = SpawnUnit(map, LeaderTemplate);
-            
+
             if (UnitsTemplate != null)
             {
                 for (int i = 0; i < MinLiveCount - 1; ++i) //- 1 for leader

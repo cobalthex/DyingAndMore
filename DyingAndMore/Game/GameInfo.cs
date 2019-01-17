@@ -175,7 +175,7 @@ namespace DyingAndMore.Game
                         ui.AddChild(new Static($"{story.MapFiles.Length} map{(story.MapFiles.Length == 1 ? "" : "s")}"));
                         ui.On(ClickEvent, delegate (Static sender, UIEventArgs e)
                         {
-                            RouteEvent(SelectedStoryEvent, new SelectedStoryEventArgs(sender, story));
+                            BubbleEvent(SelectedStoryEvent, new SelectedStoryEventArgs(sender, story));
                             return UIEventResult.Handled;
                         });
                         AddChild(ui);

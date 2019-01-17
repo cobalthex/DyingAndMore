@@ -113,6 +113,7 @@ namespace Takai.Game
         {
             get
             {
+                //todo: cache this
                 return Matrix.CreateTranslation(-ActualPosition.X, -ActualPosition.Y, 0) *
                        Matrix.CreateRotationZ(actualRotation) *
                        Matrix.CreateScale(ActualScale) *
@@ -207,7 +208,12 @@ namespace Takai.Game
             return Vector2.Transform(screenPosition, Matrix.Invert(Transform));
         }
 
-        public Vector2 NormalToWorld(Vector2 normal)
+        /// <summary>
+        /// Project a free vector to a world vector using the camera's current viewport
+        /// </summary>
+        /// <param name="normal"></param>
+        /// <returns></returns>
+        public Vector2 LocalToWorld(Vector2 normal)
         {
             return Vector2.TransformNormal(normal, Matrix.Invert(Transform));
         }

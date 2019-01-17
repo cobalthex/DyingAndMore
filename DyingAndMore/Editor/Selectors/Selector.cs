@@ -17,23 +17,21 @@ namespace DyingAndMore.Editor.Selectors
 
         public Vector2 ItemMargin { get; set; } = new Vector2(2);
 
-        public int SelectedItem
+        public int SelectedIndex
         {
-            get => _selectedItem;
+            get => _selectedIndex;
             set
             {
-                _selectedItem = Takai.Util.Clamp(value, 0, ItemCount - 1);
-                RouteEvent(SelectionChangedEvent, new UIEventArgs(this));
+                _selectedIndex = Takai.Util.Clamp(value, 0, ItemCount - 1);
+                BubbleEvent(SelectionChangedEvent, new UIEventArgs(this));
             }
         }
-        private int _selectedItem = 0;
+        private int _selectedIndex = 0;
 
         public override bool CanFocus => true;
 
         public Selector()
         {
-            HorizontalAlignment = Alignment.Stretch;
-            VerticalAlignment = Alignment.Stretch;
             On(PressEvent, OnPress);
         }
 
@@ -48,27 +46,27 @@ namespace DyingAndMore.Editor.Selectors
             base.ReflowOverride(availableSize);
         }
 
-        protected UIEventResult OnPress(Static sender, UIEventArgs e)
+        protected virtual UIEventResult OnPress(Static sender, UIEventArgs e)
         {
             var ce = (PointerEventArgs)e;
 
             var row = (int)((ce.position.Y - (ItemMargin.Y / 2)) / (ItemSize.Y + ItemMargin.Y)) * ItemsPerRow;
             var col = (int)((ce.position.X - (ItemMargin.X / 2)) / (ItemSize.X + ItemMargin.X));
 
-            SelectedItem = row + col;
+            SelectedIndex = row + col;
             return UIEventResult.Handled;
         }
 
         protected override bool HandleInput(GameTime time)
         {
             if (InputState.IsPress(Keys.Left))
-                --SelectedItem;
+                --SelectedIndex;
             else if (InputState.IsPress(Keys.Right))
-                ++SelectedItem;
+                ++SelectedIndex;
             else if (InputState.IsPress(Keys.Up))
-                SelectedItem -= ItemsPerRow;
+                SelectedIndex -= ItemsPerRow;
             else if (InputState.IsPress(Keys.Down))
-                SelectedItem += ItemsPerRow;
+                SelectedIndex += ItemsPerRow;
             else
                 return base.HandleInput(time);
             return false;
@@ -95,7 +93,7 @@ namespace DyingAndMore.Editor.Selectors
                 //    rect
                 //);
                 DrawItem(spriteBatch, i, rect);
-                if (i == SelectedItem)
+                if (i == SelectedIndex)
                 {
                     rect.Inflate(1, 1);
                     Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.White, rect);

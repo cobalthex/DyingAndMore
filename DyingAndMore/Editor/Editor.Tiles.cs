@@ -13,8 +13,6 @@ namespace DyingAndMore.Editor
         public TilesEditorMode(Editor editor)
             : base("Tiles", editor, new Selectors.TileSelector(editor.Map.Class.Tileset))
         {
-            VerticalAlignment = Takai.UI.Alignment.Stretch;
-            HorizontalAlignment = Takai.UI.Alignment.Stretch;
         }
 
         protected override void UpdatePreview(int selectedItem)
@@ -23,8 +21,8 @@ namespace DyingAndMore.Editor
                 return;
 
             preview.Sprite.ClipRect = new Rectangle(
-                (selector.SelectedItem % editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
-                (selector.SelectedItem / editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
+                (selector.SelectedIndex % editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
+                (selector.SelectedIndex / editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
                 editor.Map.Class.TileSize,
                 editor.Map.Class.TileSize
             );
@@ -46,7 +44,7 @@ namespace DyingAndMore.Editor
             var tile = short.MinValue;
 
             if (InputState.IsButtonDown(MouseButtons.Left))
-                tile = InputState.IsMod(KeyMod.Alt) ? (short)-1 : (short)selector.SelectedItem;
+                tile = InputState.IsMod(KeyMod.Alt) ? (short)-1 : (short)selector.SelectedIndex;
             else if (InputState.IsButtonDown(MouseButtons.Right))
                 tile = -1;
 

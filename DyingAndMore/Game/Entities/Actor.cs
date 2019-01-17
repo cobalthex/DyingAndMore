@@ -91,7 +91,7 @@ namespace DyingAndMore.Game.Entities
                 {
                     if (Class.Hud != null)
                     {
-                        Hud = Class.Hud.Clone();
+                        Hud = Class.Hud.CloneHierarchy();
                         Hud.BindTo(this);
                     }
                 }
@@ -215,7 +215,7 @@ namespace DyingAndMore.Game.Entities
             clone.Weapon = Weapon?.Clone();
             if (Hud != null)
             {
-                clone.Hud = Hud.Clone();
+                clone.Hud = Hud.CloneHierarchy();
                 clone.Hud.BindTo(clone);
             }
             return clone;

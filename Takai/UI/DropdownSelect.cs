@@ -61,7 +61,7 @@ namespace Takai.UI
                 var sourceList = (ItemList<T>)e.Source;
 
                 var childIndex = preview?.ChildIndex ?? -1;
-                ReplaceChild(preview = sourceList.Container.Children[sourceList.SelectedIndex].Clone(), childIndex);
+                ReplaceChild(preview = sourceList.Container.Children[sourceList.SelectedIndex].CloneHierarchy(), childIndex);
                 preview.BindTo(sourceList.SelectedItem);
                 CloseDropDown();
                 return UIEventResult.Continue;
@@ -70,9 +70,9 @@ namespace Takai.UI
 
         protected override void FinalizeClone()
         {
-            list = (ItemList<T>)list?.Clone();
-            dropdown = (ScrollBox)dropdown?.Clone();
-            preview = preview?.Clone();
+            list = (ItemList<T>)list?.CloneHierarchy();
+            dropdown = (ScrollBox)dropdown?.CloneHierarchy();
+            preview = preview?.CloneHierarchy();
 
             base.FinalizeClone();
         }

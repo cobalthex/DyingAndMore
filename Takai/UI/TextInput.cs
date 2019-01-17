@@ -339,7 +339,7 @@ namespace Takai.UI
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
 
-            RouteEvent(TextChangedEvent, new UIEventArgs(this));
+            BubbleEvent(TextChangedEvent, new UIEventArgs(this));
             Commander.Invoke(OnTextChangedCommand, this);
         }
 

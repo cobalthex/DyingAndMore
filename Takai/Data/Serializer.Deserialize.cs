@@ -114,7 +114,7 @@ namespace Takai.Data
 
         static void Warn(string message, DeserializationContext context)
         {
-            System.Diagnostics.Debug.WriteLine(message + $" <{context.file}>", context);
+            System.Diagnostics.Debug.WriteLine(message + $" <{context.file}>");
         }
 
         public static T TextDeserialize<T>(string file)
@@ -836,28 +836,6 @@ namespace Takai.Data
                     return Activator.CreateInstance(destType, expr);
                 }
 
-                //todo: support any number of items in tuple
-                if (genericType == typeof(Tuple<,>))
-                {
-                    if (sourceList == null)
-                        throw new InvalidCastException($"Type:{destType.Name} is a Tuple but '{source}' is of type:{sourceType.Name}");
-
-                    for (int i = 0; i < sourceList.Count; ++i)
-                        sourceList[i] = Cast(genericArgs[i], sourceList[i], context);
-                    return Activator.CreateInstance(destType, sourceList.ToArray());
-                }
-
-                //if (typeof(IEnumerable<>).IsAssignableFrom(genericType) && genericArgs.Count() == 1)
-                if (genericType == typeof(HashSet<>) || genericType == typeof(Queue<>) || genericType == typeof(Stack<>))
-                {
-                    if (sourceList == null)
-                        throw new InvalidCastException($"Type:{destType.Name} is a {genericType.Name} but '{source}' is of type:{sourceType.Name}");
-
-                    sourceList = sourceList.Select(i => Cast(genericArgs[0], i, context)).ToList(); //todo: List.ConvertAll (doesn't work on .net core)
-                    var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
-                    return Activator.CreateInstance(destType, new[] { casted });
-                    //return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
-                }
 
                 if (genericType == typeof(Dictionary<,>))
                 {
@@ -876,11 +854,37 @@ namespace Takai.Data
                     return dict;
                 }
 
-                if (genericType == typeof(List<>) || genericType == typeof(IEnumerable<>))
+                if (sourceList != null)
                 {
-                    sourceList = sourceList.Select(i => Cast(genericArgs[0], i, context)).ToList(); //todo: List.ConvertAll (doesn't work on .net core)
-                    var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
-                    return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
+                    //todo: support any number of items in tuple
+                    if (genericType == typeof(Tuple<,>))
+                    {
+                        if (sourceList == null)
+                            throw new InvalidCastException($"Type:{destType.Name} is a Tuple but '{source}' is of type:{sourceType.Name}");
+
+                        for (int i = 0; i < sourceList.Count; ++i)
+                            sourceList[i] = Cast(genericArgs[i], sourceList[i], context);
+                        return Activator.CreateInstance(destType, sourceList.ToArray());
+                    }
+
+                    //if (typeof(IEnumerable<>).IsAssignableFrom(genericType) && genericArgs.Count() == 1)
+                    if (genericType == typeof(HashSet<>) || genericType == typeof(Queue<>) || genericType == typeof(Stack<>))
+                    {
+                        if (sourceList == null)
+                            throw new InvalidCastException($"Type:{destType.Name} is a {genericType.Name} but '{source}' is of type:{sourceType.Name}");
+
+                        sourceList = sourceList.Select(i => Cast(genericArgs[0], i, context)).ToList(); //todo: List.ConvertAll (doesn't work on .net core)
+                        var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
+                        return Activator.CreateInstance(destType, new[] { casted });
+                        //return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
+                    }
+
+                    if (genericType == typeof(List<>) || genericType == typeof(IEnumerable<>))
+                    {
+                        sourceList = sourceList.Select(i => Cast(genericArgs[0], i, context)).ToList(); //todo: List.ConvertAll (doesn't work on .net core)
+                        var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
+                        return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
+                    }
                 }
             }
 

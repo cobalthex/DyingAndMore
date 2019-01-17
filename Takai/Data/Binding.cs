@@ -60,8 +60,14 @@ namespace Takai.Data
 
             var getset = new GetSet();
 
-            //special case (can only be at the end)
+            //special case (can only be at the end of the indirection)
             if (memberName.Equals("@type", StringComparison.OrdinalIgnoreCase))
+            {
+                getset.type = typeof(Type);
+                getset.get = () => objType;
+                return getset;
+            }
+            else if (memberName.Equals("@typename", StringComparison.OrdinalIgnoreCase))
             {
                 getset.type = typeof(string);
                 getset.get = () => objType.Name;
@@ -97,10 +103,83 @@ namespace Takai.Data
         }
     }
 
-    public enum BindingMode
+    public enum BindingDirection
     {
         OneWay, //source supplied only
         TwoWay,
+    }
+
+    public class Converter
+    {
+        //chain converters?
+
+        public virtual object Convert(Type destType, object source)
+        {
+            return Serializer.Cast(destType, source);
+        }
+    }
+
+    public class ConditionalConverter : Converter
+    {
+        /// <summary>
+        /// The value to compare the incoming source value to.
+        /// Returns true if the source equals this desired value
+        /// </summary>
+        public object DesiredValue { get; set; }
+
+        public ConditionalConverter() { }
+        public ConditionalConverter(object desiredValue)
+        {
+            DesiredValue = desiredValue;
+        }
+
+        //todo: more comparison operators
+
+        public override object Convert(Type destType, object source)
+        {
+            return base.Convert(destType, source == DesiredValue);
+        }
+    }
+
+    /// <summary>
+    /// A converter that converts text to the specified case.
+    /// Non text bindings are ignored
+    /// </summary>
+    public class TextCaseConverter : Converter
+    {
+        public enum TextCase
+        {
+            Unchanged,
+            Lowercase,
+            Uppercase,
+            //SentenceCase,
+        }
+
+        public TextCase DesiredCase { get; set; }
+
+        public TextCaseConverter() { }
+        public TextCaseConverter(TextCase desiredCase)
+        {
+            DesiredCase = desiredCase;
+        }
+
+        public override object Convert(Type destType, object source)
+        {
+            var target = base.Convert(destType, source);
+
+            if (target is string s)
+            {
+                switch (DesiredCase)
+                {
+                    case TextCase.Lowercase:
+                        return s.ToLower();
+                    case TextCase.Uppercase:
+                        return s.ToUpper();
+                }
+            }
+
+            return target;
+        }
     }
 
     /// <summary>
@@ -110,6 +189,8 @@ namespace Takai.Data
     /// </summary>
     public class Binding : ICloneable
     {
+        public static readonly Converter DefaultConverter = new Converter();
+
         /// <summary>
         /// All global variables
         /// </summary>
@@ -117,7 +198,7 @@ namespace Takai.Data
 
         //todo: globals should be bindings
 
-        public BindingMode Mode { get; set; } = BindingMode.OneWay;
+        public BindingDirection Direction { get; set; } = BindingDirection.OneWay;
 
         /// <summary>
         /// The property from the source object to bind to
@@ -138,11 +219,7 @@ namespace Takai.Data
         /// </summary>
         public bool HasDefaultValue { get; protected set; }
 
-        /// <summary>
-        /// If not null, the bound value must equal this to be displayed
-        /// (DefaultValue is displayed if conditoin not met)
-        /// </summary>
-        public object ConditionObject { get; set; }
+        public Converter Converter { get; set; } = DefaultConverter;
 
         GetSet sourceAccessors;
         GetSet targetAccessors;
@@ -151,11 +228,11 @@ namespace Takai.Data
         int cachedHash;
 
         public Binding() { }
-        public Binding(string source, string target, BindingMode mode = BindingMode.OneWay, object defaultValue = null)
+        public Binding(string source, string target, BindingDirection mode = BindingDirection.OneWay, object defaultValue = null)
         {
             Source = source;
             Target = target;
-            Mode = mode;
+            Direction = mode;
             DefaultValue = defaultValue;
         }
 
@@ -182,12 +259,9 @@ namespace Takai.Data
             var srcVal = sourceAccessors.get?.Invoke() ?? null;
             if (targetAccessors.set != null)
             {
-                if (ConditionObject != null && srcVal != ConditionObject)
-                    srcVal = null;
-
                 if (HasDefaultValue = (srcVal == null))
                     srcVal = DefaultValue;
-                targetAccessors.set(Serializer.Cast(targetAccessors.type, srcVal));
+                targetAccessors.set(Converter.Convert(targetAccessors.type, srcVal));
                 cachedValue = srcVal;
                 if (srcVal != null)
                     cachedHash = srcVal.GetHashCode();
@@ -242,12 +316,9 @@ namespace Takai.Data
             {
                 var bindVal = srcVal;
 
-                if (ConditionObject != null && bindVal != ConditionObject)
-                    bindVal = null;
-
                 if (HasDefaultValue = (bindVal == null))
                     bindVal = DefaultValue;
-                targetAccessors.set(Serializer.Cast(targetAccessors.type, bindVal));
+                targetAccessors.set(Converter.Convert(targetAccessors.type, bindVal));
                 cachedValue = srcVal;
                 cachedHash = srcHash;
                 OnUpdated();
@@ -256,7 +327,7 @@ namespace Takai.Data
                 return true;
             }
 
-            if (Mode == BindingMode.TwoWay && targetAccessors.get != null && sourceAccessors.set != null)
+            if (Direction == BindingDirection.TwoWay && targetAccessors.get != null && sourceAccessors.set != null)
             {
                 var tgtVal = targetAccessors.get();
                 var tgtHash = tgtVal?.GetHashCode() ?? 0;
@@ -265,13 +336,7 @@ namespace Takai.Data
                 if (!tgtMatches)
                 {
                     var bindVal = tgtVal;
-
-                    if (ConditionObject != null && bindVal != ConditionObject)
-                        bindVal = null;
-
-                    if (ConditionObject != null && bindVal != ConditionObject)
-                        bindVal = DefaultValue;
-                    sourceAccessors.set(Serializer.Cast(sourceAccessors.type, bindVal));
+                    sourceAccessors.set(Converter.Convert(sourceAccessors.type, bindVal));
                     cachedValue = tgtVal;
                     cachedHash = tgtHash;
                     OnUpdated();

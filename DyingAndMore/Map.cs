@@ -5,7 +5,7 @@ using System;
 
 namespace DyingAndMore
 {
-    public class MapClass : MapBaseClass 
+    public class MapClass : MapBaseClass
     {
         public override MapBaseInstance Instantiate()
         {
@@ -25,7 +25,7 @@ namespace DyingAndMore
             if (@class == null)
                 return;
         }
-        
+
         /// <summary>
         /// Reset squad spawn timer/coounters and spawn (up to limits, including previously spawned members)
         /// </summary>
@@ -34,13 +34,15 @@ namespace DyingAndMore
         {
             if (Squads == null)
                 Squads = new Dictionary<string, Game.Squad>();
-            Squads[squad.Name] = squad;
-
-            squad.OnSpawn(this);
+            //if (!Squads.ContainsKey(squad.Name))
+            {
+                Squads[squad.Name] = squad;
+                squad.OnSpawn(this);
+            }
         }
 
         //todo: squads should be clustered?
-        
+
         protected override void UpdateEntities(TimeSpan deltaTime)
         {
             if (updateSettings.isEntityLogicEnabled)

@@ -24,7 +24,7 @@ Table {
         Static {
             Bindings: [
                 Binding {
-                    Source: "@type";
+                    Source: "@typename";
                     Target: "Text";
                 }
             ];
@@ -95,7 +95,7 @@ Table {
                         {
                             Source: "CurrentHealth";
                             Target: "Text";
-                            Mode: BindingMode.OneWay;
+                            Direction: BindingDirection.OneWay;
                         }
                     ];
                  };
@@ -105,7 +105,7 @@ Table {
                         {
                             Source: "Class.MaxHealth";
                             Target: "Text";
-                            Mode: BindingMode.OneWay;
+                            Direction: BindingDirection.OneWay;
                         }
                     ];
                  };

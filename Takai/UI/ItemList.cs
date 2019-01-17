@@ -22,7 +22,7 @@ namespace Takai.UI
     /// The items can be stored in any type of <see cref="Container"/>
     /// </summary>
     /// <typeparam name="T">The type of each data-bound item</typeparam>
-    public class ItemList<T> : Static //todo: inherit from ScrollBox?
+    public class ItemList<T> : Static
     {
         public ObservableCollection<T> Items { get; set; } = new ObservableCollection<T>();
 
@@ -50,7 +50,7 @@ namespace Takai.UI
                 Container.RemoveAllChildren();
                 var newChildren = new System.Collections.Generic.List<Static>(Items.Count);
                 for (int i = 0; i < Items.Count; ++i)
-                    newChildren.Add(CreateItem(Items[i]));
+                    newChildren.Add(CreateItemEntry(Items[i]));
                 Container.AddChildren(newChildren);
             }
         }
@@ -117,13 +117,47 @@ namespace Takai.UI
 
                     var changed = new SelectionChangedEventArgs(this, _selectedIndex, value);
                     _selectedIndex = value;
-                    RouteEvent(SelectionChangedEvent, changed);
+                    BubbleEvent(SelectionChangedEvent, changed);
                 }
             }
         }
         private int _selectedIndex = -1;
 
         public float ItemPadding = 10;
+
+        /// <summary>
+        /// An optional template to add a new item
+        /// If null, the list is not user editable
+        /// UI will be cloned from value passed in
+        ///
+        /// Template bindings:
+        ///     item: bound item value
+        ///
+        /// Actions:
+        ///     Add: add the item to the list and reset the template
+        ///     Clear: reset the template
+        /// </summary>
+        public Static AddItemTemplate
+        {
+            get => _addItemTemplate;
+            set
+            {
+                if (value == _addItemTemplate)
+                    return;
+
+                if (_addItemTemplate != null)
+                    RemoveChild(_addItemTemplate);
+
+                _addItemTemplate = value.CloneHierarchy();
+                if (_addItemTemplate != null)
+                {
+                    _addItemTemplate.BindTo(newItem);
+                    AddChild(_addItemTemplate);
+                }
+            }
+        }
+        private Static _addItemTemplate;
+        protected T newItem = default(T);
 
         public ItemList()
         {
@@ -140,7 +174,7 @@ namespace Takai.UI
 
         protected override void FinalizeClone()
         {
-            Container = Container?.Clone();
+            Container = Container?.CloneHierarchy();
             base.FinalizeClone();
         }
 
@@ -165,7 +199,7 @@ namespace Takai.UI
                     SelectedIndex = -1;
 
                 for (int i = 0; i < e.NewItems.Count; ++i)
-                    Container.ReplaceChild(CreateItem((T)e.NewItems[i]), e.NewStartingIndex + i);
+                    Container.ReplaceChild(CreateItemEntry((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
             else if (e.Action == NotifyCollectionChangedAction.Move)
             {
@@ -174,7 +208,7 @@ namespace Takai.UI
             else if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 for (int i = 0; i < e.NewItems.Count; ++i)
-                    Container.InsertChild(CreateItem((T)e.NewItems[i]), e.NewStartingIndex + i);
+                    Container.InsertChild(CreateItemEntry((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
         }
 
@@ -183,18 +217,19 @@ namespace Takai.UI
         /// </summary>
         /// <param name="value">The item value to use for binding</param>
         /// <returns>The item created</returns>
-        protected Static CreateItem(T value)
+        protected Static CreateItemEntry(T value)
         {
             if (ItemTemplate == null)
                 throw new NullReferenceException("ItemTemplate cannot be null");
 
-            var item = ItemTemplate.Clone();
+            var item = ItemTemplate.CloneHierarchy();
             item.BindTo(value);
-            item.On(ClickEvent, delegate (Static sender, UIEventArgs e)
+            //bound here for correct child indexing
+            item.On("Click", delegate (Static sender, UIEventArgs e)
             {
-                var sce = new SelectionChangedEventArgs(sender, -1, sender.ChildIndex);
-                RouteEvent(sender, "_ChangeSelection", sce);
-                return UIEventResult.Continue;
+                var sce = new SelectionChangedEventArgs(sender, SelectedIndex, item.ChildIndex);
+                BubbleEvent(sender, "_ChangeSelection", sce);
+                return UIEventResult.Handled;
             });
             return item;
         }
