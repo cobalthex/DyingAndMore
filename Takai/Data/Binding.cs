@@ -16,7 +16,7 @@ namespace Takai.Data
         public Func<object> get;
         public Action<object> set;
 
-        private const BindingFlags LookupFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly; //todo: DeclaredOnly breaks some things
+        private const BindingFlags LookupFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
 
         public static GetSet GetMemberAccessors(object obj, string memberName)
         {
@@ -31,7 +31,14 @@ namespace Takai.Data
             var indirections = memberName.Split(new[] { '.' }, MaxIndirection + 1);
             for (int i = 0; i < indirections.Length - 1; ++i)
             {
-                prop = objType.GetProperty(indirections[i], LookupFlags);
+                try
+                {
+                    prop = objType.GetProperty(indirections[i], LookupFlags);
+                }
+                catch (AmbiguousMatchException)
+                {
+                    prop = objType.GetProperty(indirections[i], LookupFlags | BindingFlags.DeclaredOnly);
+                }
                 if (prop != null)
                 {
                     obj = prop.GetValue(obj);

@@ -663,7 +663,7 @@ namespace Takai.Data
                                 ParseMember(destObject, pair.Value, prop, prop.PropertyType, prop.SetValue, prop.CanWrite, context);
                         }
                         else if (derived != null)
-                            Warn($"Ignoring possible unknown field:{pair.Key} in DestType:{destType.Name} (May be derived)", context);
+                            Warn($"possible unknown field:{pair.Key} in DestType:{destType.Name} (May be derived)", context);
                         else
                             Warn($"Ignoring unknown field:{pair.Key} in DestType:{destType.Name}", context);
                     }

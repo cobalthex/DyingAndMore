@@ -307,13 +307,13 @@ namespace Takai.Game
         /// <param name="color">The color to use</param>
         public void DrawCircle(Vector2 center, float radius, Color color)
         {
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius), 0), color, new Vector2(0)));
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius, -radius), 0), color, new Vector2(1, 0)));
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius, radius), 0), color, new Vector2(0, 1)));
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius), radius), color, new Vector2(0)));
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius, -radius), radius), color, new Vector2(1, 0)));
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius, radius), radius), color, new Vector2(0, 1)));
 
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius, radius), 0), color, new Vector2(0, 1)));
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius, -radius), 0), color, new Vector2(1, 0)));
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius), 0), color, new Vector2(1)));
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius, radius), radius), color, new Vector2(0, 1)));
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius, -radius), radius), color, new Vector2(1, 0)));
+            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius), radius), color, new Vector2(1)));
         }
 
         static readonly Matrix arrowWingTransform = Matrix.CreateRotationZ(120);

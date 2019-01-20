@@ -10,7 +10,8 @@ namespace DyingAndMore.Editor
 
         public Takai.Graphics.Sprite SquadIcon { get; set; }
 
-        protected Static renameUI;
+        protected Static nameUI;
+        protected Static editUI;
 
         bool creatingSquad;
         Vector2 createOrigin;
@@ -18,7 +19,8 @@ namespace DyingAndMore.Editor
         public SquadsEditorMode(Editor editor)
             : base("Squads", editor)
         {
-            renameUI = Takai.Data.Cache.Load<Static>("UI/Editor/Name.ui.tk").CloneHierarchy();
+            nameUI = Takai.Data.Cache.Load<Static>("UI/Editor/Name.ui.tk");
+            editUI = Takai.Data.Cache.Load<Static>("UI/Editor/Squad.ui.tk");
 
             SquadIcon = new Takai.Graphics.Sprite(Takai.Data.Cache.Load<Texture2D>("UI/Editor/squad.png"));
             SquadIcon.CenterOrigin();
@@ -36,9 +38,10 @@ namespace DyingAndMore.Editor
 
             if (pea.button == 0)
             {
-                foreach (var squad in editor.Map.Squads)
+                foreach (var squad in editor.Map.Squads) //search backwards?
                 {
-                    if (Vector2.DistanceSquared(squad.Value.SpawnPosition, worldPos) <= (squad.Value.SpawnRadius * squad.Value.SpawnRadius))
+                    if (Vector2.DistanceSquared(squad.Value.SpawnPosition, worldPos) 
+                        <= (squad.Value.SpawnRadius * squad.Value.SpawnRadius))
                     {
                         SelectedSquad = squad.Value;
                         return UIEventResult.Handled;
@@ -59,24 +62,22 @@ namespace DyingAndMore.Editor
 
             if (creatingSquad)
             {
-                creatingSquad = false;
-                if (SelectedSquad != null)
+                if (SelectedSquad != null && SelectedSquad.SpawnRadius > 5)
                 {
-                    renameUI.BindTo(SelectedSquad);
-                    renameUI.On("Click", delegate (Static _sender, UIEventArgs _e)
+                    var squadUI = nameUI.CloneHierarchy();
+                    squadUI.BindTo(SelectedSquad);
+                    squadUI.CommandActions["Accept"] = delegate (Static source, object argument)
                     {
-                        //todo: this is magicarp
-                        if (_e.Source.OnClickCommand == "$Close")
-                        {
-                            renameUI.RemoveFromParent();
-                            editor.Map.Spawn(SelectedSquad);
-                            //SelectedSquad = creatingSquad;
-                            return UIEventResult.Handled;
-                        }
-
-                        return UIEventResult.Continue;
-                    });
-                    AddChild(renameUI);
+                        squadUI.RemoveFromParent();
+                        editor.Map.Spawn(SelectedSquad);
+                        creatingSquad = false;
+                    };
+                    squadUI.CommandActions["Cancel"] = delegate (Static source, object argument)
+                    {
+                        squadUI.RemoveFromParent();
+                        creatingSquad = false;
+                    };
+                    AddChild(squadUI);
                 }
             }
 
@@ -105,6 +106,17 @@ namespace DyingAndMore.Editor
             }
 
             return UIEventResult.Continue;
+        }
+
+        protected override bool HandleInput(GameTime time)
+        {
+            if (SelectedSquad?.Name != null && Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Delete))
+            {
+                editor.Map.Squads.Remove(SelectedSquad.Name);
+                return false;
+            }
+
+            return base.HandleInput(time);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

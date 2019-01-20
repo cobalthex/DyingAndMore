@@ -1,0 +1,7 @@
+NinePatch {
+	Sprite: {
+		Texture: @"./Button.png";
+		Center: false;
+	}
+	CenterRegion: [8 8 48 48];
+}

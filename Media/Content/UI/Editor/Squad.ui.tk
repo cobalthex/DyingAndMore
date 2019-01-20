@@ -1,5 +1,4 @@
 List {
-	Name: "foo";
 	IsModal: true;
 	Padding: 10;
 	Margin: 10;
@@ -9,24 +8,8 @@ List {
 	BackgroundColor: [60 60 60 255];
 
 	Children: [
-		List {
-			Direction: Direction.Horizontal;
-			Children: [
-				Static { Text: "Enter a "; };
-				#Static { Text: " new "; }; #todo: conditional bindings
-				Static {
-					Bindings: [
-						Binding {
-							Source: "@typename";
-							Target: "Text";
-							Converter: TextCaseConverter {
-								DesiredCase: TextCase.Lowercase;
-							};
-						};
-					];
-				};
-				Static { Text: " name"; };
-			];
+		Static {
+
 		};
 
 		TextInput {
@@ -41,13 +24,14 @@ List {
 			];
 		};
 
+
 		List {
 			Direction: Direction.Horizontal;
 			HorizontalAlignment: Alignment.Stretch;
 			Margin: 10;
 			Children: [
 				Static {
-					Text: "Accept";
+					Text: "Create squad";
 					HorizontalAlignment: Alignment.Stretch;
 					EventCommands: {
 						Click: "Accept";
