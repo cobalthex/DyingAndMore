@@ -273,7 +273,10 @@ namespace Takai.UI
         /// </summary>
         public virtual Color BackgroundColor { get; set; } = Color.Transparent;
 
-        public virtual Graphics.Sprite BackgroundSprite { get; set; }
+        /// <summary>
+        /// An optional background sprite to draw behind the element. Drawn over BackgroundColor
+        /// </summary>
+        public Graphics.NinePatch BackgroundSprite { get; set; }
 
         /// <summary>
         /// How this element is positioned in its container horizontally
@@ -465,7 +468,8 @@ namespace Takai.UI
         /// Can this element be focused
         /// </summary>
         [Data.Serializer.Ignored]
-        public virtual bool CanFocus => true; //false; //todo
+        public virtual bool CanFocus => (EventCommands != null && EventCommands.ContainsKey(ClickEvent)) ||
+                                        (events != null && events.ContainsKey(ClickEvent)); //todo: make user-editable?
 
         /// <summary>
         /// Disable the default behavior of the tab key
@@ -525,39 +529,85 @@ namespace Takai.UI
 
         #endregion
 
-        #region Events/Commands
+        #region Commands/Events
 
-        private Dictionary<string, UIEvent> uiEvents;
+        /// <summary>
+        /// Commands that can be bound to an action
+        /// Commands are routed until an element has a matching action
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public Dictionary<string, System.Action<Static, object>> CommandActions =>
+            (_commandActions ?? (_commandActions = new Dictionary<string, System.Action<Static, object>>()));
+        private Dictionary<string, System.Action<Static, object>> _commandActions;
+
+        /// <summary>
+        /// Bubble a command up to the root element and then global handlers
+        /// Stops once an element has the required handler
+        /// </summary>
+        /// <param name="command">The command to run</param>
+        /// <param name="argument">An optional argument to pass thru</param>
+        /// <returns>True if the command had a matching action. False otherwise or if command was null</returns>
+        public bool BubbleCommand(string command, object argument = null)
+        {
+            if (command == null)
+                return false;
+
+            var target = this;
+            while (target != null)
+            {
+                if (target._commandActions != null && target.CommandActions.TryGetValue(command, out var handler))
+                {
+                    //check if modal?
+                    handler.Invoke(this, argument);
+                    return true;
+                }
+
+                target = target.Parent;
+            }
+
+            if (target == null)
+                ; //todo: global commands
+
+            return false;
+        }
+
+        /// <summary>
+        /// A map from events to commands 
+        /// e.g. Click->SpawnEntity
+        /// </summary>
+        public Dictionary<string, string> EventCommands { get; set; }
+        
+        private Dictionary<string, UIEvent> events;
 
         public void On(string @event, UIEventHandler handler)
         {
-            if (uiEvents == null)
-                uiEvents = new Dictionary<string, UIEvent>(System.StringComparer.OrdinalIgnoreCase);
+            if (events == null)
+                events = new Dictionary<string, UIEvent>(System.StringComparer.OrdinalIgnoreCase);
 
-            if (!uiEvents.TryGetValue(@event, out var handlers))
-                uiEvents[@event] = handlers = new UIEvent(true);
+            if (!events.TryGetValue(@event, out var handlers))
+                events[@event] = handlers = new UIEvent(true);
             handlers.AddHandler(handler);
         }
 
         public void On(IEnumerable<string> events, UIEventHandler handler)
         {
-            if (uiEvents == null)
-                uiEvents = new Dictionary<string, UIEvent>(System.StringComparer.OrdinalIgnoreCase);
+            if (this.events == null)
+                this.events = new Dictionary<string, UIEvent>(System.StringComparer.OrdinalIgnoreCase);
 
             foreach (var @event in events)
             {
-                if (!uiEvents.TryGetValue(@event, out var handlers))
-                    uiEvents[@event] = handlers = new UIEvent(true);
+                if (!this.events.TryGetValue(@event, out var handlers))
+                    this.events[@event] = handlers = new UIEvent(true);
                 handlers.AddHandler(handler);
             }
         }
 
         public bool Off(string @event, UIEventHandler handler)
         {
-            if (uiEvents == null)
+            if (events == null)
                 return false;
 
-            if (!uiEvents.TryGetValue(@event, out var handlers))
+            if (!events.TryGetValue(@event, out var handlers))
                 return false;
 
             return handlers.RemoveHandler(handler);
@@ -565,13 +615,13 @@ namespace Takai.UI
 
         public bool Off(IEnumerable<string> events, UIEventHandler handler)
         {
-            if (uiEvents == null)
+            if (this.events == null)
                 return false;
 
             bool removed = false;
             foreach (var @event in events)
             {
-                if (uiEvents.TryGetValue(@event, out var handlers))
+                if (this.events.TryGetValue(@event, out var handlers))
                 {
                     handlers.RemoveHandler(handler);
                     removed = true;
@@ -611,15 +661,22 @@ namespace Takai.UI
             BubbleEvent(this, @event, args);
         }
 
-        protected void BubbleEvent(Static source, string @event, UIEventArgs args)
+        protected void BubbleEvent(Static source, string @event, UIEventArgs eventArgs)
         {
+            if (source == null || @event == null)
+                return;
+
             var target = source;
             while (target != null)
             {
-                if ((target.uiEvents != null && target.uiEvents.TryGetValue(@event, out var handlers) &&
-                    handlers.Invoke(target, args) == UIEventResult.Handled) ||
+                if (target.EventCommands != null && target.EventCommands.TryGetValue(@event, out var command) &&
+                    BubbleCommand(command))
+                    return;
+
+                if ((target.events != null && target.events.TryGetValue(@event, out var handlers) &&
+                    handlers.Invoke(target, eventArgs) == UIEventResult.Handled) ||
                     target.IsModal) //no events are routed to the parent when modal
-                    break;
+                    return;
 
                 target = target.Parent;
             }
@@ -634,8 +691,6 @@ namespace Takai.UI
         //{
         //    //from root to source
         //}
-
-        public string OnClickCommand { get; set; } //todo: use events? (Commands { Click } --- event args might crash )
 
         #endregion
 
@@ -1501,9 +1556,6 @@ namespace Takai.UI
                 bool didUpdateBinding = false;
                 foreach (var binding in Bindings)
                     didUpdateBinding |= binding.Update();
-                //if (didUpdateBinding && AutoSize)
-                //    SizeToContain();
-                //should be handled by binding setters
             }
         }
 
@@ -1597,7 +1649,7 @@ namespace Takai.UI
             }
 
             //input capture
-            //todo: maybe add setting
+            //todo: maybe add capture setting
             else if (DidPressInside(button))
             {
                 var lastMousePosition = Input.InputState.LastMouseVector;
@@ -1656,8 +1708,7 @@ namespace Takai.UI
 
                 if (toDraw.BackgroundColor.A > 0)
                     Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
-                if (BackgroundSprite != null)
-                    BackgroundSprite.Draw(spriteBatch, toDraw.VisibleBounds, 0);
+                toDraw.BackgroundSprite.Draw(spriteBatch, toDraw.VisibleBounds);
 
                 toDraw.DrawSelf(spriteBatch);
 
@@ -1835,7 +1886,6 @@ namespace Takai.UI
                 deviceIndex = deviceIndex
             };
             BubbleEvent(ClickEvent, ce);
-            Commander.Invoke(OnClickCommand, this);
         }
 
         public static Static GeneratePropSheet(object obj, Graphics.BitmapFont font, Color color)

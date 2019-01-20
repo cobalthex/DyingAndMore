@@ -391,7 +391,7 @@ namespace Takai.Graphics
             var nf = IsLooping ? ((cf + 1) % FrameCount) : Util.Clamp(cf + 1, 0, FrameCount - 1);
             var fd = elapsed % 1;
 
-            if (ShrinkToFit) //todo: fit/contain
+            if (!ShrinkToFit) //todo: fit/contain
                 bounds = GetFitRect(Width, Height, bounds);
 
             bounds.X += (int)(Origin.X / Width * bounds.Width);
@@ -488,7 +488,8 @@ namespace Takai.Graphics
 
             //center sprite by default
             if (!(props.TryGetValue("Center", out var center) &&
-                center is bool doCenter && !doCenter))
+                center is bool doCenter && !doCenter) &&
+                !props.ContainsKey("Origin"))
                 CenterOrigin();
         }
 

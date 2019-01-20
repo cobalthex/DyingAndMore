@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Takai.Graphics;
+﻿using Microsoft.Xna.Framework;
 
 using NumericBaseType = System.Int64;
 
@@ -23,7 +21,6 @@ namespace Takai.UI
                 {
                     _value = newVal;
                     BubbleEvent(ValueChangedEvent, new UIEventArgs(this));
-                    Commander.Invoke(OnValueChangedCommand, this);
                 }
             }
         }
@@ -74,8 +71,6 @@ namespace Takai.UI
         /// How much to increase or decrease the value by each step
         /// </summary>
         public NumericBaseType Increment { get; set; } = 1;
-
-        public string OnValueChangedCommand { get; set; }
 
         public virtual void IncrementValue(int scale = 1)
         {
@@ -136,6 +131,7 @@ namespace Takai.UI
                 VerticalAlignment = Alignment.Stretch
             };
 
+            //todo: change to commands
             upButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
                 BubbleEvent(sender, "_IncrementValue", new UIEventArgs(sender));

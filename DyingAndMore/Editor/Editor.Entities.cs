@@ -151,7 +151,7 @@ namespace DyingAndMore.Editor
             if (dea.button == 0 && SelectedEntity != null)
             {
                 var delta = editor.Camera.LocalToWorld(dea.delta);
-                MoveEnt(SelectedEntity, SelectedEntity.Position + delta, SelectedEntity.Position);
+                MoveEnt(SelectedEntity, SelectedEntity.Position + delta, SelectedEntity.Forward);
                 return UIEventResult.Handled;
             }
 

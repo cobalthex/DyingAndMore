@@ -95,8 +95,6 @@ namespace Takai.UI
         /// </summary>
         public bool AllowLetters { get; set; } = true;
 
-        public string OnTextChangedCommand { get; set; }
-
         /// <summary>
         /// When the last character was inputted (in system ticks)
         /// </summary>
@@ -247,7 +245,7 @@ namespace Takai.UI
                         else
                             --Caret;
                     }
-                    else if (key == Keys.Right && Caret < Text.Length)
+                    else if (key == Keys.Right && Text != null && Caret < Text.Length)
                     {
                         if (isCtrl)
                             Caret = FindNextWordStart();
@@ -258,10 +256,10 @@ namespace Takai.UI
                     else if (key == Keys.Home)
                         Caret = 0;
 
-                    else if (key == Keys.End)
+                    else if (key == Keys.End && Text != null)
                         Caret = Text.Length;
 
-                    else if (key == Keys.Back && Caret > 0)
+                    else if (key == Keys.Back && Text != null && Caret > 0)
                     {
                         if (isCtrl)
                         {
@@ -277,7 +275,7 @@ namespace Takai.UI
                         UpdateVisibleText();
                     }
 
-                    else if (key == Keys.Delete && Caret < Text.Length)
+                    else if (key == Keys.Delete && Text != null && Caret < Text.Length)
                     {
                         if (isCtrl)
                         {
@@ -314,7 +312,12 @@ namespace Takai.UI
 
                     else if (!isCtrl && (AllowNumbers || AllowSpecialCharacters) &&
                              key == Keys.OemMinus)
-                        InsertAtCaret('-');
+                    {
+                        if (isShift)
+                            InsertAtCaret('_');
+                        else
+                            InsertAtCaret('-');
+                    }
 
                     else if (AllowSpecialCharacters)
                     {
@@ -340,7 +343,6 @@ namespace Takai.UI
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
 
             BubbleEvent(TextChangedEvent, new UIEventArgs(this));
-            Commander.Invoke(OnTextChangedCommand, this);
         }
 
         void UpdateScrollPosition()

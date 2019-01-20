@@ -22,7 +22,7 @@ namespace DyingAndMore.Editor
 
             var closeButton = new Static
             {
-                OnClickCommand = "$CloseModal",
+                EventCommands = new System.Collections.Generic.Dictionary<string, string> { [ClickEvent] = "Close" },
                 Text = "Close",
                 HorizontalAlignment = Alignment.Stretch,
                 BorderColor = Color.White,
@@ -43,6 +43,7 @@ namespace DyingAndMore.Editor
                 Margin = 10,
                 IsModal = true
             };
+            triggerSettings.CommandActions["Close"] = delegate { triggerSettings.RemoveFromParent(); };
         }
 
         public override void Start()

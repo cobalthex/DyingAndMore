@@ -1,26 +1,32 @@
 ﻿float4x4 Transform;
 
-struct Output
+struct PSInput
 {
 	float4 position : POSITION;
 	float4 color    : COLOR0;
 	float2 texcoord : TEXCOORD0;
+    nointerpolation float radius : TEXCOORD1;
 };
 
-Output vmain(float4 position : POSITION, float4 color : COLOR0, float2 texcoord : TEXCOORD0)
+PSInput vmain(float4 position : POSITION, float4 color : COLOR0, float2 texcoord : TEXCOORD0)
 {
-	Output output;
-	output.position = mul(position, Transform);
+	PSInput output;
+	output.position = mul(float4(position.xy, 0, 1), Transform);
 	output.color = color;
 	output.texcoord = texcoord;
+    output.radius = position.z * length(float3(Transform[2][0], Transform[2][1], Transform[2][2]));
 
 	return output;
 }
 
-float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoord : TEXCOORD0) : SV_Target
+float4 pmain(PSInput input) : SV_Target
 {
-	texcoord = texcoord * float2(2, 2) - float2(1, 1);
-	return (dot(texcoord, texcoord) <= 1 && dot(texcoord, texcoord) >= 0.9) ? color : 0;
+    float2 polar = input.texcoord * 2 - 1;
+    float dist = dot(polar, polar);
+
+    float circleDist = abs(1 - dist) * input.radius;
+    float alpha = saturate(1 - circleDist);
+    return float4(input.color.rgb, input.color.a * alpha);
 }
 
 technique Technique1
