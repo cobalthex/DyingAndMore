@@ -78,8 +78,8 @@ namespace Takai.UI
         }
         private Static _container = new List
         {
-            HorizontalAlignment = Alignment.Stretch,
-            VerticalAlignment = Alignment.Stretch
+            //HorizontalAlignment = Alignment.Stretch,
+            //VerticalAlignment = Alignment.Stretch
         };
 
         public bool AllowSelection { get; set; } = true;
@@ -225,7 +225,8 @@ namespace Takai.UI
             var item = ItemTemplate.CloneHierarchy();
             item.BindTo(value);
             //bound here for correct child indexing
-            item.On("Click", delegate (Static sender, UIEventArgs e)
+            //todo: use commands?
+            item.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
                 var sce = new SelectionChangedEventArgs(sender, SelectedIndex, item.ChildIndex);
                 BubbleEvent(sender, "_ChangeSelection", sce);

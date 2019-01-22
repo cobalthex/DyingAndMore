@@ -1,6 +1,6 @@
 NinePatch {
 	Sprite: {
-		Texture: @"./Button.png";
+		Texture: @"./button.png";
 		Center: false;
 	}
 	CenterRegion: [8 8 48 48];

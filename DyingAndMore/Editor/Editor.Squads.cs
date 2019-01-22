@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.UI;
+using Takai.Input;
 
 namespace DyingAndMore.Editor
 {
@@ -64,20 +66,20 @@ namespace DyingAndMore.Editor
             {
                 if (SelectedSquad != null && SelectedSquad.SpawnRadius > 5)
                 {
-                    var squadUI = nameUI.CloneHierarchy();
-                    squadUI.BindTo(SelectedSquad);
-                    squadUI.CommandActions["Accept"] = delegate (Static source, object argument)
+                    var ui = nameUI.CloneHierarchy();
+                    ui.BindTo(SelectedSquad);
+                    ui.CommandActions["Accept"] = delegate (Static source, object argument)
                     {
-                        squadUI.RemoveFromParent();
+                        ui.RemoveFromParent();
                         editor.Map.Spawn(SelectedSquad);
                         creatingSquad = false;
                     };
-                    squadUI.CommandActions["Cancel"] = delegate (Static source, object argument)
+                    ui.CommandActions["Cancel"] = delegate (Static source, object argument)
                     {
-                        squadUI.RemoveFromParent();
+                        ui.RemoveFromParent();
                         creatingSquad = false;
                     };
-                    AddChild(squadUI);
+                    AddChild(ui);
                 }
             }
 
@@ -110,10 +112,21 @@ namespace DyingAndMore.Editor
 
         protected override bool HandleInput(GameTime time)
         {
-            if (SelectedSquad?.Name != null && Takai.Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Delete))
+            if (SelectedSquad?.Name != null)
             {
-                editor.Map.Squads.Remove(SelectedSquad.Name);
-                return false;
+                if (InputState.IsPress(Keys.Delete))
+                {
+                    editor.Map.Squads.Remove(SelectedSquad.Name);
+                    return false;
+                }
+
+                if (InputState.IsPress(Keys.Space))
+                {
+                    var ui = editUI.CloneHierarchy();
+                    ui.BindTo(SelectedSquad);
+
+                    AddChild(ui);
+                }
             }
 
             return base.HandleInput(time);

@@ -151,6 +151,17 @@ namespace Takai.UI
 
     //todo: invalidation/dirty states, instead of reflow each time property is updated, mark dirty. On next update, reflow if dirty
 
+    public struct EventCommandBinding
+    {
+        public string command;
+        public object argument;
+
+        public static implicit operator EventCommandBinding(string command)
+        {
+            return new EventCommandBinding { command = command, argument = null };
+        }
+    }
+
     /// <summary>
     /// The basic UI element
     /// </summary>
@@ -164,6 +175,16 @@ namespace Takai.UI
         public const string TextChangedEvent = "TextChanged";
         public const string ValueChangedEvent = "ValueChanged";
         public const string SelectionChangedEvent = "SelectionChanged";
+
+        /// <summary>
+        /// Global commands that are invoked if routed commands arent triggered
+        /// </summary>
+        public static Dictionary<string, System.Action<Static, object>> GlobalCommands
+        {
+            get => (_globalCommands ?? (_globalCommands = new Dictionary<string, System.Action<Static, object>>
+                (System.StringComparer.OrdinalIgnoreCase)));
+        }
+        private static Dictionary<string, System.Action<Static, object>> _globalCommands;
 
 #if DEBUG
         /// <summary>
@@ -537,7 +558,8 @@ namespace Takai.UI
         /// </summary>
         [Data.Serializer.Ignored]
         public Dictionary<string, System.Action<Static, object>> CommandActions =>
-            (_commandActions ?? (_commandActions = new Dictionary<string, System.Action<Static, object>>()));
+            (_commandActions ?? (_commandActions = new Dictionary<string, System.Action<Static, object>>
+                (System.StringComparer.OrdinalIgnoreCase)));
         private Dictionary<string, System.Action<Static, object>> _commandActions;
 
         /// <summary>
@@ -555,18 +577,21 @@ namespace Takai.UI
             var target = this;
             while (target != null)
             {
-                if (target._commandActions != null && target.CommandActions.TryGetValue(command, out var handler))
+                if (target._commandActions != null && target.CommandActions.TryGetValue(command, out var caction))
                 {
                     //check if modal?
-                    handler.Invoke(this, argument);
+                    caction.Invoke(this, argument);
                     return true;
                 }
 
                 target = target.Parent;
             }
 
-            if (target == null)
-                ; //todo: global commands
+            if (target == null && GlobalCommands.TryGetValue(command, out var action))
+            {
+                action.Invoke(this, argument);
+                return true;
+            }
 
             return false;
         }
@@ -575,7 +600,7 @@ namespace Takai.UI
         /// A map from events to commands 
         /// e.g. Click->SpawnEntity
         /// </summary>
-        public Dictionary<string, string> EventCommands { get; set; }
+        public Dictionary<string, EventCommandBinding> EventCommands { get; set; } //todo: bind argument? (case sensitivity)
         
         private Dictionary<string, UIEvent> events;
 
@@ -670,7 +695,7 @@ namespace Takai.UI
             while (target != null)
             {
                 if (target.EventCommands != null && target.EventCommands.TryGetValue(@event, out var command) &&
-                    BubbleCommand(command))
+                    BubbleCommand(command.command, command.argument))
                     return;
 
                 if ((target.events != null && target.events.TryGetValue(@event, out var handlers) &&
@@ -1387,8 +1412,6 @@ namespace Takai.UI
                 child.Reflow(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
         }
 
-        public event UIEventHandler ChildReflow = null;
-
         /// <summary>
         /// Called by a child when it reflows, this element can reflow/resize in relation
         /// </summary>
@@ -1401,8 +1424,7 @@ namespace Takai.UI
             if (Parent == null)
                 return;
 
-            Parent.OnChildReflow(this);
-            Parent.ChildReflow?.Invoke(this, new UIEventArgs(this));
+            Parent?.OnChildReflow(this);
         }
 
 

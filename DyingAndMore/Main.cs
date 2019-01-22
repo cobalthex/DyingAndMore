@@ -150,6 +150,7 @@ namespace DyingAndMore
 
             ui = new Takai.UI.FileList
             {
+                Name = "MapSelect",
                 //Size = new Vector2(400, 600),
                 HorizontalAlignment = Takai.UI.Alignment.Middle,
                 VerticalAlignment = Takai.UI.Alignment.Middle,
@@ -178,7 +179,7 @@ namespace DyingAndMore
                     }
                     else if (map is MapInstance mi)
                     {
-                        mi.Class.InitializeGraphics();
+                        mi.Class.InitializeGraphics();  
                         ui.ReplaceAllChildren(new Editor.Editor(mi));
                     }
                 }
@@ -222,6 +223,22 @@ namespace DyingAndMore
 
             uiMatrix = Matrix.Identity;// Matrix.CreateTranslation(-GraphicsDevice.DisplayMode.Width / 2, 0, 0) * Matrix.CreateScale(2);
 
+            Takai.UI.Static.GlobalCommands["AddUI"] = delegate (Takai.UI.Static ui, object arg)
+            {
+                if (!(arg is Takai.UI.Static child))
+                    return;
+
+                ui.AddChild(child);
+            };
+            Takai.UI.Static.GlobalCommands["CloseModal"] = delegate (Takai.UI.Static ui, object arg)
+            {
+                while (ui != null && !ui.IsModal)
+                    ui = ui.Parent;
+
+                if (ui != null)
+                    ui.RemoveFromParent();
+            };
+
             ui.HasFocus = true;
             base.Initialize();
         }
@@ -264,7 +281,7 @@ namespace DyingAndMore
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, null, uiMatrix);
             ui.Draw(sbatch);
-
+            
             int y = GraphicsDevice.Viewport.Height - 70;
             foreach (var row in Takai.LogBuffer.Entries)
             {
