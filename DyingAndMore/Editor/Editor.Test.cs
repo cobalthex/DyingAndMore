@@ -14,9 +14,12 @@ namespace DyingAndMore.Editor
         Vector2 start, end, direction, tangent;
         bool active = false;
 
+        TrailInstance trail;
+
         public TestEditorMode(Editor editor)
             : base("Test", editor)
         {
+            trail = Takai.Data.Cache.Load<TrailClass>("Effects/Trails/mouse.trail.tk").Instantiate();
         }
 
         public override void Start()
@@ -45,6 +48,9 @@ namespace DyingAndMore.Editor
             }
             else
                 active = false;
+
+            trail.Advance(pos, Vector2.Normalize(InputState.MouseDelta()));
+            editor.Map.Spawn(trail);
 
             return base.HandleInput(time);
         }

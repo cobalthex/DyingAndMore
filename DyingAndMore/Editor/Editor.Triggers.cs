@@ -22,7 +22,7 @@ namespace DyingAndMore.Editor
 
             var closeButton = new Static
             {
-                EventCommands = new System.Collections.Generic.Dictionary<string, string> { [ClickEvent] = "Close" },
+                EventCommands = new System.Collections.Generic.Dictionary<string, EventCommandBinding> { [ClickEvent] = "Close" },
                 Text = "Close",
                 HorizontalAlignment = Alignment.Stretch,
                 BorderColor = Color.White,

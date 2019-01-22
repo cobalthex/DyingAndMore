@@ -1,51 +1,49 @@
 List {
 	IsModal: true;
 	Padding: 10;
-	Margin: 10;
 	Direction: Direction.Vertical;
 	HorizontalAlignment: Alignment.Center;
 	VerticalAlignment: Alignment.Center;
 	BackgroundColor: [60 60 60 255];
 
 	Children: [
+		Static { Text: "Edit Squad"; };
+		Static { Size: [1 10]; };
+
+		Static { Text: "Actors"; };
 		Static {
+			Text: "Select actor";
+			EventCommands: {
+				Click: [
+					"AddUI"
+					List {
+						IsModal: true;
+						Padding: 10;
+						BackgroundSprite: @"UI/test/test.9p.tk";
+						Children: [
+							EntitySelector {
+								Size: [400 400];
+							};
 
+							Static {
+								Text: "Cancel";
+								Padding: 10;
+								EventCommands: {
+									Click: "CloseModal";
+								};
+							};
+						];
+					};
+				];
+			};
 		};
 
-		TextInput {
-			HasFocus: true;
-			HorizontalAlignment: Alignment.Stretch;
-			Bindings: [
-				Binding {
-					Direction: BindingDirection.TwoWay;
-					Source: "Name";
-					Target: "Text";
-				};
-			];
+		Static {
+			Text: "Close";
+			Padding: 10;
+			EventCommands: {
+				Click: "CloseModal";
+			};
 		};
-
-
-		List {
-			Direction: Direction.Horizontal;
-			HorizontalAlignment: Alignment.Stretch;
-			Margin: 10;
-			Children: [
-				Static {
-					Text: "Create squad";
-					HorizontalAlignment: Alignment.Stretch;
-					EventCommands: {
-						Click: "Accept";
-					};
-				}
-
-				Static {
-					Text: "Cancel";
-					HorizontalAlignment: Alignment.Stretch;
-					EventCommands: {
-						Click: "Cancel";
-					};
-				}
-			];
-		}
 	];
 };

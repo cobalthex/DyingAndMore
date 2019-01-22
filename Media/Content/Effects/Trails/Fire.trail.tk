@@ -1,13 +1,13 @@
 TrailClass {
     MaxPoints: 400;
-    Color: {
+    #*Color: {
         Values: [
             [0 [255 0 0 255]];
             [1 [255 0 1 255]];
         ]
-    }
+    }*#
     Sprite: {
-        texture: @"asdf.png";
+        texture: @"./fire.png";
         FrameCount: 30;
         FrameLength: 20msec;
         Width: 200;
@@ -20,17 +20,17 @@ TrailClass {
             [0 0]
             [0.3 50];
             [0.5 100];
-            [0.6 50];
+            #[0.6 50];
             [0.7 100];
             [0.8 50];
             [1 20];
         ];
     };
     #Width: 128;
-    Jitter: [-10 10];
-    SkipChance: 50%;
+    #Jitter: [-10 10];
+    #SkipChance: 50%;
 
-    MergeCollinear: false;
+    #MergeCollinear: false;
     CaptureDelay: 30Hz;
     LifeSpan: 3sec;
 

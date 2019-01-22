@@ -316,9 +316,7 @@ namespace Takai.Data
             var srcVal = sourceAccessors.get?.Invoke() ?? null;
             var srcHash = srcVal?.GetHashCode() ?? 0;
             var srcMatches = (srcHash == cachedHash && (srcVal == null ? cachedValue == null : srcVal.Equals(cachedValue)));
-
-            //todo: optimize casts? necessary?
-
+            
             if (!srcMatches)
             {
                 var bindVal = srcVal;
@@ -328,7 +326,6 @@ namespace Takai.Data
                 targetAccessors.set(Converter.Convert(targetAccessors.type, bindVal));
                 cachedValue = srcVal;
                 cachedHash = srcHash;
-                OnUpdated();
 
                 //System.Diagnostics.Debug.WriteLine($"Updated binding for source:{SourceProperty} to target:{TargetProperty} = {cachedValue}");
                 return true;
@@ -346,7 +343,6 @@ namespace Takai.Data
                     sourceAccessors.set(Converter.Convert(sourceAccessors.type, bindVal));
                     cachedValue = tgtVal;
                     cachedHash = tgtHash;
-                    OnUpdated();
 
                     //System.Diagnostics.Debug.WriteLine($"Updated binding for target:{TargetProperty} to source:{SourceProperty} = {cachedValue}");
                     return true;
@@ -354,7 +350,5 @@ namespace Takai.Data
             }
             return false;
         }
-
-        protected virtual void OnUpdated() { }
     }
 }
