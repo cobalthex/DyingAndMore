@@ -228,7 +228,9 @@ namespace Takai.Data
 
         public Converter Converter { get; set; } = DefaultConverter;
 
+        [Serializer.Ignored]
         GetSet sourceAccessors;
+        [Serializer.Ignored]
         GetSet targetAccessors;
 
         object cachedValue;

@@ -46,6 +46,12 @@ namespace DyingAndMore.Editor.Selectors
             base.ReflowOverride(availableSize);
         }
 
+        protected override void OnChildReflow(Static child)
+        {
+            if (IsAutoSized)
+                Reflow();
+        }
+
         protected virtual UIEventResult OnPress(Static sender, UIEventArgs e)
         {
             var ce = (PointerEventArgs)e;
