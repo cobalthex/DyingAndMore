@@ -190,6 +190,7 @@ namespace Takai.UI
         /// <summary>
         /// A unique ID for this element. Only present in DEBUG
         /// </summary>
+        [Data.DebugSerialize]
         public uint DebugId { get; private set; } = GenerateId();
 
         private static uint idCounter = 0;
@@ -399,29 +400,31 @@ namespace Takai.UI
         /// The last size returned by this element's <see cref="Measure"/>
         /// This includes padding and position
         /// </summary>
+        [Data.DebugSerialize]
         public Vector2 MeasuredSize { get; private set; }
 
         /// <summary>
         /// The bounds of the content area, as determined by <see cref="Reflow"/>
         /// </summary>
-        [Data.Serializer.Ignored]
+        [Data.DebugSerialize]
         public Rectangle ContentArea { get; private set; }
 
         /// <summary>
         /// The <see cref="ContentArea"/> of this element offset relative to the screen
         /// </summary>
-        [Data.Serializer.Ignored]
+        [Data.DebugSerialize]
         public Rectangle OffsetContentArea { get; private set; }
 
         /// <summary>
         /// The visible region of this element on the screen, excluding padding
         /// </summary>
-        [Data.Serializer.Ignored]
+        [Data.DebugSerialize]
         public Rectangle VisibleContentArea { get; private set; }
 
         /// <summary>
         /// The visible region of this element, including padding
         /// </summary>
+        [Data.DebugSerialize]
         public Rectangle VisibleBounds { get; private set; }
 
         /// <summary>
@@ -533,6 +536,7 @@ namespace Takai.UI
                 Reflow();
             }
         }
+        [Data.Serializer.Ignored]
         private Static _parent = null;
 
         /// <summary>

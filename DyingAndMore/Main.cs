@@ -150,7 +150,6 @@ namespace DyingAndMore
 
             ui = new Takai.UI.FileList
             {
-                Name = "MapSelect",
                 //Size = new Vector2(400, 600),
                 HorizontalAlignment = Takai.UI.Alignment.Middle,
                 VerticalAlignment = Takai.UI.Alignment.Middle,
@@ -255,11 +254,6 @@ namespace DyingAndMore
                 return;
             }
 
-            if (InputState.IsPress(Keys.F10))
-                Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
-            if (InputState.IsPress(Keys.F11))
-                ui.Reflow();
-
             if (InputState.IsPress(Keys.F8))
             {
                 if (!fpsGraph.RemoveFromParent())
@@ -268,6 +262,16 @@ namespace DyingAndMore
                     ui.AddChild(fpsGraph);
                 }
             }
+
+            if (InputState.IsPress(Keys.F9))
+            {
+                using (var stream = new System.IO.StreamWriter("ui.tk"))
+                    Serializer.TextSerialize(stream, ui, 0, false, false, true);
+            }
+            if (InputState.IsPress(Keys.F10))
+                Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
+            if (InputState.IsPress(Keys.F11))
+                ui.Reflow();
 
             InputState.Update(GraphicsDevice.Viewport.Bounds);
 

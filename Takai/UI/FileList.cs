@@ -46,6 +46,8 @@ namespace Takai.UI
 
         public FileList()
         {
+            Name = "FIEL";
+
             var template = new List
             {
                 HorizontalAlignment = Alignment.Stretch,

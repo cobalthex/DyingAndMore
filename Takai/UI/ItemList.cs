@@ -212,6 +212,12 @@ namespace Takai.UI
             }
         }
 
+        protected override void OnChildReflow(Static child)
+        {
+            if (IsAutoSized)
+                Reflow();
+        }
+
         /// <summary>
         /// Create a new list item
         /// </summary>
