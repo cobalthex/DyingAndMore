@@ -46,8 +46,6 @@ namespace Takai.UI
 
         public FileList()
         {
-            Name = "FIEL";
-
             var template = new List
             {
                 HorizontalAlignment = Alignment.Stretch,
@@ -69,7 +67,7 @@ namespace Takai.UI
                     }
                 }
             });
-            template.AddChild(new Static { Size = new Microsoft.Xna.Framework.Vector2(10, 1) });
+            template.AddChild(new Static { Name = "FU", Size = new Microsoft.Xna.Framework.Vector2(10, 1) });
             template.AddChild(new Static
             {
                 HorizontalAlignment = Alignment.Right,

@@ -194,7 +194,7 @@ namespace Takai.Data
     /// Source has priority if both are modified
     /// Bind to globals by prefixing with $ (e.g. $MapTime)
     /// </summary>
-    public class Binding : ICloneable
+    public class Binding
     {
         public static readonly Converter DefaultConverter = new Converter();
 
@@ -245,9 +245,9 @@ namespace Takai.Data
             DefaultValue = defaultValue;
         }
 
-        public object Clone()
+        public Binding Clone()
         {
-            return MemberwiseClone();
+            return (Binding)MemberwiseClone();
         }
 
         /// <summary>

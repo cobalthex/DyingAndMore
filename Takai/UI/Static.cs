@@ -165,7 +165,7 @@ namespace Takai.UI
     /// <summary>
     /// The basic UI element
     /// </summary>
-    public class Static : Data.IDerivedDeserialize, System.ICloneable
+    public class Static : Data.IDerivedDeserialize
     {
         //some standard/common events
         public const string PressEvent = "Press";
@@ -368,10 +368,10 @@ namespace Takai.UI
                 if (_size != value)
                 {
                     if (float.IsInfinity(value.X) || float.IsInfinity(value.Y))
-                        System.Diagnostics.Debug.WriteLine($"{this}: Size=Infinity will always render as collapse");
+                        ;//System.Diagnostics.Debug.WriteLine($"{this}: Size=Infinity will always render as collapse");
 
                     _size = value;
-                    ResizeAndReflow();
+                    Reflow();
                 }
             }
         }
@@ -390,7 +390,7 @@ namespace Takai.UI
                 if (_padding != value)
                 {
                     _padding = value;
-                    ResizeAndReflow();
+                    Reflow();
                 }
             }
         }
@@ -426,11 +426,6 @@ namespace Takai.UI
         /// </summary>
         [Data.DebugSerialize]
         public Rectangle VisibleBounds { get; private set; }
-
-        /// <summary>
-        /// The container that this element fits into
-        /// </summary>
-        private Rectangle containerBounds; //todo: re-evaluate necessity
 
         /// <summary>
         /// Does this element currently have focus?
@@ -554,6 +549,45 @@ namespace Takai.UI
 
         #endregion
 
+        public Static()
+        {
+            //System.Diagnostics.Debug.WriteLine($"New ID:{DebugId}");
+            Children = _children.AsReadOnly();
+        }
+
+        /// <summary>
+        /// Create a simple static label. Calls <see cref="AutoSize(float)"/>
+        /// </summary>
+        /// <param name="text">The text to set</param>
+        public Static(string text)
+            : this()
+        {
+            Text = text;
+        }
+
+        /// <summary>
+        /// Create a new element
+        /// </summary>
+        /// <param name="children">Optionally add children to this element</param>
+        public Static(params Static[] children)
+            : this()
+        {
+            foreach (var child in children)
+                AddChild(child);
+        }
+
+        private void DeserializeChildren(object objects)
+        {
+            if (!(objects is List<object> elements))
+                throw new System.ArgumentException("Children must be a list of UI elements");
+
+            foreach (var element in elements)
+            {
+                if (element is Static child)
+                    AddChild(child);
+            }
+        }
+
         #region Commands/Events
 
         /// <summary>
@@ -605,7 +639,7 @@ namespace Takai.UI
         /// e.g. Click->SpawnEntity
         /// </summary>
         public Dictionary<string, EventCommandBinding> EventCommands { get; set; } //todo: bind argument? (case sensitivity)
-        
+
         private Dictionary<string, UIEvent> events;
 
         public void On(string @event, UIEventHandler handler)
@@ -723,44 +757,6 @@ namespace Takai.UI
 
         #endregion
 
-        private void DeserializeChildren(object objects)
-        {
-            if (!(objects is List<object> elements))
-                throw new System.ArgumentException("Children must be a list of UI elements");
-
-            foreach (var element in elements)
-            {
-                if (element is Static child)
-                    AddChild(child);
-            }
-        }
-
-        public Static()
-        {
-            Children = _children.AsReadOnly();
-        }
-
-        /// <summary>
-        /// Create a simple static label. Calls <see cref="AutoSize(float)"/>
-        /// </summary>
-        /// <param name="text">The text to set</param>
-        public Static(string text)
-            : this()
-        {
-            Text = text;
-        }
-
-        /// <summary>
-        /// Create a new element
-        /// </summary>
-        /// <param name="children">Optionally add children to this element</param>
-        public Static(params Static[] children)
-            : this()
-        {
-            foreach (var child in children)
-                AddChild(child);
-        }
-
         #region Hierarchy/cloning
 
         private void SetParentNoReflow(Static newParent)
@@ -768,11 +764,6 @@ namespace Takai.UI
             var oldParent = _parent;
             _parent = newParent;
             BubbleEvent(ParentChangedEvent, new ParentChangedEventArgs(this, oldParent));
-        }
-
-        object System.ICloneable.Clone()
-        {
-            return CloneHierarchy();
         }
 
         /// <summary>
@@ -832,6 +823,7 @@ namespace Takai.UI
         /// <returns>True if the child as added, false otherwise</returns>
         public virtual bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
+            //System.Diagnostics.Debug.WriteLine($"Inserting child ID:{child.DebugId} @ {index} into ID:{DebugId}");
             //todo: maybe have a forward setting (forward all additions to specified child)
 
             if (child.Parent == this)
@@ -862,6 +854,7 @@ namespace Takai.UI
                 return false;
 
             var child = Children[index];
+            //System.Diagnostics.Debug.WriteLine($"Removing child ID:{child.DebugId} @ {index} from ID:{DebugId}");
             _children.RemoveAt(index);
             if (child.Parent == this)
                 child.SetParentNoReflow(null);
@@ -1298,14 +1291,23 @@ namespace Takai.UI
 
         #region Layout
 
+        Vector2 lastAvailableSize;
+        private Rectangle containerBounds; //todo: re-evaluate necessity
+
         /// <summary>
         /// Calculate the desired containing region of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
         /// Sets <see cref="MeasuredSize"/> to value calculated
         /// This returns a size that is large enough to include the offset element with padding
         /// </summary>
         /// <returns>The desired size of this element, including padding</returns>
-        public Vector2 Measure(Vector2 availableSize)
+        public Vector2 Measure(Vector2 availableSize, bool force = false)
         {
+            if (availableSize == lastAvailableSize && !force)
+                return MeasuredSize;
+            lastAvailableSize = availableSize;
+
+            //System.Diagnostics.Debug.WriteLine($"Measuring ID:{DebugId} (available size:{availableSize})");
+
             var size = Size;
             bool isWidthAutoSize = float.IsNaN(size.X);
             bool isHeightAutoSize = float.IsNaN(size.Y);
@@ -1335,7 +1337,7 @@ namespace Takai.UI
             {
                 if (float.IsInfinity(measuredSize.X) || float.IsNaN(measuredSize.X)
                  || float.IsInfinity(measuredSize.Y) || float.IsNaN(measuredSize.Y))
-                    throw new System.NotFiniteNumberException("Measured size cannot be NaN or infinity");
+                    throw new System./*NotFiniteNumberException*/InvalidOperationException("Measured size cannot be NaN or infinity");
 
                 if (isWidthAutoSize)
                     size.X = measuredSize.X;
@@ -1344,8 +1346,30 @@ namespace Takai.UI
                     size.Y = measuredSize.Y;
             }
 
+            var lastMeasuredSize = MeasuredSize;
             MeasuredSize = Position + size + Padding * 2;
+
+            if (MeasuredSize != lastMeasuredSize)
+                NotifyParentMeasuredSizeChanged();
             return MeasuredSize;
+        }
+
+        void NotifyParentMeasuredSizeChanged()
+        {
+            if (Parent == null)
+                return;
+
+            Parent.OnChildRemeasure(this);
+        }
+
+        /// <summary>
+        /// Called whenever a child of this element resizes. By default if this element is autosized, it will call Reflow
+        /// </summary>
+        /// <param name="child"></param>
+        protected virtual void OnChildRemeasure(Static child)
+        {
+            if (IsAutoSized)
+                Reflow();
         }
 
         /// <summary>
@@ -1371,12 +1395,7 @@ namespace Takai.UI
 
             return new Vector2(bounds.Width, bounds.Height);
         }
-
-        /// <summary>
-        /// Is this element in a reflow currently?
-        /// Used to prevent <see cref="OnChildReflow"/> from getting stuck in a loop
-        /// </summary>
-        bool isReflowing = false;
+        
         bool hasReflowed = false;
 
         public void Reflow()
@@ -1384,6 +1403,7 @@ namespace Takai.UI
             if (!hasReflowed) //if never reflowed, there is no container set so stretched objects will not have any size
                 containerBounds = Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.ContentArea;
 
+            Measure(new Vector2(containerBounds.Width, containerBounds.Height), true);
             Reflow(containerBounds);
         }
 
@@ -1393,14 +1413,16 @@ namespace Takai.UI
         /// <param name="container">Container in relative coordinates</param>
         public void Reflow(Rectangle container)
         {
-            if (!IsEnabled || isReflowing)
+            if (!IsEnabled)
                 return;
-
-            isReflowing = true;
+            
+            var lastClip = OffsetContentArea; //is this the right one?
             AdjustToContainer(container);
-            ReflowOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions
-            NotifyChildReflow();
-            isReflowing = false;
+            //if (lastClip != OffsetContentArea) //todo: doesnt hit all cases
+            {
+                //System.Diagnostics.Debug.WriteLine($"Reflowing ID:{DebugId} (container:{container})");
+                ReflowOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
+            }
             hasReflowed = true;
         }
 
@@ -1410,32 +1432,8 @@ namespace Takai.UI
         /// </summary>
         protected virtual void ReflowOverride(Vector2 availableSize)
         {
-            //todo: this availableSize needs to be Size or stretch
-
             foreach (var child in Children)
                 child.Reflow(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
-        }
-
-        /// <summary>
-        /// Called by a child when it reflows, this element can reflow/resize in relation
-        /// </summary>
-        /// <param name="child">The child element that reflowed</param>
-        protected virtual void OnChildReflow(Static child) { }
-
-        //todo: this shouldnt need to exist
-        public void NotifyChildReflow()
-        {
-            if (Parent == null)
-                return;
-
-            Parent?.OnChildReflow(this);
-        }
-
-
-        protected void ResizeAndReflow()
-        {
-            Reflow();
-            //todo: invalidate meausure here
         }
 
         /// <summary>
@@ -1456,19 +1454,19 @@ namespace Takai.UI
                 parentBounds = Parent.VisibleBounds;
             }
 
-            var measuredSize = Measure(container.Size.ToVector2()); //todo: this should go elsewhere
+            var finalSize = MeasuredSize;
 
             //todo: should this go into Measure?
             if (HorizontalAlignment == Alignment.Stretch)
-                measuredSize.X = float.IsNaN(Size.X) ? container.Width : Size.X;
+                finalSize.X = float.IsNaN(Size.X) ? container.Width : Size.X;
             if (VerticalAlignment == Alignment.Stretch)
-                measuredSize.Y = float.IsNaN(Size.Y) ? container.Height : Size.Y;
+                finalSize.Y = float.IsNaN(Size.Y) ? container.Height : Size.Y;
 
             var localPos = new Vector2(
-                GetLocalOffset(HorizontalAlignment, Position.X, measuredSize.X, Padding.X, container.Width),
-                GetLocalOffset(VerticalAlignment, Position.Y, measuredSize.Y, Padding.Y, container.Height)
+                GetLocalOffset(HorizontalAlignment, Position.X, finalSize.X, Padding.X, container.Width),
+                GetLocalOffset(VerticalAlignment, Position.Y, finalSize.Y, Padding.Y, container.Height)
             );
-            var bounds = new Rectangle((int)localPos.X, (int)localPos.Y, (int)(measuredSize.X), (int)(measuredSize.Y));
+            var bounds = new Rectangle((int)localPos.X, (int)localPos.Y, (int)(finalSize.X), (int)(finalSize.Y));
 
             bounds.Width -= (int)(Padding.X * 2 + Position.X);
             bounds.Height -= (int)(Padding.Y * 2 + Position.Y);

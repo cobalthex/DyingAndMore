@@ -39,12 +39,6 @@ namespace Takai.UI
             ColumnCount = columnCount;
         }
 
-        protected override void OnChildReflow(Static child)
-        {
-            if (IsAutoSized)
-                Reflow();
-        }
-
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             if (ColumnCount <= 0)
@@ -150,8 +144,6 @@ namespace Takai.UI
                 ));
                 offset.X += columnWidths[i % ColumnCount];
             }
-
-            NotifyChildReflow();
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
