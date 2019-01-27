@@ -149,7 +149,7 @@ namespace DyingAndMore.Game
             if (game?.Map == null)
                 throw new ArgumentNullException("There must be a map to play");
 
-            game.Map.PackageMap("Maps/test.d2map");
+            //game.Map.PackageMap("Maps/test.d2map");
 
             Game = game;
             Current = this; //apply elsewhere?

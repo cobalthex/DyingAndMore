@@ -31,13 +31,7 @@ namespace Takai.UI
                 return UIEventResult.Handled;
             });
         }
-
-        protected override void OnChildReflow(Static child)
-        {
-            Reflow();
-            base.OnChildReflow(child);
-        }
-
+        
         protected override bool HandleInput(GameTime time)
         {
             if (Input.InputState.IsClick(Input.MouseButtons.Left) && //todo: this is hacky

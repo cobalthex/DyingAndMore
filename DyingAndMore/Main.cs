@@ -58,11 +58,11 @@ namespace DyingAndMore
                 PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
                 GraphicsProfile = GraphicsProfile.HiDef,
                 PreferredBackBufferFormat = SurfaceFormat.Color,
-                PreferMultiSampling = true,
 #if WINDOWS_UAP
                 SynchronizeWithVerticalRetrace = true,
-                IsFullScreen = true,
+                //IsFullScreen = true,
 #else
+                PreferMultiSampling = true,
                 SynchronizeWithVerticalRetrace = false,
 #endif
             };
@@ -148,7 +148,7 @@ namespace DyingAndMore
 #endif
             */
 
-            ui = new Takai.UI.FileList
+            var childUI = new Takai.UI.FileList
             {
                 //Size = new Vector2(400, 600),
                 HorizontalAlignment = Takai.UI.Alignment.Middle,
@@ -156,7 +156,7 @@ namespace DyingAndMore
                 BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
                 FilterRegex = "\\.(map\\.tk|d2map\\.zip)$",
             };
-            ui.On(Takai.UI.Static.SelectionChangedEvent, delegate (Takai.UI.Static s, Takai.UI.UIEventArgs ee)
+            childUI.On(Takai.UI.Static.SelectionChangedEvent, delegate (Takai.UI.Static s, Takai.UI.UIEventArgs ee)
             {
                 var fl = (Takai.UI.FileList)s;
                 if (System.IO.File.Exists(fl.SelectedFile))
@@ -178,12 +178,13 @@ namespace DyingAndMore
                     }
                     else if (map is MapInstance mi)
                     {
-                        mi.Class.InitializeGraphics();  
+                        mi.Class.InitializeGraphics();
                         ui.ReplaceAllChildren(new Editor.Editor(mi));
                     }
                 }
                 return Takai.UI.UIEventResult.Handled;
             });
+
             //var ui = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)
             //{
@@ -200,11 +201,22 @@ namespace DyingAndMore
             //}
             //ui = Cache.Load<Takai.UI.Static>("UI/test/elements.ui.tk");
 
-            ui = new Takai.UI.Static(ui)
+            //var childUI = new Takai.UI.List
+            //{
+            //    Direction = Takai.UI.Direction.Vertical,
+            //    Position = new Vector2(10),
+            //    Padding = new Vector2(10),
+            //};
+            //childUI.AddChild(new Takai.UI.Static("item 1"));
+            //childUI.AddChild(new Takai.UI.Static("item 2"));
+            //childUI.AddChild(new Takai.UI.Static("item 3"));
+
+            ui = new Takai.UI.Static
             {
                 HorizontalAlignment = Takai.UI.Alignment.Stretch,
                 VerticalAlignment = Takai.UI.Alignment.Stretch
             };
+            ui.AddChild(childUI);
             //Takai.UI.Static.DebugFont = Takai.UI.Static.DefaultFont;
 
             fpsGraph = new Takai.FpsGraph()
@@ -219,8 +231,6 @@ namespace DyingAndMore
                 | GestureType.Flick
                 | GestureType.FreeDrag
                 | GestureType.Pinch;
-
-            uiMatrix = Matrix.Identity;// Matrix.CreateTranslation(-GraphicsDevice.DisplayMode.Width / 2, 0, 0) * Matrix.CreateScale(2);
 
             Takai.UI.Static.GlobalCommands["AddUI"] = delegate (Takai.UI.Static ui, object arg)
             {
@@ -265,14 +275,14 @@ namespace DyingAndMore
 
             if (InputState.IsPress(Keys.F9))
             {
-                using (var stream = new System.IO.StreamWriter("ui.tk"))
+                using (var stream = new System.IO.StreamWriter(System.IO.File.OpenWrite("ui.tk")))
                     Serializer.TextSerialize(stream, ui, 0, false, false, true);
             }
             if (InputState.IsPress(Keys.F10))
                 Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
             if (InputState.IsPress(Keys.F11))
                 ui.Reflow();
-
+            
             InputState.Update(GraphicsDevice.Viewport.Bounds);
 
             ui.Update(gameTime);
@@ -283,9 +293,9 @@ namespace DyingAndMore
         {
             GraphicsDevice.Clear(Color.Black);
 
-            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, null, uiMatrix);
+            sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
             ui.Draw(sbatch);
-            
+
             int y = GraphicsDevice.Viewport.Height - 70;
             foreach (var row in Takai.LogBuffer.Entries)
             {

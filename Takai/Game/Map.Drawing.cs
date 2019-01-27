@@ -523,6 +523,8 @@ namespace Takai.Game
             Class.mapAlphaTest.View = c.cameraTransform;
             c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, Class.stencilWrite, null, Class.mapAlphaTest);
 
+            var tileSize = Class.TileSize;
+            var tilesPerRow = Class.TilesPerRow;
             for (var y = c.visibleTiles.Top; y < c.visibleTiles.Bottom; ++y)
             {
                 for (var x = c.visibleTiles.Left; x < c.visibleTiles.Right; ++x)
@@ -534,8 +536,8 @@ namespace Takai.Game
                     c.spriteBatch.Draw
                     (
                         Class.TilesImage,
-                        new Vector2(x * Class.TileSize, y * Class.TileSize),
-                        new Rectangle((tile % Class.TilesPerRow) * Class.TileSize, (tile / Class.TilesPerRow) * Class.TileSize, Class.TileSize, Class.TileSize),
+                        new Vector2(x * tileSize, y * tileSize),
+                        new Rectangle((tile % Class.TilesPerRow) * tileSize, (tile / tilesPerRow) * tileSize, tileSize, tileSize),
                         Color.White
                     );
                 }

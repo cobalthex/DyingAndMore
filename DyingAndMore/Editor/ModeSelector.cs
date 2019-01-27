@@ -112,12 +112,6 @@ namespace DyingAndMore.Editor
             tabs.AddChild(tab);
         }
 
-        protected override void OnChildReflow(Static child)
-        {
-            Reflow();
-            base.OnChildReflow(child);
-        }
-
         protected override bool HandleInput(GameTime time)
         {
             for (int i = 0; i < System.Math.Min(10, modes.Count); ++i)

@@ -211,13 +211,7 @@ namespace Takai.UI
                     Container.InsertChild(CreateItemEntry((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
         }
-
-        protected override void OnChildReflow(Static child)
-        {
-            if (IsAutoSized)
-                Reflow();
-        }
-
+        
         /// <summary>
         /// Create a new list item
         /// </summary>

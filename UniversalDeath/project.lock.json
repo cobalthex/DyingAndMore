@@ -239,7 +239,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -270,11 +270,11 @@
           "System.Runtime.Serialization.Xml": "4.1.2",
           "System.Runtime.WindowsRuntime": "4.0.11",
           "System.Runtime.WindowsRuntime.UI.Xaml": "4.0.1",
-          "System.ServiceModel.Duplex": "4.0.2",
-          "System.ServiceModel.Http": "4.1.1",
-          "System.ServiceModel.NetTcp": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
-          "System.ServiceModel.Security": "4.0.2",
+          "System.ServiceModel.Duplex": "4.0.4",
+          "System.ServiceModel.Http": "4.1.3",
+          "System.ServiceModel.NetTcp": "4.1.3",
+          "System.ServiceModel.Primitives": "4.1.3",
+          "System.ServiceModel.Security": "4.0.4",
           "System.Text.Encoding.CodePages": "4.0.1",
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
@@ -325,6 +325,27 @@
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
+      "MonoGame.Framework.WindowsUniversal/3.7.1.189": {
+        "type": "package",
+        "dependencies": {
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1",
+          "SharpDX.Direct2D1": "4.0.1",
+          "SharpDX.Direct3D11": "4.0.1",
+          "SharpDX.MediaFoundation": "4.0.1",
+          "SharpDX.XAudio2": "4.0.1",
+          "SharpDX.XInput": "4.0.1"
+        },
+        "compile": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "runtime": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "build": {
+          "build/MonoGame.Framework.WindowsUniversal.targets": {}
+        }
+      },
       "runtime.native.System.IO.Compression/4.1.0": {
         "type": "package",
         "dependencies": {
@@ -349,6 +370,99 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
+        }
+      },
+      "SharpDX/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.dll": {}
+        }
+      },
+      "SharpDX.Direct2D1/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        }
+      },
+      "SharpDX.Direct3D11/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        }
+      },
+      "SharpDX.DXGI/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        }
+      },
+      "SharpDX.MediaFoundation/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        }
+      },
+      "SharpDX.XAudio2/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        }
+      },
+      "SharpDX.XInput/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
         }
       },
       "System.AppContext/4.1.0": {
@@ -1228,7 +1342,7 @@
           }
         }
       },
-      "System.Private.ServiceModel/4.1.1": {
+      "System.Private.ServiceModel/4.1.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1",
@@ -1826,12 +1940,12 @@
           "lib/netcore50/System.Security.Principal.dll": {}
         }
       },
-      "System.ServiceModel.Duplex/4.0.2": {
+      "System.ServiceModel.Duplex/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Threading": "4.0.11"
         },
         "compile": {
@@ -1841,15 +1955,15 @@
           "lib/netcore50/System.ServiceModel.Duplex.dll": {}
         }
       },
-      "System.ServiceModel.Http/4.1.1": {
+      "System.ServiceModel.Http/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
           "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Text.Encoding": "4.0.11"
         },
         "compile": {
@@ -1859,14 +1973,14 @@
           "lib/netcore50/System.ServiceModel.Http.dll": {}
         }
       },
-      "System.ServiceModel.NetTcp/4.1.1": {
+      "System.ServiceModel.NetTcp/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.NetTcp.dll": {}
@@ -1875,7 +1989,7 @@
           "lib/netcore50/System.ServiceModel.NetTcp.dll": {}
         }
       },
-      "System.ServiceModel.Primitives/4.1.1": {
+      "System.ServiceModel.Primitives/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.0.11",
@@ -1884,7 +1998,7 @@
           "System.IO": "4.1.0",
           "System.Net.Primitives": "4.0.11",
           "System.ObjectModel": "4.0.12",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Reflection": "4.1.0",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
@@ -1902,13 +2016,13 @@
           "lib/netcore50/System.ServiceModel.Primitives.dll": {}
         }
       },
-      "System.ServiceModel.Security/4.0.2": {
+      "System.ServiceModel.Security/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.Security.dll": {}
@@ -2392,7 +2506,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -2423,16 +2537,16 @@
           "System.Runtime.Serialization.Xml": "4.1.2",
           "System.Runtime.WindowsRuntime": "4.0.11",
           "System.Runtime.WindowsRuntime.UI.Xaml": "4.0.1",
-          "System.ServiceModel.Duplex": "4.0.2",
-          "System.ServiceModel.Http": "4.1.1",
-          "System.ServiceModel.NetTcp": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
-          "System.ServiceModel.Security": "4.0.2",
+          "System.ServiceModel.Duplex": "4.0.4",
+          "System.ServiceModel.Http": "4.1.3",
+          "System.ServiceModel.NetTcp": "4.1.3",
+          "System.ServiceModel.Primitives": "4.1.3",
+          "System.ServiceModel.Security": "4.0.4",
           "System.Text.Encoding.CodePages": "4.0.1",
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.6"
+          "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -2478,6 +2592,27 @@
         },
         "compile": {
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "MonoGame.Framework.WindowsUniversal/3.7.1.189": {
+        "type": "package",
+        "dependencies": {
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1",
+          "SharpDX.Direct2D1": "4.0.1",
+          "SharpDX.Direct3D11": "4.0.1",
+          "SharpDX.MediaFoundation": "4.0.1",
+          "SharpDX.XAudio2": "4.0.1",
+          "SharpDX.XInput": "4.0.1"
+        },
+        "compile": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "runtime": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "build": {
+          "build/MonoGame.Framework.WindowsUniversal.targets": {}
         }
       },
       "runtime.any.System.Collections/4.0.11": {
@@ -2775,7 +2910,7 @@
           "runtimes/win/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -2816,6 +2951,99 @@
         "type": "package",
         "native": {
           "runtimes/win8-arm/native/clrcompression.dll": {}
+        }
+      },
+      "SharpDX/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.dll": {}
+        }
+      },
+      "SharpDX.Direct2D1/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        }
+      },
+      "SharpDX.Direct3D11/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        }
+      },
+      "SharpDX.DXGI/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        }
+      },
+      "SharpDX.MediaFoundation/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        }
+      },
+      "SharpDX.XAudio2/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        }
+      },
+      "SharpDX.XInput/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
         }
       },
       "System.AppContext/4.1.0": {
@@ -3602,7 +3830,7 @@
           "lib/netstandard1.3/System.Private.DataContractSerialization.dll": {}
         }
       },
-      "System.Private.ServiceModel/4.1.1": {
+      "System.Private.ServiceModel/4.1.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1",
@@ -4144,12 +4372,12 @@
           "lib/netcore50/System.Security.Principal.dll": {}
         }
       },
-      "System.ServiceModel.Duplex/4.0.2": {
+      "System.ServiceModel.Duplex/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Threading": "4.0.11"
         },
         "compile": {
@@ -4159,15 +4387,15 @@
           "lib/netcore50/System.ServiceModel.Duplex.dll": {}
         }
       },
-      "System.ServiceModel.Http/4.1.1": {
+      "System.ServiceModel.Http/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
           "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Text.Encoding": "4.0.11"
         },
         "compile": {
@@ -4177,14 +4405,14 @@
           "lib/netcore50/System.ServiceModel.Http.dll": {}
         }
       },
-      "System.ServiceModel.NetTcp/4.1.1": {
+      "System.ServiceModel.NetTcp/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.NetTcp.dll": {}
@@ -4193,7 +4421,7 @@
           "lib/netcore50/System.ServiceModel.NetTcp.dll": {}
         }
       },
-      "System.ServiceModel.Primitives/4.1.1": {
+      "System.ServiceModel.Primitives/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.0.11",
@@ -4202,7 +4430,7 @@
           "System.IO": "4.1.0",
           "System.Net.Primitives": "4.0.11",
           "System.ObjectModel": "4.0.12",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Reflection": "4.1.0",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
@@ -4220,13 +4448,13 @@
           "lib/netcore50/System.ServiceModel.Primitives.dll": {}
         }
       },
-      "System.ServiceModel.Security/4.0.2": {
+      "System.ServiceModel.Security/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.Security.dll": {}
@@ -4689,7 +4917,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -4720,16 +4948,16 @@
           "System.Runtime.Serialization.Xml": "4.1.2",
           "System.Runtime.WindowsRuntime": "4.0.11",
           "System.Runtime.WindowsRuntime.UI.Xaml": "4.0.1",
-          "System.ServiceModel.Duplex": "4.0.2",
-          "System.ServiceModel.Http": "4.1.1",
-          "System.ServiceModel.NetTcp": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
-          "System.ServiceModel.Security": "4.0.2",
+          "System.ServiceModel.Duplex": "4.0.4",
+          "System.ServiceModel.Http": "4.1.3",
+          "System.ServiceModel.NetTcp": "4.1.3",
+          "System.ServiceModel.Primitives": "4.1.3",
+          "System.ServiceModel.Security": "4.0.4",
           "System.Text.Encoding.CodePages": "4.0.1",
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.6"
+          "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -4775,6 +5003,27 @@
         },
         "compile": {
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "MonoGame.Framework.WindowsUniversal/3.7.1.189": {
+        "type": "package",
+        "dependencies": {
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1",
+          "SharpDX.Direct2D1": "4.0.1",
+          "SharpDX.Direct3D11": "4.0.1",
+          "SharpDX.MediaFoundation": "4.0.1",
+          "SharpDX.XAudio2": "4.0.1",
+          "SharpDX.XInput": "4.0.1"
+        },
+        "compile": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "runtime": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "build": {
+          "build/MonoGame.Framework.WindowsUniversal.targets": {}
         }
       },
       "runtime.aot.System.Collections/4.0.10": {
@@ -5117,7 +5366,7 @@
           "runtimes/aot/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -5148,6 +5397,99 @@
         },
         "native": {
           "runtimes/win8-arm-aot/native/_._": {}
+        }
+      },
+      "SharpDX/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.dll": {}
+        }
+      },
+      "SharpDX.Direct2D1/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        }
+      },
+      "SharpDX.Direct3D11/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        }
+      },
+      "SharpDX.DXGI/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        }
+      },
+      "SharpDX.MediaFoundation/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        }
+      },
+      "SharpDX.XAudio2/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        }
+      },
+      "SharpDX.XInput/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
         }
       },
       "System.AppContext/4.1.0": {
@@ -5934,7 +6276,7 @@
           "runtimes/aot/lib/netcore50/System.Private.DataContractSerialization.dll": {}
         }
       },
-      "System.Private.ServiceModel/4.1.1": {
+      "System.Private.ServiceModel/4.1.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1",
@@ -6476,12 +6818,12 @@
           "lib/netcore50/System.Security.Principal.dll": {}
         }
       },
-      "System.ServiceModel.Duplex/4.0.2": {
+      "System.ServiceModel.Duplex/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Threading": "4.0.11"
         },
         "compile": {
@@ -6491,15 +6833,15 @@
           "lib/netcore50/System.ServiceModel.Duplex.dll": {}
         }
       },
-      "System.ServiceModel.Http/4.1.1": {
+      "System.ServiceModel.Http/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
           "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Text.Encoding": "4.0.11"
         },
         "compile": {
@@ -6509,14 +6851,14 @@
           "lib/netcore50/System.ServiceModel.Http.dll": {}
         }
       },
-      "System.ServiceModel.NetTcp/4.1.1": {
+      "System.ServiceModel.NetTcp/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.NetTcp.dll": {}
@@ -6525,7 +6867,7 @@
           "lib/netcore50/System.ServiceModel.NetTcp.dll": {}
         }
       },
-      "System.ServiceModel.Primitives/4.1.1": {
+      "System.ServiceModel.Primitives/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.0.11",
@@ -6534,7 +6876,7 @@
           "System.IO": "4.1.0",
           "System.Net.Primitives": "4.0.11",
           "System.ObjectModel": "4.0.12",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Reflection": "4.1.0",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
@@ -6552,13 +6894,13 @@
           "lib/netcore50/System.ServiceModel.Primitives.dll": {}
         }
       },
-      "System.ServiceModel.Security/4.0.2": {
+      "System.ServiceModel.Security/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.Security.dll": {}
@@ -7023,7 +7365,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -7054,16 +7396,16 @@
           "System.Runtime.Serialization.Xml": "4.1.2",
           "System.Runtime.WindowsRuntime": "4.0.11",
           "System.Runtime.WindowsRuntime.UI.Xaml": "4.0.1",
-          "System.ServiceModel.Duplex": "4.0.2",
-          "System.ServiceModel.Http": "4.1.1",
-          "System.ServiceModel.NetTcp": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
-          "System.ServiceModel.Security": "4.0.2",
+          "System.ServiceModel.Duplex": "4.0.4",
+          "System.ServiceModel.Http": "4.1.3",
+          "System.ServiceModel.NetTcp": "4.1.3",
+          "System.ServiceModel.Primitives": "4.1.3",
+          "System.ServiceModel.Security": "4.0.4",
           "System.Text.Encoding.CodePages": "4.0.1",
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.6"
+          "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -7109,6 +7451,27 @@
         },
         "compile": {
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "MonoGame.Framework.WindowsUniversal/3.7.1.189": {
+        "type": "package",
+        "dependencies": {
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1",
+          "SharpDX.Direct2D1": "4.0.1",
+          "SharpDX.Direct3D11": "4.0.1",
+          "SharpDX.MediaFoundation": "4.0.1",
+          "SharpDX.XAudio2": "4.0.1",
+          "SharpDX.XInput": "4.0.1"
+        },
+        "compile": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "runtime": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "build": {
+          "build/MonoGame.Framework.WindowsUniversal.targets": {}
         }
       },
       "runtime.any.System.Collections/4.0.11": {
@@ -7406,7 +7769,7 @@
           "runtimes/win/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -7453,6 +7816,99 @@
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
+        }
+      },
+      "SharpDX/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.dll": {}
+        }
+      },
+      "SharpDX.Direct2D1/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        }
+      },
+      "SharpDX.Direct3D11/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        }
+      },
+      "SharpDX.DXGI/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        }
+      },
+      "SharpDX.MediaFoundation/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        }
+      },
+      "SharpDX.XAudio2/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        }
+      },
+      "SharpDX.XInput/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
         }
       },
       "System.AppContext/4.1.0": {
@@ -8239,7 +8695,7 @@
           "lib/netstandard1.3/System.Private.DataContractSerialization.dll": {}
         }
       },
-      "System.Private.ServiceModel/4.1.1": {
+      "System.Private.ServiceModel/4.1.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1",
@@ -8781,12 +9237,12 @@
           "lib/netcore50/System.Security.Principal.dll": {}
         }
       },
-      "System.ServiceModel.Duplex/4.0.2": {
+      "System.ServiceModel.Duplex/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Threading": "4.0.11"
         },
         "compile": {
@@ -8796,15 +9252,15 @@
           "lib/netcore50/System.ServiceModel.Duplex.dll": {}
         }
       },
-      "System.ServiceModel.Http/4.1.1": {
+      "System.ServiceModel.Http/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
           "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Text.Encoding": "4.0.11"
         },
         "compile": {
@@ -8814,14 +9270,14 @@
           "lib/netcore50/System.ServiceModel.Http.dll": {}
         }
       },
-      "System.ServiceModel.NetTcp/4.1.1": {
+      "System.ServiceModel.NetTcp/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.NetTcp.dll": {}
@@ -8830,7 +9286,7 @@
           "lib/netcore50/System.ServiceModel.NetTcp.dll": {}
         }
       },
-      "System.ServiceModel.Primitives/4.1.1": {
+      "System.ServiceModel.Primitives/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.0.11",
@@ -8839,7 +9295,7 @@
           "System.IO": "4.1.0",
           "System.Net.Primitives": "4.0.11",
           "System.ObjectModel": "4.0.12",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Reflection": "4.1.0",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
@@ -8857,13 +9313,13 @@
           "lib/netcore50/System.ServiceModel.Primitives.dll": {}
         }
       },
-      "System.ServiceModel.Security/4.0.2": {
+      "System.ServiceModel.Security/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.Security.dll": {}
@@ -9329,7 +9785,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -9360,16 +9816,16 @@
           "System.Runtime.Serialization.Xml": "4.1.2",
           "System.Runtime.WindowsRuntime": "4.0.11",
           "System.Runtime.WindowsRuntime.UI.Xaml": "4.0.1",
-          "System.ServiceModel.Duplex": "4.0.2",
-          "System.ServiceModel.Http": "4.1.1",
-          "System.ServiceModel.NetTcp": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
-          "System.ServiceModel.Security": "4.0.2",
+          "System.ServiceModel.Duplex": "4.0.4",
+          "System.ServiceModel.Http": "4.1.3",
+          "System.ServiceModel.NetTcp": "4.1.3",
+          "System.ServiceModel.Primitives": "4.1.3",
+          "System.ServiceModel.Security": "4.0.4",
           "System.Text.Encoding.CodePages": "4.0.1",
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.6"
+          "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -9415,6 +9871,27 @@
         },
         "compile": {
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "MonoGame.Framework.WindowsUniversal/3.7.1.189": {
+        "type": "package",
+        "dependencies": {
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1",
+          "SharpDX.Direct2D1": "4.0.1",
+          "SharpDX.Direct3D11": "4.0.1",
+          "SharpDX.MediaFoundation": "4.0.1",
+          "SharpDX.XAudio2": "4.0.1",
+          "SharpDX.XInput": "4.0.1"
+        },
+        "compile": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "runtime": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "build": {
+          "build/MonoGame.Framework.WindowsUniversal.targets": {}
         }
       },
       "runtime.aot.System.Collections/4.0.10": {
@@ -9757,7 +10234,7 @@
           "runtimes/aot/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -9794,6 +10271,99 @@
         },
         "runtime": {
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
+        }
+      },
+      "SharpDX/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.dll": {}
+        }
+      },
+      "SharpDX.Direct2D1/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        }
+      },
+      "SharpDX.Direct3D11/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        }
+      },
+      "SharpDX.DXGI/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        }
+      },
+      "SharpDX.MediaFoundation/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        }
+      },
+      "SharpDX.XAudio2/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        }
+      },
+      "SharpDX.XInput/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
         }
       },
       "System.AppContext/4.1.0": {
@@ -10580,7 +11150,7 @@
           "runtimes/aot/lib/netcore50/System.Private.DataContractSerialization.dll": {}
         }
       },
-      "System.Private.ServiceModel/4.1.1": {
+      "System.Private.ServiceModel/4.1.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1",
@@ -11122,12 +11692,12 @@
           "lib/netcore50/System.Security.Principal.dll": {}
         }
       },
-      "System.ServiceModel.Duplex/4.0.2": {
+      "System.ServiceModel.Duplex/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Threading": "4.0.11"
         },
         "compile": {
@@ -11137,15 +11707,15 @@
           "lib/netcore50/System.ServiceModel.Duplex.dll": {}
         }
       },
-      "System.ServiceModel.Http/4.1.1": {
+      "System.ServiceModel.Http/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
           "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Text.Encoding": "4.0.11"
         },
         "compile": {
@@ -11155,14 +11725,14 @@
           "lib/netcore50/System.ServiceModel.Http.dll": {}
         }
       },
-      "System.ServiceModel.NetTcp/4.1.1": {
+      "System.ServiceModel.NetTcp/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.NetTcp.dll": {}
@@ -11171,7 +11741,7 @@
           "lib/netcore50/System.ServiceModel.NetTcp.dll": {}
         }
       },
-      "System.ServiceModel.Primitives/4.1.1": {
+      "System.ServiceModel.Primitives/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.0.11",
@@ -11180,7 +11750,7 @@
           "System.IO": "4.1.0",
           "System.Net.Primitives": "4.0.11",
           "System.ObjectModel": "4.0.12",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Reflection": "4.1.0",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
@@ -11198,13 +11768,13 @@
           "lib/netcore50/System.ServiceModel.Primitives.dll": {}
         }
       },
-      "System.ServiceModel.Security/4.0.2": {
+      "System.ServiceModel.Security/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.Security.dll": {}
@@ -11669,7 +12239,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -11700,16 +12270,16 @@
           "System.Runtime.Serialization.Xml": "4.1.2",
           "System.Runtime.WindowsRuntime": "4.0.11",
           "System.Runtime.WindowsRuntime.UI.Xaml": "4.0.1",
-          "System.ServiceModel.Duplex": "4.0.2",
-          "System.ServiceModel.Http": "4.1.1",
-          "System.ServiceModel.NetTcp": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
-          "System.ServiceModel.Security": "4.0.2",
+          "System.ServiceModel.Duplex": "4.0.4",
+          "System.ServiceModel.Http": "4.1.3",
+          "System.ServiceModel.NetTcp": "4.1.3",
+          "System.ServiceModel.Primitives": "4.1.3",
+          "System.ServiceModel.Security": "4.0.4",
           "System.Text.Encoding.CodePages": "4.0.1",
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.6"
+          "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -11755,6 +12325,27 @@
         },
         "compile": {
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "MonoGame.Framework.WindowsUniversal/3.7.1.189": {
+        "type": "package",
+        "dependencies": {
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1",
+          "SharpDX.Direct2D1": "4.0.1",
+          "SharpDX.Direct3D11": "4.0.1",
+          "SharpDX.MediaFoundation": "4.0.1",
+          "SharpDX.XAudio2": "4.0.1",
+          "SharpDX.XInput": "4.0.1"
+        },
+        "compile": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "runtime": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "build": {
+          "build/MonoGame.Framework.WindowsUniversal.targets": {}
         }
       },
       "runtime.any.System.Collections/4.0.11": {
@@ -12052,7 +12643,7 @@
           "runtimes/win/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -12099,6 +12690,99 @@
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
+        }
+      },
+      "SharpDX/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.dll": {}
+        }
+      },
+      "SharpDX.Direct2D1/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        }
+      },
+      "SharpDX.Direct3D11/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        }
+      },
+      "SharpDX.DXGI/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        }
+      },
+      "SharpDX.MediaFoundation/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        }
+      },
+      "SharpDX.XAudio2/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        }
+      },
+      "SharpDX.XInput/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
         }
       },
       "System.AppContext/4.1.0": {
@@ -12885,7 +13569,7 @@
           "lib/netstandard1.3/System.Private.DataContractSerialization.dll": {}
         }
       },
-      "System.Private.ServiceModel/4.1.1": {
+      "System.Private.ServiceModel/4.1.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1",
@@ -13427,12 +14111,12 @@
           "lib/netcore50/System.Security.Principal.dll": {}
         }
       },
-      "System.ServiceModel.Duplex/4.0.2": {
+      "System.ServiceModel.Duplex/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Threading": "4.0.11"
         },
         "compile": {
@@ -13442,15 +14126,15 @@
           "lib/netcore50/System.ServiceModel.Duplex.dll": {}
         }
       },
-      "System.ServiceModel.Http/4.1.1": {
+      "System.ServiceModel.Http/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
           "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Text.Encoding": "4.0.11"
         },
         "compile": {
@@ -13460,14 +14144,14 @@
           "lib/netcore50/System.ServiceModel.Http.dll": {}
         }
       },
-      "System.ServiceModel.NetTcp/4.1.1": {
+      "System.ServiceModel.NetTcp/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.NetTcp.dll": {}
@@ -13476,7 +14160,7 @@
           "lib/netcore50/System.ServiceModel.NetTcp.dll": {}
         }
       },
-      "System.ServiceModel.Primitives/4.1.1": {
+      "System.ServiceModel.Primitives/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.0.11",
@@ -13485,7 +14169,7 @@
           "System.IO": "4.1.0",
           "System.Net.Primitives": "4.0.11",
           "System.ObjectModel": "4.0.12",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Reflection": "4.1.0",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
@@ -13503,13 +14187,13 @@
           "lib/netcore50/System.ServiceModel.Primitives.dll": {}
         }
       },
-      "System.ServiceModel.Security/4.0.2": {
+      "System.ServiceModel.Security/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.Security.dll": {}
@@ -13975,7 +14659,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -14006,16 +14690,16 @@
           "System.Runtime.Serialization.Xml": "4.1.2",
           "System.Runtime.WindowsRuntime": "4.0.11",
           "System.Runtime.WindowsRuntime.UI.Xaml": "4.0.1",
-          "System.ServiceModel.Duplex": "4.0.2",
-          "System.ServiceModel.Http": "4.1.1",
-          "System.ServiceModel.NetTcp": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
-          "System.ServiceModel.Security": "4.0.2",
+          "System.ServiceModel.Duplex": "4.0.4",
+          "System.ServiceModel.Http": "4.1.3",
+          "System.ServiceModel.NetTcp": "4.1.3",
+          "System.ServiceModel.Primitives": "4.1.3",
+          "System.ServiceModel.Security": "4.0.4",
           "System.Text.Encoding.CodePages": "4.0.1",
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.6"
+          "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -14061,6 +14745,27 @@
         },
         "compile": {
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "MonoGame.Framework.WindowsUniversal/3.7.1.189": {
+        "type": "package",
+        "dependencies": {
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1",
+          "SharpDX.Direct2D1": "4.0.1",
+          "SharpDX.Direct3D11": "4.0.1",
+          "SharpDX.MediaFoundation": "4.0.1",
+          "SharpDX.XAudio2": "4.0.1",
+          "SharpDX.XInput": "4.0.1"
+        },
+        "compile": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "runtime": {
+          "lib/netcore/MonoGame.Framework.dll": {}
+        },
+        "build": {
+          "build/MonoGame.Framework.WindowsUniversal.targets": {}
         }
       },
       "runtime.aot.System.Collections/4.0.10": {
@@ -14403,7 +15108,7 @@
           "runtimes/aot/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
+      "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -14440,6 +15145,99 @@
         },
         "runtime": {
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
+        }
+      },
+      "SharpDX/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.dll": {}
+        }
+      },
+      "SharpDX.Direct2D1/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct2D1.dll": {}
+        }
+      },
+      "SharpDX.Direct3D11/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.Direct3D11.dll": {}
+        }
+      },
+      "SharpDX.DXGI/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.DXGI.dll": {}
+        }
+      },
+      "SharpDX.MediaFoundation/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1",
+          "SharpDX.DXGI": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.MediaFoundation.dll": {}
+        }
+      },
+      "SharpDX.XAudio2/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XAudio2.dll": {}
+        }
+      },
+      "SharpDX.XInput/4.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "SharpDX": "4.0.1"
+        },
+        "compile": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SharpDX.XInput.dll": {}
         }
       },
       "System.AppContext/4.1.0": {
@@ -15226,7 +16024,7 @@
           "runtimes/aot/lib/netcore50/System.Private.DataContractSerialization.dll": {}
         }
       },
-      "System.Private.ServiceModel/4.1.1": {
+      "System.Private.ServiceModel/4.1.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1",
@@ -15768,12 +16566,12 @@
           "lib/netcore50/System.Security.Principal.dll": {}
         }
       },
-      "System.ServiceModel.Duplex/4.0.2": {
+      "System.ServiceModel.Duplex/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Threading": "4.0.11"
         },
         "compile": {
@@ -15783,15 +16581,15 @@
           "lib/netcore50/System.ServiceModel.Duplex.dll": {}
         }
       },
-      "System.ServiceModel.Http/4.1.1": {
+      "System.ServiceModel.Http/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
           "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1",
+          "System.ServiceModel.Primitives": "4.1.3",
           "System.Text.Encoding": "4.0.11"
         },
         "compile": {
@@ -15801,14 +16599,14 @@
           "lib/netcore50/System.ServiceModel.Http.dll": {}
         }
       },
-      "System.ServiceModel.NetTcp/4.1.1": {
+      "System.ServiceModel.NetTcp/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Net.Primitives": "4.0.11",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.NetTcp.dll": {}
@@ -15817,7 +16615,7 @@
           "lib/netcore50/System.ServiceModel.NetTcp.dll": {}
         }
       },
-      "System.ServiceModel.Primitives/4.1.1": {
+      "System.ServiceModel.Primitives/4.1.3": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.0.11",
@@ -15826,7 +16624,7 @@
           "System.IO": "4.1.0",
           "System.Net.Primitives": "4.0.11",
           "System.ObjectModel": "4.0.12",
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Reflection": "4.1.0",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
@@ -15844,13 +16642,13 @@
           "lib/netcore50/System.ServiceModel.Primitives.dll": {}
         }
       },
-      "System.ServiceModel.Security/4.0.2": {
+      "System.ServiceModel.Security/4.0.4": {
         "type": "package",
         "dependencies": {
-          "System.Private.ServiceModel": "4.1.1",
+          "System.Private.ServiceModel": "4.1.3",
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.ServiceModel.Primitives": "4.1.1"
+          "System.ServiceModel.Primitives": "4.1.3"
         },
         "compile": {
           "ref/netcore50/System.ServiceModel.Security.dll": {}
@@ -18421,14 +19219,16 @@
         "runtime.json"
       ]
     },
-    "Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
-      "sha512": "T758N2M9bvyDA/9KeguVHOiUdhmAlCsmihVgKKwmf4MhnSybB8AsjwgmrCemqQVq7a6G7wffW7OkT0pSM2kNzQ==",
+    "Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
+      "sha512": "Z9Delrz1l8zEuhvuMljgiLqKQSsuvW0ijbsP2QCuC4syYuidXxfXBfnlisYPHunNoALLIIpRaFVTJ65K1FvxHg==",
       "type": "package",
-      "path": "microsoft.netcore.universalwindowsplatform/6.0.6",
+      "path": "microsoft.netcore.universalwindowsplatform/6.1.9",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
-        "microsoft.netcore.universalwindowsplatform.6.0.6.nupkg.sha512",
+        "microsoft.netcore.universalwindowsplatform.6.1.9.nupkg.sha512",
         "microsoft.netcore.universalwindowsplatform.nuspec",
         "ref/netcore50/_._",
         "ref/uap10.0.15138/Microsoft.CSharp.dll",
@@ -18797,6 +19597,23 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._"
+      ]
+    },
+    "MonoGame.Framework.WindowsUniversal/3.7.1.189": {
+      "sha512": "Wl+JdwxNg0tqdfbqYOOkxvu/+dufw9YZFJo73lk0NRbo9pXL33YukrqdMZIa0uoWXzqmdb/L58O3+XsqWre42w==",
+      "type": "package",
+      "path": "monogame.framework.windowsuniversal/3.7.1.189",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/MonoGame.Framework.WindowsUniversal.targets",
+        "lib/netcore/MonoGame.Framework.dll",
+        "lib/netcore/MonoGame.Framework.pri",
+        "lib/netcore/MonoGame.Framework.xml",
+        "lib/netcore/MonoGame.Framework/MonoGame.Framework.xr.xml",
+        "lib/netcore/MonoGame.Framework/Themes/generic.xbf",
+        "monogame.framework.windowsuniversal.3.7.1.189.nupkg.sha512",
+        "monogame.framework.windowsuniversal.nuspec"
       ]
     },
     "runtime.any.System.Collections/4.0.11": {
@@ -19566,16 +20383,18 @@
         "runtimes/win/lib/netstandard1.5/System.Runtime.Extensions.dll"
       ]
     },
-    "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
-      "sha512": "Q4qwkiwdajYNEhVLDM7nFJDP7IMdrKpHbwI1oiJOL3d6iTV422JFfo8kbyYh8k8oOTfKfrHv/UkcIRPk9FjTbg==",
+    "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
+      "sha512": "YlEnafP+HovFHMJZYG6pG0TH9buA0HeRVFK7w1G1tcq9+yg6P9fs3atRdaJtrvSDYTfh1MPb7ax52mRYawBiWQ==",
       "type": "package",
-      "path": "runtime.win10-arm-aot.microsoft.netcore.universalwindowsplatform/6.0.6",
+      "path": "runtime.win10-arm-aot.microsoft.netcore.universalwindowsplatform/6.1.9",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform.6.0.6.nupkg.sha512",
-        "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform.nuspec",
+        "runtime.win10-arm-aot.microsoft.netcore.universalwindowsplatform.6.1.9.nupkg.sha512",
+        "runtime.win10-arm-aot.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-arm-aot/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-arm-aot/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
         "runtimes/win10-arm-aot/lib/uap10.0.15138/Microsoft.Win32.Primitives.dll",
@@ -19755,16 +20574,18 @@
         "runtimes/win10-arm-aot/lib/netcore50/clrcompression.dll"
       ]
     },
-    "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
-      "sha512": "6y4QrQ+l0Oo6K06hWwVS+uNSLFE+tbBCuUBIaN9c3wB0DLWjn2A7rPKjBqoPBJoNK/NdeGPqR0AOXOKb+taauQ==",
+    "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
+      "sha512": "FLc9FFx67Xd/LglhXaNNrI++XGwDzIoJL7IH4Roo+x6K9daAGh58q7RDI50re+KP97mEpLwx2bkupQz9tOfsWw==",
       "type": "package",
-      "path": "runtime.win10-arm.microsoft.netcore.universalwindowsplatform/6.0.6",
+      "path": "runtime.win10-arm.microsoft.netcore.universalwindowsplatform/6.1.9",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform.6.0.6.nupkg.sha512",
-        "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform.nuspec",
+        "runtime.win10-arm.microsoft.netcore.universalwindowsplatform.6.1.9.nupkg.sha512",
+        "runtime.win10-arm.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-arm/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-arm/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
         "runtimes/win10-arm/lib/uap10.0.15138/Microsoft.Win32.Primitives.dll",
@@ -19931,16 +20752,18 @@
         "runtimes/win10-arm/nativeassets/uap10.0.15138/clrcompression.dll"
       ]
     },
-    "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
-      "sha512": "2mHmIyGr7MdGDisXckIUdJW1DbdHqFRb1P/d1XCOvohrF4mZEU2vr6f3m8JrcI4p5JqbxQBJVAS5LCNq0+FSww==",
+    "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
+      "sha512": "7XCBIjMH5+N0yR6VpKXS9cmR+2dIKiUCGuzGp1uG2V+4e65mmx0YJGMcSWpG/DtShyoA/WhhNJH/ea3uKJxiWw==",
       "type": "package",
-      "path": "runtime.win10-x64-aot.microsoft.netcore.universalwindowsplatform/6.0.6",
+      "path": "runtime.win10-x64-aot.microsoft.netcore.universalwindowsplatform/6.1.9",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform.6.0.6.nupkg.sha512",
-        "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform.nuspec",
+        "runtime.win10-x64-aot.microsoft.netcore.universalwindowsplatform.6.1.9.nupkg.sha512",
+        "runtime.win10-x64-aot.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-x64-aot/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-x64-aot/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
         "runtimes/win10-x64-aot/lib/uap10.0.15138/Microsoft.Win32.Primitives.dll",
@@ -20120,16 +20943,18 @@
         "runtimes/win10-x64-aot/lib/netcore50/clrcompression.dll"
       ]
     },
-    "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
-      "sha512": "KJ7TjMExpj9+k30/Zed+spk38SkMtdRyckzSKj0040WMMnnXStsU1iAATDD0h4rcTbiMdACaBlIHl3i7p98C7Q==",
+    "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
+      "sha512": "5oR2QcUdpbw0lxsYP/U2PTNI+w+GDw4BtekDUaNtGkXsHshcychs9D/zWk8T5AYbmUXc5tRMAvDNReWg9cXlWA==",
       "type": "package",
-      "path": "runtime.win10-x64.microsoft.netcore.universalwindowsplatform/6.0.6",
+      "path": "runtime.win10-x64.microsoft.netcore.universalwindowsplatform/6.1.9",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform.6.0.6.nupkg.sha512",
-        "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform.nuspec",
+        "runtime.win10-x64.microsoft.netcore.universalwindowsplatform.6.1.9.nupkg.sha512",
+        "runtime.win10-x64.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-x64/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-x64/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
         "runtimes/win10-x64/lib/uap10.0.15138/Microsoft.Win32.Primitives.dll",
@@ -20296,16 +21121,18 @@
         "runtimes/win10-x64/nativeassets/uap10.0.15138/clrcompression.dll"
       ]
     },
-    "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
-      "sha512": "ULbHfUEHeo41/DBR0O9Ps57mzYApjlOZZlOJOUjc6kDHR0TLLDU0lv5eXl88M2ouhCz0OlA4Nw1Hk3w4wNGRBQ==",
+    "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
+      "sha512": "uneYYEx5fq+DxciTAutwUx7wvo/ur9fnqJY08KbOO/alKPwFdDhmIjRtZqVQis4bd6+OOK65RYcwZVL77tOJkg==",
       "type": "package",
-      "path": "runtime.win10-x86-aot.microsoft.netcore.universalwindowsplatform/6.0.6",
+      "path": "runtime.win10-x86-aot.microsoft.netcore.universalwindowsplatform/6.1.9",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform.6.0.6.nupkg.sha512",
-        "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform.nuspec",
+        "runtime.win10-x86-aot.microsoft.netcore.universalwindowsplatform.6.1.9.nupkg.sha512",
+        "runtime.win10-x86-aot.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-x86-aot/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-x86-aot/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
         "runtimes/win10-x86-aot/lib/uap10.0.15138/Microsoft.Win32.Primitives.dll",
@@ -20485,16 +21312,18 @@
         "runtimes/win10-x86-aot/lib/netcore50/clrcompression.dll"
       ]
     },
-    "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform/6.0.6": {
-      "sha512": "0KoE35RdKGERCqE6LgqJu/kmZy5YS3fttRvcfYt/FhPgzG9/ZbVZ5NfhBuXIAus1eCFQ40xQ2FifgxLhdotXLQ==",
+    "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform/6.1.9": {
+      "sha512": "+ax/4FAWVTu0fMUoQ4llJyuqjv7HYgdDv4FgaDeFzjECYTHC+x+pbt8euBhdxNh5jXlTHaZoghqGtmrOJ8x+Rg==",
       "type": "package",
-      "path": "runtime.win10-x86.microsoft.netcore.universalwindowsplatform/6.0.6",
+      "path": "runtime.win10-x86.microsoft.netcore.universalwindowsplatform/6.1.9",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform.6.0.6.nupkg.sha512",
-        "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform.nuspec",
+        "runtime.win10-x86.microsoft.netcore.universalwindowsplatform.6.1.9.nupkg.sha512",
+        "runtime.win10-x86.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-x86/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-x86/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
         "runtimes/win10-x86/lib/uap10.0.15138/Microsoft.Win32.Primitives.dll",
@@ -20818,6 +21647,153 @@
         "runtime.win8-arm.runtime.native.system.io.compression.4.0.1.nupkg.sha512",
         "runtime.win8-arm.runtime.native.system.io.compression.nuspec",
         "runtimes/win8-arm/native/clrcompression.dll"
+      ]
+    },
+    "SharpDX/4.0.1": {
+      "sha512": "8YA1VFg1/K8Emb8FEZDobojcv1BLuppVo7CRJQEgA1V748VIMPBru0i0OnsCjLSThzTn7juOvH85qjFL9Grl1w==",
+      "type": "package",
+      "path": "sharpdx/4.0.1",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net40/SharpDX.dll",
+        "lib/net40/SharpDX.xml",
+        "lib/net45/SharpDX.dll",
+        "lib/net45/SharpDX.xml",
+        "lib/netcoreapp1.0/SharpDX.dll",
+        "lib/netcoreapp1.0/SharpDX.xml",
+        "lib/netstandard1.1/SharpDX.dll",
+        "lib/netstandard1.1/SharpDX.xml",
+        "lib/uap10.0/SharpDX.dll",
+        "lib/uap10.0/SharpDX.pri",
+        "lib/uap10.0/SharpDX.xml",
+        "sharpdx.4.0.1.nupkg.sha512",
+        "sharpdx.nuspec"
+      ]
+    },
+    "SharpDX.Direct2D1/4.0.1": {
+      "sha512": "EDBYa9kAG+gaMB4cCH7WNpxS8WijSCejNz/SERs2P1sWEPZZdUiUIruQMjPCdW3lXxT508aYiH2UXHAaZtk00g==",
+      "type": "package",
+      "path": "sharpdx.direct2d1/4.0.1",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net40/SharpDX.Direct2D1.dll",
+        "lib/net40/SharpDX.Direct2D1.xml",
+        "lib/net45/SharpDX.Direct2D1.dll",
+        "lib/net45/SharpDX.Direct2D1.xml",
+        "lib/netcoreapp1.0/SharpDX.Direct2D1.dll",
+        "lib/netcoreapp1.0/SharpDX.Direct2D1.xml",
+        "lib/netstandard1.1/SharpDX.Direct2D1.dll",
+        "lib/netstandard1.1/SharpDX.Direct2D1.xml",
+        "lib/uap10.0/SharpDX.Direct2D1.dll",
+        "lib/uap10.0/SharpDX.Direct2D1.pri",
+        "lib/uap10.0/SharpDX.Direct2D1.xml",
+        "sharpdx.direct2d1.4.0.1.nupkg.sha512",
+        "sharpdx.direct2d1.nuspec"
+      ]
+    },
+    "SharpDX.Direct3D11/4.0.1": {
+      "sha512": "7xIfeAhxPhbPgSiREfFbOOwIWonUt2GHR7XZN5p2DJMWuqjl0+h1oo2/sF+SH/c6D6APjdbt0J+dYSzoV0PA/w==",
+      "type": "package",
+      "path": "sharpdx.direct3d11/4.0.1",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net40/SharpDX.Direct3D11.dll",
+        "lib/net40/SharpDX.Direct3D11.xml",
+        "lib/net45/SharpDX.Direct3D11.dll",
+        "lib/net45/SharpDX.Direct3D11.xml",
+        "lib/netcoreapp1.0/SharpDX.Direct3D11.dll",
+        "lib/netcoreapp1.0/SharpDX.Direct3D11.xml",
+        "lib/netstandard1.1/SharpDX.Direct3D11.dll",
+        "lib/netstandard1.1/SharpDX.Direct3D11.xml",
+        "lib/uap10.0/SharpDX.Direct3D11.dll",
+        "lib/uap10.0/SharpDX.Direct3D11.pri",
+        "lib/uap10.0/SharpDX.Direct3D11.xml",
+        "sharpdx.direct3d11.4.0.1.nupkg.sha512",
+        "sharpdx.direct3d11.nuspec"
+      ]
+    },
+    "SharpDX.DXGI/4.0.1": {
+      "sha512": "Av/kToUkVR1tDtIP9zmDGwCuCtyL04+PP7kes6aABzky1Y9vT03kR7mDeE83gl+E8GUmMMbVXbQ4AG2CVb66sg==",
+      "type": "package",
+      "path": "sharpdx.dxgi/4.0.1",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net40/SharpDX.DXGI.dll",
+        "lib/net40/SharpDX.DXGI.xml",
+        "lib/net45/SharpDX.DXGI.dll",
+        "lib/net45/SharpDX.DXGI.xml",
+        "lib/netcoreapp1.0/SharpDX.DXGI.dll",
+        "lib/netcoreapp1.0/SharpDX.DXGI.xml",
+        "lib/netstandard1.1/SharpDX.DXGI.dll",
+        "lib/netstandard1.1/SharpDX.DXGI.xml",
+        "lib/uap10.0/SharpDX.DXGI.dll",
+        "lib/uap10.0/SharpDX.DXGI.pri",
+        "lib/uap10.0/SharpDX.DXGI.xml",
+        "sharpdx.dxgi.4.0.1.nupkg.sha512",
+        "sharpdx.dxgi.nuspec"
+      ]
+    },
+    "SharpDX.MediaFoundation/4.0.1": {
+      "sha512": "/po30bqI6n14db6eHirTLJYEVV8/Wi0DGn2OJGtEnf5/++jUOhMR5Z1Xi84wOldXgf+7WKXOML2BhpqCPWVC2g==",
+      "type": "package",
+      "path": "sharpdx.mediafoundation/4.0.1",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net40/SharpDX.MediaFoundation.dll",
+        "lib/net40/SharpDX.MediaFoundation.xml",
+        "lib/net45/SharpDX.MediaFoundation.dll",
+        "lib/net45/SharpDX.MediaFoundation.xml",
+        "lib/netcoreapp1.0/SharpDX.MediaFoundation.dll",
+        "lib/netcoreapp1.0/SharpDX.MediaFoundation.xml",
+        "lib/netstandard1.1/SharpDX.MediaFoundation.dll",
+        "lib/netstandard1.1/SharpDX.MediaFoundation.xml",
+        "lib/uap10.0/SharpDX.MediaFoundation.dll",
+        "lib/uap10.0/SharpDX.MediaFoundation.pri",
+        "lib/uap10.0/SharpDX.MediaFoundation.xml",
+        "sharpdx.mediafoundation.4.0.1.nupkg.sha512",
+        "sharpdx.mediafoundation.nuspec"
+      ]
+    },
+    "SharpDX.XAudio2/4.0.1": {
+      "sha512": "Kok1XdV2vEKSdr+EcGf0xFNBAd1tcjp/TZeRNBNVgB5YYoUGASoNO2decCBi7vh9qdocN+pmuuOiZCtDOd9DgQ==",
+      "type": "package",
+      "path": "sharpdx.xaudio2/4.0.1",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net40/SharpDX.XAudio2.dll",
+        "lib/net40/SharpDX.XAudio2.xml",
+        "lib/net45/SharpDX.XAudio2.dll",
+        "lib/net45/SharpDX.XAudio2.xml",
+        "lib/netcoreapp1.0/SharpDX.XAudio2.dll",
+        "lib/netcoreapp1.0/SharpDX.XAudio2.xml",
+        "lib/netstandard1.1/SharpDX.XAudio2.dll",
+        "lib/netstandard1.1/SharpDX.XAudio2.xml",
+        "lib/uap10.0/SharpDX.XAudio2.dll",
+        "lib/uap10.0/SharpDX.XAudio2.pri",
+        "lib/uap10.0/SharpDX.XAudio2.xml",
+        "sharpdx.xaudio2.4.0.1.nupkg.sha512",
+        "sharpdx.xaudio2.nuspec"
+      ]
+    },
+    "SharpDX.XInput/4.0.1": {
+      "sha512": "vDnp6CTVC9dKQHwLVF4GLNdCJqGMUuxyZLLlorDjgnVOOO7koPR20/tqt1A53gnNy/Id93Nzq7K2ILLvBQWvGQ==",
+      "type": "package",
+      "path": "sharpdx.xinput/4.0.1",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net40/SharpDX.XInput.dll",
+        "lib/net40/SharpDX.XInput.xml",
+        "lib/net45/SharpDX.XInput.dll",
+        "lib/net45/SharpDX.XInput.xml",
+        "lib/netcoreapp1.0/SharpDX.XInput.dll",
+        "lib/netcoreapp1.0/SharpDX.XInput.xml",
+        "lib/netstandard1.1/SharpDX.XInput.dll",
+        "lib/netstandard1.1/SharpDX.XInput.xml",
+        "lib/uap10.0/SharpDX.XInput.dll",
+        "lib/uap10.0/SharpDX.XInput.pri",
+        "lib/uap10.0/SharpDX.XInput.xml",
+        "sharpdx.xinput.4.0.1.nupkg.sha512",
+        "sharpdx.xinput.nuspec"
       ]
     },
     "System.AppContext/4.1.0": {
@@ -23150,18 +24126,20 @@
         "system.private.datacontractserialization.nuspec"
       ]
     },
-    "System.Private.ServiceModel/4.1.1": {
-      "sha512": "xJyHuGt++ArcsoQkkOUuBxWdPvQa9P/YZ/L1W14gL7xh4XrcDu39Ejp7159qes6JlVvrOFZVoiCRj721hj1hnw==",
+    "System.Private.ServiceModel/4.1.3": {
+      "sha512": "HC4Pun59sfjpm5+leDFBPpWcOFuzzWyYLmJTrQC3JU7M0atszNrZMU/3ETLYMSwMcAjwNSVbfKYUbXHFEtCjwg==",
       "type": "package",
-      "path": "system.private.servicemodel/4.1.1",
+      "path": "system.private.servicemodel/4.1.3",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "ref/netstandard/_._",
         "runtimes/unix/lib/netstandard1.3/System.Private.ServiceModel.dll",
         "runtimes/win7/lib/netcore50/System.Private.ServiceModel.dll",
         "runtimes/win7/lib/netstandard1.3/System.Private.ServiceModel.dll",
-        "system.private.servicemodel.4.1.1.nupkg.sha512",
+        "system.private.servicemodel.4.1.3.nupkg.sha512",
         "system.private.servicemodel.nuspec"
       ]
     },
@@ -24622,11 +25600,13 @@
         "system.security.principal.nuspec"
       ]
     },
-    "System.ServiceModel.Duplex/4.0.2": {
-      "sha512": "AABh0/uzAPK2zsdt7BG1Ay+h3zlEVfxO7T4Ht+Zo8LMOBirEDglT0dyvaMo2Jd6lCVqTjQIyGODdtk3g61UXDg==",
+    "System.ServiceModel.Duplex/4.0.4": {
+      "sha512": "uyo/AKcU0xvtQ1u3ddu/uoKz9mitV6aFlGarGLcYwO5mwWEDE+qpueecfHtR9jHmoJ439dmHsKmNLIq5UO3lOA==",
       "type": "package",
-      "path": "system.servicemodel.duplex/4.0.2",
+      "path": "system.servicemodel.duplex/4.0.4",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/net45/_._",
@@ -24639,15 +25619,17 @@
         "ref/netstandard1.1/System.ServiceModel.Duplex.dll",
         "ref/portable-net45+win8/_._",
         "ref/win8/_._",
-        "system.servicemodel.duplex.4.0.2.nupkg.sha512",
+        "system.servicemodel.duplex.4.0.4.nupkg.sha512",
         "system.servicemodel.duplex.nuspec"
       ]
     },
-    "System.ServiceModel.Http/4.1.1": {
-      "sha512": "Af8YqW1+/Plr+ufkvg6B9yw6kv7mOk/wO1aUWMMFJEErigoLCy7Q+mJ5dTjQFPeiLb6VaQsGlCkKD43bBQ7rvw==",
+    "System.ServiceModel.Http/4.1.3": {
+      "sha512": "ciyIypAu26BPEQjj/egko0dmD+Usn4cfHfkyo5RUpJXTtGvUXfqU8hQ8ZWn685+5SpM+ne5E49II8iyZtoOyPw==",
       "type": "package",
-      "path": "system.servicemodel.http/4.1.1",
+      "path": "system.servicemodel.http/4.1.3",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -24678,15 +25660,17 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.servicemodel.http.4.1.1.nupkg.sha512",
+        "system.servicemodel.http.4.1.3.nupkg.sha512",
         "system.servicemodel.http.nuspec"
       ]
     },
-    "System.ServiceModel.NetTcp/4.1.1": {
-      "sha512": "ozGfn/rBUgEuulq5CCEBen3bdLFePCPzg/Rdg+QrsPflr1eYAvFKR4JGSlFO+UVs6BumLsGstO8S1LuoMMr1Dg==",
+    "System.ServiceModel.NetTcp/4.1.3": {
+      "sha512": "MxMe8qlWDueHQINyvrwiMCGJ5Yi3L0qUyv/jbSi0ILxiRG1rlCqEGvYaQD5fwlD9hvGn7fg5zfrLS0xDlzXndQ==",
       "type": "package",
-      "path": "system.servicemodel.nettcp/4.1.1",
+      "path": "system.servicemodel.nettcp/4.1.3",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/net45/_._",
@@ -24702,15 +25686,17 @@
         "ref/netstandard1.3/System.ServiceModel.NetTcp.dll",
         "ref/portable-net45+win8/_._",
         "ref/win8/_._",
-        "system.servicemodel.nettcp.4.1.1.nupkg.sha512",
+        "system.servicemodel.nettcp.4.1.3.nupkg.sha512",
         "system.servicemodel.nettcp.nuspec"
       ]
     },
-    "System.ServiceModel.Primitives/4.1.1": {
-      "sha512": "T7KBgQiQaxeTH9mIfKptvJhLKtYFm/riraVWY4OCesjgzgRjDPpFAlHXLv6dO4lNjkQLlgeAVwKKNGBgSrDkog==",
+    "System.ServiceModel.Primitives/4.1.3": {
+      "sha512": "wyxsTbQy50P/FwfYg/gSd8aViB8h65yUHEKkJegqpyz1JOnZ8TuwiU68XahfxT60HHh3JsqaN0XUSVqlN2K0kw==",
       "type": "package",
-      "path": "system.servicemodel.primitives/4.1.1",
+      "path": "system.servicemodel.primitives/4.1.3",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -24741,15 +25727,17 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.servicemodel.primitives.4.1.1.nupkg.sha512",
+        "system.servicemodel.primitives.4.1.3.nupkg.sha512",
         "system.servicemodel.primitives.nuspec"
       ]
     },
-    "System.ServiceModel.Security/4.0.2": {
-      "sha512": "4oqvU/Upjl4q8bfj9oqI1dHv74nzpltvTcJAmDIxi+8KGlMnMOnzklh/BqonQHb6lAIVxYVmvAQlPo3lXv+P6w==",
+    "System.ServiceModel.Security/4.0.4": {
+      "sha512": "7iJ9LQjHwiq9XJjgSijWs/QXjudSviGs2YPjnx75VdrpyFNqGgHqZzruWkeSyxmS9yuFsfXAD2Qb2BiUblyArg==",
       "type": "package",
-      "path": "system.servicemodel.security/4.0.2",
+      "path": "system.servicemodel.security/4.0.4",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/net45/_._",
@@ -24765,7 +25753,7 @@
         "ref/portable-net45+win8+wp8/_._",
         "ref/win8/_._",
         "ref/wp8/_._",
-        "system.servicemodel.security.4.0.2.nupkg.sha512",
+        "system.servicemodel.security.4.0.4.nupkg.sha512",
         "system.servicemodel.security.nuspec"
       ]
     },
@@ -25565,7 +26553,8 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Microsoft.NETCore.UniversalWindowsPlatform >= 6.0.6"
+      "Microsoft.NETCore.UniversalWindowsPlatform >= 6.1.9",
+      "MonoGame.Framework.WindowsUniversal >= 3.7.1.189"
     ],
     "UAP,Version=v10.0.14393": []
   },
@@ -25591,7 +26580,8 @@
       }
     },
     "dependencies": {
-      "Microsoft.NETCore.UniversalWindowsPlatform": "[6.0.6, )"
+      "Microsoft.NETCore.UniversalWindowsPlatform": "[6.1.9, )",
+      "MonoGame.Framework.WindowsUniversal": "[3.7.1.189, )"
     },
     "frameworks": {
       "uap10.0.14393": {}

@@ -28,8 +28,9 @@ namespace Takai.UI
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             var usedSize = new Vector2();
-            foreach (var child in Children)
+            for (int i = 0; i < Children.Count; ++i)
             {
+                var child = Children[i];
                 if (!child.IsEnabled)
                     continue;
 
@@ -57,14 +58,9 @@ namespace Takai.UI
             //todo: bounds may be affected by Stretch which would prove wrong here
         }
 
-        protected override void OnChildReflow(Static child)
-        {
-            if (IsAutoSized)
-                Reflow();
-        }
-
         protected override void ReflowOverride(Vector2 availableSize)
         {
+            //todo: this first step should be pre-calculated (MeasuredSize?)
             float usedSize = 0;
             int stretches = 0;
             for (int i = 0; i < Children.Count; ++i)
@@ -110,11 +106,11 @@ namespace Takai.UI
                     if (Children[i].HorizontalAlignment == Alignment.Stretch)
                         itemSize = stretchSize;
                     else
-                        itemSize = Children[i].Position.X + Children[i].MeasuredSize.X;
+                        itemSize = Children[i].MeasuredSize.X;
 
                     Children[i].Reflow(new Rectangle(
-                        (int)(t + Children[i].Position.X),
-                        (int)Children[i].Position.Y,
+                        (int)t,
+                        (int)0,
                         (int)itemSize,
                         (int)availableSize.Y
                     ));
@@ -125,19 +121,17 @@ namespace Takai.UI
                     if (Children[i].VerticalAlignment == Alignment.Stretch)
                         itemSize = stretchSize;
                     else
-                        itemSize = Children[i].Position.Y + Children[i].MeasuredSize.Y;
+                        itemSize = Children[i].MeasuredSize.Y;
 
                     Children[i].Reflow(new Rectangle(
-                        (int)Children[i].Position.X,
-                        (int)(t + Children[i].Position.Y),
+                        (int)0,
+                        (int)t,
                         (int)availableSize.X,
                         (int)itemSize
                     ));
                     t += itemSize;
                 }
             }
-
-            NotifyChildReflow();
         }
     }
 }
