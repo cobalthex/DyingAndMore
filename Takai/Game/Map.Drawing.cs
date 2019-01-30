@@ -53,6 +53,7 @@ namespace Takai.Game
         internal XnaEffect reflectionEffect; //writes color and reflection information to two render targets
 
         internal XnaEffect colorEffect;
+        internal XnaEffect tilesEffect;
         internal XnaEffect circleEffect;
         internal XnaEffect basicEffect;
         internal XnaEffect lightmapEffect;
@@ -60,6 +61,8 @@ namespace Takai.Game
 
         internal TrailVertex[] trailVerts;
         internal DynamicVertexBuffer trailVBuffer;
+
+        internal Texture2D tilesLayoutTexture;
 
         internal VertexPositionColor[] fullScreenVerts = new[]
         {
@@ -143,21 +146,27 @@ namespace Takai.Game
                     DepthBufferEnable = false,
                 };
 
-                var width = Runtime.GraphicsDevice.PresentationParameters.BackBufferWidth;
-                var height = Runtime.GraphicsDevice.PresentationParameters.BackBufferHeight;
+                var dispwidth = Runtime.GraphicsDevice.PresentationParameters.BackBufferWidth;
+                var dispheight = Runtime.GraphicsDevice.PresentationParameters.BackBufferHeight;
 
                 mapAlphaTest = new AlphaTestEffect(Runtime.GraphicsDevice)
                 {
                     ReferenceAlpha = 1
                 };
-                preRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 1, RenderTargetUsage.DiscardContents);
-                fluidsRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
-                reflectionRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
-                reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
+                preRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 1, RenderTargetUsage.DiscardContents);
+                fluidsRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
+                reflectionRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
+                reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
                 //todo: some of the render targets may be able to be combined
+
+                //todo: this needs to work with resize
+                //todo: round up to pow2?
+                tilesLayoutTexture = new Texture2D(Runtime.GraphicsDevice, Width, Height, false, SurfaceFormat.Color);
+                PatchTileLayoutTexture(new Rectangle(0, 0, Width, Height));
             }
 
             colorEffect = Data.Cache.Load<XnaEffect>("Shaders/color.mgfx");
+            tilesEffect = Data.Cache.Load<XnaEffect>("Shaders/tiles.mgfx");
             circleEffect = Data.Cache.Load<XnaEffect>("Shaders/Circle.mgfx");
             basicEffect = Data.Cache.Load<XnaEffect>("Shaders/Basic.mgfx");
             outlineEffect = Data.Cache.Load<XnaEffect>("Shaders/Outline.mgfx");
@@ -166,6 +175,20 @@ namespace Takai.Game
             lightmapEffect = Data.Cache.Load<XnaEffect>("Shaders/Lightmap.mgfx");
 
             trailVerts = new TrailVertex[0];
+        }
+
+        public void PatchTileLayoutTexture(Rectangle region)
+        {
+            if (tilesLayoutTexture == null || region.Width < 1 || region.Height < 1)
+                return;
+            
+            uint[] tilesBlock = new uint[region.Width * region.Height];
+            for (int y = 0; y < region.Height; ++y)
+            {
+                for (int x = 0; x < region.Width; ++x)
+                    tilesBlock[x + y * region.Width] = (uint)Tiles[y + region.Y, x + region.X];
+            }
+            tilesLayoutTexture.SetData(0, region, tilesBlock, 0, tilesBlock.Length);
         }
     }
 
@@ -519,6 +542,33 @@ namespace Takai.Game
 
         public void DrawTiles(ref RenderContext c)
         {
+            //todo: store
+            var width = Class.TileSize * Class.Width;
+            var height = Class.TileSize * Class.Height;
+            var verts = new []
+            {
+                new VertexPositionColorTexture(new Vector3(0, 0, 0), Color.White, new Vector2(0, 0)),
+                new VertexPositionColorTexture(new Vector3(width, 0, 0), Color.White, new Vector2(1, 0)),
+                new VertexPositionColorTexture(new Vector3(0, height, 0), Color.White, new Vector2(0, 1)),
+                new VertexPositionColorTexture(new Vector3(width, height, 0), Color.White, new Vector2(1, 1)),
+            };
+
+            Class.tilesEffect.Parameters["Transform"].SetValue(c.viewTransform);
+            Class.tilesEffect.Parameters["TilesPerRow"].SetValue(Class.TilesPerRow);
+            //Class.tilesEffect.Parameters["TileUVScale"].SetValue(new Vector2(Class.TileSize) / new Vector2(Class.TilesImage.Width, Class.TilesImage.Height));
+            
+            foreach (EffectPass pass in Class.tilesEffect.CurrentTechnique.Passes)
+            {
+                //Class.tilesEffect.Parameters["TilesImage"].SetValue(Class.TilesImage);
+                //Class.tilesEffect.Parameters["TilesLayout"].SetValue(Class.tilesLayoutTexture);
+                pass.Apply();
+                
+                Runtime.GraphicsDevice.Textures[0] = Class.TilesImage;
+                Runtime.GraphicsDevice.Textures[1] = Class.tilesLayoutTexture;
+                Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, verts, 0, 2);
+            }
+                       
+            /*
             Class.mapAlphaTest.Projection = c.projection;
             Class.mapAlphaTest.View = c.cameraTransform;
             c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, Class.stencilWrite, null, Class.mapAlphaTest);
@@ -543,7 +593,7 @@ namespace Takai.Game
                 }
             }
 
-            c.spriteBatch.End();
+            c.spriteBatch.End();*/
         }
 
         public void DrawFluids(ref RenderContext c)
