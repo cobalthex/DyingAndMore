@@ -99,7 +99,7 @@ namespace Takai
         {
             return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
         }
-
+        
         public static int CeilDiv(int n, int m)
         {
             return (n / m) + ((n % m) > 0 ? 1 : 0);
@@ -118,6 +118,11 @@ namespace Takai
         public static Vector2 Sign(this Vector2 v)
         {
             return new Vector2(Math.Sign(v.X), Math.Sign(v.Y));
+        }
+
+        public static Vector2 Ceiling(this Vector2 v)
+        {
+            return new Vector2((float)Math.Ceiling(v.X), (float)Math.Ceiling(v.Y));
         }
 
         /// <summary>

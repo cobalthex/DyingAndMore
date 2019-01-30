@@ -58,7 +58,7 @@ namespace DyingAndMore.Editor
                         //todo: use Takai.Util.AbsRectangle
 
                         var start = (savedWorldPos / editor.Map.Class.TileSize).ToPoint();
-                        var end = (currentWorldPos / editor.Map.Class.TileSize).ToPoint();
+                        var end = Takai.Util.Ceiling(currentWorldPos / editor.Map.Class.TileSize).ToPoint();
 
                         if (start.X > end.X)
                         {
@@ -74,14 +74,16 @@ namespace DyingAndMore.Editor
                         }
 
                         var bounds = new Rectangle(0, 0, editor.Map.Class.Width, editor.Map.Class.Height);
-                        for (var y = start.Y; y <= end.Y; ++y)
+                        for (var y = start.Y; y < end.Y; ++y)
                         {
-                            for (var x = start.X; x <= end.X; ++x)
+                            for (var x = start.X; x < end.X; ++x)
                             {
                                 if (bounds.Contains(x, y))
                                     editor.Map.Class.Tiles[y, x] = tile;
                             }
                         }
+
+                        editor.Map.Class.PatchTileLayoutTexture(new Rectangle(start, end - start));
                     }
                     else
                         TileLine(savedWorldPos, currentWorldPos, tile);

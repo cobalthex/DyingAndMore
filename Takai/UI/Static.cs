@@ -1415,10 +1415,10 @@ namespace Takai.UI
         {
             if (!IsEnabled)
                 return;
-            
+
             var lastClip = OffsetContentArea; //is this the right one?
             AdjustToContainer(container);
-            //if (lastClip != OffsetContentArea) //todo: doesnt hit all cases
+            ///if (lastClip != OffsetContentArea) //todo: doesnt hit all cases
             {
                 //System.Diagnostics.Debug.WriteLine($"Reflowing ID:{DebugId} (container:{container})");
                 ReflowOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
