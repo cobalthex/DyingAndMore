@@ -20,7 +20,7 @@ Output vmain(float4 position : POSITION, float4 color : COLOR0, float2 texcoord 
 //todo: overlay color (heuristic)
 
 Texture2D TilesImage : register(t0);
-Texture2D TilesLayout : register(t1);
+Texture2D<uint> TilesLayout : register(t1);
 SamplerState Sampler;
 
 int TilesPerRow;
@@ -30,19 +30,17 @@ float4 pmain(float4 position : SV_Position, float4 color : COLOR0, float2 rpos :
 {
     uint2 tsize;
     TilesLayout.GetDimensions(tsize.x, tsize.y);
-        
+
     uint2 rel = uint2(rpos * tsize);
     float2 local = rpos % TileUVScale;
-    
-    uint4 tilecol = TilesLayout.Load(int3(rel, 0));
-    uint tile = (tilecol.r << 24) + (tilecol.g << 16) + (tilecol.b << 8) + (tilecol.a << 0);
-    if (tile == 0xffffffff)
-        return float4(0.8, 0.2, 0.2, 1);
-    return float4(0.5, tile / 98, 0, 1);
+
+    int tile = (int)TilesLayout.Load(int3(rel, 0));
+    if (tile >= 0xffff)
+        discard;
 
     float2 texcoord = uint2(
-        ((uint)tile % TilesPerRow),
-        ((uint)tile / TilesPerRow)
+        ((float)tile % TilesPerRow),
+        ((float)tile / TilesPerRow)
         ) * TileUVScale;
 
     return color * TilesImage.Sample(Sampler, texcoord);
