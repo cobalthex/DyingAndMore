@@ -8,7 +8,6 @@ namespace Takai.Data
     {
         /// <summary>
         /// The maximum number of nested object queries allowed.
-        /// Nothing returned if &lt; 1
         /// </summary>
         public static int MaxIndirection = 1;
 
@@ -318,7 +317,7 @@ namespace Takai.Data
             var srcVal = sourceAccessors.get?.Invoke() ?? null;
             var srcHash = srcVal?.GetHashCode() ?? 0;
             var srcMatches = (srcHash == cachedHash && (srcVal == null ? cachedValue == null : srcVal.Equals(cachedValue)));
-            
+
             if (!srcMatches)
             {
                 var bindVal = srcVal;
