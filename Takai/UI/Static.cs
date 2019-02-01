@@ -737,8 +737,8 @@ namespace Takai.UI
                     return;
 
                 if ((target.events != null && target.events.TryGetValue(@event, out var handlers) &&
-                    handlers.Invoke(target, eventArgs) == UIEventResult.Handled) ||
-                    target.IsModal) //no events are routed to the parent when modal
+                    handlers.Invoke(target, eventArgs) == UIEventResult.Handled))// ||
+                    //target.IsModal) //no events are routed to the parent when modal
                     return;
 
                 target = target.Parent;
