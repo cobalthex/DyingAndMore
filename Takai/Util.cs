@@ -5,6 +5,18 @@ namespace Takai
 {
     public static class Util
     {
+        public static uint NextPowerOf2(uint n)
+        {
+            --n;
+            n |= (n >> 1);
+            n |= (n >> 2);
+            n |= (n >> 4);
+            n |= (n >> 8);
+            n |= (n >> 16);
+            ++n;
+            return n;
+        }
+
         public static readonly Random RandomGenerator = new Random();
 
         public static T Random<T>(this System.Collections.Generic.IList<T> list) //distribution?

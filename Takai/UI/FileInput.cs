@@ -109,57 +109,54 @@ namespace Takai.UI
         {
             Direction = Direction.Horizontal;
 
-            On(TextInput.TextChangedEvent, delegate
+            On(TextChangedEvent, delegate
             {
                 Value = textInput.Text;
                 return UIEventResult.Handled;
             });
 
-            pickerButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
-            {
-                BubbleEvent(sender, "_SelectFile", new UIEventArgs(sender));
-                return UIEventResult.Handled;
-            });
+            pickerButton.EventCommands["Click"] = "OpenFileSelector";
+            AddChildren(textInput, pickerButton);
 
-            On("_SelectFile", delegate
-            {
+            CommandActions["OpenFileSelector"] = DoOpenFileSelector;
+
+            BorderColor = Color;
+        }
+
+        protected void DoOpenFileSelector(Static source, object startingDir)
+        {
+            string sStartingDir = startingDir as string ?? InitialDirectory;
 #if WINDOWS
 #if DEBUG
-                if (Input.InputState.IsMod(Input.KeyMod.Alt))
-                {
-                    System.Diagnostics.Process.Start(Path.GetDirectoryName(Text));
-                    return UIEventResult.Handled;
-                }
+            if (Input.InputState.IsMod(Input.KeyMod.Alt))
+            {
+                System.Diagnostics.Process.Start(Path.GetDirectoryName(Text));
+                return;
+            }
 #endif
 
-                FileDialog dialog = null;
-                if (Mode == DialogMode.Open)
-                    dialog = new OpenFileDialog();
-                else if (Mode == DialogMode.Save)
-                    dialog = new SaveFileDialog();
+            FileDialog dialog = null;
+            if (Mode == DialogMode.Open)
+                dialog = new OpenFileDialog();
+            else if (Mode == DialogMode.Save)
+                dialog = new SaveFileDialog();
 
-                dialog.FileName = Text;
-                dialog.AutoUpgradeEnabled = true;
-                dialog.RestoreDirectory = true;
-                dialog.InitialDirectory = InitialDirectory;
-                dialog.Filter = Filter;
-                dialog.ValidateNames = true;
-                dialog.CheckFileExists = VerifyFileExists;
+            dialog.FileName = Text;
+            dialog.AutoUpgradeEnabled = true;
+            dialog.RestoreDirectory = true;
+            dialog.InitialDirectory = sStartingDir;
+            dialog.Filter = Filter;
+            dialog.ValidateNames = true;
+            dialog.CheckFileExists = VerifyFileExists;
 
-                using (dialog)
-                {
-                    if (dialog.ShowDialog() == DialogResult.OK)
-                        Value = dialog.FileName;
-                }
+            using (dialog)
+            {
+                if (dialog.ShowDialog() == DialogResult.OK)
+                    Value = dialog.FileName;
+            }
 #elif WINDOWS_UAP
                 //todo
 #endif
-                return UIEventResult.Handled;
-            });
-
-            AddChildren(textInput, pickerButton);
-
-            BorderColor = Color;
         }
 
         protected void DisplayValidation()

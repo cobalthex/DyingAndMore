@@ -434,7 +434,7 @@ namespace DyingAndMore.Editor
                 var sign = Takai.Util.Sign(currentWorldPos - savedWorldPos);
                 whRatio *= sign;
 
-                if (dist != 0)
+                if (dist > 1)
                 {
                     Vector2 a = savedWorldPos, b = (savedWorldPos + dist * whRatio);
                     Camera.Scale = Camera.Viewport.Width / (sign.X * (b - a).X);

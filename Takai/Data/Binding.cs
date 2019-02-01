@@ -158,7 +158,7 @@ namespace Takai.Data
             Unchanged,
             Lowercase,
             Uppercase,
-            //SentenceCase,
+            Sentence,
         }
 
         public TextCase DesiredCase { get; set; }
@@ -181,6 +181,8 @@ namespace Takai.Data
                         return s.ToLower();
                     case TextCase.Uppercase:
                         return s.ToUpper();
+                    case TextCase.Sentence:
+                        return Util.ToSentenceCase(s);
                 }
             }
 

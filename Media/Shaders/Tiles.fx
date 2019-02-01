@@ -20,30 +20,37 @@ Output vmain(float4 position : POSITION, float4 color : COLOR0, float2 texcoord 
 //todo: overlay color (heuristic)
 
 Texture2D TilesImage : register(t0);
-Texture2D<uint> TilesLayout : register(t1);
+Texture2D TilesLayout : register(t1);
 SamplerState Sampler;
 
 int TilesPerRow;
-float2 TileUVScale; // tileSize / tilesImage.Size
+float2 TileSize;
+float2 MapSize;
+
+SamplerState LayoutSampler
+{
+    Filter = Linear;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
 
 float4 pmain(float4 position : SV_Position, float4 color : COLOR0, float2 rpos : TEXCOORD0) : SV_Target
 {
     uint2 tsize;
     TilesLayout.GetDimensions(tsize.x, tsize.y);
 
-    uint2 rel = uint2(rpos * tsize);
-    float2 local = rpos % TileUVScale;
-
-    int tile = (int)TilesLayout.Load(int3(rel, 0));
+	float4 tilec = TilesLayout.Sample(LayoutSampler, rpos * (MapSize / tsize));
+	uint tile = ((uint)(tilec.a * 255) << 24) + ((uint)(tilec.b * 255) << 16) + ((uint)(tilec.g * 255) << 8) + ((uint)(tilec.r * 255) << 0);
+	//uint4 tilec = TilesLayout.Load(uint3(rpos * MapSize, 0));
+	//uint tile = (tilec.a << 24) + (tilec.b << 16) + (tilec.g << 8) + (tilec.r << 0);
     if (tile >= 0xffff)
-        discard;
+        return float4(0.5, 0.3, 0.2, 1); // discard;
 
-    float2 texcoord = uint2(
-        ((float)tile % TilesPerRow),
-        ((float)tile / TilesPerRow)
-        ) * TileUVScale;
+    float2 cell = float2(tile % TilesPerRow, tile / TilesPerRow) / (tsize / TileSize);
+    TilesImage.GetDimensions(tsize.x, tsize.y);
+    float2 local = (rpos % (1 / MapSize)) * MapSize;
 
-    return color * TilesImage.Sample(Sampler, texcoord);
+    return color * TilesImage.Sample(Sampler, (cell + local));
 }
 
 technique Technique1

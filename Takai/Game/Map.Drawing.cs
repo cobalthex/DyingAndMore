@@ -160,8 +160,7 @@ namespace Takai.Game
                 //todo: some of the render targets may be able to be combined
 
                 //todo: this needs to work with resize
-                //todo: round up to pow2?
-                tilesLayoutTexture = new Texture2D(Runtime.GraphicsDevice, Width, Height, false, SurfaceFormat.Color);
+                tilesLayoutTexture = new Texture2D(Runtime.GraphicsDevice, (int)Util.NextPowerOf2((uint)Width), (int)Util.NextPowerOf2((uint)Height), false, SurfaceFormat.Color);
                 PatchTileLayoutTexture(new Rectangle(0, 0, Width, Height));
             }
 
@@ -182,11 +181,11 @@ namespace Takai.Game
             if (tilesLayoutTexture == null || region.Width < 1 || region.Height < 1)
                 return;
             
-            uint[] tilesBlock = new uint[region.Width * region.Height];
+            Color[] tilesBlock = new Color[region.Width * region.Height];
             for (int y = 0; y < region.Height; ++y)
             {
                 for (int x = 0; x < region.Width; ++x)
-                    tilesBlock[x + y * region.Width] = (uint)Tiles[y + region.Y, x + region.X];
+                    tilesBlock[x + y * region.Width] = new Color((uint)(int)Tiles[y + region.Y, x + region.X]);
             }
             tilesLayoutTexture.SetData(0, region, tilesBlock, 0, tilesBlock.Length);
         }
@@ -542,7 +541,7 @@ namespace Takai.Game
 
         public void DrawTiles(ref RenderContext c)
         {
-            //todo: store
+            //todo: store in vbuf
             var width = Class.TileSize * Class.Width;
             var height = Class.TileSize * Class.Height;
             var verts = new []
@@ -553,47 +552,47 @@ namespace Takai.Game
                 new VertexPositionColorTexture(new Vector3(width, height, 0), Color.White, new Vector2(1, 1)),
             };
 
+            //these can be preset too
             Class.tilesEffect.Parameters["Transform"].SetValue(c.viewTransform);
             Class.tilesEffect.Parameters["TilesPerRow"].SetValue(Class.TilesPerRow);
-            //Class.tilesEffect.Parameters["TileUVScale"].SetValue(new Vector2(Class.TileSize) / new Vector2(Class.TilesImage.Width, Class.TilesImage.Height));
-            
+            Class.tilesEffect.Parameters["TileSize"].SetValue(new Vector2(Class.TileSize));
+            Class.tilesEffect.Parameters["MapSize"].SetValue(new Vector2(Class.Width, Class.Height));
+            Class.tilesEffect.Parameters["TilesImage"].SetValue(Class.TilesImage);
+            Class.tilesEffect.Parameters["TilesLayout"].SetValue(Class.tilesLayoutTexture);
+
             foreach (EffectPass pass in Class.tilesEffect.CurrentTechnique.Passes)
             {
-                //Class.tilesEffect.Parameters["TilesImage"].SetValue(Class.TilesImage);
-                //Class.tilesEffect.Parameters["TilesLayout"].SetValue(Class.tilesLayoutTexture);
                 pass.Apply();
-                
-                Runtime.GraphicsDevice.Textures[0] = Class.TilesImage;
-                Runtime.GraphicsDevice.Textures[1] = Class.tilesLayoutTexture;
+                //Runtime.GraphicsDevice.Textures[0] = Class.TilesImage;
+                //Runtime.GraphicsDevice.Textures[1] = Class.tilesLayoutTexture;
                 Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, verts, 0, 2);
             }
-                       
-            /*
-            Class.mapAlphaTest.Projection = c.projection;
-            Class.mapAlphaTest.View = c.cameraTransform;
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, Class.stencilWrite, null, Class.mapAlphaTest);
 
-            var tileSize = Class.TileSize;
-            var tilesPerRow = Class.TilesPerRow;
-            for (var y = c.visibleTiles.Top; y < c.visibleTiles.Bottom; ++y)
-            {
-                for (var x = c.visibleTiles.Left; x < c.visibleTiles.Right; ++x)
-                {
-                    var tile = Class.Tiles[y, x];
-                    if (tile < 0)
-                        continue;
+            //Class.mapAlphaTest.Projection = c.projection;
+            //Class.mapAlphaTest.View = c.cameraTransform;
+            //c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, Class.stencilWrite, null, null/*Class.mapAlphaTest*/, c.cameraTransform);
 
-                    c.spriteBatch.Draw
-                    (
-                        Class.TilesImage,
-                        new Vector2(x * tileSize, y * tileSize),
-                        new Rectangle((tile % Class.TilesPerRow) * tileSize, (tile / tilesPerRow) * tileSize, tileSize, tileSize),
-                        Color.White
-                    );
-                }
-            }
+            //var tileSize = Class.TileSize;
+            //var tilesPerRow = Class.TilesPerRow;
+            //for (var y = c.visibleTiles.Top; y < c.visibleTiles.Bottom; ++y)
+            //{
+            //    for (var x = c.visibleTiles.Left; x < c.visibleTiles.Right; ++x)
+            //    {
+            //        var tile = Class.Tiles[y, x];
+            //        if (tile < 0)
+            //            continue;
 
-            c.spriteBatch.End();*/
+            //        c.spriteBatch.Draw
+            //        (
+            //            Class.TilesImage,
+            //            new Vector2(x * tileSize, y * tileSize),
+            //            new Rectangle((tile % Class.TilesPerRow) * tileSize, (tile / tilesPerRow) * tileSize, tileSize, tileSize),
+            //            new Color(Color.CornflowerBlue, 0.5f)
+            //        );
+            //    }
+            //}
+
+            //c.spriteBatch.End();
         }
 
         public void DrawFluids(ref RenderContext c)
