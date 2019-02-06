@@ -95,6 +95,26 @@ namespace Takai
                 list.Add(defaultValue);
         }
 
+        /// <summary>
+        /// Resize a list
+        /// </summary>
+        /// <typeparam name="T">The type of values in the list</typeparam>
+        /// <param name="array">The list to resize</param>
+        /// <param name="newSize">The new size of the list</param>
+        /// <param name="defaultValue">A default value for any new items in the list. Existing items will be unchanged</param>
+        public static T[] EnsureSize<T>(this T[] array, int newSize, T defaultValue = default(T))
+        {
+            if (newSize > array.Length)
+            {
+                var newArray = new T[newSize];
+                Array.Copy(array, newArray, newSize);
+                for (int i = array.Length; i < newSize; ++i)
+                    newArray[i] = defaultValue;
+                return newArray;
+            }
+            return array;
+        }
+
         public static Vector2 Reject(this Vector2 a, Vector2 b)
         {
             var ab = Vector2.Dot(a, b);

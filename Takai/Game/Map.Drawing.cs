@@ -181,13 +181,13 @@ namespace Takai.Game
             if (tilesLayoutTexture == null || region.Width < 1 || region.Height < 1)
                 return;
             
-            Color[] tilesBlock = new Color[region.Width * region.Height];
+            var buf = new uint[region.Width * region.Height];
             for (int y = 0; y < region.Height; ++y)
             {
                 for (int x = 0; x < region.Width; ++x)
-                    tilesBlock[x + y * region.Width] = new Color((uint)(int)Tiles[y + region.Y, x + region.X]);
+                    buf[x + y * region.Width] = (uint)Tiles[y + region.Y, x + region.X];
             }
-            tilesLayoutTexture.SetData(0, region, tilesBlock, 0, tilesBlock.Length);
+            tilesLayoutTexture.SetData(0, region, buf, 0, buf.Length);
         }
     }
 
@@ -355,8 +355,7 @@ namespace Takai.Game
             DrawLine(tip, tip - (magnitude * Vector2.Transform(direction, arrowWingTransform)), color);
             DrawLine(tip, tip - (magnitude * Vector2.Transform(direction, Matrix.Invert(arrowWingTransform))), color);
         }
-
-
+        
         private List<EntityInstance> _drawEntsOutlined = new List<EntityInstance>();
         private HashSet<Trigger> _drawTriggers = new HashSet<Trigger>();
 
@@ -557,8 +556,8 @@ namespace Takai.Game
             Class.tilesEffect.Parameters["TilesPerRow"].SetValue(Class.TilesPerRow);
             Class.tilesEffect.Parameters["TileSize"].SetValue(new Vector2(Class.TileSize));
             Class.tilesEffect.Parameters["MapSize"].SetValue(new Vector2(Class.Width, Class.Height));
-            Class.tilesEffect.Parameters["TilesImage"].SetValue(Class.TilesImage);
-            Class.tilesEffect.Parameters["TilesLayout"].SetValue(Class.tilesLayoutTexture);
+            Class.tilesEffect.Parameters["TilesImage"]?.SetValue(Class.TilesImage);
+            Class.tilesEffect.Parameters["TilesLayout"]?.SetValue(Class.tilesLayoutTexture);
 
             foreach (EffectPass pass in Class.tilesEffect.CurrentTechnique.Passes)
             {
