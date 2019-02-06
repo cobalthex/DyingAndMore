@@ -1,0 +1,12 @@
+MapInstance {
+    Class: MapClass {
+        Name: "One tile";
+        TileSize: 48;
+        MaterialInteractions: @"Materials/Test.mtl.tk";
+        TilesMaterial: "Tiles";
+        TilesImage: "Tilesets/Tiles2.png";
+        Width: 1;
+        Height: 1;
+        Tiles: [8];
+    }
+}
