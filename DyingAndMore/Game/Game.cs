@@ -96,7 +96,6 @@ namespace DyingAndMore.Game
         List<PlayerInstance> players;
 
         Static fpsDisplay;
-        Static crapDisplay;
         Static clockDisplay;
 
         TabPanel settingsConsole;
@@ -167,14 +166,6 @@ namespace DyingAndMore.Game
                 Position = new Vector2(20),
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.End,
-            });
-            AddChild(crapDisplay = new Static
-            {
-                Name = "stuff display",
-                Position = new Vector2(20),
-                VerticalAlignment = Alignment.Start,
-                HorizontalAlignment = Alignment.End,
-                Color = Color.PaleGreen
             });
             AddChild(clockDisplay = new Static
             {

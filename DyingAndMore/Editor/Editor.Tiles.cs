@@ -181,6 +181,20 @@ namespace DyingAndMore.Editor
                     start.Y += sy;
                 }
             }
+
+            if (start.X < end.X)
+            {
+                var s = start.X;
+                start.X = end.X;
+                end.X = s;
+            }
+            if (start.Y < end.Y)
+            {
+                var s = start.Y;
+                start.Y = end.Y;
+                end.Y = s;
+            }
+            editor.Map.Class.PatchTileLayoutTexture(new Rectangle(start, Takai.Util.Max(new Point(1), end - start)));
         }
 
         void TileFill(Vector2 Position, short TileValue)
@@ -193,6 +207,9 @@ namespace DyingAndMore.Editor
 
             if (initialValue == TileValue)
                 return;
+
+            Point min = editor.Map.Class.TileBounds.Size;
+            Point max = new Point(0);
 
             var queue = new System.Collections.Generic.Queue<Point>();
             queue.Enqueue(initial);
@@ -215,8 +232,14 @@ namespace DyingAndMore.Editor
                     if (first.Y < editor.Map.Class.Height - 1 && editor.Map.Class.Tiles[first.Y + 1, left] == initialValue)
                         queue.Enqueue(new Point(left, first.Y + 1));
                 }
-            }
-        }
 
+                min.X = System.Math.Min(min.X, left);
+                min.Y = System.Math.Min(min.Y, first.Y);
+                max.X = System.Math.Max(max.X, right);
+                max.Y = System.Math.Max(max.Y, first.Y);
+            }
+            //editor.Map.Class.PatchTileLayoutTexture(new Rectangle(min, Takai.Util.Max(new Point(1), max - min)));
+            editor.Map.Class.PatchTileLayoutTexture(editor.Map.Class.TileBounds);
+        }
     }
 }

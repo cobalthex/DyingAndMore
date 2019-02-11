@@ -20,7 +20,7 @@ Output vmain(float4 position : POSITION, float4 color : COLOR0, float2 texcoord 
 //todo: overlay color (heuristic)
 
 Texture2D TilesImage : register(t0);
-Texture2D TilesLayout : register(t1);
+Texture2D<uint> TilesLayout : register(t1);
 
 SamplerState Sampler;
 
@@ -40,14 +40,14 @@ float4 pmain(float4 position : SV_Position, float4 color : COLOR0, float2 rpos :
     uint2 tsize;
     TilesLayout.GetDimensions(tsize.x, tsize.y);
 
-    float4 tilec = TilesLayout.Sample(LayoutSampler, rpos * MapSize / tsize);
-    uint tile = ((uint)(tilec.a * 255) << 24) + ((uint)(tilec.b * 255) << 16) + ((uint)(tilec.g * 255) << 8) + ((uint)(tilec.r * 255) << 0);
+    //surface format color (unorm)
+    //float4 tilec = TilesLayout.Load(uint3(rpos * MapSize, 0));
+    //uint tile = ((uint)(tilec.a * 255) << 24) + ((uint)(tilec.b * 255) << 16) + ((uint)(tilec.g * 255) << 8) + ((uint)(tilec.r * 255) << 0);
 
-	//uint4 tilec = TilesLayout.Load(uint3(rpos * MapSize, 0));
-	//uint tile = (tilec.a << 24) + (tilec.b << 16) + (tilec.g << 8) + (tilec.r << 0);
+    uint tile = TilesLayout.Load(uint3(rpos * MapSize, 0));
 
-    if (tile >= 0xffff)
-        return float4(1, 0.3, 0.2, 1); // discard;
+    if (tile == 0xffffffff)
+        discard;
 
     TilesImage.GetDimensions(tsize.x, tsize.y);
     float2 tdiv = tsize / TileSize;

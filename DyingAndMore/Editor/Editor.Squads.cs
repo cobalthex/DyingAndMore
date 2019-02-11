@@ -138,25 +138,28 @@ namespace DyingAndMore.Editor
 
             var clampScale = Takai.Util.Clamp(editor.Camera.ActualScale, 0.4f, 1);
 
-            foreach (var squad in editor.Map.Squads)
+            if (editor.Map.Squads != null)
             {
-                editor.Map.DrawCircle(squad.Value.SpawnPosition, squad.Value.SpawnRadius, SelectedSquad == squad.Value ? Color.Gold : Color.Cyan);
-                SquadIcon.Draw(
-                    spriteBatch,
-                    editor.Camera.WorldToScreen(squad.Value.SpawnPosition),
-                    0,
-                    Color.White,
-                    clampScale
-                );
+                foreach (var squad in editor.Map.Squads)
+                {
+                    editor.Map.DrawCircle(squad.Value.SpawnPosition, squad.Value.SpawnRadius, SelectedSquad == squad.Value ? Color.Gold : Color.Cyan);
+                    SquadIcon.Draw(
+                        spriteBatch,
+                        editor.Camera.WorldToScreen(squad.Value.SpawnPosition),
+                        0,
+                        Color.White,
+                        clampScale
+                    );
 
-                var squadNameSize = DefaultFont.MeasureString(squad.Key);
-                DefaultFont.Draw(
-                    spriteBatch,
-                    squad.Key,
-                    editor.Camera.WorldToScreen(squad.Value.SpawnPosition + new Vector2(0, squad.Value.SpawnRadius))
-                        + new Vector2(squadNameSize.X / -2, 10 * clampScale),
-                    Color.White
-                );
+                    var squadNameSize = DefaultFont.MeasureString(squad.Key);
+                    DefaultFont.Draw(
+                        spriteBatch,
+                        squad.Key,
+                        editor.Camera.WorldToScreen(squad.Value.SpawnPosition + new Vector2(0, squad.Value.SpawnRadius))
+                            + new Vector2(squadNameSize.X / -2, 10 * clampScale),
+                        Color.White
+                    );
+                }
             }
 
             if (creatingSquad && SelectedSquad != null)

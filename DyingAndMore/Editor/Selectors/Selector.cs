@@ -13,7 +13,19 @@ namespace DyingAndMore.Editor.Selectors
 
         public int ItemCount { get; set; } = 0;
 
-        protected int ItemsPerRow { get; private set; } = 8;
+        protected int ItemsPerRow
+        {
+            get => _ItemsPerRow;
+            set
+            {
+                if (_ItemsPerRow == value)
+                    return;
+
+                _ItemsPerRow = value;
+                Reflow();
+            }
+        }
+        private int _ItemsPerRow = 8;
 
         public Vector2 ItemMargin { get; set; } = new Vector2(2);
 
@@ -37,7 +49,7 @@ namespace DyingAndMore.Editor.Selectors
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            return new Vector2(ItemsPerRow * ItemSize.X, ItemCount / ItemsPerRow * ItemSize.Y);
+            return new Vector2(ItemCount % ItemsPerRow, Takai.Util.CeilDiv(ItemCount, ItemsPerRow)) * (ItemSize.ToVector2() + ItemMargin);
         }
 
         protected override void ReflowOverride(Vector2 availableSize)
@@ -77,7 +89,8 @@ namespace DyingAndMore.Editor.Selectors
             var visPos = VisibleContentArea.Y - OffsetContentArea.Y;
             int start = (int)(visPos / (ItemSize.Y + ItemMargin.X) * ItemsPerRow);
             start = Math.Max(start, 0);
-            for (int i = start; i < Math.Min(start + (int)(ContentArea.Height / (ItemSize.Y + ItemMargin.Y) + 2) * ItemsPerRow, ItemCount); ++i)
+            //todo: fix
+            for (int i = start; i < Math.Min(start + (int)(ContentArea.Height / (ItemSize.Y + ItemMargin.Y) + ItemMargin.Y) * ItemsPerRow, ItemCount); ++i)
             {
                 var rect = new Rectangle(
                     (int)(OffsetContentArea.X + ItemMargin.X + (i % ItemsPerRow) * (ItemSize.X + ItemMargin.X)),

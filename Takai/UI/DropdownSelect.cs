@@ -88,9 +88,9 @@ namespace Takai.UI
 
             var root = GetRoot();
 
-            var end = new Vector2(VisibleContentArea.Right, VisibleContentArea.Bottom) + dropdown.Size;
+            var end = new Vector2(VisibleContentArea.Right + dropdown.VisibleBounds.Width, VisibleContentArea.Bottom + dropdown.VisibleBounds.Height);
             if (end.X > root.VisibleContentArea.Width || end.Y > root.VisibleContentArea.Height)
-                dropdown.Position = VisibleContentArea.Location.ToVector2() - new Vector2(0, dropdown.Size.Y);
+                dropdown.Position = VisibleContentArea.Location.ToVector2() - new Vector2(0, dropdown.VisibleBounds.Height);
             else
                 dropdown.Position = VisibleContentArea.Location.ToVector2() + new Vector2(0, MeasuredSize.Y); //todo: smarter placement
 
