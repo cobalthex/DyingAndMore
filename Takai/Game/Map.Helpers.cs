@@ -9,6 +9,15 @@ namespace Takai.Game
         internal void Resize(int newWidth, int newHeight)
         {
             Tiles = Tiles.Resize(newHeight, newWidth);
+
+            if (tilesEffect != null)
+            {
+                tilesEffect.Parameters["TilesPerRow"].SetValue(TilesPerRow);
+                tilesEffect.Parameters["TileSize"].SetValue(new Vector2(TileSize));
+                tilesEffect.Parameters["MapSize"].SetValue(new Vector2(Width, Height));
+                tilesEffect.Parameters["TilesImage"]?.SetValue(TilesImage);
+                tilesEffect.Parameters["TilesLayout"]?.SetValue(tilesLayoutTexture);
+            }
         }
 
         /// <summary>

@@ -160,7 +160,7 @@ namespace Takai.Game
                 //todo: some of the render targets may be able to be combined
 
                 //todo: this needs to work with resize
-                tilesLayoutTexture = new Texture2D(Runtime.GraphicsDevice, (int)Util.NextPowerOf2((uint)Width), (int)Util.NextPowerOf2((uint)Height), false, SurfaceFormat.Color);
+                tilesLayoutTexture = new Texture2D(Runtime.GraphicsDevice, (int)Util.NextPowerOf2((uint)Width), (int)Util.NextPowerOf2((uint)Height), false, SurfaceFormat.Single); //any 32 bit format should do (not unorm)
                 PatchTileLayoutTexture(new Rectangle(0, 0, Width, Height));
             }
 
@@ -178,8 +178,10 @@ namespace Takai.Game
 
         public void PatchTileLayoutTexture(Rectangle region)
         {
+            region = Rectangle.Intersect(region, TileBounds);
             if (tilesLayoutTexture == null || region.Width < 1 || region.Height < 1)
                 return;
+
             
             var buf = new uint[region.Width * region.Height];
             for (int y = 0; y < region.Height; ++y)
@@ -551,47 +553,14 @@ namespace Takai.Game
                 new VertexPositionColorTexture(new Vector3(width, height, 0), Color.White, new Vector2(1, 1)),
             };
 
-            //these can be preset too
+            Runtime.GraphicsDevice.DepthStencilState = Class.stencilWrite;
+            Runtime.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             Class.tilesEffect.Parameters["Transform"].SetValue(c.viewTransform);
-            Class.tilesEffect.Parameters["TilesPerRow"].SetValue(Class.TilesPerRow);
-            Class.tilesEffect.Parameters["TileSize"].SetValue(new Vector2(Class.TileSize));
-            Class.tilesEffect.Parameters["MapSize"].SetValue(new Vector2(Class.Width, Class.Height));
-            Class.tilesEffect.Parameters["TilesImage"]?.SetValue(Class.TilesImage);
-            Class.tilesEffect.Parameters["TilesLayout"]?.SetValue(Class.tilesLayoutTexture);
-
             foreach (EffectPass pass in Class.tilesEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                //Runtime.GraphicsDevice.Textures[0] = Class.TilesImage;
-                //Runtime.GraphicsDevice.Textures[1] = Class.tilesLayoutTexture;
                 Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, verts, 0, 2);
             }
-
-            //Class.mapAlphaTest.Projection = c.projection;
-            //Class.mapAlphaTest.View = c.cameraTransform;
-            //c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, Class.stencilWrite, null, null/*Class.mapAlphaTest*/, c.cameraTransform);
-
-            //var tileSize = Class.TileSize;
-            //var tilesPerRow = Class.TilesPerRow;
-            //for (var y = c.visibleTiles.Top; y < c.visibleTiles.Bottom; ++y)
-            //{
-            //    for (var x = c.visibleTiles.Left; x < c.visibleTiles.Right; ++x)
-            //    {
-            //        var tile = Class.Tiles[y, x];
-            //        if (tile < 0)
-            //            continue;
-
-            //        c.spriteBatch.Draw
-            //        (
-            //            Class.TilesImage,
-            //            new Vector2(x * tileSize, y * tileSize),
-            //            new Rectangle((tile % Class.TilesPerRow) * tileSize, (tile / tilesPerRow) * tileSize, tileSize, tileSize),
-            //            new Color(Color.CornflowerBlue, 0.5f)
-            //        );
-            //    }
-            //}
-
-            //c.spriteBatch.End();
         }
 
         public void DrawFluids(ref RenderContext c)

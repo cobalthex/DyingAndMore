@@ -193,10 +193,9 @@ namespace Takai.Game
                 foreach (var trigger in Data.Serializer.Cast<List<Trigger>>(triggers))
                     AddTrigger(trigger);
             }
-
+            
+            Class?.InitializeGraphics(); //todo: this is a hack fix
             Resize(Class.Width, Class.Height); //builds spacial info, etc
-
-            Class?.InitializeGraphics(); //todo: this is a hack fix7
         }
     }
 }
