@@ -156,9 +156,15 @@ namespace Takai.UI
         public string command;
         public object argument;
 
+        public EventCommandBinding(string command, object argument = null)
+        {
+            this.command = command;
+            this.argument = argument;
+        }
+
         public static implicit operator EventCommandBinding(string command)
         {
-            return new EventCommandBinding { command = command, argument = null };
+            return new EventCommandBinding(command);
         }
     }
 
@@ -487,7 +493,7 @@ namespace Takai.UI
         /// Can this element be focused
         /// </summary>
         [Data.Serializer.Ignored]
-        public virtual bool CanFocus => (EventCommands != null && EventCommands.ContainsKey(ClickEvent)) ||
+        public virtual bool CanFocus => (_eventCommands != null && EventCommands.ContainsKey(ClickEvent)) ||
                                         (events != null && events.ContainsKey(ClickEvent)); //todo: make user-editable?
 
         /// <summary>
@@ -618,7 +624,7 @@ namespace Takai.UI
                 if (target._commandActions != null && target.CommandActions.TryGetValue(command, out var caction))
                 {
                     //check if modal?
-                    caction.Invoke(this, argument);
+                    caction.Invoke(target /*this?*/, argument);
                     return true;
                 }
 
@@ -638,7 +644,12 @@ namespace Takai.UI
         /// A map from events to commands 
         /// e.g. Click->SpawnEntity
         /// </summary>
-        public Dictionary<string, EventCommandBinding> EventCommands { get; set; } //todo: bind argument? (case sensitivity)
+        public Dictionary<string, EventCommandBinding> EventCommands
+        {
+            get => _eventCommands ?? (_eventCommands = new Dictionary<string, EventCommandBinding>(System.StringComparer.OrdinalIgnoreCase));
+            set => _eventCommands = new Dictionary<string, EventCommandBinding>(value, System.StringComparer.OrdinalIgnoreCase); //mod passed in value?
+        }
+        private Dictionary<string, EventCommandBinding> _eventCommands;
 
         private Dictionary<string, UIEvent> events;
 
@@ -695,6 +706,27 @@ namespace Takai.UI
         }
 
         /// <summary>
+        /// Turn all events off for a specific handler
+        /// </summary>
+        /// <param name="events">The events to remove handlers for</param>
+        /// <returns>True if one or more of the handlers was turned off</returns>
+        public bool Off(params string[] events)
+        {
+            bool removed = false;
+            foreach (var @event in events)
+                removed |= this.events.Remove(@event);
+            return removed;
+        }
+
+        /// <summary>
+        /// Remove all event handlers
+        /// </summary>
+        public void OffAll()
+        {
+            this.events.Clear();
+        }
+
+        /// <summary>
         /// Bind this UI element to an object
         /// </summary>
         /// <param name="source">The source object for the bindings</param>
@@ -732,7 +764,7 @@ namespace Takai.UI
             var target = source;
             while (target != null)
             {
-                if (target.EventCommands != null && target.EventCommands.TryGetValue(@event, out var command) &&
+                if (target._eventCommands != null && target.EventCommands.TryGetValue(@event, out var command) &&
                     BubbleCommand(command.command, command.argument))
                     return;
 
@@ -1407,6 +1439,7 @@ namespace Takai.UI
             Reflow(containerBounds);
         }
 
+        bool isReflowing = false;
         /// <summary>
         /// Reflow this container, relative to its parent
         /// </summary>
@@ -1416,6 +1449,11 @@ namespace Takai.UI
             if (!IsEnabled)
                 return;
 
+            if (isReflowing)
+                return;
+
+            isReflowing = true; //todo: this should be unnecessary once fixing reflow if case below
+
             var lastClip = OffsetContentArea; //is this the right one?
             AdjustToContainer(container);
             ///if (lastClip != OffsetContentArea) //todo: doesnt hit all cases
@@ -1423,6 +1461,7 @@ namespace Takai.UI
                 //System.Diagnostics.Debug.WriteLine($"Reflowing ID:{DebugId} (container:{container})");
                 ReflowOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
             }
+            isReflowing = false;
             hasReflowed = true;
         }
 
@@ -1761,7 +1800,14 @@ namespace Takai.UI
                 }
             }
 
-            debugDraw?.DrawDebugInfo(spriteBatch);
+            if (debugDraw != null)
+            {
+                debugDraw.DrawDebugInfo(spriteBatch);
+#if DEBUG
+                if (Input.InputState.IsPress(Keys.Pause))
+                    System.Diagnostics.Debugger.Break();
+#endif
+            }
         }
 
         public void DrawDebugInfo(SpriteBatch spriteBatch)

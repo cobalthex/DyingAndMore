@@ -14,10 +14,6 @@ ActorClass {
         Behaviors: [
             TargetEnemyBehavior {
             };
-            MagnetBehavior {
-                Strength: 100000;
-                Radius: 400;
-            };
         ];
     }];
 

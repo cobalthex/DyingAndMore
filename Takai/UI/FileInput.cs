@@ -115,7 +115,7 @@ namespace Takai.UI
                 return UIEventResult.Handled;
             });
 
-            pickerButton.EventCommands["Click"] = "OpenFileSelector";
+            pickerButton.EventCommands[ClickEvent] = "OpenFileSelector";
             AddChildren(textInput, pickerButton);
 
             CommandActions["OpenFileSelector"] = DoOpenFileSelector;

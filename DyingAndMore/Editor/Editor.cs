@@ -63,9 +63,9 @@ namespace DyingAndMore.Editor
                 return UIEventResult.Handled;
             });
 
-            On("_OpenSelector", delegate
+            On("_OpenSelector", delegate (Static sender, UIEventArgs e)
             {
-                selectorDrawer.IsEnabled = true;
+                ((SelectorEditorMode<TSelector>)sender).selectorDrawer.IsEnabled = true;
                 return UIEventResult.Handled;
             });
 

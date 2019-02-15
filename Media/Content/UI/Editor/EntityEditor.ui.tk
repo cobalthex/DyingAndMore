@@ -84,7 +84,9 @@ List {
             Padding: [10 5];
             HorizontalAlignment: Alignment.Middle;
             Text: "Close";
-            OnClickCommand: "$CloseModal";
+            EventCommands: {
+                Click: "CloseModal";
+            }
         };
     ];
 }

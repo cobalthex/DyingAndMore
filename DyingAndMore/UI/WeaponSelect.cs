@@ -46,14 +46,13 @@ namespace DyingAndMore.UI
                 catch { }
             }
 
-
-        }
-
-        protected UIEventResult OnSelectedItemChanged(Static sender, SelectionChangedEventArgs e)
-        {
-            _instance = null;
-            System.Diagnostics.Debug.WriteLine(SelectedItem);
-            return UIEventResult.Handled;
+            On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
+            {
+                var self = (WeaponSelect)sender;
+                self._instance = null; //lazy load
+                System.Diagnostics.Debug.WriteLine(self.SelectedItem);
+                return UIEventResult.Handled;
+            });
         }
     }
 }

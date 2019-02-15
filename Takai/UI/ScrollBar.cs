@@ -335,6 +335,9 @@ namespace Takai.UI
 
         public override bool CanFocus => true;
 
+        //todo: unify this design (logical/visible children?)
+        public IList<Static> EnumerableChildren => contentContainer.Children;
+
         public ScrollBox()
         {
             ScrollBarTemplate = new ScrollBar();
