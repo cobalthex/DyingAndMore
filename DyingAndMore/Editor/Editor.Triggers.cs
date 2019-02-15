@@ -22,12 +22,12 @@ namespace DyingAndMore.Editor
 
             var closeButton = new Static
             {
-                EventCommands = new System.Collections.Generic.Dictionary<string, EventCommandBinding> { [ClickEvent] = "Close" },
                 Text = "Close",
                 HorizontalAlignment = Alignment.Stretch,
                 BorderColor = Color.White,
                 Padding = new Vector2(10)
             };
+            closeButton.EventCommands[ClickEvent] = "Close";
 
             var label = new Static { Text = "Name" };
 

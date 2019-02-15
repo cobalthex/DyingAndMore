@@ -40,39 +40,68 @@ namespace Takai.UI
                 BackgroundColor = new Color(32, 0, 128)
             };
 
-            dropdownContainer = new Static
+            dropdownContainer = new Static(dropdown)
             {
+                BackgroundColor = new Color(0, 0, 0, 127),
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
             };
-
-            On("Click", delegate (Static sender, UIEventArgs e)
+            dropdownContainer.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                if (dropdownContainer.Parent != null)
-                    CloseDropDown();
+                sender.RemoveFromParent();
+                return UIEventResult.Handled;
+            });
+
+            On(ClickEvent, delegate (Static sender, UIEventArgs e)
+            {
+                var self = (DropdownSelect<T>)sender;
+                if (self.dropdownContainer.Parent != null)
+                    self.CloseDropDown();
                 else
-                    OpenDropdown();
+                    self.OpenDropdown();
 
                 return UIEventResult.Handled;
             });
 
-            On("SelectionChanged", delegate (Static sender, UIEventArgs e)
+            dropdown.On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
             {
                 var sourceList = (ItemList<T>)e.Source;
 
                 var childIndex = preview?.ChildIndex ?? -1;
                 ReplaceChild(preview = sourceList.Container.Children[sourceList.SelectedIndex].CloneHierarchy(), childIndex);
                 preview.BindTo(sourceList.SelectedItem);
-                CloseDropDown();
-                return UIEventResult.Continue;
+                BubbleEvent(SelectionChangedEvent, e);
+                return UIEventResult.Handled; //the dropdown is not part of the main tree
             });
         }
 
         protected override void FinalizeClone()
         {
-            list = (ItemList<T>)list?.CloneHierarchy();
-            dropdown = (ScrollBox)dropdown?.CloneHierarchy();
-            preview = preview?.CloneHierarchy();
+            dropdownContainer = dropdownContainer.CloneHierarchy();
+            dropdown = (ScrollBox)dropdownContainer.Children[0];
+            list = (ItemList<T>)dropdown.EnumerableChildren[0];
+            
+            var previewChildIndex = preview?.ChildIndex ?? -1;
+            if (previewChildIndex >= 0)
+            {
+                ReplaceChild(preview = list.Container.Children[list.SelectedIndex].CloneHierarchy(), previewChildIndex);
+                preview.BindTo(list.SelectedItem);
+            }
+            else
+                preview = null;
+
+            //rebind the dropdown events
+            dropdown.Off(SelectionChangedEvent);
+            dropdown.On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
+            {
+                var sourceList = (ItemList<T>)e.Source;
+
+                var childIndex = preview?.ChildIndex ?? -1;
+                ReplaceChild(preview = sourceList.Container.Children[sourceList.SelectedIndex].CloneHierarchy(), childIndex);
+                preview.BindTo(sourceList.SelectedItem);
+                BubbleEvent(SelectionChangedEvent, e);
+                return UIEventResult.Handled; //the dropdown is not part of the main tree
+            });
 
             base.FinalizeClone();
         }
@@ -85,6 +114,7 @@ namespace Takai.UI
         public void OpenDropdown()
         {
             dropdown.Size = new Vector2(MeasuredSize.X, System.Math.Max(list.Size.Y, 200));
+            list.Reflow();
 
             var root = GetRoot();
 
@@ -93,8 +123,7 @@ namespace Takai.UI
                 dropdown.Position = VisibleContentArea.Location.ToVector2() - new Vector2(0, dropdown.VisibleBounds.Height);
             else
                 dropdown.Position = VisibleContentArea.Location.ToVector2() + new Vector2(0, MeasuredSize.Y); //todo: smarter placement
-
-            dropdownContainer.AddChild(dropdown);
+            
             root.AddChild(dropdownContainer);
         }
 

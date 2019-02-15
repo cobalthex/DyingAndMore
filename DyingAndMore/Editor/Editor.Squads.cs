@@ -40,16 +40,18 @@ namespace DyingAndMore.Editor
 
             if (pea.button == 0)
             {
-                foreach (var squad in editor.Map.Squads) //search backwards?
+                if (editor.Map.Squads != null)
                 {
-                    if (Vector2.DistanceSquared(squad.Value.SpawnPosition, worldPos) 
-                        <= (squad.Value.SpawnRadius * squad.Value.SpawnRadius))
+                    foreach (var squad in editor.Map.Squads) //search backwards?
                     {
-                        SelectedSquad = squad.Value;
-                        return UIEventResult.Handled;
+                        if (Vector2.DistanceSquared(squad.Value.SpawnPosition, worldPos)
+                            <= (squad.Value.SpawnRadius * squad.Value.SpawnRadius))
+                        {
+                            SelectedSquad = squad.Value;
+                            return UIEventResult.Handled;
+                        }
                     }
                 }
-
                 SelectedSquad = null;
                 creatingSquad = true;
                 createOrigin = worldPos;
@@ -68,13 +70,13 @@ namespace DyingAndMore.Editor
                 {
                     var ui = nameUI.CloneHierarchy();
                     ui.BindTo(SelectedSquad);
-                    ui.CommandActions["Accept"] = delegate (Static source, object argument)
+                    ui.CommandActions["Accept"] = delegate (Static sender, object argument)
                     {
                         ui.RemoveFromParent();
                         editor.Map.Spawn(SelectedSquad);
                         creatingSquad = false;
                     };
-                    ui.CommandActions["Cancel"] = delegate (Static source, object argument)
+                    ui.CommandActions["Cancel"] = delegate (Static sender, object argument)
                     {
                         ui.RemoveFromParent();
                         creatingSquad = false;

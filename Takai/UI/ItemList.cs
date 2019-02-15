@@ -164,17 +164,15 @@ namespace Takai.UI
             Items.CollectionChanged += Items_CollectionChanged;
             AddChild(Container);
 
-            On("_ChangeSelection", delegate (Static sender, UIEventArgs e)
+            CommandActions["ChangeSelection"] = delegate (Static sender, object arg)
             {
-                var sce = (SelectionChangedEventArgs)e;
-                SelectedIndex = sce.newIndex;
-                return UIEventResult.Handled;
-            });
+                ((ItemList<T>)sender).SelectedIndex = (int)arg;
+            };
         }
 
         protected override void FinalizeClone()
         {
-            Container = Container?.CloneHierarchy();
+            _container = Children[Container.ChildIndex];
             base.FinalizeClone();
         }
 
@@ -211,7 +209,7 @@ namespace Takai.UI
                     Container.InsertChild(CreateItemEntry((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
         }
-        
+
         /// <summary>
         /// Create a new list item
         /// </summary>
@@ -224,13 +222,10 @@ namespace Takai.UI
 
             var item = ItemTemplate.CloneHierarchy();
             item.BindTo(value);
-            //bound here for correct child indexing
-            //todo: use commands?
             item.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                var sce = new SelectionChangedEventArgs(sender, SelectedIndex, item.ChildIndex);
-                BubbleEvent(sender, "_ChangeSelection", sce);
-                return UIEventResult.Handled;
+                sender.BubbleCommand("ChangeSelection", sender.ChildIndex);
+                return UIEventResult.Continue;
             });
             return item;
         }
