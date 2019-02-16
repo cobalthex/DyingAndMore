@@ -1,12 +1,13 @@
 ProjectileClass {
     Name: "Plasma rocket";
-    MuzzleVelocity: 1500;
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
-    Drag: 0.4;
-    MinimumSpeed: 300;
-    CanDamageSource: true;
-    InheritSourcePhysics: false;    
+    Drag: 0;
+    CanDamageSource: false;
+    InheritSourcePhysics: false;
+
+    MuzzleVelocity: 10500;
+    MagnetismAnglePerSecond: 1400deg;
 
     #*FadeEffect: {
         Effects: [
@@ -28,10 +29,15 @@ ProjectileClass {
 
     Trail: {
         MaxPoints: 200;
-        Color: Color [240 192 255 255];
+        Color: {
+            Values: [
+                [0 [240 192 255 255]];
+                [1 Color.White];
+            ];
+        };
         Sprite: @"Effects/Trails/Lightning.png";
-        LifeSpan: 0.5sec;
-        CaptureDelay: 300hz;
+        LifeSpan: 0.1sec;
+        CaptureDelay: 3000hz;
         Width: {
             Values: [
                 [0 0];
@@ -39,9 +45,9 @@ ProjectileClass {
                 [1 4];
             ]
         };
-        Jitter: [-3 3];
+        Jitter: [-50 50];
     }
-
+	#*
     Animations: {
         Idle: {
             Sprite: {
@@ -49,5 +55,5 @@ ProjectileClass {
             };
             #Effect: @"Effects/Shards.fx.tk";
         }
-    }
+    }*#
 }

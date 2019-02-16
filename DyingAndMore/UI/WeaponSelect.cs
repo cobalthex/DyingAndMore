@@ -4,7 +4,7 @@ using Takai.UI;
 
 namespace DyingAndMore.UI
 {
-    public class WeaponSelect : DropdownSelect<WeaponClass>
+    public class ObjectSelect : DropdownSelect<WeaponClass>
     {
         /// <summary>
         /// An instance of the selected weapon. Created on demand (and cached)
@@ -23,7 +23,7 @@ namespace DyingAndMore.UI
         }
         private WeaponInstance _instance;
 
-        public WeaponSelect()
+        public ObjectSelect()
         {
             BorderColor = Microsoft.Xna.Framework.Color.White;
 
@@ -48,7 +48,7 @@ namespace DyingAndMore.UI
 
             On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
             {
-                var self = (WeaponSelect)sender;
+                var self = (ObjectSelect)sender;
                 self._instance = null; //lazy load
                 System.Diagnostics.Debug.WriteLine(self.SelectedItem);
                 return UIEventResult.Handled;

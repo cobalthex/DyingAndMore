@@ -80,7 +80,7 @@ namespace Takai.UI
             dropdownContainer = dropdownContainer.CloneHierarchy();
             dropdown = (ScrollBox)dropdownContainer.Children[0];
             list = (ItemList<T>)dropdown.EnumerableChildren[0];
-            
+
             var previewChildIndex = preview?.ChildIndex ?? -1;
             if (previewChildIndex >= 0)
             {
@@ -123,7 +123,7 @@ namespace Takai.UI
                 dropdown.Position = VisibleContentArea.Location.ToVector2() - new Vector2(0, dropdown.VisibleBounds.Height);
             else
                 dropdown.Position = VisibleContentArea.Location.ToVector2() + new Vector2(0, MeasuredSize.Y); //todo: smarter placement
-            
+
             root.AddChild(dropdownContainer);
         }
 
