@@ -1,0 +1,258 @@
+MapInstance {
+    Squads: Null;
+    Class: MapClass {
+        Name: "Shooting Range";
+        TileSize: 48;
+        Tileset: Tileset {
+            texture: "Tilesets/Tiles2.png";
+            size: 48;
+        };
+        MaterialInteractions: @"Materials/Test.mtl.tk";
+        TilesMaterial: "Tiles";
+        TilesImage: "Tilesets/Tiles2.png";
+        Width: 256;
+        Height: 8;
+        Tiles: [8 0 0 0 0 0 0 0 0 0 9 -1 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 22 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 23 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 10 0 0 0 0 0 0 0 0 0 11 -1 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 11];
+    };
+    Sounds: [];
+    ElapsedTime: 0;
+    TimeScale: 1;
+    currentScreenFade: ScreenFade {
+        Duration: 0;
+        Colors: Null;
+        Blend: Null;
+    };
+    currentScreenFadeElapsedTime: 52525.2684;
+    Entities: [
+        ActorInstance {
+            Class: @"Actors/Player.ent.tk";
+            Factions: Factions [Player Ally];
+            Controller: Null;
+            CurrentHealth: 5000;
+            Conditions: {
+            };
+            MaxSpeed: 300;
+            Weapon: GunInstance {
+                Class: @"Weapons/Plasma.wpn.tk";
+                CurrentAmmo: 1000;
+                Class: @"Weapons/Plasma.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
+            };
+            Id: 1;
+            Class: @"Actors/Player.ent.tk";
+            Name: Null;
+            Position: [186.8323 193.1566];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 7268.3857;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 50000;
+            Class: @"Actors/Target.ent.tk";
+            Class: @"Actors/Target.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 2;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 0;
+            Position: [1343.895 48.84033];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 13008.4294;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            CurrentHealth: 50000;
+            Class: @"Actors/Target.ent.tk";
+            Class: @"Actors/Target.ent.tk";
+            Weapon: Null;
+            Controller: AIController {
+                Behaviors: [
+                    TargetEnemyBehavior {
+                        SightDistance: 100000;
+                    }
+                ];
+                Target: Null;
+                TargetTime: 0;
+                LastKnownTargetPosition: [0 0];
+            };
+            Factions: Factions [Enemy];
+            Id: 3;
+            Name: Null;
+            Conditions: {
+            };
+            MaxSpeed: 0;
+            Position: [1343.895 333.6751];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 15525.1496;
+            EventHandlers: Null;
+        }
+        WeaponPickupInstance {
+            Weapon: GunInstance {
+                CurrentAmmo: 5000;
+                Class: @"Weapons/bfg.wpn.tk";
+                Class: @"Weapons/bfg.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
+            };
+            Class: @"Pickups/Bfg.ent.tk";
+            NextRespawnTime: 0;
+            Id: 4;
+            Class: @"Pickups/Bfg.ent.tk";
+            Name: Null;
+            Position: [62.77088 46.30841];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 19315.7552;
+            EventHandlers: Null;
+        }
+        WeaponPickupInstance {
+            Weapon: GunInstance {
+                CurrentAmmo: 200;
+                Class: @"Weapons/GrenadeLauncher.wpn.tk";
+                Class: @"Weapons/GrenadeLauncher.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
+            };
+            Class: @"Pickups/GrenadeLauncher.ent.tk";
+            Class: @"Pickups/GrenadeLauncher.ent.tk";
+            Id: 5;
+            Name: Null;
+            NextRespawnTime: 0;
+            Position: [188.0982 46.30841];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 22949.1973;
+            EventHandlers: Null;
+        }
+        WeaponPickupInstance {
+            Weapon: GunInstance {
+                CurrentAmmo: 1000;
+                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/mg.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
+            };
+            Class: @"Pickups/MG.ent.tk";
+            Class: @"Pickups/MG.ent.tk";
+            Id: 6;
+            Name: Null;
+            NextRespawnTime: 0;
+            Position: [60.23902 186.827];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 25899.5215;
+            EventHandlers: Null;
+        }
+        WeaponPickupInstance {
+            Weapon: GunInstance {
+                CurrentAmmo: 400;
+                Class: @"Weapons/Test.wpn.tk";
+                Class: @"Weapons/Test.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
+            };
+            Class: @"Pickups/Tuber.ent.tk";
+            Class: @"Pickups/Tuber.ent.tk";
+            Id: 7;
+            Name: Null;
+            NextRespawnTime: 0;
+            Position: [47.57969 337.4729];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 30930.4266;
+            EventHandlers: Null;
+        }
+        WeaponPickupInstance {
+            Weapon: GunInstance {
+                CurrentAmmo: 20000;
+                Class: @"Weapons/Flamethrower.wpn.tk";
+                Class: @"Weapons/Flamethrower.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
+            };
+            Class: @"Pickups/TestPfx.ent.tk";
+            Class: @"Pickups/TestPfx.ent.tk";
+            Id: 8;
+            Name: Null;
+            NextRespawnTime: 0;
+            Position: [188.0982 331.1433];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 37121.5178;
+            EventHandlers: Null;
+        }
+    ];
+    Triggers: [
+        Trigger {
+            Name: "Test trigger";
+            Region: [535 -20 32 422];
+            Filter: Null;
+            OnEnterCommands: Null;
+            OnEnterEffects: EffectsClass {
+                Name: Null;
+                SkipPercent: 0;
+                Delay: [0 0];
+                Offset: [0 0];
+                Effects: [
+                    ConditionEffect {
+                        Condition: @"Actors/Conditions/poison.cond.tk";
+                        Radius: 0;
+                        Duration: 15000;
+                        AcquireChance: 1;
+                    }
+                ];
+            };
+            MaxUses: 0;
+            UseCount: 0;
+        }
+    ];
+    Fluids: [];
+}

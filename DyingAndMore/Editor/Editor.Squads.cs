@@ -70,13 +70,13 @@ namespace DyingAndMore.Editor
                 {
                     var ui = nameUI.CloneHierarchy();
                     ui.BindTo(SelectedSquad);
-                    ui.CommandActions["Accept"] = delegate (Static sender, object argument)
+                    ui.CommandActions["Accept"] = delegate (Static _sender, object argument)
                     {
                         ui.RemoveFromParent();
                         editor.Map.Spawn(SelectedSquad);
                         creatingSquad = false;
                     };
-                    ui.CommandActions["Cancel"] = delegate (Static sender, object argument)
+                    ui.CommandActions["Cancel"] = delegate (Static _sender, object argument)
                     {
                         ui.RemoveFromParent();
                         creatingSquad = false;

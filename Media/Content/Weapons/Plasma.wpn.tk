@@ -7,7 +7,7 @@ GunClass {
     ProjectilesPerRound: 1;
     MaxBursts: 0;
     ChargeTime: 0msec;
-    DischargeTime: 300msec;
+    DischargeTime: 50msec;
     CooldownTime: 600msec;
     ErrorAngle: [-6deg 6deg];
 }

@@ -63,14 +63,27 @@ List {
         						#conditions
         						#actions
 
-        						Static { Text: "Controller"; };
-                                Static {
+                                List {
                                     Bindings: [
                                         Binding {
-                                            Source: "Controller.@typename";
-                                            Target: "Text";
-                                            DefaultValue: "[None]";
+                                            Source: "@typename";
+                                            Target: "IsEnabled";
+                                            Converter: ConditionalConverter {
+                                                DesiredValue: "ActorInstance";
+                                            };
                                         }
+                                    ];
+                                    Children: [
+                						Static { Text: "Controller"; };
+                                        Static {
+                                            Bindings: [
+                                                Binding {
+                                                    Source: "Controller.@typename";
+                                                    Target: "Text";
+                                                    DefaultValue: "[None]";
+                                                }
+                                            ];
+                                        };
                                     ];
                                 };
                             ];

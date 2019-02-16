@@ -42,9 +42,9 @@ namespace Takai.Data
                 {
                     obj = prop.GetValue(obj);
                     if (obj == null)
-                        return new GetSet();
-
-                    objType = obj.GetType();
+                        objType = prop.PropertyType;
+                    else
+                        objType = obj.GetType();
                     continue;
                 }
 
@@ -53,9 +53,9 @@ namespace Takai.Data
                 {
                     obj = field.GetValue(obj);
                     if (obj == null)
-                        return new GetSet();
-
-                    objType = obj.GetType();
+                        objType = field.FieldType;
+                    else
+                        objType = obj.GetType();
                     continue;
                 }
 
@@ -143,7 +143,7 @@ namespace Takai.Data
 
         public override object Convert(Type destType, object source)
         {
-            return base.Convert(destType, source == DesiredValue);
+            return base.Convert(destType, source.Equals(DesiredValue));
         }
     }
 

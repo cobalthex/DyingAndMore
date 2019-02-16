@@ -641,7 +641,7 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// A map from events to commands 
+        /// A map from events to commands
         /// e.g. Click->SpawnEntity
         /// </summary>
         public Dictionary<string, EventCommandBinding> EventCommands
@@ -1427,7 +1427,7 @@ namespace Takai.UI
 
             return new Vector2(bounds.Width, bounds.Height);
         }
-        
+
         bool hasReflowed = false;
 
         public void Reflow()
