@@ -36,6 +36,7 @@ namespace Takai.Data
                 }
                 catch (AmbiguousMatchException)
                 {
+                    System.Diagnostics.Debug.WriteLine($"Ambiguous: {indirections[i]} ({memberName})");
                     prop = objType.GetProperty(indirections[i], LookupFlags | BindingFlags.DeclaredOnly);
                 }
                 if (prop != null)
@@ -93,16 +94,17 @@ namespace Takai.Data
 
                 //getset.get = prop.CanRead ? (Func<object>)prop.GetGetMethod(false).CreateDelegate(typeof(Func<object>), obj) : null;
                 //getset.set = prop.CanWrite ? (Action<object>)prop.GetSetMethod(false).CreateDelegate(typeof(Action<object>), obj) : null;
-                return getset;
             }
-
-            field = objType.GetField(memberName, LookupFlags);
-            if (field != null)
+            else
             {
-                getset.type = field.FieldType;
-                if (!field.IsInitOnly)
-                    getset.set = (value) => field.SetValue(obj, value);
-                getset.get = () => field.GetValue(obj);
+                field = objType.GetField(memberName, LookupFlags);
+                if (field != null)
+                {
+                    getset.type = field.FieldType;
+                    if (!field.IsInitOnly)
+                        getset.set = (value) => field.SetValue(obj, value);
+                    getset.get = () => field.GetValue(obj);
+                }
             }
 
             return getset;
@@ -237,6 +239,11 @@ namespace Takai.Data
         object cachedValue;
         int cachedHash;
 
+#if DEBUG
+        private object sourceObject;
+        private object targetObject;
+#endif
+
         public Binding() { }
         public Binding(string source, string target, BindingDirection mode = BindingDirection.OneWay, object defaultValue = null)
         {
@@ -262,13 +269,18 @@ namespace Takai.Data
             if (Source == null || Target == null)
                 return;
 
+#if DEBUG
+            sourceObject = sourceObj;
+            targetObject = targetObj;
+#endif
+
             sourceAccessors = GetAccessors(Source, sourceObj);
             targetAccessors = GetAccessors(Target, targetObj);
 
             //set initial value
-            var srcVal = sourceAccessors.get?.Invoke() ?? null;
             if (targetAccessors.set != null)
             {
+                var srcVal = sourceAccessors.get?.Invoke() ?? null;
                 if (HasDefaultValue = (srcVal == null))
                     srcVal = DefaultValue;
                 targetAccessors.set(Converter.Convert(targetAccessors.type, srcVal));
@@ -317,8 +329,10 @@ namespace Takai.Data
                 return false;
 
             var srcVal = sourceAccessors.get?.Invoke() ?? null;
-            var srcHash = srcVal?.GetHashCode() ?? 0;
+            var srcHash = srcVal == null ? 0 : srcVal.GetHashCode();
             var srcMatches = (srcHash == cachedHash && (srcVal == null ? cachedValue == null : srcVal.Equals(cachedValue)));
+
+            //fuck boxing. srcVal!=cachedValue if value types
 
             if (!srcMatches)
             {
@@ -327,31 +341,35 @@ namespace Takai.Data
                 if (HasDefaultValue = (bindVal == null))
                     bindVal = DefaultValue;
                 targetAccessors.set(Converter.Convert(targetAccessors.type, bindVal));
+                System.Diagnostics.Debug.WriteLine($"Updated binding for source:{Source} ({cachedValue}) to target:{Target} ({cachedValue})");
                 cachedValue = srcVal;
                 cachedHash = srcHash;
-
-                //System.Diagnostics.Debug.WriteLine($"Updated binding for source:{SourceProperty} to target:{TargetProperty} = {cachedValue}");
                 return true;
             }
 
             if (Direction == BindingDirection.TwoWay && targetAccessors.get != null && sourceAccessors.set != null)
             {
                 var tgtVal = targetAccessors.get();
-                var tgtHash = tgtVal?.GetHashCode() ?? 0;
+                var tgtHash = tgtVal == null ? 0 : tgtVal.GetHashCode();
                 var tgtMatches = (tgtHash == cachedHash && (tgtVal == null ? cachedValue == null : tgtVal.Equals(cachedValue)));
 
                 if (!tgtMatches)
                 {
                     var bindVal = tgtVal;
                     sourceAccessors.set(Converter.Convert(sourceAccessors.type, bindVal));
+                    System.Diagnostics.Debug.WriteLine($"Updated binding for target:{Target} ({cachedValue}) to source:{Source} ({cachedValue})");
                     cachedValue = tgtVal;
                     cachedHash = tgtHash;
 
-                    //System.Diagnostics.Debug.WriteLine($"Updated binding for target:{TargetProperty} to source:{SourceProperty} = {cachedValue}");
                     return true;
                 }
             }
             return false;
+        }
+
+        public override string ToString()
+        {
+            return $"{Source}{(Direction == BindingDirection.TwoWay ? "<" : "")}->{Target}";
         }
     }
 }

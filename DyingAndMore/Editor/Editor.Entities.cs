@@ -17,7 +17,11 @@ namespace DyingAndMore.Editor
             get => _selectedEntity;
             set
             {
+                if (_selectedEntity != null)
+                    _selectedEntity.OutlineColor = Color.Transparent;
                 _selectedEntity = value;
+                if (_selectedEntity != null)
+                    _selectedEntity.OutlineColor = Color.Gold;
                 entInfo.BindTo(value);
             }
         }
@@ -60,11 +64,7 @@ namespace DyingAndMore.Editor
 
         public override void End()
         {
-            if (SelectedEntity != null)
-            {
-                SelectedEntity.OutlineColor = Color.Transparent;
-                SelectedEntity = null;
-            }
+            SelectedEntity = null;
             editor.Map.renderSettings.drawEntityForwardVectors = false;
         }
 
@@ -194,7 +194,7 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsPress(Keys.Space))
                 {
-                    entEditor.BindTo(SelectedEntity);
+                    entEditor.BindTo(SelectedEntity); //todo: this is blowing away internal bindings
                     entEditor.FocusFirstAvailable();
                     AddChild(entEditor);
                     return false;
