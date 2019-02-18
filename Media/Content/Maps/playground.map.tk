@@ -32,7 +32,12 @@ MapInstance {
             Conditions: {
             };
             MaxSpeed: 300;
-            Weapon: Null;
+            Weapon: GunInstance {
+                Class: @"Weapons/mg.wpn.tk";
+                CurrentAmmo: 1000;
+                StateTime: 0;
+                Charge: 0;
+            };
             Id: 1;
             Class: @"Actors/Player.ent.tk";
             Name: Null;
@@ -50,7 +55,6 @@ MapInstance {
             Weapon: GunInstance {
                 Class: @"Weapons/bfg.wpn.tk";
                 CurrentAmmo: 5000;
-                Class: @"Weapons/bfg.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
@@ -73,11 +77,9 @@ MapInstance {
             Weapon: GunInstance {
                 CurrentAmmo: 1000;
                 Class: @"Weapons/mg.wpn.tk";
-                Class: @"Weapons/mg.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
-            Class: @"Pickups/MG.ent.tk";
             Class: @"Pickups/MG.ent.tk";
             Id: 3;
             Name: Null;
@@ -95,7 +97,6 @@ MapInstance {
         WeaponPickupInstance {
             Weapon: GunInstance {
                 CurrentAmmo: 1200;
-                Class: @"Weapons/shotgun.wpn.tk";
                 Class: @"Weapons/shotgun.wpn.tk";
                 StateTime: 0;
                 Charge: 0;

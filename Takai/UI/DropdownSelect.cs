@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
@@ -13,12 +12,19 @@ namespace Takai.UI
         public T SelectedItem
         {
             get => list.SelectedItem;
-            set => list.SelectedItem = value;
+            set
+            {
+                list.SelectedItem = value;
+
+            }
         }
         public int SelectedIndex
         {
             get => list.SelectedIndex;
-            set => list.SelectedIndex = value;
+            set
+            {
+                list.SelectedIndex = value;
+            }
         }
 
         public Static ItemTemplate { get => list.ItemTemplate; set => list.ItemTemplate = value; }
@@ -63,16 +69,30 @@ namespace Takai.UI
                 return UIEventResult.Handled;
             });
 
-            dropdown.On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
-            {
-                var sourceList = (ItemList<T>)e.Source;
+            dropdown.On(SelectionChangedEvent, OnSelectionChanged);
+            //On(SelectionChangedEvent, OnSelectionChanged);
 
-                var childIndex = preview?.ChildIndex ?? -1;
-                ReplaceChild(preview = sourceList.Container.Children[sourceList.SelectedIndex].CloneHierarchy(), childIndex);
-                preview.BindTo(sourceList.SelectedItem);
-                BubbleEvent(SelectionChangedEvent, e);
-                return UIEventResult.Handled; //the dropdown is not part of the main tree
+            On(ParentChangedEvent, delegate (Static sender, UIEventArgs e)
+            {
+                //System.Diagnostics.Debugger.Break();
+                return UIEventResult.Handled;
             });
+        }
+
+        protected UIEventResult OnSelectionChanged(Static sender, UIEventArgs e)
+        {
+            var childIndex = preview?.ChildIndex ?? -1;
+            if (SelectedIndex >= 0)
+            {
+                ReplaceChild(preview = list.Container.Children[SelectedIndex].CloneHierarchy(), childIndex);
+                preview.Name = "fuck";
+                preview.BindTo(SelectedItem);
+            }
+            else
+                preview.BindTo(null);
+
+            BubbleEvent(this, SelectionChangedEvent, e);
+            return UIEventResult.Handled; //the dropdown is not part of the main tree
         }
 
         protected override void FinalizeClone()
@@ -92,16 +112,7 @@ namespace Takai.UI
 
             //rebind the dropdown events
             dropdown.Off(SelectionChangedEvent);
-            dropdown.On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
-            {
-                var sourceList = (ItemList<T>)e.Source;
-
-                var childIndex = preview?.ChildIndex ?? -1;
-                ReplaceChild(preview = sourceList.Container.Children[sourceList.SelectedIndex].CloneHierarchy(), childIndex);
-                preview.BindTo(sourceList.SelectedItem);
-                BubbleEvent(SelectionChangedEvent, e);
-                return UIEventResult.Handled; //the dropdown is not part of the main tree
-            });
+            dropdown.On(SelectionChangedEvent, OnSelectionChanged);
 
             base.FinalizeClone();
         }

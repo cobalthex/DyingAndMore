@@ -152,16 +152,19 @@ namespace DyingAndMore.Game.Entities
             get => _weapon;
             set
             {
-                if (_weapon != value)
-                {
-                    if (_weapon != null)
-                    {
-                        _weapon.Actor = null;
-                        if (Hud != null && _weapon.Hud != null)
-                            Hud.RemoveChild(_weapon.Hud);
-                    }
+                if (_weapon == value)
+                    return;
 
-                    _weapon = value;
+                if (_weapon != null)
+                {
+                    _weapon.Actor = null;
+                    if (Hud != null && _weapon.Hud != null)
+                        Hud.RemoveChild(_weapon.Hud);
+                }
+
+                _weapon = value;
+                if (_weapon != null)
+                {
                     _weapon.Actor = this;
                     if (Hud != null && _weapon.Hud != null)
                         Hud.AddChild(_weapon.Hud);

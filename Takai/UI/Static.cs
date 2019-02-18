@@ -182,6 +182,8 @@ namespace Takai.UI
         public const string ValueChangedEvent = "ValueChanged";
         public const string SelectionChangedEvent = "SelectionChanged";
 
+        public static readonly HashSet<string> InputEvents = new HashSet<string> { PressEvent, ClickEvent, DragEvent }; 
+
         /// <summary>
         /// Global commands that are invoked if routed commands arent triggered
         /// </summary>
@@ -756,6 +758,13 @@ namespace Takai.UI
             BubbleEvent(this, @event, args);
         }
 
+        /// <summary>
+        /// Bubble an event back towards the root element.
+        /// Stops at any modal element if event is part of <see cref="InputEvents"/>
+        /// </summary>
+        /// <param name="source">The element to start bubbling from</param>
+        /// <param name="event">The event name</param>
+        /// <param name="eventArgs">Arguments for the event</param>
         protected void BubbleEvent(Static source, string @event, UIEventArgs eventArgs)
         {
             if (source == null || @event == null)
@@ -769,8 +778,8 @@ namespace Takai.UI
                     return;
 
                 if ((target.events != null && target.events.TryGetValue(@event, out var handlers) &&
-                    handlers.Invoke(target, eventArgs) == UIEventResult.Handled))// ||
-                    //target.IsModal) //no events are routed to the parent when modal
+                    handlers.Invoke(target, eventArgs) == UIEventResult.Handled) ||
+                    (target.IsModal && InputEvents.Contains(@event))) //no events are routed to the parent when modal
                     return;
 
                 target = target.Parent;
@@ -1571,7 +1580,7 @@ namespace Takai.UI
                 i = toUpdate.Children.Count;
             }
 
-            bool handleInput = true;// Runtime.HasFocus;
+            bool handleInput = Runtime.HasFocus;
             while (true)
             {
                 if (handleInput)
@@ -1629,7 +1638,6 @@ namespace Takai.UI
         /// <returns>False if the input has been handled by this UI</returns>
         protected virtual bool HandleInput(GameTime time)
         {
-            //todo: maybe move to pre-update (and have pre-update override updateSelf)
             if (HasFocus)
             {
                 if ((!ignoreTabKey && Input.InputState.IsPress(Keys.Tab)) ||
