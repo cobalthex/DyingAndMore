@@ -79,13 +79,18 @@ namespace Takai.UI
             });
         }
 
+        public override void BindTo(object source)
+        {
+            //internal UI elements have their own bindings
+            BindToThis(source);
+        }
+
         protected UIEventResult OnSelectionChanged(Static sender, UIEventArgs e)
         {
             var childIndex = preview?.ChildIndex ?? -1;
             if (SelectedIndex >= 0)
             {
                 ReplaceChild(preview = list.Container.Children[SelectedIndex].CloneHierarchy(), childIndex);
-                preview.Name = "fuck";
                 preview.BindTo(SelectedItem);
             }
             else

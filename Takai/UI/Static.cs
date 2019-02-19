@@ -182,7 +182,7 @@ namespace Takai.UI
         public const string ValueChangedEvent = "ValueChanged";
         public const string SelectionChangedEvent = "SelectionChanged";
 
-        public static readonly HashSet<string> InputEvents = new HashSet<string> { PressEvent, ClickEvent, DragEvent }; 
+        public static readonly HashSet<string> InputEvents = new HashSet<string> { PressEvent, ClickEvent, DragEvent };
 
         /// <summary>
         /// Global commands that are invoked if routed commands arent triggered
@@ -730,21 +730,23 @@ namespace Takai.UI
 
         /// <summary>
         /// Bind this UI element to an object
+        /// Calls <see cref="BindTo"/> on child elements by default
+        /// Can be overriden to customize this behavior
         /// </summary>
         /// <param name="source">The source object for the bindings</param>
         /// <param name="recursive">Recurse through all children and set their source aswell</param>
-        public void BindTo(object source, bool recursive = true)
+        public virtual void BindTo(object source)
         {
-            if (recursive)
-            {
-                foreach (var elem in EnumerateRecursive())
-                    elem.BindToThis(source);
-            }
-            else
-                BindToThis(source);
+            BindToThis(source);
+            foreach (var child in Children)
+                child.BindTo(source);
         }
 
-        protected virtual void BindToThis(object source)
+        /// <summary>
+        /// Update bindings only this element and not children
+        /// </summary>
+        /// <param name="source">The source object for the binding</param>
+        protected void BindToThis(object source)
         {
             if (Bindings == null)
                 return;
