@@ -355,8 +355,7 @@ namespace Takai.Data
 
                 if (!tgtMatches)
                 {
-                    var bindVal = tgtVal;
-                    sourceAccessors.set(Converter.Convert(sourceAccessors.type, bindVal));
+                    sourceAccessors.set(Converter.Convert(sourceAccessors.type, tgtVal));
                     System.Diagnostics.Debug.WriteLine($"Updated binding for target:{Target} ({cachedValue}) to source:{Source} ({cachedValue})");
                     cachedValue = tgtVal;
                     cachedHash = tgtHash;

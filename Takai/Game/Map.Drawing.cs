@@ -16,11 +16,10 @@ namespace Takai.Game
     {
         internal struct TrailVertex : IVertexType
         {
-            public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(
-            new[] {
-            new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0),
-            new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 0),
-            new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.TextureCoordinate, 0)
+            public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(new[] {
+                new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0),
+                new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+                new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.TextureCoordinate, 0)
             });
 
             public Vector2 position;
@@ -182,7 +181,7 @@ namespace Takai.Game
             if (tilesLayoutTexture == null || region.Width < 1 || region.Height < 1)
                 return;
 
-            
+
             var buf = new uint[region.Width * region.Height];
             for (int y = 0; y < region.Height; ++y)
             {
@@ -357,7 +356,7 @@ namespace Takai.Game
             DrawLine(tip, tip - (magnitude * Vector2.Transform(direction, arrowWingTransform)), color);
             DrawLine(tip, tip - (magnitude * Vector2.Transform(direction, Matrix.Invert(arrowWingTransform))), color);
         }
-        
+
         private List<EntityInstance> _drawEntsOutlined = new List<EntityInstance>();
         private HashSet<Trigger> _drawTriggers = new HashSet<Trigger>();
 

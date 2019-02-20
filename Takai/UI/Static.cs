@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
+using Takai.Input;
 
 namespace Takai.UI
 {
@@ -45,7 +47,7 @@ namespace Takai.UI
         public Vector2 position;
 
         public int button; //maps to relevent enum for device
-        public Input.DeviceType device;
+        public DeviceType device;
         public int deviceIndex; //e.g. player index
 
         public PointerEventArgs(Static source)
@@ -520,8 +522,8 @@ namespace Takai.UI
         /// Was the mouse pressed inside this static (and is the mouse still down)
         /// </summary>
         /// <returns>True if the mouse is currently down and was pressed inside this static</returns>
-        protected bool DidPressInside(Input.MouseButtons button) =>
-            didPress && Input.InputState.IsButtonDown(button);
+        protected bool DidPressInside(MouseButtons button) =>
+            didPress && InputState.IsButtonDown(button);
 
         /// <summary>
         /// Who owns/contains this element
@@ -1642,51 +1644,54 @@ namespace Takai.UI
         {
             if (HasFocus)
             {
-                if ((!ignoreTabKey && Input.InputState.IsPress(Keys.Tab)) ||
-                    Input.InputState.IsAnyPress(Buttons.RightShoulder))
+                if ((!ignoreTabKey && InputState.IsPress(Keys.Tab)) ||
+                    InputState.IsAnyPress(Buttons.RightShoulder))
                 {
-                    if (Input.InputState.IsMod(Input.KeyMod.Shift))
+                    if (InputState.IsMod(KeyMod.Shift))
                         FocusPrevious();
                     else
                         FocusNext();
                     return false;
                 }
 
-                if (Input.InputState.IsAnyPress(Buttons.LeftShoulder))
+                if (InputState.IsAnyPress(Buttons.LeftShoulder))
                 {
                     FocusPrevious();
                     return false;
                 }
 
-                var thumb = Input.InputState.Thumbsticks().Left;
-                var lastThumb = Input.InputState.LastThumbsticks().Left;
+                var thumb = InputState.Thumbsticks().Left;
+                var lastThumb = InputState.LastThumbsticks().Left;
                 if (thumb != Vector2.Zero && lastThumb == Vector2.Zero)
                 {
                     if (FocusGeographically(thumb) != null)
                         return false;
                 }
 
-                if (!ignoreEnterKey && Input.InputState.IsPress(Keys.Enter))
+                if (!ignoreEnterKey && InputState.IsPress(Keys.Enter))
                 {
-                    TriggerClick(Vector2.Zero, (int)Keys.Enter, Input.DeviceType.Keyboard);
+                    TriggerClick(Vector2.Zero, (int)Keys.Enter, DeviceType.Keyboard);
                     return false;
                 }
-                if (!ignoreSpaceKey && Input.InputState.IsPress(Keys.Space))
+                if (!ignoreSpaceKey && InputState.IsPress(Keys.Space))
                 {
-                    TriggerClick(Vector2.Zero, (int)Keys.Space, Input.DeviceType.Keyboard);
+                    TriggerClick(Vector2.Zero, (int)Keys.Space, DeviceType.Keyboard);
                     return false;
                 }
-                if (Input.InputState.IsAnyPress(Buttons.A, out var player))
+                if (InputState.IsAnyPress(Buttons.A, out var player))
                 {
-                    TriggerClick(Vector2.Zero, (int)Keys.Enter, Input.DeviceType.Gamepad, (int)player);
+                    TriggerClick(Vector2.Zero, (int)Keys.Enter, DeviceType.Gamepad, (int)player);
                     return false;
                 }
             }
 
+            if (!HandleTouchInput())
+                return false;
+
             //todo: improve
-            if (Input.InputState.IsPress(0) && VisibleBounds.Contains(Input.InputState.touches[0].Position))
+            if (InputState.IsPress(0) && VisibleBounds.Contains(InputState.touches[0].Position))
             {
-                TriggerClick(Vector2.Zero, 0, Input.DeviceType.Touch);
+                TriggerClick(Vector2.Zero, 0, DeviceType.Touch);
 
                 if (CanFocus)
                 {
@@ -1697,19 +1702,42 @@ namespace Takai.UI
                 return false;
             }
 
-            var mouse = Input.InputState.MousePoint;
-            return HandleMouseInput(mouse, Input.MouseButtons.Left);
+            var mouse = InputState.MousePoint;
+            return HandleMouseInput(mouse, MouseButtons.Left);
         }
 
-        bool HandleMouseInput(Point mousePosition, Input.MouseButtons button)
+        bool HandleTouchInput()
         {
-            if (Input.InputState.IsPress(button) && VisibleBounds.Contains(mousePosition))
+            if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture) && VisibleBounds.Contains(gesture.Position))
+            {
+                var pea = new PointerEventArgs(this)
+                {
+                    position = (gesture.Position - OffsetContentArea.Location.ToVector2()) + Padding,
+                    button = 0,
+                    device = DeviceType.Touch
+                };
+                BubbleEvent(PressEvent, pea);
+                BubbleEvent(ClickEvent, pea);
+
+                if (CanFocus)
+                {
+                    HasFocus = true;
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        bool HandleMouseInput(Point mousePosition, MouseButtons button)
+        {
+            if (InputState.IsPress(button) && VisibleBounds.Contains(mousePosition))
             {
                 var pea = new PointerEventArgs(this)
                 {
                     position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
                     button = (int)button,
-                    device = Input.DeviceType.Mouse
+                    device = DeviceType.Mouse
                 };
                 BubbleEvent(PressEvent, pea);
 
@@ -1725,8 +1753,8 @@ namespace Takai.UI
             //todo: maybe add capture setting
             else if (DidPressInside(button))
             {
-                var lastMousePosition = Input.InputState.LastMouseVector;
-                var newMousePosition = Input.InputState.MouseVector;
+                var lastMousePosition = InputState.LastMouseVector;
+                var newMousePosition = InputState.MouseVector;
                 if (lastMousePosition != newMousePosition)
                 {
                     var pea = new DragEventArgs(this)
@@ -1734,22 +1762,22 @@ namespace Takai.UI
                         delta = newMousePosition - lastMousePosition,
                         position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
                         button = (int)button,
-                        device = Input.DeviceType.Mouse
+                        device = DeviceType.Mouse
                     };
                     BubbleEvent(DragEvent, pea);
                 }
                 return false;
             }
 
-            else if (Input.InputState.IsButtonUp(button))
-            //else if (Input.InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
+            else if (InputState.IsButtonUp(button))
+            //else if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
                 if (didPress && VisibleBounds.Contains(mousePosition)) //gesture pos
                 {
                     TriggerClick(
                         (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
                         (int)button,
-                        Input.DeviceType.Mouse
+                        DeviceType.Mouse
                     );
                     didPress = false;
                     return false;
@@ -1789,7 +1817,7 @@ namespace Takai.UI
                 if (DebugFont != null && borderColor == Color.Transparent)
                     borderColor = Color.SteelBlue;
 
-                if (DebugFont != null && toDraw.VisibleBounds.Contains(Input.InputState.MousePoint))
+                if (DebugFont != null && toDraw.VisibleBounds.Contains(InputState.MousePoint))
                     debugDraw = toDraw;
 
                 if (borderColor.A > 0)
@@ -1814,7 +1842,7 @@ namespace Takai.UI
             {
                 debugDraw.DrawDebugInfo(spriteBatch);
 #if DEBUG
-                if (Input.InputState.IsPress(Keys.Pause))
+                if (InputState.IsPress(Keys.Pause))
                     System.Diagnostics.Debugger.Break();
 #endif
             }
@@ -1956,7 +1984,7 @@ namespace Takai.UI
 
         //todo: better name
 
-        public void TriggerClick(Vector2 relativePosition, int button = 0, Input.DeviceType device = Input.DeviceType.Mouse, int deviceIndex = 0)
+        public void TriggerClick(Vector2 relativePosition, int button = 0, DeviceType device = DeviceType.Mouse, int deviceIndex = 0)
         {
             var ce = new PointerEventArgs(this)
             {

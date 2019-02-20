@@ -45,7 +45,9 @@ namespace DyingAndMore.Editor
 
         protected override void UpdatePreview(int selectedItem)
         {
-            if (selectedItem >= 0 && selector.ents[selectedItem].Animations.TryGetValue("EditorPreview", out var animation))
+            if (selectedItem >= 0 && 
+                (selector.ents[selectedItem].Animations.TryGetValue("EditorPreview", out var animation)) ||
+                 selector.ents[selectedItem].Animations.TryGetValue(selector.ents[selectedItem].DefaultBaseAnimation, out animation))
             {
                 preview.Sprite = animation.Sprite;
                 preview.Size = Vector2.Max(new Vector2(32), preview.Sprite?.Size.ToVector2() ?? new Vector2(32));

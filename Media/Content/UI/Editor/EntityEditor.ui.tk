@@ -37,6 +37,7 @@ List {
         						Static { Text: "Actor Properties"; };
         						Static { Text: "Current Health"; };
         						NumericInput {
+                                    Name: "helf";
         							Bindings: [
         								Binding {
         									Direction: BindingDirection.TwoWay;

@@ -126,16 +126,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The current health of the actor
         /// </summary>
-        public float CurrentHealth
-        {
-            get => _currentHealth;
-            set
-            {
-                _currentHealth = value;
-                //broadcast property
-            }
-        }
-        private float _currentHealth;
+        public float CurrentHealth { get; set; }
 
         /// <summary>
         /// All current conditions, and time remaining

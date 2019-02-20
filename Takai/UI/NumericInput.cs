@@ -93,6 +93,7 @@ namespace Takai.UI
         {
             textInput = new TextInput
             {
+                Name = "clarq",
                 Text = "0",
                 AllowLetters = false,
                 AllowNumbers = true,
@@ -106,12 +107,13 @@ namespace Takai.UI
 
             On(TextChangedEvent, delegate (Static sender, UIEventArgs e)
             {
+                var self = (NumericInput)sender;
                 var input = (TextInput)e.Source;
                 if (NumericBaseType.TryParse(input.Text, out var val))
                 {
-                    Value = val;
-                    if (Value != val)
-                        input.Text = Value.ToString();
+                    self.Value = val;
+                    if (self.Value != val)
+                        input.Text = self.Value.ToString();
                 }
                 return UIEventResult.Continue;
             });
@@ -131,34 +133,23 @@ namespace Takai.UI
                 VerticalAlignment = Alignment.Stretch
             };
 
-            //todo: change to commands
-            upButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
-            {
-                BubbleEvent(sender, "_IncrementValue", new UIEventArgs(sender));
-                return UIEventResult.Continue;
-            });
-            downButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
-            {
-                BubbleEvent(sender, "_DecrementValue", new UIEventArgs(sender));
-                return UIEventResult.Continue;
-            });
+            upButton.EventCommands[ClickEvent] = "IncrementValue";
+            downButton.EventCommands[ClickEvent] = "DecrementValue";
 
-            On("_IncrementValue", delegate (Static sender, UIEventArgs e)
+            CommandActions["IncrementValue"] = delegate (Static sender, object arg)
             {
-                IncrementValue();
-                return UIEventResult.Handled;
-            });
-
-            On("_DecrementValue", delegate (Static sender, UIEventArgs e)
+                ((NumericInput)sender).IncrementValue();
+            };
+            CommandActions["DecrementValue"] = delegate (Static sender, object arg)
             {
-                DecrementValue();
-                return UIEventResult.Handled;
-            });
+                ((NumericInput)sender).DecrementValue();
+            };
 
             On(ValueChangedEvent, delegate (Static sender, UIEventArgs e)
             {
-                textInput.Text = Value.ToString();
-                textInput.ScrollPosition = 0;
+                var self = (NumericInput)sender;
+                self.textInput.Text = Value.ToString();
+                self.textInput.ScrollPosition = 0;
                 return UIEventResult.Continue;
             });
 
