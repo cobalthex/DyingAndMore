@@ -43,6 +43,7 @@ namespace DyingAndMore
         Takai.UI.Static ui;
 
         Takai.FpsGraph fpsGraph;
+        UI.DevtoolsMenu debugMenu;
 
         public Matrix uiMatrix;
 
@@ -248,6 +249,7 @@ namespace DyingAndMore
                     ui.RemoveFromParent();
             };
 
+            ui.AddChild(debugMenu = new UI.DevtoolsMenu());
             ui.HasFocus = true;
             base.Initialize();
         }

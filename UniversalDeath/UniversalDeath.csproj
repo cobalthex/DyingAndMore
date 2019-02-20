@@ -196,12 +196,8 @@
       <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="B:\Code\DyingAndMore\Media\Maps\.hgkeep">
-      <Link>Maps\.hgkeep</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="B:\Code\DyingAndMore\Media\Maps\test.d2map">
-      <Link>Maps\test.d2map</Link>
+    <Content Include="$(MediaDir)Maps\**\*.*">
+      <Link>Maps\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="$(MediaDir)Config\**\*.*">
