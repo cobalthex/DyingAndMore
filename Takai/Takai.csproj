@@ -117,6 +117,7 @@
     <Compile Include="UI\Graphic.cs" />
     <Compile Include="UI\ItemList.cs" />
     <Compile Include="UI\ObjectSelect.cs" />
+    <Compile Include="UI\Switch.cs" />
     <Compile Include="UI\Table.cs" />
     <Compile Include="UI\List.cs" />
     <Compile Include="UI\Meter.cs" />

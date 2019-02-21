@@ -75,7 +75,7 @@
             var tabHeader = new Static(child.Name);
             tabHeader.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                BubbleEvent(sender, "_SelectTab", new SelectionChangedEventArgs(sender, -1, sender.ChildIndex));
+                BubbleEvent(sender, "_SelectTab", new SelectionChangedEventArgs(sender, -1, sender.IndexOfParent));
                 return UIEventResult.Handled;
             });
             TabBar.InsertChild(tabHeader, index);

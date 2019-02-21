@@ -12,6 +12,7 @@ namespace DyingAndMore.UI
         {
             Direction = Direction.Vertical;
             Margin = 10;
+            IsModal = true;
 
             On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
@@ -20,7 +21,7 @@ namespace DyingAndMore.UI
                 if (e.Source.Parent != sender)
                     return UIEventResult.Continue;
 
-                var ci = e.Source.ChildIndex;
+                var ci = e.Source.IndexOfParent;
                 if (ci < 0 || ci >= self.items.Count)
                     return UIEventResult.Continue;
 
@@ -40,6 +41,10 @@ namespace DyingAndMore.UI
 
             foreach (var item in items)
                 AddChild(new Static(item.Name));
+
+            var close = new Static("Close");
+            close.EventCommands["Click"] = "CloseModal";
+            AddChild(close);
         }
 
         protected override bool HandleInput(GameTime time)

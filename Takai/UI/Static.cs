@@ -857,7 +857,17 @@ namespace Takai.UI
         /// <summary>
         /// The index of this child in its parents, -1 if no parent
         /// </summary>
-        public int ChildIndex => Parent?.Children.IndexOf(this) ?? -1;
+        public int IndexOfParent => Parent?.Children.IndexOf(this) ?? -1;
+
+        /// <summary>
+        /// Get the index of a child to this element
+        /// </summary>
+        /// <param name="child">The child to search</param>
+        /// <returns>-1 if the element is not a child or null</returns>
+        public int IndexOf(Static child)
+        {
+            return Children.IndexOf(child);
+        }
 
         /// <summary>
         /// Insert the child into the children without reflowing
@@ -965,7 +975,7 @@ namespace Takai.UI
         /// <param name="child"></param>
         public Static RemoveChild(Static child)
         {
-            InternalRemoveChildIndex(_children.IndexOf(child));
+            InternalRemoveChildIndex(IndexOf(child));
             return child;
         }
 

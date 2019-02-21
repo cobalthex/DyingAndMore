@@ -269,12 +269,12 @@ namespace Takai.UI
                 if (value == null)
                     return;
 
-                var hsp = horizontalScrollbar?.ChildIndex ?? -1;
+                var hsp = horizontalScrollbar?.IndexOfParent ?? -1;
                 horizontalScrollbar = (ScrollBar)value.CloneHierarchy();
                 horizontalScrollbar.HorizontalAlignment = Alignment.Stretch;
                 horizontalScrollbar.Direction = Direction.Horizontal;
 
-                var vsp = verticalScrollbar?.ChildIndex ?? -1;
+                var vsp = verticalScrollbar?.IndexOfParent ?? -1;
                 verticalScrollbar = (ScrollBar)value.CloneHierarchy();
                 verticalScrollbar.VerticalAlignment = Alignment.Stretch;
                 verticalScrollbar.Direction = Direction.Vertical;

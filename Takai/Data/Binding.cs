@@ -15,6 +15,9 @@ namespace Takai.Data
         public Func<object> get;
         public Action<object> set;
 
+        internal object cachedValue;
+        internal int cachedHash;
+
         private const BindingFlags LookupFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
 
         public static GetSet GetMemberAccessors(object obj, string memberName)
@@ -236,9 +239,6 @@ namespace Takai.Data
         [Serializer.Ignored]
         GetSet targetAccessors;
 
-        object cachedValue;
-        int cachedHash;
-
 #if DEBUG
         private object sourceObject;
         private object targetObject;
@@ -284,9 +284,9 @@ namespace Takai.Data
                 if (HasDefaultValue = (srcVal == null))
                     srcVal = DefaultValue;
                 targetAccessors.set(Converter.Convert(targetAccessors.type, srcVal));
-                cachedValue = srcVal;
+                sourceAccessors.cachedValue = targetAccessors.cachedValue = srcVal;
                 if (srcVal != null)
-                    cachedHash = srcVal.GetHashCode();
+                    sourceAccessors.cachedHash = targetAccessors.cachedHash = srcVal.GetHashCode();
             }
         }
 
@@ -330,20 +330,23 @@ namespace Takai.Data
 
             var srcVal = sourceAccessors.get?.Invoke() ?? null;
             var srcHash = srcVal == null ? 0 : srcVal.GetHashCode();
-            var srcMatches = (srcHash == cachedHash && (srcVal == null ? cachedValue == null : srcVal.Equals(cachedValue)));
-
-            //fuck boxing. srcVal!=cachedValue if value types
+            var srcMatches = (srcHash == sourceAccessors.cachedHash &&
+                             (srcVal == null ? sourceAccessors.cachedValue == null : srcVal.Equals(sourceAccessors.cachedValue)));
 
             if (!srcMatches)
             {
                 var bindVal = srcVal;
-
                 if (HasDefaultValue = (bindVal == null))
                     bindVal = DefaultValue;
-                targetAccessors.set(Converter.Convert(targetAccessors.type, bindVal));
-                System.Diagnostics.Debug.WriteLine($"Updated binding for source:{Source} ({cachedValue}) to target:{Target} ({cachedValue})");
-                cachedValue = srcVal;
-                cachedHash = srcHash;
+
+                bindVal = Converter.Convert(targetAccessors.type, bindVal);
+                targetAccessors.set(bindVal);
+
+                sourceAccessors.cachedValue = srcVal;
+                sourceAccessors.cachedHash = srcHash;
+                targetAccessors.cachedValue = bindVal;
+                targetAccessors.cachedHash = bindVal.GetHashCode();
+                //System.Diagnostics.Debug.WriteLine($"Updated binding for source:{Source} ({sourceAccessors.cachedValue}) to target:{Target} ({srcVal})");
                 return true;
             }
 
@@ -351,15 +354,19 @@ namespace Takai.Data
             {
                 var tgtVal = targetAccessors.get();
                 var tgtHash = tgtVal == null ? 0 : tgtVal.GetHashCode();
-                var tgtMatches = (tgtHash == cachedHash && (tgtVal == null ? cachedValue == null : tgtVal.Equals(cachedValue)));
+                var tgtMatches = (tgtHash == targetAccessors.cachedHash &&
+                                 (tgtVal == null ? targetAccessors.cachedValue == null : tgtVal.Equals(targetAccessors.cachedValue)));
 
                 if (!tgtMatches)
                 {
-                    sourceAccessors.set(Converter.Convert(sourceAccessors.type, tgtVal));
-                    System.Diagnostics.Debug.WriteLine($"Updated binding for target:{Target} ({cachedValue}) to source:{Source} ({cachedValue})");
-                    cachedValue = tgtVal;
-                    cachedHash = tgtHash;
+                    var bindVal = Converter.Convert(sourceAccessors.type, tgtVal);
+                    sourceAccessors.set(bindVal);
 
+                    targetAccessors.cachedValue = tgtVal;
+                    targetAccessors.cachedHash = tgtHash;
+                    sourceAccessors.cachedValue = bindVal;
+                    sourceAccessors.cachedHash = bindVal.GetHashCode();
+                    //System.Diagnostics.Debug.WriteLine($"Updated binding for target:{Target} ({targetAccessors.cachedValue}) to source:{Source} ({tgtVal})");
                     return true;
                 }
             }
