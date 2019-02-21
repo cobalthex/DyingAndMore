@@ -881,7 +881,7 @@ namespace Takai.UI
             //System.Diagnostics.Debug.WriteLine($"Inserting child ID:{child.DebugId} @ {index} into ID:{DebugId}");
             //todo: maybe have a forward setting (forward all additions to specified child)
 
-            if (child.Parent == this)
+            if (child == null || child.Parent == this)
                 return false;
 
             if (child.Parent != null)

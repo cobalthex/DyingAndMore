@@ -56,11 +56,11 @@ namespace Takai.UI
         protected void SetActiveItem(object newValue)
         {
             Static item = null;
-            if (!Items.TryGetValue(Value, out item))
+            if (Value == null || Items == null || !Items.TryGetValue(Value, out item))
                 item = FallbackItem;
 
             var oldIndex = IndexOf(item);
-            if (!Items.TryGetValue(newValue, out item))
+            if (Value == null || Items == null || !Items.TryGetValue(newValue, out item))
                 item = FallbackItem;
 
             ReplaceChild(item, oldIndex);
