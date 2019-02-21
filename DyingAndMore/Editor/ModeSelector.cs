@@ -106,7 +106,7 @@ namespace DyingAndMore.Editor
 
             tab.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                BubbleEvent(sender, "_SetMode", new SelectionChangedEventArgs(sender, -1, sender.ChildIndex));
+                BubbleEvent(sender, "_SetMode", new SelectionChangedEventArgs(sender, -1, sender.IndexOfParent));
                 return UIEventResult.Handled;
             });
             tabs.AddChild(tab);

@@ -148,7 +148,7 @@ namespace Takai.UI
             On(ValueChangedEvent, delegate (Static sender, UIEventArgs e)
             {
                 var self = (NumericInput)sender;
-                self.textInput.Text = Value.ToString();
+                self.textInput.Text = self.Value.ToString();
                 self.textInput.ScrollPosition = 0;
                 return UIEventResult.Continue;
             });
@@ -158,7 +158,7 @@ namespace Takai.UI
 
         protected override void FinalizeClone()
         {
-            textInput = (TextInput)Children[textInput.ChildIndex];
+            textInput = (TextInput)Children[textInput.IndexOfParent];
             base.FinalizeClone();
         }
 

@@ -43,7 +43,7 @@ namespace DyingAndMore
         Takai.UI.Static ui;
 
         Takai.FpsGraph fpsGraph;
-        UI.DevtoolsMenu debugMenu;
+        UI.DevtoolsMenu devtoolsMenu;
 
         public Matrix uiMatrix;
 
@@ -249,13 +249,20 @@ namespace DyingAndMore
                     ui.RemoveFromParent();
             };
 
-            ui.AddChild(debugMenu = new UI.DevtoolsMenu());
+            devtoolsMenu = new UI.DevtoolsMenu
+            {
+                HorizontalAlignment = Takai.UI.Alignment.Middle,
+                VerticalAlignment = Takai.UI.Alignment.Middle
+            };
+
             ui.HasFocus = true;
             base.Initialize();
         }
 
         protected override void Update(GameTime gameTime)
         {
+            InputState.Update(GraphicsDevice.Viewport.Bounds);
+
             if (InputState.IsPress(Keys.Q)
             && InputState.IsMod(KeyMod.Control))
                 Takai.Runtime.IsExiting = true;
@@ -266,7 +273,13 @@ namespace DyingAndMore
                 return;
             }
 
-            if (InputState.IsPress(Keys.F8))
+            if (InputState.IsPress(Keys.F7))
+            {
+                if (!devtoolsMenu.RemoveFromParent())
+                    ui.AddChild(devtoolsMenu);
+            }
+
+            else if (InputState.IsPress(Keys.F8))
             {
                 if (!fpsGraph.RemoveFromParent())
                 {
@@ -275,17 +288,16 @@ namespace DyingAndMore
                 }
             }
 
-            if (InputState.IsPress(Keys.F9))
+            else if (InputState.IsPress(Keys.F9))
             {
                 using (var stream = new System.IO.StreamWriter(System.IO.File.OpenWrite("ui.tk")))
                     Serializer.TextSerialize(stream, ui, 0, false, false, true);
             }
-            if (InputState.IsPress(Keys.F10))
+
+            else if (InputState.IsPress(Keys.F10))
                 Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
-            if (InputState.IsPress(Keys.F11))
+            else if (InputState.IsPress(Keys.F11))
                 ui.Reflow();
-            
-            InputState.Update(GraphicsDevice.Viewport.Bounds);
 
             ui.Update(gameTime);
             //ui.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);

@@ -45,7 +45,7 @@ namespace Takai.UI
                 int focusIndex = -1;
                 var focused = FindFocusedNoParent();
                 if (focused != null && focused.Parent == this)
-                    focusIndex = focused.ChildIndex;
+                    focusIndex = focused.IndexOfParent;
 
                 Container.RemoveAllChildren();
                 var newChildren = new System.Collections.Generic.List<Static>(Items.Count);
@@ -172,7 +172,7 @@ namespace Takai.UI
 
         protected override void FinalizeClone()
         {
-            _container = Children[Container.ChildIndex];
+            _container = Children[Container.IndexOfParent];
             base.FinalizeClone();
         }
 
@@ -224,7 +224,7 @@ namespace Takai.UI
             item.BindTo(value);
             item.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                sender.BubbleCommand("ChangeSelection", sender.ChildIndex);
+                sender.BubbleCommand("ChangeSelection", sender.IndexOfParent);
                 return UIEventResult.Continue;
             });
             return item;

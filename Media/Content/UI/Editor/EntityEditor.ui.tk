@@ -64,7 +64,26 @@ List {
         						#conditions
         						#actions
 
-                                List {
+                                Switch {
+                                    Bindings: [
+                                        Binding {
+                                            Source: "Controller.@typename";
+                                            Target: "Value";
+                                        }
+                                    ];
+                                    Items: {
+                                        "ArtilleryController": {
+                                            Text: "Art";
+                                        };
+
+                                        "InputController": {
+                                            Text: "Playa";
+                                        };
+                                    }
+                                }
+
+                                #*List {
+
                                     Bindings: [
                                         Binding {
                                             Source: "@typename";
@@ -86,7 +105,7 @@ List {
                                             ];
                                         };
                                     ];
-                                };
+                                };*#
                             ];
                         };
                     ];
