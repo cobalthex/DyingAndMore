@@ -3,7 +3,7 @@ using Takai.UI;
 
 namespace DyingAndMore.UI
 {
-    class DevtoolsMenu : List
+    class DevtoolsMenu : List //preview menu?
     {
         System.Collections.Generic.List<Static> items = new System.Collections.Generic.List<Static>();
         int activeItem = -1;
@@ -21,7 +21,7 @@ namespace DyingAndMore.UI
                 if (e.Source.Parent != sender)
                     return UIEventResult.Continue;
 
-                var ci = e.Source.IndexOfParent;
+                var ci = e.Source.ChildIndex;
                 if (ci < 0 || ci >= self.items.Count)
                     return UIEventResult.Continue;
 
@@ -57,5 +57,6 @@ namespace DyingAndMore.UI
             }
 
             return base.HandleInput(time);
-        }}
+        }
+    }
 }

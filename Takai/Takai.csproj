@@ -128,6 +128,7 @@
     <Compile Include="UI\TabPanel.cs" />
     <Compile Include="UI\TextInput.cs" />
     <Compile Include="UI\TrackBar.cs" />
+    <Compile Include="UI\TypeSelect.cs" />
     <Compile Include="UI\UITree.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>

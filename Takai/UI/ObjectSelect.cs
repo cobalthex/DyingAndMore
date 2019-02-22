@@ -63,7 +63,6 @@ namespace Takai.UI
                 var self = (ObjectSelect<TClass, TInstance>)sender;
                 self._instance = default(TInstance);
                 self.hasInstance = false;
-                System.Diagnostics.Debug.WriteLine(self.SelectedItem);
                 return UIEventResult.Handled;
             });
         }
