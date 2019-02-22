@@ -35,6 +35,8 @@ namespace Takai.UI
 
         public DropdownSelect()
         {
+            BorderColor = Color.White;
+
             list = new ItemList<T>()
             {
                 HorizontalAlignment = Alignment.Stretch
@@ -87,7 +89,7 @@ namespace Takai.UI
 
         protected UIEventResult OnSelectionChanged(Static sender, UIEventArgs e)
         {
-            var childIndex = preview?.IndexOfParent ?? -1;
+            var childIndex = preview?.ChildIndex ?? -1;
             if (SelectedIndex >= 0)
             {
                 ReplaceChild(preview = list.Container.Children[SelectedIndex].CloneHierarchy(), childIndex);
@@ -106,7 +108,7 @@ namespace Takai.UI
             dropdown = (ScrollBox)dropdownContainer.Children[0];
             list = (ItemList<T>)dropdown.EnumerableChildren[0];
 
-            var previewChildIndex = preview?.IndexOfParent ?? -1;
+            var previewChildIndex = preview?.ChildIndex ?? -1;
             if (previewChildIndex >= 0)
             {
                 ReplaceChild(preview = list.Container.Children[list.SelectedIndex].CloneHierarchy(), previewChildIndex);

@@ -158,7 +158,7 @@ namespace Takai.UI
 
         protected override void FinalizeClone()
         {
-            textInput = (TextInput)Children[textInput.IndexOfParent];
+            textInput = (TextInput)Children[textInput.ChildIndex];
             base.FinalizeClone();
         }
 

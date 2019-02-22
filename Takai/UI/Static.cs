@@ -857,7 +857,7 @@ namespace Takai.UI
         /// <summary>
         /// The index of this child in its parents, -1 if no parent
         /// </summary>
-        public int IndexOfParent => Parent?.Children.IndexOf(this) ?? -1;
+        public int ChildIndex => Parent?.Children.IndexOf(this) ?? -1;
 
         /// <summary>
         /// Get the index of a child to this element
