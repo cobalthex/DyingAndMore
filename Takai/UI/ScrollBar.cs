@@ -279,20 +279,6 @@ namespace Takai.UI
                 verticalScrollbar.VerticalAlignment = Alignment.Stretch;
                 verticalScrollbar.Direction = Direction.Vertical;
 
-                On(ScrollBar.HScrollEvent, delegate (Static sender, UIEventArgs e)
-                {
-                    var se = (ScrollEventArgs)e;
-                    contentContainer.Position -= new Vector2(se.Delta, 0);
-                    return UIEventResult.Handled;
-                });
-
-                On(ScrollBar.VScrollEvent, delegate (Static sender, UIEventArgs e)
-                {
-                    var se = (ScrollEventArgs)e;
-                    contentContainer.Position -= new Vector2(0, se.Delta);
-                    return UIEventResult.Handled;
-                });
-
                 if (vsp >= 0)
                 {
                     base.InternalRemoveChildIndex(vsp);
@@ -346,6 +332,22 @@ namespace Takai.UI
             base.InternalInsertChild(contentContainer);
             base.InternalInsertChild(verticalScrollbar);
             base.InternalInsertChild(horizontalScrollbar);
+
+            On(ScrollBar.HScrollEvent, delegate (Static sender, UIEventArgs e)
+            {
+                var self = (ScrollBox)sender;
+                var se = (ScrollEventArgs)e;
+                self.contentContainer.Position -= new Vector2(se.Delta, 0);
+                return UIEventResult.Handled;
+            });
+
+            On(ScrollBar.VScrollEvent, delegate (Static sender, UIEventArgs e)
+            {
+                var self = (ScrollBox)sender;
+                var se = (ScrollEventArgs)e;
+                self.contentContainer.Position -= new Vector2(0, se.Delta);
+                return UIEventResult.Handled;
+            });
         }
 
         public ScrollBox(params Static[] children)

@@ -794,6 +794,12 @@ namespace Takai.Data
 
                 if (destTypeInfo.IsEnum)
                     return Enum.Parse(destType, sourceString);
+
+                if (destType == typeof(Type))
+                {
+                    RegisteredTypes.TryGetValue(sourceString, out var outType);
+                    return outType;
+                }
             }
 
             if (source == null && destTypeInfo.IsPrimitive)

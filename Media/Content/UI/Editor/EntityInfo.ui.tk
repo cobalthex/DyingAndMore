@@ -24,7 +24,7 @@ Table {
         Static {
             Bindings: [
                 Binding {
-                    Source: "@typename";
+                    Source: ":typename";
                     Target: "Text";
                 }
             ];

@@ -61,7 +61,7 @@ namespace Takai.UI
             template.AddChild(new Static(P.DirectorySeparatorChar.ToString())
             {
                 Bindings = new System.Collections.Generic.List<Data.Binding> {
-                    new Data.Binding("@type", "IsEnabled")
+                    new Data.Binding(":type", "IsEnabled")
                     {
                         Converter = new Data.ConditionalConverter(typeof(DirectoryInfo))
                     }

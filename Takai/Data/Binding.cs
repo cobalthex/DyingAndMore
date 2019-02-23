@@ -70,44 +70,70 @@ namespace Takai.Data
 
             var getset = new GetSet();
 
-            //special case (can only be at the end of the indirection)
-            if (memberName.Equals("@type", StringComparison.OrdinalIgnoreCase))
-            {
-                getset.type = typeof(Type);
-                getset.get = () => objType;
-                return getset;
-            }
-            else if (memberName.Equals("@typename", StringComparison.OrdinalIgnoreCase))
-            {
-                getset.type = typeof(string);
-                getset.get = () => objType.Name;
-                return getset;
-            }
+            var modifier = memberName.Split(new[] { ':' }, 2); //modifiers only allowed on child most object
+            memberName = modifier[0];
 
-            prop = objType.GetProperty(memberName, LookupFlags);
-            if (prop != null)
+            if (memberName.Length > 0)
             {
-                //todo: get delegates working
+                prop = objType.GetProperty(memberName, LookupFlags);
+                if (prop != null)
+                {
+                    //todo: get delegates working
 
-                getset.type = prop.PropertyType;
-                if (prop.CanRead)
-                    getset.get = () => prop.GetValue(obj);
-                if (prop.CanWrite)
-                    getset.set = (value) => prop.SetValue(obj, value);
+                    getset.type = prop.PropertyType;
+                    if (prop.CanRead)
+                        getset.get = () => prop.GetValue(obj);
+                    if (prop.CanWrite)
+                        getset.set = (value) => prop.SetValue(obj, value);
 
-                //getset.get = prop.CanRead ? (Func<object>)prop.GetGetMethod(false).CreateDelegate(typeof(Func<object>), obj) : null;
-                //getset.set = prop.CanWrite ? (Action<object>)prop.GetSetMethod(false).CreateDelegate(typeof(Action<object>), obj) : null;
+                    //getset.get = prop.CanRead ? (Func<object>)prop.GetGetMethod(false).CreateDelegate(typeof(Func<object>), obj) : null;
+                    //getset.set = prop.CanWrite ? (Action<object>)prop.GetSetMethod(false).CreateDelegate(typeof(Action<object>), obj) : null;
+                }
+                else
+                {
+                    field = objType.GetField(memberName, LookupFlags);
+                    if (field != null)
+                    {
+                        getset.type = field.FieldType;
+                        getset.get = () => field.GetValue(obj);
+                        if (!field.IsInitOnly)
+                            getset.set = (value) => field.SetValue(obj, value);
+                    }
+                }
             }
             else
             {
-                field = objType.GetField(memberName, LookupFlags);
-                if (field != null)
+                getset.type = objType;
+                getset.get = () => obj;
+            }
+
+
+            if (modifier.Length > 1)
+            {
+                var oget = getset.get; //explicitly allow throw
+
+                if (modifier[1].Equals("type", StringComparison.OrdinalIgnoreCase))
                 {
-                    getset.type = field.FieldType;
-                    if (!field.IsInitOnly)
-                        getset.set = (value) => field.SetValue(obj, value);
-                    getset.get = () => field.GetValue(obj);
+                    getset.type = typeof(Type);
+                    //getset.get = () => objType;
+                    getset.get = () => oget()?.GetType(); //live type (works w/ polymorphism)
+                    return getset;
                 }
+                else if (modifier[1].Equals("typename", StringComparison.OrdinalIgnoreCase))
+                {
+                    getset.type = typeof(string);
+                    //getset.get = () => objType.Name;
+                    getset.get = () => oget()?.GetType().Name; //live type (works w/ polymorphism)
+                    return getset;
+                }
+                else if (modifier[1].Equals("hash", StringComparison.OrdinalIgnoreCase))
+                {
+                    getset.type = typeof(int);
+                    getset.get = () => oget()?.GetHashCode() ?? 0;
+                    return getset;
+                }
+                else
+                    System.Diagnostics.Debug.WriteLine($"Ignoring unknown binding modifier {modifier[0]}:{modifier[1]}");
             }
 
             return getset;
@@ -346,7 +372,7 @@ namespace Takai.Data
                 sourceAccessors.cachedHash = srcHash;
                 targetAccessors.cachedValue = bindVal;
                 targetAccessors.cachedHash = bindVal.GetHashCode();
-                //System.Diagnostics.Debug.WriteLine($"Updated binding for source:{Source} ({sourceAccessors.cachedValue}) to target:{Target} ({srcVal})");
+                System.Diagnostics.Debug.WriteLine($"Updated binding for source:{Source} ({sourceAccessors.cachedValue}) to target:{Target} ({srcVal})");
                 return true;
             }
 
@@ -366,10 +392,20 @@ namespace Takai.Data
                     targetAccessors.cachedHash = tgtHash;
                     sourceAccessors.cachedValue = bindVal;
                     sourceAccessors.cachedHash = bindVal.GetHashCode();
-                    //System.Diagnostics.Debug.WriteLine($"Updated binding for target:{Target} ({targetAccessors.cachedValue}) to source:{Source} ({tgtVal})");
+                    System.Diagnostics.Debug.WriteLine($"Updated binding for target:{Target} ({targetAccessors.cachedValue}) to source:{Source} ({tgtVal})");
                     return true;
                 }
             }
+
+            /* todo: current limitation,
+                bindings are not weak bindings, nested objects will bind to specific objects, not members; e.g.
+                var a, b;
+                obj = a;
+                BindTo(obj.prop);
+                obj = b;
+                //binding still points to a.prop not b.prop
+            */
+
             return false;
         }
 

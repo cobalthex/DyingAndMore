@@ -15,8 +15,8 @@ namespace Takai.UI
                 if (value == _items)
                     return;
 
+                SetActiveItem(Value, Value);
                 _items = value;
-                SetActiveItem(Value);
             }
         }
         Dictionary<object, Static> _items;
@@ -29,8 +29,8 @@ namespace Takai.UI
                 if (value == _fallbackItem)
                     return;
 
+                SetActiveItem(Value, Value);
                 _fallbackItem = value;
-                SetActiveItem(Value);
             }
         }
         private Static _fallbackItem;
@@ -43,24 +43,32 @@ namespace Takai.UI
                 if (value == _value)
                     return;
 
+                SetActiveItem(_value, value);
                 _value = value;
-                SetActiveItem(_value);
             }
         }
         object _value;
 
-        //finalize clone
-
         public Switch() { }
 
-        protected void SetActiveItem(object newValue)
+        protected override void FinalizeClone()
+        {
+            var newItems = new Dictionary<object, Static>(Items.Count);
+            foreach (var item in Items)
+                newItems[item.Key] = item.Value.CloneHierarchy();
+            Items = newItems;
+
+            base.FinalizeClone();
+        }
+
+        void SetActiveItem(object oldValue, object newValue)
         {
             Static item = null;
-            if (Value == null || Items == null || !Items.TryGetValue(Value, out item))
+            if (oldValue == null || Items == null || !Items.TryGetValue(oldValue, out item))
                 item = FallbackItem;
-
             var oldIndex = IndexOf(item);
-            if (Value == null || Items == null || !Items.TryGetValue(newValue, out item))
+
+            if (newValue == null || Items == null || !Items.TryGetValue(newValue, out item))
                 item = FallbackItem;
 
             ReplaceChild(item, oldIndex);
