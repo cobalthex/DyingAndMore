@@ -32,7 +32,7 @@ namespace DyingAndMore.Game.Entities
         {
             //todo: one-time animation play, then die
 
-            if (Actor.Weapon.IsDepleted())
+            if (Actor.Weapon == null || Actor.Weapon.IsDepleted())
             {
                 Actor.PlayAnimation("Inactive"); //todo: call once?
                 return;

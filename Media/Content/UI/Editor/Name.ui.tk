@@ -17,7 +17,7 @@ List {
 				Static {
 					Bindings: [
 						Binding {
-							Source: "@typename";
+							Source: ":typename";
 							Target: "Text";
 							Converter: TextCaseConverter {
 								DesiredCase: TextCase.Lowercase;
