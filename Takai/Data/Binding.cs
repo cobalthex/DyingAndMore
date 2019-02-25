@@ -66,6 +66,9 @@ namespace Takai.Data
                 return new GetSet(); //not found
             }
 
+            if (obj == null)
+                return new GetSet();
+
             memberName = indirections[indirections.Length - 1];
 
             var getset = new GetSet();
@@ -108,7 +111,7 @@ namespace Takai.Data
             }
 
 
-            if (modifier.Length > 1)
+            if (modifier.Length > 1 && getset.get != null)
             {
                 var oget = getset.get; //explicitly allow throw
 

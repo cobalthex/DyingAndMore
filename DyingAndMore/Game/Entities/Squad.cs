@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DyingAndMore.Game.Entities;
 using Takai.Game;
 
-namespace DyingAndMore.Game
+namespace DyingAndMore.Game.Entities
 {
     /// <summary>
     /// Represents a group of actors that can coordinate.

@@ -5,7 +5,7 @@
     ☐  Invincibility
 
   Game AI:
-    ☐  Squads/Platoons
+    ✔  Squads/Platoons @done (19-02-25 01:08)
     ☐  Cover
     ☐  Waypoints
     ☐  Objectives/navpoints
@@ -48,7 +48,7 @@
     ☐ default buttons (click enter in text box to submit)
     ☐ display scaling
     ☐ tab focus should not be able to escape modal
-    ☐ global commands ($Close should close nearest modal)
+    ✔ global commands ($Close should close nearest modal) @done (19-02-25 01:08)
     ☐ when adding a modal to UI, should switch focus
     ☐ cache previous focus in modal?
     ☐ special modal element?

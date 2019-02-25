@@ -1,0 +1,7 @@
+SpawnerClass {
+	Name: "Cyst Spawner";
+    AnimationClass: "Spawner";
+    ChargeTime: 500msec;
+	DischargeTime: 2sec;
+	UnderchargeAction: UnderchargeAction.Discharge;
+}

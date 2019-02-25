@@ -33,7 +33,7 @@ namespace Takai.UI
 
             On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                IsChecked ^= true;
+                ((CheckBox)sender).IsChecked ^= true;
                 return UIEventResult.Handled;
             });
         }

@@ -383,7 +383,7 @@ namespace Takai.UI
             horizontalScrollbar.IsEnabled = contentContainer.MeasuredSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X;
             verticalScrollbar.IsEnabled = contentContainer.MeasuredSize.Y > availableSize.Y - verticalScrollbar.MeasuredSize.Y;
 
-            Measure(availableSize);
+            Measure(availableSize, true);
             base.ReflowOverride(availableSize);
         }
 

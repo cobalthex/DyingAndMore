@@ -129,7 +129,7 @@ namespace Takai.UI
             return new Vector2(200, 20);
         }
 
-        public void OpenDropdown()
+        public virtual void OpenDropdown()
         {
             dropdown.Size = new Vector2(MeasuredSize.X, System.Math.Max(list.Size.Y, 200));
             list.Reflow();
@@ -145,7 +145,7 @@ namespace Takai.UI
             root.AddChild(dropdownContainer);
         }
 
-        public void CloseDropDown()
+        public virtual void CloseDropDown()
         {
             dropdownContainer.RemoveFromParent();
         }

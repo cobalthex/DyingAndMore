@@ -1,0 +1,59 @@
+List {
+    Children: [
+        ControllerSelect {
+            Bindings: [
+                Binding {
+                    Source: "Controller";
+                    Target: "Instance";
+                    Direction: BindingDirection.TwoWay;
+                }
+            ];
+        };
+		Switch {
+			Bindings: [
+			    Binding {
+			        Source: "Controller:typename";
+			        Target: "Value";
+			    }
+			];
+			Items: {
+			    ArtilleryController: List {
+					Direction: Direction.Vertical;
+					Margin: 10;
+					Children: [
+						Static { Text: "Search Range"; };
+						NumericInput {
+							Minimum: 1;
+							Maximum: 1000;
+							Bindings: [{
+								Source: "Controller.MaxRange"; #todo: this doesnt rebind ;; binding scope?
+								Target: "Value";
+								Direction: BindingDirection.TwoWay;
+							}];
+						};
+						CheckBox {
+							Text: "Can rotate to face target";
+							Bindings: [{
+								Source: "Controller.CanRotate"; #todo: this doesnt rebind ;; binding scope?
+								Target: "IsChecked";
+								Direction: BindingDirection.TwoWay;
+							}];
+						};
+						CheckBox {
+							Text: "Show targeting sweep lines";
+							Bindings: [{
+								Source: "Controller.ShowSweepLines"; #todo: this doesnt rebind ;; binding scope?
+								Target: "IsChecked";
+								Direction: BindingDirection.TwoWay;
+							}];
+						};
+					];
+			    };
+
+			    AIController: {
+			        Text: "[Todo AI]";
+			    };
+			};
+		};
+    ];
+};

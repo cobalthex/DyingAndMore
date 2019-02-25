@@ -16,7 +16,19 @@ namespace DyingAndMore
     public class MapInstance : MapBaseInstance
     {
         [Takai.Data.Serializer.AsReference]
-        public Dictionary<string, Game.Squad> Squads { get; set; }
+        public Dictionary<string, Game.Entities.Squad> Squads
+        {
+            get => _squads;
+            set
+            {
+                if (_squads == value)
+                    return;
+
+                _squads = value;
+                Takai.Data.Binding.Globals["Map.Squads"] = _squads;
+            }
+        }
+        Dictionary<string, Game.Entities.Squad> _squads;
 
         public MapInstance() : this(null) { }
         public MapInstance(MapClass @class)
@@ -30,10 +42,12 @@ namespace DyingAndMore
         /// Reset squad spawn timer/coounters and spawn (up to limits, including previously spawned members)
         /// </summary>
         /// <param name="squad">The squad to spawn</param>
-        public void Spawn(Game.Squad squad)
+        public void Spawn(Game.Entities.Squad squad)
         {
             if (Squads == null)
-                Squads = new Dictionary<string, Game.Squad>();
+            {
+                Squads = new Dictionary<string, Game.Entities.Squad>();
+            }
             //if (!Squads.ContainsKey(squad.Name))
             {
                 Squads[squad.Name] = squad;

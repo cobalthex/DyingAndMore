@@ -35,8 +35,8 @@ namespace DyingAndMore.Editor
         public EntitiesEditorMode(Editor editor)
             : base("Entities", editor)
         {
-            AddChild(entInfo = Takai.Data.Cache.Load<Static>("UI/Editor/EntityInfo.ui.tk").CloneHierarchy());
-            entEditor = Takai.Data.Cache.Load<Static>("UI/Editor/EntityEditor.ui.tk").CloneHierarchy();
+            AddChild(entInfo = Takai.Data.Cache.Load<Static>("UI/Editor/Entities/EntityInfo.ui.tk").CloneHierarchy());
+            entEditor = Takai.Data.Cache.Load<Static>("UI/Editor/Entities/EntityEditor.ui.tk").CloneHierarchy();
 
             On(PressEvent, OnPress);
             On(ClickEvent, OnClick);
