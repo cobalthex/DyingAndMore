@@ -54,7 +54,10 @@ float4 pmain(float4 position : SV_Position, float4 color : COLOR0, float2 rpos :
     float2 cell = float2(tile % TilesPerRow, tile / TilesPerRow);
     float2 local = (rpos % (1 / MapSize)) * MapSize;
 
-    return color * TilesImage.Sample(Sampler, (cell + local) / tdiv);
+    float4 ti = TilesImage.Sample(Sampler, (cell + local) / tdiv);
+	if (ti.a == 0)
+		discard; //todo: this shouldnt be necessary
+	return color * ti;
 }
 
 technique Technique1

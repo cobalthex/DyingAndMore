@@ -8,7 +8,7 @@ namespace DyingAndMore.Editor
 {
     class SquadsEditorMode : EditorMode
     {
-        public Game.Squad SelectedSquad { get; set; }
+        public Game.Entities.Squad SelectedSquad { get; set; }
 
         public Takai.Graphics.Sprite SquadIcon { get; set; }
 
@@ -98,7 +98,7 @@ namespace DyingAndMore.Editor
                 {
                     var worldPos = editor.Camera.ScreenToWorld(dea.position);
                     if (SelectedSquad == null)
-                        SelectedSquad = new Game.Squad { SpawnPosition = createOrigin };
+                        SelectedSquad = new Game.Entities.Squad { SpawnPosition = createOrigin };
                     SelectedSquad.SpawnRadius = Vector2.Distance(worldPos, createOrigin);
                 }
 

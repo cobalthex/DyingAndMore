@@ -1,0 +1,80 @@
+List {
+    Name: "Entity properties editor";
+    IsModal: true;
+    HorizontalAlignment: Alignment.Middle;
+    VerticalAlignment: Alignment.Middle;
+    BackgroundColor: [32 0 128 192];
+    Margin: 10;
+    Padding: 10;
+
+    Children: [
+        Scrollbox {
+            Size: 400;
+            ScrollBarTemplate: {
+                Padding: 3;
+                BorderColor: Color.White;
+            }
+            Children: [
+                List {
+                    Direction: Direction.Vertical;
+                    HorizontalAlignment: Alignment.Stretch;
+                    Margin: 10;
+
+                    Children: [
+                        Static { Text: "Name"; }
+                        TextInput {
+                            HorizontalAlignment: Alignment.Stretch;
+                            Padding: [4 2];
+                            Bindings: [
+                                {
+                                    Direction: BindingDirection.TwoWay;
+                                    Source: "Name";
+                                    Target: "Text";
+                                };
+                            ];
+                        };
+
+                        List {
+                            margin: 10;
+                            Children: [
+        						Static { Text: "Actor Properties"; };
+        						Static { Text: "Current Health"; };
+        						NumericInput {
+                                    Name: "helf";
+        							Bindings: [
+        								Binding {
+        									Direction: BindingDirection.TwoWay;
+        									Source: "CurrentHealth";
+        									Target: "Value";
+        								};
+        							];
+        							Minimum: 0;
+        							Maximum: 2E9;
+        						};
+
+        						#weapon
+                                Static { Text: "Weapon"; };
+                                @"./Weapon.ui.tk";
+
+        						#conditions
+        						#actions
+
+                                Static { Text: "Controller"; };
+                                @"./Controller.ui.tk";
+                            ];
+                        };
+                    ];
+                };
+            ];
+        };
+
+        Static {
+            Padding: [10 5];
+            HorizontalAlignment: Alignment.Middle;
+            Text: "Close";
+            EventCommands: {
+                Click: "CloseModal";
+            }
+        };
+    ];
+}

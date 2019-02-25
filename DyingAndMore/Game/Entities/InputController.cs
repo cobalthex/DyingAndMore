@@ -39,28 +39,25 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public Takai.Input.InputMap<InputAction> Inputs { get; set; }
 
-        public InputController()
-        {
-        }
+        public InputController() { }
 
         public override void Think(TimeSpan deltaTime)
         {
             if (Inputs == null)
                 return;
 
-            float magnitude;
-
-            if (Inputs.CurrentInputs.TryGetValue(InputAction.FirePrimaryWeapon, out magnitude))
+            if (Inputs.CurrentInputs.TryGetValue(InputAction.FirePrimaryWeapon, out _))
                 Actor.Weapon?.TryUse();
 
             Vector2 moveDirection = new Vector2();
 
+            float magnitude;
             if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveX, out magnitude))
                 moveDirection.X += magnitude;
             if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveY, out magnitude))
                 moveDirection.Y += magnitude;
 
-            //read lineal movements
+            //read lineal (forward) and lateral (sideways) movements
             if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveLineal, out magnitude))
                 moveDirection += (Actor.Forward * magnitude);
             if (Inputs.CurrentInputs.TryGetValue(InputAction.MoveLateral, out magnitude))

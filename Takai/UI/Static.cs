@@ -1458,6 +1458,7 @@ namespace Takai.UI
             if (!hasReflowed) //if never reflowed, there is no container set so stretched objects will not have any size
                 containerBounds = Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.ContentArea;
 
+            //System.Diagnostics.Debug.WriteLine($"Reflowing {DebugId} ({GetType().Name})");
             Measure(new Vector2(containerBounds.Width, containerBounds.Height), true);
             Reflow(containerBounds);
         }

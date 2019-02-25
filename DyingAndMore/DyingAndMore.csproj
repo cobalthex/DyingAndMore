@@ -64,6 +64,7 @@
     </Shaders>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActorList.cs" />
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
@@ -92,7 +93,7 @@
     <Compile Include="Game\Entities\Projectile.cs" />
     <Compile Include="Game\Entities\Vehicle.cs" />
     <Compile Include="Game\GameInfo.cs" />
-    <Compile Include="Game\Squad.cs" />
+    <Compile Include="Game\Entities\Squad.cs" />
     <Compile Include="Game\Weapons\Gun.cs" />
     <Compile Include="Game\Weapons\Spawner.cs" />
     <Compile Include="Game\Weapons\Weapon.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="UI\ControllerSelect.cs" />
     <Compile Include="UI\Devtools.cs" />
     <Compile Include="UI\EntViewer.cs" />
+    <Compile Include="UI\SquadSelect.cs" />
     <Compile Include="UI\WeaponSelect.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">

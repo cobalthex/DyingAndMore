@@ -46,7 +46,6 @@ namespace Takai.Game
         internal RenderTarget2D reflectedRenderTarget; //draw all things that should be reflected here
         internal DepthStencilState stencilWrite;
         internal DepthStencilState stencilRead;
-        internal AlphaTestEffect mapAlphaTest;
         internal XnaEffect outlineEffect;
         internal XnaEffect fluidEffect;
         internal XnaEffect reflectionEffect; //writes color and reflection information to two render targets
@@ -139,7 +138,7 @@ namespace Takai.Game
                 stencilRead = new DepthStencilState()
                 {
                     StencilEnable = true,
-                    StencilFunction = CompareFunction.Equal,
+                    StencilFunction = CompareFunction.LessEqual,
                     StencilPass = StencilOperation.Keep,
                     ReferenceStencil = 1,
                     DepthBufferEnable = false,
@@ -148,10 +147,6 @@ namespace Takai.Game
                 var dispwidth = Runtime.GraphicsDevice.PresentationParameters.BackBufferWidth;
                 var dispheight = Runtime.GraphicsDevice.PresentationParameters.BackBufferHeight;
 
-                mapAlphaTest = new AlphaTestEffect(Runtime.GraphicsDevice)
-                {
-                    ReferenceAlpha = 1
-                };
                 preRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 1, RenderTargetUsage.DiscardContents);
                 fluidsRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
                 reflectionRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 1, RenderTargetUsage.DiscardContents);
@@ -552,6 +547,7 @@ namespace Takai.Game
                 new VertexPositionColorTexture(new Vector3(width, height, 0), Color.White, new Vector2(1, 1)),
             };
 
+            Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             Runtime.GraphicsDevice.DepthStencilState = Class.stencilWrite;
             Runtime.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             Class.tilesEffect.Parameters["Transform"].SetValue(c.viewTransform);

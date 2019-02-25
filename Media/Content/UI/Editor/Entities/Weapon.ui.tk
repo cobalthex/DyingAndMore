@@ -1,0 +1,81 @@
+List {
+	Margin: 10;
+    Children: [
+	    WeaponSelect {
+	        Bindings: [
+	            Binding {
+	                Direction: BindingDirection.TwoWay;
+	                Source: "Weapon";
+	                Target: "Instance";
+	            }
+	        ];
+	    };
+
+		Switch {
+			Bindings: [
+			    Binding {
+			        Source: "Weapon:typename";
+			        Target: "Value";
+			    }
+			];
+			Items: {
+			    GunInstance: List {
+			    	Children: [
+					    Static { Text: "Ammo count"; };
+					    NumericInput {
+					    	Minimum: 0;
+							Bindings: [
+							    Binding {
+							        Source: "Weapon.CurrentAmmo";
+							        Target: "Value";
+	                				Direction: BindingDirection.TwoWay;
+							    }
+							];
+					    }
+				    ];
+			    };
+			    SpawnerInstance: List {
+			    	Children: [
+					    Static { Text: "Squad"; };
+			    		SquadSelect {
+			    			ItemTemplate: List {
+			    				Children: [
+			    					Static {
+			    						Bindings: [
+										    Binding {
+										        Source: "Name";
+										        Target: "Text";
+										    };
+										];
+			    					};
+			    					List {
+			    						Direction: Direction.Horizontal;
+			    						Margin: 10;
+				    					Children: [
+					    					Static {
+					    						Bindings: [
+												    Binding {
+												        Source: "Leader.Name";
+												        Target: "Text";
+												    };
+												];
+					    					};
+					    					Static {
+					    						Bindings: [
+												    Binding {
+												        Source: "Units.Count";
+												        Target: "Text";
+												    };
+												];
+											};
+				    					];
+				    				};
+			    				];
+			    			};
+			    		};
+		    		];
+			    };
+			};
+		};
+    ];
+};
