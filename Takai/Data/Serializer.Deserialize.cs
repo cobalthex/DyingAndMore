@@ -280,7 +280,7 @@ namespace Takai.Data
                 }
 
                 if (loaded is IReferenceable ir)
-                    context.resolverCache[loaded.GetType().Name + "." + ir.Name] = loaded; //todo: better id naming and only allow one?
+                    context.resolverCache[loaded.GetType().Name + "." + ir.Name] = loaded;
                 return loaded;
             }
 
