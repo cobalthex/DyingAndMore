@@ -375,6 +375,11 @@ namespace Takai.UI
             return contentContainer.InternalRemoveChildIndex(index);
         }
 
+        protected override void OnChildRemeasure(Static child)
+        {
+            Reflow();
+        }
+
         protected override void ReflowOverride(Vector2 availableSize)
         {
             horizontalScrollbar.ContentSize = contentContainer.MeasuredSize.X;
@@ -383,7 +388,7 @@ namespace Takai.UI
             horizontalScrollbar.IsEnabled = contentContainer.MeasuredSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X;
             verticalScrollbar.IsEnabled = contentContainer.MeasuredSize.Y > availableSize.Y - verticalScrollbar.MeasuredSize.Y;
 
-            Measure(availableSize, true);
+            //Measure(availableSize, true);
             base.ReflowOverride(availableSize);
         }
 
