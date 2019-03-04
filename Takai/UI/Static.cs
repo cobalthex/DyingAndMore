@@ -1041,6 +1041,27 @@ namespace Takai.UI
 
         #region Navigation
 
+#if DEBUG
+        public Static _FindInTreeByDebugId(uint id, bool breakOnResult = false)
+        {
+            var root = GetRoot();
+            foreach (var elem in root.EnumerateRecursive(true))
+            {
+                if (elem.DebugId == id)
+                {
+                    if (breakOnResult)
+                        elem.BreakOnThis();
+                    return elem;
+                }
+            }
+            return null;
+        }
+#endif
+
+        /// <summary>
+        /// Get the root element in this hierarchy
+        /// </summary>
+        /// <returns>The root element (or this if no parent)</returns>
         public Static GetRoot()
         {
             var current = this;
@@ -1463,6 +1484,10 @@ namespace Takai.UI
             Reflow(containerBounds);
         }
 
+#if DEBUG
+        private static uint reflowCount = 0; //set breakpoint for speicifc reflow
+#endif
+
         bool isReflowing = false;
         /// <summary>
         /// Reflow this container, relative to its parent
@@ -1470,6 +1495,10 @@ namespace Takai.UI
         /// <param name="container">Container in relative coordinates</param>
         public void Reflow(Rectangle container)
         {
+#if DEBUG
+            ++reflowCount;
+#endif
+
             if (!IsEnabled)
                 return;
 
@@ -1480,9 +1509,9 @@ namespace Takai.UI
 
             var lastClip = OffsetContentArea; //is this the right one?
             AdjustToContainer(container);
-            ///if (lastClip != OffsetContentArea) //todo: doesnt hit all cases
+            if (lastClip != OffsetContentArea) //todo: doesnt hit all cases
             {
-                //System.Diagnostics.Debug.WriteLine($"Reflowing ID:{DebugId} (container:{container})");
+                //System.Diagnostics.Debug.WriteLine($"Reflowing ID:{DebugId} ({this}) [container:{container}]");
                 ReflowOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
             }
             isReflowing = false;
@@ -1854,9 +1883,14 @@ namespace Takai.UI
                 debugDraw.DrawDebugInfo(spriteBatch);
 #if DEBUG
                 if (InputState.IsPress(Keys.Pause))
-                    System.Diagnostics.Debugger.Break();
+                    debugDraw.BreakOnThis();
 #endif
             }
+        }
+
+        private void BreakOnThis()
+        {
+            System.Diagnostics.Debugger.Break();
         }
 
         public void DrawDebugInfo(SpriteBatch spriteBatch)
@@ -1872,6 +1906,7 @@ namespace Takai.UI
                         + $"ID: {DebugId}\n"
 #endif
                         + $"Name: {(Name ?? "(No name)")}\n"
+                        + $"Parent ID: {Parent?.DebugId}\n"
                         + $"Children: {Children?.Count ?? 0}\n"
                         + $"Bounds: {OffsetContentArea}\n"
                         + $"Position: {Position}: Size {Size}, Padding: {Padding}\n"

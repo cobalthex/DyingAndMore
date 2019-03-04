@@ -57,17 +57,11 @@ namespace DyingAndMore.Editor
                 VerticalAlignment = Alignment.Start,
                 BorderColor = Color.White
             });
-            preview.On(ClickEvent, delegate (Static sender, UIEventArgs e)
-            {
-                BubbleEvent(sender, "_OpenSelector", new UIEventArgs(sender));
-                return UIEventResult.Handled;
-            });
-
-            On("_OpenSelector", delegate (Static sender, UIEventArgs e)
+            preview.EventCommands[ClickEvent] = "OpenSelector";
+            CommandActions["OpenSelector"] = delegate (Static sender, object arg)
             {
                 ((SelectorEditorMode<TSelector>)sender).selectorDrawer.IsEnabled = true;
-                return UIEventResult.Handled;
-            });
+            };
 
             this.selector = selector ?? new TSelector();
             this.selector.HorizontalAlignment = Alignment.Stretch;

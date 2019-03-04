@@ -31,7 +31,7 @@ namespace Takai.UI
             set
             {
                 contentSize = Math.Max(value, 0);
-                ContentPosition = contentPosition;
+                ContentPosition = _contentPosition;
             }
         }
         private float contentSize = 1;
@@ -48,26 +48,26 @@ namespace Takai.UI
         /// </summary>
         public float ContentPosition
         {
-            get => contentPosition;
+            get => _contentPosition;
             set
             {
-                var newPosition = value;
                 var size = Direction == Direction.Horizontal ? ContentArea.Width : ContentArea.Height;
 
+                float newPosition;
                 if (size > contentSize)
                     newPosition = 0;
                 else
                     newPosition = Util.Clamp(value, 0, ContentSize - size);
 
-                if (newPosition != contentPosition)
+                if (newPosition != _contentPosition)
                 {
-                    var e = new ScrollEventArgs(this, newPosition - contentPosition);
-                    contentPosition = newPosition;
+                    var e = new ScrollEventArgs(this, newPosition - _contentPosition);
+                    _contentPosition = newPosition;
                     BubbleEvent(Direction == Direction.Horizontal ? HScrollEvent : VScrollEvent, e);
                 }
             }
         }
-        private float contentPosition = 0;
+        private float _contentPosition = 0;
 
         /// <summary>
         /// Which direction the scrollbar moves
@@ -128,13 +128,13 @@ namespace Takai.UI
                     {
                         if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Up))
                         {
-                            contentPosition -= (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                            _contentPosition -= (float)(400 * time.ElapsedGameTime.TotalSeconds);
                             return false;
                         }
 
                         if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Down))
                         {
-                            contentPosition += (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                            _contentPosition += (float)(400 * time.ElapsedGameTime.TotalSeconds);
                             return false;
                         }
                     }
@@ -143,13 +143,13 @@ namespace Takai.UI
                     {
                         if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Left))
                         {
-                            contentPosition -= (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                            _contentPosition -= (float)(400 * time.ElapsedGameTime.TotalSeconds);
                             return false;
                         }
 
                         if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Right))
                         {
-                            contentPosition += (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                            _contentPosition += (float)(400 * time.ElapsedGameTime.TotalSeconds);
                             return false;
                         }
                     }
@@ -295,6 +295,9 @@ namespace Takai.UI
             }
         }
 
+        public bool EnableHorizontalScrolling { get; set; } = true;
+        public bool EnableVerticalScrolling { get; set; } = true;
+
         protected ScrollBar verticalScrollbar;
         protected ScrollBar horizontalScrollbar;
         protected Static contentContainer = new Static
@@ -337,16 +340,22 @@ namespace Takai.UI
             {
                 var self = (ScrollBox)sender;
                 var se = (ScrollEventArgs)e;
+                var lastPos = self.contentContainer.Position;
                 self.contentContainer.Position -= new Vector2(se.Delta, 0);
-                return UIEventResult.Handled;
+                if (lastPos != self.contentContainer.Position)
+                    return UIEventResult.Handled;
+                return UIEventResult.Continue;
             });
 
             On(ScrollBar.VScrollEvent, delegate (Static sender, UIEventArgs e)
             {
                 var self = (ScrollBox)sender;
                 var se = (ScrollEventArgs)e;
+                var lastPos = self.contentContainer.Position;
                 self.contentContainer.Position -= new Vector2(0, se.Delta);
-                return UIEventResult.Handled;
+                if (lastPos != self.contentContainer.Position)
+                    return UIEventResult.Handled;
+                return UIEventResult.Continue;
             });
         }
 
@@ -385,10 +394,9 @@ namespace Takai.UI
             horizontalScrollbar.ContentSize = contentContainer.MeasuredSize.X;
             verticalScrollbar.ContentSize = contentContainer.MeasuredSize.Y;
 
-            horizontalScrollbar.IsEnabled = contentContainer.MeasuredSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X;
-            verticalScrollbar.IsEnabled = contentContainer.MeasuredSize.Y > availableSize.Y - verticalScrollbar.MeasuredSize.Y;
+            horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && contentContainer.MeasuredSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X;
+            verticalScrollbar.IsEnabled = EnableVerticalScrolling && contentContainer.MeasuredSize.Y > availableSize.Y - horizontalScrollbar.MeasuredSize.Y;
 
-            //Measure(availableSize, true);
             base.ReflowOverride(availableSize);
         }
 

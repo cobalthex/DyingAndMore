@@ -59,13 +59,10 @@
   <ItemGroup>
     <Compile Include="Curves.cs" />
     <Compile Include="Data\Cache.cs" />
+    <Compile Include="Data\Serializer.BinSerialize.cs" />
     <Compile Include="Data\Serializer.cs" />
-    <Compile Include="Data\Serializer.Deserialize.cs">
-      <DependentUpon>Serializer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Serializer.Serialize.cs">
-      <DependentUpon>Serializer.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Data\Serializer.TextDeserialize.cs" />
+    <Compile Include="Data\Serializer.TextSerialize.cs" />
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Commands.cs" />
     <Compile Include="Game\Effects.cs" />
