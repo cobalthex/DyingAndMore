@@ -260,8 +260,7 @@ namespace Takai.UI
                     _text = value;
                     if (Font != null && _text != null)
                         textSize = Font.MeasureString(_text);
-                    if (IsAutoSized)
-                        Reflow();
+                    InvalidateMeasure();
                 }
             }
         }
@@ -282,8 +281,7 @@ namespace Takai.UI
                     _font = value;
                     if (_font != null && Text != null)
                         textSize = Font.MeasureString(Text);
-                    if (IsAutoSized)
-                        Reflow();
+                    InvalidateMeasure();
                 }
             }
         }
@@ -321,7 +319,7 @@ namespace Takai.UI
                 if (_horizontalAlignment != value)
                 {
                     _horizontalAlignment = value;
-                    Reflow();
+                    InvalidateMeasure();
                 }
             }
         }
@@ -338,7 +336,7 @@ namespace Takai.UI
                 if (_verticalAlignment != value)
                 {
                     _verticalAlignment = value;
-                    Reflow();
+                    InvalidateMeasure();
                 }
             }
         }
@@ -360,7 +358,7 @@ namespace Takai.UI
                 if (_position != value)
                 {
                     _position = value;
-                    Reflow();
+                    InvalidateLayout();
                 }
             }
         }
@@ -381,7 +379,7 @@ namespace Takai.UI
                         ;//System.Diagnostics.Debug.WriteLine($"{this}: Size=Infinity will always render as collapse");
 
                     _size = value;
-                    Reflow();
+                    InvalidateMeasure();
                 }
             }
         }
@@ -400,7 +398,7 @@ namespace Takai.UI
                 if (_padding != value)
                 {
                     _padding = value;
-                    Reflow();
+                    InvalidateMeasure();
                 }
             }
         }
@@ -488,7 +486,7 @@ namespace Takai.UI
 
                 _isEnabled = value;
                 if (_isEnabled)
-                    Reflow();
+                    InvalidateMeasure();
             }
         }
         private bool _isEnabled = true;
@@ -538,7 +536,7 @@ namespace Takai.UI
                     return;
 
                 SetParentNoReflow(value);
-                Reflow();
+                InvalidateMeasure();
             }
         }
         [Data.Serializer.Ignored]
@@ -898,7 +896,7 @@ namespace Takai.UI
                 child.HasFocus = true;
 
             if (reflow)
-                Reflow();
+                InvalidateMeasure(); //if autosized, else only layout?
 
             return true;
         }
@@ -966,7 +964,7 @@ namespace Takai.UI
                 lastFocus.HasFocus = true;
 
             if (Children.Count != count)
-                Reflow();
+                InvalidateMeasure();
         }
 
         /// <summary>
@@ -1367,7 +1365,20 @@ namespace Takai.UI
 
         #region Layout
 
-        Vector2 lastAvailableSize;
+        public void InvalidateLayout()
+        {
+            isLayoutValid = false;
+            Reflow();
+        }
+
+        public void InvalidateMeasure()
+        {
+            //if (IsAutoSized)
+            isMeasureValid = false;
+            InvalidateLayout();
+        }
+
+        bool isMeasureValid, isLayoutValid;
         private Rectangle containerBounds; //todo: re-evaluate necessity
 
         /// <summary>
@@ -1376,11 +1387,10 @@ namespace Takai.UI
         /// This returns a size that is large enough to include the offset element with padding
         /// </summary>
         /// <returns>The desired size of this element, including padding</returns>
-        public Vector2 Measure(Vector2 availableSize, bool force = false)
+        public Vector2 Measure(Vector2 availableSize)
         {
-            if (availableSize == lastAvailableSize && !force)
+            if (isMeasureValid)
                 return MeasuredSize;
-            lastAvailableSize = availableSize;
 
             //System.Diagnostics.Debug.WriteLine($"Measuring ID:{DebugId} (available size:{availableSize})");
 
@@ -1425,8 +1435,10 @@ namespace Takai.UI
             var lastMeasuredSize = MeasuredSize;
             MeasuredSize = Position + size + Padding * 2;
 
+            isMeasureValid = true;
             if (MeasuredSize != lastMeasuredSize)
                 NotifyParentMeasuredSizeChanged();
+
             return MeasuredSize;
         }
 
@@ -1445,7 +1457,7 @@ namespace Takai.UI
         protected virtual void OnChildRemeasure(Static child)
         {
             if (IsAutoSized)
-                Reflow();
+                InvalidateMeasure();
         }
 
         /// <summary>
@@ -1480,7 +1492,7 @@ namespace Takai.UI
                 containerBounds = Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.ContentArea;
 
             //System.Diagnostics.Debug.WriteLine($"Reflowing {DebugId} ({GetType().Name})");
-            Measure(new Vector2(containerBounds.Width, containerBounds.Height), true);
+            Measure(new Vector2(containerBounds.Width, containerBounds.Height));
             Reflow(containerBounds);
         }
 
@@ -1488,7 +1500,6 @@ namespace Takai.UI
         private static uint reflowCount = 0; //set breakpoint for speicifc reflow
 #endif
 
-        bool isReflowing = false;
         /// <summary>
         /// Reflow this container, relative to its parent
         /// </summary>
@@ -1499,23 +1510,16 @@ namespace Takai.UI
             ++reflowCount;
 #endif
 
-            if (!IsEnabled)
+            if (!IsEnabled || isLayoutValid)
                 return;
-
-            if (isReflowing)
-                return;
-
-            isReflowing = true; //todo: this should be unnecessary once fixing reflow if case below
 
             var lastClip = OffsetContentArea; //is this the right one?
+
             AdjustToContainer(container);
-            if (lastClip != OffsetContentArea) //todo: doesnt hit all cases
-            {
-                //System.Diagnostics.Debug.WriteLine($"Reflowing ID:{DebugId} ({this}) [container:{container}]");
-                ReflowOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
-            }
-            isReflowing = false;
-            hasReflowed = true;
+            //System.Diagnostics.Debug.WriteLine($"Reflowing ID:{DebugId} ({this}) [container:{container}]");
+            ReflowOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
+
+            isLayoutValid = true;
         }
 
         /// <summary>
