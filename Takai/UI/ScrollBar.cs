@@ -118,7 +118,7 @@ namespace Takai.UI
 
                 if (VisibleContentArea.Contains(InputState.MousePoint) && InputState.HasScrolled())
                 {
-                    ScrollTowards(InputState.ScrollDelta());
+                    Scroll(InputState.ScrollDelta());
                     return false;
                 }
 
@@ -168,7 +168,7 @@ namespace Takai.UI
             return base.HandleInput(time);
         }
 
-        public void ScrollTowards(int direction)
+        public void Scroll(int direction)
         {
             ContentPosition -= Math.Sign(direction) * (Font != null ? Font.MaxCharHeight : 20);
         }
@@ -408,13 +408,13 @@ namespace Takai.UI
                 {
                     if (horizontalScrollbar.IsEnabled)
                     {
-                        horizontalScrollbar.ScrollTowards(InputState.ScrollDelta());
+                        horizontalScrollbar.Scroll(InputState.ScrollDelta());
                         return false;
                     }
                 }
                 else if (verticalScrollbar.IsEnabled)
                 {
-                    verticalScrollbar.ScrollTowards(InputState.ScrollDelta());
+                    verticalScrollbar.Scroll(InputState.ScrollDelta());
                     return false;
                 }
             }
