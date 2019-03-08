@@ -58,7 +58,7 @@ namespace Takai.UI
             //todo: bounds may be affected by Stretch which would prove wrong here
         }
 
-        protected override void ReflowOverride(Vector2 availableSize)
+        protected override void ArrangeOverride(Vector2 availableSize)
         {
             //todo: this first step should be pre-calculated (MeasuredSize?)
             float usedSize = 0;
@@ -108,7 +108,7 @@ namespace Takai.UI
                     else
                         itemSize = Children[i].MeasuredSize.X;
 
-                    Children[i].Reflow(new Rectangle(
+                    Children[i].Arrange(new Rectangle(
                         (int)t,
                         (int)0,
                         (int)itemSize,
@@ -123,7 +123,7 @@ namespace Takai.UI
                     else
                         itemSize = Children[i].MeasuredSize.Y;
 
-                    Children[i].Reflow(new Rectangle(
+                    Children[i].Arrange(new Rectangle(
                         (int)0,
                         (int)t,
                         (int)availableSize.X,

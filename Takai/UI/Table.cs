@@ -100,7 +100,7 @@ namespace Takai.UI
             return measuredArea + margins;
         }
 
-        protected override void ReflowOverride(Vector2 availableSize)
+        protected override void ArrangeOverride(Vector2 availableSize)
         {
             if (ColumnCount <= 0)
                 return;
@@ -136,7 +136,7 @@ namespace Takai.UI
                         offset.X += Margin.X;
                 }
 
-                Children[i].Reflow(new Rectangle(
+                Children[i].Arrange(new Rectangle(
                     (int)offset.X,
                     (int)offset.Y,
                     (int)columnWidths[i % ColumnCount],

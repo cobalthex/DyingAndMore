@@ -57,7 +57,7 @@ namespace Takai.UI
             return base.HandleInput(time);
         }
 
-        protected override void ReflowOverride(Vector2 availableSize)
+        protected override void ArrangeOverride(Vector2 availableSize)
         {
             var container = new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y);
             switch (HorizontalAlignment)
@@ -72,7 +72,7 @@ namespace Takai.UI
             }
 
             foreach (var child in Children)
-                child.Reflow(container);
+                child.Arrange(container);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

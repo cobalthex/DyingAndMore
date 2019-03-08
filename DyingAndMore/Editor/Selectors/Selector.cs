@@ -52,10 +52,10 @@ namespace DyingAndMore.Editor.Selectors
             return new Vector2(ItemCount % ItemsPerRow, Takai.Util.CeilDiv(ItemCount, ItemsPerRow)) * (ItemSize.ToVector2() + ItemMargin);
         }
 
-        protected override void ReflowOverride(Vector2 availableSize)
+        protected override void ArrangeOverride(Vector2 availableSize)
         {
             ItemsPerRow = Math.Max(1, (int)((availableSize.X - ItemMargin.X) / (ItemSize.X + ItemMargin.X)));
-            base.ReflowOverride(availableSize);
+            base.ArrangeOverride(availableSize);
         }
 
         protected virtual UIEventResult OnPress(Static sender, UIEventArgs e)
