@@ -314,7 +314,7 @@ namespace DyingAndMore.Game
             return UIEventResult.Handled;
         }
 
-        protected override void ReflowOverride(Vector2 availableSize)
+        protected override void ArrangeOverride(Vector2 availableSize)
         {
             //todo: should this go in MeasureOverride?
 
@@ -337,7 +337,7 @@ namespace DyingAndMore.Game
                     players[i].camera.Viewport = viewport;
                 }
             }
-            base.ReflowOverride(availableSize);
+            base.ArrangeOverride(availableSize);
         }
 
         protected override void UpdateSelf(GameTime time)

@@ -12,7 +12,7 @@ namespace Takai.UI
         /// </summary>
         public float Radius { get; set; } = 50;
 
-        protected override void ReflowOverride(Vector2 availableSize)
+        protected override void ArrangeOverride(Vector2 availableSize)
         {
             throw new System.NotImplementedException(); //todo
 

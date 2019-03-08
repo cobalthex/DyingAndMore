@@ -174,7 +174,7 @@ namespace Takai.UI
             return inputSz + new Vector2(inputSz.Y * (Children.Count - 1), 0);
         }
 
-        protected override void ReflowOverride(Vector2 availableSize)
+        protected override void ArrangeOverride(Vector2 availableSize)
         {
             var buttonSize = textInput.MeasuredSize.Y;
             var shift = (int)(availableSize.X - buttonSize * (Children.Count - 1));
@@ -182,9 +182,9 @@ namespace Takai.UI
             foreach (var child in Children)
             {
                 if (child == textInput)
-                    child.Reflow(new Rectangle(0, 0, shift, (int)availableSize.Y));
+                    child.Arrange(new Rectangle(0, 0, shift, (int)availableSize.Y));
                 else
-                    child.Reflow(new Rectangle(shift + (int)(n++ * buttonSize), 0, (int)buttonSize, (int)availableSize.Y));
+                    child.Arrange(new Rectangle(shift + (int)(n++ * buttonSize), 0, (int)buttonSize, (int)availableSize.Y));
             }
 
             //todo: this is ugly

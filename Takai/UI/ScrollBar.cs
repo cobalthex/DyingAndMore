@@ -386,10 +386,10 @@ namespace Takai.UI
 
         protected override void OnChildRemeasure(Static child)
         {
-            Reflow();
+            InvalidateMeasure();
         }
 
-        protected override void ReflowOverride(Vector2 availableSize)
+        protected override void ArrangeOverride(Vector2 availableSize)
         {
             horizontalScrollbar.ContentSize = contentContainer.MeasuredSize.X;
             verticalScrollbar.ContentSize = contentContainer.MeasuredSize.Y;
@@ -397,7 +397,7 @@ namespace Takai.UI
             horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && contentContainer.MeasuredSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X;
             verticalScrollbar.IsEnabled = EnableVerticalScrolling && contentContainer.MeasuredSize.Y > availableSize.Y - horizontalScrollbar.MeasuredSize.Y;
 
-            base.ReflowOverride(availableSize);
+            base.ArrangeOverride(availableSize);
         }
 
         protected override bool HandleInput(GameTime time)

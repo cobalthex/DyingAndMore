@@ -319,7 +319,10 @@ namespace Takai.UI
                 if (_horizontalAlignment != value)
                 {
                     _horizontalAlignment = value;
-                    InvalidateMeasure();
+                    if (_verticalAlignment == Alignment.Stretch)
+                        InvalidateMeasure();
+                    else
+                        InvalidateLayout();
                 }
             }
         }
@@ -336,7 +339,10 @@ namespace Takai.UI
                 if (_verticalAlignment != value)
                 {
                     _verticalAlignment = value;
-                    InvalidateMeasure();
+                    if (_verticalAlignment == Alignment.Stretch)
+                        InvalidateMeasure();
+                    else
+                        InvalidateLayout();
                 }
             }
         }
@@ -486,7 +492,7 @@ namespace Takai.UI
 
                 _isEnabled = value;
                 if (_isEnabled)
-                    InvalidateMeasure();
+                    InvalidateMeasure(); //todo: evaluate
             }
         }
         private bool _isEnabled = true;
@@ -536,7 +542,7 @@ namespace Takai.UI
                     return;
 
                 SetParentNoReflow(value);
-                InvalidateMeasure();
+                //InvalidateMeasure(); //todo: evaluate
             }
         }
         [Data.Serializer.Ignored]
@@ -1367,7 +1373,7 @@ namespace Takai.UI
 
         public void InvalidateLayout()
         {
-            isLayoutValid = false;
+            isArrangeValid = false;
             Reflow();
         }
 
@@ -1378,7 +1384,7 @@ namespace Takai.UI
             InvalidateLayout();
         }
 
-        bool isMeasureValid, isLayoutValid;
+        bool isMeasureValid, isArrangeValid;
         private Rectangle containerBounds; //todo: re-evaluate necessity
 
         /// <summary>
@@ -1389,9 +1395,6 @@ namespace Takai.UI
         /// <returns>The desired size of this element, including padding</returns>
         public Vector2 Measure(Vector2 availableSize)
         {
-            if (isMeasureValid)
-                return MeasuredSize;
-
             //System.Diagnostics.Debug.WriteLine($"Measuring ID:{DebugId} (available size:{availableSize})");
 
             var size = Size;
@@ -1486,14 +1489,25 @@ namespace Takai.UI
 
         bool hasReflowed = false;
 
+        /// <summary>
+        /// Measure and arrange this and child UI elements
+        /// (customizable through <see cref="MeasureOverride(Vector2)"/> and <see cref="ArrangeOverride(Vector2)"/>
+        /// </summary>
         public void Reflow()
         {
             if (!hasReflowed) //if never reflowed, there is no container set so stretched objects will not have any size
                 containerBounds = Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.ContentArea;
 
+            if (!IsEnabled)
+                return;
+
             //System.Diagnostics.Debug.WriteLine($"Reflowing {DebugId} ({GetType().Name})");
-            Measure(new Vector2(containerBounds.Width, containerBounds.Height));
-            Reflow(containerBounds);
+
+            if (!isMeasureValid)
+                Measure(new Vector2(containerBounds.Width, containerBounds.Height));
+            
+            if (!isArrangeValid)
+                Arrange(containerBounds);
         }
 
 #if DEBUG
@@ -1504,32 +1518,29 @@ namespace Takai.UI
         /// Reflow this container, relative to its parent
         /// </summary>
         /// <param name="container">Container in relative coordinates</param>
-        public void Reflow(Rectangle container)
+        public void Arrange(Rectangle container)
         {
 #if DEBUG
             ++reflowCount;
 #endif
 
-            if (!IsEnabled || isLayoutValid)
-                return;
-
-            var lastClip = OffsetContentArea; //is this the right one?
+            //todo: this should be further optimizable (reduce # of calls), however I am unsuccessful in doing so
 
             AdjustToContainer(container);
-            //System.Diagnostics.Debug.WriteLine($"Reflowing ID:{DebugId} ({this}) [container:{container}]");
-            ReflowOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
+            //System.Diagnostics.Debug.WriteLine($"Arranging ID:{DebugId} ({this}) [container:{container}]");
+            ArrangeOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
 
-            isLayoutValid = true;
+            isArrangeValid = true;
         }
 
         /// <summary>
         /// Reflow child elements relative to this element
         /// Called whenever this element's position or size is adjusted
         /// </summary>
-        protected virtual void ReflowOverride(Vector2 availableSize)
+        protected virtual void ArrangeOverride(Vector2 availableSize)
         {
             foreach (var child in Children)
-                child.Reflow(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
+                child.Arrange(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
         }
 
         /// <summary>
@@ -1884,6 +1895,13 @@ namespace Takai.UI
 
             if (debugDraw != null)
             {
+                DebugFont.Draw(
+                    spriteBatch,
+                    $"Reflow Count: {reflowCount}\nTotal Elements Created: {idCounter}",
+                    new Vector2(10),
+                    Color.CornflowerBlue
+                );
+
                 debugDraw.DrawDebugInfo(spriteBatch);
 #if DEBUG
                 if (InputState.IsPress(Keys.Pause))

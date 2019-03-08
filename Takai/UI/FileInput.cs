@@ -180,12 +180,12 @@ namespace Takai.UI
             return sz + new Vector2(sz.Y, 0);
         }
 
-        protected override void ReflowOverride(Vector2 availableSize)
+        protected override void ArrangeOverride(Vector2 availableSize)
         {
             var sz = availableSize.ToPoint();
             //todo: pickerButton bounds?
-            textInput.Reflow(new Rectangle(0, 0, sz.X - (int)pickerButton.MeasuredSize.X, sz.Y));
-            pickerButton.Reflow(new Rectangle(sz.X - (int)pickerButton.MeasuredSize.X, 0, (int)pickerButton.MeasuredSize.X, sz.Y));
+            textInput.Arrange(new Rectangle(0, 0, sz.X - (int)pickerButton.MeasuredSize.X, sz.Y));
+            pickerButton.Arrange(new Rectangle(sz.X - (int)pickerButton.MeasuredSize.X, 0, (int)pickerButton.MeasuredSize.X, sz.Y));
         }
     }
 }
