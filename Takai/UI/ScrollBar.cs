@@ -384,11 +384,6 @@ namespace Takai.UI
             return contentContainer.InternalRemoveChildIndex(index);
         }
 
-        protected override void OnChildRemeasure(Static child)
-        {
-            InvalidateMeasure();
-        }
-
         protected override void ArrangeOverride(Vector2 availableSize)
         {
             horizontalScrollbar.ContentSize = contentContainer.MeasuredSize.X;

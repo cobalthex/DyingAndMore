@@ -1379,7 +1379,6 @@ namespace Takai.UI
 
         public void InvalidateMeasure()
         {
-            //if (IsAutoSized)
             isMeasureValid = false;
             InvalidateLayout();
         }
@@ -1454,12 +1453,14 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Called whenever a child of this element resizes. By default if this element is autosized, it will call Reflow
+        /// Called whenever a child of this element resizes.
+        /// By default if this element is autosized, it will call Reflow
         /// </summary>
-        /// <param name="child"></param>
+        /// <param name="child">The child that was remeasured</param>
         protected virtual void OnChildRemeasure(Static child)
         {
-            if (IsAutoSized)
+            if (IsAutoSized &&
+                (HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch))
                 InvalidateMeasure();
         }
 
@@ -1505,7 +1506,7 @@ namespace Takai.UI
 
             if (!isMeasureValid)
                 Measure(new Vector2(containerBounds.Width, containerBounds.Height));
-            
+
             if (!isArrangeValid)
                 Arrange(containerBounds);
         }

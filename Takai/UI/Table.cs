@@ -39,6 +39,11 @@ namespace Takai.UI
             ColumnCount = columnCount;
         }
 
+        protected override void OnChildRemeasure(Static child)
+        {
+            InvalidateMeasure();
+        }
+
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             if (ColumnCount <= 0)
@@ -67,15 +72,9 @@ namespace Takai.UI
 
                 var csize = Children[i].Measure(new Vector2(InfiniteSize)); //needed up here for children to correctly size
                 if (Children[i].HorizontalAlignment == Alignment.Stretch)
-                {
                     hStretches.Add(i % ColumnCount);
-                    //csize.X = 0;
-                }
                 if (Children[i].VerticalAlignment == Alignment.Stretch)
-                {
                     vStretches.Add(i / ColumnCount);
-                    //csize.Y = 0;
-                }
 
                 columnWidths[i % ColumnCount] = System.Math.Max(columnWidths[i % ColumnCount], csize.X);
                 rowHeights[i / ColumnCount] = System.Math.Max(rowHeights[i / ColumnCount], csize.Y);
