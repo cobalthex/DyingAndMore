@@ -25,6 +25,11 @@ namespace Takai.UI
         public List(params Static[] children)
             : base(children) { }
 
+        protected override void OnChildRemeasure(Static child)
+        {
+            InvalidateMeasure();
+        }
+
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             var usedSize = new Vector2();
