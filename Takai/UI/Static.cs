@@ -1459,8 +1459,8 @@ namespace Takai.UI
         /// <param name="child">The child that was remeasured</param>
         protected virtual void OnChildRemeasure(Static child)
         {
-            if (IsAutoSized &&
-                (HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch))
+            if (IsAutoSized)// &&
+                //(HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch))
                 InvalidateMeasure();
         }
 
@@ -1507,7 +1507,7 @@ namespace Takai.UI
             if (!isMeasureValid)
                 Measure(new Vector2(containerBounds.Width, containerBounds.Height));
 
-            if (!isArrangeValid)
+            if (!isArrangeValid) //todo: unify design with measure
                 Arrange(containerBounds);
         }
 
@@ -1521,13 +1521,14 @@ namespace Takai.UI
         /// <param name="container">Container in relative coordinates</param>
         public void Arrange(Rectangle container)
         {
+            AdjustToContainer(container);
+
 #if DEBUG
             ++reflowCount;
 #endif
 
             //todo: this should be further optimizable (reduce # of calls), however I am unsuccessful in doing so
 
-            AdjustToContainer(container);
             //System.Diagnostics.Debug.WriteLine($"Arranging ID:{DebugId} ({this}) [container:{container}]");
             ArrangeOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
 
