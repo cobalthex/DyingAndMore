@@ -171,7 +171,10 @@ namespace Takai.UI
                         (int)columnWidths[i % ColumnCount],
                         (int)rowHeights[i / ColumnCount]
                     );
-                    Graphics.Primitives2D.DrawFill(spriteBatch, CellColor, Rectangle.Intersect(rect, VisibleContentArea));
+                    rect = Rectangle.Intersect(rect, VisibleContentArea);
+                    Graphics.Primitives2D.DrawFill(spriteBatch, CellColor, rect);
+
+                    DebugFont?.Draw(spriteBatch, $"{columnWidths[i % ColumnCount]}x{rowHeights[i / ColumnCount]}", rect, Color.LightGreen);
 
                     offset.X += columnWidths[i % ColumnCount];
                 }
