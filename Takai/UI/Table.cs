@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
-    public class Table : Static
+    public class Table : LayoutBase
     {
         /// <summary>
         /// Spacing between items
@@ -37,11 +37,6 @@ namespace Takai.UI
             : base(children)
         {
             ColumnCount = columnCount;
-        }
-
-        protected override void OnChildRemeasure(Static child)
-        {
-            InvalidateMeasure();
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)

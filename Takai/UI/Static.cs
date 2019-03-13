@@ -209,6 +209,12 @@ namespace Takai.UI
             //a method here allows for easier debuggin
             return ++idCounter;
         }
+
+        /// <summary>
+        /// the XPath equivelent for this UI
+        /// </summary>
+        [Data.DebugSerialize]
+        public string DebugTreePath { get; private set; }
 #endif
 
         /// <summary>
@@ -567,6 +573,9 @@ namespace Takai.UI
         {
             //System.Diagnostics.Debug.WriteLine($"New ID:{DebugId}");
             Children = _children.AsReadOnly();
+#if DEBUG
+            DebugTreePath = $"/{(GetType().Name)}({DebugId})";
+#endif
         }
 
         /// <summary>
@@ -812,6 +821,15 @@ namespace Takai.UI
         {
             var oldParent = _parent;
             _parent = newParent;
+#if DEBUG
+            //todo: make this on-demand?
+            foreach (var child in EnumerateRecursive(true))
+            {
+                child.DebugTreePath = $"/{(child.GetType().Name)}({child.DebugId})";
+                if (child.Parent != null)
+                    child.DebugTreePath = child.Parent.DebugTreePath + child.DebugTreePath;
+            }
+#endif
             BubbleEvent(ParentChangedEvent, new ParentChangedEventArgs(this, oldParent));
         }
 
@@ -1383,7 +1401,7 @@ namespace Takai.UI
             InvalidateLayout();
         }
 
-        bool isMeasureValid, isArrangeValid;
+        bool isMeasureValid = false, isArrangeValid = false;
         private Rectangle containerBounds; //todo: re-evaluate necessity
 
         /// <summary>
@@ -1394,6 +1412,9 @@ namespace Takai.UI
         /// <returns>The desired size of this element, including padding</returns>
         public Vector2 Measure(Vector2 availableSize)
         {
+            if (isMeasureValid)
+                return MeasuredSize;
+
             //System.Diagnostics.Debug.WriteLine($"Measuring ID:{DebugId} (available size:{availableSize})");
 
             var size = Size;
@@ -1459,8 +1480,8 @@ namespace Takai.UI
         /// <param name="child">The child that was remeasured</param>
         protected virtual void OnChildRemeasure(Static child)
         {
-            if (IsAutoSized)// &&
-                //(HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch))
+            if (IsAutoSized &&
+                (HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch))
                 InvalidateMeasure();
         }
 
@@ -1504,10 +1525,9 @@ namespace Takai.UI
 
             //System.Diagnostics.Debug.WriteLine($"Reflowing {DebugId} ({GetType().Name})");
 
-            if (!isMeasureValid)
-                Measure(new Vector2(containerBounds.Width, containerBounds.Height));
+            Measure(new Vector2(containerBounds.Width, containerBounds.Height));
 
-            if (!isArrangeValid) //todo: unify design with measure
+            if (!isArrangeValid) //todo: consisten w/ measure ? (inside Arrange()) -- is possible?
                 Arrange(containerBounds);
         }
 
@@ -1521,7 +1541,6 @@ namespace Takai.UI
         /// <param name="container">Container in relative coordinates</param>
         public void Arrange(Rectangle container)
         {
-            AdjustToContainer(container);
 
 #if DEBUG
             ++reflowCount;
@@ -1530,6 +1549,7 @@ namespace Takai.UI
             //todo: this should be further optimizable (reduce # of calls), however I am unsuccessful in doing so
 
             //System.Diagnostics.Debug.WriteLine($"Arranging ID:{DebugId} ({this}) [container:{container}]");
+            AdjustToContainer(container);
             ArrangeOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
 
             isArrangeValid = true;
@@ -1908,6 +1928,12 @@ namespace Takai.UI
 #if DEBUG
                 if (InputState.IsPress(Keys.Pause))
                     debugDraw.BreakOnThis();
+
+                if (InputState.IsPress(Keys.F9))
+                {
+                    using (var stream = new System.IO.StreamWriter(System.IO.File.OpenWrite("ui.tk")))
+                        Data.Serializer.TextSerialize(stream, debugDraw, 0, false, false, true);
+                }
 #endif
             }
         }

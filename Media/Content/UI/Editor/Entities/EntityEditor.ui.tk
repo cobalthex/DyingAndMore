@@ -18,6 +18,7 @@ List {
             }
             Children: [
                 List {
+                    Name: "fuck";
                     Direction: Direction.Vertical;
                     HorizontalAlignment: Alignment.Stretch;
                     Margin: 10;

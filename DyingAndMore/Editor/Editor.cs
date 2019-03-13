@@ -323,7 +323,7 @@ namespace DyingAndMore.Editor
 
         protected override void UpdateSelf(GameTime time)
         {
-            fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
+            //fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
 
             Map.BeginUpdate();
             Map.MarkRegionActive(Camera);
