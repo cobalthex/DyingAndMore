@@ -78,6 +78,7 @@ namespace Takai.UI
         }
         private Static _container = new List
         {
+            Name = "ilcontainer"
             //HorizontalAlignment = Alignment.Stretch,
             //VerticalAlignment = Alignment.Stretch
         };

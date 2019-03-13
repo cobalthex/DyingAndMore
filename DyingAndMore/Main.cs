@@ -287,13 +287,7 @@ namespace DyingAndMore
                     ui.AddChild(fpsGraph);
                 }
             }
-
-            else if (InputState.IsPress(Keys.F9))
-            {
-                using (var stream = new System.IO.StreamWriter(System.IO.File.OpenWrite("ui.tk")))
-                    Serializer.TextSerialize(stream, ui, 0, false, false, true);
-            }
-
+            //F9 used in UI code
             else if (InputState.IsPress(Keys.F10))
                 Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
             else if (InputState.IsPress(Keys.F11))

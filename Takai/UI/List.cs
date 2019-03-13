@@ -9,7 +9,22 @@ namespace Takai.UI
         Vertical
     }
 
-    public class List : Static
+    public abstract class LayoutBase : Static
+    {
+        public LayoutBase() { }
+        public LayoutBase(params Static[] children) : base(children) { }
+
+        protected override void OnChildRemeasure(Static child)
+        {
+            if (IsAutoSized &&
+                (HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch))
+                InvalidateMeasure();
+            else
+                InvalidateLayout();
+        }
+    }
+
+    public class List : LayoutBase
     {
         /// <summary>
         /// Spacing between items
@@ -25,11 +40,7 @@ namespace Takai.UI
         public List(params Static[] children)
             : base(children) { }
 
-        protected override void OnChildRemeasure(Static child)
-        {
-            InvalidateMeasure();
-        }
-
+        int stretches = 0;
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             var usedSize = new Vector2();
@@ -44,12 +55,16 @@ namespace Takai.UI
                 {
                     if (child.HorizontalAlignment != Alignment.Stretch)
                         usedSize.X += childSize.X; //todo: better format for this
+                    else
+                        ++stretches;
                     usedSize.Y = System.Math.Max(usedSize.Y, childSize.Y);
                 }
                 else
                 {
                     if (child.VerticalAlignment != Alignment.Stretch)
                         usedSize.Y += childSize.Y;
+                    else
+                        ++stretches;
                     usedSize.X = System.Math.Max(usedSize.X, childSize.X);
                 }
             }
@@ -63,38 +78,14 @@ namespace Takai.UI
             //todo: bounds may be affected by Stretch which would prove wrong here
         }
 
+
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            //todo: this first step should be pre-calculated (MeasuredSize?)
-            float usedSize = 0;
-            int stretches = 0;
-            for (int i = 0; i < Children.Count; ++i)
-            {
-                if (!Children[i].IsEnabled)
-                    continue;
-
-                if (Direction == Direction.Horizontal)
-                {
-                    if (Children[i].HorizontalAlignment == Alignment.Stretch)
-                        ++stretches;
-                    else
-                        usedSize += Children[i].MeasuredSize.X;
-                }
-                else
-                {
-                    if (Children[i].VerticalAlignment == Alignment.Stretch)
-                        ++stretches;
-                    else
-                        usedSize += Children[i].MeasuredSize.Y;
-                }
-            }
-            usedSize += Margin * (Children.Count - 1);
-
             float stretchSize;
             if (Direction == Direction.Horizontal)
-                stretchSize = System.Math.Max(0, (availableSize.X - usedSize) / stretches); //todo: availableSize?
+                stretchSize = System.Math.Max(0, (availableSize.X - MeasuredSize.X) / stretches); //todo: availableSize?
             else
-                stretchSize = System.Math.Max(0, (availableSize.Y - usedSize) / stretches);
+                stretchSize = System.Math.Max(0, (availableSize.Y - MeasuredSize.Y) / stretches);
 
             float t = 0;
             for (int i = 0; i < Children.Count; ++i)
@@ -136,7 +127,7 @@ namespace Takai.UI
                     ));
                     t += itemSize;
                 }
-            }
+     }
         }
     }
 }
