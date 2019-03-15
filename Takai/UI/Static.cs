@@ -548,7 +548,7 @@ namespace Takai.UI
                     return;
 
                 SetParentNoReflow(value);
-                //InvalidateMeasure(); //todo: evaluate
+                InvalidateMeasure(); //todo: evaluate
             }
         }
         [Data.Serializer.Ignored]
@@ -576,6 +576,7 @@ namespace Takai.UI
 #if DEBUG
             DebugTreePath = $"/{(GetType().Name)}({DebugId})";
 #endif
+            containerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
         }
 
         /// <summary>
@@ -830,6 +831,8 @@ namespace Takai.UI
                     child.DebugTreePath = child.Parent.DebugTreePath + child.DebugTreePath;
             }
 #endif
+            containerBounds = Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.ContentArea;
+
             BubbleEvent(ParentChangedEvent, new ParentChangedEventArgs(this, oldParent));
         }
 
@@ -854,6 +857,7 @@ namespace Takai.UI
                 clone._children[i] = child;
             }
             clone.FinalizeClone();
+            clone.InvalidateMeasure();
             return clone;
         }
 
@@ -1392,13 +1396,28 @@ namespace Takai.UI
         public void InvalidateLayout()
         {
             isArrangeValid = false;
-            Reflow();
+            Arrange(containerBounds);
         }
 
         public void InvalidateMeasure()
         {
             isMeasureValid = false;
-            InvalidateLayout();
+            Measure(containerBounds.Size.ToVector2());
+            if (!isArrangeValid)
+                InvalidateLayout();
+        }
+
+        /// <summary>
+        /// force the entire tree to be remeasured and relayed-out
+        /// </summary>
+        public void DebugInvalidateTree()
+        {
+            foreach (var element in EnumerateRecursive())
+            {
+                element.isMeasureValid = false;
+                element.isArrangeValid = false;
+            }
+            InvalidateMeasure();
         }
 
         bool isMeasureValid = false, isArrangeValid = false;
@@ -1509,31 +1528,11 @@ namespace Takai.UI
             return new Vector2(bounds.Width, bounds.Height);
         }
 
-        bool hasReflowed = false;
-
-        /// <summary>
-        /// Measure and arrange this and child UI elements
-        /// (customizable through <see cref="MeasureOverride(Vector2)"/> and <see cref="ArrangeOverride(Vector2)"/>
-        /// </summary>
-        public void Reflow()
-        {
-            if (!hasReflowed) //if never reflowed, there is no container set so stretched objects will not have any size
-                containerBounds = Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.ContentArea;
-
-            if (!IsEnabled)
-                return;
-
-            //System.Diagnostics.Debug.WriteLine($"Reflowing {DebugId} ({GetType().Name})");
-
-            Measure(new Vector2(containerBounds.Width, containerBounds.Height));
-
-            if (!isArrangeValid) //todo: consisten w/ measure ? (inside Arrange()) -- is possible?
-                Arrange(containerBounds);
-        }
-
 #if DEBUG
         private static uint reflowCount = 0; //set breakpoint for speicifc reflow
 #endif
+
+        bool firstArrange = true;
 
         /// <summary>
         /// Reflow this container, relative to its parent
@@ -1541,7 +1540,6 @@ namespace Takai.UI
         /// <param name="container">Container in relative coordinates</param>
         public void Arrange(Rectangle container)
         {
-
 #if DEBUG
             ++reflowCount;
 #endif
@@ -1562,7 +1560,10 @@ namespace Takai.UI
         protected virtual void ArrangeOverride(Vector2 availableSize)
         {
             foreach (var child in Children)
-                child.Arrange(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
+            {
+                if (child.IsEnabled)
+                    child.Arrange(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
+            }
         }
 
         /// <summary>

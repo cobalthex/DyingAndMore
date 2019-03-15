@@ -33,7 +33,7 @@ Static {
 			}
 		}
 
-		Graphic {
+		#*Graphic {
 			Name: "Health frame";
 			Position: [0 62];
 			Sprite: {
@@ -42,6 +42,6 @@ Static {
 				Width: 86;
 				Height: 92;
 			};
-		}
+		}*#
 	];
 }

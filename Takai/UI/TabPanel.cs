@@ -41,7 +41,6 @@
                     Children[lastTabIndex + 1].IsEnabled = false;
                 if (_tabIndex >= 0)
                     Children[_tabIndex + 1].IsEnabled = true;
-                Reflow();
             }
         }
         private int _tabIndex;
