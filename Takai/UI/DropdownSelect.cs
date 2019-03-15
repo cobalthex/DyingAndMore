@@ -132,7 +132,6 @@ namespace Takai.UI
         public virtual void OpenDropdown()
         {
             dropdown.Size = new Vector2(MeasuredSize.X, System.Math.Max(list.Size.Y, 200));
-            list.Reflow();
 
             var root = GetRoot();
 

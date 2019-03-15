@@ -291,7 +291,7 @@ namespace Takai.UI
                 }
 
                 if (vsp >= 0 || hsp >= 0)
-                    Reflow();
+                    InvalidateMeasure();
             }
         }
 

@@ -34,12 +34,6 @@ namespace Takai.UI
                 var pos = Util.Direction(i * thetaScale) * Radius;
                 Children[i].Position = center - ccenter + pos;
             }
-
-            foreach (var child in Children)
-            {
-                if (child.IsEnabled)
-                    child.Reflow();
-            }
         }
     }
 }

@@ -1,0 +1,15 @@
+List {
+	BackgroundColor: [20 100 150];
+	BorderColor: [120 180 250];
+	Name: "a";
+	Size: [200 200];
+	HorizontalAlignment: Alignment.Center;
+	VerticalAlignment: Alignment.Center;
+
+	Children: [
+		Static { Text: "Test 1"; Name: "a1"; };
+		Static { Text: "Test 2"; Name: "a2"; };
+		Static { Text: "Test 3"; Name: "a3"; };
+		Static { Text: "Test 4"; Name: "a4"; };
+	];
+};

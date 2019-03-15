@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 using System.Reflection;
 using Takai.Data;
 using Takai.Input;
+using Takai.UI;
 
 namespace DyingAndMore
 {
@@ -40,7 +41,7 @@ namespace DyingAndMore
 #endif
 
         SpriteBatch sbatch;
-        Takai.UI.Static ui;
+        Static ui;
 
         Takai.FpsGraph fpsGraph;
         UI.DevtoolsMenu devtoolsMenu;
@@ -108,12 +109,34 @@ namespace DyingAndMore
 #endif
             #endregion
 
+            InputState.EnabledGestures
+                = GestureType.Tap
+                | GestureType.Flick
+                | GestureType.FreeDrag
+                | GestureType.Pinch;
+
             sbatch = new SpriteBatch(GraphicsDevice);
 
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            Takai.UI.Static.DefaultFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
+            Static.DefaultFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
+
+            Static.GlobalCommands["AddUI"] = delegate (Static ui, object arg)
+            {
+                if (!(arg is Static child))
+                    return;
+
+                ui.AddChild(child);
+            };
+            Static.GlobalCommands["CloseModal"] = delegate (Static ui, object arg)
+            {
+                while (ui != null && !ui.IsModal)
+                    ui = ui.Parent;
+
+                if (ui != null)
+                    ui.RemoveFromParent();
+            };
 
             /*
 #if WINDOWS //UWP launch activation parameters?
@@ -139,9 +162,9 @@ namespace DyingAndMore
                     map.InitializeGraphics();
                     var instance = map.Instantiate();
                     if (presetMode == "game")
-                        ui = new Takai.UI.Static(new Game.GameInstance(new Game.Game { Map = instance }));
+                        ui = new Static(new Game.GameInstance(new Game.Game { Map = instance }));
                     else
-                        ui = new Takai.UI.Static(new Editor.Editor(instance));
+                        ui = new Static(new Editor.Editor(instance));
                     return;
                 }
                 catch (System.IO.FileNotFoundException) { }
@@ -149,17 +172,17 @@ namespace DyingAndMore
 #endif
             */
 
-            var childUI = new Takai.UI.FileList
+            var childUI = new FileList
             {
                 //Size = new Vector2(400, 600),
-                HorizontalAlignment = Takai.UI.Alignment.Middle,
-                VerticalAlignment = Takai.UI.Alignment.Middle,
+                HorizontalAlignment = Alignment.Middle,
+                VerticalAlignment = Alignment.Middle,
                 BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
                 FilterRegex = "\\.(map\\.tk|d2map\\.zip)$",
             };
-            childUI.On(Takai.UI.Static.SelectionChangedEvent, delegate (Takai.UI.Static s, Takai.UI.UIEventArgs ee)
+            childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)
             {
-                var fl = (Takai.UI.FileList)s;
+                var fl = (FileList)s;
                 if (System.IO.File.Exists(fl.SelectedFile))
                 {
                     if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
@@ -167,7 +190,7 @@ namespace DyingAndMore
                         var packmap = (MapInstance)Takai.Game.MapBaseInstance.FromPackage(fl.SelectedFile);
                         packmap.Class.InitializeGraphics();
                         ui.ReplaceAllChildren(new Editor.Editor(packmap));
-                        return Takai.UI.UIEventResult.Handled;
+                        return UIEventResult.Handled;
                     }
 
                     var map = Cache.Load(fl.SelectedFile);
@@ -183,10 +206,12 @@ namespace DyingAndMore
                         ui.ReplaceAllChildren(new Editor.Editor(mi));
                     }
                 }
-                return Takai.UI.UIEventResult.Handled;
+                return UIEventResult.Handled;
             });
 
-            //var ui = Cache.Load<Takai.UI.Static>("UI/SelectStory.ui.tk");
+            //var childUI = Cache.Load<Static>("UI/test/simple.ui.tk");
+
+            //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)
             //{
             //    ss.StorySelected += delegate (object _sender, Game.GameStory story)
@@ -200,60 +225,27 @@ namespace DyingAndMore
             //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
             //    };
             //}
-            //ui = Cache.Load<Takai.UI.Static>("UI/test/elements.ui.tk");
 
-            //var childUI = new Takai.UI.List
-            //{
-            //    Direction = Takai.UI.Direction.Vertical,
-            //    Position = new Vector2(10),
-            //    Padding = new Vector2(10),
-            //};
-            //childUI.AddChild(new Takai.UI.Static("item 1"));
-            //childUI.AddChild(new Takai.UI.Static("item 2"));
-            //childUI.AddChild(new Takai.UI.Static("item 3"));
-
-            ui = new Takai.UI.Static
+            ui = new Static
             {
-                HorizontalAlignment = Takai.UI.Alignment.Stretch,
-                VerticalAlignment = Takai.UI.Alignment.Stretch
+                HorizontalAlignment = Alignment.Stretch,
+                VerticalAlignment = Alignment.Stretch
             };
             ui.AddChild(childUI);
-            //Takai.UI.Static.DebugFont = Takai.UI.Static.DefaultFont;
+            //Static.DebugFont = Static.DefaultFont;
 
-            fpsGraph = new Takai.FpsGraph()
-            {
-                Position = new Vector2(0, 100),
-                Size = new Vector2(800, 100),
-                HorizontalAlignment = Takai.UI.Alignment.Middle
-            };
+            //fpsGraph = new Takai.FpsGraph()
+            //{
+            //    Position = new Vector2(0, 100),
+            //    Size = new Vector2(800, 100),
+            //    HorizontalAlignment = Alignment.Middle
+            //};
 
-            InputState.EnabledGestures =
-                GestureType.Tap
-                | GestureType.Flick
-                | GestureType.FreeDrag
-                | GestureType.Pinch;
-
-            Takai.UI.Static.GlobalCommands["AddUI"] = delegate (Takai.UI.Static ui, object arg)
-            {
-                if (!(arg is Takai.UI.Static child))
-                    return;
-
-                ui.AddChild(child);
-            };
-            Takai.UI.Static.GlobalCommands["CloseModal"] = delegate (Takai.UI.Static ui, object arg)
-            {
-                while (ui != null && !ui.IsModal)
-                    ui = ui.Parent;
-
-                if (ui != null)
-                    ui.RemoveFromParent();
-            };
-
-            devtoolsMenu = new UI.DevtoolsMenu
-            {
-                HorizontalAlignment = Takai.UI.Alignment.Middle,
-                VerticalAlignment = Takai.UI.Alignment.Middle
-            };
+            //devtoolsMenu = new UI.DevtoolsMenu
+            //{
+            //    HorizontalAlignment = Alignment.Middle,
+            //    VerticalAlignment = Alignment.Middle
+            //};
 
             ui.HasFocus = true;
             base.Initialize();
@@ -289,9 +281,9 @@ namespace DyingAndMore
             }
             //F9 used in UI code
             else if (InputState.IsPress(Keys.F10))
-                Takai.UI.Static.DebugFont = (Takai.UI.Static.DebugFont == null ? Takai.UI.Static.DefaultFont : null);
+                Static.DebugFont = (Static.DebugFont == null ? Static.DefaultFont : null);
             else if (InputState.IsPress(Keys.F11))
-                ui.Reflow();
+                ui.DebugInvalidateTree();
 
             ui.Update(gameTime);
             //ui.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
@@ -310,10 +302,10 @@ namespace DyingAndMore
                 if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
                 {
                     var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
-                    var sz = Takai.UI.Static.DefaultFont.MeasureString(text);
-                    Takai.UI.Static.DefaultFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
+                    var sz = Static.DefaultFont.MeasureString(text);
+                    Static.DefaultFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
                 }
-                y -= Takai.UI.Static.DefaultFont.MaxCharHeight;
+                y -= Static.DefaultFont.MaxCharHeight;
             }
 
             sbatch.End();

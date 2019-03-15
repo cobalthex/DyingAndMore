@@ -22,7 +22,7 @@ namespace DyingAndMore.Editor.Selectors
                     return;
 
                 _ItemsPerRow = value;
-                Reflow();
+                InvalidateMeasure();
             }
         }
         private int _ItemsPerRow = 8;
