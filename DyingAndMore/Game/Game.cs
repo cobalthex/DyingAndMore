@@ -350,7 +350,7 @@ namespace DyingAndMore.Game
                 Map = (MapInstance)Map.Class.Instantiate();
                 isDead = false;
                 OnParentChanged(this, new ParentChangedEventArgs(this, null));
-                InvalidateLayout();
+                InvalidateArrange();
                 return;
             }
 

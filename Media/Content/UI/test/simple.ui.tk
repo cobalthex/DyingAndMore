@@ -2,7 +2,7 @@ List {
 	BackgroundColor: [20 100 150];
 	BorderColor: [120 180 250];
 	Name: "a";
-	Size: [200 200];
+	#Size: [200 200];
 	HorizontalAlignment: Alignment.Center;
 	VerticalAlignment: Alignment.Center;
 

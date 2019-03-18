@@ -20,7 +20,7 @@ namespace Takai.UI
                 (HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch))
                 InvalidateMeasure();
             else
-                InvalidateLayout();
+                InvalidateArrange();
         }
     }
 
