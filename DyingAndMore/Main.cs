@@ -171,8 +171,9 @@ namespace DyingAndMore
             }
 #endif
             */
+            Static childUI;
 
-            var childUI = new FileList
+            childUI = new FileList
             {
                 //Size = new Vector2(400, 600),
                 HorizontalAlignment = Alignment.Middle,
@@ -209,7 +210,7 @@ namespace DyingAndMore
                 return UIEventResult.Handled;
             });
 
-            //var childUI = Cache.Load<Static>("UI/test/simple.ui.tk");
+            //childUI = Cache.Load<Static>("UI/test/simple.ui.tk");
 
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)

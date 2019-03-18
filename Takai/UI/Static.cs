@@ -328,7 +328,7 @@ namespace Takai.UI
                     if (_verticalAlignment == Alignment.Stretch)
                         InvalidateMeasure();
                     else
-                        InvalidateLayout();
+                        InvalidateArrange();
                 }
             }
         }
@@ -348,7 +348,7 @@ namespace Takai.UI
                     if (_verticalAlignment == Alignment.Stretch)
                         InvalidateMeasure();
                     else
-                        InvalidateLayout();
+                        InvalidateArrange();
                 }
             }
         }
@@ -370,7 +370,7 @@ namespace Takai.UI
                 if (_position != value)
                 {
                     _position = value;
-                    InvalidateLayout();
+                    InvalidateArrange();
                 }
             }
         }
@@ -548,7 +548,7 @@ namespace Takai.UI
                     return;
 
                 SetParentNoReflow(value);
-                InvalidateMeasure(); //todo: evaluate
+                Parent?.OnChildRemeasure(this); //todo: evaluate
             }
         }
         [Data.Serializer.Ignored]
@@ -576,7 +576,6 @@ namespace Takai.UI
 #if DEBUG
             DebugTreePath = $"/{(GetType().Name)}({DebugId})";
 #endif
-            containerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
         }
 
         /// <summary>
@@ -816,7 +815,7 @@ namespace Takai.UI
 
         #endregion
 
-        #region Hierarchy/cloning
+        #region Hierarchy/Cloning
 
         private void SetParentNoReflow(Static newParent)
         {
@@ -831,7 +830,6 @@ namespace Takai.UI
                     child.DebugTreePath = child.Parent.DebugTreePath + child.DebugTreePath;
             }
 #endif
-            containerBounds = Parent == null ? Runtime.GraphicsDevice.Viewport.Bounds : Parent.ContentArea;
 
             BubbleEvent(ParentChangedEvent, new ParentChangedEventArgs(this, oldParent));
         }
@@ -924,12 +922,12 @@ namespace Takai.UI
                 child.HasFocus = true;
 
             if (reflow)
-                InvalidateMeasure(); //if autosized, else only layout?
+                OnChildRemeasure(child);
 
             return true;
         }
 
-        public virtual bool InternalRemoveChildIndex(int index)
+        public virtual bool InternalRemoveChildIndex(int index, bool reflow = true)
         {
             if (index < 0 || index >= Children.Count)
                 return false;
@@ -939,6 +937,10 @@ namespace Takai.UI
             _children.RemoveAt(index);
             if (child.Parent == this)
                 child.SetParentNoReflow(null);
+
+            if (reflow)
+                OnChildRemeasure(this);
+
             return true;
         }
 
@@ -1393,9 +1395,10 @@ namespace Takai.UI
 
         #region Layout
 
-        public void InvalidateLayout()
+        public void InvalidateArrange()
         {
-            isArrangeValid = false;
+            if (Parent == null)
+                containerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
             Arrange(containerBounds);
         }
 
@@ -1403,8 +1406,7 @@ namespace Takai.UI
         {
             isMeasureValid = false;
             Measure(containerBounds.Size.ToVector2());
-            if (!isArrangeValid)
-                InvalidateLayout();
+            InvalidateArrange();
         }
 
         /// <summary>
@@ -1415,13 +1417,14 @@ namespace Takai.UI
             foreach (var element in EnumerateRecursive())
             {
                 element.isMeasureValid = false;
-                element.isArrangeValid = false;
             }
             InvalidateMeasure();
         }
 
-        bool isMeasureValid = false, isArrangeValid = false;
+        bool isMeasureValid = false;
         private Rectangle containerBounds; //todo: re-evaluate necessity
+        static int arrangeGeneration = 0;
+        int lastArrange = 0;
 
         /// <summary>
         /// Calculate the desired containing region of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
@@ -1502,6 +1505,8 @@ namespace Takai.UI
             if (IsAutoSized &&
                 (HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch))
                 InvalidateMeasure();
+            else
+                InvalidateArrange();
         }
 
         /// <summary>
@@ -1532,8 +1537,6 @@ namespace Takai.UI
         private static uint reflowCount = 0; //set breakpoint for speicifc reflow
 #endif
 
-        bool firstArrange = true;
-
         /// <summary>
         /// Reflow this container, relative to its parent
         /// </summary>
@@ -1543,14 +1546,11 @@ namespace Takai.UI
 #if DEBUG
             ++reflowCount;
 #endif
-
-            //todo: this should be further optimizable (reduce # of calls), however I am unsuccessful in doing so
+            //todo: this needs to be called less
 
             //System.Diagnostics.Debug.WriteLine($"Arranging ID:{DebugId} ({this}) [container:{container}]");
             AdjustToContainer(container);
             ArrangeOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
-
-            isArrangeValid = true;
         }
 
         /// <summary>

@@ -84,10 +84,10 @@
             return base.InternalInsertChild(child, index, reflow, ignoreFocus);
         }
 
-        public override bool InternalRemoveChildIndex(int index)
+        public override bool InternalRemoveChildIndex(int index, bool reflow = true)
         {
             TabBar.RemoveChildAt(index);
-            return base.InternalRemoveChildIndex(index + 1);
+            return base.InternalRemoveChildIndex(index + 1, reflow);
         }
     }
 }

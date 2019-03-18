@@ -379,9 +379,9 @@ namespace Takai.UI
             return contentContainer.InternalInsertChild(child, index, reflow, ignoreFocus);
         }
 
-        public override bool InternalRemoveChildIndex(int index)
+        public override bool InternalRemoveChildIndex(int index, bool reflow = true)
         {
-            return contentContainer.InternalRemoveChildIndex(index);
+            return contentContainer.InternalRemoveChildIndex(index, reflow);
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
