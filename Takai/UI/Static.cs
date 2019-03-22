@@ -576,6 +576,7 @@ namespace Takai.UI
 #if DEBUG
             DebugTreePath = $"/{(GetType().Name)}({DebugId})";
 #endif
+            containerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
         }
 
         /// <summary>
@@ -1395,18 +1396,22 @@ namespace Takai.UI
 
         #region Layout
 
+        static List<Static> measureQueue = new List<Static>();
+        static List<Static> arrangeQueue = new List<Static>();
+
         public void InvalidateArrange()
         {
-            if (Parent == null)
-                containerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
-            Arrange(containerBounds);
+            if (isArrangeValid)
+            {
+                isArrangeValid = false;
+                arrangeQueue.Add(this);
+            }
         }
 
         public void InvalidateMeasure()
         {
             isMeasureValid = false;
-            Measure(containerBounds.Size.ToVector2());
-            InvalidateArrange();
+            measureQueue.Add(this);
         }
 
         /// <summary>
@@ -1421,10 +1426,8 @@ namespace Takai.UI
             InvalidateMeasure();
         }
 
-        bool isMeasureValid = false;
+        bool isMeasureValid = false, isArrangeValid = true;
         private Rectangle containerBounds; //todo: re-evaluate necessity
-        static int arrangeGeneration = 0;
-        int lastArrange = 0;
 
         /// <summary>
         /// Calculate the desired containing region of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
@@ -1482,7 +1485,10 @@ namespace Takai.UI
 
             isMeasureValid = true;
             if (MeasuredSize != lastMeasuredSize)
+            {
+                InvalidateArrange();
                 NotifyParentMeasuredSizeChanged();
+            }
 
             return MeasuredSize;
         }
@@ -1543,6 +1549,7 @@ namespace Takai.UI
         /// <param name="container">Container in relative coordinates</param>
         public void Arrange(Rectangle container)
         {
+            isArrangeValid = true;
 #if DEBUG
             ++reflowCount;
 #endif
@@ -1637,6 +1644,19 @@ namespace Takai.UI
         /// <param name="time">Game time</param>
         public virtual void Update(GameTime time)
         {
+            //update layout
+            {
+                for (int i = 0; i < measureQueue.Count; ++i)
+                    measureQueue[i].Measure(new Vector2(InfiniteSize));
+                measureQueue.Clear();
+                for (int i = 0; i < arrangeQueue.Count; ++i)
+                {
+                    if (!arrangeQueue[i].isArrangeValid)
+                        arrangeQueue[i].Arrange(arrangeQueue[i].containerBounds);
+                }
+                arrangeQueue.Clear();
+            }
+
             if (!IsEnabled)
                 return;
 
@@ -1819,11 +1839,11 @@ namespace Takai.UI
                 };
                 BubbleEvent(PressEvent, pea);
 
+                didPress = true;
                 if (CanFocus)
-                {
+                { 
                     HasFocus = true;
-                    didPress = true;
-                    return false;
+                    return false; //todo: always return false?
                 }
             }
 
