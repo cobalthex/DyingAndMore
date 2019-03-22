@@ -148,5 +148,16 @@ namespace Takai.UI
         {
             dropdownContainer.RemoveFromParent();
         }
+
+        protected override bool HandleInput(GameTime time)
+        {
+            if (dropdownContainer.Parent != null && Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Escape))
+            {
+                CloseDropDown();
+                return false;
+            }
+
+            return base.HandleInput(time);
+        }
     }
 }
