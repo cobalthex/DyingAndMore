@@ -171,7 +171,7 @@ namespace Takai.UI
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             var inputSz = textInput.Measure(availableSize);
-            return inputSz + new Vector2(inputSz.Y * (Children.Count - 1), 0);
+            return inputSz;// + new Vector2(inputSz.Y * (Children.Count - 1), 0);
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)

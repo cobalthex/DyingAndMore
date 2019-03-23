@@ -9,22 +9,7 @@ namespace Takai.UI
         Vertical
     }
 
-    public abstract class LayoutBase : Static
-    {
-        public LayoutBase() { }
-        public LayoutBase(params Static[] children) : base(children) { }
-
-        protected override void OnChildRemeasure(Static child)
-        {
-            if (IsAutoSized &&
-                (HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch))
-                InvalidateMeasure();
-            else
-                InvalidateArrange();
-        }
-    }
-
-    public class List : LayoutBase
+    public class List : Static
     {
         /// <summary>
         /// Spacing between items

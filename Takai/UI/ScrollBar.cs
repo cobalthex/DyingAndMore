@@ -257,7 +257,7 @@ namespace Takai.UI
     }
 
     //todo: convert scroll bars to use enabled/disabled
-    public class ScrollBox : Table
+    public class ScrollBox : Static
     {
         /// <summary>
         /// An optional style to apply to the scrollbars (write-only)
@@ -317,8 +317,8 @@ namespace Takai.UI
             set
             {
                 //InternalSetScrollPosition and reflow after?
-                horizontalScrollbar.ContentPosition = value.X;
                 verticalScrollbar.ContentPosition = value.Y;
+                horizontalScrollbar.ContentPosition = value.X;
             }
         }
 
@@ -331,10 +331,9 @@ namespace Takai.UI
         {
             ScrollBarTemplate = new ScrollBar();
 
-            ColumnCount = 2;
-            base.InternalInsertChild(contentContainer);
-            base.InternalInsertChild(verticalScrollbar);
-            base.InternalInsertChild(horizontalScrollbar);
+            base.InternalInsertChild(contentContainer, 0, false);
+            base.InternalInsertChild(verticalScrollbar, 1, false);
+            base.InternalInsertChild(horizontalScrollbar, 2, true);
 
             On(ScrollBar.HScrollEvent, delegate (Static sender, UIEventArgs e)
             {
@@ -384,15 +383,28 @@ namespace Takai.UI
             return contentContainer.InternalRemoveChildIndex(index, reflow);
         }
 
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
+        {
+            var availSize = new Vector2(InfiniteSize);
+            foreach (var child in Children)
+                child.Measure(availSize);
+            return contentContainer.MeasuredSize;
+        }
+
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            horizontalScrollbar.ContentSize = contentContainer.MeasuredSize.X;
             verticalScrollbar.ContentSize = contentContainer.MeasuredSize.Y;
+            horizontalScrollbar.ContentSize = contentContainer.MeasuredSize.X;
 
-            horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && contentContainer.MeasuredSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X;
             verticalScrollbar.IsEnabled = EnableVerticalScrolling && contentContainer.MeasuredSize.Y > availableSize.Y - horizontalScrollbar.MeasuredSize.Y;
+            horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && contentContainer.MeasuredSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X;
 
-            base.ArrangeOverride(availableSize);
+            var hs = horizontalScrollbar.IsEnabled ? horizontalScrollbar.MeasuredSize : Vector2.Zero;
+            var vs = verticalScrollbar.IsEnabled ? verticalScrollbar.MeasuredSize : Vector2.Zero;
+
+            contentContainer.Arrange(new Rectangle(0, 0, (int)(availableSize.X - vs.X), (int)(availableSize.Y - hs.Y)));
+            verticalScrollbar.Arrange(new Rectangle((int)(availableSize.X - vs.X), 0, (int)vs.X, (int)availableSize.Y));
+            horizontalScrollbar.Arrange(new Rectangle(0, (int)(availableSize.Y - hs.Y), (int)availableSize.X, (int)hs.Y));
         }
 
         protected override bool HandleInput(GameTime time)

@@ -27,6 +27,8 @@ namespace Takai.UI
             }
         }
 
+        public float DropdownMaxHeight { get; set; } = 300;
+
         public Static ItemTemplate { get => list.ItemTemplate; set => list.ItemTemplate = value; }
 
         public System.Collections.Generic.ICollection<T> Items => list.Items;
@@ -131,7 +133,10 @@ namespace Takai.UI
 
         public virtual void OpenDropdown()
         {
-            dropdown.Size = new Vector2(MeasuredSize.X, System.Math.Max(list.Size.Y, 200));
+            if (Items.Count < 1)
+                return;
+
+            dropdown.Size = new Vector2(MeasuredSize.X, System.Math.Min(list.MeasuredSize.Y, DropdownMaxHeight));
 
             var root = GetRoot();
 

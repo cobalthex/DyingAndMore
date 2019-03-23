@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
-    public class Table : LayoutBase
+    public class Table : Static
     {
         /// <summary>
         /// Spacing between items
@@ -62,10 +62,10 @@ namespace Takai.UI
 
             for (int i = 0; i < Children.Count; ++i)
             {
-                if (!Children[i].IsEnabled) //disabled children still occupy cells
+                if (!Children[i].IsEnabled)
                     continue;
 
-                var csize = Children[i].Measure(new Vector2(InfiniteSize)); //needed up here for children to correctly size
+                var csize = Children[i].Measure(new Vector2(InfiniteSize));
                 if (Children[i].HorizontalAlignment == Alignment.Stretch)
                     hStretches.Add(i % ColumnCount);
                 if (Children[i].VerticalAlignment == Alignment.Stretch)

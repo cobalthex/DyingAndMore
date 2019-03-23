@@ -78,9 +78,8 @@ namespace Takai.UI
         }
         private Static _container = new List
         {
-            Name = "ilcontainer"
-            //HorizontalAlignment = Alignment.Stretch,
-            //VerticalAlignment = Alignment.Stretch
+            HorizontalAlignment = Alignment.Stretch,
+            VerticalAlignment = Alignment.Stretch
         };
 
         public bool AllowSelection { get; set; } = true;

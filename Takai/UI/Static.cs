@@ -1503,13 +1503,13 @@ namespace Takai.UI
 
         /// <summary>
         /// Called whenever a child of this element resizes.
-        /// By default if this element is autosized, it will call Reflow
+        /// By default, will remeasure if the child is auto-sized
         /// </summary>
         /// <param name="child">The child that was remeasured</param>
         protected virtual void OnChildRemeasure(Static child)
         {
-            if (IsAutoSized &&
-                (HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch))
+            if (IsAutoSized)
+                //(HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch)) <- breaks things like scrollboxes.. may be solution
                 InvalidateMeasure();
             else
                 InvalidateArrange();
