@@ -10,6 +10,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Data
 {
+    /// <summary>
+    /// Allow this object to be serialized in debug mode, regardless of write settings
+    /// </summary>
     [AttributeUsage(AttributeTargets.All)]
     [System.Runtime.InteropServices.ComVisible(true)]
     public class DebugSerializeAttribute : Attribute { }
@@ -58,8 +61,11 @@ namespace Takai.Data
             var dir = Path.GetDirectoryName(file);
             if (!string.IsNullOrEmpty(dir))
                 Directory.CreateDirectory(dir);
-            using (var writer = new StreamWriter(new FileStream(file, FileMode.Truncate)))
+            using (var writer = new StreamWriter(new FileStream(file, FileMode.Create)))
+            {
+                writer.BaseStream.SetLength(0); // truncate
                 TextSerialize(writer, serializing);
+            }
         }
 
         /// <summary>

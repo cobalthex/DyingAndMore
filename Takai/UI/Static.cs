@@ -1396,9 +1396,6 @@ namespace Takai.UI
 
         #region Layout
 
-        static List<Static> measureQueue = new List<Static>();
-        static List<Static> arrangeQueue = new List<Static>();
-
         public void InvalidateArrange()
         {
             if (isArrangeValid)
@@ -1634,6 +1631,25 @@ namespace Takai.UI
             }
         }
 
+        static List<Static> measureQueue = new List<Static>();
+        static List<Static> arrangeQueue = new List<Static>();
+
+        /// <summary>
+        /// Complete any pending reflows/arranges
+        /// </summary>
+        public static void Reflow()
+        {
+            for (int i = 0; i < measureQueue.Count; ++i)
+                measureQueue[i].Measure(new Vector2(InfiniteSize));
+            measureQueue.Clear();
+            for (int i = 0; i < arrangeQueue.Count; ++i)
+            {
+                if (!arrangeQueue[i].isArrangeValid)
+                    arrangeQueue[i].Arrange(arrangeQueue[i].containerBounds);
+            }
+            arrangeQueue.Clear();
+        }
+
         #endregion
 
         #region Updating/Drawing
@@ -1644,18 +1660,7 @@ namespace Takai.UI
         /// <param name="time">Game time</param>
         public virtual void Update(GameTime time)
         {
-            //update layout
-            {
-                for (int i = 0; i < measureQueue.Count; ++i)
-                    measureQueue[i].Measure(new Vector2(InfiniteSize));
-                measureQueue.Clear();
-                for (int i = 0; i < arrangeQueue.Count; ++i)
-                {
-                    if (!arrangeQueue[i].isArrangeValid)
-                        arrangeQueue[i].Arrange(arrangeQueue[i].containerBounds);
-                }
-                arrangeQueue.Clear();
-            }
+            Reflow();
 
             if (!IsEnabled)
                 return;
