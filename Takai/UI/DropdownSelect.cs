@@ -6,7 +6,7 @@ namespace Takai.UI
     {
         protected Static dropdownContainer;
         protected ScrollBox dropdown;
-        protected ItemList<T> list;
+        public ItemList<T> list;
         protected Static preview;
 
         public T SelectedItem
@@ -129,6 +129,13 @@ namespace Takai.UI
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             return new Vector2(200, 20);
+        }
+
+        protected override void ArrangeOverride(Vector2 availableSize)
+        {
+            if (dropdownContainer.Parent != null)
+                OpenDropdown();
+            base.ArrangeOverride(availableSize);
         }
 
         public virtual void OpenDropdown()

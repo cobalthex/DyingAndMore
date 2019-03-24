@@ -39,6 +39,7 @@ List {
 					    Static { Text: "Squad"; };
 			    		SquadSelect {
 			    			ItemTemplate: List {
+			    				HorizontalAlignment: Alignment.Stretch;
 			    				Children: [
 			    					Static {
 			    						Bindings: [
@@ -52,6 +53,7 @@ List {
 			    						Direction: Direction.Horizontal;
 			    						Margin: 10;
 				    					Children: [
+				    						Static {Text: "Leader: "; };
 					    					Static {
 					    						Bindings: [
 												    Binding {
@@ -60,6 +62,7 @@ List {
 												    };
 												];
 					    					};
+				    						Static {Text: "- Units: "; };
 					    					Static {
 					    						Bindings: [
 												    Binding {

@@ -82,6 +82,7 @@ namespace Takai.UI
 
         public ScrollBar()
         {
+            BorderColor = ThumbColor;
             On(PressEvent, OnPress);
         }
 

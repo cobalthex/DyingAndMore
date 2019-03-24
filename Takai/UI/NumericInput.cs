@@ -178,16 +178,10 @@ namespace Takai.UI
         {
             var buttonSize = textInput.MeasuredSize.Y;
             var shift = (int)(availableSize.X - buttonSize * (Children.Count - 1));
-            int n = 0;
-            foreach (var child in Children)
-            {
-                if (child == textInput)
-                    child.Arrange(new Rectangle(0, 0, shift, (int)availableSize.Y));
-                else
-                    child.Arrange(new Rectangle(shift + (int)(n++ * buttonSize), 0, (int)buttonSize, (int)availableSize.Y));
-            }
-
-            //todo: this is ugly
+            //todo: hacky
+            Children[0].Arrange(new Rectangle(0, 0, shift, (int)availableSize.Y));
+            Children[1].Arrange(new Rectangle(shift, 0, (int)buttonSize, (int)availableSize.Y));
+            Children[2].Arrange(new Rectangle(shift + (int)buttonSize, 0, (int)buttonSize, (int)availableSize.Y));
         }
 
         protected override bool HandleInput(GameTime time)

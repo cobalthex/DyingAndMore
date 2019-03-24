@@ -172,6 +172,8 @@ namespace Takai.UI
 
         protected override void FinalizeClone()
         {
+            Items = new ObservableCollection<T>(Items);
+            Items.CollectionChanged += Items_CollectionChanged;
             _container = Children[Container.ChildIndex];
             base.FinalizeClone();
         }
@@ -208,6 +210,7 @@ namespace Takai.UI
                 for (int i = 0; i < e.NewItems.Count; ++i)
                     Container.InsertChild(CreateItemEntry((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
+            InvalidateMeasure();
         }
 
         /// <summary>
