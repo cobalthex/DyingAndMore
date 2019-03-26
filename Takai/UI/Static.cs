@@ -1522,18 +1522,36 @@ namespace Takai.UI
         /// <returns>The preferred size of this element</returns>
         protected virtual Vector2 MeasureOverride(Vector2 availableSize)
         {
-            var bounds = new Rectangle(0, 0, (int)textSize.X, (int)textSize.Y);
+            var bounds = Rectangle.Union(
+                new Rectangle(0, 0, (int)textSize.X, (int)textSize.Y),
+                DefaultMeasureSomeChildren(availableSize, 0, Children.Count)
+            );
+            return new Vector2(bounds.Width, bounds.Height);
+        }
 
-            foreach (var child in Children)
+        /// <summary>
+        /// Get the clip bounds for a selection of (enabled) child elements
+        /// </summary>
+        /// <param name="startIndex">The first child to measure</param>
+        /// <param name="count">The number of children to measure (including disabled)</param>
+        /// <returns>The measured area</returns>
+        protected Rectangle DefaultMeasureSomeChildren(Vector2 availableSize, int startIndex, int count)
+        {
+            var bounds = new Rectangle();
+            for (int i = startIndex; i < System.Math.Min(Children.Count, startIndex + count); ++i)
             {
-                if (!child.IsEnabled)
+                if (!Children[i].IsEnabled)
                     continue;
 
-                var mes = child.Measure(availableSize).ToPoint();
-                bounds = Rectangle.Union(bounds, new Rectangle((int)child.Position.X, (int)child.Position.Y, mes.X, mes.Y));
+                var mes = Children[i].Measure(availableSize).ToPoint();
+                bounds = Rectangle.Union(bounds, new Rectangle(
+                    (int)Children[i].Position.X,
+                    (int)Children[i].Position.Y,
+                    mes.X,
+                    mes.Y
+                ));
             }
-
-            return new Vector2(bounds.Width, bounds.Height);
+            return bounds;
         }
 
 #if DEBUG
@@ -1846,7 +1864,7 @@ namespace Takai.UI
 
                 didPress = true;
                 if (CanFocus)
-                { 
+                {
                     HasFocus = true;
                     return false; //todo: always return false?
                 }

@@ -108,7 +108,7 @@ namespace Takai.UI
         {
             dropdownContainer = dropdownContainer.CloneHierarchy();
             dropdown = (ScrollBox)dropdownContainer.Children[0];
-            list = (ItemList<T>)dropdown.EnumerableChildren[0];
+            list = (ItemList<T>)System.Linq.Enumerable.First(dropdown.EnumerableChildren);
 
             var previewChildIndex = preview?.ChildIndex ?? -1;
             if (previewChildIndex >= 0)
