@@ -301,15 +301,11 @@ namespace Takai.UI
 
         protected ScrollBar verticalScrollbar;
         protected ScrollBar horizontalScrollbar;
-
-        public IEnumerable<Static> EnumerableChildren
+        protected Static contentContainer = new Static
         {
-            get
-            {
-                for (int i = 2; i < Children.Count; ++i)
-                    yield return Children[i];
-            }
-        }
+            HorizontalAlignment = Alignment.Stretch,
+            VerticalAlignment = Alignment.Stretch
+        };
 
         /// <summary>
         /// The curently scrolled position of this scrollbox.
@@ -327,26 +323,32 @@ namespace Takai.UI
             }
         }
 
+        /// <summary>
+        /// Padding between the content and scrollbars (X between content and vertical scrollbar, Y between content and horizontal scrollbar)
+        /// </summary>
+        public Vector2 InnerPadding { get; set; }
+
         public override bool CanFocus => true;
+
+        //todo: unify this design (logical/visible children?)
+        public IList<Static> EnumerableChildren => contentContainer.Children;
 
         public ScrollBox()
         {
             ScrollBarTemplate = new ScrollBar();
 
-            base.InternalInsertChild(verticalScrollbar, 0, false);
-            base.InternalInsertChild(horizontalScrollbar, 1, true);
+            base.InternalInsertChild(contentContainer, 0, false);
+            base.InternalInsertChild(verticalScrollbar, 1, false);
+            base.InternalInsertChild(horizontalScrollbar, 2, true);
 
             On(ScrollBar.HScrollEvent, delegate (Static sender, UIEventArgs e)
             {
                 var self = (ScrollBox)sender;
                 var se = (ScrollEventArgs)e;
-                var lastPos = ScrollPosition;
-                var newPos = lastPos - new Vector2(se.Delta, 0);
-                if (lastPos != newPos)
-                {
-                    ScrollPosition = newPos;
+                var lastPos = self.contentContainer.Position;
+                self.contentContainer.Position -= new Vector2(se.Delta, 0);
+                if (lastPos != self.contentContainer.Position)
                     return UIEventResult.Handled;
-                }
                 return UIEventResult.Continue;
             });
 
@@ -354,13 +356,10 @@ namespace Takai.UI
             {
                 var self = (ScrollBox)sender;
                 var se = (ScrollEventArgs)e;
-                var lastPos = ScrollPosition;
-                var newPos = lastPos - new Vector2(se.Delta, 0);
-                if (lastPos != newPos)
-                {
-                    ScrollPosition = newPos;
+                var lastPos = self.contentContainer.Position;
+                self.contentContainer.Position -= new Vector2(0, se.Delta);
+                if (lastPos != self.contentContainer.Position)
                     return UIEventResult.Handled;
-                }
                 return UIEventResult.Continue;
             });
         }
@@ -375,57 +374,43 @@ namespace Takai.UI
 
         protected override void FinalizeClone()
         {
-            verticalScrollbar = (ScrollBar)Children[0];
-            horizontalScrollbar = (ScrollBar)Children[1];
+            contentContainer = Children[0];
+            verticalScrollbar = (ScrollBar)Children[1];
+            horizontalScrollbar = (ScrollBar)Children[2];
         }
 
         public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
-            return base.InternalInsertChild(child, index >= 0 ? index + 2 : -1, reflow, ignoreFocus);
+            return contentContainer.InternalInsertChild(child, index, reflow, ignoreFocus);
         }
 
         public override bool InternalRemoveChildIndex(int index, bool reflow = true)
         {
-            return base.InternalRemoveChildIndex(index + 2, reflow);
+            return contentContainer.InternalRemoveChildIndex(index, reflow);
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            verticalScrollbar.Measure(new Vector2(InfiniteSize));
-            horizontalScrollbar.Measure(new Vector2(InfiniteSize));
-
-            var bounds = Rectangle.Union(
-                new Rectangle(0, 0, (int)textSize.X, (int)textSize.Y),
-                DefaultMeasureSomeChildren(availableSize, 2, Children.Count)
-            );
-            return new Vector2(bounds.Width, bounds.Height);
+            var availSize = new Vector2(InfiniteSize);
+            foreach (var child in Children)
+                child.Measure(availSize);
+            return contentContainer.MeasuredSize;
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            verticalScrollbar.ContentSize = MeasuredSize.Y;
-            horizontalScrollbar.ContentSize = MeasuredSize.X;
+            verticalScrollbar.ContentSize = contentContainer.MeasuredSize.Y;
+            horizontalScrollbar.ContentSize = contentContainer.MeasuredSize.X;
 
-            verticalScrollbar.IsEnabled = EnableVerticalScrolling && MeasuredSize.Y > availableSize.Y - horizontalScrollbar.MeasuredSize.Y;
-            horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && MeasuredSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X;
+            verticalScrollbar.IsEnabled = EnableVerticalScrolling && contentContainer.MeasuredSize.Y > availableSize.Y - horizontalScrollbar.MeasuredSize.Y - InnerPadding.Y;
+            horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && contentContainer.MeasuredSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X - InnerPadding.X;
 
-            var hs = horizontalScrollbar.IsEnabled ? horizontalScrollbar.MeasuredSize : Vector2.Zero;
-            var vs = verticalScrollbar.IsEnabled ? verticalScrollbar.MeasuredSize : Vector2.Zero;
+            var hs = horizontalScrollbar.IsEnabled ? horizontalScrollbar.MeasuredSize + new Vector2(0, InnerPadding.Y) : Vector2.Zero;
+            var vs = verticalScrollbar.IsEnabled ? verticalScrollbar.MeasuredSize + new Vector2(InnerPadding.X, 0) : Vector2.Zero;
 
-            verticalScrollbar.Arrange(new Rectangle((int)(availableSize.X - vs.X), 0, (int)vs.X, (int)(availableSize.Y - hs.Y)));
-            horizontalScrollbar.Arrange(new Rectangle(0, (int)(availableSize.Y - hs.Y), (int)(availableSize.X - vs.X), (int)hs.Y));
-
-            var container = new Rectangle(
-                (int)horizontalScrollbar.ContentPosition,
-                (int)verticalScrollbar.ContentPosition,
-                (int)(availableSize.X - vs.X),
-                (int)(availableSize.Y - hs.Y)
-            );
-            for (int i = 2; i < Children.Count; ++i)
-            {
-                if (Children[i].IsEnabled)
-                    Children[i].Arrange(container);
-            }
+            contentContainer.Arrange(new Rectangle(0, 0, (int)(availableSize.X - vs.X), (int)(availableSize.Y - hs.Y)));
+            verticalScrollbar.Arrange(new Rectangle((int)(availableSize.X - vs.X + InnerPadding.X), 0, (int)vs.X, (int)(availableSize.Y - hs.Y)));
+            horizontalScrollbar.Arrange(new Rectangle(0, (int)(availableSize.Y - hs.Y + InnerPadding.Y), (int)(availableSize.X - vs.X), (int)hs.Y));
         }
 
         protected override bool HandleInput(GameTime time)
