@@ -18,7 +18,19 @@ namespace DyingAndMore.Game.Weapons
         /// The squad to pick actors from
         /// </summary>
         [Takai.Data.Serializer.AsReference]
-        public Squad Squad { get; set; }
+        public Squad Squad
+        {
+            get => _squad;
+            set
+            {
+                if (_squad == value)
+                    return;
+
+                _squad = value;
+                SpawnQueue.Clear();
+            }
+        }
+        private Squad _squad;
 
         public new SpawnerClass Class
         {

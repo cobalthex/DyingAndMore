@@ -192,10 +192,8 @@ namespace DyingAndMore.Game.Entities
             CurrentHealth = Class.MaxHealth;
             Factions = Class.DefaultFactions;
 
-            if (Class.DefaultWeapon != null)
-                Weapon = Util.Random(Class.DefaultWeapon).Instantiate();
-            if (Class.DefaultController != null)
-                Controller = Util.Random(Class.DefaultController).Clone();
+            Weapon = Util.Random(Class.DefaultWeapon)?.Instantiate();
+            Controller = Util.Random(Class.DefaultController)?.Clone();
         }
 
         public override EntityInstance Clone()

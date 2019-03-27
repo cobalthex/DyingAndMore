@@ -38,6 +38,13 @@ List {
 			    	Children: [
 					    Static { Text: "Squad"; };
 			    		SquadSelect {
+			    			Bindings: [
+			    				Binding {
+			    					Source: "Weapon.Squad";
+			    					Target: "SelectedItem";
+			    					Direction: BindingDirection.TwoWay;
+			    				}
+			    			];
 			    			ItemTemplate: List {
 			    				HorizontalAlignment: Alignment.Stretch;
 			    				Children: [
@@ -59,6 +66,7 @@ List {
 												    Binding {
 												        Source: "Leader.Name";
 												        Target: "Text";
+												        DefaultValue: "(None)";
 												    };
 												];
 					    					};

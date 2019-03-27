@@ -374,7 +374,7 @@ namespace Takai.Data
                 sourceAccessors.cachedValue = srcVal;
                 sourceAccessors.cachedHash = srcHash;
                 targetAccessors.cachedValue = bindVal;
-                targetAccessors.cachedHash = bindVal.GetHashCode();
+                targetAccessors.cachedHash = bindVal == null ? 0 : bindVal.GetHashCode();
                 //System.Diagnostics.Debug.WriteLine($"Updated binding for source:{Source} ({sourceAccessors.cachedValue}) to target:{Target} ({srcVal})");
                 return true;
             }
@@ -394,7 +394,7 @@ namespace Takai.Data
                     targetAccessors.cachedValue = tgtVal;
                     targetAccessors.cachedHash = tgtHash;
                     sourceAccessors.cachedValue = bindVal;
-                    sourceAccessors.cachedHash = bindVal.GetHashCode();
+                    sourceAccessors.cachedHash = bindVal == null ? 0 : bindVal.GetHashCode();
                     //System.Diagnostics.Debug.WriteLine($"Updated binding for target:{Target} ({targetAccessors.cachedValue}) to source:{Source} ({tgtVal})");
                     return true;
                 }
