@@ -12,6 +12,7 @@ List {
 	    };
 
 		Switch {
+			ChildBindScope: "Weapon";
 			Bindings: [
 			    Binding {
 			        Source: "Weapon:typename";
@@ -26,7 +27,7 @@ List {
 					    	Minimum: 0;
 							Bindings: [
 							    Binding {
-							        Source: "Weapon.CurrentAmmo";
+							        Source: "CurrentAmmo";
 							        Target: "Value";
 	                				Direction: BindingDirection.TwoWay;
 							    }
@@ -38,9 +39,10 @@ List {
 			    	Children: [
 					    Static { Text: "Squad"; };
 			    		SquadSelect {
+			    			Name: "SquadSel";
 			    			Bindings: [
 			    				Binding {
-			    					Source: "Weapon.Squad";
+			    					Source: "Squad";
 			    					Target: "SelectedItem";
 			    					Direction: BindingDirection.TwoWay;
 			    				}

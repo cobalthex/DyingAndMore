@@ -37,6 +37,7 @@ namespace DyingAndMore.Game.Entities
                 Actor.PlayAnimation("Inactive"); //todo: call once?
                 return;
             }
+            Actor.PlayAnimation("Active"); //todo: call once?
 
             if (trackedActor != null)
             {

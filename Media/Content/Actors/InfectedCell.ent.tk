@@ -8,8 +8,6 @@ ActorClass {
     MoveForce: [300 500];
     IsPhysical: true;
     IgnoreTrace: false;
-    AlwaysDrawUpright: true;
-    DestroyOnDeath: true;
 
     DefaultController: [AIController {
         Behaviors: [
@@ -38,6 +36,7 @@ ActorClass {
                 IsLooping: True;
                 Tween: TweenStyle [Overlap];
             };
+            AlwaysDrawUpright: true;
             Sound: { };
             Material: 'Infection';
         };
@@ -53,6 +52,7 @@ ActorClass {
                 IsLooping: false;
                 Tween: TweenStyle [Overlap];
             };
+            AlwaysDrawUpright: true;
             Sound: { };
             Material: 'Infection';
         };

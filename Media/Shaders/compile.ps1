@@ -13,7 +13,7 @@ $currentPath = (Get-Location | Get-Item)
 #todo: test if newer (maybe -Force?)
 if ($FNA)
 {
-    Write-Verbose "Compiling for FNA"
+    Write-Verbose "Compiling for FNA ($Configuration)"
 
     $outDir = New-Item -Force -ItemType directory -Path 'FNA'
     $Files | Get-Item | % {
@@ -41,7 +41,7 @@ $mgfxExe = 'C:\Program Files (x86)\MSBuild\MonoGame\v3.0\Tools\2MGFX.exe'
 
 if ($DX11)
 {
-    Write-Verbose "Compiling for DirectX 11"
+    Write-Verbose "Compiling for DirectX 11 ($Configuration)"
     
     $outDir = New-Item -Force -ItemType directory -Path 'DX11'
     $Files | Get-Item | % {
@@ -66,7 +66,7 @@ if ($DX11)
 
 if ($OGL)
 {
-    Write-Verbose "Compiling for OpenGL"
+    Write-Verbose "Compiling for OpenGL ($Configuration)"
     
     $outDir = New-Item -Force -ItemType directory -Path 'OGL'
     $Files | Get-Item | % {

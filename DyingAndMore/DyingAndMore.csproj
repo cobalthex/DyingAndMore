@@ -179,7 +179,7 @@
     </PowershellArgs>
   </ItemGroup>
   <Target Name="CompileShaders" Label="Compile shaders" AfterTargets="Build" Inputs="@(Shaders)" Outputs="@(Shaders -> '$(MediaDir)Shaders\$(ShaderProfile)\%(RecursiveDir)%(Filename).mgfx')">
-    <Exec Command="&#xD;&#xA;powershell.exe @(PowershellArgs, ' ') -File &quot;$(MediaDir)Shaders\compile.ps1&quot; -Files %(Shaders.Identity) -$(ShaderProfile) -Configuration $(Configuration)" WorkingDirectory="$(MediaDir)Shaders\" />
+    <Exec Command="&#xD;&#xA;powershell.exe @(PowershellArgs, ' ') -File &quot;$(MediaDir)Shaders\compile.ps1&quot; -Verbose -Files %(Shaders.Identity) -$(ShaderProfile) -Configuration $(Configuration)" WorkingDirectory="$(MediaDir)Shaders\" />
   </Target>
   <Target Name="SymlinkMediaFiles" Label="Symlink media files" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
     <Exec Command="&#xD;&#xA;            powershell.exe @(PowershellArgs, ' ') -Command &quot; Copy-Item -Force -Container -Recurse -Path '$(MediaDir)Shaders\$(ShaderProfile)\*' -Destination (New-Item -Force -ItemType directory -Path '$(MediaDir)Content\Shaders'); ('Config','Content','Maps','Saves') | %% { New-Item -ErrorAction SilentlyContinue -ItemType Junction -Value (Join-Path '$(SolutionDir)Media' $_) -Path (Join-Path '$(TargetDir)' $_) }&quot;&#xD;&#xA;          " />

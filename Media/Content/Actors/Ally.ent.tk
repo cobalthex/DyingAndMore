@@ -46,5 +46,4 @@ ActorClass {
     MoveForce: 600;
     IsPhysical: True;
     IgnoreTrace: False;
-    AlwaysDrawUpright: False;
 }

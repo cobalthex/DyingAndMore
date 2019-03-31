@@ -29,6 +29,11 @@ namespace Takai.Game
         //todo: sprite loop frame?
         public Graphics.Sprite Sprite { get; set; }
 
+        /// <summary>
+        /// Should the sprite always be drawn with the original sprite orientation?
+        /// </summary>
+        public bool AlwaysDrawUpright { get; set; } = false;
+
         public Light Light { get; set; }
 
         /// <summary>
@@ -229,7 +234,10 @@ namespace Takai.Game
             Radius = Math.Max(Radius, animation.Radius);
             if (animation.Sprite != null)
             {
-                lastVisibleSize = Util.Max(lastVisibleSize, animation.Sprite.Size);
+                if (animation.AlwaysDrawUpright)
+                    lastSizeFixed = Util.Max(lastSizeFixed, animation.Sprite.Size);
+                else
+                    lastSizeRotating = Util.Max(lastSizeRotating, animation.Sprite.Size);
                 UpdateAxisAlignedBounds();
             }
 
@@ -264,12 +272,16 @@ namespace Takai.Game
             }
             else if (animation.Type == AnimationType.Overlay)
             {
-                var index = overlayAnimations.FindIndex((a) => a.Class == animation);
+                //todo: remove animation callbacks and make serializable
 
-                if (invokeCallback && overlayAnimations[index].CompletionCallback != null)
-                    overlayAnimations[index].CompletionCallback();
-                overlayAnimations[index].Dispose();
-                overlayAnimations.RemoveAt(index);
+                var index = overlayAnimations.FindIndex((a) => a.Class == animation);
+                if (index >= 0)
+                {
+                    if (invokeCallback && overlayAnimations[index].CompletionCallback != null)
+                        overlayAnimations[index].CompletionCallback();
+                    overlayAnimations[index].Dispose();
+                    overlayAnimations.RemoveAt(index);
+                }
             }
             else
                 return false;
@@ -284,7 +296,7 @@ namespace Takai.Game
         public virtual void UpdateAnimations(TimeSpan deltaTime)
         {
             Radius = 0;
-            lastVisibleSize = Point.Zero;
+            lastSizeRotating = lastSizeFixed = Point.Zero;
             if (baseAnimation.Class != null)
             {
                 Radius = baseAnimation.Class.Radius;
@@ -298,7 +310,12 @@ namespace Takai.Game
                 }
 
                 if (baseAnimation.Class.Sprite != null)
-                    lastVisibleSize = baseAnimation.Class.Sprite.Size;
+                {
+                    if (baseAnimation.Class.AlwaysDrawUpright)
+                        lastSizeFixed =  baseAnimation.Class.Sprite.Size;
+                    else
+                        lastSizeRotating = baseAnimation.Class.Sprite.Size;
+                }
 
                 if (baseAnimation.Class.Effect != null && Map != null)
                     Map.Spawn(baseAnimation.Class.Effect.Instantiate(this));
@@ -322,11 +339,16 @@ namespace Takai.Game
                 else
                 {
                     overlayAnimations[i] = animation;
-                    Radius = Math.Max(Radius, baseAnimation.Class.Radius);
-                    if (baseAnimation.Class != null)
+                    Radius = Math.Max(Radius, animation.Class.Radius);
+                    if (animation.Class != null)
                     {
                         if (baseAnimation.Class.Sprite != null)
-                            lastVisibleSize = Util.Max(lastVisibleSize, baseAnimation.Class.Sprite.Size);
+                        {
+                            if (animation.Class.AlwaysDrawUpright)
+                                lastSizeFixed = Util.Max(lastSizeFixed, animation.Class.Sprite.Size);
+                            else
+                                lastSizeRotating = Util.Max(lastSizeRotating, animation.Class.Sprite.Size);
+                        }
 
                         if (baseAnimation.Class.Effect != null && Map != null)
                             Map.Spawn(baseAnimation.Class.Effect.Instantiate(this));

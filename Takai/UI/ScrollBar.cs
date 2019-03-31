@@ -391,7 +391,7 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            var availSize = new Vector2(InfiniteSize);
+            var availSize = availableSize;
             foreach (var child in Children)
                 child.Measure(availSize);
             return contentContainer.MeasuredSize;

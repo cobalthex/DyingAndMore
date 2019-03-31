@@ -10,11 +10,11 @@ float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoo
 {
     float4 mask = Mask.Sample(Sampler, texcoord);
     float4 col = 0;
-    if ((Range == 0 && mask.x <= Cutoff) || //todo: replace with sdf
-        (Cutoff - Range <= mask.x && Cutoff + Range >= mask.x))
+     if ((Range == 0 && mask.r <= Cutoff) || //todo: replace with sdf
+         (Cutoff - Range <= mask.r && Cutoff + Range >= mask.r))
     {
         col = Tex.Sample(Sampler, texcoord) * color;
-        //col.a *= 1 - saturate((Cutoff - mask.x) / max(fwidth(mask.x), 0.0001));
+        //col.a *= 1 - saturate((Cutoff - mask.r) / max(fwidth(mask.r), 0.0001));
     }
     return col;
 }

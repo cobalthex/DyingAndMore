@@ -20,7 +20,7 @@ namespace Takai.Data
 
         private const BindingFlags LookupFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
 
-        public static GetSet GetMemberAccessors(object obj, string memberName)
+        public static GetSet GetMemberAccessors(object obj, string memberName, bool allowNonPublic = false)
         {
             if (memberName == null || obj == null)
                 return new GetSet();
@@ -30,17 +30,23 @@ namespace Takai.Data
             PropertyInfo prop;
             FieldInfo field;
 
+            var finalLookupFlags = LookupFlags | (allowNonPublic ? BindingFlags.NonPublic : 0);
+
             var indirections = memberName.Split(new[] { '.' }, MaxIndirection + 1);
+
+            //NOTE: if any part of the hierarchy changes, this binding will point to the old version
+            //this is technically leaky and otherwise generally not desirable
+
             for (int i = 0; i < indirections.Length - 1; ++i)
             {
                 try
                 {
-                    prop = objType.GetProperty(indirections[i], LookupFlags);
+                    prop = objType.GetProperty(indirections[i], finalLookupFlags);
                 }
                 catch (AmbiguousMatchException)
                 {
                     System.Diagnostics.Debug.WriteLine($"Ambiguous: {indirections[i]} ({memberName})");
-                    prop = objType.GetProperty(indirections[i], LookupFlags | BindingFlags.DeclaredOnly);
+                    prop = objType.GetProperty(indirections[i], finalLookupFlags | BindingFlags.DeclaredOnly);
                 }
                 if (prop != null)
                 {
@@ -52,7 +58,7 @@ namespace Takai.Data
                     continue;
                 }
 
-                field = objType.GetField(indirections[i], LookupFlags);
+                field = objType.GetField(indirections[i], finalLookupFlags);
                 if (field != null)
                 {
                     obj = field.GetValue(obj);
@@ -78,7 +84,7 @@ namespace Takai.Data
 
             if (memberName.Length > 0)
             {
-                prop = objType.GetProperty(memberName, LookupFlags);
+                prop = objType.GetProperty(memberName, finalLookupFlags);
                 if (prop != null)
                 {
                     //todo: get delegates working
@@ -94,7 +100,7 @@ namespace Takai.Data
                 }
                 else
                 {
-                    field = objType.GetField(memberName, LookupFlags);
+                    field = objType.GetField(memberName, finalLookupFlags);
                     if (field != null)
                     {
                         getset.type = field.FieldType;
@@ -139,6 +145,7 @@ namespace Takai.Data
                     System.Diagnostics.Debug.WriteLine($"Ignoring unknown binding modifier {modifier[0]}:{modifier[1]}");
             }
 
+            //getset.recursiveGets = recursives;
             return getset;
         }
     }
@@ -293,7 +300,7 @@ namespace Takai.Data
         /// </summary>
         /// <param name="sourceObj">The backing object to bind against</param>
         /// <param name="targetObj">The object to send/recieve data to/from the source</param>
-        public virtual void BindTo(object sourceObj, object targetObj)
+        public virtual void BindTo(object sourceObj, object targetObj, bool allowNonPublic = false)
         {
             if (Source == null || Target == null)
                 return;
@@ -303,8 +310,8 @@ namespace Takai.Data
             targetObject = targetObj;
 #endif
 
-            sourceAccessors = GetAccessors(Source, sourceObj);
-            targetAccessors = GetAccessors(Target, targetObj);
+            sourceAccessors = GetAccessors(Source, sourceObj, allowNonPublic);
+            targetAccessors = GetAccessors(Target, targetObj, allowNonPublic);
 
             //set initial value
             if (targetAccessors.set != null)
@@ -319,7 +326,7 @@ namespace Takai.Data
             }
         }
 
-        public static GetSet GetAccessors(string binding, object obj)
+        public static GetSet GetAccessors(string binding, object obj, bool allowNonPublic = false)
         {
             if (obj == null)
                 return new GetSet();
@@ -340,7 +347,7 @@ namespace Takai.Data
                 };
             }
             else
-                getset = GetSet.GetMemberAccessors(obj, binding);
+                getset = GetSet.GetMemberAccessors(obj, binding, allowNonPublic);
 
             if (getset.get == null && getset.set == null)
                 System.Diagnostics.Debug.WriteLine($"Binding '{binding}' does not exist in '{obj.GetType()}'");

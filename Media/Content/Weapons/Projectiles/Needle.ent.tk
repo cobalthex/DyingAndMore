@@ -8,17 +8,21 @@ ProjectileClass {
     MinimumSpeed: 100;
     MagnetismAnglePerSecond: 600deg;
     InheritSourcePhysics: false;
-    Damage: 15;
+    Damage: 25;
 
     Trail: {
-        #MaxPoints: 20;
+        MaxPoints: 50;
         LifeSpan: 0.25sec;
-        CaptureDelay: 30Hz;
+        CaptureDelay: 160Hz;
         Color: {
             Values: [
-                [0 [32 0 64 128]];
-                [0.9 [128 32 192 128]];
-                [1 [144 32 144 128]];
+                [0 Color.Transparent];
+                [0.1 [0 22 64 128]];
+                [0.4 [0 128 192 128]];
+                [0.7 [100 255 255 128]];
+                [0.8 [255 255 255 128]];
+                [0.9 [100 180 255 128]];
+                [1 [0 164 255 128]];
             ]
         }
         SpriteScale: 2;
@@ -27,7 +31,8 @@ ProjectileClass {
             values: [
                 [0 0]
                 [0.9 4]
-                [1 1]
+                [0.95 1]
+                [1 0]
             ]
         }
     }
@@ -38,34 +43,9 @@ ProjectileClass {
         };
         Idle: {
             Sprite: {
-                Texture: @"./needle.png";
-                Origin: [28 0];
+                Texture: @"./asdf.png";
             };
             Material: "Needle";
-
-            Effect: {
-                Effects: [
-                    ParticleEffect {
-                        Class: {
-                            Sprite: {
-                                Texture: @"Effects/trailglow.png";
-                            };
-                            Blend: BlendState.Additive;
-                            ColorOverTime: Color.Tomato;
-                            ScaleOverTime: {
-                                values: [
-                                    [0 1];
-                                    [1 0.1];
-                                ];
-                            };
-                            LifeSpan: [0.15sec 0.65sec];
-                            Drag: 5;
-                        }
-                        Count: [-20 1];
-                        Spread: [-30deg 30deg];
-                    };
-                ]
-            }
         }
     }
 }
