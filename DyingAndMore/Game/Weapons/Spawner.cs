@@ -27,7 +27,7 @@ namespace DyingAndMore.Game.Weapons
                     return;
 
                 _squad = value;
-                SpawnQueue.Clear();
+                SpawnQueue?.Clear();
             }
         }
         private Squad _squad;
@@ -72,7 +72,7 @@ namespace DyingAndMore.Game.Weapons
         public override bool IsDepleted()
         {
             //reset delay?
-            return SpawnQueue == null || SpawnQueue.Count <= 0; //todo: handle deserializing spawn queue better
+            return Squad == null || (SpawnQueue != null && SpawnQueue.Count <= 0); //todo: handle deserializing spawn queue better
         }
 
         public override bool CanUse(TimeSpan totalTime)
@@ -84,7 +84,11 @@ namespace DyingAndMore.Game.Weapons
         protected override void OnDischarge()
         {
             if (SpawnQueue == null)
+            {
                 GenerateSpawnQueue();
+                if (IsDepleted())
+                    return;
+            }
 
             var next = SpawnQueue.Dequeue();
             Actor.Map.Spawn(next, Actor.Position + Actor.Forward * (Actor.Radius + 10), Actor.Forward, Actor. Forward * 100);

@@ -8,7 +8,6 @@ ActorClass {
     MoveForce: 300;
     IsPhysical: True;
     IgnoreTrace: False;
-    AlwaysDrawUpright: False;
 
     DefaultController: [AIController {
         Behaviors: [

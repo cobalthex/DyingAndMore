@@ -1,4 +1,5 @@
 ﻿using System;
+using DyingAndMore.Game.Entities;
 using Microsoft.Xna.Framework;
 using Takai;
 
@@ -39,6 +40,13 @@ namespace DyingAndMore.Game.Weapons
 
         //bloom (error angle increases over time)
 
+        /// <summary>
+        /// Optionally refil ammo at this rate (none if zero)
+        /// Refills one per tick
+        /// </summary>
+        public TimeSpan AmmoRefillSpeed { get; set; }
+        public bool OnlyRefillWhileIdle { get; set; }
+
         public override WeaponInstance Instantiate()
         {
             return new GunInstance(this);
@@ -57,6 +65,8 @@ namespace DyingAndMore.Game.Weapons
         public int MaxAmmo => Class.MaxAmmo;
 
         public int CurrentAmmo { get; set; }
+        public TimeSpan LastAmmoRefillTime { get; set; }
+        public bool OnlyRefillIfIdle { get; set; } = true;
 
         protected int currentBurstShotCount = 0;
         protected int burstCount = 0;
@@ -66,9 +76,7 @@ namespace DyingAndMore.Game.Weapons
             : base(@class)
         {
             if (@class != null)
-            {
                 CurrentAmmo = @class.MaxAmmo;
-            }
         }
 
         protected override void OnEndUse()
@@ -84,8 +92,6 @@ namespace DyingAndMore.Game.Weapons
 
         public override bool CanUse(TimeSpan elapsedTime)
         {
-            //todo: unit test
-
             return (Class.MaxBursts == 0 || burstCount < Class.MaxBursts)
                 && (burstCount == 0 || currentBurstShotCount > 0 || elapsedTime > StateTime + Class.BurstCooldownTime)
                 && base.CanUse(elapsedTime);
@@ -104,6 +110,18 @@ namespace DyingAndMore.Game.Weapons
                 }
             }
 
+            if (LastAmmoRefillTime == TimeSpan.Zero ||
+                (State == WeaponState.Idle && Class.OnlyRefillWhileIdle)) //ugly
+                LastAmmoRefillTime = Actor.Map.ElapsedTime;
+
+            var timeSinceLastRefill = Actor.Map.ElapsedTime - LastAmmoRefillTime;
+            if (Class.AmmoRefillSpeed != TimeSpan.Zero &&
+                timeSinceLastRefill.Ticks >= Math.Abs(Class.AmmoRefillSpeed.Ticks))
+            {
+                CurrentAmmo = MathHelper.Clamp(CurrentAmmo + (int)(timeSinceLastRefill.Ticks / Class.AmmoRefillSpeed.Ticks), 0, MaxAmmo);
+                LastAmmoRefillTime = Actor.Map.ElapsedTime;
+            }
+
             base.Think(deltaTime);
         }
 
@@ -115,7 +133,7 @@ namespace DyingAndMore.Game.Weapons
             {
                 for (int i = 0; i < Class.ProjectilesPerRound; ++i)
                 {
-                    var projectile = (Entities.ProjectileInstance)Class.Projectile.Instantiate();
+                    var projectile = (ProjectileInstance)Class.Projectile.Instantiate();
                     projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + Class.SpawnOffset));
 
                     var error = Class.ErrorAngle.Random();

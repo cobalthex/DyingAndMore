@@ -4,7 +4,7 @@ ProjectileClass {
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     #Drag: 0.4;
-    MinimumSpeed: -3000000;
+    MinimumSpeed: 1;
     CanDamageSource: true;
     #InheritSourcePhysics: true;
     DirectionMod: ProjectileClass.WaveDirectionMod;

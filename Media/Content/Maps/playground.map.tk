@@ -1,5 +1,24 @@
 MapInstance {
-    Squads: Null;
+    Squads: {
+        asdf: Squad {
+            Name: "asdf";
+            LeaderTemplate: Null;
+            UnitsTemplate: Null;
+            SpawnPosition: [381.4998 767.5181];
+            SpawnRadius: 191.4334;
+            DontSpawnAutomatically: False;
+            MinLiveCount: 0;
+            MaxLiveCount: 1;
+            MaxSpawnCount: 0;
+            SpawnDelay: 0;
+            ResetDelay: 0;
+            DisableSpawningIfLeaderIsDead: False;
+            Leader: Null;
+            Units: [];
+            TotalSpawnCount: 0;
+            LastSpawnTime: 253470.5483;
+        };
+    };
     Class: MapClass {
         Name: "playground";
         TileSize: 48;
@@ -15,14 +34,14 @@ MapInstance {
         Tiles: [0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 22 0 0 0 23 0 0 0 22 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 24 25 0 0 50 0 0 0 -1 0 0 0 0 15 14 0 0 0 0 0 26 27 0 0 -1 14 0 0 13 -1 -1 -1 -1 -1 12 0 0 0 0 0 0 0 0 0 -1 -1 14 0 0 13 -1 -1 -1 -1 0 0 0 -1 -1 -1 0 -1 -1 -1 -1 -1 -1 14 0 0 -1 -1 -1 -1 0 0 0 -1 28 29 0 -1 -1 -1 -1 -1 -1 -1 14 0 13 -1 -1 -1 0 0 0 -1 30 31 0 -1 -1 -1 -1 8 0 9 -1 14 0 -1 -1 -1 0 0 0 -1 -1 -1 0 -1 -1 -1 -1 0 0 0 -1 -1 14 13 -1 -1 0 0 0 -1 -1 -1 0 95 -1 -1 -1 0 0 0 13 -1 -1 14 13 -1 0 0 0 0 0 -1 0 0 -1 0 0 0 0 0 0 13 -1 -1 14 13 0 0 0 0 0 -1 20 0 -1 0 0 0 0 0 0 0 -1 -1 -1 14 0 0 0 0 21 -1 0 0 -1 0 0 0 0 0 0 0 13 4 4 12 0 0 0 0 0 -1 0 21 79 0 0 0 0 0 0 0 0 0 0 0 0 0 55 0 0 -1 14 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 47 16 0 73 -1 -1 20 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 26 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
     };
     Sounds: [];
-    ElapsedTime: 151195.3955;
+    ElapsedTime: 254243.4547;
     TimeScale: 1;
     currentScreenFade: ScreenFade {
         Duration: 0;
         Colors: Null;
         Blend: Null;
     };
-    currentScreenFadeElapsedTime: 151195.3955;
+    currentScreenFadeElapsedTime: 254243.4547;
     Entities: [
         ActorInstance {
             Class: @"Actors/Player.ent.tk";
@@ -35,6 +54,7 @@ MapInstance {
             Weapon: GunInstance {
                 Class: @"Weapons/mg.wpn.tk";
                 CurrentAmmo: 1000;
+                Class: @"Weapons/mg.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
@@ -48,11 +68,12 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 74071.8174;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
+                Class: @"Weapons/bfg.wpn.tk";
                 Class: @"Weapons/bfg.wpn.tk";
                 CurrentAmmo: 5000;
                 StateTime: 0;
@@ -70,20 +91,22 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 77071.0527;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
-                CurrentAmmo: 1000;
                 Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/mg.wpn.tk";
+                CurrentAmmo: 1000;
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/MG.ent.tk";
-            Id: 3;
-            Name: Null;
             NextRespawnTime: 0;
+            Id: 3;
+            Class: @"Pickups/MG.ent.tk";
+            Name: Null;
             Position: [32.566 36.16143];
             Forward: [1 0];
             Velocity: [0 0];
@@ -91,21 +114,22 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 81480.164;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
-                CurrentAmmo: 1200;
                 Class: @"Weapons/shotgun.wpn.tk";
+                Class: @"Weapons/shotgun.wpn.tk";
+                CurrentAmmo: 1200;
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/Shotgun.ent.tk";
-            Class: @"Pickups/Shotgun.ent.tk";
-            Id: 4;
-            Name: Null;
             NextRespawnTime: 0;
+            Id: 4;
+            Class: @"Pickups/Shotgun.ent.tk";
+            Name: Null;
             Position: [301.5458 34.76918];
             Forward: [1 0];
             Velocity: [0 0];
@@ -113,22 +137,22 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 84484.0843;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
+                Class: @"Weapons/Laser.wpn.tk";
+                Class: @"Weapons/Laser.wpn.tk";
                 CurrentAmmo: 4000;
-                Class: @"Weapons/Laser.wpn.tk";
-                Class: @"Weapons/Laser.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/Laser.ent.tk";
-            Class: @"Pickups/Laser.ent.tk";
-            Id: 5;
-            Name: Null;
             NextRespawnTime: 0;
+            Id: 5;
+            Class: @"Pickups/Laser.ent.tk";
+            Name: Null;
             Position: [232.9503 35.93439];
             Forward: [1 0];
             Velocity: [0 0];
@@ -136,22 +160,22 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 87901.9929;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
+                Class: @"Weapons/GrenadeLauncher.wpn.tk";
+                Class: @"Weapons/GrenadeLauncher.wpn.tk";
                 CurrentAmmo: 200;
-                Class: @"Weapons/GrenadeLauncher.wpn.tk";
-                Class: @"Weapons/GrenadeLauncher.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/GrenadeLauncher.ent.tk";
-            Class: @"Pickups/GrenadeLauncher.ent.tk";
-            Id: 6;
-            Name: Null;
             NextRespawnTime: 0;
+            Id: 6;
+            Class: @"Pickups/GrenadeLauncher.ent.tk";
+            Name: Null;
             Position: [165.6504 35.94365];
             Forward: [1 0];
             Velocity: [0 0];
@@ -159,22 +183,22 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 103185.8939;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
+                Class: @"Weapons/Flamethrower.wpn.tk";
+                Class: @"Weapons/Flamethrower.wpn.tk";
                 CurrentAmmo: 20000;
-                Class: @"Weapons/Flamethrower.wpn.tk";
-                Class: @"Weapons/Flamethrower.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/TestPfx.ent.tk";
-            Class: @"Pickups/TestPfx.ent.tk";
-            Id: 7;
-            Name: Null;
             NextRespawnTime: 0;
+            Id: 7;
+            Class: @"Pickups/TestPfx.ent.tk";
+            Name: Null;
             Position: [98.06796 35.94364];
             Forward: [1 0];
             Velocity: [0 0];
@@ -182,22 +206,22 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 107505.7616;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
+                Class: @"Weapons/Test.wpn.tk";
+                Class: @"Weapons/Test.wpn.tk";
                 CurrentAmmo: 400;
-                Class: @"Weapons/Test.wpn.tk";
-                Class: @"Weapons/Test.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/Tuber.ent.tk";
-            Class: @"Pickups/Tuber.ent.tk";
-            Id: 8;
-            Name: Null;
             NextRespawnTime: 0;
+            Id: 8;
+            Class: @"Pickups/Tuber.ent.tk";
+            Name: Null;
             Position: [35.14649 164.117];
             Forward: [1 0];
             Velocity: [0 0];
@@ -205,35 +229,30 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 129118.8198;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         ActorInstance {
+            Class: @"Actors/Target.ent.tk";
+            Class: @"Actors/Target.ent.tk";
             CurrentHealth: 50000;
-            Class: @"Actors/Target.ent.tk";
-            Class: @"Actors/Target.ent.tk";
-            Weapon: Null;
+            Factions: Factions [Enemy];
             Controller: AIController {
                 Behaviors: [
                     TargetEnemyBehavior {
                         SightDistance: 100000;
-                    }
-                    MagnetBehavior {
-                        Strength: 100000;
-                        Radius: 400;
-                        IsEnabled: True;
                     }
                 ];
                 Target: Null;
                 TargetTime: 0;
                 LastKnownTargetPosition: [0 0];
             };
-            Factions: Factions [Enemy];
-            Id: 9;
-            Name: Null;
             Conditions: {
             };
             MaxSpeed: 0;
+            Weapon: Null;
+            Id: 9;
+            Name: Null;
             Position: [48.59587 622.9557];
             Forward: [1 0];
             Velocity: [0 0];
@@ -241,35 +260,30 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 134875.8245;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         ActorInstance {
+            Class: @"Actors/Target.ent.tk";
+            Class: @"Actors/Target.ent.tk";
             CurrentHealth: 50000;
-            Class: @"Actors/Target.ent.tk";
-            Class: @"Actors/Target.ent.tk";
-            Weapon: Null;
+            Factions: Factions [Enemy];
             Controller: AIController {
                 Behaviors: [
                     TargetEnemyBehavior {
                         SightDistance: 100000;
-                    }
-                    MagnetBehavior {
-                        Strength: 100000;
-                        Radius: 400;
-                        IsEnabled: True;
                     }
                 ];
                 Target: Null;
                 TargetTime: 0;
                 LastKnownTargetPosition: [0 0];
             };
-            Factions: Factions [Enemy];
-            Id: 10;
-            Name: Null;
             Conditions: {
             };
             MaxSpeed: 0;
+            Weapon: Null;
+            Id: 10;
+            Name: Null;
             Position: [458.4362 504.4068];
             Forward: [1 0];
             Velocity: [0 0];
@@ -277,35 +291,30 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 138691.6484;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         ActorInstance {
+            Class: @"Actors/Target.ent.tk";
+            Class: @"Actors/Target.ent.tk";
             CurrentHealth: 50000;
-            Class: @"Actors/Target.ent.tk";
-            Class: @"Actors/Target.ent.tk";
-            Weapon: Null;
+            Factions: Factions [Enemy];
             Controller: AIController {
                 Behaviors: [
                     TargetEnemyBehavior {
                         SightDistance: 100000;
-                    }
-                    MagnetBehavior {
-                        Strength: 100000;
-                        Radius: 400;
-                        IsEnabled: True;
                     }
                 ];
                 Target: Null;
                 TargetTime: 0;
                 LastKnownTargetPosition: [0 0];
             };
-            Factions: Factions [Enemy];
-            Id: 11;
-            Name: Null;
             Conditions: {
             };
             MaxSpeed: 0;
+            Weapon: Null;
+            Id: 11;
+            Name: Null;
             Position: [627.7896 194.4887];
             Forward: [1 0];
             Velocity: [0 0];
@@ -313,35 +322,30 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 143096.7348;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
         ActorInstance {
+            Class: @"Actors/Target.ent.tk";
+            Class: @"Actors/Target.ent.tk";
             CurrentHealth: 50000;
-            Class: @"Actors/Target.ent.tk";
-            Class: @"Actors/Target.ent.tk";
-            Weapon: Null;
+            Factions: Factions [Enemy];
             Controller: AIController {
                 Behaviors: [
                     TargetEnemyBehavior {
                         SightDistance: 100000;
-                    }
-                    MagnetBehavior {
-                        Strength: 100000;
-                        Radius: 400;
-                        IsEnabled: True;
                     }
                 ];
                 Target: Null;
                 TargetTime: 0;
                 LastKnownTargetPosition: [0 0];
             };
-            Factions: Factions [Enemy];
-            Id: 12;
-            Name: Null;
             Conditions: {
             };
             MaxSpeed: 0;
+            Weapon: Null;
+            Id: 12;
+            Name: Null;
             Position: [863.1955 914.2465];
             Forward: [1 0];
             Velocity: [0 0];
@@ -349,7 +353,7 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 149804.7496;
+            SpawnTime: 151195;
             EventHandlers: Null;
         }
     ];

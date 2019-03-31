@@ -630,14 +630,16 @@ namespace Takai.Game
                     _drawEntsOutlined.Add(ent);
                 else
                 {
-                    var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
+                    var angle = (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
                     foreach (var state in ent.ActiveAnimations)
                     {
+                        var stateAngle = state.Class.AlwaysDrawUpright ? 0 : angle;
+
                         state.Class?.Sprite?.Draw(
                             c.spriteBatch,
                             ent.Position,
-                            angle,
+                            stateAngle,
                             ent.TintColor,
                             1,
                             state.ElapsedTime
@@ -648,7 +650,7 @@ namespace Takai.Game
                             renderedLights.Add(new RenderedLight
                             {
                                 light = state.Class.Light,
-                                angle = angle,
+                                angle = stateAngle,
                                 position = ent.Position,
                                 spriteElapsedTime = state.ElapsedTime
                             });
@@ -697,6 +699,7 @@ namespace Takai.Game
 
                 if (renderSettings.drawDebugInfo && Class.DebugFont != null)
                 {
+                    //todo: defer this drawing and draw outside of stencil
                     var textPos = ent.Position + new Vector2(ent.Radius + 10);
                     Class.DebugFont.Draw(c.spriteBatch, ent.GetDebugInfo(), textPos, Color.Gold);
                 }
@@ -709,12 +712,14 @@ namespace Takai.Game
 
             foreach (var ent in _drawEntsOutlined)
             {
-                var angle = ent.Class.AlwaysDrawUpright ? 0 : (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
+                var angle = (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
 
                 foreach (var state in ent.ActiveAnimations)
                 {
                     if (state.Class?.Sprite == null)
                         continue;
+
+                    var stateAngle = state.Class.AlwaysDrawUpright ? 0 : angle;
 
                     var sprite = state.Class.Sprite;
                     Class.outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
@@ -722,7 +727,7 @@ namespace Takai.Game
                     sprite.Draw(
                         c.spriteBatch,
                         ent.Position,
-                        angle,
+                        stateAngle,
                         ent.OutlineColor,
                         1,
                         state.ElapsedTime
@@ -733,7 +738,7 @@ namespace Takai.Game
                         renderedLights.Add(new RenderedLight
                         {
                             light = state.Class.Light,
-                            angle = angle,
+                            angle = stateAngle,
                             position = ent.Position,
                             spriteElapsedTime = state.ElapsedTime
                         });

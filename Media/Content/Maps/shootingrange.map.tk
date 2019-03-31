@@ -1,5 +1,24 @@
 MapInstance {
-    Squads: Null;
+    Squads: {
+        test: Squad {
+            Name: "test";
+            LeaderTemplate: Null;
+            UnitsTemplate: Null;
+            SpawnPosition: [1150.172 192.2032];
+            SpawnRadius: 187.0809;
+            DontSpawnAutomatically: False;
+            MinLiveCount: 0;
+            MaxLiveCount: 1;
+            MaxSpawnCount: 0;
+            SpawnDelay: 0;
+            ResetDelay: 0;
+            DisableSpawningIfLeaderIsDead: False;
+            Leader: Null;
+            Units: [];
+            TotalSpawnCount: 0;
+            LastSpawnTime: 18234.6082;
+        };
+    };
     Class: MapClass {
         Name: "Shooting Range";
         TileSize: 48;
@@ -15,14 +34,14 @@ MapInstance {
         Tiles: [8 0 0 0 0 0 0 0 0 0 9 -1 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 22 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 23 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 10 0 0 0 0 0 0 0 0 0 11 -1 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 11];
     };
     Sounds: [];
-    ElapsedTime: 0;
+    ElapsedTime: 59505.1869;
     TimeScale: 1;
     currentScreenFade: ScreenFade {
         Duration: 0;
         Colors: Null;
         Blend: Null;
     };
-    currentScreenFadeElapsedTime: 52525.2684;
+    currentScreenFadeElapsedTime: 112030.1869;
     Entities: [
         ActorInstance {
             Class: @"Actors/Player.ent.tk";
@@ -49,14 +68,14 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 7268.3857;
+            SpawnTime: 0;
             EventHandlers: Null;
         }
         ActorInstance {
+            Class: @"Actors/Target.ent.tk";
+            Class: @"Actors/Target.ent.tk";
             CurrentHealth: 50000;
-            Class: @"Actors/Target.ent.tk";
-            Class: @"Actors/Target.ent.tk";
-            Weapon: Null;
+            Factions: Factions [Enemy];
             Controller: AIController {
                 Behaviors: [
                     TargetEnemyBehavior {
@@ -67,12 +86,12 @@ MapInstance {
                 TargetTime: 0;
                 LastKnownTargetPosition: [0 0];
             };
-            Factions: Factions [Enemy];
-            Id: 2;
-            Name: Null;
             Conditions: {
             };
             MaxSpeed: 0;
+            Weapon: Null;
+            Id: 2;
+            Name: Null;
             Position: [1343.895 48.84033];
             Forward: [1 0];
             Velocity: [0 0];
@@ -80,14 +99,14 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 13008.4294;
+            SpawnTime: 0;
             EventHandlers: Null;
         }
         ActorInstance {
+            Class: @"Actors/Target.ent.tk";
+            Class: @"Actors/Target.ent.tk";
             CurrentHealth: 50000;
-            Class: @"Actors/Target.ent.tk";
-            Class: @"Actors/Target.ent.tk";
-            Weapon: Null;
+            Factions: Factions [Enemy];
             Controller: AIController {
                 Behaviors: [
                     TargetEnemyBehavior {
@@ -98,12 +117,12 @@ MapInstance {
                 TargetTime: 0;
                 LastKnownTargetPosition: [0 0];
             };
-            Factions: Factions [Enemy];
-            Id: 3;
-            Name: Null;
             Conditions: {
             };
             MaxSpeed: 0;
+            Weapon: Null;
+            Id: 3;
+            Name: Null;
             Position: [1343.895 333.6751];
             Forward: [1 0];
             Velocity: [0 0];
@@ -111,14 +130,14 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 15525.1496;
+            SpawnTime: 0;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
+                Class: @"Weapons/bfg.wpn.tk";
+                Class: @"Weapons/bfg.wpn.tk";
                 CurrentAmmo: 5000;
-                Class: @"Weapons/bfg.wpn.tk";
-                Class: @"Weapons/bfg.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
@@ -134,22 +153,22 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 19315.7552;
+            SpawnTime: 0;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
+                Class: @"Weapons/GrenadeLauncher.wpn.tk";
+                Class: @"Weapons/GrenadeLauncher.wpn.tk";
                 CurrentAmmo: 200;
-                Class: @"Weapons/GrenadeLauncher.wpn.tk";
-                Class: @"Weapons/GrenadeLauncher.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/GrenadeLauncher.ent.tk";
-            Class: @"Pickups/GrenadeLauncher.ent.tk";
-            Id: 5;
-            Name: Null;
             NextRespawnTime: 0;
+            Id: 5;
+            Class: @"Pickups/GrenadeLauncher.ent.tk";
+            Name: Null;
             Position: [188.0982 46.30841];
             Forward: [1 0];
             Velocity: [0 0];
@@ -157,22 +176,22 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 22949.1973;
+            SpawnTime: 0;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
+                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/mg.wpn.tk";
                 CurrentAmmo: 1000;
-                Class: @"Weapons/mg.wpn.tk";
-                Class: @"Weapons/mg.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/MG.ent.tk";
-            Class: @"Pickups/MG.ent.tk";
-            Id: 6;
-            Name: Null;
             NextRespawnTime: 0;
+            Id: 6;
+            Class: @"Pickups/MG.ent.tk";
+            Name: Null;
             Position: [60.23902 186.827];
             Forward: [1 0];
             Velocity: [0 0];
@@ -180,22 +199,22 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 25899.5215;
+            SpawnTime: 0;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
+                Class: @"Weapons/Test.wpn.tk";
+                Class: @"Weapons/Test.wpn.tk";
                 CurrentAmmo: 400;
-                Class: @"Weapons/Test.wpn.tk";
-                Class: @"Weapons/Test.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/Tuber.ent.tk";
-            Class: @"Pickups/Tuber.ent.tk";
-            Id: 7;
-            Name: Null;
             NextRespawnTime: 0;
+            Id: 7;
+            Class: @"Pickups/Tuber.ent.tk";
+            Name: Null;
             Position: [47.57969 337.4729];
             Forward: [1 0];
             Velocity: [0 0];
@@ -203,22 +222,22 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 30930.4266;
+            SpawnTime: 0;
             EventHandlers: Null;
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
+                Class: @"Weapons/Flamethrower.wpn.tk";
+                Class: @"Weapons/Flamethrower.wpn.tk";
                 CurrentAmmo: 20000;
-                Class: @"Weapons/Flamethrower.wpn.tk";
-                Class: @"Weapons/Flamethrower.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/TestPfx.ent.tk";
-            Class: @"Pickups/TestPfx.ent.tk";
-            Id: 8;
-            Name: Null;
             NextRespawnTime: 0;
+            Id: 8;
+            Class: @"Pickups/TestPfx.ent.tk";
+            Name: Null;
             Position: [188.0982 331.1433];
             Forward: [1 0];
             Velocity: [0 0];
@@ -226,7 +245,7 @@ MapInstance {
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 37121.5178;
+            SpawnTime: 0;
             EventHandlers: Null;
         }
     ];

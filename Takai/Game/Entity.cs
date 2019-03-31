@@ -60,11 +60,6 @@ namespace Takai.Game
         public bool DestroyIfOffscreen { get; set; } = false;
 
         /// <summary>
-        /// Should the sprite always be drawn with the original sprite orientation?
-        /// </summary>
-        public bool AlwaysDrawUpright { get; set; } = false; //todo: move to animation
-
-        /// <summary>
         /// An effect created at the entity's position when its spawned in a map
         /// </summary>
         public EffectsClass SpawnEffect { get; set; }
@@ -184,7 +179,7 @@ namespace Takai.Game
             set
             {
                 _forward = value;
-                if (Class != null && !Class.AlwaysDrawUpright)
+                if (Class != null)
                 {
                     lastTransform.M11 = lastTransform.M22 = value.X;
                     lastTransform.M12 = -value.Y;
@@ -303,7 +298,8 @@ namespace Takai.Game
         }
 
         Matrix lastTransform = Matrix.Identity;
-        Point lastVisibleSize = new Point(1, 1);
+        Point lastSizeFixed = new Point(1, 1);
+        Point lastSizeRotating = new Point(1, 1);
 
         /// <summary>
         /// Update the axis aligned bounds
@@ -311,13 +307,14 @@ namespace Takai.Game
         internal void UpdateAxisAlignedBounds()
         {
             var r = new Rectangle(
-                lastVisibleSize.X / -2,
-                lastVisibleSize.Y / -2,
-                lastVisibleSize.X,
-                lastVisibleSize.Y
+                lastSizeRotating.X / -2,
+                lastSizeRotating.Y / -2,
+                lastSizeRotating.X,
+                lastSizeRotating.Y
             );
 
             //todo: handle origin
+            //todo: needs to be on per-animation basis (perhaps sizeRotated, sizeFixed)
 
             var min = new Vector2(float.MaxValue);
             var max = new Vector2(float.MinValue);
@@ -340,8 +337,14 @@ namespace Takai.Game
 
             var size = max - min;
             r = new Rectangle((int)min.X, (int)min.Y, (int)Math.Ceiling(size.X), (int)Math.Ceiling(size.Y));
-
-            //todo: parent/child relationships
+            r = Rectangle.Union(
+                new Rectangle(
+                    lastSizeFixed.X / -2,
+                    lastSizeFixed.Y / -2,
+                    lastSizeFixed.X, 
+                    lastSizeFixed.Y
+                ), r
+            );
 
             AxisAlignedBounds = r;
         }

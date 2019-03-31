@@ -22,6 +22,8 @@ namespace DyingAndMore.Game
         public override void Invoke(MapBaseInstance map)
         {
             var minst = (MapInstance)map;
+            if (minst == null)
+                return;
             var squad = minst.Squads[SquadName];
             if (squad != null)
                 minst.Spawn(squad);

@@ -567,6 +567,12 @@ namespace Takai.UI
         /// </summary>
         public List<Data.Binding> Bindings { get; set; }
 
+        /// <summary>
+        /// If not null, child elements will be bound with the specified property of this class
+        /// </summary>
+        public string ChildBindScope { get; set; }
+        private Data.GetSet bindScopeGetset;
+
         #endregion
 
         public Static()
@@ -754,8 +760,17 @@ namespace Takai.UI
         public virtual void BindTo(object source)
         {
             BindToThis(source);
+
+            var childScope = source;
+            if (ChildBindScope != null)
+            {
+                bindScopeGetset = Data.GetSet.GetMemberAccessors(source, ChildBindScope);
+                childScope = bindScopeGetset.cachedValue = bindScopeGetset.get?.Invoke();
+                bindScopeGetset.cachedHash = (bindScopeGetset.cachedValue ?? 0).GetHashCode();
+            }
+
             foreach (var child in Children)
-                child.BindTo(source);
+                child.BindTo(childScope);
         }
 
         /// <summary>
@@ -1750,9 +1765,21 @@ namespace Takai.UI
         {
             if (Bindings != null)
             {
-                bool didUpdateBinding = false;
                 foreach (var binding in Bindings)
-                    didUpdateBinding |= binding.Update();
+                    binding.Update();
+            }
+
+            if (bindScopeGetset.get != null)
+            {
+                var newVal = bindScopeGetset.get();
+                var newHash = (newVal ?? 0).GetHashCode();
+                if (newHash != bindScopeGetset.cachedHash)
+                {
+                    bindScopeGetset.cachedValue = newVal;
+                    bindScopeGetset.cachedHash = newHash;
+                    foreach (var child in Children)
+                        child.BindTo(newVal);
+                }
             }
         }
 

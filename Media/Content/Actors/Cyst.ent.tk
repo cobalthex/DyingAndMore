@@ -62,7 +62,6 @@ ActorClass {
 
     IsPhysical: True;
     IgnoreTrace: False;
-    AlwaysDrawUpright: False;
     DestroyOnDeath: False;
 
     DefaultWeapon: [];
