@@ -1,0 +1,23 @@
+List {
+	Direction: Direction.Horizontal;
+	Margin: 10;
+	Children: [
+		Graphic {
+			Bindings: [
+				Binding {
+					Source: "EditorPreviewSprite";
+					Target: "Sprite";
+				};
+			];
+			Size: 48;
+			MissingSpriteXColor: Color.White;
+			BorderColor: Color.White;
+		}
+		Static {
+			Bindings: [
+				Binding { Source: "Name"; Target: "Text"; DefaultValue: "(No name)" };
+			];
+			VerticalAlignment: Alignment.Middle;
+		}
+	];
+}

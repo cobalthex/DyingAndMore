@@ -9,9 +9,9 @@ namespace Takai.UI
         public Graphics.Sprite Sprite { get; set; }
 
         /// <summary>
-        /// Draw an X in the graphic if the sprite is missing
+        /// If not transparent, draws and X if the <see cref="Sprite"/> is missing
         /// </summary>
-        public bool DrawXIfMissingSprite { get; set; } = false;
+        public Color MissingSpriteXColor { get; set; } = Color.Transparent;
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
@@ -32,11 +32,11 @@ namespace Takai.UI
             //todo: custom positioning/sizing
             if (Sprite?.Texture != null)
                 DrawSprite(spriteBatch, Sprite, new Rectangle(0, 0, ContentArea.Width - 1, ContentArea.Height - 1));
-            else if (DrawXIfMissingSprite)
+            else if (MissingSpriteXColor.A > 0)
             {
                 var rect = VisibleContentArea;
                 rect.Inflate(-4, -4);
-                Graphics.Primitives2D.DrawX(spriteBatch, Color.Tomato, rect);
+                Graphics.Primitives2D.DrawX(spriteBatch, MissingSpriteXColor, rect);
             }
 
             base.DrawSelf(spriteBatch);

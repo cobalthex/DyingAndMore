@@ -78,7 +78,16 @@ namespace Takai.Game
         /// </summary>
         public virtual HashSet<string> Events { get; }
 
-        public EntityClass() { }
+        public EntityClass()
+        {
+            EditorPreviewSprite = new Lazy<Graphics.Sprite>(delegate
+            {
+                if (Animations.TryGetValue("EditorPreview", out var state) ||
+                    Animations.TryGetValue(DefaultBaseAnimation, out state))
+                    return state.Sprite;
+                return null;
+            });
+        }
 
         public virtual EntityInstance Instantiate()
         {

@@ -667,6 +667,8 @@ namespace Takai.UI
         /// <summary>
         /// A map from events to commands
         /// e.g. Click->SpawnEntity
+        /// Multiple commands can be called for a single event
+        /// Evaluate in order and if any are handled (all run), the event is considered handled
         /// </summary>
         public Dictionary<string, EventCommandBinding> EventCommands
         {
@@ -806,9 +808,9 @@ namespace Takai.UI
             var target = source;
             while (target != null)
             {
-                if (target._eventCommands != null && target.EventCommands.TryGetValue(@event, out var command) &&
+                if (target._eventCommands != null && target.EventCommands.TryGetValue(@event, out var command) && 
                     BubbleCommand(command.command, command.argument))
-                    return;
+                        return;
 
                 if ((target.events != null && target.events.TryGetValue(@event, out var handlers) &&
                     handlers.Invoke(target, eventArgs) == UIEventResult.Handled) ||
