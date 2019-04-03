@@ -150,6 +150,18 @@ namespace DyingAndMore
                     ui.GetRoot().FindChildByName(str)?.RemoveFromParent();
             };
 
+            Static.GlobalCommands["Multiple"] = delegate (Static ui, object arg)
+            {
+                if (arg is System.Collections.IEnumerable ie)
+                {
+                    foreach (var i in ie)
+                    {
+                        var cmd = Serializer.Cast<EventCommandBinding>(i);
+                        ui.BubbleCommand(cmd.command, cmd.argument);
+                    }
+                }
+            };
+
             /*
 #if WINDOWS //UWP launch activation parameters?
             //parse command line args

@@ -126,6 +126,9 @@ namespace Takai.Game
         /// </summary>
         public string DefaultBaseAnimation { get; set; } = "Idle";
 
+        [Data.Serializer.Ignored]
+        public readonly Lazy<Graphics.Sprite> EditorPreviewSprite;
+
         //entity state map (id to class name)
     }
 

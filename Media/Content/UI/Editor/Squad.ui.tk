@@ -10,61 +10,88 @@ List {
 		Static { Text: "Edit Squad"; };
 		Static { Size: [1 10]; };
 
-		Static { Text: "Units"; };
-		ActorList {
-			Bindings: [
-				Binding {
-					Source: "Units";
-					Target: "Items";
+		Static { Text: "Leader (Randomized)"; };
+		ScrollBox {
+			Size: [300 100];
+			Children: [
+				ActorList {
+					Container: List {
+						Direction: Direction.Vertical;
+						Margin: 10;
+					}
+					Bindings: [
+						Binding {
+							Source: "LeaderTemplate";
+							Target: "Items";
+						};
+					];
+					ItemTemplate: @"./ActorPreview.ui.tk";
 				};
 			];
-			ItemTemplate: List {
-				Direction: Direction.Horizontal;
-				Margin: 10;
-				Children: [
-					Static { Bindings: [ Binding { Source: ":Typename"; Target: "Text" } ]; }
-				];
-			}
-		}
+		};
 
-		#*Static {
-			Text: "Select actor";
-			EventCommands: {
-				Click: [
-					"AddRootUI"
-					List {
-						Name: "ActorSelector";
-						HorizontalAlignment: Alignment.Center;
-						VerticalAlignment: Alignment.Center;
-						IsModal: true;
-						Padding: 10;
-						BackgroundSprite: @"UI/test/test.9p.tk";
-						Children: [
-							EntitySelector {
-								Size: [400 400];
-								EventCommands: {
-									SelectionChanged: ["RemoveNamedUI" "ActorSelector"];
-								}
-							};
+		Static { Text: "Units"; };
+		ScrollBox {
+			Size: 300;
+			Children: [
+				ActorList {
+					Container: List {
+						Direction: Direction.Vertical;
+						Margin: 10;
+					}
+					Bindings: [
+						Binding {
+							Source: "UnitsTemplate";
+							Target: "Items";
+						};
+					];
+					ItemTemplate: @"./ActorPreview.ui.tk";
 
-							Static {
-								Text: "Cancel";
-								Padding: 10;
-								EventCommands: {
-									Click: "CloseModal";
+					AddItemTemplate: Static {
+						Text: "Select actor";
+						Size: [NaN 48];
+						EventCommands: {
+							Click: [
+								"AddRootUI"
+								List {
+									Name: "ActorSelector";
+									HorizontalAlignment: Alignment.Center;
+									VerticalAlignment: Alignment.Center;
+									IsModal: true;
+									Padding: 10;
+									BackgroundSprite: @"UI/test/test.9p.tk";
+									Children: [
+										EntitySelector {
+											Size: [400 400];
+											EventCommands: {
+												SelectionChanged: ["Multiple" [["RemoveNamedUI" "ActorSelector"] "AddItem"]]; # broken since Root UI
+												# todo: routable commands (route to named UI)
+											}
+										};
+
+										Static {
+											Text: "Cancel";
+											HorizontalAlignment: Alignment.Center;
+											Padding: 10;
+											EventCommands: {
+												Click: ["RemoveNamedUI" "ActorSelector"];
+											};
+										};
+									];
 								};
-							};
-						];
+							];
+						};
 					};
-				];
-			};
-		};*#
+				};
+			];
+		};
 
 		Static {
 			Text: "Close";
+			HorizontalAlignment: Alignment.Center;
 			Padding: 10;
 			EventCommands: {
-				Click: "CloseModal";
+				Click: ["CloseModal"];
 			};
 		};
 	];

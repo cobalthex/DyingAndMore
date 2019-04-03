@@ -22,9 +22,25 @@ namespace Takai.UI
     /// The items can be stored in any type of <see cref="Container"/>
     /// </summary>
     /// <typeparam name="T">The type of each data-bound item</typeparam>
-    public class ItemList<T> : Static
+    public class ItemList<T> : List
     {
-        public ObservableCollection<T> Items { get; set; } = new ObservableCollection<T>();
+        public ObservableCollection<T> Items
+        {
+            get => _items;
+            set
+            {
+                if (_items == value)
+                    return;
+
+                if (value == null)
+                    value = new ObservableCollection<T>();
+
+                _items = value;
+                _items.CollectionChanged += Items_CollectionChanged;
+                Items_CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value));
+            }
+        }
+        private ObservableCollection<T> _items;
 
         /// <summary>
         /// The template used to render each item.
@@ -47,7 +63,6 @@ namespace Takai.UI
                 if (focused != null && focused.Parent == this)
                     focusIndex = focused.ChildIndex;
                 
-
                 Container.RemoveAllChildren();
                 var newChildren = new System.Collections.Generic.List<Static>(Items.Count);
                 for (int i = 0; i < Items.Count; ++i)
@@ -75,14 +90,15 @@ namespace Takai.UI
                 if (_container != null)
                     _container.MoveAllChildrenTo(value);
 
+                var lastContainerIndex = _container.ChildIndex;
                 _container = value;
-                ReplaceAllChildren(_container);
+                ReplaceChild(value, lastContainerIndex);
             }
         }
         private Static _container = new List
         {
-            HorizontalAlignment = Alignment.Stretch,
-            VerticalAlignment = Alignment.Stretch
+            //HorizontalAlignment = Alignment.Stretch,
+            //VerticalAlignment = Alignment.Stretch
         };
 
         public bool AllowSelection { get; set; } = true;
@@ -140,7 +156,7 @@ namespace Takai.UI
         ///     Add: add the item to the list and reset the template
         ///     Clear: reset the template
         /// </summary>
-        public Static AddItemTemplate
+        public Static AddItemTemplate //todo: should this go inside the container?
         {
             get => _addItemTemplate;
             set
@@ -160,25 +176,38 @@ namespace Takai.UI
             }
         }
         private Static _addItemTemplate;
-        protected T newItem = default(T);
+        protected T newItem = default;
 
         public ItemList()
         {
-            Items.CollectionChanged += Items_CollectionChanged;
+            Items = new ObservableCollection<T>();
             AddChild(Container);
 
             CommandActions["ChangeSelection"] = delegate (Static sender, object arg)
             {
                 ((ItemList<T>)sender).SelectedIndex = (int)arg;
             };
+
+            CommandActions["AddItem"] = delegate (Static sender, object arg)
+            {
+                Items.Add(newItem);
+                newItem = default;
+                AddItemTemplate.BindTo(newItem);
+            };
         }
 
         protected override void FinalizeClone()
         {
             Items = new ObservableCollection<T>(Items);
-            Items.CollectionChanged += Items_CollectionChanged;
             _container = Children[Container.ChildIndex];
+            if (_addItemTemplate != null)
+                _addItemTemplate = Children[_addItemTemplate.ChildIndex];
             base.FinalizeClone();
+        }
+
+        public override void BindTo(object source)
+        {
+            BindToThis(source);
         }
 
         protected void Items_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
