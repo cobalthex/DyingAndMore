@@ -27,6 +27,19 @@ namespace Takai.Data
 
             var objType = obj.GetType();
 
+            if (memberName.Equals("this", StringComparison.OrdinalIgnoreCase)) //experimental
+            {
+                return new GetSet
+                {
+                    type = objType,
+                    set = delegate (object value)
+                    {
+                        Serializer.ApplyObject(obj, value); //hacky
+                    },
+                    get = () => obj
+                };
+            }
+
             PropertyInfo prop;
             FieldInfo field;
 
@@ -119,8 +132,7 @@ namespace Takai.Data
 
             if (modifier.Length > 1 && getset.get != null)
             {
-                var oget = getset.get; //explicitly allow throw
-
+                var oget = getset.get; //explicitly allow throwing
                 if (modifier[1].Equals("type", StringComparison.OrdinalIgnoreCase))
                 {
                     getset.type = typeof(Type);
