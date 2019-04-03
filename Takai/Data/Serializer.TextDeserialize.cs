@@ -885,7 +885,8 @@ namespace Takai.Data
                         //return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
                     }
 
-                    if (genericType == typeof(List<>) || genericType == typeof(IEnumerable<>))
+                    if (genericType == typeof(List<>) ||
+                        genericType == typeof(IEnumerable<>))
                     {
                         sourceList = sourceList.Select(i => Cast(genericArgs[0], i, context)).ToList(); //todo: List.ConvertAll (doesn't work on .net core)
                         var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });

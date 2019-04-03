@@ -46,12 +46,15 @@ namespace Takai.UI
                 var focused = FindFocusedNoParent();
                 if (focused != null && focused.Parent == this)
                     focusIndex = focused.ChildIndex;
+                
 
                 Container.RemoveAllChildren();
                 var newChildren = new System.Collections.Generic.List<Static>(Items.Count);
                 for (int i = 0; i < Items.Count; ++i)
                     newChildren.Add(CreateItemEntry(Items[i]));
                 Container.AddChildren(newChildren);
+                if (focusIndex > -1)
+                    Container.Children[focusIndex].HasFocus = true;
             }
         }
         private Static _itemTemplate = null;

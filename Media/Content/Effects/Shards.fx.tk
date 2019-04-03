@@ -17,12 +17,12 @@ EffectsClass {
                 Sprite: @"./spark.png";
                 Blend: BlendState.Additive;
                 ColorOverTime: Color.HotPink;
-                InitialSpeed: [-300 -400];
-                LifeSpan: [0.15sec 0.5sec];
+                InitialSpeed: [-100 -200];
+                LifeSpan: [0.05sec 0.15sec];
                 Drag: 8;
             }
             Count: [3 8];
-            Spread: [50deg 80deg];
+            Spread: [10deg 40deg];
         };
 	];
 };

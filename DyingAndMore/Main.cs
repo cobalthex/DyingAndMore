@@ -129,6 +129,13 @@ namespace DyingAndMore
 
                 ui.AddChild(child);
             };
+            Static.GlobalCommands["AddRootUI"] = delegate (Static ui, object arg)
+            {
+                if (!(arg is Static child))
+                    return;
+
+                ui.GetRoot().AddChild(child);
+            };
             Static.GlobalCommands["CloseModal"] = delegate (Static ui, object arg)
             {
                 while (ui != null && !ui.IsModal)
@@ -136,6 +143,11 @@ namespace DyingAndMore
 
                 if (ui != null)
                     ui.RemoveFromParent();
+            };
+            Static.GlobalCommands["RemoveNamedUI"] = delegate (Static ui, object arg)
+            {
+                if (arg is string str)
+                    ui.GetRoot().FindChildByName(str)?.RemoveFromParent();
             };
 
             /*
