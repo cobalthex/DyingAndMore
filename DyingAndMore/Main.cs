@@ -162,6 +162,23 @@ namespace DyingAndMore
                 }
             };
 
+            Static.GlobalCommands["Routed"] = delegate (Static ui, object arg)
+            {
+                //solve this via tunneling?
+
+                if (!(arg is System.Collections.IList il) || il.Count < 2 || 
+                    !(il[0] is string name))
+                        return;
+
+                var namedUI = ui.GetRoot().FindChildByName(name);
+                if (namedUI != null)
+                {
+                    var cmd = Serializer.Cast<EventCommandBinding>(il[1]);
+                    namedUI.BubbleCommand(cmd.command, cmd.argument);
+                }
+
+            };
+
             /*
 #if WINDOWS //UWP launch activation parameters?
             //parse command line args

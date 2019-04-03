@@ -35,6 +35,7 @@ List {
 			Size: 300;
 			Children: [
 				ActorList {
+					Name: "SquadActorSelect";
 					Container: List {
 						Direction: Direction.Vertical;
 						Margin: 10;
@@ -62,9 +63,20 @@ List {
 									BackgroundSprite: @"UI/test/test.9p.tk";
 									Children: [
 										EntitySelector {
+											Bindings: [
+												Binding {
+													Source: "this";
+													Target: "SelectedEntity";
+												};
+											];
 											Size: [400 400];
 											EventCommands: {
-												SelectionChanged: ["Multiple" [["RemoveNamedUI" "ActorSelector"] "AddItem"]]; # broken since Root UI
+												SelectionChanged: [
+													"Multiple" [
+														["Routed" ["SquadActorSelect" "AddItem"]]
+														["RemoveNamedUI" "ActorSelector"]
+													]
+												]; # broken since Root UI
 												# todo: routable commands (route to named UI)
 											}
 										};
