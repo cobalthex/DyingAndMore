@@ -91,8 +91,11 @@ namespace DyingAndMore.Game.Weapons
             }
 
             var next = SpawnQueue.Dequeue();
-            Actor.Map.Spawn(next, Actor.Position + Actor.Forward * (Actor.Radius + 10), Actor.Forward, Actor. Forward * 100);
-            base.OnDischarge();
+            if (next != null)
+            {
+                Actor.Map.Spawn(next, Actor.Position + Actor.Forward * (Actor.Radius + 10), Actor.Forward, Actor.Forward * 100);
+                base.OnDischarge();
+            }
         }
 
         public override bool Combine(WeaponInstance other)

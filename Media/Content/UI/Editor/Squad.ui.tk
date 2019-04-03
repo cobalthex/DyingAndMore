@@ -10,19 +10,41 @@ List {
 		Static { Text: "Edit Squad"; };
 		Static { Size: [1 10]; };
 
-		Static { Text: "Actors"; };
-		Static {
+		Static { Text: "Units"; };
+		ActorList {
+			Bindings: [
+				Binding {
+					Source: "Units";
+					Target: "Items";
+				};
+			];
+			ItemTemplate: List {
+				Direction: Direction.Horizontal;
+				Margin: 10;
+				Children: [
+					Static { Bindings: [ Binding { Source: ":Typename"; Target: "Text" } ]; }
+				];
+			}
+		}
+
+		#*Static {
 			Text: "Select actor";
 			EventCommands: {
 				Click: [
-					"AddUI"
+					"AddRootUI"
 					List {
+						Name: "ActorSelector";
+						HorizontalAlignment: Alignment.Center;
+						VerticalAlignment: Alignment.Center;
 						IsModal: true;
 						Padding: 10;
 						BackgroundSprite: @"UI/test/test.9p.tk";
 						Children: [
 							EntitySelector {
 								Size: [400 400];
+								EventCommands: {
+									SelectionChanged: ["RemoveNamedUI" "ActorSelector"];
+								}
 							};
 
 							Static {
@@ -36,7 +58,7 @@ List {
 					};
 				];
 			};
-		};
+		};*#
 
 		Static {
 			Text: "Close";
