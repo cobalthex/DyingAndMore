@@ -108,7 +108,7 @@ namespace Takai.UI
         /// </summary>
         public T SelectedItem
         {
-            get => SelectedIndex < 0 ? default(T) : Items[SelectedIndex];
+            get => SelectedIndex < 0 ? default : Items[SelectedIndex];
             set => SelectedIndex = Items.IndexOf(value);
         }
 
@@ -144,6 +144,11 @@ namespace Takai.UI
 
         public float ItemPadding = 10;
 
+        struct NewItemContainer
+        {
+            public T item;
+        }
+
         /// <summary>
         /// An optional template to add a new item
         /// If null, the list is not user editable
@@ -170,13 +175,16 @@ namespace Takai.UI
                 _addItemTemplate = value.CloneHierarchy();
                 if (_addItemTemplate != null)
                 {
+                    newItem = new NewItemContainer();
                     _addItemTemplate.BindTo(newItem);
                     AddChild(_addItemTemplate);
                 }
             }
         }
         private Static _addItemTemplate;
-        protected T newItem = default;
+        private NewItemContainer newItem = new NewItemContainer();
+
+        //add item item template
 
         public ItemList()
         {
@@ -190,9 +198,18 @@ namespace Takai.UI
 
             CommandActions["AddItem"] = delegate (Static sender, object arg)
             {
-                Items.Add(newItem);
-                newItem = default;
+                if (newItem.item == default)
+                    return;
+
+                Items.Add(newItem.item);
                 AddItemTemplate.BindTo(newItem);
+            };
+
+            //remove item
+            CommandActions["RemoveItem"] = delegate (Static sender, object arg)
+            {
+                if (arg is int i)
+                    Items.RemoveAt(i);
             };
         }
 
@@ -201,7 +218,10 @@ namespace Takai.UI
             Items = new ObservableCollection<T>(Items);
             _container = Children[Container.ChildIndex];
             if (_addItemTemplate != null)
+            {
                 _addItemTemplate = Children[_addItemTemplate.ChildIndex];
+                _addItemTemplate.BindTo(newItem);
+            }
             base.FinalizeClone();
         }
 
