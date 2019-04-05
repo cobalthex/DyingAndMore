@@ -65,8 +65,8 @@ List {
 										EntitySelector {
 											Bindings: [
 												Binding {
-													Source: "this";
-													Target: "SelectedEntity";
+													Source: "SelectedEntity";
+													Target: "item";
 												};
 											];
 											Size: [400 400];

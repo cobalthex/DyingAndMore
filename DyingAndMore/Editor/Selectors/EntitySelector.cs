@@ -10,7 +10,8 @@ namespace DyingAndMore.Editor.Selectors
         public List<Takai.Game.EntityClass> ents = new List<Takai.Game.EntityClass>();
         System.TimeSpan elapsedTime;
 
-        public Takai.Game.EntityClass SelectedEntity => SelectedIndex == -1 ? null : ents[SelectedIndex];
+        public Takai.Game.EntityClass SelectedEntity => 
+            SelectedIndex == -1 ? null : ents[SelectedIndex];
 
         public EntitySelector()
         {
