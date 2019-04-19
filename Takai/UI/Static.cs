@@ -1675,7 +1675,9 @@ namespace Takai.UI
         public static void Reflow()
         {
             for (int i = 0; i < measureQueue.Count; ++i)
+            {
                 measureQueue[i].Measure(new Vector2(InfiniteSize));
+            }
             measureQueue.Clear();
             for (int i = 0; i < arrangeQueue.Count; ++i)
             {

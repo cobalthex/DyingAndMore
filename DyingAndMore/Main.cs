@@ -77,7 +77,6 @@ namespace DyingAndMore
             };
 
             IsMouseVisible = true;
-
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 144f);
             IsFixedTimeStep = false;
         }
@@ -122,6 +121,7 @@ namespace DyingAndMore
 
             Static.DefaultFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
 
+            //todo: move elsewhere
             Static.GlobalCommands["AddUI"] = delegate (Static ui, object arg)
             {
                 if (!(arg is Static child))
@@ -144,10 +144,31 @@ namespace DyingAndMore
                 if (ui != null)
                     ui.RemoveFromParent();
             };
-            Static.GlobalCommands["RemoveNamedUI"] = delegate (Static ui, object arg)
+            Static.GlobalCommands["RemoveUI"] = delegate (Static ui, object arg)
             {
                 if (arg is string str)
                     ui.GetRoot().FindChildByName(str)?.RemoveFromParent();
+            };
+
+            Static.GlobalCommands["EnableUI"] = delegate (Static ui, object arg)
+            {
+                if (arg is string str)
+                {
+                    ui = ui.GetRoot().FindChildByName(str);
+                    if (ui != null)
+                        ui.IsEnabled = true;
+                }
+                //int (debug id), static
+            };
+            Static.GlobalCommands["DisableUI"] = delegate (Static ui, object arg)
+            {
+                if (arg is string str)
+                {
+                    ui = ui.GetRoot().FindChildByName(str);
+                    if (ui != null)
+                        ui.IsEnabled = false;
+                }
+                //int (debug id), static
             };
 
             Static.GlobalCommands["Multiple"] = delegate (Static ui, object arg)

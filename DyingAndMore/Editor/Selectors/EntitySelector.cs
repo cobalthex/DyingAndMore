@@ -57,12 +57,22 @@ namespace DyingAndMore.Editor.Selectors
         {
             var ent = ents[itemIndex];
 
-            if ((ent.Animations.TryGetValue("EditorPreview", out var state) ||
-                 ent.Animations.TryGetValue(ent.DefaultBaseAnimation, out state)) &&
-                state.Sprite?.Texture != null)
-                state.Sprite.Draw(spriteBatch, bounds, 0, Color.White, elapsedTime);
+            var editorSprite = ent.EditorPreviewSprite.Value;
+            if (editorSprite?.Texture != null)
+            {
+                var clipLoc = VisibleContentArea.Location - OffsetContentArea.Location;
+                editorSprite.Draw(
+                    spriteBatch, 
+                    new Rectangle(clipLoc.X + bounds.X, clipLoc.Y + bounds.Y, bounds.Width, bounds.Height), 
+                    new Rectangle(clipLoc.X, clipLoc.Y, bounds.Width - clipLoc.X, bounds.Height - clipLoc.Y), 
+                    0, 
+                    Color.White, 
+                    elapsedTime
+                );
+            }
             else
             {
+                //todo: constrain to content area
                 bounds.Inflate(-4, -4);
                 Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Tomato, bounds);
                 bounds.Offset(0, 2);
