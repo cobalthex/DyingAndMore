@@ -213,12 +213,24 @@ namespace Takai.UI
             };
         }
 
+        /*protected Static FindRelevantChild(Static source)
+        {
+            while (source != null)
+            {
+                if (source.Parent == Container)
+                    return source;
+                source = source.Parent;
+            }
+            return null;
+        }*/
+
         protected override void FinalizeClone()
         {
             Items = new ObservableCollection<T>(Items);
             _container = Children[Container.ChildIndex];
             if (_addItemTemplate != null)
             {
+                newItem = new NewItemContainer();
                 _addItemTemplate = Children[_addItemTemplate.ChildIndex];
                 _addItemTemplate.BindTo(newItem);
             }

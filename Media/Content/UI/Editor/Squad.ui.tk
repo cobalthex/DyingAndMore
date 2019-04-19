@@ -49,50 +49,54 @@ List {
 					ItemTemplate: @"./ActorPreview.ui.tk";
 
 					AddItemTemplate: Static {
-						Text: "Select actor";
-						Size: [NaN 48];
-						EventCommands: {
-							Click: [
-								"AddRootUI"
-								List {
-									Name: "ActorSelector";
-									HorizontalAlignment: Alignment.Center;
-									VerticalAlignment: Alignment.Center;
-									IsModal: true;
-									Padding: 10;
-									BackgroundSprite: @"UI/test/test.9p.tk";
-									Children: [
-										EntitySelector {
-											Bindings: [
-												Binding {
-													Source: "SelectedEntity";
-													Target: "item";
-												};
-											];
-											Size: [400 400];
-											EventCommands: {
-												SelectionChanged: [
-													"Multiple" [
-														["Routed" ["SquadActorSelect" "AddItem"]]
-														["RemoveNamedUI" "ActorSelector"]
-													]
-												]; # broken since Root UI
-												# todo: routable commands (route to named UI)
-											}
-										};
-
-										Static {
-											Text: "Cancel";
-											HorizontalAlignment: Alignment.Center;
-											Padding: 10;
-											EventCommands: {
-												Click: ["RemoveNamedUI" "ActorSelector"];
-											};
-										};
-									];
+						Children: [
+							Static {
+								Text: "Select actor";
+								Size: [NaN 48];
+								EventCommands: {
+									Click: ["EnableUI" "SquadActorSelector"];
 								};
-							];
-						};
+							};
+
+							Static {
+								Name: "SquadActorSelector";
+								HorizontalAlignment: Alignment.Center;
+								VerticalAlignment: Alignment.Center;
+								IsModal: true;
+								IsEnabled: false;
+								Padding: 10;
+								BackgroundSprite: @"UI/test/test.9p.tk";
+								Children: [
+									EntitySelector {
+										Bindings: [
+											Binding {
+												Source: "SelectedEntity";
+												Target: "item";
+											};
+										];
+										Size: [400 400];
+										EventCommands: {
+											SelectionChanged: [
+												"Multiple" [
+													["Routed" ["SquadActorSelect" "AddItem"]]
+													["RemoveNamedUI" "ActorSelector"]
+												]
+											]; # broken since Root UI
+											# todo: routable commands (route to named UI)
+										}
+									};
+
+									Static {
+										Text: "Cancel";
+										HorizontalAlignment: Alignment.Center;
+										Padding: 10;
+										EventCommands: {
+											Click: ["DisableUI" "SquadActorSelector"];
+										};
+									};
+								];
+							};
+						];
 					};
 				};
 			];
