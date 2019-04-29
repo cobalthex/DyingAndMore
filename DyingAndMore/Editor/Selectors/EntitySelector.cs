@@ -7,19 +7,40 @@ namespace DyingAndMore.Editor.Selectors
 {
     class EntitySelector : Selector
     {
+        public string[] SearchPaths
+        {
+            get => _searchPaths;
+            set
+            {
+                if (_searchPaths == value)
+                    return;
+
+                _searchPaths = value;
+                RescanDirectories();
+            }
+        }
+        string[] _searchPaths = new[] { "Actors", "Scenery", "Pickups" };
+
         public List<Takai.Game.EntityClass> ents = new List<Takai.Game.EntityClass>();
         System.TimeSpan elapsedTime;
 
-        public Takai.Game.EntityClass SelectedEntity => 
-            SelectedIndex == -1 ? null : ents[SelectedIndex];
-
-        public EntitySelector()
+        public Takai.Game.EntityClass SelectedEntity
         {
-            ItemSize = new Point(64, 64);
+            get => SelectedIndex == -1 ? null : ents[SelectedIndex];
+            set
+            {
+                SelectedIndex = ents.IndexOf(value);
+            }
+        }
 
-            var searchPaths = new[] { "Actors", "Scenery", "Pickups" };
+        void RescanDirectories()
+        {
+            ents.Clear();
+            elapsedTime = System.TimeSpan.Zero;
+            if (SearchPaths == null)
+                return;
 
-            foreach (var path in searchPaths)
+            foreach (var path in SearchPaths)
             {
                 var searchPath = Path.Combine(Takai.Data.Cache.Root, path);
                 int i = 0;
@@ -37,14 +58,18 @@ namespace DyingAndMore.Editor.Selectors
                     }
                 }
             }
+            ItemCount = ents.Count;
+        }
+
+        public EntitySelector()
+        {
+            ItemSize = new Point(64, 64);
 
             //foreach (var obj in Takai.Data.Cache.LoadZip("Content/Actors.zip"))
             //{
             //    if (obj is Takai.Game.EntityClass ent)
             //        ents.Add(ent);
             //}
-
-            ItemCount = ents.Count;
         }
 
         protected override void UpdateSelf(GameTime time)
@@ -53,30 +78,23 @@ namespace DyingAndMore.Editor.Selectors
             base.UpdateSelf(time);
         }
 
-        public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds)
+        public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle offsetBounds)
         {
             var ent = ents[itemIndex];
 
             var editorSprite = ent.EditorPreviewSprite.Value;
             if (editorSprite?.Texture != null)
             {
-                var clipLoc = VisibleContentArea.Location - OffsetContentArea.Location;
-                editorSprite.Draw(
-                    spriteBatch, 
-                    new Rectangle(clipLoc.X + bounds.X, clipLoc.Y + bounds.Y, bounds.Width, bounds.Height), 
-                    new Rectangle(clipLoc.X, clipLoc.Y, bounds.Width - clipLoc.X, bounds.Height - clipLoc.Y), 
-                    0, 
-                    Color.White, 
-                    elapsedTime
-                );
+                offsetBounds.Offset(-OffsetContentArea.X, -OffsetContentArea.Y);
+                DrawSprite(spriteBatch, editorSprite, offsetBounds);
             }
             else
             {
                 //todo: constrain to content area
-                bounds.Inflate(-4, -4);
-                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Tomato, bounds);
-                bounds.Offset(0, 2);
-                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Black, bounds);
+                offsetBounds.Inflate(-4, -4);
+                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Tomato, offsetBounds);
+                offsetBounds.Offset(0, 2);
+                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Black, offsetBounds);
             }
         }
     }

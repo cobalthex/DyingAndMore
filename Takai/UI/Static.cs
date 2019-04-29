@@ -758,7 +758,6 @@ namespace Takai.UI
         /// Can be overriden to customize this behavior
         /// </summary>
         /// <param name="source">The source object for the bindings</param>
-        /// <param name="recursive">Recurse through all children and set their source aswell</param>
         public virtual void BindTo(object source)
         {
             BindToThis(source);
@@ -769,6 +768,8 @@ namespace Takai.UI
                 bindScopeGetset = Data.GetSet.GetMemberAccessors(source, ChildBindScope);
                 childScope = bindScopeGetset.cachedValue = bindScopeGetset.get?.Invoke();
                 bindScopeGetset.cachedHash = (bindScopeGetset.cachedValue ?? 0).GetHashCode();
+
+                //todo: this is not dynamic
             }
 
             foreach (var child in Children)
@@ -786,6 +787,14 @@ namespace Takai.UI
 
             foreach (var binding in Bindings)
                 binding.BindTo(source, this);
+        }
+
+        public object GetChildBindScope()
+        {
+            if (ChildBindScope == null)
+                return null;
+
+            return bindScopeGetset.cachedValue;
         }
 
         protected void BubbleEvent(string @event, UIEventArgs args)
@@ -2121,12 +2130,24 @@ namespace Takai.UI
             if (sprite?.Texture == null)
                 return;
 
-            var clip = VisibleContentArea;
-            clip.X -= OffsetContentArea.X;
-            clip.Y -= OffsetContentArea.Y;
+            var dx = VisibleContentArea.X - OffsetContentArea.X;
+            var dy = VisibleContentArea.Y - OffsetContentArea.Y;
+            var clip = sprite.ClipRect;
+            clip.X += dx;
+            clip.Y += dy;
+            clip.Width -= dx * 2;
+            clip.Height -= dy * 2;
+
             destRect.X += VisibleContentArea.X;
             destRect.Y += VisibleContentArea.Y;
-            destRect.Inflate(-clip.X / 2, -clip.Y / 2);
+            destRect.Width = clip.Width;
+            destRect.Height = clip.Height;
+
+            //broken for scrolling
+
+            //clip is applied before scaling
+            //separate version that does post scaling?
+
             sprite.Draw(spriteBatch, destRect, clip, 0, Color.White, sprite.ElapsedTime);
         }
 

@@ -131,7 +131,7 @@ namespace Takai.UI
                     }
                     if (value >= 0 && value < Items.Count)
                     {
-                        Container.Children[value].BorderColor = Static.FocusedBorderColor;
+                        Container.Children[value].BorderColor = FocusedBorderColor;
                     }
 
                     var changed = new SelectionChangedEventArgs(this, _selectedIndex, value);
@@ -144,7 +144,7 @@ namespace Takai.UI
 
         public float ItemPadding = 10;
 
-        struct NewItemContainer
+        class NewItemContainer //class required for bindings to work
         {
             public T item;
         }
@@ -198,18 +198,21 @@ namespace Takai.UI
 
             CommandActions["AddItem"] = delegate (Static sender, object arg)
             {
-                if (newItem.item == default)
+                var il = (ItemList<T>)sender;
+
+                if (il.newItem.item == default)
                     return;
 
-                Items.Add(newItem.item);
-                AddItemTemplate.BindTo(newItem);
+                il.Items.Add(il.newItem.item);
+                il.AddItemTemplate.BindTo(il.newItem);
             };
 
             //remove item
             CommandActions["RemoveItem"] = delegate (Static sender, object arg)
             {
+                var il = (ItemList<T>)sender;
                 if (arg is int i)
-                    Items.RemoveAt(i);
+                    il.Items.RemoveAt(i);
             };
         }
 

@@ -155,6 +155,11 @@ namespace Takai.Input
         [Data.Serializer.Ignored]
         public Dictionary<TAction, float> CurrentInputs { get; set; } = new Dictionary<TAction, float>();
 
+        /// <summary>
+        /// Set the state of one input
+        /// </summary>
+        /// <param name="binding">The input binding</param>
+        /// <param name="magnitude">the magnitude multiplier (e.g. analog inputs)</param>
         protected void SetInput(InputBinding<TAction> binding, float magnitude = 1)
         {
             magnitude *= binding.magnitude;

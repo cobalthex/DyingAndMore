@@ -27,7 +27,7 @@ namespace Takai.Data
 
             var objType = obj.GetType();
 
-            /*if (memberName.Equals("this", StringComparison.OrdinalIgnoreCase)) //experimental
+            if (memberName.Equals("this", StringComparison.OrdinalIgnoreCase)) //experimental
             {
                 return new GetSet
                 {
@@ -38,7 +38,7 @@ namespace Takai.Data
                     },
                     get = () => obj
                 };
-            }*/
+            }
 
             PropertyInfo prop;
             FieldInfo field;

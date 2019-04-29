@@ -116,6 +116,6 @@ namespace DyingAndMore.Editor.Selectors
             }
         }
 
-        public abstract void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds);
+        public abstract void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle offsetBounds);
     }
 }
