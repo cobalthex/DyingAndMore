@@ -150,6 +150,12 @@ namespace Takai.Game
         public Range<int> Count { get; set; } = 0;
         public Range<float> Spread { get; set; } = new Range<float>(0, MathHelper.TwoPi);
         public RandomDistribution SpreadDistribution { get; set; }
+
+        /// <summary>
+        /// Snap to a certain angle (e.g. every 15 deg), 0 for none
+        /// </summary>
+        public float AngleSnap { get; set; } = 0;
+
         public float Radius { get; set; } = 0; //spawn radius around the spawn point
 
         public bool InheritParentVelocity { get; set; }
@@ -167,6 +173,9 @@ namespace Takai.Game
             for (int i = 0; i < numParticles; ++i)
             {
                 var angle = Spread.Random(SpreadDistribution);
+                if (AngleSnap != 0)
+                    angle = (int)(angle / AngleSnap) * AngleSnap; //round?
+
                 var dir = Vector2.TransformNormal(instance.Direction, Matrix.CreateRotationZ(-angle));
                 var initAngle = dir.Angle();
 

@@ -8,6 +8,7 @@ EffectsClass {
                 InitialSpeed: [-300 -400];
                 LifeSpan: [0.15sec 0.5sec];
                 Drag: 8;
+                AngleSnap: 90deg;
             }
             Count: [1 5];
             Spread: [-80deg -50deg];
@@ -20,6 +21,7 @@ EffectsClass {
                 InitialSpeed: [-100 -200];
                 LifeSpan: [0.05sec 0.15sec];
                 Drag: 8;
+                AngleSnap: 90deg;
             }
             Count: [3 8];
             Spread: [10deg 40deg];

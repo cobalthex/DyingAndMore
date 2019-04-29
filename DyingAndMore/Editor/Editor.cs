@@ -415,6 +415,10 @@ namespace DyingAndMore.Editor
             {
                 isZoomSizing = true;
                 savedWorldPos = currentWorldPos = Camera.ScreenToWorld(InputState.MouseVector);
+                if (float.IsNaN(currentWorldPos.X) || float.IsNaN(currentWorldPos.Y))
+                {
+                    savedWorldPos = currentWorldPos = new Vector2();
+                }
                 return false;
             }
             if (InputState.IsClick(Keys.Z))

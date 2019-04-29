@@ -134,6 +134,9 @@ namespace DyingAndMore
                 if (!(arg is Static child))
                     return;
 
+                if (ui.ChildBindScope != null)
+                    child.BindTo(ui.GetChildBindScope());
+
                 ui.GetRoot().AddChild(child);
             };
             Static.GlobalCommands["CloseModal"] = delegate (Static ui, object arg)
