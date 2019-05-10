@@ -1970,7 +1970,7 @@ namespace Takai.UI
 
                 if (toDraw.BackgroundColor.A > 0)
                     Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
-                toDraw.BackgroundSprite.Draw(spriteBatch, toDraw.VisibleBounds);
+                toDraw.BackgroundSprite.Draw(spriteBatch, toDraw.VisibleBounds); //todo: stretch properly
 
                 toDraw.DrawSelf(spriteBatch);
 
@@ -2127,29 +2127,37 @@ namespace Takai.UI
 
         protected void DrawSprite(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle destRect)
         {
-            if (sprite?.Texture == null)
+            DrawSpriteCustomRegion(spriteBatch, sprite, destRect, VisibleContentArea);
+        }
+
+        void DrawSpriteCustomRegion(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle destRect, Rectangle clipRegion)
+        {
+            //todo: use this w/ background sprite
+
+            if (sprite?.Texture == null || destRect.Width == 0 || destRect.Height == 0)
                 return;
+
+            var sx = sprite.Width / (float)destRect.Width;
+            var sy = sprite.Height / (float)destRect.Height;
 
             var dx = VisibleContentArea.X - OffsetContentArea.X;
             var dy = VisibleContentArea.Y - OffsetContentArea.Y;
-            var clip = sprite.ClipRect;
-            clip.X += dx;
-            clip.Y += dy;
-            clip.Width -= dx * 2;
-            clip.Height -= dy * 2;
 
-            destRect.X += VisibleContentArea.X;
-            destRect.Y += VisibleContentArea.Y;
-            destRect.Width = clip.Width;
-            destRect.Height = clip.Height;
+            destRect.X += clipRegion.X;
+            destRect.Y += clipRegion.Y;
+            destRect.Width = System.Math.Min(destRect.Width, clipRegion.Width);
+            destRect.Height = System.Math.Min(destRect.Height, clipRegion.Height);
 
-            //broken for scrolling
-
-            //clip is applied before scaling
-            //separate version that does post scaling?
+            var clip = new Rectangle(
+                (int)(dx * sx),
+                (int)(dy * sy),
+                (int)(destRect.Width * sx),
+                (int)(destRect.Height * sy)
+            );
 
             sprite.Draw(spriteBatch, destRect, clip, 0, Color.White, sprite.ElapsedTime);
         }
+
 
         #endregion
 

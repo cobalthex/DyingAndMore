@@ -8,12 +8,17 @@ MapInstance {
             UnitsTemplate: [
                 @"Actors/InfectedCell.ent.tk"
                 @"Actors/Astrovirus.ent.tk"
+                @"Actors/Astrovirus.ent.tk"
+                @"Actors/Astrovirus.ent.tk"
+                @"Actors/Astrovirus.ent.tk"
+                @"Actors/Astrovirus.ent.tk"
+                @"Actors/ShootTest.ent.tk"
             ];
-            SpawnPosition: [3000 800];
+            SpawnPosition: [3000 1800];
             SpawnRadius: 150;
             DontSpawnAutomatically: True;
             MinLiveCount: 0;
-            MaxLiveCount: 4;    
+            MaxLiveCount: 4;
             MaxSpawnCount: 18;
             SpawnDelay: 4000;
             ResetDelay: 30000;
