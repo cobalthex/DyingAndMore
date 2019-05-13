@@ -1,54 +1,151 @@
 List {
 	IsModal: true;
-	Padding: 10;
-	Direction: Direction.Vertical;
+	Padding: 20;
+	Margin: 20;
 	HorizontalAlignment: Alignment.Center;
 	VerticalAlignment: Alignment.Center;
-	BackgroundColor: [60 60 60 255];
-
+	Direction: Direction.Vertical;
+	BackgroundSprite: @"UI/test/test.9p.tk";
 	Children: [
-		Static { Text: "Edit Squad"; };
-		Static { Size: [1 10]; };
+		List {
+			Direction: Direction.Horizontal;
+			Margin: 20;
 
-		Static { Text: "Leader (Randomized)"; };
-		ScrollBox {
-			Size: [300 100];
 			Children: [
-				ActorList {
-					Container: List {
-						Direction: Direction.Vertical;
-						Margin: 10;
-					}
-					Bindings: [
-						Binding {
-							Source: "LeaderTemplate";
-							Target: "Items";
+				List {
+					Direction: Direction.Vertical;
+					Size: [300 NaN];
+					Margin: 10;
+					Children: [
+						Static { Text: "`_Options"; };
+						Static { Size: [1 1]; };
+
+						CheckBox {
+							Text: "Disable Spawning if\nLeader is dead";
+							Bindings: [
+								Binding {
+									Source: "DisableSpawningIfLeaderIsDead";
+									Target: "IsChecked";
+									Direction: BindingDirection.TwoWay;
+								};
+							];
+						};
+
+						Static { Text: "`_Minimum Active Units"; }
+						NumericInput {
+							Bindings: [
+								Binding {
+									Source: "MinLiveCount";
+									Target: "Value";
+									Direction: BindingDirection.TwoWay;
+								};
+							];
+						};
+
+						Static { Text: "`_Maximum Active Units"; }
+						NumericInput {
+							Bindings: [
+								Binding {
+									Source: "MaxLiveCount";
+									Target: "Value";
+									Direction: BindingDirection.TwoWay;
+								};
+							];
+						};
+
+						Static { Text: "`_Total Spawn Allowance"; }
+						NumericInput {
+							Bindings: [
+								Binding {
+									Source: "MaxSpawnCount";
+									Target: "Value";
+									Direction: BindingDirection.TwoWay;
+								};
+							];
+						};
+
+						Static { Text: "`_Current Spawn Count"; }
+						Static {
+							Bindings: [
+								Binding {
+									Source: "TotalSpawnCount";
+									Target: "Text";
+								};
+							];
+						};
+
+						Static { Text: "`_Current Active Count"; }
+						Static {
+							Bindings: [
+								Binding {
+									Source: "Units.Count";
+									Target: "Text";
+								};
+							];
 						};
 					];
-					ItemTemplate: @"./ActorPreview.ui.tk";
-					AddItemTemplate: @"./Entities/SelectActor.ui.tk";
+					# size calculation fucked right now
 				};
-			];
-		};
+				Static {
+					BackgroundColor: [255 255 255 127];
+					VerticalAlignment: Alignment.Stretch;
+					Size: [1 NaN];
+				}
+				List {
+					Direction: Direction.Vertical;
+					Margin: 10;
+					Size: [300 NaN];
+					Children: [
+						Static { Text: "`_Spawns"; };
+						Static { Size: [1 1]; };
 
-		Static { Text: "Units"; };
-		ScrollBox {
-			Size: 300;
-			Children: [
-				ActorList {
-					Name: "SquadActorSelect";
-					Container: List {
-						Direction: Direction.Vertical;
-						Margin: 10;
-					}
-					Bindings: [
-						Binding {
-							Source: "UnitsTemplate";
-							Target: "Items";
+						Static { Text: "`_Leader (Randomized)"; };
+						ScrollBox {
+							HorizontalAlignment: Alignment.Stretch;
+							Size: [NaN 100];
+							Children: [
+								ActorList {
+									Container: List {
+										Direction: Direction.Vertical;
+										Margin: 10;
+									}
+									Bindings: [
+										Binding {
+											Source: "LeaderTemplate";
+											Target: "Items";
+											Direction: BindingDirection.TwoWay;
+										};
+									];
+									ItemTemplate: @"./ActorPreview.ui.tk";
+									AddItemTemplate: @"./Entities/SelectActor.ui.tk";
+								};
+							];
+						};
+
+						Static { Text: "`_Units"; };
+						ScrollBox {
+							HorizontalAlignment: Alignment.Stretch;
+							Size: [NaN 300];
+							Children: [
+								ActorList {
+									Name: "SquadActorSelect";
+									Container: List {
+										Direction: Direction.Vertical;
+										Margin: 10;
+									}
+									Bindings: [
+										Binding {
+											Source: "UnitsTemplate";
+											Target: "Items";
+											Direction: BindingDirection.TwoWay;
+										};
+									];
+									ItemTemplate: @"./ActorPreview.ui.tk";
+									AddItemTemplate: @"./Entities/SelectActor.ui.tk";
+								};
+							];
 						};
 					];
-					ItemTemplate: @"./ActorPreview.ui.tk";
-					AddItemTemplate: @"./Entities/SelectActor.ui.tk";
 				};
 			];
 		};
@@ -56,7 +153,8 @@ List {
 		Static {
 			Text: "Close";
 			HorizontalAlignment: Alignment.Center;
-			Padding: 10;
+			Padding: 5;
+			Size: [100 NaN];
 			EventCommands: {
 				Click: ["CloseModal"];
 			};

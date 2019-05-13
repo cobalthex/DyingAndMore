@@ -131,7 +131,7 @@ namespace Takai
         {
             return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
         }
-        
+
         public static int CeilDiv(int n, int m)
         {
             return (n / m) + ((n % m) > 0 ? 1 : 0);
@@ -309,6 +309,14 @@ namespace Takai
             return builder.ToString();
         }
 
+        public static float LineIntersectAaBbX(Vector2 a, Vector2 b, float xLine)
+        {
+            return a.Y + (((b.Y - a.Y) / (b.X - a.X)) * (xLine - a.X));
+        }
+        public static float LineIntersectAaBbY(Vector2 a, Vector2 b, float yLine)
+        {
+            return a.X + ((yLine - a.Y) / ((b.Y - a.Y) / (b.X - a.X)));
+        }
     }
 
     public struct Extent

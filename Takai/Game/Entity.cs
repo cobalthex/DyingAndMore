@@ -345,7 +345,7 @@ namespace Takai.Game
             max = Vector2.Max(max, v);
 
             var size = max - min;
-            r = new Rectangle((int)min.X, (int)min.Y, (int)Math.Ceiling(size.X), (int)Math.Ceiling(size.Y));
+            r = new Rectangle(0, 0, (int)Math.Ceiling(size.X), (int)Math.Ceiling(size.Y));
             r = Rectangle.Union(
                 new Rectangle(
                     lastSizeFixed.X / -2,
@@ -354,6 +354,7 @@ namespace Takai.Game
                     lastSizeFixed.Y
                 ), r
             );
+            r.Offset((int)min.X, (int)min.Y);
 
             AxisAlignedBounds = r;
         }
