@@ -21,6 +21,7 @@ namespace Takai.Graphics
             };
         }
 
+        //todo: clip rect
         public void Draw(SpriteBatch spriteBatch, Rectangle destination)
         {
             if (Sprite == null)

@@ -1970,7 +1970,7 @@ namespace Takai.UI
 
                 if (toDraw.BackgroundColor.A > 0)
                     Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
-                toDraw.BackgroundSprite.Draw(spriteBatch, toDraw.VisibleBounds); //todo: stretch properly
+                toDraw.BackgroundSprite.Draw(spriteBatch, toDraw.VisibleBounds);
 
                 toDraw.DrawSelf(spriteBatch);
 

@@ -1,6 +1,6 @@
 Table {
     Name: "Entity info";
-    BackgroundColor: [32 0 128 192];
+    BackgroundSprite: @"UI/test/test.9p.tk";
     Position: [20 20];
     VerticalAlignment: Alignment.Bottom;
     ColumnCount: 2;
