@@ -59,11 +59,13 @@ namespace DyingAndMore.Editor.Selectors
                 }
             }
             ItemCount = ents.Count;
+            InvalidateMeasure();
         }
 
         public EntitySelector()
         {
             ItemSize = new Point(64, 64);
+            RescanDirectories();
 
             //foreach (var obj in Takai.Data.Cache.LoadZip("Content/Actors.zip"))
             //{
@@ -80,6 +82,9 @@ namespace DyingAndMore.Editor.Selectors
 
         public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle offsetBounds)
         {
+            if (ents.Count <= itemIndex)
+                return;
+
             var ent = ents[itemIndex];
 
             var editorSprite = ent.EditorPreviewSprite.Value;

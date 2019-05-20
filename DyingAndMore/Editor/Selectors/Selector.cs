@@ -11,7 +11,19 @@ namespace DyingAndMore.Editor.Selectors
     {
         public Point ItemSize { get; set; } = new Point(1);
 
-        public int ItemCount { get; set; } = 0;
+        public int ItemCount
+        {
+            get => _ItemCount;
+            set
+            {
+                if (_ItemCount == value)
+                    return;
+
+                _ItemCount = value;
+                InvalidateMeasure();
+            }
+        }
+        private int _ItemCount = 8;
 
         protected int ItemsPerRow
         {
