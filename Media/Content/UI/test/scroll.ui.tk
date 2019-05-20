@@ -18,6 +18,8 @@ ScrollBox {
 				Static { Text: "ghi"; Size: [300 100]; BackgroundColor: ColorUtil.RandomColor; };
 				Static { Text: "jkl"; Size: [400 100]; BackgroundColor: ColorUtil.RandomColor; };
 				Static { Text: "mno"; Size: [500 100]; BackgroundColor: ColorUtil.RandomColor; };
+				Static { Name: "foo"; Text: "zzz"; Size: [500 100]; BackgroundColor: ColorUtil.RandomColor; };
+
 			]
 		}
 	]

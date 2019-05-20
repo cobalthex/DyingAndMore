@@ -274,11 +274,13 @@ namespace Takai.UI
                 horizontalScrollbar = (ScrollBar)value.CloneHierarchy();
                 horizontalScrollbar.HorizontalAlignment = Alignment.Stretch;
                 horizontalScrollbar.Direction = Direction.Horizontal;
+                horizontalScrollbar.VerticalAlignment = Alignment.Bottom;
 
                 var vsp = verticalScrollbar?.ChildIndex ?? -1;
                 verticalScrollbar = (ScrollBar)value.CloneHierarchy();
                 verticalScrollbar.VerticalAlignment = Alignment.Stretch;
                 verticalScrollbar.Direction = Direction.Vertical;
+                verticalScrollbar.HorizontalAlignment = Alignment.Right;
 
                 if (vsp >= 0)
                 {
@@ -391,10 +393,7 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            var availSize = availableSize;
-            foreach (var child in Children)
-                child.Measure(availSize);
-            return contentContainer.MeasuredSize;
+            return contentContainer.Measure(new Vector2(InfiniteSize));
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)

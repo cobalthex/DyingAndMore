@@ -45,7 +45,7 @@ namespace DyingAndMore.Editor
 
         protected override void UpdatePreview(int selectedItem)
         {
-            if (selectedItem >= 0 && 
+            if (selectedItem >= 0 && selector.ents.Count > selectedItem &&
                 (selector.ents[selectedItem].Animations.TryGetValue("EditorPreview", out var animation) ||
                  selector.ents[selectedItem].Animations.TryGetValue(selector.ents[selectedItem].DefaultBaseAnimation, out animation)))
             {
