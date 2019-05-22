@@ -57,7 +57,7 @@ namespace Takai.UI
 
             if (IsChecked)
             {
-                checkBounds.Inflate(-4, -4);
+                checkBounds.Inflate(checkboxSize * -0.2f, checkboxSize * -0.2f);
                 Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, Rectangle.Intersect(checkBounds, VisibleContentArea));
             }
 
