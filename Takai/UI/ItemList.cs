@@ -215,7 +215,6 @@ namespace Takai.UI
                     il.Items.RemoveAt(i);
             };
         }
-
         /*protected Static FindRelevantChild(Static source)
         {
             while (source != null)
@@ -277,7 +276,6 @@ namespace Takai.UI
                 for (int i = 0; i < e.NewItems.Count; ++i)
                     Container.InsertChild(CreateItemEntry((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
-            InvalidateMeasure();
         }
 
         /// <summary>

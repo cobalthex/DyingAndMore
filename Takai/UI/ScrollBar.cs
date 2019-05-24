@@ -305,6 +305,7 @@ namespace Takai.UI
         protected ScrollBar horizontalScrollbar;
         protected Static contentContainer = new Static
         {
+            Name = "cc",
             HorizontalAlignment = Alignment.Stretch,
             VerticalAlignment = Alignment.Stretch
         };

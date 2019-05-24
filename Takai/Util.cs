@@ -157,6 +157,16 @@ namespace Takai
             return new Vector2((float)Math.Ceiling(v.X), (float)Math.Ceiling(v.Y));
         }
 
+        public static Point Abs(this Point p)
+        {
+            return new Point(Math.Abs(p.X), Math.Abs(p.Y));
+        }
+        public static Vector2 Abs(this Vector2 v)
+        {
+            return new Vector2(Math.Abs(v.X), Math.Abs(v.Y));
+        }
+
+
         /// <summary>
         /// Calculate a rectangle that is always of positive size
         /// </summary>
