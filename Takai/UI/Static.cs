@@ -1571,8 +1571,8 @@ namespace Takai.UI
 
                 var mes = Children[i].Measure(availableSize).ToPoint();
                 bounds = Rectangle.Union(bounds, new Rectangle(
-                    (int)Children[i].Position.X,
-                    (int)Children[i].Position.Y,
+                    0,//(int)Children[i].Position.X,
+                    0,//(int)Children[i].Position.Y,
                     mes.X,
                     mes.Y
                 ));
