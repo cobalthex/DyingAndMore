@@ -352,7 +352,6 @@ namespace DyingAndMore
                 ui.DebugInvalidateTree();
 
             ui.Update(gameTime);
-            //ui.Size = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         }
 
         protected override void Draw(GameTime gameTime)

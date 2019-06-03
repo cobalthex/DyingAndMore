@@ -100,7 +100,7 @@ List {
 						Static { Size: [1 1]; };
 
 						Static { Text: "`_Leader (Randomized)"; };
-						ScrollBox {
+						#*ScrollBox {
 							HorizontalAlignment: Alignment.Stretch;
 							Size: [NaN 100];
 							Children: [
@@ -120,16 +120,18 @@ List {
 									AddItemTemplate: @"./Entities/SelectActor.ui.tk";
 								};
 							];
-						};
+						};*#
 
 						Static { Text: "`_Units"; };
 						ScrollBox {
+							Name: "zop";
 							HorizontalAlignment: Alignment.Stretch;
 							Size: [NaN 300];
 							Children: [
 								ActorList {
 									Name: "SquadActorSelect";
 									Container: List {
+										Name: "333";
 										Direction: Direction.Vertical;
 										Margin: 10;
 									}
@@ -140,7 +142,8 @@ List {
 											Direction: BindingDirection.TwoWay;
 										};
 									];
-									ItemTemplate: @"./ActorPreview.ui.tk";
+									#ItemTemplate: @"./ActorPreview.ui.tk";
+									ItemTemplate: Static { Text: "AAA"; };
 									AddItemTemplate: @"./Entities/SelectActor.ui.tk";
 								};
 							];

@@ -1,4 +1,4 @@
-ScrollBox {
+#*ScrollBox {
 	Size: [400 400];
 	BorderColor: [0 40 100];
 	HorizontalAlignment: Alignment.Middle;
@@ -23,4 +23,38 @@ ScrollBox {
 			]
 		}
 	]
-}
+}*#
+
+Static {
+	Name: "!";
+	Width: 400;
+	Height: 400;
+	HorizontalAlignment: Alignment.Middle;
+	VerticalAlignment: Alignment.Middle;
+	BackgroundColor: [0 38 58];
+	Children: [
+		ScrollBox {
+			Name: "a";
+			HorizontalAlignment: Alignment.Stretch;
+			Size: [NaN 300];
+			Children: [
+				ActorList {
+					Name: "b";
+					Container: List {
+						Name: "c";
+						Direction: Direction.Vertical;
+						Margin: 10;
+					}
+					ItemTemplate: Static { Text: "AAA"; Size: [100 100]; };
+					Items: [
+						@"Actors/player.ent.tk";
+						@"Actors/player.ent.tk";
+						@"Actors/player.ent.tk";
+						@"Actors/player.ent.tk";
+						@"Actors/player.ent.tk";
+					];
+				};
+			];
+		};
+	];
+};

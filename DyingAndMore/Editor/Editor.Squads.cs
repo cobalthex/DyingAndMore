@@ -66,7 +66,7 @@ namespace DyingAndMore.Editor
 
             if (creatingSquad)
             {
-                if (SelectedSquad != null && SelectedSquad.SpawnRadius > 5)
+                if (SelectedSquad != null && SelectedSquad.SpawnRadius > 10)
                 {
                     var ui = nameUI.CloneHierarchy();
                     ui.BindTo(SelectedSquad);
@@ -124,7 +124,7 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsPress(Keys.Space))
                 {
-                    var ui = editUI.CloneHierarchy();
+                    var ui = editUI;//.CloneHierarchy();
                     ui.BindTo(SelectedSquad);
 
                     AddChild(ui);

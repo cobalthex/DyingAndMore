@@ -9,7 +9,7 @@ namespace DyingAndMore.Editor.Selectors
 {
     public abstract class Selector : Static
     {
-        public Point ItemSize { get; set; } = new Point(1);
+        public Vector2 ItemSize { get; set; } = new Vector2(1);
 
         public int ItemCount
         {
@@ -23,21 +23,9 @@ namespace DyingAndMore.Editor.Selectors
                 InvalidateMeasure();
             }
         }
-        private int _ItemCount = 8;
+        private int _ItemCount = 0;
 
-        protected int ItemsPerRow
-        {
-            get => _ItemsPerRow;
-            set
-            {
-                if (_ItemsPerRow == value)
-                    return;
-
-                _ItemsPerRow = value;
-                InvalidateMeasure();
-            }
-        }
-        private int _ItemsPerRow = 8;
+        public int ItemsPerRow { get; private set; }
 
         public Vector2 ItemMargin { get; set; } = new Vector2(2);
 
@@ -54,6 +42,7 @@ namespace DyingAndMore.Editor.Selectors
 
         public override bool CanFocus => true;
 
+
         public Selector()
         {
             On(PressEvent, OnPress);
@@ -61,12 +50,12 @@ namespace DyingAndMore.Editor.Selectors
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            return new Vector2(ItemCount % ItemsPerRow, Takai.Util.CeilDiv(ItemCount, ItemsPerRow)) * (ItemSize.ToVector2() + ItemMargin);
+            return availableSize == new Vector2(InfiniteSize) ? (float)Math.Sqrt(ItemCount) * (ItemSize + ItemMargin) : availableSize;
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            ItemsPerRow = Math.Max(1, (int)((availableSize.X - ItemMargin.X) / (ItemSize.X + ItemMargin.X)));
+            ItemsPerRow = (int)(availableSize.X / (ItemSize.X + ItemMargin.X));
             base.ArrangeOverride(availableSize);
         }
 
@@ -107,8 +96,8 @@ namespace DyingAndMore.Editor.Selectors
                 var rect = new Rectangle(
                     (int)(OffsetContentArea.X + ItemMargin.X + (i % ItemsPerRow) * (ItemSize.X + ItemMargin.X)),
                     (int)(OffsetContentArea.Y + ItemMargin.Y + (i / ItemsPerRow) * (ItemSize.Y + ItemMargin.Y) - visPos),
-                    ItemSize.X,
-                    ItemSize.Y
+                    (int)ItemSize.X,
+                    (int)ItemSize.Y
                 );
                 rect = Rectangle.Intersect(rect, VisibleContentArea);
 
