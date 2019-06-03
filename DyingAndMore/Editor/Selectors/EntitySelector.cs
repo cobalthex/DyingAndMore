@@ -64,7 +64,7 @@ namespace DyingAndMore.Editor.Selectors
 
         public EntitySelector()
         {
-            ItemSize = new Point(64, 64);
+            ItemSize = new Vector2(64, 64);
             RescanDirectories();
 
             //foreach (var obj in Takai.Data.Cache.LoadZip("Content/Actors.zip"))

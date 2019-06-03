@@ -15,7 +15,7 @@ namespace DyingAndMore.Editor.Selectors
         {
             this.tileset = tileset;
 
-            ItemSize = new Point(tileset.size);
+            ItemSize = new Vector2(tileset.size);
             tilesPerRow = tileset.TilesPerRow;
 
             if (tileset.texture != null)
@@ -25,10 +25,10 @@ namespace DyingAndMore.Editor.Selectors
         public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds)
         {
             var clip = new Rectangle(
-                (itemIndex % tilesPerRow) * ItemSize.X,
-                (itemIndex / tilesPerRow) * ItemSize.Y,
-                ItemSize.X,
-                ItemSize.Y
+                (int)((itemIndex % tilesPerRow) * ItemSize.X),
+                (int)((itemIndex / tilesPerRow) * ItemSize.Y),
+                (int)ItemSize.X,
+                (int)ItemSize.Y
             );
             spriteBatch.Draw(tileset.texture, bounds, clip, Color.White);
         }

@@ -111,7 +111,7 @@ namespace Takai.UI
                     ));
                     t += itemSize;
                 }
-     }
+            }
         }
     }
 }

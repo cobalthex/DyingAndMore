@@ -880,6 +880,12 @@ namespace Takai.UI
                 var child = clone._children[i].CloneHierarchy();
                 child.SetParentNoReflow(clone);
                 clone._children[i] = child;
+
+                //do these immediately (on original)?
+                if (child.measureCount > 0)
+                    measureQueue.Add(child);
+                if (child.arrangeCount > 0)
+                    arrangeQueue.Add(child);
             }
             clone.FinalizeClone();
             clone.InvalidateMeasure();
@@ -1422,34 +1428,41 @@ namespace Takai.UI
 
         #region Layout
 
-        public void InvalidateArrange()
+        public void InvalidateMeasure()
         {
-            if (isArrangeValid)
+            if (measureCount < 1)
             {
-                isArrangeValid = false;
-                arrangeQueue.Add(this);
+                ++measureCount;
+                measureQueue.Add(this);
             }
         }
 
-        public void InvalidateMeasure()
-        {
-            isMeasureValid = false;
-            measureQueue.Add(this);
-        }
 
+        public void InvalidateArrange()
+        {
+            if (arrangeCount < 1)
+            {
+                ++arrangeCount;
+                arrangeQueue.Add(this);
+            }
+        }
         /// <summary>
         /// force the entire tree to be remeasured and relayed-out
         /// </summary>
         public void DebugInvalidateTree()
         {
             foreach (var element in EnumerateRecursive())
-            {
-                element.isMeasureValid = false;
-            }
-            InvalidateMeasure();
+                element.InvalidateMeasure();
         }
 
-        bool isMeasureValid = false, isArrangeValid = true;
+        //how many measures/arranges are currently queued
+        //if 0, measure/arrange valid
+        //if 1, next measure/arrange will act accordingly
+        //if >1, skipped
+        //this (hopefully) ensures that child measures/invalids happen in correct order
+        int measureCount;
+        int arrangeCount;
+
         private Rectangle containerBounds; //todo: re-evaluate necessity
 
         /// <summary>
@@ -1460,8 +1473,11 @@ namespace Takai.UI
         /// <returns>The desired size of this element, including padding</returns>
         public Vector2 Measure(Vector2 availableSize)
         {
-            if (isMeasureValid)
+            if (measureCount == 0)
                 return MeasuredSize;
+#if DEBUG
+            ++totalMeasureCount;
+#endif
 
             //System.Diagnostics.Debug.WriteLine($"Measuring ID:{DebugId} (available size:{availableSize})");
 
@@ -1506,7 +1522,7 @@ namespace Takai.UI
             var lastMeasuredSize = MeasuredSize;
             MeasuredSize = Position + size + Padding * 2;
 
-            isMeasureValid = true;
+            --measureCount;
             if (MeasuredSize != lastMeasuredSize)
             {
                 InvalidateArrange();
@@ -1532,7 +1548,7 @@ namespace Takai.UI
         protected virtual void OnChildRemeasure(Static child)
         {
             if (IsAutoSized)
-                //(HorizontalAlignment != Alignment.Stretch || VerticalAlignment != Alignment.Stretch)) <- breaks things like scrollboxes.. may be solution
+                //&& (HorizontalAlignment != Alignment.Stretch && VerticalAlignment != Alignment.Stretch)) broken; should be able to handle scrollboxes
                 InvalidateMeasure();
             else
                 InvalidateArrange();
@@ -1571,8 +1587,8 @@ namespace Takai.UI
 
                 var mes = Children[i].Measure(availableSize).ToPoint();
                 bounds = Rectangle.Union(bounds, new Rectangle(
-                    0,//(int)Children[i].Position.X,
-                    0,//(int)Children[i].Position.Y,
+                    0, //measured size includes offset
+                    0, //ditto
                     mes.X,
                     mes.Y
                 ));
@@ -1581,7 +1597,8 @@ namespace Takai.UI
         }
 
 #if DEBUG
-        private static uint reflowCount = 0; //set breakpoint for speicifc reflow
+        private static uint totalMeasureCount = 0; //set breakpoint for speicifc reflow
+        private static uint totalArrangeCount = 0; //set breakpoint for speicifc reflow
 #endif
 
         /// <summary>
@@ -1590,9 +1607,9 @@ namespace Takai.UI
         /// <param name="container">Container in relative coordinates</param>
         public void Arrange(Rectangle container)
         {
-            isArrangeValid = true;
+            --arrangeCount;
 #if DEBUG
-            ++reflowCount;
+            ++totalArrangeCount;
 #endif
             //todo: this needs to be called less
 
@@ -1681,32 +1698,46 @@ namespace Takai.UI
         /// <summary>
         /// Complete any pending reflows/arranges
         /// </summary>
-        public static void Reflow()
+        /// <param name="maxCount">The maximum number of items to reflow at once/param>
+        public static void Reflow(int maxCount = 1000000000)//int.MaxValue)
         {
-            for (int i = 0; i < measureQueue.Count; ++i)
+            //store queues in actual Queues?
+            for (int i = 0; i < System.Math.Min(maxCount, measureQueue.Count); ++i)
             {
                 measureQueue[i].Measure(new Vector2(InfiniteSize));
+                if (measureQueue[i].measureCount == 1)
+                    measureQueue[i].Measure(new Vector2(InfiniteSize));
+                else if (measureQueue[i].measureCount > 1)
+                    --measureQueue[i].measureCount;
             }
-            measureQueue.Clear();
-            for (int i = 0; i < arrangeQueue.Count; ++i)
+            //measureQueue.Clear();
+            measureQueue.RemoveRange(0, System.Math.Min(maxCount, measureQueue.Count));
+            for (int i = 0; i < System.Math.Min(maxCount, arrangeQueue.Count); ++i)
             {
-                if (!arrangeQueue[i].isArrangeValid)
+                if (arrangeQueue[i].arrangeCount == 1)
                     arrangeQueue[i].Arrange(arrangeQueue[i].containerBounds);
+                else if (arrangeQueue[i].arrangeCount > 1)
+                    --arrangeQueue[i].arrangeCount;
             }
-            arrangeQueue.Clear();
+            arrangeQueue.RemoveRange(0, System.Math.Min(maxCount, arrangeQueue.Count));
+            //arrangeQueue.Clear();
         }
 
         #endregion
 
         #region Updating/Drawing
-
+        System.TimeSpan lt = new System.TimeSpan();
         /// <summary>
         /// Update this element and all of its children
         /// </summary>
         /// <param name="time">Game time</param>
         public virtual void Update(GameTime time)
         {
-            Reflow();
+            if (time.TotalGameTime > lt + System.TimeSpan.FromMilliseconds(100))
+            {
+                Reflow();
+                lt = time.TotalGameTime;
+            }
 
             if (!IsEnabled)
                 return;
@@ -2003,7 +2034,7 @@ namespace Takai.UI
             {
                 DebugFont.Draw(
                     spriteBatch,
-                    $"Reflow Count: {reflowCount}\nTotal Elements Created: {idCounter}",
+                    $"Measure Count: {totalMeasureCount}\nArrange Count: {totalArrangeCount}\nTotal Elements Created: {idCounter}",
                     new Vector2(10),
                     Color.CornflowerBlue
                 );
