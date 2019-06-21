@@ -43,6 +43,7 @@ namespace DyingAndMore.Editor
                         tabs.Children[i].Color = ActiveColor;
                         modes[i].Start();
                         InsertChild(modes[i]);
+                        modes[i].Arrange(ContentArea);
                     }
                     else
                     {
@@ -82,12 +83,10 @@ namespace DyingAndMore.Editor
 
             Modes = modes.AsReadOnly();
 
-            On("_SetMode", delegate (Static sender, UIEventArgs e)
-            {
-                var sce = (SelectionChangedEventArgs)e;
-                ModeIndex = sce.newIndex;
-                return UIEventResult.Handled;
-            });
+            CommandActions["SetMode"] = delegate (Static sender, object arg)
+            { 
+                ModeIndex = (int)arg;
+            };
         }
 
         public void AddMode(EditorMode mode)
@@ -106,7 +105,7 @@ namespace DyingAndMore.Editor
 
             tab.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                BubbleEvent(sender, "_SetMode", new SelectionChangedEventArgs(sender, -1, sender.ChildIndex));
+                BubbleCommand("SetMode", sender.ChildIndex);
                 return UIEventResult.Handled;
             });
             tabs.AddChild(tab);
@@ -116,7 +115,6 @@ namespace DyingAndMore.Editor
         {
             for (int i = 0; i < System.Math.Min(10, modes.Count); ++i)
             {
-                //set editor mode
                 if (InputState.IsPress(Keys.D1 + i) || InputState.IsPress(Keys.NumPad1 + i))
                 {
                     ModeIndex = i;

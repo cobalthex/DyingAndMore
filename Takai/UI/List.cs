@@ -21,6 +21,9 @@ namespace Takai.UI
         /// </summary>
         public Direction Direction { get; set; } = Direction.Vertical;
 
+        //todo: shared size? (only measure using MeasuredSize)
+        //must manually calculate size?
+
         public List() { }
         public List(params Static[] children)
             : base(children) { }
@@ -35,21 +38,23 @@ namespace Takai.UI
                 if (!child.IsEnabled)
                     continue;
 
+                //stretched items in primary axis are rendered at 
+
                 var childSize = child.Measure(new Vector2(InfiniteSize));
                 if (Direction == Direction.Horizontal)
                 {
-                    if (child.HorizontalAlignment != Alignment.Stretch)
-                        usedSize.X += childSize.X; //todo: better format for this
-                    else
+                    if (child.HorizontalAlignment == Alignment.Stretch)
                         ++stretches;
+                    else //(only else here if stretch size != 0, see Static::Measure)
+                        usedSize.X += childSize.X;
                     usedSize.Y = System.Math.Max(usedSize.Y, childSize.Y);
                 }
                 else
                 {
-                    if (child.VerticalAlignment != Alignment.Stretch)
-                        usedSize.Y += childSize.Y;
-                    else
+                    if (child.VerticalAlignment == Alignment.Stretch)
                         ++stretches;
+                    else //ditto above
+                        usedSize.Y += childSize.Y;
                     usedSize.X = System.Math.Max(usedSize.X, childSize.X);
                 }
             }

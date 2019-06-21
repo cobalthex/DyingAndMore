@@ -380,7 +380,21 @@ namespace Takai.UI
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             var lastContentSize = ContentSize;
-            ContentSize = DefaultMeasureSomeChildren(availableSize, 2, Children.Count - 2).Size.ToVector2();
+            //ContentSize = DefaultMeasureSomeChildren(availableSize, 2, Children.Count - 2).Size.ToVector2();
+
+            //only necessary when stretched children have intrinsic size (see Static::Measure)
+            var bounds = new Rectangle();
+            for (int i = 2; i < Children.Count; ++i)
+            {
+                Children[i].InvalidateMeasure();
+                var cm = Children[i].Measure(availableSize);
+                if (Children[i].HorizontalAlignment == Alignment.Stretch)
+                    cm.X = 0;
+                if (Children[i].VerticalAlignment == Alignment.Stretch)
+                    cm.Y = 0;
+                bounds = Rectangle.Union(bounds, new Rectangle(0, 0, (int)cm.X, (int)cm.Y));
+            }
+            ContentSize = new Vector2(bounds.Width, bounds.Height);
 
             if (lastContentSize != ContentSize)
                 InvalidateArrange();
@@ -388,13 +402,13 @@ namespace Takai.UI
             return ContentSize;
         }
 
-        //protected override void OnChildRemeasure(Static child)
-        //{
-        //    //todo
-        //    //if (contentContainer.Position != Vector2.Zero)
-        //    //    ; //maintain offset
-        //    InvalidateArrange();
-        //}
+        protected override void OnChildRemeasure(Static child)
+        {
+            //todo
+            //if (contentContainer.Position != Vector2.Zero)
+            //    ; //maintain offset
+            InvalidateMeasure();
+        }
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
@@ -410,7 +424,7 @@ namespace Takai.UI
             verticalScrollbar.Arrange(new Rectangle((int)(availableSize.X - vs.X + InnerPadding.X), 0, (int)vs.X, (int)(availableSize.Y - hs.Y)));
             horizontalScrollbar.Arrange(new Rectangle(0, (int)(availableSize.Y - hs.Y + InnerPadding.Y), (int)(availableSize.X - vs.X), (int)hs.Y));
 
-            var arrangeRect = new Rectangle(-(int)ScrollPosition.X, -(int)ScrollPosition.Y, (int)ContentSize.X, (int)ContentSize.Y);
+            var arrangeRect = new Rectangle(-(int)ScrollPosition.X, -(int)ScrollPosition.Y, (int)(availableSize.X - vs.X), (int)(availableSize.Y - hs.Y));
             for (int i = 2; i < Children.Count; ++i)
                 Children[i].Arrange(arrangeRect);
         }
@@ -432,12 +446,6 @@ namespace Takai.UI
                     verticalScrollbar.Scroll(InputState.ScrollDelta());
                     return false;
                 }
-            }
-
-            if (HasFocus)
-            {
-                //todo: refer scroll input to horizontal/vertical
-                return false;
             }
 
             return base.HandleInput(time);
