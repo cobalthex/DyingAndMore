@@ -48,7 +48,7 @@ namespace Takai.UI
         {
             var template = new List
             {
-                HorizontalAlignment = Alignment.Stretch,
+                HorizontalAlignment = Alignment.Stretch, //disable if no-intrinsic sized elements (see Static::Measure)
                 Direction = Direction.Horizontal,
                 Padding = new Microsoft.Xna.Framework.Vector2(10),
             };

@@ -882,9 +882,9 @@ namespace Takai.UI
                 clone._children[i] = child;
 
                 //do these immediately (on original)?
-                if (child.measureCount > 0)
+                if (!child.isMeasureValid)
                     measureQueue.Add(child);
-                if (child.arrangeCount > 0)
+                if (!child.isArrangeValid)
                     arrangeQueue.Add(child);
             }
             clone.FinalizeClone();
@@ -1428,22 +1428,43 @@ namespace Takai.UI
 
         #region Layout
 
+        private Rectangle containerBounds; //todo: re-evaluate necessity
+
+        //how many measures/arranges are currently queued
+        //if 0, measure/arrange valid
+        //if 1, next measure/arrange will act accordingly
+        //if >1, skipped
+        //this (hopefully) ensures that child measures/invalids happen in correct order
+        private bool isMeasureValid = true;
+        private bool isArrangeValid = true;
+
+        /// <summary>
+        /// Invalidat the size/measurement of this element.
+        /// <see cref="Measure(Vector2)"/> will be called on this element at some point in the future.
+        /// Typically called when an element is resized.
+        /// </summary>
         public void InvalidateMeasure()
         {
-            if (measureCount < 1)
+            if (isMeasureValid)
             {
-                ++measureCount;
-                measureQueue.Add(this);
+                isMeasureValid = false;
+                //measureQueue.Add(this);
+                Measure(new Vector2(InfiniteSize));
             }
         }
 
-
+        /// <summary>
+        /// Invalidate the arrangement of this element.
+        /// <see cref="Arrange(Rectangle)"/> will be called on this element at some point in the future.
+        /// Typically called when an element is moved or was resized previously.
+        /// </summary>
         public void InvalidateArrange()
         {
-            if (arrangeCount < 1)
+            if (isArrangeValid)
             {
-                ++arrangeCount;
-                arrangeQueue.Add(this);
+                isArrangeValid = false;
+                //arrangeQueue.Add(this);
+                Arrange(containerBounds);
             }
         }
         /// <summary>
@@ -1455,16 +1476,6 @@ namespace Takai.UI
                 element.InvalidateMeasure();
         }
 
-        //how many measures/arranges are currently queued
-        //if 0, measure/arrange valid
-        //if 1, next measure/arrange will act accordingly
-        //if >1, skipped
-        //this (hopefully) ensures that child measures/invalids happen in correct order
-        int measureCount;
-        int arrangeCount;
-
-        private Rectangle containerBounds; //todo: re-evaluate necessity
-
         /// <summary>
         /// Calculate the desired containing region of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
         /// Sets <see cref="MeasuredSize"/> to value calculated
@@ -1473,7 +1484,7 @@ namespace Takai.UI
         /// <returns>The desired size of this element, including padding</returns>
         public Vector2 Measure(Vector2 availableSize)
         {
-            if (measureCount == 0)
+            if (isMeasureValid)
                 return MeasuredSize;
 #if DEBUG
             ++totalMeasureCount;
@@ -1513,16 +1524,17 @@ namespace Takai.UI
                     throw new System./*NotFiniteNumberException*/InvalidOperationException("Measured size cannot be NaN or infinity");
 
                 if (isWidthAutoSize)
-                    size.X = measuredSize.X;
+                    size.X = measuredSize.X; //stretched items do have intrinsic size
+                    //size.X = isHStretch ? 0 : measuredSize.X; //stretched items have no intrinsic size
 
                 if (isHeightAutoSize)
-                    size.Y = measuredSize.Y;
+                    size.Y = isVStretch ? 0 : measuredSize.Y;
             }
 
             var lastMeasuredSize = MeasuredSize;
             MeasuredSize = Position + size + Padding * 2;
 
-            --measureCount;
+            isMeasureValid = true;
             if (MeasuredSize != lastMeasuredSize)
             {
                 InvalidateArrange();
@@ -1607,7 +1619,7 @@ namespace Takai.UI
         /// <param name="container">Container in relative coordinates</param>
         public void Arrange(Rectangle container)
         {
-            --arrangeCount;
+            isArrangeValid = true;
 #if DEBUG
             ++totalArrangeCount;
 #endif
@@ -1691,7 +1703,7 @@ namespace Takai.UI
                     return position + padding;
             }
         }
-
+        
         static List<Static> measureQueue = new List<Static>();
         static List<Static> arrangeQueue = new List<Static>();
 
@@ -1705,39 +1717,29 @@ namespace Takai.UI
             for (int i = 0; i < System.Math.Min(maxCount, measureQueue.Count); ++i)
             {
                 measureQueue[i].Measure(new Vector2(InfiniteSize));
-                if (measureQueue[i].measureCount == 1)
+                if (!measureQueue[i].isMeasureValid)
                     measureQueue[i].Measure(new Vector2(InfiniteSize));
-                else if (measureQueue[i].measureCount > 1)
-                    --measureQueue[i].measureCount;
             }
-            //measureQueue.Clear();
-            measureQueue.RemoveRange(0, System.Math.Min(maxCount, measureQueue.Count));
+            measureQueue.Clear();
             for (int i = 0; i < System.Math.Min(maxCount, arrangeQueue.Count); ++i)
             {
-                if (arrangeQueue[i].arrangeCount == 1)
+                if (!arrangeQueue[i].isArrangeValid)
                     arrangeQueue[i].Arrange(arrangeQueue[i].containerBounds);
-                else if (arrangeQueue[i].arrangeCount > 1)
-                    --arrangeQueue[i].arrangeCount;
             }
-            arrangeQueue.RemoveRange(0, System.Math.Min(maxCount, arrangeQueue.Count));
             //arrangeQueue.Clear();
         }
-
+        
         #endregion
 
         #region Updating/Drawing
-        System.TimeSpan lt = new System.TimeSpan();
+
         /// <summary>
         /// Update this element and all of its children
         /// </summary>
         /// <param name="time">Game time</param>
         public virtual void Update(GameTime time)
         {
-            if (time.TotalGameTime > lt + System.TimeSpan.FromMilliseconds(100))
-            {
-                Reflow();
-                lt = time.TotalGameTime;
-            }
+            Reflow();
 
             if (!IsEnabled)
                 return;
@@ -1768,7 +1770,9 @@ namespace Takai.UI
             while (true)
             {
                 if (handleInput)
+                {
                     handleInput = toUpdate.HandleInput(time) && !toUpdate.IsModal;
+                }
 
                 toUpdate.UpdateSelf(time);
 
@@ -1891,7 +1895,7 @@ namespace Takai.UI
                     return false;
                 }
 
-                return false;
+                //return false;
             }
 
             var mouse = InputState.MousePoint;
