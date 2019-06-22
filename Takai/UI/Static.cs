@@ -582,7 +582,7 @@ namespace Takai.UI
 #if DEBUG
             DebugTreePath = $"/{(GetType().Name)}({DebugId})";
 #endif
-            containerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
+            lastMeasureContainerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
         }
 
         /// <summary>
@@ -1428,8 +1428,6 @@ namespace Takai.UI
 
         #region Layout
 
-        private Rectangle containerBounds; //todo: re-evaluate necessity
-
         //how many measures/arranges are currently queued
         //if 0, measure/arrange valid
         //if 1, next measure/arrange will act accordingly
@@ -1448,8 +1446,8 @@ namespace Takai.UI
             if (isMeasureValid)
             {
                 isMeasureValid = false;
-                //measureQueue.Add(this);
-                Measure(new Vector2(InfiniteSize));
+                measureQueue.Add(this);
+                //Measure(new Vector2(InfiniteSize));
             }
         }
 
@@ -1463,8 +1461,8 @@ namespace Takai.UI
             if (isArrangeValid)
             {
                 isArrangeValid = false;
-                //arrangeQueue.Add(this);
-                Arrange(containerBounds);
+                arrangeQueue.Add(this);
+                //Arrange(containerBounds);
             }
         }
         /// <summary>
@@ -1476,6 +1474,9 @@ namespace Takai.UI
                 element.InvalidateMeasure();
         }
 
+        private Vector2 lastMeasureAvailableSize;
+        private Rectangle lastMeasureContainerBounds; //todo: re-evaluate necessity
+
         /// <summary>
         /// Calculate the desired containing region of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
         /// Sets <see cref="MeasuredSize"/> to value calculated
@@ -1484,11 +1485,12 @@ namespace Takai.UI
         /// <returns>The desired size of this element, including padding</returns>
         public Vector2 Measure(Vector2 availableSize)
         {
-            if (isMeasureValid)
+            if (isMeasureValid && availableSize == lastMeasureAvailableSize)
                 return MeasuredSize;
 #if DEBUG
             ++totalMeasureCount;
 #endif
+            lastMeasureAvailableSize = availableSize;
 
             //System.Diagnostics.Debug.WriteLine($"Measuring ID:{DebugId} (available size:{availableSize})");
 
@@ -1687,7 +1689,7 @@ namespace Takai.UI
             tmp.Inflate(Padding.X, Padding.Y);
             VisibleBounds = Rectangle.Intersect(tmp, parentBounds);
 
-            containerBounds = container;
+            lastMeasureContainerBounds = container;
         }
 
         public float GetLocalOffset(Alignment alignment, float position, float size, float padding, float containerSize)
@@ -1724,7 +1726,7 @@ namespace Takai.UI
             for (int i = 0; i < System.Math.Min(maxCount, arrangeQueue.Count); ++i)
             {
                 if (!arrangeQueue[i].isArrangeValid)
-                    arrangeQueue[i].Arrange(arrangeQueue[i].containerBounds);
+                    arrangeQueue[i].Arrange(arrangeQueue[i].lastMeasureContainerBounds);
             }
             //arrangeQueue.Clear();
         }
@@ -2011,7 +2013,7 @@ namespace Takai.UI
 
                 var borderColor = (toDraw.HasFocus && toDraw.CanFocus) ? FocusedBorderColor : toDraw.BorderColor;
                 if (DebugFont != null && borderColor == Color.Transparent)
-                    borderColor = Color.SteelBlue;
+                    borderColor = isMeasureValid && isArrangeValid ? Color.SteelBlue : Color.Tomato;
 
                 if (DebugFont != null && toDraw.VisibleBounds.Contains(InputState.MousePoint))
                     debugDraw = toDraw;
@@ -2065,20 +2067,22 @@ namespace Takai.UI
         public void DrawDebugInfo(SpriteBatch spriteBatch)
         {
             var rect = OffsetContentArea;
-            Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.OrangeRed, 0.5f), rect);
+            Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Orange, 0.5f), rect);
 
             rect.Inflate(Padding.X, Padding.Y);
-            Graphics.Primitives2D.DrawRect(spriteBatch, Color.Red, rect);
+            Graphics.Primitives2D.DrawRect(spriteBatch, Color.OrangeRed, rect);
 
             string info = $"{GetType().Name}\n"
 #if DEBUG
                         + $"ID: {DebugId}\n"
 #endif
                         + $"Name: {(Name ?? "(No name)")}\n"
+#if DEBUG
                         + $"Parent ID: {Parent?.DebugId}\n"
+#endif
                         + $"Children: {Children?.Count ?? 0}\n"
-                        + $"Bounds: {OffsetContentArea}\n"
-                        + $"Position: {Position}: Size {Size}, Padding: {Padding}\n"
+                        + $"Bounds: {OffsetContentArea}\n" //visible bounds?
+                        + $"Position: {Position}, Size: {Size}, Padding: {Padding}\n"
                         + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}";
 
             var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);

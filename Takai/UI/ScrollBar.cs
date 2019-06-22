@@ -379,6 +379,7 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
+            LogBuffer.Append("moo");
             var lastContentSize = ContentSize;
             //ContentSize = DefaultMeasureSomeChildren(availableSize, 2, Children.Count - 2).Size.ToVector2();
 
@@ -386,7 +387,6 @@ namespace Takai.UI
             var bounds = new Rectangle();
             for (int i = 2; i < Children.Count; ++i)
             {
-                Children[i].InvalidateMeasure();
                 var cm = Children[i].Measure(availableSize);
                 if (Children[i].HorizontalAlignment == Alignment.Stretch)
                     cm.X = 0;
