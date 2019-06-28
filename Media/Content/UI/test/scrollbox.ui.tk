@@ -1,0 +1,15 @@
+ScrollBox {
+	Size: 400;
+	HorizontalAlignment: ALignment.Middle;
+	VerticalAlignment: ALignment.Middle;
+	BorderColor: Color.White;
+	InnerPadding: 10;
+
+	Children: [
+		Graphic {
+			Sprite: @"distort.png";
+			Size: 500;
+			#Position: 10;
+		}
+	];
+}

@@ -60,7 +60,7 @@ namespace Takai.UI
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             if (!float.IsNaN(availableSize.X))
-                availableSize.X -= GripperWidth;
+                availableSize.X = System.Math.Max(GripperWidth, availableSize.X - GripperWidth);
             return base.MeasureOverride(availableSize);
         }
 

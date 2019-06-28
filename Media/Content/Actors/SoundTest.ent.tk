@@ -14,9 +14,9 @@ ActorClass {
                 IsLooping: true;
                 Tween: TweenStyle.Overlap;
     		};
-            Sound: SoundClass {
+            #*Sound: SoundClass {
                 Source: @"Sounds/test.opus";
-            }
+            }*#
     	};
         Dead: {
             Sprite: {

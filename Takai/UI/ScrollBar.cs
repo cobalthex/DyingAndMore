@@ -379,52 +379,46 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            LogBuffer.Append("moo");
-            var lastContentSize = ContentSize;
-            //ContentSize = DefaultMeasureSomeChildren(availableSize, 2, Children.Count - 2).Size.ToVector2();
+            verticalScrollbar.Measure(new Vector2(InfiniteSize));
+            horizontalScrollbar.Measure(new Vector2(InfiniteSize));
 
-            //only necessary when stretched children have intrinsic size (see Static::Measure)
             var bounds = new Rectangle();
             for (int i = 2; i < Children.Count; ++i)
             {
                 var cm = Children[i].Measure(availableSize);
-                if (Children[i].HorizontalAlignment == Alignment.Stretch)
-                    cm.X = 0;
-                if (Children[i].VerticalAlignment == Alignment.Stretch)
-                    cm.Y = 0;
                 bounds = Rectangle.Union(bounds, new Rectangle(0, 0, (int)cm.X, (int)cm.Y));
             }
             ContentSize = new Vector2(bounds.Width, bounds.Height);
-
-            if (lastContentSize != ContentSize)
-                InvalidateArrange();
-
             return ContentSize;
         }
 
-        protected override void OnChildRemeasure(Static child)
-        {
+        //protected override void OnChildRemeasure(Static child)
+        //{
             //todo
             //if (contentContainer.Position != Vector2.Zero)
             //    ; //maintain offset
-            InvalidateMeasure();
-        }
+        //}
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
             verticalScrollbar.ContentSize = ContentSize.Y;
             horizontalScrollbar.ContentSize = ContentSize.X;
             
-            verticalScrollbar.IsEnabled = EnableVerticalScrolling && ContentSize.Y > availableSize.Y - horizontalScrollbar.MeasuredSize.Y - InnerPadding.Y;
-            horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && ContentSize.X > availableSize.X - verticalScrollbar.MeasuredSize.X - InnerPadding.X;
+            verticalScrollbar.IsEnabled = EnableVerticalScrolling && ContentSize.Y > availableSize.Y - InnerPadding.Y;
+            horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && ContentSize.X > availableSize.X - InnerPadding.X;
 
-            var hs = horizontalScrollbar.IsEnabled ? horizontalScrollbar.MeasuredSize + new Vector2(0, InnerPadding.Y) : Vector2.Zero;
-            var vs = verticalScrollbar.IsEnabled ? verticalScrollbar.MeasuredSize + new Vector2(InnerPadding.X, 0) : Vector2.Zero;
+            var vs = verticalScrollbar.IsEnabled ? new Vector2(verticalScrollbar.MeasuredSize.X, 0) : Vector2.Zero;
+            var hs = horizontalScrollbar.IsEnabled ? new Vector2(0, horizontalScrollbar.MeasuredSize.Y) : Vector2.Zero;
 
-            verticalScrollbar.Arrange(new Rectangle((int)(availableSize.X - vs.X + InnerPadding.X), 0, (int)vs.X, (int)(availableSize.Y - hs.Y)));
-            horizontalScrollbar.Arrange(new Rectangle(0, (int)(availableSize.Y - hs.Y + InnerPadding.Y), (int)(availableSize.X - vs.X), (int)hs.Y));
+            verticalScrollbar.Arrange(new Rectangle((int)(availableSize.X - vs.X), 0, (int)vs.X, (int)(availableSize.Y - hs.Y)));
+            horizontalScrollbar.Arrange(new Rectangle(0, (int)(availableSize.Y - hs.Y), (int)(availableSize.X - vs.X), (int)hs.Y));
 
-            var arrangeRect = new Rectangle(-(int)ScrollPosition.X, -(int)ScrollPosition.Y, (int)(availableSize.X - vs.X), (int)(availableSize.Y - hs.Y));
+            var arrangeRect = new Rectangle(
+                (int)(-ScrollPosition.X + InnerPadding.X),
+                (int)(-ScrollPosition.Y + InnerPadding.Y),
+                (int)(availableSize.X - vs.X - InnerPadding.X * 2),
+                (int)(availableSize.Y - hs.Y - InnerPadding.Y * 2)
+            );
             for (int i = 2; i < Children.Count; ++i)
                 Children[i].Arrange(arrangeRect);
         }
