@@ -33,10 +33,11 @@ namespace Takai.Data
 
         public static void BinSerialize(BinaryWriter writer, object serializing)
         {
-            uint idCounter = 0;
-            var known = new Dictionary<uint, object>();
+            throw new NotImplementedException();
+            //uint idCounter = 0;
+            //var known = new Dictionary<uint, object>();
 
-            writer.Write(new[] { 'T', 'K', '0', '1' }); //magic + version
+            //writer.Write(new[] { 'T', 'K', '0', '1' }); //magic + version
             //checksum? (at end?)
 
 

@@ -238,44 +238,44 @@ namespace DyingAndMore
             */
             Static childUI;
 
-            childUI = new FileList
-            {
-                //Size = new Vector2(400, 600),
-                HorizontalAlignment = Alignment.Middle,
-                VerticalAlignment = Alignment.Middle,
-                BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
-                FilterRegex = "\\.(map\\.tk|d2map\\.zip)$",
-            };
-            childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)
-            {
-                var fl = (FileList)s;
-                if (System.IO.File.Exists(fl.SelectedFile))
-                {
-                    if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
-                    {
-                        var packmap = (MapInstance)Takai.Game.MapBaseInstance.FromPackage(fl.SelectedFile);
-                        packmap.Class.InitializeGraphics();
-                        ui.ReplaceAllChildren(new Editor.Editor(packmap));
-                        return UIEventResult.Handled;
-                    }
+            //childUI = new FileList
+            //{
+            //    //Size = new Vector2(400, 600),
+            //    HorizontalAlignment = Alignment.Middle,
+            //    VerticalAlignment = Alignment.Middle,
+            //    BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
+            //    FilterRegex = "\\.(map\\.tk|d2map\\.zip)$",
+            //};
+            //childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)
+            //{
+            //    var fl = (FileList)s;
+            //    if (System.IO.File.Exists(fl.SelectedFile))
+            //    {
+            //        if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
+            //        {
+            //            var packmap = (MapInstance)Takai.Game.MapBaseInstance.FromPackage(fl.SelectedFile);
+            //            packmap.Class.InitializeGraphics();
+            //            ui.ReplaceAllChildren(new Editor.Editor(packmap));
+            //            return UIEventResult.Handled;
+            //        }
 
-                    var map = Cache.Load(fl.SelectedFile);
-                    if (map is MapClass mc)
-                    {
-                        mc.InitializeGraphics();
-                        ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
+            //        var map = Cache.Load(fl.SelectedFile);
+            //        if (map is MapClass mc)
+            //        {
+            //            mc.InitializeGraphics();
+            //            ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
 
-                    }
-                    else if (map is MapInstance mi)
-                    {
-                        mi.Class.InitializeGraphics();
-                        ui.ReplaceAllChildren(new Editor.Editor(mi));
-                    }
-                }
-                return UIEventResult.Handled;
-            });
+            //        }
+            //        else if (map is MapInstance mi)
+            //        {
+            //            mi.Class.InitializeGraphics();
+            //            ui.ReplaceAllChildren(new Editor.Editor(mi));
+            //        }
+            //    }
+            //    return UIEventResult.Handled;
+            //});
 
-            //childUI = Cache.Load<Static>("UI/test/simple.ui.tk");
+            childUI = Cache.Load<Static>("UI/test/scrollbox.ui.tk");
 
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)

@@ -1436,6 +1436,9 @@ namespace Takai.UI
         private bool isMeasureValid = true;
         private bool isArrangeValid = true;
 
+        private Vector2 lastMeasureAvailableSize = new Vector2(InfiniteSize);
+        private Rectangle lastMeasureContainerBounds = Rectangle.Empty;
+
         /// <summary>
         /// Invalidat the size/measurement of this element.
         /// <see cref="Measure(Vector2)"/> will be called on this element at some point in the future.
@@ -1447,7 +1450,6 @@ namespace Takai.UI
             {
                 isMeasureValid = false;
                 measureQueue.Add(this);
-                //Measure(new Vector2(InfiniteSize));
             }
         }
 
@@ -1462,7 +1464,6 @@ namespace Takai.UI
             {
                 isArrangeValid = false;
                 arrangeQueue.Add(this);
-                //Arrange(containerBounds);
             }
         }
         /// <summary>
@@ -1473,9 +1474,6 @@ namespace Takai.UI
             foreach (var element in EnumerateRecursive())
                 element.InvalidateMeasure();
         }
-
-        private Vector2 lastMeasureAvailableSize;
-        private Rectangle lastMeasureContainerBounds; //todo: re-evaluate necessity
 
         /// <summary>
         /// Calculate the desired containing region of this element and its children. Can be customized through <see cref="MeasureOverride"/>.
@@ -1682,12 +1680,15 @@ namespace Takai.UI
             bounds.Offset(container.Location);
             ContentArea = bounds;
 
-            var tmp = bounds;
+            bounds.Offset(offsetParent);
+            OffsetContentArea = bounds;
+
+            var tmp = container;
             tmp.Offset(offsetParent);
-            OffsetContentArea = tmp;
-            VisibleContentArea = Rectangle.Intersect(tmp, parentContentArea);
-            tmp.Inflate(Padding.X, Padding.Y);
-            VisibleBounds = Rectangle.Intersect(tmp, parentBounds);
+            bounds = Rectangle.Intersect(bounds, tmp);
+            VisibleContentArea = Rectangle.Intersect(bounds, parentContentArea);
+            bounds.Inflate(Padding.X, Padding.Y);
+            VisibleBounds = Rectangle.Intersect(bounds, parentBounds);
 
             lastMeasureContainerBounds = container;
         }
@@ -1718,7 +1719,7 @@ namespace Takai.UI
             //store queues in actual Queues?
             for (int i = 0; i < System.Math.Min(maxCount, measureQueue.Count); ++i)
             {
-                measureQueue[i].Measure(new Vector2(InfiniteSize));
+                measureQueue[i].Measure(measureQueue[i].lastMeasureAvailableSize);
                 if (!measureQueue[i].isMeasureValid)
                     measureQueue[i].Measure(new Vector2(InfiniteSize));
             }
@@ -2166,12 +2167,14 @@ namespace Takai.UI
 
         protected void DrawSprite(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle destRect)
         {
-            DrawSpriteCustomRegion(spriteBatch, sprite, destRect, VisibleContentArea);
+            DrawSpriteCustomRegion(spriteBatch, sprite, destRect, Rectangle.Intersect(VisibleContentArea, OffsetContentArea));
         }
 
         void DrawSpriteCustomRegion(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle destRect, Rectangle clipRegion)
         {
             //todo: use this w/ background sprite
+
+            //todo: broken, doesnt stretch correctly
 
             if (sprite?.Texture == null || destRect.Width == 0 || destRect.Height == 0)
                 return;
@@ -2196,7 +2199,6 @@ namespace Takai.UI
 
             sprite.Draw(spriteBatch, destRect, clip, 0, Color.White, sprite.ElapsedTime);
         }
-
 
         #endregion
 

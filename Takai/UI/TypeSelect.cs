@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Takai.UI
 {
@@ -60,12 +61,14 @@ namespace Takai.UI
         /// <param name="type">The type to add. Can be abstract</param>
         public void AddTypeTree(Type type)
         {
-            if (!type.IsAbstract)
+            var typeInfo = type.GetTypeInfo();
+            if (!typeInfo.IsAbstract)
                 Items.Add(type);
 
             foreach (var rtype in Data.Serializer.RegisteredTypes)
             {
-                if (!rtype.Value.IsAbstract && rtype.Value.IsSubclassOf(type))
+                var rti = rtype.Value.GetTypeInfo();
+                if (!rti.IsAbstract && rti.IsSubclassOf(type))
                     Items.Add(rtype.Value);
             }
         }
