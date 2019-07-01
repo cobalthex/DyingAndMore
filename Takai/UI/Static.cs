@@ -1680,23 +1680,14 @@ namespace Takai.UI
             bounds.Offset(container.Location);
             ContentArea = bounds;
 
-            //bounds.Offset(offsetParent);
-            //OffsetContentArea = bounds;
-
-            //var tmp = container;
-            //tmp.Offset(offsetParent);
-            //bounds = Rectangle.Intersect(bounds, tmp);
-            //VisibleContentArea = Rectangle.Intersect(bounds, parentContentArea);
-            //bounds.Inflate(Padding.X, Padding.Y);
-            //VisibleBounds = Rectangle.Intersect(bounds, parentBounds);
-
             var tmp = bounds;
-
-            //todo: doesn't clip to container correctly, above works but visible content area does not
-
             tmp.Offset(offsetParent);
             OffsetContentArea = tmp;
+
+            tmp = Rectangle.Intersect(bounds, container);
+            tmp.Offset(offsetParent);
             VisibleContentArea = Rectangle.Intersect(tmp, parentContentArea);
+
             tmp.Inflate(Padding.X, Padding.Y);
             VisibleBounds = Rectangle.Intersect(tmp, parentBounds);
 

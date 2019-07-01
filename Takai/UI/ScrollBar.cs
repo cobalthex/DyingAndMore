@@ -401,8 +401,8 @@ namespace Takai.UI
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            verticalScrollbar.ContentSize = ContentSize.Y;
-            horizontalScrollbar.ContentSize = ContentSize.X;
+            verticalScrollbar.ContentSize = ContentSize.Y + InnerPadding.Y * 2;
+            horizontalScrollbar.ContentSize = ContentSize.X + InnerPadding.X * 2;
             
             verticalScrollbar.IsEnabled = EnableVerticalScrolling && ContentSize.Y > availableSize.Y - InnerPadding.Y;
             horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && ContentSize.X > availableSize.X - InnerPadding.X;
@@ -413,11 +413,13 @@ namespace Takai.UI
             verticalScrollbar.Arrange(new Rectangle((int)(availableSize.X - vs.X), 0, (int)vs.X, (int)(availableSize.Y - hs.Y)));
             horizontalScrollbar.Arrange(new Rectangle(0, (int)(availableSize.Y - hs.Y), (int)(availableSize.X - vs.X), (int)hs.Y));
 
+            var scrollX = (int)(-ScrollPosition.X + InnerPadding.X);
+            var scrollY = (int)(-ScrollPosition.Y + InnerPadding.Y);
             var arrangeRect = new Rectangle(
-                (int)(-ScrollPosition.X + InnerPadding.X),
-                (int)(-ScrollPosition.Y + InnerPadding.Y),
-                (int)(availableSize.X - vs.X - InnerPadding.X * 2),
-                (int)(availableSize.Y - hs.Y - InnerPadding.Y * 2)
+                scrollX,
+                scrollY,
+                (int)(availableSize.X - vs.X - InnerPadding.X) - scrollX,
+                (int)(availableSize.Y - hs.Y - InnerPadding.Y) - scrollY
             );
             for (int i = 2; i < Children.Count; ++i)
                 Children[i].Arrange(arrangeRect);
