@@ -1680,15 +1680,25 @@ namespace Takai.UI
             bounds.Offset(container.Location);
             ContentArea = bounds;
 
-            bounds.Offset(offsetParent);
-            OffsetContentArea = bounds;
+            //bounds.Offset(offsetParent);
+            //OffsetContentArea = bounds;
 
-            var tmp = container;
+            //var tmp = container;
+            //tmp.Offset(offsetParent);
+            //bounds = Rectangle.Intersect(bounds, tmp);
+            //VisibleContentArea = Rectangle.Intersect(bounds, parentContentArea);
+            //bounds.Inflate(Padding.X, Padding.Y);
+            //VisibleBounds = Rectangle.Intersect(bounds, parentBounds);
+
+            var tmp = bounds;
+
+            //todo: doesn't clip to container correctly, above works but visible content area does not
+
             tmp.Offset(offsetParent);
-            bounds = Rectangle.Intersect(bounds, tmp);
-            VisibleContentArea = Rectangle.Intersect(bounds, parentContentArea);
-            bounds.Inflate(Padding.X, Padding.Y);
-            VisibleBounds = Rectangle.Intersect(bounds, parentBounds);
+            OffsetContentArea = tmp;
+            VisibleContentArea = Rectangle.Intersect(tmp, parentContentArea);
+            tmp.Inflate(Padding.X, Padding.Y);
+            VisibleBounds = Rectangle.Intersect(tmp, parentBounds);
 
             lastMeasureContainerBounds = container;
         }
@@ -2072,6 +2082,7 @@ namespace Takai.UI
 
             rect.Inflate(Padding.X, Padding.Y);
             Graphics.Primitives2D.DrawRect(spriteBatch, Color.OrangeRed, rect);
+            Graphics.Primitives2D.DrawRect(spriteBatch, Color.Cyan, VisibleBounds);
 
             string info = $"{GetType().Name}\n"
 #if DEBUG
@@ -2167,14 +2178,12 @@ namespace Takai.UI
 
         protected void DrawSprite(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle destRect)
         {
-            DrawSpriteCustomRegion(spriteBatch, sprite, destRect, Rectangle.Intersect(VisibleContentArea, OffsetContentArea));
+            DrawSpriteCustomRegion(spriteBatch, sprite, destRect, VisibleContentArea);
         }
 
         void DrawSpriteCustomRegion(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle destRect, Rectangle clipRegion)
         {
             //todo: use this w/ background sprite
-
-            //todo: broken, doesnt stretch correctly
 
             if (sprite?.Texture == null || destRect.Width == 0 || destRect.Height == 0)
                 return;
@@ -2185,19 +2194,15 @@ namespace Takai.UI
             var dx = VisibleContentArea.X - OffsetContentArea.X;
             var dy = VisibleContentArea.Y - OffsetContentArea.Y;
 
-            destRect.X += clipRegion.X;
-            destRect.Y += clipRegion.Y;
-            destRect.Width = System.Math.Min(destRect.Width, clipRegion.Width);
-            destRect.Height = System.Math.Min(destRect.Height, clipRegion.Height);
-
             var clip = new Rectangle(
                 (int)(dx * sx),
                 (int)(dy * sy),
-                (int)(destRect.Width * sx),
-                (int)(destRect.Height * sy)
+                (int)((clipRegion.Width - destRect.X) * sx),
+                (int)((clipRegion.Height - destRect.Y) * sy)
             );
 
-            sprite.Draw(spriteBatch, destRect, clip, 0, Color.White, sprite.ElapsedTime);
+            clipRegion.Offset(destRect.Location); //todo: verify (and - destRect above)
+            sprite.Draw(spriteBatch, clipRegion, clip, 0, Color.White, sprite.ElapsedTime);
         }
 
         #endregion

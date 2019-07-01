@@ -7,7 +7,7 @@ ScrollBox {
 
 	Children: [
 		Graphic {
-			Sprite: @"distort.png";
+			Sprite: @"test.png";
 			Size: 500;
 			#Position: 10;
 		}
