@@ -6,10 +6,26 @@ ScrollBox {
 	InnerPadding: 10;
 
 	Children: [
-		Graphic {
-			Sprite: @"test.png";
+		Static {
 			Size: 500;
-			#Position: 10;
-		}
+			Position: 30;
+			BackgroundColor: [48 0 128 192];
+			Children: [
+				Graphic {
+					Position: 200;
+					#Sprite: @"test.png";
+
+					Sprite: {
+						texture: @"other/animation.png";
+						width: 34;
+						height: 49;
+						cliprect: [0 49 340 49];
+						framecount: 10;
+						framelength: 100msec;
+						IsLooping: true;
+					}
+				}
+			];
+		};
 	];
 }
