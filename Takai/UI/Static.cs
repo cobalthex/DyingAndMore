@@ -498,7 +498,7 @@ namespace Takai.UI
 
                 _isEnabled = value;
                 if (_isEnabled)
-                    InvalidateMeasure(); //todo: evaluate
+                    InvalidateArrange();
             }
         }
         private bool _isEnabled = true;
@@ -2188,7 +2188,7 @@ namespace Takai.UI
             var clip = new Rectangle(
                 (int)(dx * sx),
                 (int)(dy * sy),
-                (int)((clipRegion.Width - destRect.X) * sx),
+                (int)((clipRegion.Width - destRect.X) * sx), //min?
                 (int)((clipRegion.Height - destRect.Y) * sy)
             );
 
