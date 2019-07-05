@@ -2185,15 +2185,19 @@ namespace Takai.UI
             var dx = VisibleContentArea.X - OffsetContentArea.X;
             var dy = VisibleContentArea.Y - OffsetContentArea.Y;
 
+            destRect.X += clipRegion.X;
+            destRect.Y += clipRegion.Y;
+            destRect.Width = System.Math.Min(destRect.Width, clipRegion.Width);
+            destRect.Height = System.Math.Min(destRect.Height, clipRegion.Height);
+
             var clip = new Rectangle(
                 (int)(dx * sx),
                 (int)(dy * sy),
-                (int)((clipRegion.Width - destRect.X) * sx), //min?
-                (int)((clipRegion.Height - destRect.Y) * sy)
+                (int)(destRect.Width * sx),
+                (int)(destRect.Height * sy)
             );
 
-            clipRegion.Offset(destRect.Location); //todo: verify (and - destRect above)
-            sprite.Draw(spriteBatch, clipRegion, clip, 0, Color.White, sprite.ElapsedTime);
+            sprite.Draw(spriteBatch, destRect, clip, 0, Color.White, sprite.ElapsedTime);
         }
 
         #endregion
