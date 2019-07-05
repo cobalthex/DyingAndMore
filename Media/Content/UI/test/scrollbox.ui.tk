@@ -7,13 +7,17 @@ ScrollBox {
 
 	Children: [
 		Static {
-			Size: 500;
+			Size: 600;
 			Position: 30;
 			BackgroundColor: [48 0 128 192];
 			Children: [
 				Graphic {
+					Position: 100;
+					Size: 500;
+					Sprite: @"test.png";
+				}
+				Graphic {
 					Position: 200;
-					#Sprite: @"test.png";
 
 					Sprite: {
 						texture: @"other/animation.png";
