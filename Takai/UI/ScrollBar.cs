@@ -379,13 +379,15 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            verticalScrollbar.Measure(new Vector2(InfiniteSize));
-            horizontalScrollbar.Measure(new Vector2(InfiniteSize));
+            var vs = verticalScrollbar.Measure(new Vector2(InfiniteSize));
+            var hs = horizontalScrollbar.Measure(new Vector2(InfiniteSize));
 
             var bounds = new Rectangle();
             for (int i = 2; i < Children.Count; ++i)
             {
-                var cm = Children[i].Measure(availableSize);
+                //todo: may need to double measure with scroll bars once, then again without if within container
+
+                var cm = Children[i].Measure(availableSize - new Vector2(vs.X, hs.Y)); //todo: account for infinite
                 bounds = Rectangle.Union(bounds, new Rectangle(0, 0, (int)cm.X, (int)cm.Y));
             }
             ContentSize = new Vector2(bounds.Width, bounds.Height);
@@ -395,7 +397,7 @@ namespace Takai.UI
         //protected override void OnChildRemeasure(Static child)
         //{
             //todo
-            //if (contentContainer.Position != Vector2.Zero)
+            //if (contentContainer.Position != Vector2.Zero) //&& stayAtBottom
             //    ; //maintain offset
         //}
 
