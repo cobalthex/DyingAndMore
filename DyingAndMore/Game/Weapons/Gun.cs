@@ -99,6 +99,9 @@ namespace DyingAndMore.Game.Weapons
 
         public override void Think(TimeSpan deltaTime)
         {
+            if (Actor.Map == null)
+                return; //there is a bug in entity update code - cannot find source (actor.Map is null during Think())
+
             if (currentBurstShotCount > 0)
             {
                 if (currentBurstShotCount < Class.RoundsPerBurst && !IsDepleted())

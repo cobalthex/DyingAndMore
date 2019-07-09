@@ -51,12 +51,15 @@ namespace DyingAndMore.Editor.Selectors
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             var iz = ItemSize + ItemMargin;
+            var usedSize = new Vector2();
 
-            if (float.IsPositiveInfinity(availableSize.X))
-                availableSize.X = 4 * iz.X; //make square?
-            if (float.IsPositiveInfinity(availableSize.Y))
-                availableSize.Y = (float)Math.Ceiling((float)ItemCount / (int)(availableSize.X / iz.X)) * iz.Y;
-            return availableSize;
+            var cols = 4;
+            if (!float.IsPositiveInfinity(availableSize.X))
+                cols = (int)(availableSize.X / iz.X);
+            usedSize.X = cols * iz.X;
+
+            usedSize.Y = (float)Math.Ceiling((float)ItemCount / cols) * iz.Y;
+            return usedSize;
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)

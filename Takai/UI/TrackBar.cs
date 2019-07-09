@@ -5,7 +5,7 @@ namespace Takai.UI
 {
     public class TrackBar : NumericBase
     {
-        //todo: vertical
+        //public Direction Direction { get; set; } = Direction.Horizontal; //todo
 
         public override bool CanFocus => true;
 
