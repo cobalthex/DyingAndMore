@@ -2068,25 +2068,26 @@ namespace Takai.UI
 
         public void DrawDebugInfo(SpriteBatch spriteBatch)
         {
+            Graphics.Primitives2D.DrawRect(spriteBatch, Color.Cyan, VisibleBounds);
+
             var rect = OffsetContentArea;
             Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Orange, 0.5f), rect);
 
             rect.Inflate(Padding.X, Padding.Y);
             Graphics.Primitives2D.DrawRect(spriteBatch, Color.OrangeRed, rect);
-            Graphics.Primitives2D.DrawRect(spriteBatch, Color.Cyan, VisibleBounds);
 
             string info = $"{GetType().Name}\n"
 #if DEBUG
-                        + $"ID: {DebugId}\n"
+                         + $"ID: {DebugId}\n"
 #endif
-                        + $"Name: {(Name ?? "(No name)")}\n"
+                         + $"Name: {(Name ?? "(No name)")}\n"
 #if DEBUG
-                        + $"Parent ID: {Parent?.DebugId}\n"
+                         + $"Parent ID: {Parent?.DebugId}\n"
 #endif
-                        + $"Children: {Children?.Count ?? 0}\n"
-                        + $"Bounds: {OffsetContentArea}\n" //visible bounds?
-                        + $"Position: {Position}, Size: {Size}, Padding: {Padding}\n"
-                        + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}";
+                         + $"Children: {Children?.Count ?? 0}\n"
+                         + $"Bounds: {OffsetContentArea}\n" //visible bounds?
+                         + $"Position: {Position}, Size: {Size}, Padding: {Padding}\n"
+                         + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}";
 
             var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);
             var size = DebugFont.MeasureString(info);
