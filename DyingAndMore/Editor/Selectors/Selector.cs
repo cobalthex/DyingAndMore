@@ -51,15 +51,14 @@ namespace DyingAndMore.Editor.Selectors
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             var iz = ItemSize + ItemMargin;
-            var usedSize = new Vector2();
 
-            var cols = 4;
-            if (!float.IsPositiveInfinity(availableSize.X))
-                cols = (int)(availableSize.X / iz.X);
-            usedSize.X = cols * iz.X;
+            int cols;
+            if (float.IsPositiveInfinity(availableSize.X))
+                cols = (int)Math.Sqrt(ItemCount);
+            else
+                cols = Math.Max(1, (int)(availableSize.X / iz.X));
 
-            usedSize.Y = (float)Math.Ceiling((float)ItemCount / cols) * iz.Y;
-            return usedSize;
+            return new Vector2(cols, (float)Math.Ceiling((float)ItemCount / cols)) * iz + ItemMargin;
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
@@ -96,19 +95,19 @@ namespace DyingAndMore.Editor.Selectors
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var visPos = VisibleContentArea.Y - OffsetContentArea.Y;
-            int start = (int)(visPos / (ItemSize.Y + ItemMargin.X) * ItemsPerRow);
+            var iz = ItemSize + ItemMargin;
+            int start = (int)(ContentArea.Y / iz.Y) * ItemsPerRow;
             start = Math.Max(start, 0);
-            //todo: fix
-            for (int i = start; i < Math.Min(start + (int)(ContentArea.Height / (ItemSize.Y + ItemMargin.Y) + ItemMargin.Y) * ItemsPerRow, ItemCount); ++i)
+            for (int i = start; i < Math.Min(start + (int)Math.Ceiling(ContentArea.Height / iz.Y + ItemMargin.Y) * ItemsPerRow, ItemCount); ++i)
             {
                 var rect = new Rectangle(
-                    (int)(OffsetContentArea.X + ItemMargin.X + (i % ItemsPerRow) * (ItemSize.X + ItemMargin.X)),
-                    (int)(OffsetContentArea.Y + ItemMargin.Y + (i / ItemsPerRow) * (ItemSize.Y + ItemMargin.Y) - visPos),
+                    (int)(OffsetContentArea.X + ItemMargin.X + (i % ItemsPerRow) * iz.X),
+                    (int)(OffsetContentArea.Y + ItemMargin.Y + (i / ItemsPerRow) * iz.Y),
                     (int)ItemSize.X,
                     (int)ItemSize.Y
                 );
-                rect = Rectangle.Intersect(rect, VisibleContentArea);
+
+                rect = Rectangle.Intersect(rect, VisibleContentArea); //todo: DrawItem needs to account for stretching (e.g. tilesets)
 
                 //Takai.Graphics.Primitives2D.DrawFill(
                 //    spriteBatch,

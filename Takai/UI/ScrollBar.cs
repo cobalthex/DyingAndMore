@@ -181,6 +181,20 @@ namespace Takai.UI
             var pe = (PointerEventArgs)e;
             var sbar = (ScrollBar)sender;
 
+            if (pe.device == DeviceType.Keyboard) //todo
+            {
+                if (pe.button == (int)Microsoft.Xna.Framework.Input.Keys.Up)
+                {
+                    sbar.Scroll(-1);
+                    return UIEventResult.Handled;
+                }
+                if (pe.button == (int)Microsoft.Xna.Framework.Input.Keys.Down)
+                {
+                    sbar.Scroll(1);
+                    return UIEventResult.Handled;
+                }
+            }
+
             var thumb = sbar.GetThumbBounds();
             if (!thumb.Contains(pe.position))
             {
@@ -227,6 +241,7 @@ namespace Takai.UI
 
         protected float GetThumbOffset()
         {
+            //todo: cache in arrange
             var containerSize = GetContainerSize();
             var size = GetThumbSize();
 
@@ -235,6 +250,7 @@ namespace Takai.UI
 
         protected Rectangle GetThumbBounds()
         {
+            //todo: cache in Measure
             switch (Direction)
             {
                 case Direction.Vertical:
@@ -387,7 +403,7 @@ namespace Takai.UI
             {
                 //todo: may need to double measure with scroll bars once, then again without if within container
 
-                var cm = Children[i].Measure(availableSize - new Vector2(vs.X, hs.Y)); //todo: account for infinite
+                var cm = Children[i].Measure(availableSize - new Vector2(vs.X, hs.Y));
                 bounds = Rectangle.Union(bounds, new Rectangle(0, 0, (int)cm.X, (int)cm.Y));
             }
             ContentSize = new Vector2(bounds.Width, bounds.Height);
