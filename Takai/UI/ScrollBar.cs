@@ -51,6 +51,7 @@ namespace Takai.UI
             get => _contentPosition;
             set
             {
+                //use helper methods
                 var size = Direction == Direction.Horizontal ? ContentArea.Width : ContentArea.Height;
 
                 float newPosition;
@@ -80,6 +81,22 @@ namespace Takai.UI
 
         public override bool CanFocus => IsThumbVisible;
 
+        public float ThumbSize { get; private set; }
+
+        public float ThumbPosition { get; private set; }
+
+        public bool AtBeginning()
+        {
+            return ContentPosition == 0;
+        }
+
+        public bool AtEnd()
+        {
+            //todo: use helper methods
+            var size = Direction == Direction.Horizontal ? ContentArea.Width : ContentArea.Height;
+            return ContentPosition >= ContentSize - size;
+        }
+
         public ScrollBar()
         {
             BorderColor = ThumbColor;
@@ -92,6 +109,83 @@ namespace Takai.UI
                 return new Vector2(float.IsInfinity(availableSize.X) ? 20 : availableSize.X, 20);
             else
                 return new Vector2(20, float.IsInfinity(availableSize.Y) ? 20 : availableSize.Y);
+        }
+
+        protected override void ArrangeOverride(Vector2 availableSize)
+        {
+            var containerSize = GetContainerSize();
+            ThumbSize = (containerSize / ContentSize) * containerSize;
+            ThumbPosition = Util.Clamp((ContentPosition / ContentSize) * containerSize, 0, containerSize - ThumbSize);
+            base.ArrangeOverride(availableSize);
+        }
+
+        public void Scroll(int direction)
+        {
+            ContentPosition -= Math.Sign(direction) * (Font != null ? Font.MaxCharHeight : 20);
+        }
+
+        static UIEventResult OnPress(Static sender, UIEventArgs e)
+        {
+            //todo: compare against absolute bounds not dimensions
+
+            var pe = (PointerEventArgs)e;
+            var sbar = (ScrollBar)sender;
+
+            if (pe.device == DeviceType.Keyboard) //todo
+            {
+                if (pe.button == (int)Microsoft.Xna.Framework.Input.Keys.Up)
+                {
+                    sbar.Scroll(-1);
+                    return UIEventResult.Handled;
+                }
+                if (pe.button == (int)Microsoft.Xna.Framework.Input.Keys.Down)
+                {
+                    sbar.Scroll(1);
+                    return UIEventResult.Handled;
+                }
+            }
+
+            var thumb = sbar.GetThumbBounds();
+            if (!thumb.Contains(pe.position))
+            {
+                //todo: maybe scroll to mouse over time
+
+                //center thumb around mouse
+                if (sbar.Direction == Direction.Vertical)
+                    sbar.ContentPosition = (int)((pe.position.Y - sbar.ThumbSize / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
+                else if (sbar.Direction == Direction.Horizontal)
+                    sbar.ContentPosition = (int)((pe.position.X - sbar.ThumbSize / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
+            }
+            sbar.didPressThumb = true;
+            return UIEventResult.Handled;
+        }
+
+        protected float GetContainerSize()
+        {
+            //todo: precalculate
+            switch (Direction)
+            {
+                case Direction.Vertical:
+                    return ContentArea.Height;
+                case Direction.Horizontal:
+                    return ContentArea.Width;
+                default:
+                    return 1;
+            }
+        }
+
+        protected Rectangle GetThumbBounds()
+        {
+            //cache?
+            switch (Direction)
+            {
+                case Direction.Vertical:
+                    return new Rectangle(0, (int)ThumbPosition, (int)ContentArea.Width, (int)ThumbSize);
+                case Direction.Horizontal:
+                    return new Rectangle((int)ThumbPosition, 0, (int)ThumbSize, (int)ContentArea.Height);
+                default:
+                    return Rectangle.Empty;
+            }
         }
 
         protected override bool HandleInput(GameTime time)
@@ -169,99 +263,6 @@ namespace Takai.UI
             return base.HandleInput(time);
         }
 
-        public void Scroll(int direction)
-        {
-            ContentPosition -= Math.Sign(direction) * (Font != null ? Font.MaxCharHeight : 20);
-        }
-
-        static UIEventResult OnPress(Static sender, UIEventArgs e)
-        {
-            //todo: compare against absolute bounds not dimensions
-
-            var pe = (PointerEventArgs)e;
-            var sbar = (ScrollBar)sender;
-
-            if (pe.device == DeviceType.Keyboard) //todo
-            {
-                if (pe.button == (int)Microsoft.Xna.Framework.Input.Keys.Up)
-                {
-                    sbar.Scroll(-1);
-                    return UIEventResult.Handled;
-                }
-                if (pe.button == (int)Microsoft.Xna.Framework.Input.Keys.Down)
-                {
-                    sbar.Scroll(1);
-                    return UIEventResult.Handled;
-                }
-            }
-
-            var thumb = sbar.GetThumbBounds();
-            if (!thumb.Contains(pe.position))
-            {
-                //todo: maybe scroll to mouse over time
-
-                //center thumb around mouse
-                if (sbar.Direction == Direction.Vertical)
-                    sbar.ContentPosition = (int)((pe.position.Y - sbar.GetThumbSize() / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
-                else if (sbar.Direction == Direction.Horizontal)
-                    sbar.ContentPosition = (int)((pe.position.X - sbar.GetThumbSize() / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
-            }
-            sbar.didPressThumb = true;
-            return UIEventResult.Handled;
-        }
-
-        protected float GetContainerSize()
-        {
-            //todo: precalculate
-            switch (Direction)
-            {
-                case Direction.Vertical:
-                    return ContentArea.Height;
-                case Direction.Horizontal:
-                    return ContentArea.Width;
-                default:
-                    return 1;
-            }
-        }
-
-        protected float GetThumbSize()
-        {
-            //todo: cache in Measure
-
-            switch (Direction)
-            {
-                case Direction.Vertical:
-                    return (ContentArea.Height / ContentSize) * GetContainerSize();
-                case Direction.Horizontal:
-                    return (ContentArea.Width / ContentSize) * GetContainerSize(); //todo: this should be inclusive size
-                default:
-                    return 1;
-            }
-        }
-
-        protected float GetThumbOffset()
-        {
-            //todo: cache in arrange
-            var containerSize = GetContainerSize();
-            var size = GetThumbSize();
-
-            return Util.Clamp((ContentPosition / ContentSize) * containerSize, 0, containerSize - size);
-        }
-
-        protected Rectangle GetThumbBounds()
-        {
-            //todo: cache in Measure
-            switch (Direction)
-            {
-                case Direction.Vertical:
-                    return new Rectangle(0, (int)GetThumbOffset(), (int)ContentArea.Width, (int)GetThumbSize());
-                case Direction.Horizontal:
-                    return new Rectangle((int)GetThumbOffset(), 0, (int)GetThumbSize(), (int)ContentArea.Height);
-                default:
-                    return Rectangle.Empty;
-            }
-        }
-
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             if (!IsThumbVisible)
@@ -333,8 +334,8 @@ namespace Takai.UI
             set
             {
                 //InternalSetScrollPosition and reflow after?
-                verticalScrollbar.ContentPosition = value.Y;
                 horizontalScrollbar.ContentPosition = value.X;
+                verticalScrollbar.ContentPosition = value.Y;
             }
         }
 
@@ -346,6 +347,11 @@ namespace Takai.UI
         public Vector2 ContentSize { get; private set; }
 
         public override bool CanFocus => true;
+
+        /// <summary>
+        /// when resizing, if the previous scroll position was at the end, stay at the end
+        /// </summary>
+        public bool StayAtEnd { get; set; } = false;
 
         public ScrollBox()
         {
@@ -395,8 +401,8 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            var vs = verticalScrollbar.Measure(new Vector2(InfiniteSize));
             var hs = horizontalScrollbar.Measure(new Vector2(InfiniteSize));
+            var vs = verticalScrollbar.Measure(new Vector2(InfiniteSize));
 
             var bounds = new Rectangle();
             for (int i = 2; i < Children.Count; ++i)
@@ -410,34 +416,44 @@ namespace Takai.UI
             return ContentSize;
         }
 
-        //protected override void OnChildRemeasure(Static child)
-        //{
-            //todo
-            //if (contentContainer.Position != Vector2.Zero) //&& stayAtBottom
-            //    ; //maintain offset
-        //}
+        protected override void OnChildRemeasure(Static child)
+        {
+            InvalidateMeasure();
+            InvalidateArrange();
+        }
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            verticalScrollbar.ContentSize = ContentSize.Y + InnerPadding.Y * 2;
+            var newPosition = ScrollPosition;
+            if (StayAtEnd && newPosition != Vector2.Zero)
+            {
+                if (horizontalScrollbar.AtEnd())
+                    newPosition.X = horizontalScrollbar.ContentSize;
+                if (verticalScrollbar.AtEnd())
+                    newPosition.Y = verticalScrollbar.ContentSize;
+            }
+
             horizontalScrollbar.ContentSize = ContentSize.X + InnerPadding.X * 2;
+            verticalScrollbar.ContentSize = ContentSize.Y + InnerPadding.Y * 2;
+
+            ScrollPosition = newPosition;
             
-            verticalScrollbar.IsEnabled = EnableVerticalScrolling && ContentSize.Y > availableSize.Y - InnerPadding.Y;
             horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && ContentSize.X > availableSize.X - InnerPadding.X;
+            verticalScrollbar.IsEnabled = EnableVerticalScrolling && ContentSize.Y > availableSize.Y - InnerPadding.Y;
 
-            var vs = verticalScrollbar.IsEnabled ? new Vector2(verticalScrollbar.MeasuredSize.X, 0) : Vector2.Zero;
             var hs = horizontalScrollbar.IsEnabled ? new Vector2(0, horizontalScrollbar.MeasuredSize.Y) : Vector2.Zero;
+            var vs = verticalScrollbar.IsEnabled ? new Vector2(verticalScrollbar.MeasuredSize.X, 0) : Vector2.Zero;
 
-            verticalScrollbar.Arrange(new Rectangle((int)(availableSize.X - vs.X), 0, (int)vs.X, (int)(availableSize.Y - hs.Y)));
             horizontalScrollbar.Arrange(new Rectangle(0, (int)(availableSize.Y - hs.Y), (int)(availableSize.X - vs.X), (int)hs.Y));
+            verticalScrollbar.Arrange(new Rectangle((int)(availableSize.X - vs.X), 0, (int)vs.X, (int)(availableSize.Y - hs.Y)));
 
             var scrollX = (int)(-ScrollPosition.X + InnerPadding.X);
             var scrollY = (int)(-ScrollPosition.Y + InnerPadding.Y);
             var arrangeRect = new Rectangle(
                 scrollX,
                 scrollY,
-                (int)(availableSize.X - vs.X - InnerPadding.X) - scrollX,
-                (int)(availableSize.Y - hs.Y - InnerPadding.Y) - scrollY
+                (int)(availableSize.X - vs.X - InnerPadding.X - 1) - scrollX,
+                (int)(availableSize.Y - hs.Y - InnerPadding.Y - 1) - scrollY
             );
             for (int i = 2; i < Children.Count; ++i)
                 Children[i].Arrange(arrangeRect);

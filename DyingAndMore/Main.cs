@@ -275,6 +275,17 @@ namespace DyingAndMore
                 return UIEventResult.Handled;
             });
 
+            //childUI = new UI.TestSizer()
+            //{
+            //    Position = new Vector2(10),
+            //    BackgroundColor = new Color(200, 100, 40)
+            //};
+            //childUI = new ScrollBox(childUI)
+            //{
+            //    Size = new Vector2(300),
+            //    Position = new Vector2(50)
+            //};
+
             //childUI = Cache.Load<Static>("UI/test/scrollbox.ui.tk");
 
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");

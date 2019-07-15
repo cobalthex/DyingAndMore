@@ -106,6 +106,7 @@
     <Compile Include="UI\Devtools.cs" />
     <Compile Include="UI\EntViewer.cs" />
     <Compile Include="UI\SquadSelect.cs" />
+    <Compile Include="UI\TestSizer.cs" />
     <Compile Include="UI\WeaponSelect.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">

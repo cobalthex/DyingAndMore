@@ -1528,7 +1528,8 @@ namespace Takai.UI
                     //size.X = isHStretch ? 0 : measuredSize.X; //stretched items have no intrinsic size
 
                 if (isHeightAutoSize)
-                    size.Y = isVStretch ? 0 : measuredSize.Y;
+                    size.Y = measuredSize.Y; //stretched items do have intrinsic size
+                    //size.Y = isVStretch ? 0 : measuredSize.Y; //stretched items have no intrinsic size
             }
 
             var lastMeasuredSize = MeasuredSize;
