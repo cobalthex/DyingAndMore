@@ -101,13 +101,15 @@ namespace DyingAndMore.Editor.Selectors
             for (int i = start; i < Math.Min(start + (int)Math.Ceiling(ContentArea.Height / iz.Y + ItemMargin.Y) * ItemsPerRow, ItemCount); ++i)
             {
                 var rect = new Rectangle(
-                    (int)(OffsetContentArea.X + ItemMargin.X + (i % ItemsPerRow) * iz.X),
-                    (int)(OffsetContentArea.Y + ItemMargin.Y + (i / ItemsPerRow) * iz.Y),
+                    (int)(ItemMargin.X + (i % ItemsPerRow) * iz.X),
+                    (int)(ItemMargin.Y + (i / ItemsPerRow) * iz.Y),
                     (int)ItemSize.X,
                     (int)ItemSize.Y
                 );
 
-                rect = Rectangle.Intersect(rect, VisibleContentArea); //todo: DrawItem needs to account for stretching (e.g. tilesets)
+                //DrawItem should handle positioning and clipping itself
+                //DrawItem draws relatively
+                //rect = Rectangle.Intersect(rect, VisibleContentArea); //todo: DrawItem needs to account for stretching (e.g. tilesets)
 
                 //Takai.Graphics.Primitives2D.DrawFill(
                 //    spriteBatch,
@@ -115,6 +117,9 @@ namespace DyingAndMore.Editor.Selectors
                 //    rect
                 //);
                 DrawItem(spriteBatch, i, rect);
+
+                rect.Offset(OffsetContentArea.Location);
+                rect = Rectangle.Intersect(VisibleContentArea, rect);
                 if (i == SelectedIndex)
                 {
                     rect.Inflate(1, 1);
@@ -125,6 +130,6 @@ namespace DyingAndMore.Editor.Selectors
             }
         }
 
-        public abstract void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle offsetBounds);
+        public abstract void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds);
     }
 }

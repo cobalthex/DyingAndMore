@@ -30,10 +30,14 @@ namespace DyingAndMore.Editor.Selectors
             ItemSize = new Vector2(64, 64);
         }
 
-        public override void DrawItem(SpriteBatch spriteBatch, int ItemIndex, Rectangle Bounds)
+        public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds)
         {
-            if (fluids[ItemIndex].Texture != null)
-                spriteBatch.Draw(fluids[ItemIndex].Texture, Bounds, Color.White);
+            if (fluids[itemIndex].Texture == null)
+                return;
+
+            bounds.Offset(OffsetContentArea.Location);
+            bounds = Rectangle.Intersect(bounds, VisibleContentArea);
+            spriteBatch.Draw(fluids[itemIndex].Texture, bounds, Color.White);
         }
     }
 }

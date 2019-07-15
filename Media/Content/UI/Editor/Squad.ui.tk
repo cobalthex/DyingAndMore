@@ -124,14 +124,14 @@ List {
 
 						Static { Text: "`_Units"; };
 						ScrollBox {
-							Name: "zop";
+							Name: "zzz";
 							HorizontalAlignment: Alignment.Stretch;
 							Size: [NaN 300];
+							StayAtEnd: true;
 							Children: [
 								ActorList {
 									Name: "SquadActorSelect";
 									Container: List {
-										Name: "333";
 										Direction: Direction.Vertical;
 										Margin: 10;
 									}
@@ -142,8 +142,7 @@ List {
 											Direction: BindingDirection.TwoWay;
 										};
 									];
-									#ItemTemplate: @"./ActorPreview.ui.tk";
-									ItemTemplate: Static { Text: "AAA"; };
+									ItemTemplate: @"./ActorPreview.ui.tk";
 									AddItemTemplate: @"./Entities/SelectActor.ui.tk";
 								};
 							];

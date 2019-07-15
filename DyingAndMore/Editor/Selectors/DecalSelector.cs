@@ -26,6 +26,8 @@ namespace DyingAndMore.Editor.Selectors
 
         public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds)
         {
+            bounds.Offset(OffsetContentArea.Location);
+            bounds = Rectangle.Intersect(bounds, VisibleContentArea);
             spriteBatch.Draw(textures[itemIndex], bounds, Color.White);
         }
     }

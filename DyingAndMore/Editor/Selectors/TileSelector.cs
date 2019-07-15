@@ -30,6 +30,10 @@ namespace DyingAndMore.Editor.Selectors
                 (int)ItemSize.X,
                 (int)ItemSize.Y
             );
+
+            bounds.Offset(OffsetContentArea.Location);
+            bounds = Rectangle.Intersect(bounds, VisibleContentArea);
+            //todo: clip clip to visible area
             spriteBatch.Draw(tileset.texture, bounds, clip, Color.White);
         }
     }

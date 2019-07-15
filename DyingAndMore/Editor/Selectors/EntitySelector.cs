@@ -80,7 +80,7 @@ namespace DyingAndMore.Editor.Selectors
             base.UpdateSelf(time);
         }
 
-        public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle offsetBounds)
+        public override void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds)
         {
             if (ents.Count <= itemIndex)
                 return;
@@ -89,17 +89,15 @@ namespace DyingAndMore.Editor.Selectors
 
             var editorSprite = ent.EditorPreviewSprite.Value;
             if (editorSprite?.Texture != null)
-            {
-                offsetBounds.Offset(-OffsetContentArea.X, -OffsetContentArea.Y);
-                DrawSprite(spriteBatch, editorSprite, offsetBounds);
-            }
+                DrawSprite(spriteBatch, editorSprite, bounds); //todo: broken (when in scrolled area)
             else
             {
+                bounds.Offset(OffsetContentArea.Location);
                 //todo: constrain to content area
-                offsetBounds.Inflate(-4, -4);
-                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Tomato, offsetBounds);
-                offsetBounds.Offset(0, 2);
-                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Black, offsetBounds);
+                bounds.Inflate(-4, -4);
+                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Tomato, bounds);
+                bounds.Offset(0, 2);
+                Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Black, bounds);
             }
         }
     }

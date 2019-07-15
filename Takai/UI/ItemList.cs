@@ -215,16 +215,6 @@ namespace Takai.UI
                     il.Items.RemoveAt(i);
             };
         }
-        /*protected Static FindRelevantChild(Static source)
-        {
-            while (source != null)
-            {
-                if (source.Parent == Container)
-                    return source;
-                source = source.Parent;
-            }
-            return null;
-        }*/
 
         protected override void FinalizeClone()
         {
@@ -241,6 +231,7 @@ namespace Takai.UI
 
         public override void BindTo(object source)
         {
+            Items.Clear();
             BindToThis(source);
         }
 
@@ -276,6 +267,8 @@ namespace Takai.UI
                 for (int i = 0; i < e.NewItems.Count; ++i)
                     Container.InsertChild(CreateItemEntry((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
+
+            Container.InvalidateArrange();
         }
 
         /// <summary>
