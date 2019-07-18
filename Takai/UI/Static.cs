@@ -2187,19 +2187,24 @@ namespace Takai.UI
             var dx = VisibleContentArea.X - OffsetContentArea.X;
             var dy = VisibleContentArea.Y - OffsetContentArea.Y;
 
-            destRect.X += clipRegion.X;
-            destRect.Y += clipRegion.Y;
-            destRect.Width = System.Math.Min(destRect.Width, clipRegion.Width);
-            destRect.Height = System.Math.Min(destRect.Height, clipRegion.Height);
+            destRect.X += clipRegion.X - dx;
+            destRect.Y += clipRegion.Y - dy;
+            //destRect.Width = System.Math.Min(destRect.Width, clipRegion.Width);
+            //destRect.Height = System.Math.Min(destRect.Height, clipRegion.Height);
+            var finalRect = Rectangle.Intersect(destRect, clipRegion);
 
+            var vx = -(int)((finalRect.Width - destRect.Width) * sx);
+            var vy = -(int)((finalRect.Height - destRect.Height) * sy);
             var clip = new Rectangle(
-                (int)(dx * sx),
-                (int)(dy * sy),
-                (int)(destRect.Width * sx),
-                (int)(destRect.Height * sy)
+                vx,
+                vy,
+                sprite.Width - vx,
+                sprite.Height - vy
             );
 
-            sprite.Draw(spriteBatch, destRect, clip, 0, Color.White, sprite.ElapsedTime);
+            sprite.Draw(spriteBatch, finalRect, clip, 0, Color.White, sprite.ElapsedTime);
+
+            Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, finalRect);
         }
 
         #endregion
@@ -2220,7 +2225,7 @@ namespace Takai.UI
                 Size = new Vector2(Data.Serializer.Cast<float>(width), Size.Y);
 
             if (props.TryGetValue("Height", out var height))
-                Size = new Vector2(Size.X, Data.Serializer.Cast<float>(height));
+                Size = new Vector2(Size.Y, Data.Serializer.Cast<float>(height));
         }
 
         #region Helpers
