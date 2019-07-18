@@ -118,10 +118,11 @@ namespace DyingAndMore.Editor.Selectors
                 //);
                 DrawItem(spriteBatch, i, rect);
 
-                rect.Offset(OffsetContentArea.Location);
-                rect = Rectangle.Intersect(VisibleContentArea, rect);
                 if (i == SelectedIndex)
                 {
+                    rect.Offset(OffsetContentArea.Location);
+                    rect = Rectangle.Intersect(VisibleContentArea, rect);
+                    //todo: intersect after inflate
                     rect.Inflate(1, 1);
                     Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.White, rect);
                     rect.Inflate(1, 1);

@@ -32,7 +32,6 @@ namespace Takai.UI
                 !VisibleContentArea.Contains(Input.InputState.MousePoint))
                 IsEnabled = false;
 
-            //this is wtf right now???
             if (isSizing)
             {
                 if (Input.InputState.IsButtonDown(Input.MouseButtons.Left))
@@ -42,10 +41,10 @@ namespace Takai.UI
                     switch (HorizontalAlignment)
                     {
                         case Alignment.Left:
-                            Size = new Vector2(MathHelper.Clamp(ContentArea.Width + mdx, GripperWidth, maxx), float.NaN);
+                            Size = new Vector2(MathHelper.Clamp(ContentArea.Width + mdx, GripperWidth, maxx), Size.Y);
                             return false;
                         case Alignment.Right:
-                            Size = new Vector2(MathHelper.Clamp(ContentArea.Width - mdx, GripperWidth, maxx), float.NaN);
+                            Size = new Vector2(MathHelper.Clamp(ContentArea.Width - mdx, GripperWidth, maxx), Size.Y);
                             return false;
                     }
                     return false;
