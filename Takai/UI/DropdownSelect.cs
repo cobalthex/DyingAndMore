@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿
+using Microsoft.Xna.Framework;
 
 namespace Takai.UI
 {
@@ -46,6 +47,7 @@ namespace Takai.UI
 
             dropdown = new ScrollBox(list)
             {
+                Name = "dropdown",
                 BorderColor = Color.White,
                 BackgroundColor = new Color(32, 0, 128)
             };

@@ -6,13 +6,13 @@ ProjectileClass {
     Range: 100000;
     Drag: 0.0;
     MinimumSpeed: 100;
-    MagnetismAnglePerSecond: 600deg;
+    MagnetismAnglePerSecond: 1200deg;
     InheritSourcePhysics: false;
     Damage: 25;
 
     Trail: {
-        MaxPoints: 50;
-        LifeSpan: 0.25sec;
+        MaxPoints: 100;
+        LifeSpan: 1.25sec;
         CaptureDelay: 160Hz;
         Color: {
             Values: [

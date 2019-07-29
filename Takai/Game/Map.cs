@@ -439,6 +439,18 @@ namespace Takai.Game
             }
         }
 
+        /// <summary>
+        /// Recreate (and reset to default state) all entities
+        /// However, they maintain their same world state
+        /// </summary>
+        public void ReconstructAllEntities()
+        {
+            var allEnts = new List<EntityInstance>(AllEntities);
+            RemoveAllEntities();
+            for (int i = 0; i < allEnts.Count; ++i)
+                Spawn(allEnts[i].Class, allEnts[i].Position, allEnts[i].Forward, allEnts[i].Velocity, allEnts[i].Name);
+        }
+
         #endregion
     }
 }
