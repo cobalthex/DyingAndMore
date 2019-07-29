@@ -243,7 +243,7 @@ namespace DyingAndMore
                 //Size = new Vector2(400, 600),
                 HorizontalAlignment = Alignment.Middle,
                 VerticalAlignment = Alignment.Middle,
-                BasePath = System.IO.Path.Combine(Cache.Root, "Maps"),
+                BasePath = System.IO.Path.Combine(Cache.Root, "Mapsrc"),
                 FilterRegex = "\\.(map\\.tk|d2map\\.zip)$",
             };
             childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)

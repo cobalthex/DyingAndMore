@@ -11,6 +11,7 @@ List {
     Padding: [10 10];
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
+    IsModal: true;
     Children: [
         Static {
             Text: "Create a New Map";
@@ -76,14 +77,18 @@ List {
             HorizontalAlignment: Alignment.Stretch;
             Children: [
                 Static {
-                    Name: "create";
+                    EventCommands: {
+                        Click: ["Create"];
+                    };
                     Text: "Create";
                     Font: @"Fonts/UILarge.bfnt";
                     HorizontalAlignment: Alignment.Stretch;
                 }
 
                 Static {
-                    Action: "$Close";
+                    EventCommands: {
+                        Click: ["CloseModal"];
+                    };
                     Text: "Cancel";
                     Font: @"Fonts/UILarge.bfnt";
                     HorizontalAlignment: Alignment.Stretch;

@@ -457,11 +457,14 @@ namespace DyingAndMore.Editor
                     using (var sfd = new System.Windows.Forms.SaveFileDialog()
                     {
                         Filter = "Dying and More! Maps (*.map.tk)|*.map.tk",
+                        InitialDirectory = System.IO.Path.GetDirectoryName(Map.Class.File),
                         RestoreDirectory = true,
                         SupportMultiDottedExtensions = true,
-                        FileName = System.IO.Path.GetFileName(Map.Class.File)
+                        FileName = System.IO.Path.GetFileName(Map.Class.File),
                     })
                     {
+                        sfd.CustomPlaces.Add(System.IO.Path.GetFullPath("Content/Mapsrc"));
+                        sfd.CustomPlaces.Add(System.IO.Path.GetFullPath("Maps"));
                         if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         {
                             try
@@ -482,11 +485,13 @@ namespace DyingAndMore.Editor
                     using (var ofd = new System.Windows.Forms.OpenFileDialog()
                     {
                         Filter = "Dying and More! Maps (*.map.tk)|*.map.tk|Dying and More! Saves (*.d2sav)|*.d2sav",
-                        InitialDirectory = System.IO.Path.Combine(Cache.Root, "Maps"),
+                        InitialDirectory = System.IO.Path.Combine(Cache.Root, "Mapsrc"),
                         RestoreDirectory = true,
                         SupportMultiDottedExtensions = true,
                     })
                     {
+                        ofd.CustomPlaces.Add(System.IO.Path.GetFullPath("Content/Mapsrc")); //test if exists in release mode?
+                        ofd.CustomPlaces.Add(System.IO.Path.GetFullPath("Maps"));
                         if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         {
                             //try
@@ -502,9 +507,21 @@ namespace DyingAndMore.Editor
                                 }
                                 else
                                 {
-                                    var mapClass = Cache.Load<MapClass>(ofd.FileName);
-                                    mapClass.InitializeGraphics();
-                                    Parent.ReplaceAllChildren(new Editor((MapInstance)mapClass.Instantiate()));
+                                    var mapFile = Cache.Load(ofd.FileName);
+                                    if (mapFile is MapClass mapClass)
+                                    {
+                                        mapClass.InitializeGraphics();
+                                        Parent.ReplaceAllChildren(new Editor((MapInstance)mapClass.Instantiate()));
+                                    }
+                                    else if (mapFile is MapInstance mapInst)
+                                    {
+                                        if (mapInst.Class == null)
+                                            throw new System.NullReferenceException("Map class cannot be null");
+                                        mapInst.Class.InitializeGraphics();
+                                        Parent.ReplaceAllChildren(new Editor(mapInst));
+                                    }
+                                    else
+                                        throw new System.NotSupportedException("Unknown map format");
                                 }
 
                                 Cache.CleanupStaleReferences();
@@ -520,33 +537,28 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsPress(Keys.N))
                 {
-                    throw new System.NotImplementedException(); //todo: use bindings here
-
                     var newMap = Cache.Load<Static>("UI/Editor/NewMap.ui.tk");
+                    newMap.CommandActions["Create"] = delegate (Static sender, object arg)
+                    {
+                        newMap.RemoveFromParent();
+
+                        var name = sender.FindChildByName("name").Text;
+                        var width = sender.FindChildByName<NumericBase>("width").Value;
+                        var height = sender.FindChildByName<NumericBase>("height").Value;
+                        var tileset = Cache.Load<Tileset>(sender.FindChildByName<FileInputBase>("tileset").Value);
+
+                        var map = new MapClass
+                        {
+                            Name = name,
+                            Tiles = new short[height, width],
+                            TileSize = tileset.size,
+                            TilesImage = tileset.texture,
+                        };
+                        map.InitializeGraphics();
+                        Map = (MapInstance)map.Instantiate();
+                    };
+
                     AddChild(newMap);
-
-
-                    //newMap.FindChildByName("create").Click += delegate (Static sender, ClickEventArgs e)
-                    //{
-                    //    var name = resizeMap.FindChildByName("name").Text;
-                    //    var width = resizeMap.FindChildByName<NumericBase>("width").Value;
-                    //    var height = resizeMap.FindChildByName<NumericBase>("height").Value;
-                    //    var tileset = Cache.Load<Tileset>(resizeMap.FindChildByName<FileInputBase>("tileset").Value);
-
-                    //    var map = new MapClass
-                    //    {
-                    //        Name = name,
-                    //        Tiles = new short[height, width],
-                    //        TileSize = tileset.size,
-                    //        TilesImage = tileset.texture,
-                    //    };
-                    //    map.InitializeGraphics();
-                    //    Map = map.Instantiate();
-                    //    resizeMap.RemoveFromParent();
-
-                    //    return UIEventResult.Handled;
-                    //};
-
                 }
 
                 if (InputState.IsPress(Keys.R))

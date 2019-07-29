@@ -4,24 +4,29 @@ using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
 {
-    /// <summary>
-    /// Allows for modifying the direction of a traveling object
-    /// </summary>
-    /// <param name="distance">How far the projectile has traveled since it spawned</param>
-    /// <param name="direction">The current direction of the projectile</param>
-    /// <returns>The new direction of the object</returns>
-    public delegate Vector2 DirectionModifier(float distance, Vector2 direction);
+    public interface IDirectionModifier
+    {
+        Vector2 GetNextDirection(float distance, Vector2 direction, float speed, float seed, float deltaSeconds);
+    }
+
+    public class WaveDirectionModifier : IDirectionModifier
+    {
+        public float Period { get; set; } = 300;
+
+        public Vector2 GetNextDirection(float distance, Vector2 direction, float speed, float seed, float deltaSeconds)
+        {
+            float r = MathHelper.Pi * (speed / Period);
+            var tangent = (Math.Abs(((distance / Period) % 4) - 2)) * r * deltaSeconds;
+            if (seed % 2 == 0)
+                tangent = -tangent;
+            return Vector2.TransformNormal(direction, Matrix.CreateRotationZ(tangent));
+        }
+    }
 
     //move projectiles to actors or even generic entities (behaviors for projectile specifics) ?
 
     public class ProjectileClass : EntityClass
     {
-        public static DirectionModifier WaveDirectionMod => delegate (float distance, Vector2 direction)
-        {
-            var tangent = (float)Math.Sin(distance / 100000) * MathHelper.PiOver2;
-            return Vector2.TransformNormal(direction, Matrix.CreateRotationZ(tangent));
-        };
-
         /// <summary>
         /// Initial speed of the projectile
         /// </summary>
@@ -72,7 +77,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// A modifier to modify the direction of the projectile as it travels
         /// </summary>
-        public DirectionModifier DirectionMod { get; set; } = null;
+        public IDirectionModifier DirectionMod { get; set; } = null;
 
         public ProjectileClass()
         {
@@ -104,25 +109,25 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public ActorInstance CurrentMagnet { get; set; }
 
-        /// <summary>
-        /// Where the projectile was spawned
-        /// </summary>
-        protected Vector2 origin; //origin angle?
-
         protected TimeSpan nextTargetSearchTime;
+
+        protected float distanceTraveled = 0; //needs to be serializable?
+        protected float randomSeed = Takai.Util.RandomGenerator.Next(0, 65536);
 
         public ProjectileInstance() { }
         public ProjectileInstance(ProjectileClass @class)
             : base(@class) { }
 
+        Vector2 lastPosition;
         public override void Think(TimeSpan deltaTime)
         {
-            var cdist = Vector2.Distance(origin, Position);
+            distanceTraveled += Vector2.Distance(lastPosition, Position);
+            lastPosition = Position;    
 
             if (IsAlive &&
                 (ForwardSpeed() < Class.MinimumSpeed ||
                 (Class.LifeSpan > TimeSpan.Zero && Map.ElapsedTime > SpawnTime + Class.LifeSpan) ||
-                (Class.Range != 0 && cdist > Class.Range)))
+                (Class.Range != 0 && distanceTraveled > Class.Range)))
             {
                 DisableNextDestructionEffect = true;
                 if (Class.FadeEffect != null)
@@ -160,7 +165,7 @@ namespace DyingAndMore.Game.Entities
 
                 if (Class.DirectionMod != null)
                 {
-                    var newDirection = Class.DirectionMod(cdist, Forward);
+                    var newDirection = Class.DirectionMod.GetNextDirection(distanceTraveled, Forward, ForwardSpeed(), randomSeed, (float)deltaTime.TotalSeconds);
                     Forward = newDirection;
                     Velocity = Forward * Velocity.Length();
                 }
@@ -192,7 +197,7 @@ namespace DyingAndMore.Game.Entities
                         var norm = diff / length;
                         var dot = Vector2.Dot(norm, Forward);
 
-                        if (dot <= 0)
+                        if (dot <= 0) //ignore targets behind
                             continue;
 
                         if (length < minDist || (length == minDist && dot < minDot))
@@ -213,7 +218,7 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnSpawn(MapBaseInstance map)
         {
-            origin = Position;
+            lastPosition = Position;
             if (Class.InheritSourcePhysics && Source != null) //todo: this should be part of entity spawning?
             {
                 Velocity += Source.Velocity;

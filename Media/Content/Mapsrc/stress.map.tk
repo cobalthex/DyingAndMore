@@ -1,3736 +1,3734 @@
-MapClass {
-    Name: "test";
-    TileSize: 48;
-    Width: 46;
-    Height: 46;
-    MaterialInteractions: @"Materials/Test.mtl.tk";
-    TileBounds: [0 0 46 46];
-    InitialState: InitialMapState {
-        Entities: [
-            EntitySpawn {
+MapInstance {
+    Class: MapClass {
+        Name: "test";
+        TileSize: 48;
+        Width: 46;
+        Height: 46;
+        MaterialInteractions: @"Materials/Test.mtl.tk";
+        TileBounds: [0 0 46 46];
+        TilesImage: "Tilesets/Tiles2.png";
+        Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    }
+    Entities: [
+            ActorInstance {
                 Class: @"Actors/Player.ent.tk";
                 Position: [267 259];
                 Forward: [0.9955281 0.09446617];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/Rhinovirus.ent.tk";
                 Position: [1194.895 164.3975];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [886.0308 418.9539];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [580.3077 673.7231];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [993.6 738.8308];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/SoundTest.ent.tk";
                 Position: [283.5273 996.1091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1794 401.4545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1766.4 403.9636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1633.418 429.0545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1593.273 504.3273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1653.491 614.7273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1728.764 597.1636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1761.382 546.9818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1854.218 486.7636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1891.855 524.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1886.836 602.1818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1656 634.8];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1643.455 755.2364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1799.018 787.8546];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1932 752.7273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2037.382 745.2];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2085.055 838.0364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2039.891 880.6909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1871.782 900.7636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1824.109 930.8727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1904.4 986.0727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2009.782 1008.655];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2064.982 1041.273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1932 1081.418];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1791.491 1056.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1826.618 1129.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2180.4 1199.345];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2052.437 1186.8];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1914.436 1284.655];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2049.927 1354.909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1871.782 1357.418];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1834.146 1520.509];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1939.527 1558.146];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2052.437 1515.491];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1615.855 1661.018];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1731.273 1731.273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1796.509 1728.764];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1618.364 1713.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1560.655 1708.691];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1452.764 1645.964];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1460.291 1523.018];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1467.818 1397.564];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1452.764 1417.636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1397.564 1402.582];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1284.655 1465.309];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1299.709 1548.109];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1349.891 1661.018];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1470.327 1713.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1583.236 1794];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1713.709 1851.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1791.491 1821.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1896.873 1761.382];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1783.964 1668.545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1681.091 1548.109];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1648.473 1482.873];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1736.291 1347.382];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1686.109 1259.564];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1628.4 1156.691];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1628.4 1071.382];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1635.927 993.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1598.291 930.8727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1583.236 903.2727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1540.582 825.4909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1538.073 780.3273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1528.036 732.6545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1495.418 669.9272];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1490.4 632.2909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1455.273 557.0182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1422.655 501.8182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1402.582 454.1454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1380 401.4545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1362.436 388.9091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1337.346 391.4182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1329.818 439.0909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1342.364 481.7455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1382.509 569.5637];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1410.109 629.7818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1427.673 700.0364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1440.218 755.2364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1425.164 802.9091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1417.636 880.6909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1420.146 940.9091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1417.636 976.0364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1447.745 1036.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1465.309 1078.909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1490.4 1131.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1585.745 1191.818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1570.691 1224.436];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1588.255 1279.636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1653.491 1397.564];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1625.891 1482.873];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1605.818 1530.545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1523.018 1565.673];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1510.473 1548.109];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1545.6 1472.836];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1553.127 1450.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1528.036 1372.473];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1497.927 1324.8];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1472.836 1279.636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1455.273 1247.018];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1437.709 1196.836];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1417.636 1149.164];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1405.091 1121.564];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1395.055 1093.964];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1377.491 1041.273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1362.436 1006.145];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1359.927 948.4363];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1367.455 920.8364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1364.946 865.6364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1367.455 817.9636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1380 772.8];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1372.473 715.0909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1354.909 664.9091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1334.836 619.7454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1319.782 584.6182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1287.164 524.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1287.164 499.3091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1282.146 461.6727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1269.6 414];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1244.509 406.4727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1234.473 436.5818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1229.455 479.2364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1231.964 519.3818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1234.473 557.0182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1244.509 584.6182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1247.018 652.3636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1252.036 702.5455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1267.091 730.1454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1277.127 795.3818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1274.618 835.5273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1267.091 890.7273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1279.636 950.9454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1292.182 983.5637];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1294.691 1036.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1314.764 1119.055];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1344.873 1226.945];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1354.909 1264.582];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1367.455 1304.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1347.382 1332.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1304.727 1354.909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1272.109 1334.836];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1264.582 1292.182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1259.564 1236.982];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1252.036 1184.291];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1247.018 1156.691];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1242 1109.018];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1231.964 1061.345];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1229.455 1003.636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1219.418 950.9454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1221.927 903.2727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1224.436 853.0909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1206.873 790.3636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1194.327 735.1636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1191.818 707.5637];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1189.309 624.7636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1186.8 594.6545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1196.836 506.8364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1181.782 446.6182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1181.782 426.5454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1111.527 376.3636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1086.436 419.0182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1116.546 494.2909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1134.109 594.6545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1131.6 659.8909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1134.109 720.1091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1141.636 772.8];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1154.182 833.0182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1161.709 903.2727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1161.709 971.0182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1156.691 1028.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1154.182 1053.818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1144.146 1156.691];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1144.146 1196.836];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1144.146 1226.945];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1154.182 1307.236];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1209.382 1324.8];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1184.291 1372.473];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1136.618 1415.127];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1189.309 1442.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1206.873 1485.382];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1174.255 1525.527];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1151.673 1553.127];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1216.909 1590.764];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1239.491 1648.473];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1294.691 1673.564];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1352.4 1756.364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1405.091 1846.691];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1480.364 1871.782];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1583.236 1992.218];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1357.418 1962.109];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1302.218 1932];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1199.346 1899.382];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1174.255 1851.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1186.8 1796.509];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1181.782 1776.436];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1134.109 1691.127];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1116.546 1656];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1091.455 1573.2];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1076.4 1518];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1058.836 1470.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1058.836 1357.418];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1053.818 1284.655];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1043.782 1236.982];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1031.236 1169.236];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1026.218 1131.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1013.673 1036.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1046.291 928.3636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1061.346 820.4727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1051.309 792.8727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1043.782 725.1273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1036.255 690];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1026.218 617.2364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1033.745 554.5091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1016.182 511.8546];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [973.5273 499.3091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [935.891 524.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [928.3637 567.0546];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [925.8546 629.7818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [920.8364 667.4182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [930.8728 720.1091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [918.3273 797.8909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [925.8546 850.5818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [950.9456 893.2364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [953.4547 930.8727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [938.4001 998.6182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [928.3637 1061.345];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [908.291 1134.109];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [880.691 1196.836];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [900.7637 1254.545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [900.7637 1304.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [905.7819 1354.909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [895.7455 1405.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [880.691 1455.273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [910.8 1615.854];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [976.0364 1696.146];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [991.091 1796.509];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [996.1092 1856.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [998.6183 1884.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [981.0546 1947.055];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [953.4547 1994.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [908.291 1989.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [880.691 1944.545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [870.6546 1889.345];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [873.1637 1841.673];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [875.6728 1794];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [870.6546 1736.291];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [835.5273 1630.909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [817.9637 1578.218];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [805.4183 1520.509];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [797.891 1442.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [792.8728 1380];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [792.8728 1309.745];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [780.3273 1211.891];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [787.8546 1106.509];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [795.3819 1043.782];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [807.9274 968.5091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [820.4728 920.8364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [825.491 845.5637];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [830.5092 755.2364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [830.5092 690];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [828.0001 647.3455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [810.4365 559.5273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [787.8546 506.8364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [765.2728 486.7636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [715.091 524.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [725.1274 604.6909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [727.6364 654.8727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [722.6183 707.5637];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [720.1092 780.3273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [707.5637 828];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [697.5273 863.1273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [695.0182 925.8546];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [707.5637 1003.636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [700.0364 1068.873];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [702.5455 1104];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [697.5273 1169.236];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [702.5455 1206.873];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [702.5455 1269.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [695.0182 1312.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [679.9637 1359.927];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [679.9637 1390.036];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [690.0001 1467.818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [697.5273 1535.564];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [705.0546 1640.945];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [712.5819 1686.109];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [720.1092 1746.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [710.0728 1829.127];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [705.0546 1894.364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [692.5092 1949.564];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [652.3637 1989.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [587.1274 1964.618];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [612.2183 1904.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [614.7274 1859.236];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [614.7274 1811.564];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [609.7092 1751.345];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [624.7637 1688.618];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [632.291 1645.964];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [632.291 1593.273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [629.7819 1528.036];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [627.2728 1487.891];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [637.3091 1410.109];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [639.8182 1342.364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [639.8182 1282.146];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [639.8182 1234.473];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [637.3091 1174.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [634.8 1098.982];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [642.3273 1048.8];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [649.8546 963.4909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [649.8546 938.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [652.3637 885.7091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [659.891 820.4727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [654.8728 782.8364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [654.8728 722.6182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [654.8728 690];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [659.891 609.7091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [654.8728 592.1454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [629.7819 519.3818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [584.6183 491.7818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [546.9819 514.3636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [516.8728 569.5637];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [504.3274 657.3818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [499.3092 715.0909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [501.8183 747.7091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [516.8728 817.9636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [516.8728 855.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [516.8728 898.2545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [519.3819 976.0364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [516.8728 1018.691];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [514.3637 1081.418];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [514.3637 1129.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [519.3819 1171.745];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [524.4001 1229.455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [514.3637 1289.673];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [506.8365 1357.418];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [504.3274 1450.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [511.8546 1507.964];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [506.8365 1575.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [491.7819 1638.436];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [476.7274 1766.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [461.6728 1859.236];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [449.1273 1906.909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [589.6364 790.3636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [582.1092 838.0364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [582.1092 883.2];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [584.6183 938.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [587.1274 978.5455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [609.7092 1056.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [584.6183 1114.036];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [569.5637 1159.2];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [577.091 1186.8];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [587.1274 1226.945];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [589.6364 1277.127];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [582.1092 1369.964];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [582.1092 1485.382];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [572.0728 1538.073];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [577.091 1595.782];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [564.5455 1653.491];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [552.0001 1696.146];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [552.0001 1738.8];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [536.9456 1851.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [531.9274 1886.836];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [521.891 1982.182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [506.8365 2022.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [439.091 2024.836];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [424.0364 2012.291];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [391.4183 1982.182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [378.8728 1937.018];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [386.4001 1886.836];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [396.4364 1819.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [401.4546 1756.364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [403.9637 1693.636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [408.9819 1635.927];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [426.5455 1568.182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [426.5455 1543.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [431.5637 1442.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [439.091 1400.073];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [431.5637 1297.2];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [436.5819 1242];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [441.6001 1174.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [439.091 1126.582];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [436.5819 1081.418];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [439.091 981.0546];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [441.6001 935.8909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [444.1092 868.1454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [454.1455 815.4545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [449.1273 760.2545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [451.6364 712.5818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [459.1637 664.9091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [449.1273 592.1454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [444.1092 531.9272];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [424.0364 504.3273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [406.4728 504.3273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [388.9092 554.5091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [391.4183 584.6182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [388.9092 627.2727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [388.9092 692.5091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [383.891 740.1818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [358.8001 815.4545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [366.3273 888.2181];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [378.8728 981.0546];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [371.3455 1028.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [366.3274 1066.364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [371.3455 1116.545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [371.3455 1159.2];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [363.8183 1229.455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [363.8183 1267.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [361.3092 1317.273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [348.7637 1367.455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [343.7455 1425.164];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [346.2546 1510.473];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [336.2183 1563.164];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [333.7092 1618.364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [328.691 1688.618];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [316.1455 1783.964];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [386.4001 1773.927];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [353.7819 1829.127];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [353.7819 1884.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [353.7819 1949.564];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [331.2001 1977.164];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [203.2365 1957.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [215.7819 1919.455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [255.9274 1861.745];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [306.1092 1889.345];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [276.0001 1944.545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [250.9092 1768.909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [248.4001 1711.2];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [253.4183 1676.073];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [255.9274 1640.945];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [250.9092 1608.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [250.9092 1575.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [250.9092 1533.055];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [260.9455 1497.927];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [270.9819 1465.309];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [270.9819 1407.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [273.491 1380];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [286.0364 1332.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [283.5273 1304.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [298.5819 1267.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [303.6001 1226.945];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [303.6001 1189.309];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [331.2001 1086.436];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [331.2001 1023.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [338.7274 981.0546];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [338.7274 928.3636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [321.1637 858.1091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [313.6364 805.4182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [313.6364 755.2364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [318.6546 702.5455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [326.1819 672.4363];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [321.1637 604.6909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [318.6546 584.6182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [308.6183 541.9636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [296.0728 514.3636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [270.9819 531.9272];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [240.8728 592.1454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [243.3819 639.8182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [250.9092 707.5637];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [245.891 765.2727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [240.8728 833.0182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [225.8183 888.2182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [223.3092 983.5637];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [228.3273 1013.673];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [218.291 1063.854];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [200.7274 1131.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [203.2365 1176.764];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [205.7455 1214.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [205.7455 1272.109];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [200.7274 1332.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [200.7274 1364.945];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [193.2001 1437.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [190.691 1505.455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [183.1637 1578.218];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [185.6728 1650.982];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [185.6728 1696.146];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [183.1637 1814.073];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [175.6364 1871.782];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [168.1092 2012.291];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [135.491 1982.182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [102.8728 1924.473];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [92.83644 1879.309];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [97.85462 1804.036];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [107.891 1733.782];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [112.9092 1696.146];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [105.3819 1610.836];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [107.891 1565.673];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [115.4183 1495.418];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [117.9274 1440.218];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [122.9455 1390.036];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [148.0364 1289.673];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [138.0001 1239.491];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [148.0364 1134.109];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [140.5092 1111.527];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [143.0183 1088.945];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [135.491 1053.818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [130.4728 1013.673];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [140.5092 938.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [143.0183 888.2182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [153.0546 802.9091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [155.5637 730.1454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [160.5819 695.0182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [160.5819 619.7454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [150.5455 582.1091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [130.4728 541.9636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [105.3819 511.8546];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [87.81826 536.9454];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [72.76372 612.2182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [65.23644 649.8546];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [70.25462 705.0546];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [60.21826 775.3091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [52.69099 845.5637];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [42.65462 893.2364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [40.14553 960.9818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [40.14553 1003.636];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [47.67281 1058.836];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [62.72735 1134.109];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [62.72735 1189.309];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [80.29099 1231.964];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [67.74554 1307.236];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [65.23644 1362.436];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [62.72735 1430.182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [62.72735 1480.364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [55.20008 1525.527];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [50.1819 1595.782];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [50.1819 1635.927];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [50.1819 1676.073];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [52.69099 1728.764];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [55.20008 1786.473];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [55.20008 1846.691];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [57.70917 1932];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [57.70917 2007.273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [67.74554 2039.891];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [67.74554 2064.982];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [97.85462 2110.146];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [132.9819 2095.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [240.8728 2090.073];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [260.9455 2132.727];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [306.1092 2155.309];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [348.7637 2142.764];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [366.3274 2115.164];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [456.6546 2122.691];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [519.3819 2160.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [567.0546 2137.745];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [599.6728 2047.418];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [604.691 2012.291];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [639.8182 2042.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [659.891 2122.691];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [695.0182 2117.673];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [750.2183 2054.946];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [770.291 2002.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [845.5637 2102.618];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [913.3091 2157.818];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [988.5819 2095.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1011.164 2075.018];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1068.873 2140.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1109.018 2095.091];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1194.327 2127.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1292.182 2105.127];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1359.927 2082.545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1395.055 2120.182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1440.218 2142.764];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1487.891 2117.673];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1555.636 2092.582];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1605.818 2110.146];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1673.564 2142.764];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1758.873 2127.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1814.073 2090.073];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1856.727 2057.455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1949.564 2105.127];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2027.346 2105.127];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2057.455 2075.018];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2057.455 2029.854];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1984.691 2004.764];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1861.745 2029.854];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1891.855 2064.982];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1919.455 2092.582];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1881.818 2117.673];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1771.418 2080.036];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1698.655 2039.891];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1668.546 2064.982];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1628.4 2022.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1663.527 1947.055];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1701.164 1977.164];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1738.8 1989.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1801.527 1959.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1841.673 1944.545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1884.327 1959.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1929.491 1932];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1944.546 1904.4];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2019.818 1909.418];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2062.473 1924.473];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2072.509 1949.564];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2165.345 2022.327];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2177.891 2044.909];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2162.836 2082.545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2122.691 2097.6];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2097.6 2112.655];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2070 2130.218];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1959.6 2077.527];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2002.255 2052.436];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2095.091 2004.764];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2110.146 1992.218];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2125.2 1974.655];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2122.691 1944.545];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [2112.655 1899.382];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1500.436 2002.255];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1420.146 2039.891];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1465.309 2059.964];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1332.327 2032.364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1206.873 2017.309];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1219.418 2032.364];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1226.946 2057.455];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1284.655 2007.273];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1252.036 1982.182];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1116.546 1989.709];
                 Forward: [1 0];
                 Name: Null;
             }
-            EntitySpawn {
+            ActorInstance {
                 Class: @"Actors/InfectedCell.ent.tk";
                 Position: [1139.127 2027.345];
                 Forward: [1 0];
                 Name: Null;
             }
         ];
-        Fluids: [];
-        Decals: [];
     };
-    TilesImage: "Tilesets/Tiles2.png";
-    Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
-}

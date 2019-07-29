@@ -9,7 +9,7 @@ namespace DyingAndMore
     {
         public override MapBaseInstance Instantiate()
         {
-            return new MapInstance();
+            return new MapInstance(this);
         }
     }
 

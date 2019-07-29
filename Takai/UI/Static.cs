@@ -2043,7 +2043,10 @@ namespace Takai.UI
             {
                 DebugFont.Draw(
                     spriteBatch,
-                    $"Measure Count: {totalMeasureCount}\nArrange Count: {totalArrangeCount}\nTotal Elements Created: {idCounter}",
+                    $"Measure Count: {totalMeasureCount}\n" +
+                    $"Arrange Count: {totalArrangeCount}\n" +
+                    $"Total Elements Created: {idCounter}\n" +
+                    $"Total binding Updates: {Takai.Data.Binding.TotalUpdateCount}",
                     new Vector2(10),
                     Color.CornflowerBlue
                 );

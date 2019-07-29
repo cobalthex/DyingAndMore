@@ -337,6 +337,10 @@ namespace Takai.Game
 
         public void RemoveAllEntities()
         {
+            possibleOffscreenEntities.Clear();
+            activeEntities.Clear();
+            _allEntities.Clear();
+
             foreach (var sector in Sectors)
                 sector.entities.Clear();
         }
