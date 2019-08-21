@@ -9,7 +9,6 @@ List {
 
     Children: [
         Scrollbox {
-			Name: "scrolly";
 			CellColor: [50 100 200];
             Size: 400;
             InnerPadding: 10;
@@ -19,7 +18,6 @@ List {
             }
             Children: [
                 List {
-                    Name: "fuck";
                     Direction: Direction.Vertical;
                     HorizontalAlignment: Alignment.Stretch;
                     Margin: 10;
@@ -44,7 +42,6 @@ List {
         						Static { Text: "Actor Properties"; };
         						Static { Text: "Current Health"; };
         						NumericInput {
-                                    Name: "helf";
         							Bindings: [
         								Binding {
         									Direction: BindingDirection.TwoWay;

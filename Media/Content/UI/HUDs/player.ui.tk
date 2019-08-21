@@ -1,7 +1,6 @@
 Static {
 	Name: "Player HUD";
-	Position: [100 100];
-	Size: [200 200];
+	Padding: 50;
 	Children: [
 		Meter {
 			Name: "Health";

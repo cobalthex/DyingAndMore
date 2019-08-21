@@ -9,5 +9,6 @@ GunClass {
     ChargeTime: 0msec;
     DischargeTime: 300msec;
     CooldownTime: 600msec;
-    ErrorAngle: [-6deg 6deg];
+    #ErrorAngle: [-6deg 6deg];
+    ErrorAngle: 0;
 }

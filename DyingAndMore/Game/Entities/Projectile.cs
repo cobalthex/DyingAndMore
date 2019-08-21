@@ -6,19 +6,24 @@ namespace DyingAndMore.Game.Entities
 {
     public interface IDirectionModifier
     {
-        Vector2 GetNextDirection(float distance, Vector2 direction, float speed, float seed, float deltaSeconds);
+        Vector2 GetNextDirection(float distance, Vector2 direction, float speed, float seed, double deltaSeconds);
     }
 
     public class WaveDirectionModifier : IDirectionModifier
     {
-        public float Period { get; set; } = 300;
+        public float ArcLength { get; set; } = 60;
+        public float Amplitude { get; set; } = 100;
 
-        public Vector2 GetNextDirection(float distance, Vector2 direction, float speed, float seed, float deltaSeconds)
+        public Vector2 GetNextDirection(float distance, Vector2 direction, float speed, float seed, double deltaSeconds)
         {
-            float r = MathHelper.Pi * (speed / Period);
-            var tangent = (Math.Abs(((distance / Period) % 4) - 2)) * r * deltaSeconds;
+            var y = ((Math.Floor((distance + (Amplitude / 2)) / Amplitude) % 2) - 0.5) * 2;
+            var tangent = (float)(y * (speed / ArcLength) * deltaSeconds);
+
+            // this appears to be affected by framerate
+
             if (seed % 2 == 0)
                 tangent = -tangent;
+
             return Vector2.TransformNormal(direction, Matrix.CreateRotationZ(tangent));
         }
     }

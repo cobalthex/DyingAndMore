@@ -1,6 +1,7 @@
 GunClass {
     Name: "Machine gun";
     Projectile: @"Weapons/Projectiles/MGPellet.ent.tk";
+    Hud: @"./mg.ui.tk";
 
     MaxAmmo: 1000;
     RoundsPerBurst: 1;

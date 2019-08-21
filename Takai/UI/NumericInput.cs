@@ -68,6 +68,11 @@ namespace Takai.UI
         private NumericBaseType _maximum = NumericBaseType.MaxValue;
 
         /// <summary>
+        /// The range of values that this numeric element can represent
+        /// </summary>
+        public NumericBaseType Range => System.Math.Abs(Maximum - Minimum);
+
+        /// <summary>
         /// How much to increase or decrease the value by each step
         /// </summary>
         public NumericBaseType Increment { get; set; } = 1;

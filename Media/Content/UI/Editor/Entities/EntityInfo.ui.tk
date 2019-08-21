@@ -1,5 +1,5 @@
 Table {
-    Name: "Entity info";
+    Name: "Entity Info";
     BackgroundSprite: @"UI/test/test.9p.tk";
     Position: [20 20];
     VerticalAlignment: Alignment.Bottom;

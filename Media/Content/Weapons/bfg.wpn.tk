@@ -11,40 +11,7 @@ GunClass {
     ErrorAngle: [-30deg 30deg];
     AmmoRefillSpeed: 10Hz;
 
-    Hud: {
-        name: "BFG HUD";
-        Children: [
-            Meter {
-                Position: [8 0];
-                Size: [76 76];
-
-                Minimum: 0;
-                Bindings: [
-                    {
-                        Source: "CurrentAmmo";
-                        Target: "Value";
-                    };
-                    {
-                        Source: "MaxAmmo";
-                        Target: "Maximum";
-                    };
-                ];
-
-                Sprite: {
-                    Texture: @"UI/HUDs/player.png";
-                    ClipRect: [85 0 76 76];
-                    Width: 76;
-                    Height: 76;
-                }
-                Mask: {
-                    Texture: @"UI/HUDs/player.mask.png";
-                    ClipRect: [85 0 76 76];
-                    Width: 76;
-                    Height: 76;
-                }
-            };
-        ];
-    }
+    Hud: @"./defaulthud.ui.tk";
 
     DischargeEffect: { #move to spawn effect on projectile?
         Effects: [

@@ -47,9 +47,9 @@ namespace Takai.UI
 
             dropdown = new ScrollBox(list)
             {
-                Name = "dropdown",
                 BorderColor = Color.White,
-                BackgroundColor = new Color(32, 0, 128)
+                BackgroundColor = new Color(32, 0, 128),
+                Padding = new Vector2(2)
             };
 
             dropdownContainer = new Static(dropdown)
@@ -75,13 +75,12 @@ namespace Takai.UI
                 return UIEventResult.Handled;
             });
 
-            dropdown.On(SelectionChangedEvent, OnSelectionChanged);
-            //On(SelectionChangedEvent, OnSelectionChanged);
+            dropdown.On(SelectionChangedEvent, OnSelectionChanged_Dropdown);
 
-            On(ParentChangedEvent, delegate (Static sender, UIEventArgs e)
+            On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
             {
-                //System.Diagnostics.Debugger.Break();
-                return UIEventResult.Handled;
+                CloseDropDown();
+                return UIEventResult.Continue;
             });
         }
 
@@ -91,8 +90,10 @@ namespace Takai.UI
             BindToThis(source);
         }
 
-        protected UIEventResult OnSelectionChanged(Static sender, UIEventArgs e)
+        protected UIEventResult OnSelectionChanged_Dropdown(Static sender, UIEventArgs e)
         {
+            //clones must bind directly to this
+
             var childIndex = preview?.ChildIndex ?? -1;
             if (SelectedIndex >= 0)
             {
@@ -121,22 +122,37 @@ namespace Takai.UI
             else
                 preview = null;
 
-            //rebind the dropdown events
             dropdown.Off(SelectionChangedEvent);
-            dropdown.On(SelectionChangedEvent, OnSelectionChanged);
+            dropdown.On(SelectionChangedEvent, OnSelectionChanged_Dropdown);
 
             base.FinalizeClone();
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
+            if (dropdownContainer.Parent != null)
+                dropdown.Measure(new Vector2(InfiniteSize));
             return new Vector2(200, 20);
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
             if (dropdownContainer.Parent != null)
-                OpenDropdown();
+            {
+                dropdownContainer.Arrange(GetRoot().OffsetContentArea);
+
+                var dpos = new Vector2(VisibleContentArea.X, VisibleContentArea.Y + MeasuredSize.Y);
+                var dsz = new Vector2(
+                    System.Math.Max(list.MeasuredSize.X, MeasuredSize.X),
+                    System.Math.Min(list.MeasuredSize.Y, DropdownMaxHeight)
+                );
+
+                dpos.X = MathHelper.Clamp(dpos.X, 0, dropdownContainer.OffsetContentArea.Width - dsz.X);
+                dpos.Y = MathHelper.Clamp(dpos.Y, 0, dropdownContainer.OffsetContentArea.Height - dsz.Y);
+
+                dropdown.Position = dpos;
+                dropdown.Size = dsz;
+            }
             base.ArrangeOverride(availableSize);
         }
 
@@ -145,21 +161,14 @@ namespace Takai.UI
             if (Items.Count < 1)
                 return;
 
-            dropdown.Size = new Vector2(MeasuredSize.X, System.Math.Min(list.MeasuredSize.Y, DropdownMaxHeight));
-
             var root = GetRoot();
-
-            var end = new Vector2(VisibleContentArea.Right + dropdown.VisibleBounds.Width, VisibleContentArea.Bottom + dropdown.VisibleBounds.Height);
-            if (end.X > root.VisibleContentArea.Width || end.Y > root.VisibleContentArea.Height)
-                dropdown.Position = VisibleContentArea.Location.ToVector2() - new Vector2(0, dropdown.VisibleBounds.Height);
-            else
-                dropdown.Position = VisibleContentArea.Location.ToVector2() + new Vector2(0, MeasuredSize.Y); //todo: smarter placement
-
             root.AddChild(dropdownContainer);
+            InvalidateArrange();
         }
 
         public virtual void CloseDropDown()
         {
+            //todo: some hierarchy fuckup around here
             dropdownContainer.RemoveFromParent();
         }
 

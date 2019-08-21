@@ -1,0 +1,37 @@
+Static {
+    name: "MG HUD";
+    Children: [
+        Meter {
+            Position: [8 0];
+
+            Minimum: 0;
+            Bindings: [
+                {
+                    Source: "CurrentAmmo";
+                    Target: "Value";
+                };
+                {
+                    Source: "MaxAmmo";
+                    Target: "Maximum";
+                };
+            ];
+
+            Sprite: {
+                Texture: @"./mg-hud.png";
+                ClipRect: [0 0 172 228];
+                Width: 84;
+                Height: 228;
+            }
+            Mask: {
+                Texture: @"./mg-hud.mask.png";
+                ClipRect: [0 0 172 228];
+                Width: 84;
+                Height: 228;
+            }
+        };
+
+        #*Sprite {
+            position: [8 0];
+        }*#
+    ];
+}

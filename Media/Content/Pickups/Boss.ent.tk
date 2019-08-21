@@ -1,0 +1,18 @@
+WeaponPickupClass {
+    Name: "Some boss gun";
+
+	Weapon: @"Weapons/boss.wpn.tk";
+
+    Animations: {
+        Idle: {
+        	Sprite: {
+                texture: @"./TestGuns.png";
+                width: 64;
+                height: 64;
+                ClipRect: [192 64 64 64];
+            };
+        };
+    };
+    SpawnEffect: @"./PickupSpawn.fx.tk";
+    DestructionEffect: @"./Pickup.fx.tk";
+}
