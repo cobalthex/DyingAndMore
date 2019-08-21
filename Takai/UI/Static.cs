@@ -2207,7 +2207,7 @@ namespace Takai.UI
 
             sprite.Draw(spriteBatch, finalRect, clip, 0, Color.White, sprite.ElapsedTime);
 
-            Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, finalRect);
+            //Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, finalRect);
         }
 
         #endregion

@@ -68,6 +68,12 @@ namespace Takai.UI
             //todo: bounds may be affected by Stretch which would prove wrong here
         }
 
+        //protected override void OnChildRemeasure(Static child)
+        //{
+        //    InvalidateMeasure();
+        //    InvalidateArrange();
+        //}
+
         protected override void ArrangeOverride(Vector2 availableSize)
         {
             float stretchSize;

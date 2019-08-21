@@ -365,7 +365,7 @@ namespace DyingAndMore.Game
                 for (int i = 0; i < players.Count; ++i)
                 {
                     //var region = new Rectangle(GameInstance.Current.players[i].Position.ToPoint(), new Point(1));
-                    var region = players[i].camera.VisibleRegion;
+                    var region = players[i].camera.VisibleRegion; //todo: clip to some size
                     region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
 
                     Map.BuildHeuristic((players[i].actor.Position / Map.Class.TileSize).ToPoint(), region, i > 0);

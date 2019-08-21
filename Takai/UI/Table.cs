@@ -39,6 +39,12 @@ namespace Takai.UI
             ColumnCount = columnCount;
         }
 
+        protected override void OnChildRemeasure(Static child)
+        {
+            InvalidateMeasure();
+            InvalidateArrange();
+        }
+
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             if (ColumnCount <= 0)

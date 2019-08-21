@@ -1,13 +1,17 @@
 ProjectileClass {
     Name: "Missile";
-    MuzzleVelocity: 1600;
+    MuzzleVelocity: 2400;
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     #Drag: 0.4;
     MinimumSpeed: 1;
     CanDamageSource: true;
-    #InheritSourcePhysics: true;
-    DirectionMod: WaveDirectionModifier { };
+    InheritSourcePhysics: true;
+
+    DirectionMod: WaveDirectionModifier {
+        Amplitude: 90;
+        ArcLength: 40;
+    };
 
     Range: 4000;
     #*FadeEffect: {

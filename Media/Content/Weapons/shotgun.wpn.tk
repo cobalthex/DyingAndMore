@@ -1,6 +1,7 @@
 GunClass {
     Name: "Shotgun";
-    Projectile: @"Weapons/Projectiles/ShotgunPellet.ent.tk";
+    #Projectile: @"Weapons/Projectiles/ShotgunPellet.ent.tk";
+    Projectile: @"./Projectiles/missile.ent.tk";
 
     MaxAmmo: 1200;
     MaxBursts: 0;

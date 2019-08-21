@@ -8,10 +8,13 @@ namespace Takai.UI
     /// </summary>
     public class Meter : NumericBase
     {
+        // 9 patch?
+
         public Graphics.Sprite Sprite { get; set; }
 
         /// <summary>
-        /// Mask the graphic with this
+        /// Sprite is masked with this via red channel intensity.
+        /// Note: this must share the same clip rect as Sprite
         /// </summary>
         public Graphics.Sprite Mask { get; set; }
 

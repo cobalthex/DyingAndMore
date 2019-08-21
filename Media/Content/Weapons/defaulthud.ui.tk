@@ -1,0 +1,34 @@
+Static {
+    name: "Weapon HUD";
+    Children: [
+        Meter {
+            Position: [8 0];
+            Size: [76 76];
+
+            Minimum: 0;
+            Bindings: [
+                {
+                    Source: "CurrentAmmo";
+                    Target: "Value";
+                };
+                {
+                    Source: "MaxAmmo";
+                    Target: "Maximum";
+                };
+            ];
+
+            Sprite: {
+                Texture: @"UI/HUDs/player.png";
+                ClipRect: [85 0 76 76];
+                Width: 76;
+                Height: 76;
+            }
+            Mask: {
+                Texture: @"UI/HUDs/player.mask.png";
+                ClipRect: [85 0 76 76];
+                Width: 76;
+                Height: 76;
+            }
+        };
+    ];
+}

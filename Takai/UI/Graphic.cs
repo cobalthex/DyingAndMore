@@ -6,6 +6,8 @@ namespace Takai.UI
 {
     public class Graphic : Static
     {
+        public string RestartCommand = "Restart";
+
         public Graphics.Sprite Sprite { get; set; }
 
         /// <summary>
@@ -16,6 +18,20 @@ namespace Takai.UI
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             return (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2());
+        }
+
+        public Graphic()
+        {
+            CommandActions[RestartCommand] = delegate (Static sender, object arg)
+            {
+                Sprite.ElapsedTime = System.TimeSpan.Zero;
+            };
+        }
+
+        public Graphic(Graphics.Sprite sprite)
+            : this()
+        {
+            Sprite = sprite;
         }
 
         protected override void UpdateSelf(GameTime time)
