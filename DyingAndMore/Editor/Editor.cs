@@ -68,8 +68,9 @@ namespace DyingAndMore.Editor
 
             On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
             {
-                selectorDrawer.IsEnabled = false;
-                UpdatePreview(this.selector.SelectedIndex);
+                var source = (SelectorEditorMode<TSelector>)sender;
+                source.selectorDrawer.IsEnabled = false;
+                source.UpdatePreview(this.selector.SelectedIndex);
                 return UIEventResult.Handled;
             });
 
@@ -229,12 +230,13 @@ namespace DyingAndMore.Editor
 
         protected UIEventResult OnParentChanged(Static sender, UIEventArgs e)
         {
-            if (Parent == null)
+            var editor = (Editor)sender;
+            if (editor.Parent == null) //todo: necessary?
                 return UIEventResult.Continue;
 
-            Map.updateSettings.SetEditor();
-            Map.renderSettings = config.renderSettings.Clone();
-            renderSettingsConsole?.BindTo(Map.renderSettings);
+            editor.Map.updateSettings.SetEditor();
+            editor.Map.renderSettings = config.renderSettings.Clone();
+            editor.renderSettingsConsole?.BindTo(Map.renderSettings);
 
             return UIEventResult.Handled;
         }
@@ -243,7 +245,7 @@ namespace DyingAndMore.Editor
         {
             if (e.Source.Name == "Play button")
             {
-                SwitchToGame();
+                ((Editor)sender).SwitchToGame();
                 return UIEventResult.Handled;
             }
 

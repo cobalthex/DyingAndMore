@@ -37,7 +37,8 @@ namespace Takai.UI
 
                 _items = value;
                 _items.CollectionChanged += Items_CollectionChanged;
-                Items_CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value));
+                Container.RemoveAllChildren();
+                Items_CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _items, 0));
             }
         }
         private ObservableCollection<T> _items;
@@ -214,6 +215,36 @@ namespace Takai.UI
                 if (arg is int i)
                     il.Items.RemoveAt(i);
             };
+        }
+
+        protected override bool HandleInput(GameTime time)
+        {
+            //todo: change to events
+            if (AllowSelection)
+            {
+                //todo: pageup/dn
+                if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Up))
+                {
+                    --SelectedIndex;
+                    return false;
+                }
+                if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Down))
+                {
+                    ++SelectedIndex;
+                    return false;
+                }
+                if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Home))
+                {
+                    SelectedIndex = -1;
+                    return false;
+                }
+                if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.End))
+                {
+                    SelectedIndex = Items.Count - 1;
+                    return false;
+                }
+            }
+            return base.HandleInput(time);
         }
 
         protected override void FinalizeClone()

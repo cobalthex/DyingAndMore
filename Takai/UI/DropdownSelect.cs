@@ -16,7 +16,6 @@ namespace Takai.UI
             set
             {
                 list.SelectedItem = value;
-
             }
         }
         public int SelectedIndex
@@ -94,11 +93,14 @@ namespace Takai.UI
         {
             //clones must bind directly to this
 
+            //todo: arrow keying through dropdown entries sometimes leaves preview blank
+            // (fills in once dropdown is closed)
+
             var childIndex = preview?.ChildIndex ?? -1;
             if (SelectedIndex >= 0)
             {
                 ReplaceChild(preview = list.Container.Children[SelectedIndex].CloneHierarchy(), childIndex);
-                preview.BindTo(SelectedItem);
+                preview.BindTo(list.Items[SelectedIndex]);
             }
             else
                 preview.BindTo(null);
@@ -174,7 +176,10 @@ namespace Takai.UI
 
         protected override bool HandleInput(GameTime time)
         {
-            if (dropdownContainer.Parent != null && Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Escape))
+            if (dropdownContainer.Parent != null && 
+                (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Escape) ||
+                Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Space) ||
+                Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Enter)))
             {
                 CloseDropDown();
                 return false;
