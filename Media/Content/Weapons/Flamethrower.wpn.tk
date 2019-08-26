@@ -7,7 +7,7 @@ GunClass {
         Effects: [
             ParticleEffect {
                 Count: 10;
-                Spread: [-10deg 10deg];
+                Spread: [-2deg 2deg];
                 Class: {
                     Sprite: {
                         Texture: @"Effects/fire.png";
@@ -15,31 +15,12 @@ GunClass {
                         height: 48;
                         Origin: [24 24];
                     };
-                    Blend: {
-                        # only draw on entities
-                        #ColorSourceBlend: Blend.DestinationColor;
-                        #ColorDestinationBlend: Blend.One;
-                        #AlphaSourceBlend: Blend.Zero;
-                        #AlphaDestinationBlend: Blend.DestinationAlpha;
-
-                        # dark fire
-                        ColorSourceBlend: Blend.SourceAlpha;
-                        ColorDestinationBlend: Blend.One;
-                        AlphaSourceBlend: Blend.InverseSourceAlpha;
-                        AlphaDestinationBlend: Blend.One;
-
-                        # ghost fire
-                        #ColorSourceBlend: Blend.SourceColor;
-                        #ColorDestinationBlend: Blend.BlendFactor;
-                        #AlphaSourceBlend: Blend.Zero;
-                        #AlphaDestinationBlend: Blend.One;
-                    };
                     InitialSpeed: [800 1200];
-                    Drag: 1.0;
-                    LifeSpan: [600msec 1200msec];
+                    Drag: 2.0;
+                    MinimumSpeed: 10;
                     ColorOverTime: {
                         Reverse: false;
-                        Values: [
+                        #*Values: [ # blue->white->yellow->red->black
                             [0 [32 64 128 255]];
                             [0.1 Color.SteelBlue];
                             #[0.5 Color.Orange];
@@ -49,26 +30,25 @@ GunClass {
                             [0.5 Color.Orange];
                             [0.6 [100 0 0 255]];
                             [1 [0 0 0 0]];
+                        ];*#
+                        Values: [ # gray -> white -> yellow -> orange -> red -> dark gray
+                            [0 [200 200 200 128]];
+                            [0.05 Color.White];
+                            [0.1 Color.Yellow];
+                            [0.15 [255 48 0 255]];
+                            [0.6 [20 20 20 255]];
+                            [1 [0 0 0 0]];
                         ];
                     };
 
                     ScaleOverTime: {
                         IsLinear: true;
                         Values: [
-                            [0 0.25]
-                            [0.7 2]
-                            [1 0]
+                            [0 0.05]
+                            [0.1 0.25]
+                            [1 2]
                         ];
                     };
-                    #*AngleOverTime: {
-                        Values: [
-                            [0 0];
-                            [0.1 45deg];
-                            [0.4 0deg];
-                            [1 -45deg];
-                        ];
-                    };*#
-
 
                     CollisionEffect: {
                         Effects: [

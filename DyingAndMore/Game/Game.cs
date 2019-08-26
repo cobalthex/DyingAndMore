@@ -215,18 +215,8 @@ namespace DyingAndMore.Game
             Map = ((Game)sender).Map;
         }
 
-        protected void OnMapChanged()
+        protected void SelectPlayers()
         {
-            if (Map.Class != Game.Map.Class)
-                Game = new Game { Map = Map }; //todo: proper map reset support
-
-            ElapsedRealTime = TimeSpan.Zero;
-
-            hudContainer.RemoveAllChildren();
-
-            updateSettingsPane?.BindTo(Map.updateSettings);
-            renderSettingsPane?.BindTo(Map.renderSettings);
-
             var possiblePlayers = new List<Entities.ActorInstance>();
 
             foreach (var ent in Map.AllEntities)
@@ -258,6 +248,8 @@ namespace DyingAndMore.Game
                 players[0].inputs = Cache.Load<InputMap<Entities.InputAction>>("Player1.input.tk", "Config");
                 ((Entities.InputController)players[0].actor.Controller).Inputs = players[0].inputs;
             }
+
+            CreatePlayerViewports();
         }
 
         /// <summary>
@@ -294,6 +286,48 @@ namespace DyingAndMore.Game
             },
         };
 
+        protected void CreatePlayerViewports()
+        {
+            if (players == null)
+                return;
+
+            var wx = 0.01f * MeasuredSize.X;
+            var wy = 0.01f * MeasuredSize.Y;
+
+            for (int i = 0; i < players.Count; ++i)
+            {
+                var viewport = new Rectangle();
+                if (players.Count <= viewportLayouts.Length && i < viewportLayouts[players.Count].Length)
+                    viewport = viewportLayouts[players.Count][i];
+
+                viewport.X = (int)(viewport.X * wx);
+                viewport.Y = (int)(viewport.Y * wy);
+                viewport.Width = (int)(viewport.Width * wx);
+                viewport.Height = (int)(viewport.Height * wy);
+
+                players[i].camera.Viewport = viewport;
+            }
+        }
+
+        protected override void ArrangeOverride(Vector2 availableSize)
+        {
+            CreatePlayerViewports();
+            base.ArrangeOverride(availableSize);
+        }
+
+        protected void OnMapChanged()
+        {
+            if (Map.Class != Game.Map.Class)
+                Game = new Game { Map = Map }; //todo: proper map reset support
+
+            ElapsedRealTime = TimeSpan.Zero;
+
+            updateSettingsPane?.BindTo(Map.updateSettings);
+            renderSettingsPane?.BindTo(Map.renderSettings);
+
+            SelectPlayers();
+        }
+
         string GetClockText(TimeSpan time)
         {
             return $"{(int)time.TotalHours:D2}:"
@@ -304,40 +338,20 @@ namespace DyingAndMore.Game
 
         protected UIEventResult OnParentChanged(Static sender, UIEventArgs e)
         {
-            if (Parent == null)
+            var game = (GameInstance)sender;
+
+            if (game.Parent == null)
                 return UIEventResult.Continue;
 
-            Map.updateSettings.SetGame();
-            Map.renderSettings.SetDefault();
-            updateSettingsPane?.BindTo(Map.updateSettings);
-            renderSettingsPane?.BindTo(Map.renderSettings);
+            game.Map.updateSettings.SetGame();
+            game.Map.renderSettings.SetDefault();
+            game.updateSettingsPane?.BindTo(Map.updateSettings);
+            game.renderSettingsPane?.BindTo(Map.renderSettings);
+
+            game.hudContainer.RemoveAllChildren();
+            game.SelectPlayers();
+
             return UIEventResult.Handled;
-        }
-
-        protected override void ArrangeOverride(Vector2 availableSize)
-        {
-            //todo: should this go in MeasureOverride?
-
-            var wx = 0.01f * availableSize.X;
-            var wy = 0.01f * availableSize.Y;
-
-            if (players != null)
-            {
-                for (int i = 0; i < players.Count; ++i)
-                {
-                    var viewport = new Rectangle();
-                    if (players.Count <= viewportLayouts.Length && i < viewportLayouts[players.Count].Length)
-                        viewport = viewportLayouts[players.Count][i];
-
-                    viewport.X = (int)(viewport.X * wx);
-                    viewport.Y = (int)(viewport.Y * wy);
-                    viewport.Width = (int)(viewport.Width * wx);
-                    viewport.Height = (int)(viewport.Height * wy);
-
-                    players[i].camera.Viewport = viewport;
-                }
-            }
-            base.ArrangeOverride(availableSize);
         }
 
         protected override void UpdateSelf(GameTime time)

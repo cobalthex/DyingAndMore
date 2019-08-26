@@ -21,20 +21,33 @@ ConditionClass {
                         #AlphaDestinationBlend: Blend.DestinationAlpha;
 
                         # dark fire
-                        ColorSourceBlend: Blend.SourceAlpha;
-                        ColorDestinationBlend: Blend.One;
-                        AlphaSourceBlend: Blend.InverseSourceAlpha;
-                        AlphaDestinationBlend: Blend.One;
+                        #ColorSourceBlend: Blend.SourceAlpha;
+                        #ColorDestinationBlend: Blend.One;
+                        #AlphaSourceBlend: Blend.InverseSourceAlpha;
+                        #AlphaDestinationBlend: Blend.One;
 
                         # ghost fire
                         #ColorSourceBlend: Blend.SourceColor;
                         #ColorDestinationBlend: Blend.BlendFactor;
+                        #ColorBlendFunction: BlendFunction.Add;
                         #AlphaSourceBlend: Blend.Zero;
                         #AlphaDestinationBlend: Blend.One;
+
+                        # explosion
+                        #ColorSourceBlend: Blend.SourceColor;
+                        #AlphaSourceBlend: Blend.Zero;
+                        #ColorDestinationBlend: Blend.InverseSourceAlpha;
+                        #AlphaDestinationBlend: Blend.InverseSourceAlpha;
+
+
+                        ColorSourceBlend: Blend.One;
+                        AlphaSourceBlend: Blend.Zero;
+                        ColorDestinationBlend: Blend.InverseSourceAlpha;
+                        AlphaDestinationBlend: Blend.InverseSourceAlpha;
                     };
-                    InitialSpeed: [60 180];
+                    InitialSpeed: [5 50];
+                    LifeSpan: [1000msec 1500msec];
                     Drag: 1.0;
-                    LifeSpan: [300msec 500msec];
                     ColorOverTime: {
                         Reverse: false;
                         Values: [
@@ -42,7 +55,7 @@ ConditionClass {
                             [0.3 Color.Yellow];
                             [0.5 Color.Orange];
                             [0.6 [100 0 0 255]];
-                            [1 [0 0 0 0]];
+                            [1 [00 00 00 10]];
                         ];
                     };
 
@@ -50,7 +63,7 @@ ConditionClass {
                         IsLinear: true;
                         Values: [
                             [0 0.2]
-                            [0.7 1]
+                            [0.7 0.5]
                             [1 0]
                         ];
                     };

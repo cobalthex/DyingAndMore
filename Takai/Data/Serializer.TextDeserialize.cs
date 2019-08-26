@@ -469,7 +469,7 @@ namespace Takai.Data
                         return Enum.ToObject(type, values);
                     }
                     if (peek == '.')
-                        return Enum.Parse(type, ReadWord(context.reader));
+                        return Enum.Parse(type, ReadWord(context.reader), !CaseSensitiveIdentifiers);
 
                     if (context.reader.Read() != '[')
                         throw new InvalidDataException(GetExceptionMessage($"Expected a '[' when reading enum value (EnumType[Key1; Key2]) or '.' (EnumType.Key) while attempting to read '{word}'", context));
