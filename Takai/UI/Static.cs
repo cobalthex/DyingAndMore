@@ -62,17 +62,6 @@ namespace Takai.UI
             : base(source) { }
     }
 
-    public class ParentChangedEventArgs : UIEventArgs
-    {
-        public Static Previous { get; set; }
-
-        public ParentChangedEventArgs(Static source, Static previousParent)
-            : base(source)
-        {
-            Previous = previousParent;
-        }
-    }
-
     public enum UIEventResult
     {
         Continue,
@@ -179,7 +168,6 @@ namespace Takai.UI
         public const string PressEvent = "Press";
         public const string ClickEvent = "Click";
         public const string DragEvent = "Drag";
-        public const string ParentChangedEvent = "ParentChanged";
         public const string TextChangedEvent = "TextChanged";
         public const string ValueChangedEvent = "ValueChanged";
         public const string SelectionChangedEvent = "SelectionChanged";
@@ -844,6 +832,8 @@ namespace Takai.UI
 
         #region Hierarchy/Cloning
 
+        protected virtual void OnParentChanged(Static oldParent) { } //this event should not bubble and is internal
+
         private void SetParentNoReflow(Static newParent)
         {
             var oldParent = _parent;
@@ -858,7 +848,7 @@ namespace Takai.UI
             }
 #endif
 
-            BubbleEvent(ParentChangedEvent, new ParentChangedEventArgs(this, oldParent));
+            OnParentChanged(oldParent);
         }
 
         /// <summary>

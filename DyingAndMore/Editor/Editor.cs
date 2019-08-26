@@ -77,7 +77,7 @@ namespace DyingAndMore.Editor
             selectorDrawer = new Drawer
             {
                 Position = new Vector2(10),
-                Size = new Vector2(100, 400),
+                Size = new Vector2(400, 400),
                 BackgroundColor = Color.Gray,
                 HorizontalAlignment = Alignment.Right,
                 VerticalAlignment = Alignment.Stretch,
@@ -198,7 +198,6 @@ namespace DyingAndMore.Editor
                 Text = "> PLAY >",
                 Padding = new Vector2(20)
             });
-            On(ParentChangedEvent, OnParentChanged);
 
             AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor));
             renderSettingsConsole.IsEnabled = false;
@@ -228,17 +227,14 @@ namespace DyingAndMore.Editor
             //modes.AddMode(new TestEditorMode(this));
         }
 
-        protected UIEventResult OnParentChanged(Static sender, UIEventArgs e)
+        protected override void OnParentChanged(Static oldParent)
         {
-            var editor = (Editor)sender;
-            if (editor.Parent == null) //todo: necessary?
-                return UIEventResult.Continue;
+            if (Parent == null)
+                return;
 
-            editor.Map.updateSettings.SetEditor();
-            editor.Map.renderSettings = config.renderSettings.Clone();
-            editor.renderSettingsConsole?.BindTo(Map.renderSettings);
-
-            return UIEventResult.Handled;
+            Map.updateSettings.SetEditor();
+            Map.renderSettings = config.renderSettings.Clone();
+            renderSettingsConsole?.BindTo(Map.renderSettings);
         }
 
         protected UIEventResult OnClick(Static sender, UIEventArgs e)
@@ -273,6 +269,11 @@ namespace DyingAndMore.Editor
         void SwitchToGame()
         {
             modes.Mode?.End();
+
+            Map.File = null;
+            var tmpFile = System.IO.Path.GetTempFileName();
+            Map.Save(tmpFile);
+            Map.File = tmpFile;
 
             if (Game.GameInstance.Current == null)
                 Game.GameInstance.Current = new Game.GameInstance(new Game.Game { Map = Map });

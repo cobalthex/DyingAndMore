@@ -9,6 +9,7 @@ ActorClass {
     IsPhysical: True;
     IgnoreTrace: False;
     AlwaysDrawUpright: False;
+    DestroyOnDeath: false;
 
     #DefaultWeapon: @"Weapons/Flamethrower.wpn.tk";
 

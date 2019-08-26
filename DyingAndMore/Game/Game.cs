@@ -206,8 +206,6 @@ namespace DyingAndMore.Game
 
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
-
-            On(ParentChangedEvent, OnParentChanged);
         }
 
         private void GameMapChanged(object sender, MapChangedEventArgs e)
@@ -248,8 +246,6 @@ namespace DyingAndMore.Game
                 players[0].inputs = Cache.Load<InputMap<Entities.InputAction>>("Player1.input.tk", "Config");
                 ((Entities.InputController)players[0].actor.Controller).Inputs = players[0].inputs;
             }
-
-            CreatePlayerViewports();
         }
 
         /// <summary>
@@ -291,13 +287,13 @@ namespace DyingAndMore.Game
             if (players == null)
                 return;
 
-            var wx = 0.01f * MeasuredSize.X;
-            var wy = 0.01f * MeasuredSize.Y;
+            var wx = 0.01f * ContentArea.Width;
+            var wy = 0.01f * ContentArea.Height;
 
             for (int i = 0; i < players.Count; ++i)
             {
                 var viewport = new Rectangle();
-                if (players.Count <= viewportLayouts.Length && i < viewportLayouts[players.Count].Length)
+                if (players.Count < viewportLayouts.Length && i < viewportLayouts[players.Count].Length)
                     viewport = viewportLayouts[players.Count][i];
 
                 viewport.X = (int)(viewport.X * wx);
@@ -336,22 +332,17 @@ namespace DyingAndMore.Game
                     + $"{time.Milliseconds:D3}";
         }
 
-        protected UIEventResult OnParentChanged(Static sender, UIEventArgs e)
+        protected override void OnParentChanged(Static oldParent)
         {
-            var game = (GameInstance)sender;
+            if (Parent == null)
+                return;
 
-            if (game.Parent == null)
-                return UIEventResult.Continue;
+            Map.updateSettings.SetGame();
+            Map.renderSettings.SetDefault();
+            updateSettingsPane?.BindTo(Map.updateSettings);
+            renderSettingsPane?.BindTo(Map.renderSettings);
 
-            game.Map.updateSettings.SetGame();
-            game.Map.renderSettings.SetDefault();
-            game.updateSettingsPane?.BindTo(Map.updateSettings);
-            game.renderSettingsPane?.BindTo(Map.renderSettings);
-
-            game.hudContainer.RemoveAllChildren();
-            game.SelectPlayers();
-
-            return UIEventResult.Handled;
+            hudContainer.RemoveAllChildren(); //todo: huds getting fucked
         }
 
         protected override void UpdateSelf(GameTime time)
@@ -361,10 +352,9 @@ namespace DyingAndMore.Game
 
             if (isDead && time.TotalGameTime > restartTimer)
             {
-                Map = (MapInstance)Map.Class.Instantiate();
+                //todo: this is being called imemediately and not sure why
                 isDead = false;
-                OnParentChanged(this, new ParentChangedEventArgs(this, null));
-                InvalidateArrange();
+                Map = Cache.Load<MapInstance>(Map.File);
                 return;
             }
 
