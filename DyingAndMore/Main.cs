@@ -264,7 +264,6 @@ namespace DyingAndMore
                     {
                         mc.InitializeGraphics();
                         ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
-
                     }
                     else if (map is MapInstance mi)
                     {

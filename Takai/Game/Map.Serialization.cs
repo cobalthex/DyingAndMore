@@ -104,19 +104,6 @@ namespace Takai.Game
 
     public partial class MapBaseInstance : Data.IDerivedSerialize, Data.IDerivedDeserialize
     {
-        public void SaveAsIntermediateMap(string file)
-        {
-            if (Class == null)
-            {
-                Save(file);
-                return;
-            }
-
-            string cachedMapFile = Class.File;
-            Save(file);
-            Class.File = file;
-        }
-
         /// <summary>
         /// Package the map into an archive
         /// </summary>

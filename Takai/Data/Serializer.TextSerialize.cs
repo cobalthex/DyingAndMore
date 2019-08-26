@@ -87,7 +87,7 @@ namespace Takai.Data
             //external serialization
             if (!serializeExternals && serializing is ISerializeExternally sex)
             {
-                if (sex.File != null)
+                if (!String.IsNullOrEmpty(sex.File))
                 {
                     writer.Write($"@\"{sex.File}\"");
                     return;

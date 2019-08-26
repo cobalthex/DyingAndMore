@@ -132,9 +132,12 @@ namespace Takai.Game
     }
 
     [Data.Cache.AlwaysReload] //todo: necessary?
-    public partial class MapBaseInstance : Data.IInstance<MapBaseClass>
+    public partial class MapBaseInstance : Data.IInstance<MapBaseClass>, Data.ISerializeExternally
     {
         private int nextEntityID = 0;
+
+        [Data.Serializer.Ignored]
+        public string File { get; set; }
 
         /// <summary>
         /// The map backing this instance. Cannot be null

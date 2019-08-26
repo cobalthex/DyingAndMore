@@ -547,6 +547,8 @@ namespace Takai.Game
                 new VertexPositionColorTexture(new Vector3(width, height, 0), Color.White, new Vector2(1, 1)),
             };
 
+            //todo: this needs to clip to viewport
+
             Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             Runtime.GraphicsDevice.DepthStencilState = Class.stencilWrite;
             Runtime.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
