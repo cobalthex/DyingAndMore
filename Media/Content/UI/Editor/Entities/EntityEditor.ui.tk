@@ -52,16 +52,14 @@ List {
         							Minimum: 0;
         							Maximum: 2E9;
         						};
-
-        						#weapon
-                                Static { Text: "Weapon"; };
-                                @"./Weapon.ui.tk";
-
         						#conditions
         						#actions
 
                                 Static { Text: "Controller"; };
                                 @"./Controller.ui.tk";
+
+                                Static { Text: "Weapon"; };
+                                @"./Weapon.ui.tk";
                             ];
                         };
                     ];
