@@ -151,6 +151,8 @@ namespace DyingAndMore.Editor
         Static resizeDialog;
         Static playButton;
 
+        UI.Balloon errorBalloon;
+
         bool isZoomSizing;
 
         Vector2 savedWorldPos, currentWorldPos;
@@ -198,6 +200,15 @@ namespace DyingAndMore.Editor
                 Text = "> PLAY >",
                 Padding = new Vector2(20)
             });
+
+            errorBalloon = new UI.Balloon
+            {
+                HorizontalAlignment = Alignment.Middle,
+                VerticalAlignment = Alignment.Middle,
+                BackgroundColor = Color.Red,
+                BorderColor = Color.DarkRed,
+                Padding = new Vector2(30, 20)
+            };
 
             AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor));
             renderSettingsConsole.IsEnabled = false;
@@ -268,6 +279,25 @@ namespace DyingAndMore.Editor
 
         void SwitchToGame()
         {
+            bool foundPlayer = false;
+            foreach (var ent in Map.AllEntities)
+            {
+                if (ent is Game.Entities.ActorInstance actor && actor.Controller is Game.Entities.InputController)
+                {
+                    foundPlayer = true;
+                    break;
+                }
+            }
+
+            //allow overriding?
+            if (!foundPlayer)
+            {
+                errorBalloon.ResetTimer();
+                errorBalloon.Text = "There must be at least one player\n(controller = InputController) to test the map";
+                AddChild(errorBalloon);
+                return;
+            }
+
             modes.Mode?.End();
 
             Map.File = null;
@@ -536,7 +566,7 @@ namespace DyingAndMore.Editor
                         }
                     }
                     return false;
-                }
+                } 
 
                 if (InputState.IsPress(Keys.N))
                 {

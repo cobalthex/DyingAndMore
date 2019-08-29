@@ -38,4 +38,10 @@ ProjectileClass {
             ]
         }
     }
+
+    DestructionEffect: {
+        Effects: [
+
+        ];
+    }
 }

@@ -12,7 +12,7 @@ MaterialInteractions {
         ["Brass 2" "*" MaterialInteraction {
             MaxBounceAngle: 25deg;
             Friction: 0.1;
-            Effect: @"Effects/Sparks2.fx.tk";
+            Effect: @"Effects/explosion.fx.tk";
         }]
 
         ["Needle" "*" MaterialInteraction {

@@ -1,13 +1,13 @@
 GunClass {
-    Name: "Machine Gun (2)";
-    Projectile: @"Weapons/Projectiles/MGPellet2.ent.tk";
+    Name: "Auto Cannon";
+    Projectile: @"./Projectiles/shell.ent.tk";
 
     MaxAmmo: 1000;
     RoundsPerBurst: 1;
     #ProjectilesPerRound: 6;
     MaxBursts: 0;
     ChargeTime: 0msec;
-    DischargeTime: 800rpm;
+    DischargeTime: 200rpm;
     #ErrorAngle: [-4deg 4deg];
 
     DischargeEffect: {

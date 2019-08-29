@@ -8,7 +8,7 @@ ActorClass {
         ];
     }];
 
-    DefaultWeapon: [@"Weapons/MG2.wpn.tk"];
+    DefaultWeapon: [@"Weapons/autocannon.wpn.tk"];
 
     Animations: {
     	Idle: {
