@@ -88,7 +88,7 @@ namespace Takai.Game
         public GameTime RealTime { get; protected set; }
 
         /// <summary>
-        /// Ents to destroy during the next Update()
+        /// Entities to destroy during the next Update()
         /// </summary>
         protected List<EntityInstance> entsToDestroy = new List<EntityInstance>(8);
 
@@ -106,6 +106,13 @@ namespace Takai.Game
         /// Entities were/are active (visible and updated)
         /// </summary>
         public IEnumerable<EntityInstance> ActiveEntities => activeEntities;
+
+        //public event EventHandler<List<EntityInstance>> EntitiesRemoved;
+        //public event EventHandler<List<EntityInstance>> EntitiesAdded;
+        /// <summary>
+        /// Entities added within the last update cycle 
+        /// </summary>
+        //protected List<EntityInstance> entsAdded = new List<EntityInstance>(8);
 
         public void BeginUpdate()
         {
@@ -132,6 +139,13 @@ namespace Takai.Game
         {
             var deltaSeconds = (float)deltaTime.TotalSeconds;
 
+            //at end of function?
+            //if (entsAdded.Count > 0)
+            //{
+            //    EntitiesAdded?.Invoke(this, entsAdded);
+            //    entsAdded.Clear();
+            //}
+
             if (updateSettings.allowEntityDeletion)
             {
                 foreach (var entity in possibleOffscreenEntities)
@@ -143,15 +157,19 @@ namespace Takai.Game
             }
             possibleOffscreenEntities.Clear();
 
-            //remove entities that have been destroyed
-            foreach (var entity in entsToDestroy)
+            if (entsToDestroy.Count > 0)
             {
-                if (entity.Map != this || entity.Map == null)
-                    continue; //delete may be being called twice?
+                //remove entities that have been destroyed
+                foreach (var entity in entsToDestroy)
+                {
+                    if (entity.Map != this || entity.Map == null)
+                        continue; //delete may be being called twice?
 
-                FinalDestroy(entity);
+                    FinalDestroy(entity);
+                }
+                //EntitiesRemoved?.Invoke(this, entsToDestroy);
+                entsToDestroy.Clear();
             }
-            entsToDestroy.Clear();
 
             #region entity physics
 

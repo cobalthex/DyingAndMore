@@ -81,8 +81,9 @@ namespace DyingAndMore.Game
                 if (Map == value)
                     return;
 
+                var oldMap = _map;
                 _map = value;
-                OnMapChanged();
+                OnMapChanged(oldMap);
             }
         }
         private MapInstance _map;
@@ -104,6 +105,8 @@ namespace DyingAndMore.Game
         Static gameplaySettingsPane;
 
         Static hudContainer;
+
+        Static actorStatusTemplate;
 
         bool isDead = false;
         TimeSpan restartTimer;
@@ -311,7 +314,7 @@ namespace DyingAndMore.Game
             base.ArrangeOverride(availableSize);
         }
 
-        protected void OnMapChanged()
+        protected void OnMapChanged(MapInstance oldMap)
         {
             if (Map.Class != Game.Map.Class)
                 Game = new Game { Map = Map }; //todo: proper map reset support
@@ -320,7 +323,7 @@ namespace DyingAndMore.Game
 
             updateSettingsPane?.BindTo(Map.updateSettings);
             renderSettingsPane?.BindTo(Map.renderSettings);
-
+            
             SelectPlayers();
         }
 
@@ -538,7 +541,20 @@ namespace DyingAndMore.Game
 
             foreach (var player in players)
             {
+#if DEBUG
+                foreach (var ent in Map.ActiveEntities)
+                {
+                    if (ent is Entities.ActorInstance actor)
+                    {
+                        var pos = player.camera.WorldToScreen(ent.Position - new Vector2(0, ent.Radius + 16));
+                        DrawHealthBar(spriteBatch, pos, actor.CurrentHealth, actor.Class.MaxHealth);
+                    }
+                }
+#endif
+
                 Map.Draw(player.camera);
+
+#if DEBUG
                 Takai.Graphics.Primitives2D.DrawLine(spriteBatch, Color.Gray,
                     new Vector2(player.camera.Viewport.Right, player.camera.Viewport.Top),
                     new Vector2(player.camera.Viewport.Right, player.camera.Viewport.Bottom),
@@ -550,6 +566,7 @@ namespace DyingAndMore.Game
                     new Vector2(player.camera.Viewport.Left + 10, player.camera.Viewport.Top + 10),
                     Color.Cyan
                 );
+#endif
 
                 //var v = new Vector2(player.camera.Viewport.Width, player.camera.Viewport.Height);
                 //foreach (var touch in player.inputs.Touches)
@@ -577,6 +594,16 @@ namespace DyingAndMore.Game
                 new Vector2(20, 200),
                 Color.Orange
             );
+        }
+
+        protected void DrawHealthBar(SpriteBatch spriteBatch, Vector2 screenPosition, float health, float maxHealth)
+        {
+            var rect = new Rectangle((int)screenPosition.X - 30, (int)screenPosition.Y - 3, 60, 6);
+            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, Color.Tomato, rect);
+            Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Brown, rect);
+            rect.Width = (int)(rect.Width * (health / maxHealth));
+            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, Color.LawnGreen, rect);
+            Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Teal, rect);
         }
     }
 }

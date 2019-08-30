@@ -49,7 +49,7 @@ namespace Takai.UI
                     Value = _minimum;
             }
         }
-        private NumericBaseType _minimum = NumericBaseType.MinValue;
+        private NumericBaseType _minimum = 0;
 
         /// <summary>
         /// The maximum allowed value

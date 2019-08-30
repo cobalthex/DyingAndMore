@@ -262,6 +262,7 @@ namespace Takai.Game
                 instance.OnSpawn(this);
 
             _allEntities.Add(instance);
+            //entsAdded.Add(instance);
 
             var sectors = GetOverlappingSectors(instance.AxisAlignedBounds);
             for (int y = sectors.Top; y < sectors.Bottom; ++y)

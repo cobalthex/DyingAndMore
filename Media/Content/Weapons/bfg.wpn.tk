@@ -9,7 +9,7 @@ GunClass {
     ChargeTime: 30msec;
     DischargeTime: 50msec;
     ErrorAngle: [-30deg 30deg];
-    AmmoRefillSpeed: 10Hz;
+    AmmoRefillSpeed: 4Hz;
 
     Hud: @"./defaulthud.ui.tk";
 
