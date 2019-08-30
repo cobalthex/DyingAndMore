@@ -39,9 +39,5 @@ ProjectileClass {
         }
     }
 
-    DestructionEffect: {
-        Effects: [
-
-        ];
-    }
+    #DestructionEffect: @"Effects/explosion.fx.tk";
 }

@@ -46,7 +46,7 @@ MapInstance {
         ActorInstance {
             Class: @"Actors/Player.ent.tk";
             Factions: Factions [Player Ally];
-            Controller: Null;
+            Controller: InputController { };
             CurrentHealth: 5000;
             Conditions: {
             };
