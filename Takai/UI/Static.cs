@@ -375,8 +375,8 @@ namespace Takai.UI
             {
                 if (_size != value)
                 {
-                    if (float.IsInfinity(value.X) || float.IsInfinity(value.Y))
-                        ;//System.Diagnostics.Debug.WriteLine($"{this}: Size=Infinity will always render as collapse");
+                    //if (float.IsInfinity(value.X) || float.IsInfinity(value.Y))
+                    //  System.Diagnostics.Debug.WriteLine($"{this}: Size=Infinity will always render as collapse");
 
                     _size = value;
                     InvalidateMeasure();

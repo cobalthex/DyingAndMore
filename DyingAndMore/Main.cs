@@ -43,9 +43,6 @@ namespace DyingAndMore
         SpriteBatch sbatch;
         Static ui;
 
-        Takai.FpsGraph fpsGraph;
-        UI.DevtoolsMenu devtoolsMenu;
-
         public Matrix uiMatrix;
 
         /// <summary>
@@ -341,20 +338,6 @@ namespace DyingAndMore
                 return;
             }
 
-            if (InputState.IsPress(Keys.F7))
-            {
-                if (!devtoolsMenu.RemoveFromParent())
-                    ui.AddChild(devtoolsMenu);
-            }
-
-            else if (InputState.IsPress(Keys.F8))
-            {
-                if (!fpsGraph.RemoveFromParent())
-                {
-                    fpsGraph.Clear();
-                    ui.AddChild(fpsGraph);
-                }
-            }
             //F9 used in UI code
             else if (InputState.IsPress(Keys.F10))
                 Static.DebugFont = (Static.DebugFont == null ? Static.DefaultFont : null);
