@@ -208,7 +208,6 @@ namespace Takai.UI
                 il.AddItemTemplate.BindTo(il.newItem);
             };
 
-            //remove item
             CommandActions["RemoveItem"] = delegate (Static sender, object arg)
             {
                 var il = (ItemList<T>)sender;

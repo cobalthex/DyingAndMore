@@ -100,6 +100,7 @@ namespace Takai.UI
             if (SelectedIndex >= 0)
             {
                 ReplaceChild(preview = list.Container.Children[SelectedIndex].CloneHierarchy(), childIndex);
+                preview.Arrange(OffsetContentArea); //todo: still needs work
                 preview.BindTo(list.Items[SelectedIndex]);
             }
             else
@@ -176,16 +177,24 @@ namespace Takai.UI
 
         protected override bool HandleInput(GameTime time)
         {
-            if (dropdownContainer.Parent != null && 
+            if (dropdownContainer.Parent != null &&
                 (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Escape) ||
                 Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Space) ||
                 Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Enter)))
-            {
                 CloseDropDown();
-                return false;
-            }
 
-            return base.HandleInput(time);
+            else if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Up))
+                --SelectedIndex;
+            else if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Down))
+                ++SelectedIndex;
+            else if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Home))
+                SelectedIndex = -1;
+            else if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.End))
+                SelectedIndex = Items.Count - 1;
+            else
+                return base.HandleInput(time);
+
+            return false;
         }
     }
 }

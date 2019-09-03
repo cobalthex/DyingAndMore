@@ -19,10 +19,10 @@ namespace Takai.UI
         public Graphics.Sprite Mask { get; set; }
 
         /// <summary>
-        /// THe range to pad around the cutoff value. If 0, <see cref="Value"/> acts as a cutoff
+        /// The range to pad around the cutoff value. If 0, <see cref="Value"/> acts as a cutoff
         /// If != 0, it behaves as a range and this is a padding factor (*2 for above and below <see cref="Value"/>)
         /// </summary>
-        public float Range { get; set; } = 0;
+        public float BandPass { get; set; } = 0;
 
         Effect maskEffect;
         SpriteBatch sbatch;
@@ -43,7 +43,7 @@ namespace Takai.UI
             base.DrawSelf(spriteBatch);
 
             maskEffect.Parameters["Cutoff"].SetValue(NormalizedValue);
-            maskEffect.Parameters["Range"].SetValue(Range);
+            maskEffect.Parameters["Range"].SetValue(BandPass);
             maskEffect.Parameters["Mask"].SetValue(Mask.Texture);
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, maskEffect);
             DrawSprite(sbatch, Sprite, new Rectangle(0, 0, ContentArea.Width - 1, ContentArea.Height - 1));

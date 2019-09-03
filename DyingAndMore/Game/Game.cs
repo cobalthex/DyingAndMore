@@ -598,10 +598,12 @@ namespace DyingAndMore.Game
 
         protected void DrawHealthBar(SpriteBatch spriteBatch, Vector2 screenPosition, float health, float maxHealth)
         {
+            var pc = (maxHealth == 0 ? 0 : Math.Max(0, health) / maxHealth);
+
             var rect = new Rectangle((int)screenPosition.X - 30, (int)screenPosition.Y - 3, 60, 6);
             Takai.Graphics.Primitives2D.DrawFill(spriteBatch, Color.Tomato, rect);
             Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Brown, rect);
-            rect.Width = (int)(rect.Width * (health / maxHealth));
+            rect.Width = (int)(rect.Width * pc);
             Takai.Graphics.Primitives2D.DrawFill(spriteBatch, Color.LawnGreen, rect);
             Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Teal, rect);
         }
