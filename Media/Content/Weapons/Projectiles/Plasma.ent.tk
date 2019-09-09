@@ -45,7 +45,7 @@ ProjectileClass {
                 [1 4];
             ]
         };
-        Jitter: [-50 50];
+        Jitter: [-10 10];
     }
 	#*
     Animations: {

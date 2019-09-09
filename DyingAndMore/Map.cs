@@ -50,6 +50,7 @@ namespace DyingAndMore
             }
             //if (!Squads.ContainsKey(squad.Name))
             {
+                //todo: prevent empty name (or generate one)
                 Squads[squad.Name] = squad;
                 squad.OnSpawn(this);
             }

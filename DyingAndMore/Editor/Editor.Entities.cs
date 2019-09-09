@@ -32,6 +32,10 @@ namespace DyingAndMore.Editor
         Static entInfo;
         Static entEditor;
 
+        bool isBatchDeleting = false;
+        Vector2 savedWorldPos;
+        Rectangle deleteRect;
+
         public EntitiesEditorMode(Editor editor)
             : base("Entities", editor)
         {
@@ -203,6 +207,55 @@ namespace DyingAndMore.Editor
                 }
             }
 
+#if DEBUG
+            if (InputState.IsPress(Keys.OemCloseBrackets) && selector.SelectedEntity != null)
+            {
+                var ent = selector.SelectedEntity;
+                var spacing = 100;
+                var sz = (new Vector2(editor.Map.Class.Width, editor.Map.Class.Height) * editor.Map.Class.TileSize).ToPoint();
+                var offset = new Vector2(10 + Util.RandomGenerator.Next(0, spacing / 2));
+                for (var y = 0; y < sz.Y / spacing; ++y)
+                {
+                    for (var x = 0; x < sz.X / spacing; ++x)
+                    {
+                        var pos = offset + new Vector2(x, y) * new Vector2(spacing);
+
+                        if (!editor.Map.Class.IsInsideMap(pos))
+                            continue;
+
+                        editor.Map.Spawn(ent, pos, Vector2.UnitX, Vector2.Zero);
+                    }
+                }
+            }
+
+
+            if (InputState.IsPress(Keys.X))
+            {
+                isBatchDeleting = true;
+                savedWorldPos = currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+                if (float.IsNaN(currentWorldPos.X) || float.IsNaN(currentWorldPos.Y))
+                {
+                    savedWorldPos = currentWorldPos = new Vector2();
+                }
+                return false;
+            }
+
+            if (isBatchDeleting)
+            {
+                deleteRect = Util.AbsRectangle(savedWorldPos, currentWorldPos);
+                editor.Map.DrawRect(deleteRect, Color.Red);
+            }
+
+            if (InputState.IsClick(Keys.X))
+            {
+                isBatchDeleting = false;
+                foreach (var ent in editor.Map.FindEntitiesInRegion(deleteRect))
+                    editor.Map.Destroy(ent);
+
+                return false;
+            }
+#endif
+
             return base.HandleInput(time);
         }
 
@@ -231,9 +284,9 @@ namespace DyingAndMore.Editor
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            DrawEntityInfo(spriteBatch);
-
             base.DrawSelf(spriteBatch);
+
+            DrawEntityInfo(spriteBatch);
         }
 
         //todo: make work in both editor and game

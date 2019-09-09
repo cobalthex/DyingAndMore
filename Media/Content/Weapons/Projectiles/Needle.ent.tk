@@ -11,8 +11,8 @@ ProjectileClass {
     Damage: 25;
 
     Trail: {
-        MaxPoints: 100;
-        LifeSpan: 1.25sec;
+        #MaxPoints: 100;
+        LifeSpan: 0.25sec;
         CaptureDelay: 160Hz;
         Color: {
             Values: [

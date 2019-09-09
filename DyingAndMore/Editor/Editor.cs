@@ -300,10 +300,8 @@ namespace DyingAndMore.Editor
 
             modes.Mode?.End();
 
-            Map.File = null;
             var tmpFile = System.IO.Path.GetTempFileName();
             Map.Save(tmpFile);
-            Map.File = tmpFile;
 
             if (Game.GameInstance.Current == null)
                 Game.GameInstance.Current = new Game.GameInstance(new Game.Game { Map = Map });

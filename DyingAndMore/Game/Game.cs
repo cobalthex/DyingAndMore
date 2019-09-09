@@ -106,8 +106,6 @@ namespace DyingAndMore.Game
 
         Static hudContainer;
 
-        Static actorStatusTemplate;
-
         bool isDead = false;
         TimeSpan restartTimer;
 
@@ -222,7 +220,7 @@ namespace DyingAndMore.Game
 
             foreach (var ent in Map.AllEntities)
             {
-                if (ent is Entities.ActorInstance actor && actor.IsAlliedWith(Entities.Factions.Player))
+                if (ent is Entities.ActorInstance actor && actor.Controller is Entities.InputController)
                     possiblePlayers.Add(actor);
             }
 

@@ -49,6 +49,9 @@ namespace DyingAndMore.Game.Entities
 
         protected ActorInstance SpawnUnit(MapBaseInstance map, List<ActorClass> template)
         {
+            if (template.Count < 1)
+                return null;
+
             var unit = (ActorInstance)Takai.Util.Random(template).Instantiate();
             Units.Add(unit);
             if (TryPlaceUnit(unit, map))
@@ -149,7 +152,7 @@ namespace DyingAndMore.Game.Entities
             else if (map.ElapsedTime >= LastSpawnTime + SpawnDelay)
             {
                 //limit this per delay cycle?
-                for (int i = 0; i < MaxLiveCount && TotalSpawnCount < MaxSpawnCount; ++i)
+                for (int i = 0; liveUnits < MaxLiveCount && (MaxSpawnCount == 0 || TotalSpawnCount < MaxSpawnCount); ++i, ++liveUnits)
                     SpawnUnit(map, UnitsTemplate);
             }
 

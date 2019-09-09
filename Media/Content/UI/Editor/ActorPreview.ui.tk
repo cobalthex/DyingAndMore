@@ -1,5 +1,6 @@
 List {
 	Direction: Direction.Horizontal;
+	HorizontalAlignment: Alignment.Stretch;
 	Margin: 10;
 	Children: [
 		Graphic {
@@ -18,6 +19,16 @@ List {
 				Binding { Source: "Name"; Target: "Text"; DefaultValue: "(No name)" };
 			];
 			VerticalAlignment: Alignment.Middle;
+		}
+		Static {
+			Text: "X"; #todo
+			VerticalAlignment: Alignment.Middle;
+			HorizontalAlignment: Alignment.Right;
+			padding: 10;
+			Color: Color.Tomato;
+			EventCommands: {
+				Click: "RemoveSelf";
+			}
 		}
 	];
 }

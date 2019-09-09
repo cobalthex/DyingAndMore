@@ -18,7 +18,10 @@ namespace DyingAndMore.Editor
         public TriggersEditorMode(Editor editor)
             : base("Triggers", editor)
         {
-            triggerSettingsNameInput = new TextInput();
+            triggerSettingsNameInput = new TextInput
+            {
+                Size = new Vector2(200, 20)
+            };
 
             var closeButton = new Static
             {
@@ -41,6 +44,7 @@ namespace DyingAndMore.Editor
                 HorizontalAlignment = Alignment.Middle,
                 VerticalAlignment = Alignment.Middle,
                 Margin = 10,
+                Padding = new Vector2(10),
                 IsModal = true
             };
             triggerSettings.CommandActions["Close"] = delegate { triggerSettings.RemoveFromParent(); };

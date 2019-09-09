@@ -147,7 +147,9 @@ namespace Takai.UI
 
         class NewItemContainer //class required for bindings to work
         {
+#pragma warning disable CS0649
             public T item;
+#pragma warning restore CS0649
         }
 
         /// <summary>
@@ -298,8 +300,24 @@ namespace Takai.UI
                     Container.InsertChild(CreateItemEntry((T)e.NewItems[i]), e.NewStartingIndex + i);
             }
 
+            _Hack_CommitChanges();
             Container.InvalidateArrange();
         }
+
+#pragma warning disable IDE1006
+        void _Hack_CommitChanges()
+        {
+            if (Bindings == null)
+                return;
+
+            // due to issues w/ two-way binding containers, do it manually here
+            foreach (var binding in Bindings)
+            {
+                if (binding.Target == "Items" && binding.Direction == Data.BindingDirection.TwoWay)
+                    binding.isTargetDirty = true;
+            }
+        }
+#pragma warning restore IDE1006
 
         /// <summary>
         /// Create a new list item
@@ -318,6 +336,10 @@ namespace Takai.UI
                 sender.BubbleCommand("ChangeSelection", sender.ChildIndex);
                 return UIEventResult.Continue;
             });
+            item.CommandActions["RemoveSelf"] = delegate (Static sender, object arg)
+            {
+                sender.BubbleCommand("RemoveItem", sender.ChildIndex);
+            };
             return item;
         }
     }

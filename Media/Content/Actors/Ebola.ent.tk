@@ -13,8 +13,8 @@ ActorClass {
         Behaviors: [
             FlowSeekBehavior { };
 
-            TargetEnemyBehavior { };
-            FocusBehavior { };
+            #TargetEnemyBehavior { };
+            #FocusBehavior { };
         ];
     }];
 

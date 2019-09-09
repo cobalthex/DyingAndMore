@@ -21,6 +21,17 @@ List {
 						Static { Size: [1 1]; };
 
 						CheckBox {
+							Text: "Don't spawn units\nautomatically";
+							Bindings: [
+								Binding {
+									Source: "DontSpawnAutomatically";
+									Target: "IsChecked";
+									Direction: BindingDirection.TwoWay;
+								};
+							];
+						};
+
+						CheckBox {
 							Text: "Disable Spawning if\nLeader is dead";
 							Bindings: [
 								Binding {
@@ -131,8 +142,10 @@ List {
 							Children: [
 								ActorList {
 									Name: "SquadActorSelect";
+									HorizontalAlignment: Alignment.Stretch;
 									Container: List {
 										Direction: Direction.Vertical;
+										HorizontalAlignment: Alignment.Stretch;
 										Margin: 10;
 									}
 									Bindings: [
