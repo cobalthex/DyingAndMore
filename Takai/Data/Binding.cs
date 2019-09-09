@@ -284,9 +284,9 @@ namespace Takai.Data
         public Converter Converter { get; set; } = DefaultConverter;
 
         [Serializer.Ignored]
-        GetSet sourceAccessors;
+        internal GetSet sourceAccessors;
         [Serializer.Ignored]
-        GetSet targetAccessors;
+        internal GetSet targetAccessors;
 
 #if DEBUG
         private object sourceObject;
@@ -380,6 +380,8 @@ namespace Takai.Data
             return getset;
         }
 
+        internal bool isTargetDirty = false; //for hacky shit (usually forcing collections to update)
+
         /// <summary>
         /// Check to see if the binding needs update and perform the update
         /// </summary>
@@ -423,7 +425,7 @@ namespace Takai.Data
                                  (tgtVal == null ? targetAccessors.cachedValue == null : 
                                     BothEqual(tgtVal, targetAccessors.cachedValue, targetAccessors.isCollection)));
 
-                if (!tgtMatches)
+                if (!tgtMatches || isTargetDirty)
                 {
                     var bindVal = Converter.Convert(sourceAccessors.type, tgtVal);
                     sourceAccessors.set(bindVal);
@@ -436,6 +438,7 @@ namespace Takai.Data
 #if DEBUG
                     ++TotalUpdateCount;
 #endif
+                    isTargetDirty = false;
                     return true;
                 }
             }

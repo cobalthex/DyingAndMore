@@ -162,7 +162,7 @@ namespace DyingAndMore.Game.Entities
                     else
                         CurrentMagnet = null;
                 }
-                else if (Class.MagnetismAnglePerSecond != 0 && Map.RealTime.TotalGameTime >= nextTargetSearchTime)
+                else if (Class.MagnetismAnglePerSecond != 0 && Map?.RealTime.TotalGameTime >= nextTargetSearchTime) //? shouldnt be necessarily
                 {
                     CurrentMagnet = FindTarget();
                     nextTargetSearchTime = Map.RealTime.TotalGameTime + TimeSpan.FromMilliseconds(50); //store delay in editor config?

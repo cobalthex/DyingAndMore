@@ -4,11 +4,11 @@ GunClass {
 
     MaxAmmo: 5000;
     RoundsPerBurst: 1;
-    ProjectilesPerRound: 10;
+    ProjectilesPerRound: 25;
     MaxBursts: 0;
-    ChargeTime: 30msec;
-    DischargeTime: 50msec;
-    ErrorAngle: [-30deg 30deg];
+    ChargeTime: 10msec;
+    DischargeTime: 10msec;
+    ErrorAngle: [-40deg 30deg];
     AmmoRefillSpeed: 4Hz;
 
     Hud: @"./defaulthud.ui.tk";

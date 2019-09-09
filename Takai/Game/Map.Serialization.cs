@@ -137,9 +137,11 @@ namespace Takai.Game
         /// Save this map instance as a save state
         /// </summary>
         /// <param name="file">The file to save to</param>
-        public void Save(string file)
+        public void Save(string file, bool setName = true)
         {
+            File = null;
             Data.Serializer.TextSerialize(file, this);
+            File = file;
         }
         
         public virtual Dictionary<string, object> DerivedSerialize()

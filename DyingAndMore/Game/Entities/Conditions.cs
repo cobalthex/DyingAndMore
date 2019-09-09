@@ -32,6 +32,8 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public float ContagiousChance { get; set; } = 0; //todo
 
+        // increase effect based on repetition (fire getting hotter)
+
         //taper?
 
         //todo: move duration into here?

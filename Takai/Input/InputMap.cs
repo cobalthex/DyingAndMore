@@ -177,7 +177,7 @@ namespace Takai.Input
             }
             foreach (var binding in GamepadButtons)
             {
-                if (InputState.IsButtonDown(binding.Key, player))
+                if (player < PlayerIndex.Four && InputState.IsButtonDown(binding.Key, player))
                     SetInput(binding.Value);
             }
 
