@@ -238,6 +238,12 @@ namespace Takai.UI
                         //todo
                     }
 
+                    if (key == Keys.Tab)
+                    {
+                        keyed = false;
+                        break;
+                    }
+
                     else if (key == Keys.Left && Caret > 0)
                     {
                         if (isCtrl)

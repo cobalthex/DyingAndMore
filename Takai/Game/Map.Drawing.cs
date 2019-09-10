@@ -919,6 +919,12 @@ namespace Takai.Game
             if (renderedCircles.Count > 0)
             {
                 Class.circleEffect.Parameters["Transform"].SetValue(c.viewTransform);
+                Class.circleEffect.Parameters["Thickness"].SetValue(3f);
+                //float seglen = 16;
+                //Class.circleEffect.Parameters["SegmentLength"].SetValue(seglen);
+                //Class.circleEffect.Parameters["SegmentOffset"].SetValue(((float)ElapsedTime.TotalSeconds * 50) % (seglen * 2));
+
+                //instance buffer/custom vertex type for more shader params?
 
                 Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
                 Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;

@@ -128,7 +128,14 @@ namespace DyingAndMore.Editor
                     ui.BindTo(SelectedSquad);
 
                     AddChild(ui);
+                    return false;
                 }
+            }
+
+            if (InputState.IsPress(Keys.Escape))
+            {
+                creatingSquad = false;
+                return false;
             }
 
             return base.HandleInput(time);
@@ -165,7 +172,7 @@ namespace DyingAndMore.Editor
             }
 
             if (creatingSquad && SelectedSquad != null)
-                editor.Map.DrawCircle(SelectedSquad.SpawnPosition, SelectedSquad.SpawnRadius, new Color(Color.LightGoldenrodYellow, 0.6f));
+                editor.Map.DrawCircle(SelectedSquad.SpawnPosition, SelectedSquad.SpawnRadius, new Color(Color.White, 0.6f));
         }
     }
 }

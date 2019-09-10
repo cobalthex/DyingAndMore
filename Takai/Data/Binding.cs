@@ -284,9 +284,9 @@ namespace Takai.Data
         public Converter Converter { get; set; } = DefaultConverter;
 
         [Serializer.Ignored]
-        internal GetSet sourceAccessors;
+        GetSet sourceAccessors;
         [Serializer.Ignored]
-        internal GetSet targetAccessors;
+        GetSet targetAccessors;
 
 #if DEBUG
         private object sourceObject;
