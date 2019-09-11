@@ -75,13 +75,17 @@ List {
 
 			Children: [
 				Static {
-					OnClickCommand: "ResizeMap";
+					EventCommands: {
+						Click: "ResizeMap";
+					};
 					Text: "Resize";
 					HorizontalAlignment: Alignment.Stretch;
 					BorderColor: [255 192 0 255];
 				}
 				Static {
-					OnClickCommand: "$CloseModal";
+					EventCommands: {
+						Click: "$CloseModal";
+					};
 					Text: "Cancel";
 					HorizontalAlignment: Alignment.Stretch;
 				}

@@ -52,7 +52,7 @@ namespace DyingAndMore
             {
                 //todo: prevent empty name (or generate one)
                 Squads[squad.Name] = squad;
-                squad.OnSpawn(this);
+                squad.SpawnUnits(this);
             }
         }
 

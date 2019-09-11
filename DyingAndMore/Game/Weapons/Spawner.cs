@@ -63,10 +63,14 @@ namespace DyingAndMore.Game.Weapons
             //todo: bind to squad?
 
             //spawn leader last?
-            SpawnQueue.Enqueue(Takai.Util.Random(Squad.LeaderTemplate));
+            if (Squad.LeaderTemplate.Count > 0)
+                SpawnQueue.Enqueue(Takai.Util.Random(Squad.LeaderTemplate));
 
-            for (int i = 0; i < Squad.MaxSpawnCount; ++i)
-                SpawnQueue.Enqueue(Takai.Util.Random(Squad.UnitsTemplate));
+            if (Squad.UnitsTemplate.Count > 0)
+            {
+                for (int i = 0; i < (Squad.MaxSpawnCount == 0 ? 50 : Squad.MaxSpawnCount); ++i) //todo: dont limit
+                    SpawnQueue.Enqueue(Takai.Util.Random(Squad.UnitsTemplate));
+            }
         }
 
         public override bool IsDepleted()

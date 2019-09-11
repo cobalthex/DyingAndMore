@@ -75,6 +75,18 @@ List {
 							];
 						};
 
+						Static { Text: "`_Spawn Delay"; }
+						DurationInput {
+							ShowMinutes: false;
+							Bindings: [
+								Binding {
+									Source: "SpawnDelay";
+									Target: "Duration";
+									Direction: BindingDirection.TwoWay;
+								};
+							];
+						};
+
 						Static { Text: "`_Current Spawn Count"; }
 						Static {
 							Bindings: [
@@ -95,7 +107,6 @@ List {
 							];
 						};
 					];
-					# size calculation fucked right now
 				};
 				Static {
 					BackgroundColor: [255 255 255 127];
@@ -111,13 +122,17 @@ List {
 						Static { Size: [1 1]; };
 
 						Static { Text: "`_Leader (Randomized)"; };
-						#*ScrollBox {
+						ScrollBox {
 							HorizontalAlignment: Alignment.Stretch;
-							Size: [NaN 100];
+							Size: [NaN 140];
+							StayAtEnd: true;
 							Children: [
 								ActorList {
+									Name: "SquadLeaderSelect";
+									HorizontalAlignment: Alignment.Stretch;
 									Container: List {
 										Direction: Direction.Vertical;
+										HorizontalAlignment: Alignment.Stretch;
 										Margin: 10;
 									}
 									Bindings: [
@@ -128,20 +143,73 @@ List {
 										};
 									];
 									ItemTemplate: @"./ActorPreview.ui.tk";
-									AddItemTemplate: @"./Entities/SelectActor.ui.tk";
+									AddItemTemplate: Static {
+										Children: [
+											Static {
+												Text: "Select actor";
+												Size: [NaN 48];
+												ChildBindScope: "this";
+												EventCommands: {
+													Click: [
+														"AddRootUI"
+														List {
+															Name: "SquadActorSelector";
+															HorizontalAlignment: Alignment.Center;
+															VerticalAlignment: Alignment.Center;
+															IsModal: true;
+															Padding: 10;
+															Margin: 10;
+															Direction: Direction.Vertical;
+															BackgroundSprite: @"UI/test/test.9p.tk";
+															Children: [
+																EntitySelector {
+																	SearchPaths: ["Actors"];
+
+																	Bindings: [
+																		Binding {
+																			Source: "item";
+																			Target: "SelectedEntity";
+																			Direction: BindingDirection.TwoWay;
+																		};
+																	];
+																	EventCommands: {
+																		Click: [ # hack (SelectionChanged will trigger before bindings update)
+																			"Multiple" [
+																				["Routed" ["SquadLeaderSelect" "AddItem"]]
+																				["RemoveUI" "SquadActorSelector"]
+																			]
+																		];
+																	}
+																	Size: [400 400];
+																};
+
+																Static {
+																	Text: "Cancel";
+																	HorizontalAlignment: Alignment.Center;
+																	Padding: 10;
+																	EventCommands: {
+																		Click: ["RemoveUI" "SquadActorSelector"];
+																	};
+																};
+															];
+														};
+													];
+												};
+											};
+										];
+									};
 								};
 							];
-						};*#
+						};
 
 						Static { Text: "`_Units"; };
 						ScrollBox {
-							Name: "zzz";
 							HorizontalAlignment: Alignment.Stretch;
 							Size: [NaN 300];
 							StayAtEnd: true;
 							Children: [
 								ActorList {
-									Name: "SquadActorSelect";
+									Name: "SquadUnitSelect";
 									HorizontalAlignment: Alignment.Stretch;
 									Container: List {
 										Direction: Direction.Vertical;
@@ -156,7 +224,61 @@ List {
 										};
 									];
 									ItemTemplate: @"./ActorPreview.ui.tk";
-									AddItemTemplate: @"./Entities/SelectActor.ui.tk";
+									AddItemTemplate: Static {
+										Children: [
+											Static {
+												Text: "Select actor";
+												Size: [NaN 48];
+												ChildBindScope: "this";
+												EventCommands: {
+													Click: [
+														"AddRootUI"
+														List {
+															Name: "SquadActorSelector";
+															HorizontalAlignment: Alignment.Center;
+															VerticalAlignment: Alignment.Center;
+															IsModal: true;
+															Padding: 10;
+															Margin: 10;
+															Direction: Direction.Vertical;
+															BackgroundSprite: @"UI/test/test.9p.tk";
+															Children: [
+																EntitySelector {
+																	SearchPaths: ["Actors"];
+
+																	Bindings: [
+																		Binding {
+																			Source: "item";
+																			Target: "SelectedEntity";
+																			Direction: BindingDirection.TwoWay;
+																		};
+																	];
+																	EventCommands: {
+																		Click: [ # hack (SelectionChanged will trigger before bindings update)
+																			"Multiple" [
+																				["Routed" ["SquadUnitSelect" "AddItem"]]
+																				["RemoveUI" "SquadActorSelector"]
+																			]
+																		];
+																	}
+																	Size: [400 400];
+																};
+
+																Static {
+																	Text: "Cancel";
+																	HorizontalAlignment: Alignment.Center;
+																	Padding: 10;
+																	EventCommands: {
+																		Click: ["RemoveUI" "SquadActorSelector"];
+																	};
+																};
+															];
+														};
+													];
+												};
+											};
+										];
+									};
 								};
 							];
 						};

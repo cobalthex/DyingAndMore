@@ -91,8 +91,11 @@ namespace Takai.Input
     /// <typeparam name="TAction">The action type to bind to</typeparam>
     //[Data.CustomSerialize("CustomSerialize"),
     // Data.CustomDeserialize(typeof(InputMap<>), "CustomDeserialize")]
-    public class InputMap<TAction>
+    public class InputMap<TAction> : Data.ISerializeExternally
     {
+        [Data.Serializer.Ignored]
+        public string File { get; set; }
+
         [Data.Serializer.Ignored]
         public Dictionary<Keys, InputBinding<TAction>> Keys { get; set; } = new Dictionary<Keys, InputBinding<TAction>>();
         [Data.Serializer.Ignored]

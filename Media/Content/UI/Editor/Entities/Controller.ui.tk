@@ -1,4 +1,5 @@
 List {
+    HorizontalAlignment: Alignment.Stretch;
     Children: [
         ControllerSelect {
             Bindings: [
