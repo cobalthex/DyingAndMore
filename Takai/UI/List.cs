@@ -83,12 +83,12 @@ namespace Takai.UI
                 stretchSize = System.Math.Max(0, (availableSize.Y - MeasuredSize.Y) / stretches);
 
             float t = 0;
-            for (int i = 0; i < Children.Count; ++i)
+            for (int i = 0, n = 0; i < Children.Count; ++i)
             {
                 if (!Children[i].IsEnabled)
                     continue;
 
-                if (i > 0)
+                if (n++ > 0)
                     t += Margin;
 
                 float itemSize;

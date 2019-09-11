@@ -1,0 +1,138 @@
+MapInstance {
+    Squads: {
+        spawner: Squad {
+            Name: "spawner";
+            LeaderTemplate: [];
+            UnitsTemplate: [
+                @"Actors/Astrovirus.ent.tk"
+                @"Actors/InfectedCell.ent.tk"
+                @"Actors/Ebola.ent.tk"
+            ];
+            SpawnPosition: [644.9997 154.9995];
+            SpawnRadius: 73.40981;
+            DontSpawnAutomatically: True;
+            MinLiveCount: 0;
+            MaxLiveCount: 1;
+            MaxSpawnCount: 100;
+            SpawnDelay: 0;
+            ResetDelay: 0;
+            DisableSpawningIfLeaderIsDead: False;
+            Leader: Null;
+            Units: [];
+            TotalSpawnCount: 0;
+            LastSpawnTime: 37690;
+        };
+    };
+    Class: MapClass {
+        Name: Null;
+        TileSize: 48;
+        Tileset: Tileset {
+            texture: "Tilesets/Tiles2.png";
+            size: 48;
+        };
+        MaterialInteractions: MaterialInteractions {
+            File: Null;
+            Interactions: [];
+        };
+        TilesMaterial: "Tiles";
+        TilesImage: "Tilesets/Tiles2.png";
+        Width: 16;
+        Height: 6;
+        Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    };
+    Sounds: [];
+    ElapsedTime: 121020.2949;
+    TimeScale: 1;
+    currentScreenFade: ScreenFade {
+        Duration: 0;
+        Colors: Null;
+        Blend: Null;
+    };
+    currentScreenFadeElapsedTime: 121020.2949;
+    Entities: [
+        ActorInstance {
+            Class: @"Actors/Player.ent.tk";
+            Factions: Factions [Player Ally];
+            Controller: InputController {
+            };
+            CurrentHealth: 5000;
+            Conditions: {
+            };
+            MaxSpeed: 300;
+            Weapon: GunInstance {
+                Class: @"Weapons/mg.wpn.tk";
+                CurrentAmmo: 1000;
+                LastAmmoRefillTime: 78705;
+                OnlyRefillIfIdle: True;
+                Class: @"Weapons/mg.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
+            };
+            Id: 1;
+            Class: @"Actors/Player.ent.tk";
+            Name: Null;
+            Position: [190.9995 139.9995];
+            Forward: [1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 102259;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            Name: Null;
+            Class: @"Actors/Cyst.ent.tk";
+            Class: @"Actors/Cyst.ent.tk";
+            CurrentHealth: 1000;
+            Id: 2;
+            Factions: Factions [Enemy];
+            Controller: ArtilleryController {
+                MaxRange: 400;
+                CanRotate: False;
+                ShowSweepLines: True;
+                trackedActor: Null;
+            };
+            Weapon: SpawnerInstance {
+                Squad: Squad {
+                    Name: "spawner";
+                    DontSpawnAutomatically: True;
+                    DisableSpawningIfLeaderIsDead: False;
+                    MinLiveCount: 0;
+                    MaxLiveCount: 1;
+                    MaxSpawnCount: 0;
+                    SpawnDelay: 0;
+                    TotalSpawnCount: 0;
+                    Units: [];
+                    LeaderTemplate: [];
+                    UnitsTemplate: [];
+                    SpawnPosition: [644.9997 154.9995];
+                    SpawnRadius: 73.40981;
+                    ResetDelay: 0;
+                    Leader: Null;
+                    LastSpawnTime: 37690;
+                };
+                Class: @"Weapons/Cyst.wpn.tk";
+                SpawnQueue: Null;
+                Class: @"Weapons/Cyst.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
+            };
+            Conditions: {
+            };
+            MaxSpeed: 0;
+            Position: [743.9998 147.9995];
+            Forward: [-1 -8.742278E-08];
+            Velocity: [0 0];
+            OutlineColor: [255 215 0 255];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 102259;
+            EventHandlers: Null;
+        }
+    ];
+    Triggers: [];
+    Fluids: [];
+}

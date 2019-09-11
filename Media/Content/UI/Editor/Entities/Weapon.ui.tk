@@ -1,7 +1,9 @@
 List {
+    HorizontalAlignment: Alignment.Stretch;
 	Margin: 10;
     Children: [
 	    WeaponSelect {
+            HorizontalAlignment: Alignment.Stretch;
 	        Bindings: [
 	            Binding {
 	                Direction: BindingDirection.TwoWay;

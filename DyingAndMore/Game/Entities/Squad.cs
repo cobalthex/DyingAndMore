@@ -10,7 +10,7 @@ namespace DyingAndMore.Game.Entities
     /// Squads can spawn a variable number of members and are optionally directed by a leader.
     /// Squads can respawn per rules set in this class
     /// </summary>
-    public class Squad : ISpawnable
+    public class Squad
     {
         public string Name { get; set; } //todo: this should auto-generate
 
@@ -49,7 +49,7 @@ namespace DyingAndMore.Game.Entities
 
         protected ActorInstance SpawnUnit(MapBaseInstance map, List<ActorClass> template)
         {
-            if (template.Count < 1)
+            if (template == null || template.Count < 1)
                 return null;
 
             var unit = (ActorInstance)Takai.Util.Random(template).Instantiate();
@@ -57,26 +57,6 @@ namespace DyingAndMore.Game.Entities
             if (TryPlaceUnit(unit, map))
                 ++TotalSpawnCount;
             return unit;
-        }
-
-        public virtual void OnSpawn(MapBaseInstance map)
-        {
-            //todo: this should be be called once, e.g. not every trigger enter
-            //maybe control via MapInstance.Spawn() ?
-
-            if (Units.Count > 0)
-                return;
-
-            if (LeaderTemplate != null)
-                Leader = SpawnUnit(map, LeaderTemplate);
-
-            if (UnitsTemplate != null)
-            {
-                for (int i = 0; i < MinLiveCount - 1; ++i) //- 1 for leader
-                    SpawnUnit(map, UnitsTemplate);
-            }
-
-            LastSpawnTime = map.ElapsedTime;
         }
 
         protected virtual bool TryPlaceUnit(ActorInstance unit, MapBaseInstance map)
@@ -107,24 +87,6 @@ namespace DyingAndMore.Game.Entities
 
         public void Update(MapBaseInstance map, TimeSpan deltaTime)
         {
-            if (!DontSpawnAutomatically)
-            {
-                if (LastSpawnTime == TimeSpan.Zero)
-                    OnSpawn(map);
-
-                else if (ResetDelay > TimeSpan.Zero &&
-                         TotalSpawnCount >= MaxSpawnCount &&
-                         Units.Count == 0 &&
-                         map.ElapsedTime >= LastSpawnTime + ResetDelay)
-                {
-                    Leader = null;
-                    TotalSpawnCount = 0;
-                    OnSpawn(map);
-                }
-            }
-            else if (LastSpawnTime == TimeSpan.Zero)
-                return;
-
             //udpate live count (remove dead units)
             for (int i = 0; i < Units.Count; ++i)
             {
@@ -140,9 +102,16 @@ namespace DyingAndMore.Game.Entities
                 }
             }
 
-            if (UnitsTemplate == null || (DisableSpawningIfLeaderIsDead && Leader != null && !Leader.IsAlive))
+            if (UnitsTemplate == null ||
+                (DisableSpawningIfLeaderIsDead && Leader != null && !Leader.IsAlive) ||
+                (DontSpawnAutomatically && TotalSpawnCount == 0))
                 return;
 
+            SpawnUnits(map);
+        }
+
+        public void SpawnUnits(MapBaseInstance map)
+        {
             int liveUnits = Units.Count;
             if (liveUnits < MinLiveCount)
             {
