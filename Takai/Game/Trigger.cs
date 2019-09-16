@@ -24,7 +24,6 @@ namespace Takai.Game
         /// </summary>
         public Rectangle Region { get; set; } = new Rectangle(0, 0, 1, 1);
 
-
         /// <summary>
         /// Restrict who can activate this trigger (by default, anyone)
         /// </summary>
@@ -42,7 +41,7 @@ namespace Takai.Game
         public EffectsClass OnEnterEffects { get; set; }
 
         /// <summary>
-        /// How many times this trigger can be used, 0 for infinite
+        /// How many times this trigger can be used, 0 for infinitex
         /// </summary>
         public int MaxUses { get; set; } = 0;
 

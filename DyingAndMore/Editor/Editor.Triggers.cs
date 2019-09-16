@@ -13,41 +13,11 @@ namespace DyingAndMore.Editor
         Takai.Game.Trigger activeTrigger = null;
 
         Static triggerSettings;
-        TextInput triggerSettingsNameInput;
 
         public TriggersEditorMode(Editor editor)
             : base("Triggers", editor)
         {
-            triggerSettingsNameInput = new TextInput
-            {
-                Size = new Vector2(200, 20)
-            };
-
-            var closeButton = new Static
-            {
-                Text = "Close",
-                HorizontalAlignment = Alignment.Stretch,
-                BorderColor = Color.White,
-                Padding = new Vector2(10)
-            };
-            closeButton.EventCommands[ClickEvent] = "Close";
-
-            var label = new Static { Text = "Name" };
-
-            triggerSettings = new List(
-                label,
-                triggerSettingsNameInput,
-                closeButton
-            )
-            {
-                BackgroundColor = new Color(20, 20, 20, 255),
-                HorizontalAlignment = Alignment.Middle,
-                VerticalAlignment = Alignment.Middle,
-                Margin = 10,
-                Padding = new Vector2(10),
-                IsModal = true
-            };
-            triggerSettings.CommandActions["Close"] = delegate { triggerSettings.RemoveFromParent(); };
+            triggerSettings = Takai.Data.Cache.Load<Static>("UI/Editor/Trigger.ui.tk");
         }
 
         public override void Start()
@@ -66,9 +36,9 @@ namespace DyingAndMore.Editor
 
             if (activeTrigger != null && InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Space))
             {
-                triggerSettingsNameInput.Text = activeTrigger.Name;
-                triggerSettingsNameInput.HasFocus = true;
-                AddChild(triggerSettings);
+                var ui = triggerSettings.CloneHierarchy();
+                ui.BindTo(activeTrigger);
+                AddChild(ui);
                 return false;
             }
 
@@ -170,7 +140,7 @@ namespace DyingAndMore.Editor
             if (activeTrigger != null)
             {
                 editor.Map.DrawRect(activeTrigger.Region, Color.GreenYellow);
-                var textPos = new Vector2(activeTrigger.Region.X + 5, activeTrigger.Region.Y + 5);
+                var textPos = new Vector2(activeTrigger.Region.X + 10, activeTrigger.Region.Y + 5);
                 DefaultFont?.Draw(spriteBatch, activeTrigger.Name, editor.Camera.WorldToScreen(textPos), Color.White);
             }
             base.DrawSelf(spriteBatch);

@@ -15,7 +15,6 @@ namespace DyingAndMore.Game.Entities
         None = 0,
 
         All = ~0,
-        Any = All,
 
         Player = (1 << 0), //only player(s) should have this faction
 

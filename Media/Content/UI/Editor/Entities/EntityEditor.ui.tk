@@ -9,7 +9,6 @@ List {
 
     Children: [
         Scrollbox {
-			CellColor: [50 100 200];
             Size: [300 400];
             InnerPadding: 10;
             ScrollBarTemplate: {
@@ -23,7 +22,7 @@ List {
                     Margin: 10;
 
                     Children: [
-                        Static { Text: "Name"; }
+                        Static { Text: "`_Name"; }
                         TextInput {
                             HorizontalAlignment: Alignment.Stretch;
                             Padding: [4 2];
@@ -40,7 +39,8 @@ List {
                             margin: 10;
                             Children: [
         						Static { Text: "Actor Properties"; };
-        						Static { Text: "Current Health"; };
+
+        						Static { Text: "`_Current Health"; };
         						NumericInput {
                                     HorizontalAlignment: Alignment.Stretch;
         							Bindings: [
@@ -56,10 +56,23 @@ List {
         						#conditions
         						#actions
 
-                                Static { Text: "Controller"; };
+
+                                Static { Text: "`_Factions"; };
+                                FactionSelect {
+                                    Bindings: [
+                                        {
+                                            Direction: BindingDirection.TwoWay;
+                                            Source: "Factions";
+                                            Target: "Value";
+                                        };
+                                    ];
+                                }
+
+
+                                Static { Text: "`_Controller"; };
                                 @"./Controller.ui.tk";
 
-                                Static { Text: "Weapon"; };
+                                Static { Text: "`_Weapon"; };
                                 @"./Weapon.ui.tk";
                             ];
                         };

@@ -50,6 +50,8 @@ namespace DyingAndMore
             }
             //if (!Squads.ContainsKey(squad.Name))
             {
+                if (squad.Name == null)
+                    squad.Name = Takai.Util.RandomString();
                 //todo: prevent empty name (or generate one)
                 Squads[squad.Name] = squad;
                 squad.SpawnUnits(this);

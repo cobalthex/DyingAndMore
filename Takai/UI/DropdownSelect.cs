@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
 namespace Takai.UI
 {
@@ -31,7 +30,7 @@ namespace Takai.UI
 
         public Static ItemTemplate { get => list.ItemTemplate; set => list.ItemTemplate = value; }
 
-        public System.Collections.Generic.ICollection<T> Items => list.Items;
+        public System.Collections.Generic.IList<T> Items => list.Items;
 
         public override bool CanFocus => true;
 
