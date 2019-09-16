@@ -68,7 +68,7 @@ namespace Takai.UI
             foreach (var rtype in Data.Serializer.RegisteredTypes)
             {
                 var rti = rtype.Value.GetTypeInfo();
-                if (!rti.IsAbstract && rti.IsSubclassOf(type))
+                if (!rti.IsAbstract && typeInfo.IsAssignableFrom(rtype.Value))
                     Items.Add(rtype.Value);
             }
         }

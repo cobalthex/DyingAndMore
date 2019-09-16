@@ -1,0 +1,119 @@
+List {
+    Name: "Trigger Editor";
+    IsModal: true;
+    HorizontalAlignment: Alignment.Middle;
+    VerticalAlignment: Alignment.Middle;
+    BackgroundSprite: @"UI/test/test.9p.tk";
+    Margin: 10;
+    Padding: 10;
+
+    Children: [
+        Scrollbox {
+			CellColor: [50 100 200];
+            Size: [300 400];
+            InnerPadding: 10;
+            ScrollBarTemplate: {
+                Padding: 3;
+                BorderColor: Color.White;
+            }
+            Children: [
+                List {
+                    Direction: Direction.Vertical;
+                    HorizontalAlignment: Alignment.Stretch;
+                    Margin: 10;
+
+                    Children: [
+                        Static { Text: "`_Name"; }
+                        TextInput {
+                        	HasFocus: true;
+                            HorizontalAlignment: Alignment.Stretch;
+                            Padding: [4 2];
+                            Bindings: [
+                                {
+                                    Direction: BindingDirection.TwoWay;
+                                    Source: "Name";
+                                    Target: "Text";
+                                };
+                            ];
+                        };
+
+                        Static { Text: "`_Filter"; }
+                        TriggerFilterSelect {
+                        	Bindings: [
+                                {
+                                    Direction: BindingDirection.TwoWay;
+                                    Source: "Filter";
+                                    Target: "Instance";
+                                };
+                        	];
+                        }
+
+						Switch {
+							Bindings: [
+							    Binding {
+							        Source: "Filter:typename";
+							        Target: "Value";
+							    }
+							];
+							Items: {
+							    ActorTriggerFilter: List {
+							    	Margin: 10;
+							    	Children: [
+							    		Static { Text: "`_Factions"; }
+							    		FactionSelect {
+				                        	Bindings: [
+				                                {
+				                                    Direction: BindingDirection.TwoWay;
+				                                    Source: "Filter.Factions"; #todo: this doesnt rebind ;; binding scope?
+				                                    Target: "Value";
+				                                };
+				                        	];
+							    		}
+							    	];
+							    }
+							};
+						};
+
+                        Static { Text: "`_Max Uses"; }
+                        NumericInput {
+                            HorizontalAlignment: Alignment.Stretch;
+                            Padding: [4 2];
+                            Bindings: [
+                                {
+                                    Direction: BindingDirection.TwoWay;
+                                    Source: "MaxUses";
+                                    Target: "Value";
+                                };
+                            ];
+                        };
+
+                        Static { Text: "`_Use Count"; }
+                        List {
+                        	Direction: Direction.Horizontal;
+                        	Margin: 10;
+                        	Children: [
+		                        Static {
+		                            Bindings: [
+		                                {
+		                                    Source: "UseCount";
+		                                    Target: "Text";
+		                                };
+		                            ];
+		                        };
+	                        ];
+	                    };
+                    ];
+                };
+            ];
+        };
+
+        Static {
+            Padding: [10 5];
+            HorizontalAlignment: Alignment.Middle;
+            Text: "Close";
+            EventCommands: {
+                Click: "CloseModal";
+            }
+        };
+    ];
+}

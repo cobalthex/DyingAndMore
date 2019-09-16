@@ -1,7 +1,7 @@
 List {
 	IsModal: true;
-	Padding: 20;
-	Margin: 20;
+	Padding: 10;
+	Margin: 10;
 	HorizontalAlignment: Alignment.Center;
 	VerticalAlignment: Alignment.Center;
 	Direction: Direction.Vertical;
@@ -9,7 +9,7 @@ List {
 	Children: [
 		List {
 			Direction: Direction.Horizontal;
-			Margin: 20;
+			Margin: 10;
 
 			Children: [
 				List {

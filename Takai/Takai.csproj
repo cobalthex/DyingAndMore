@@ -109,6 +109,7 @@
     <Compile Include="UI\CheckBox.cs" />
     <Compile Include="UI\Drawer.cs" />
     <Compile Include="UI\DropdownSelect.cs" />
+    <Compile Include="UI\EnumSelect.cs" />
     <Compile Include="UI\FileInput.cs" />
     <Compile Include="UI\FileList.cs" />
     <Compile Include="UI\Graphic.cs" />

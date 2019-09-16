@@ -17,14 +17,24 @@ namespace Takai
             return n;
         }
 
+        public static bool IsPowerOf2(int n)
+        {
+            return (n != 0 && 0 == (n & (n - 1)));
+        }
+
+        public static bool IsPowerOf2(long n)
+        {
+            return (n != 0 && 0 == (n & (n - 1)));
+        }
+
         public static readonly Random RandomGenerator = new Random();
 
         public static T Random<T>(this System.Collections.Generic.IList<T> list) //distribution?
         {
             if (list == null || list.Count < 1)
-                return default(T);
+                return default;
 
-            return list[Util.RandomGenerator.Next(list.Count)];
+            return list[RandomGenerator.Next(list.Count)];
         }
 
         public static Vector2 RandomCircle(Vector2 position, float radius)
@@ -34,6 +44,17 @@ namespace Takai
                 (float)Math.Cos(RandomGenerator.NextDouble() * MathHelper.TwoPi),
                 (float)Math.Sin(RandomGenerator.NextDouble() * MathHelper.TwoPi)
             ) * radius;
+        }
+
+        const string randChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        public static string RandomString(int minLength = 8, int maxLength = 8)
+        {
+            var len = RandomGenerator.Next(minLength, maxLength + 1);
+            var sb = new System.Text.StringBuilder(len);
+            for (int i = 0; i < len; ++i)
+                sb.Append(randChars[RandomGenerator.Next(0, randChars.Length)]);
+            return sb.ToString();
         }
 
         /// <summary>

@@ -34,6 +34,7 @@ namespace Takai.UI
             On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
                 ((CheckBox)sender).IsChecked ^= true;
+                BubbleEvent(sender, ValueChangedEvent, new UIEventArgs(sender));
                 return UIEventResult.Handled;
             });
         }
