@@ -51,7 +51,7 @@ namespace DyingAndMore.Game.Entities
         {
             var newSquad = (Squad)MemberwiseClone();
             newSquad.Leader = null;
-            newSquad.Units.Clear();
+            newSquad.Units = new List<ActorInstance>();
             newSquad.LeaderTemplate = LeaderTemplate != null ? new List<ActorClass>(LeaderTemplate) : null;
             newSquad.UnitsTemplate = UnitsTemplate != null ? new List<ActorClass>(UnitsTemplate) : null;
             TotalSpawnCount = 0;
