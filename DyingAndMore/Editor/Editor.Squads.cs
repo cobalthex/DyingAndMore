@@ -40,19 +40,34 @@ namespace DyingAndMore.Editor
 
             if (pea.button == 0)
             {
+                SelectedSquad = null;
+                float lastDist = float.PositiveInfinity;
                 if (editor.Map.Squads != null)
                 {
                     foreach (var squad in editor.Map.Squads) //search backwards?
                     {
-                        if (Vector2.DistanceSquared(squad.Value.SpawnPosition, worldPos)
-                            <= (squad.Value.SpawnRadius * squad.Value.SpawnRadius))
+                        var dist = Vector2.DistanceSquared(squad.Value.SpawnPosition, worldPos);
+                        if (dist <= (squad.Value.SpawnRadius * squad.Value.SpawnRadius) &&
+                            dist < lastDist)
                         {
+                            lastDist = dist;
                             SelectedSquad = squad.Value;
-                            return UIEventResult.Handled;
                         }
                     }
+
+                    if (SelectedSquad != null)
+                    {
+                        if (InputState.IsMod(KeyMod.Control))
+                        {
+                            var newSquad = SelectedSquad.Clone();
+                            newSquad.Name = Takai.Util.IncrementName(newSquad.Name);
+                            editor.Map.Squads[newSquad.Name] = newSquad;
+                            SelectedSquad = newSquad;
+                        }
+
+                        return UIEventResult.Handled;
+                    }
                 }
-                SelectedSquad = null;
                 creatingSquad = true;
                 createOrigin = worldPos;
             }
@@ -99,7 +114,7 @@ namespace DyingAndMore.Editor
                     var worldPos = editor.Camera.ScreenToWorld(dea.position);
                     if (SelectedSquad == null)
                         SelectedSquad = new Game.Entities.Squad { SpawnPosition = createOrigin };
-                    SelectedSquad.SpawnRadius = Vector2.Distance(worldPos, createOrigin);
+                    SelectedSquad.SpawnRadius = System.Math.Max(10, Vector2.Distance(worldPos, createOrigin));
                 }
 
                 else if (SelectedSquad != null)
@@ -127,8 +142,16 @@ namespace DyingAndMore.Editor
                     var ui = editUI;//.CloneHierarchy();
                     ui.BindTo(SelectedSquad);
 
+                    //todo: changing name (if allowed?) will break map dictionary
+
                     AddChild(ui);
                     return false;
+                }
+
+                if (InputState.IsButtonHeld(Keys.R))
+                {
+                    var worldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+                    SelectedSquad.SpawnRadius = System.Math.Max(10, Vector2.Distance(SelectedSquad.SpawnPosition, worldPos));
                 }
             }
 
