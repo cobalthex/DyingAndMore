@@ -47,6 +47,19 @@ namespace DyingAndMore.Game.Entities
         public int TotalSpawnCount { get; set; } = 0;
         public TimeSpan LastSpawnTime { get; set; } = TimeSpan.Zero;
 
+        public Squad Clone()
+        {
+            var newSquad = (Squad)MemberwiseClone();
+            newSquad.Leader = null;
+            newSquad.Units.Clear();
+            newSquad.LeaderTemplate = LeaderTemplate != null ? new List<ActorClass>(LeaderTemplate) : null;
+            newSquad.UnitsTemplate = UnitsTemplate != null ? new List<ActorClass>(UnitsTemplate) : null;
+            TotalSpawnCount = 0;
+            LastSpawnTime = TimeSpan.Zero;
+
+            return newSquad;
+        }
+
         protected ActorInstance SpawnUnit(MapBaseInstance map, List<ActorClass> template)
         {
             if (template == null || template.Count < 1)

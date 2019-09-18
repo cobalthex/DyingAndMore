@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 
 namespace Takai
@@ -45,18 +46,6 @@ namespace Takai
                 (float)Math.Sin(RandomGenerator.NextDouble() * MathHelper.TwoPi)
             ) * radius;
         }
-
-        const string randChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-        public static string RandomString(int minLength = 8, int maxLength = 8)
-        {
-            var len = RandomGenerator.Next(minLength, maxLength + 1);
-            var sb = new System.Text.StringBuilder(len);
-            for (int i = 0; i < len; ++i)
-                sb.Append(randChars[RandomGenerator.Next(0, randChars.Length)]);
-            return sb.ToString();
-        }
-
         /// <summary>
         /// Return a gaussian distribution of a random double
         /// </summary>
@@ -338,6 +327,35 @@ namespace Takai
             }
 
             return builder.ToString();
+        }
+
+        const string randChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; //first 62 chars of base64
+
+        public static string RandomString(int minLength = 8, int maxLength = 8)
+        {
+            var len = RandomGenerator.Next(minLength, maxLength + 1);
+            var sb = new System.Text.StringBuilder(len);
+            for (int i = 0; i < len; ++i)
+                sb.Append(randChars[RandomGenerator.Next(0, randChars.Length)]);
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Append _# to name (or increment #).
+        /// e.g. foo -> foo_1 -> foo_2.
+        /// Note: uses regex
+        /// </summary>
+        /// <param name="name">The name to increment</param>
+        /// <param name="divider">The divider between the name and the number (default _)</param>
+        /// <param name="initial">The initial number to append</param>
+        /// <returns>The new name</returns>
+        public static string IncrementName(string name, string divider = "_", int initial = 1)
+        {
+            var match = Regex.Match(name, divider + "(\\d+)$");
+            if (match.Success)
+                return name.Substring(0, match.Groups[1].Index) + (int.Parse(match.Groups[1].Value) + 1).ToString();
+            else
+                return name + divider + initial.ToString();
         }
 
         public static float LineIntersectAaBbX(Vector2 a, Vector2 b, float xLine)
