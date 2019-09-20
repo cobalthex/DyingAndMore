@@ -108,11 +108,9 @@ List {
 						};
 					];
 				};
-				Static {
-					BackgroundColor: [255 255 255 127];
-					VerticalAlignment: Alignment.Stretch;
-					Size: [1 NaN];
-				}
+
+				Divider { Direction: Direction.Vertical; Padding: 10; };
+
 				List {
 					Direction: Direction.Vertical;
 					Margin: 10;

@@ -103,14 +103,11 @@
     <Compile Include="Map.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Balloon.cs" />
-    <Compile Include="UI\ControllerSelect.cs" />
     <Compile Include="UI\Devtools.cs" />
+    <Compile Include="UI\Divider.cs" />
     <Compile Include="UI\EntViewer.cs" />
-    <Compile Include="UI\FactionSelect.cs" />
-    <Compile Include="UI\SquadSelect.cs" />
+    <Compile Include="UI\Selects.cs" />
     <Compile Include="UI\TestSizer.cs" />
-    <Compile Include="UI\TriggerFilterSelect.cs" />
-    <Compile Include="UI\WeaponSelect.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <Content Include="$(MediaDir)Content\**\*.*">

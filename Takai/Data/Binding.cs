@@ -374,6 +374,8 @@ namespace Takai.Data
             else
                 getset = GetSet.GetMemberAccessors(obj, binding, allowNonPublic);
 
+            //todo: magic properties set by binder (e.g. index counters for lists, something like :index)
+
             if (getset.get == null && getset.set == null)
                 System.Diagnostics.Debug.WriteLine($"Binding '{binding}' does not exist in '{obj.GetType()}'");
 

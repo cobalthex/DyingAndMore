@@ -34,6 +34,27 @@ namespace Takai.Data
     }
 
     /// <summary>
+    /// Specifies which member of a class can be used to accept nested objects from the Tk syntax
+    /// e.g.
+    /// <code>List {
+    ///     ChildItem1 { }
+    ///     ChildItem2 { }
+    /// }</code>.
+    /// Custom derived types work as well
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct)]
+    public class AutoChildrenAttribute : Attribute
+    {
+        internal string memberName;
+        internal MemberInfo member;
+
+        public AutoChildrenAttribute(string member)
+        {
+            memberName = member;
+        }
+    }
+
+    /// <summary>
     /// Allows for custom deserialization on top of the default deserialization
     /// </summary>
     public interface IDerivedDeserialize

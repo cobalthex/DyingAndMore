@@ -37,8 +37,11 @@ List {
                             ];
                         };
 
+                        Divider { };
+
                         Static { Text: "`_Filter"; }
                         TriggerFilterSelect {
+                            HorizontalAlignment: Alignment.Stretch;
                         	Bindings: [
                                 {
                                     Direction: BindingDirection.TwoWay;
@@ -49,6 +52,7 @@ List {
                         }
 
 						Switch {
+                            HorizontalAlignment: Alignment.Stretch;
 							Bindings: [
 							    Binding {
 							        Source: "Filter:typename";
@@ -57,10 +61,12 @@ List {
 							];
 							Items: {
 							    ActorTriggerFilter: List {
+                                    HorizontalAlignment: Alignment.Stretch;
 							    	Margin: 10;
 							    	Children: [
 							    		Static { Text: "`_Factions"; }
 							    		FactionSelect {
+                                            HorizontalAlignment: Alignment.Stretch;
 				                        	Bindings: [
 				                                {
 				                                    Direction: BindingDirection.TwoWay;
@@ -73,6 +79,124 @@ List {
 							    }
 							};
 						};
+
+                        Divider { };
+
+                        Static { Text: "`_Commands (On Enter)"; }
+                        GameCommandsList {
+                            HorizontalAlignment: Alignment.Stretch;
+                            Bindings: [
+                                {
+                                    Direction: BindingDirection.TwoWay;
+                                    Source: "OnEnterCommands";
+                                    Target: "Items";
+                                };
+                            ];
+
+                            ItemTemplate: List {
+                                Direction: Direction.Horizontal;
+                                Margin: 10;
+                                Children: [
+                                    Static {
+                                        Bindings: [
+                                            Binding {
+                                                Source: ":typename";
+                                                Target: "Text";
+                                            };
+                                        ];
+                                    };
+                                    Static { Text: "->"; };
+                                    Static {
+                                        Bindings: [
+                                            Binding {
+                                                Source: "ActionName";
+                                                Target: "Text";
+                                            };
+                                        ];
+                                    };
+                                ];
+                            };
+
+                            AddItemTemplate: List {
+                                HorizontalAlignment: Alignment.Stretch;
+                                Margin: 10;
+                                Children: [
+                                    GameCommandSelect {
+                                        HorizontalAlignment: Alignment.Stretch;
+                                        Bindings: [
+                                            Binding {
+                                                Source: "item";
+                                                Target: "Instance";
+                                                Direction: BindingDirection.TwoWay;
+                                            }
+                                        ];
+                                    }
+
+                                    Static { Text: "Action"; }
+                                    TextInput {
+                                        HorizontalAlignment: Alignment.Stretch;
+                                        Bindings: [
+                                            Binding {
+                                                Source: "item.ActionName";
+                                                Target: "Text";
+                                                Direction: BindingDirection.TwoWay;
+                                            };
+                                        ];
+                                    }
+
+                                    Switch {
+                                        Bindings: [
+                                            Binding {
+                                                Source: "item:typename";
+                                                Target: "Value";
+                                            }
+                                        ];
+                                        Items: {
+                                            SpawnSquadCommand: SquadSelect {
+                                                Bindings: [
+                                                    Binding {
+                                                        Source: "item.SquadName";
+                                                        Target: "Squad.Name";
+                                                        Direction: BindingDirection.TwoWay;
+                                                    };
+                                                ]
+                                                ItemTemplate: {
+                                                    Bindings: [
+                                                        Binding {
+                                                            Source: "Name";
+                                                            Target: "Text";
+                                                            Direction: BindingDirection.TwoWay;
+                                                        };
+                                                    ]
+                                                }
+                                            };
+                                        };
+                                    };
+                                    Static {
+                                        Text: "Add Command";
+                                        EventCommands: {
+                                            Click: "AddItem";
+                                        }
+                                    }
+                                ];
+                            };
+                        };
+
+                        Divider { };
+
+                        Static { Text: "`_Effects (On Enter)"; }
+                        EffectsSelect {
+                            HorizontalAlignment: Alignment.Stretch;
+                            Bindings: [
+                                {
+                                    Direction: BindingDirection.TwoWay;
+                                    Source: "OnEnterEffects";
+                                    Target: "SelectedItem";
+                                };
+                            ];
+                        }
+
+                        Divider { };
 
                         Static { Text: "`_Max Uses"; }
                         NumericInput {
