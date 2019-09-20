@@ -5,6 +5,9 @@ using Takai.Game;
 
 namespace DyingAndMore.Game
 {
+    /// <summary>
+    /// commands that affect the game (like complete level/etc)
+    /// </summary>
     class GameCommand : Takai.Game.GameCommand
     {
         public override void Invoke(MapBaseInstance map)
