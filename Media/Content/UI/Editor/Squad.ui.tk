@@ -140,8 +140,8 @@ List {
 											Direction: BindingDirection.TwoWay;
 										};
 									];
-									ItemTemplate: @"./ActorPreview.ui.tk";
-									AddItemTemplate: Static {
+									ItemUI: @"./ActorPreview.ui.tk";
+									AddItemUI: Static {
 										Children: [
 											Static {
 												Text: "Select actor";
@@ -221,8 +221,8 @@ List {
 											Direction: BindingDirection.TwoWay;
 										};
 									];
-									ItemTemplate: @"./ActorPreview.ui.tk";
-									AddItemTemplate: Static {
+									ItemUI: @"./ActorPreview.ui.tk";
+									AddItemUI: Static {
 										Children: [
 											Static {
 												Text: "Select actor";

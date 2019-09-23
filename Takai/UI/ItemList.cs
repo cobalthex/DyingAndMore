@@ -48,22 +48,22 @@ namespace Takai.UI
         /// Values are bound using bindings
         /// Items are recreated whenever this is modified
         /// </summary>
-        public Static ItemTemplate
+        public Static ItemUI
         {
-            get => _itemTemplate;
+            get => _itemUI;
             set
             {
-                if (value == _itemTemplate)
+                if (value == _itemUI)
                     return;
 
-                System.Diagnostics.Contracts.Contract.Assume(value != null, nameof(ItemTemplate) + " cannot be null");
-                _itemTemplate = value;
+                System.Diagnostics.Contracts.Contract.Assume(value != null, nameof(ItemUI) + " cannot be null");
+                _itemUI = value;
 
                 int focusIndex = -1;
                 var focused = FindFocusedNoParent();
                 if (focused != null && focused.Parent == this)
                     focusIndex = focused.ChildIndex;
-                
+
                 Container.RemoveAllChildren();
                 var newChildren = new System.Collections.Generic.List<Static>(Items.Count);
                 for (int i = 0; i < Items.Count; ++i)
@@ -73,7 +73,7 @@ namespace Takai.UI
                     Container.Children[focusIndex].HasFocus = true;
             }
         }
-        private Static _itemTemplate = null;
+        private Static _itemUI = null;
 
         /// <summary>
         /// Where to render the items to
@@ -150,10 +150,17 @@ namespace Takai.UI
 #pragma warning disable CS0649
             public T item;
 #pragma warning restore CS0649
+
+            public NewItemContainer() { }
+
+            public NewItemContainer(NewItemContainer proto)
+            {
+                item = (T)Util._ShallowClone_Slow(proto.item);
+            }
         }
 
         /// <summary>
-        /// An optional template to add a new item
+        /// An optional UI template to add a new item
         /// If null, the list is not user editable
         /// UI will be cloned from value passed in
         ///
@@ -162,30 +169,43 @@ namespace Takai.UI
         ///
         /// Actions:
         ///     Add: add the item to the list and reset the template
+        ///     Remove(index): remove the specified index from the list
         ///     Clear: reset the template
         /// </summary>
-        public Static AddItemTemplate //todo: should this go inside the container?
+        public Static AddItemUI //todo: should this go inside the container?
         {
-            get => _addItemTemplate;
+            get => _addItemUI;
             set
             {
-                if (value == _addItemTemplate)
+                if (value == _addItemUI)
                     return;
 
-                if (_addItemTemplate != null)
-                    RemoveChild(_addItemTemplate);
+                if (_addItemUI != null)
+                    RemoveChild(_addItemUI);
 
-                _addItemTemplate = value.CloneHierarchy();
-                if (_addItemTemplate != null)
+                _addItemUI = value.CloneHierarchy();
+                if (_addItemUI != null)
                 {
-                    newItem = new NewItemContainer();
-                    _addItemTemplate.BindTo(newItem);
-                    AddChild(_addItemTemplate);
+                    _addItemUI.BindTo(newItem);
+                    AddChild(_addItemUI);
                 }
             }
         }
-        private Static _addItemTemplate;
+        private Static _addItemUI;
         private NewItemContainer newItem = new NewItemContainer();
+
+        /// <summary>
+        /// The item for the AddItemTemplate
+        /// </summary>
+        public T AddItemTemplate
+        {
+            get => newItem.item;
+            set
+            {
+                newItem.item = value;
+                _addItemUI?.BindTo(newItem);
+            }
+        }
 
         //add item item template
 
@@ -193,7 +213,7 @@ namespace Takai.UI
         {
             Items = new ObservableCollection<T>();
             AddChild(Container);
-
+            
             CommandActions["ChangeSelection"] = delegate (Static sender, object arg)
             {
                 ((ItemList<T>)sender).SelectedIndex = (int)arg;
@@ -207,7 +227,8 @@ namespace Takai.UI
                     return;
 
                 il.Items.Add(il.newItem.item);
-                il.AddItemTemplate.BindTo(il.newItem);
+                il.newItem = new NewItemContainer(il.newItem);
+                il.AddItemUI.BindTo(il.newItem);
             };
 
             CommandActions["RemoveItem"] = delegate (Static sender, object arg)
@@ -252,11 +273,11 @@ namespace Takai.UI
         {
             Items = new ObservableCollection<T>(Items);
             _container = Children[Container.ChildIndex];
-            if (_addItemTemplate != null)
+            if (_addItemUI != null)
             {
-                newItem = new NewItemContainer();
-                _addItemTemplate = Children[_addItemTemplate.ChildIndex];
-                _addItemTemplate.BindTo(newItem);
+                newItem = new NewItemContainer(newItem);
+                _addItemUI = Children[_addItemUI.ChildIndex];
+                _addItemUI.BindTo(newItem);
             }
             base.FinalizeClone();
         }
@@ -326,10 +347,10 @@ namespace Takai.UI
         /// <returns>The item created</returns>
         protected Static CreateItemEntry(T value)
         {
-            if (ItemTemplate == null)
+            if (ItemUI == null)
                 throw new NullReferenceException("ItemTemplate cannot be null");
 
-            var item = ItemTemplate.CloneHierarchy();
+            var item = ItemUI.CloneHierarchy();
             item.BindTo(value);
             item.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {

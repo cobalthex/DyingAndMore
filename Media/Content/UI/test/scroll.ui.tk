@@ -4,7 +4,7 @@
 	HorizontalAlignment: Alignment.Middle;
 	VerticalAlignment: Alignment.Middle;
 
-	ScrollBarTemplate: {
+	ScrollBarUI: {
 		BorderColor: [255 255 255 64];
 		ThumbColor: Color.LightSteelBlue;
 		Padding: [2 2];
@@ -45,7 +45,7 @@ Static {
 						Direction: Direction.Vertical;
 						Margin: 10;
 					}
-					ItemTemplate: Static { Text: "AAA"; Size: [100 100]; };
+					ItemUI: Static { Text: "AAA"; Size: [100 100]; };
 					Items: [
 						@"Actors/player.ent.tk";
 						@"Actors/player.ent.tk";

@@ -280,7 +280,7 @@ namespace Takai.UI
         /// <summary>
         /// An optional style to apply to the scrollbars (write-only)
         /// </summary>
-        public ScrollBar ScrollBarTemplate
+        public ScrollBar ScrollBarUI
         {
             set
             {
@@ -346,7 +346,7 @@ namespace Takai.UI
 
         public Vector2 ContentSize { get; private set; }
 
-        public override bool CanFocus => true;
+        public override bool CanFocus => true; //dont draw focus rect
 
         /// <summary>
         /// when resizing, if the previous scroll position was at the end, stay at the end
@@ -355,7 +355,7 @@ namespace Takai.UI
 
         public ScrollBox()
         {
-            ScrollBarTemplate = new ScrollBar();
+            ScrollBarUI = new ScrollBar();
 
             base.InternalInsertChild(verticalScrollbar, 0, false);
             base.InternalInsertChild(horizontalScrollbar, 1, true);

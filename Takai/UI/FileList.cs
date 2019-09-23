@@ -76,7 +76,7 @@ namespace Takai.UI
                     new Data.Binding("LastWriteTime", "Text")
                 }
             });
-            ItemTemplate = template;
+            ItemUI = template;
 
             On(SelectionChangedEvent, OnSelectionChanged);
         }
@@ -98,7 +98,7 @@ namespace Takai.UI
 
             if (Path != BasePath)
             {
-                var prevItem = ItemTemplate.CloneHierarchy();
+                var prevItem = ItemUI.CloneHierarchy();
                 prevItem.On("Click", delegate (Static sender, UIEventArgs e)
                 {
                     Path = Directory.GetParent(Path).FullName;

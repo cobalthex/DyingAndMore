@@ -11,7 +11,7 @@ List {
         Scrollbox {
             Size: [300 400];
             InnerPadding: 10;
-            ScrollBarTemplate: {
+            ScrollBarUI: {
                 Padding: 3;
                 BorderColor: Color.White;
             }

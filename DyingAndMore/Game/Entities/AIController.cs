@@ -87,8 +87,6 @@ namespace DyingAndMore.Game.Entities
         [Takai.Data.Serializer.Ignored]
         public Behavior[] ChosenBehaviors { get; set; } = new Behavior[(int)BehaviorMask._Count_];
 
-        Random random = new Random();
-
         [Takai.Data.Serializer.AsReference]
         public ActorInstance Target
         {
@@ -160,7 +158,7 @@ namespace DyingAndMore.Game.Entities
             {
                 if (behaviorCosts[i].Count > 0)
                 {
-                    var choice = random.Next(0, behaviorCosts[i].Count);
+                    var choice = Util.RandomGenerator.Next(0, behaviorCosts[i].Count);
                     ChosenBehaviors[i] = behaviorCosts[i][choice].behavior;
                     ChosenBehaviors[i].Think(deltaTime);
                     behaviorCosts[i].Clear();

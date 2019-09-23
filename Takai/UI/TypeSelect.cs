@@ -33,7 +33,7 @@ namespace Takai.UI
 
         public TypeSelect()
         {
-            ItemTemplate = new Static
+            ItemUI = new Static
             {
                 Bindings = new List<Data.Binding>
                 {
