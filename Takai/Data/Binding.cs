@@ -154,6 +154,12 @@ namespace Takai.Data
                     getset.get = () => oget()?.GetHashCode() ?? 0;
                     return getset;
                 }
+                else if (modifier[1].Equals("string", StringComparison.OrdinalIgnoreCase))
+                {
+                    getset.type = typeof(string);
+                    getset.get = () => oget()?.ToString() ?? "[null]";
+                    return getset;
+                }
                 else
                     System.Diagnostics.Debug.WriteLine($"Ignoring unknown binding modifier {modifier[0]}:{modifier[1]}");
             }
@@ -294,14 +300,6 @@ namespace Takai.Data
 
         public static int TotalUpdateCount { get; private set; } = 0;
 #endif
-
-        delegate object CloneFn(object source);
-        private static CloneFn cloneFn;
-        static Binding()
-        {
-            var clone = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
-            cloneFn = (CloneFn)clone.CreateDelegate(typeof(CloneFn));
-        }
 
         public Binding() { }
         public Binding(string source, string target, BindingDirection mode = BindingDirection.OneWay, object defaultValue = null)

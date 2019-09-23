@@ -26,11 +26,11 @@ namespace DyingAndMore.UI
     {
         public GameCommandSelect()
         {
-            AddTypeTree<GameCommand>();
+            AddTypeTree<ICommand>();
         }
     }
 
-    class GameCommandsList : ItemList<GameCommand> { }
+    class GameCommandsList : ItemList<ICommand> { }
 
     public class WeaponSelect : ObjectSelect<WeaponClass, WeaponInstance>
     {
@@ -55,7 +55,7 @@ namespace DyingAndMore.UI
         public EffectsSelect()
             : base()
         {
-            ItemTemplate = new Static
+            ItemUI = new Static
             {
                 Bindings = new System.Collections.Generic.List<Takai.Data.Binding>
                 {

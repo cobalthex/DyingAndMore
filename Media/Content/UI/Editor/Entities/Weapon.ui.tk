@@ -49,7 +49,7 @@ List {
 			    					Direction: BindingDirection.TwoWay;
 			    				}
 			    			];
-			    			ItemTemplate: List {
+			    			ItemUI: List {
 			    				HorizontalAlignment: Alignment.Stretch;
 			    				Children: [
 			    					Static {

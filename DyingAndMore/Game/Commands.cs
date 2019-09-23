@@ -8,9 +8,12 @@ namespace DyingAndMore.Game
     /// <summary>
     /// commands that affect the game (like complete level/etc)
     /// </summary>
-    class GameCommand : Takai.Game.GameCommand
+    class GameCommand : ICommand
     {
-        public override void Invoke(MapBaseInstance map)
+        public string ActionName { get; set; }
+        public object ActionParameter { get; set; }
+
+        public void Invoke(MapBaseInstance map)
         {
             if (GameInstance.Current != null &&
                 GameInstance.Current.GameActions.TryGetValue(ActionName, out var action))
@@ -18,11 +21,14 @@ namespace DyingAndMore.Game
         }
     }
 
-    class SpawnSquadCommand : Takai.Game.GameCommand
+    class SpawnSquadCommand : ICommand
     {
+        string ICommand.ActionName { get; set; }
+        object ICommand.ActionParameter { get; set; }
+
         public string SquadName { get; set; } = null;
 
-        public override void Invoke(MapBaseInstance map)
+        public void Invoke(MapBaseInstance map)
         {
             var minst = (MapInstance)map;
             if (minst == null)
@@ -30,6 +36,11 @@ namespace DyingAndMore.Game
             var squad = minst.Squads[SquadName];
             if (squad != null)
                 minst.Spawn(squad);
+        }
+
+        public override string ToString()
+        {
+            return nameof(SpawnSquadCommand) + $" - Squad: {SquadName}";
         }
     }
 }

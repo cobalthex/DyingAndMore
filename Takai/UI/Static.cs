@@ -140,8 +140,6 @@ namespace Takai.UI
         }
     }
 
-    //todo: invalidation/dirty states, instead of reflow each time property is updated, mark dirty. On next update, reflow if dirty
-
     public struct EventCommandBinding
     {
         public string command;

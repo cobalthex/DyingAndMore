@@ -1,11 +1,11 @@
 ﻿namespace Takai.Game
 {
-    public abstract class GameCommand
+    public interface ICommand
     {
-        public string ActionName { get; set; }
-        public object ActionParameter { get; set; }
+        string ActionName { get; set; }
+        object ActionParameter { get; set; }
 
-        public abstract void Invoke(MapBaseInstance map);
+        void Invoke(MapBaseInstance map);
     }
 
     public delegate void CommandAction(object parameter);
@@ -14,11 +14,14 @@
 
     //todo: command delays?
     
-    public class EntityCommand : GameCommand
+    public class EntityCommand : ICommand
     {
+        public string ActionName { get; set; }
+        public object ActionParameter { get; set; }
+
         public EntityInstance Target { get; set; }
 
-        public override void Invoke(MapBaseInstance map)
+        public void Invoke(MapBaseInstance map)
         {
             if (ActionName == null ||
                 Target?.Actions == null ||

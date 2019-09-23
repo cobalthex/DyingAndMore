@@ -247,7 +247,7 @@ namespace Takai.Game
         /// <summary>
         /// Event handlers for this entity. Set by <see cref="EntityClass.Events"/>
         /// </summary>
-        public Dictionary<string, List<GameCommand>> EventHandlers { get; set; }
+        public Dictionary<string, List<ICommand>> EventHandlers { get; set; }
 
         /// <summary>
         /// Actions that this entity can perform

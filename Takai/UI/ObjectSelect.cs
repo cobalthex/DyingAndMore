@@ -50,7 +50,7 @@ namespace Takai.UI
         {
             BorderColor = Microsoft.Xna.Framework.Color.White;
 
-            ItemTemplate = new Static
+            ItemUI = new Static
             {
                 Bindings = new List<Data.Binding>
                 {

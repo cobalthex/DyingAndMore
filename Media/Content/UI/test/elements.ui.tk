@@ -23,7 +23,7 @@ ScrollBox {
 	#Padding: 20;
 	BorderColor: Color.Gray;
 
-	ScrollBarTemplate: {
+	ScrollBarUI: {
 		Padding: 0;
 		BorderColor: Color.Gray;
 		ThumbColor: [192 192 192 128];
@@ -108,7 +108,7 @@ ScrollBox {
 				};
 
 				# meter
-			
+
 				Static { Text: "Horizontal\nList"; };
 				List {
 					Name: "HorizontalList";

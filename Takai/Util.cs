@@ -6,6 +6,13 @@ namespace Takai
 {
     public static class Util
     {
+        static Util()
+        {
+            var clone = typeof(object).GetMethod("MemberwiseClone", 
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            _ShallowClone_Slow = (CloneFn)clone.CreateDelegate(typeof(CloneFn));
+        }
+
         public static uint NextPowerOf2(uint n)
         {
             --n;
@@ -366,6 +373,9 @@ namespace Takai
         {
             return a.X + ((yLine - a.Y) / ((b.Y - a.Y) / (b.X - a.X)));
         }
+
+        public delegate object CloneFn(object source);
+        public static CloneFn _ShallowClone_Slow { get; }
     }
 
     public struct Extent

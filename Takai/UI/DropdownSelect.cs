@@ -28,7 +28,7 @@ namespace Takai.UI
 
         public float DropdownMaxHeight { get; set; } = 300;
 
-        public Static ItemTemplate { get => list.ItemTemplate; set => list.ItemTemplate = value; }
+        public Static ItemUI { get => list.ItemUI; set => list.ItemUI = value; }
 
         public System.Collections.Generic.IList<T> Items => list.Items;
 
