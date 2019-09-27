@@ -1,0 +1,58 @@
+MapInstance {
+    Squads: {
+        asdf: Squad {
+            Name: "asdf";
+            LeaderTemplate: Null;
+            UnitsTemplate: Null;
+            SpawnPosition: [27.00028 46.00016];
+            SpawnRadius: 44.82163;
+            DontSpawnAutomatically: False;
+            MinLiveCount: 0;
+            MaxLiveCount: 1;
+            MaxSpawnCount: 0;
+            SpawnDelay: 0;
+            ResetDelay: 0;
+            DisableSpawningIfLeaderIsDead: False;
+            Leader: Null;
+            Units: [];
+            TotalSpawnCount: 0;
+            LastSpawnTime: 0;
+        };
+    };
+    Class: MapClass {
+        Name: "2x2 tiles";
+        TileSize: 48;
+        Tileset: Tileset {
+            texture: "Tilesets/Tiles2.png";
+            size: 48;
+        };
+        MaterialInteractions: @"Materials/Test.mtl.tk";
+        TilesMaterial: "Tiles";
+        TilesImage: "Tilesets/Tiles2.png";
+        Width: 2;
+        Height: 2;
+        Tiles: [3 3 3 3];
+    };
+    Sounds: [];
+    ElapsedTime: 10313.5246;
+    TimeScale: 1;
+    currentScreenFade: ScreenFade {
+        Duration: 0;
+        Colors: Null;
+        Blend: Null;
+    };
+    currentScreenFadeElapsedTime: 10313.5246;
+    Entities: [];
+    Triggers: [
+        Trigger {
+            Name: "asdf";
+            Region: [15 24 59 55];
+            Filter: Null;
+            OnEnterCommands: [];
+            OnEnterEffects: Null;
+            MaxUses: 0;
+            UseCount: 0;
+        }
+    ];
+    Fluids: [];
+}

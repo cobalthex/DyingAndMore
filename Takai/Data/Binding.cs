@@ -17,7 +17,6 @@ namespace Takai.Data
 
         internal object cachedValue;
         internal int cachedHash;
-        internal bool isCollection;
 
         private const BindingFlags LookupFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
 
@@ -108,9 +107,6 @@ namespace Takai.Data
                         getset.get = () => prop.GetValue(obj);
                     if (prop.CanWrite)
                         getset.set = (value) => prop.SetValue(obj, value);
-
-                    //getset.get = prop.CanRead ? (Func<object>)prop.GetGetMethod(false).CreateDelegate(typeof(Func<object>), obj) : null;
-                    //getset.set = prop.CanWrite ? (Action<object>)prop.GetSetMethod(false).CreateDelegate(typeof(Action<object>), obj) : null;
                 }
                 else
                 {
@@ -139,6 +135,7 @@ namespace Takai.Data
                     getset.type = typeof(Type);
                     //getset.get = () => objType;
                     getset.get = () => oget()?.GetType(); //live type (works w/ polymorphism)
+                    getset.set = null;
                     return getset;
                 }
                 else if (modifier[1].Equals("typename", StringComparison.OrdinalIgnoreCase))
@@ -146,25 +143,27 @@ namespace Takai.Data
                     getset.type = typeof(string);
                     //getset.get = () => objType.Name;
                     getset.get = () => oget()?.GetType().Name; //live type (works w/ polymorphism)
+                    getset.set = null;
                     return getset;
                 }
                 else if (modifier[1].Equals("hash", StringComparison.OrdinalIgnoreCase))
                 {
                     getset.type = typeof(int);
                     getset.get = () => oget()?.GetHashCode() ?? 0;
+                    getset.set = null;
                     return getset;
                 }
                 else if (modifier[1].Equals("string", StringComparison.OrdinalIgnoreCase))
                 {
                     getset.type = typeof(string);
                     getset.get = () => oget()?.ToString() ?? "[null]";
+                    getset.set = null;
                     return getset;
                 }
                 else
                     System.Diagnostics.Debug.WriteLine($"Ignoring unknown binding modifier {modifier[0]}:{modifier[1]}");
             }
 
-            //getset.recursiveGets = recursives;
             return getset;
         }
     }
@@ -342,8 +341,6 @@ namespace Takai.Data
                     srcVal = DefaultValue;
                 targetAccessors.set(Converter.Convert(targetAccessors.type, srcVal));
                 sourceAccessors.cachedValue = targetAccessors.cachedValue = srcVal;// sourceAccessors.type.IsClass ? cloneFn(srcVal) : srcVal;
-                sourceAccessors.isCollection = targetAccessors.isCollection 
-                    = typeof(System.Collections.ICollection).IsInstanceOfType(srcVal);
                 if (srcVal != null)
                     sourceAccessors.cachedHash = targetAccessors.cachedHash = srcVal.GetHashCode();
             }
@@ -388,33 +385,32 @@ namespace Takai.Data
         /// <returns>True if the binding's value was updated</returns>
         public bool Update()
         {
-            if (targetAccessors.set == null)
-                return false;
-
-            var srcVal = sourceAccessors.get?.Invoke() ?? null;
-            var srcHash = srcVal == null ? 0 : srcVal.GetHashCode();
-            var srcMatches = (srcHash == sourceAccessors.cachedHash &&
-                             (srcVal == null ? sourceAccessors.cachedValue == null : //srcVal.Equals(sourceAccessors.cachedValue)));
-                                   BothEqual(srcVal, sourceAccessors.cachedValue, sourceAccessors.isCollection)));
-
-            if (!srcMatches)
+            if (targetAccessors.set != null)
             {
-                var bindVal = srcVal;
-                if (HasDefaultValue = (bindVal == null))
-                    bindVal = DefaultValue;
+                var srcVal = sourceAccessors.get?.Invoke() ?? null;
+                var srcHash = srcVal == null ? 0 : srcVal.GetHashCode();
+                var srcMatches = (srcHash == sourceAccessors.cachedHash &&
+                                 (srcVal == null ? sourceAccessors.cachedValue == null : srcVal.Equals(sourceAccessors.cachedValue)));
 
-                bindVal = Converter.Convert(targetAccessors.type, bindVal);
-                targetAccessors.set(bindVal);
+                if (!srcMatches)
+                {
+                    var bindVal = srcVal;
+                    if (HasDefaultValue = (bindVal == null))
+                        bindVal = DefaultValue;
 
-                sourceAccessors.cachedValue = srcVal;
-                sourceAccessors.cachedHash = srcHash;
-                targetAccessors.cachedValue = bindVal;
-                targetAccessors.cachedHash = bindVal == null ? 0 : bindVal.GetHashCode();
-                //System.Diagnostics.Debug.WriteLine($"Updated binding for source:{Source} ({sourceAccessors.cachedValue}) to target:{Target} ({srcVal})");
+                    bindVal = Converter.Convert(targetAccessors.type, bindVal);
+                    targetAccessors.set(bindVal);
+
+                    sourceAccessors.cachedValue = srcVal;
+                    sourceAccessors.cachedHash = srcHash;
+                    targetAccessors.cachedValue = bindVal;
+                    targetAccessors.cachedHash = bindVal == null ? 0 : bindVal.GetHashCode();
+                    //System.Diagnostics.Debug.WriteLine($"Updated binding for source:{Source} ({sourceAccessors.cachedValue}) to target:{Target} ({srcVal})");
 #if DEBUG
-                ++TotalUpdateCount;
+                    ++TotalUpdateCount;
 #endif
-                return true;
+                    return true;
+                }
             }
 
             if (Direction == BindingDirection.TwoWay && targetAccessors.get != null && sourceAccessors.set != null)
@@ -422,8 +418,7 @@ namespace Takai.Data
                 var tgtVal = targetAccessors.get();
                 var tgtHash = tgtVal == null ? 0 : tgtVal.GetHashCode();
                 var tgtMatches = (tgtHash == targetAccessors.cachedHash &&
-                                 (tgtVal == null ? targetAccessors.cachedValue == null : 
-                                    BothEqual(tgtVal, targetAccessors.cachedValue, targetAccessors.isCollection)));
+                                 (tgtVal == null ? targetAccessors.cachedValue == null : tgtVal.Equals(targetAccessors.cachedValue)));
 
                 if (!tgtMatches || isTargetDirty)
                 {
@@ -453,28 +448,6 @@ namespace Takai.Data
             */
 
             return false;
-        }
-
-        bool BothEqual(object a, object b, bool isCollection)
-        {
-            if (isCollection)
-            {
-                var ac = (System.Collections.ICollection)a;
-                var bc = (System.Collections.ICollection)b;
-                if (ac.Count != bc.Count)
-                    return false;
-                var ae = ac.GetEnumerator();
-                var be = bc.GetEnumerator();
-                for (var i = 0; i < ac.Count; ++i)
-                {
-                    ae.MoveNext();
-                    be.MoveNext();
-                    if (ae.Current != be.Current)
-                        return false;
-                }
-                return true;
-            }
-            return a.Equals(b);
         }
 
         public override string ToString()

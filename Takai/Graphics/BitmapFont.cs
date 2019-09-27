@@ -288,15 +288,16 @@ namespace Takai.Graphics
                 lineHeight = Math.Max(lineHeight, rgn.Height + Convert.ToInt32(underline));
             }
 
-            //todo: underline height?
+            const int underlineHeight = 1; //factor of line height?
             if (underline)
             {
-                Primitives2D.DrawFill(spriteBatch, curColor, new Rectangle(
+                var rect = new Rectangle(
                     bounds.X + underlineX,
-                    bounds.Y + curPos.Y + lineHeight - 1,
+                    bounds.Y + curPos.Y + lineHeight - underlineHeight,
                     curPos.X - underlineX,
-                    1
-                ));
+                    underlineHeight
+                );
+                Primitives2D.DrawFill(spriteBatch, curColor, Rectangle.Intersect(rect, bounds));
             }
             return curPos - bounds.Location;
         }

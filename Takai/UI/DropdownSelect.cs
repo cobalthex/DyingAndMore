@@ -166,6 +166,7 @@ namespace Takai.UI
             var root = GetRoot();
             root.AddChild(dropdownContainer);
             InvalidateArrange();
+            // arrange now
         }
 
         public virtual void CloseDropDown()
