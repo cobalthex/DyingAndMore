@@ -9,8 +9,7 @@ List {
 
     Children: [
         Scrollbox {
-			CellColor: [50 100 200];
-            Size: [300 400];
+            Size: [400 400];
             InnerPadding: 10;
             ScrollBarUI: {
                 Padding: 3;
@@ -93,13 +92,12 @@ List {
                                 };
                             ];
 
-                            AddItemTemplate: EntityCommand { };
-
                             ItemUI: List {
                                 Direction: Direction.Horizontal;
                                 Margin: 10;
                                 Children: [
                                     Static {
+                                        name: "foo";
                                         Bindings: [
                                             Binding {
                                                 Source: ":string";
@@ -109,6 +107,8 @@ List {
                                     };
                                 ];
                             };
+
+                            AddItemTemplate: EntityCommand { };
 
                             AddItemUI: List {
                                 HorizontalAlignment: Alignment.Stretch;
@@ -125,6 +125,7 @@ List {
                                         ];
                                     }
 
+                                    #*
                                     Static { Text: "Action"; }
                                     TextInput {
                                         HorizontalAlignment: Alignment.Stretch;
@@ -136,32 +137,40 @@ List {
                                             };
                                         ];
                                     }
+                                    *#
 
                                     Switch {
+                                        ChildBindScope: "item";
                                         Bindings: [
                                             Binding {
                                                 Source: "item:typename";
                                                 Target: "Value";
                                             }
                                         ];
-                                        Items: {
-                                            SpawnSquadCommand: SquadSelect {
-                                                Bindings: [
-                                                    Binding {
-                                                        Source: "item.SquadName";
-                                                        Target: "SelectedItem.Name";
-                                                        Direction: BindingDirection.TwoWay;
-                                                    };
-                                                ]
-                                                ItemUI: {
-                                                    Bindings: [
-                                                        Binding {
-                                                            Source: "Name";
-                                                            Target: "Text";
-                                                            Direction: BindingDirection.TwoWay;
+                                        Items: { #todo: need to rethink design of this
+                                            SpawnSquadCommand: List {
+                                                Children: [
+                                                    Static { Text: "Squad"; };
+                                                    SquadSelect {
+                                                        Bindings: [
+                                                            Binding {
+                                                                Source: "SquadName";
+                                                                Target: "SelectedItem.name";
+                                                                Direction: BindingDirection.TwoWay;
+                                                            };
+                                                        ]
+                                                        ItemUI: {
+                                                            HorizontalAlignment: Alignment.Stretch;
+                                                            Bindings: [
+                                                                Binding {
+                                                                    Source: "Name";
+                                                                    Target: "Text";
+                                                                    Direction: BindingDirection.TwoWay;
+                                                                };
+                                                            ];
                                                         };
-                                                    ]
-                                                }
+                                                    };
+                                                ];
                                             };
                                         };
                                     };

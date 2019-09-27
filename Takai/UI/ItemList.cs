@@ -98,7 +98,7 @@ namespace Takai.UI
         }
         private Static _container = new List
         {
-            //HorizontalAlignment = Alignment.Stretch,
+            HorizontalAlignment = Alignment.Stretch,
             //VerticalAlignment = Alignment.Stretch
         };
 
@@ -183,7 +183,7 @@ namespace Takai.UI
                 if (_addItemUI != null)
                     RemoveChild(_addItemUI);
 
-                _addItemUI = value.CloneHierarchy();
+                _addItemUI = value.CloneHierarchy(); //todo: clone on create/add item
                 if (_addItemUI != null)
                 {
                     _addItemUI.BindTo(newItem);
@@ -206,8 +206,6 @@ namespace Takai.UI
                 _addItemUI?.BindTo(newItem);
             }
         }
-
-        //add item item template
 
         public ItemList()
         {

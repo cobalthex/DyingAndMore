@@ -754,8 +754,6 @@ namespace Takai.UI
                 bindScopeGetset = Data.GetSet.GetMemberAccessors(source, ChildBindScope);
                 childScope = bindScopeGetset.cachedValue = bindScopeGetset.get?.Invoke();
                 bindScopeGetset.cachedHash = (bindScopeGetset.cachedValue ?? 0).GetHashCode();
-
-                //todo: this is not dynamic
             }
 
             foreach (var child in Children)
@@ -780,7 +778,7 @@ namespace Takai.UI
             if (ChildBindScope == null)
                 return null;
 
-            return bindScopeGetset.cachedValue;
+            return bindScopeGetset.cachedValue; 
         }
 
         protected void BubbleEvent(string @event, UIEventArgs args)
@@ -832,7 +830,7 @@ namespace Takai.UI
 
         protected virtual void OnParentChanged(Static oldParent) { } //this event should not bubble and is internal
 
-        private void SetParentNoReflow(Static newParent)
+        private void SetParentNoReflow(Static newParent) //todo: re-evaluate necessity
         {
             var oldParent = _parent;
             _parent = newParent;
@@ -1703,23 +1701,21 @@ namespace Takai.UI
         /// <summary>
         /// Complete any pending reflows/arranges
         /// </summary>
-        /// <param name="maxCount">The maximum number of items to reflow at once/param>
-        public static void Reflow(int maxCount = 1000000000)//int.MaxValue)
+        public static void Reflow()
         {
-            //store queues in actual Queues?
-            for (int i = 0; i < System.Math.Min(maxCount, measureQueue.Count); ++i)
+            for (int i = 0; i < measureQueue.Count; ++i)
             {
                 measureQueue[i].Measure(measureQueue[i].lastMeasureAvailableSize);
-                if (!measureQueue[i].isMeasureValid)
+                if (!measureQueue[i].isMeasureValid) //todo: que?
                     measureQueue[i].Measure(new Vector2(InfiniteSize));
             }
             measureQueue.Clear();
-            for (int i = 0; i < System.Math.Min(maxCount, arrangeQueue.Count); ++i)
+            for (int i = 0; i < arrangeQueue.Count; ++i)
             {
                 if (!arrangeQueue[i].isArrangeValid)
                     arrangeQueue[i].Arrange(arrangeQueue[i].lastMeasureContainerBounds);
             }
-            //arrangeQueue.Clear();
+            arrangeQueue.Clear();
         }
         
         #endregion
@@ -1810,14 +1806,17 @@ namespace Takai.UI
                     binding.Update();
             }
 
+            //child bind scopes (hacky)
             if (bindScopeGetset.get != null)
             {
                 var newVal = bindScopeGetset.get();
                 var newHash = (newVal ?? 0).GetHashCode();
                 if (newHash != bindScopeGetset.cachedHash)
                 {
+                    bindScopeGetset = Data.GetSet.GetMemberAccessors(newVal, ChildBindScope);
                     bindScopeGetset.cachedValue = newVal;
                     bindScopeGetset.cachedHash = newHash;
+
                     foreach (var child in Children)
                         child.BindTo(newVal);
                 }
