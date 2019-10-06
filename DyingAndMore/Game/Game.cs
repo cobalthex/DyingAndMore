@@ -216,6 +216,8 @@ namespace DyingAndMore.Game
 
         protected void SelectPlayers()
         {
+            hudContainer.RemoveAllChildren();
+
             var possiblePlayers = new List<Entities.ActorInstance>();
 
             foreach (var ent in Map.AllEntities)
@@ -321,7 +323,6 @@ namespace DyingAndMore.Game
 
             updateSettingsPane?.BindTo(Map.updateSettings);
             renderSettingsPane?.BindTo(Map.renderSettings);
-            
             SelectPlayers();
         }
 
@@ -343,7 +344,7 @@ namespace DyingAndMore.Game
             updateSettingsPane?.BindTo(Map.updateSettings);
             renderSettingsPane?.BindTo(Map.renderSettings);
 
-            hudContainer.RemoveAllChildren(); //todo: huds getting fucked
+            SelectPlayers(); //todo: this will sometimes be called w/ OnMapChanged. Find a way to cut this to one
         }
 
         protected override void UpdateSelf(GameTime time)
@@ -583,6 +584,7 @@ namespace DyingAndMore.Game
             foreach (var ptype in Map.Particles)
                 particleCount += ptype.Value.Count;
 
+#if DEBUG
             DefaultFont.Draw(spriteBatch,
                 $"Total entities:{Map.AllEntities.Count()}" +
                 $"\nActive entities:{Map.UpdateStats.updatedEntities}" +
@@ -592,6 +594,7 @@ namespace DyingAndMore.Game
                 new Vector2(20, 200),
                 Color.Orange
             );
+#endif
         }
 
         protected void DrawHealthBar(SpriteBatch spriteBatch, Vector2 screenPosition, float health, float maxHealth)

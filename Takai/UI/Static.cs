@@ -162,6 +162,8 @@ namespace Takai.UI
     /// </summary>
     public class Static : Data.IDerivedDeserialize
     {
+        #region Events + Command Definitions
+
         //some standard/common events
         public const string PressEvent = "Press";
         public const string ClickEvent = "Click";
@@ -181,6 +183,8 @@ namespace Takai.UI
                 (System.StringComparer.OrdinalIgnoreCase)));
         }
         private static Dictionary<string, System.Action<Static, object>> _globalCommands;
+
+        #endregion
 
 #if DEBUG
         /// <summary>
@@ -211,20 +215,13 @@ namespace Takai.UI
 
         #region Properties
 
+        public static Dictionary<string, object> DefaultStyle { get; set; }
+
         /// <summary>
         /// A font to use for drawing debug info.
         /// If null, debug info is not drawn
         /// </summary>
         public static Graphics.BitmapFont DebugFont = null;
-
-        /// <summary>
-        /// The default font used for elements
-        /// </summary>
-        public static Graphics.BitmapFont DefaultFont = null;
-        /// <summary>
-        /// The default color used for element text
-        /// </summary>
-        public static Color DefaultColor = Color.White;
 
         /// <summary>
         /// The color to use when drawing the focus rectangle around the focused element
@@ -277,13 +274,13 @@ namespace Takai.UI
                 }
             }
         }
-        private Graphics.BitmapFont _font = DefaultFont;
+        private Graphics.BitmapFont _font;
 
         /// <summary>
         /// The color of this element. Usage varies between element types
         /// Usually applies to text color
         /// </summary>
-        public virtual Color Color { get; set; } = DefaultColor;
+        public virtual Color Color { get; set; }
 
         /// <summary>
         /// The color to draw the outline with, by default, transparent
@@ -2026,6 +2023,7 @@ namespace Takai.UI
                 }
             }
 
+#if DEBUG //todo: re-evaluate
             if (debugDraw != null)
             {
                 DebugFont.Draw(
@@ -2039,7 +2037,6 @@ namespace Takai.UI
                 );
 
                 debugDraw.DrawDebugInfo(spriteBatch);
-#if DEBUG
                 if (InputState.IsPress(Keys.Pause))
                     debugDraw.BreakOnThis();
 
@@ -2048,8 +2045,8 @@ namespace Takai.UI
                     using (var stream = new System.IO.StreamWriter(System.IO.File.OpenWrite("ui.tk")))
                         Data.Serializer.TextSerialize(stream, debugDraw, 0, false, false, true);
                 }
+        }
 #endif
-            }
         }
 
         private void BreakOnThis()
@@ -2216,6 +2213,30 @@ namespace Takai.UI
 
             if (props.TryGetValue("Height", out var height))
                 Size = new Vector2(Size.Y, Data.Serializer.Cast<float>(height));
+        }
+
+        protected T GetStyleRule<T>(Dictionary<string, object> props, string propName, T inheritedValue)
+        {
+            //Cast?
+            if (!props.TryGetValue(propName, out var sProp) || !(sProp is T prop))
+                prop = inheritedValue;
+            return prop;
+        }
+
+        public virtual void ApplyStyles(Dictionary<string, object> styleRules, Static parent = null)
+        {
+            bool isParentNull = parent == null;
+            Color = GetStyleRule(styleRules, "Color", isParentNull ? Color.White : parent.Color);
+            Font = GetStyleRule(styleRules, "Font", isParentNull ? null : parent.Font);
+            BorderColor = GetStyleRule(styleRules, "BorderColor", isParentNull ? Color.Transparent : parent.BorderColor);
+            BackgroundColor = GetStyleRule(styleRules, "BackgroundColor", isParentNull ? Color.Transparent : parent.BackgroundColor);
+            BackgroundSprite = GetStyleRule(styleRules, "BackgroundSprite", isParentNull ? null : parent.BackgroundSprite);
+
+            HorizontalAlignment = GetStyleRule(styleRules, "HorizontalAlignment", isParentNull ? Alignment.Start : parent.HorizontalAlignment);
+            VerticalAlignment = GetStyleRule(styleRules, "VerticalAlignment", isParentNull ? Alignment.Start : parent.VerticalAlignment);
+            Position = GetStyleRule(styleRules, "Position", isParentNull ? Vector2.Zero : parent.Position);
+            Size = GetStyleRule(styleRules, "Size", isParentNull ? Vector2.One : parent.Size);
+            Padding = GetStyleRule(styleRules, "Padding", isParentNull ? Vector2.Zero : parent.Padding);
         }
 
         #region Helpers
