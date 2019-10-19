@@ -34,6 +34,8 @@ namespace Takai.UI
         [Data.Serializer.Ignored]
         public int ScrollPosition { get; set; } = 0;
 
+        Vector2 textSize;
+
         /// <summary>
         /// The position of the caret. Text is inserted at the caret
         /// </summary>
@@ -347,6 +349,7 @@ namespace Takai.UI
         protected void UpdateVisibleText()
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
+            textSize = Font?.MeasureString(visibleText) ?? Vector2.Zero;
 
             BubbleEvent(TextChangedEvent, new UIEventArgs(this));
         }

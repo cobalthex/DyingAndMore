@@ -3,9 +3,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using System.Reflection;
+using System.Collections.Generic;
 using Takai.Data;
 using Takai.Input;
 using Takai.UI;
+
 
 namespace DyingAndMore
 {
@@ -113,10 +115,12 @@ namespace DyingAndMore
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
+            Static.Styles = Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.tk");
+
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            Static.DefaultFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
+            // = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
 
             //todo: move elsewhere
             Static.GlobalCommands["AddUI"] = delegate (Static ui, object arg)
@@ -271,19 +275,6 @@ namespace DyingAndMore
                 return UIEventResult.Handled;
             });
 
-            //childUI = new UI.TestSizer()
-            //{
-            //    Position = new Vector2(10),
-            //    BackgroundColor = new Color(200, 100, 40)
-            //};
-            //childUI = new ScrollBox(childUI)
-            //{
-            //    Size = new Vector2(300),
-            //    Position = new Vector2(50)
-            //};
-
-            //childUI = Cache.Load<Static>("UI/test/scrollbox.ui.tk");
-
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)
             //{
@@ -302,9 +293,11 @@ namespace DyingAndMore
             ui = new Static
             {
                 HorizontalAlignment = Alignment.Stretch,
-                VerticalAlignment = Alignment.Stretch
+                VerticalAlignment = Alignment.Stretch,
+                Style = "Static"
             };
             ui.AddChild(childUI);
+            
             //Static.DebugFont = Static.DefaultFont;
 
             //fpsGraph = new Takai.FpsGraph()
@@ -340,7 +333,7 @@ namespace DyingAndMore
 
             //F9 used in UI code
             else if (InputState.IsPress(Keys.F10))
-                Static.DebugFont = (Static.DebugFont == null ? Static.DefaultFont : null);
+                Static.DebugFont = (Static.DebugFont == null ? ui.Font : null);
             else if (InputState.IsPress(Keys.F11))
                 ui.DebugInvalidateTree();
 
@@ -360,10 +353,10 @@ namespace DyingAndMore
                 if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
                 {
                     var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
-                    var sz = Static.DefaultFont.MeasureString(text);
-                    Static.DefaultFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
+                    var sz = ui.Font.MeasureString(text);
+                    ui.Font.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
                 }
-                y -= Static.DefaultFont.MaxCharHeight;
+                y -= ui.Font.MaxCharHeight;
             }
 
             sbatch.End();

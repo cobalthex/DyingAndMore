@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
@@ -27,6 +28,13 @@ namespace Takai.UI
         public List() { }
         public List(params Static[] children)
             : base(children) { }
+
+        public override void ApplyStyles(Dictionary<string, object> styleRules)
+        {
+            base.ApplyStyles(styleRules);
+            Margin = GetStyleRule(styleRules, "Margin", Margin);
+            Direction = GetStyleRule(styleRules, "Direction", Direction);
+        }
 
         int stretches = 0;
         protected override Vector2 MeasureOverride(Vector2 availableSize)

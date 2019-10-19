@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Takai.Data
 {
+    //todo: late bound bindings (live bindings?, store all nested layers?)
     public struct GetSet
     {
         /// <summary>
@@ -27,8 +28,9 @@ namespace Takai.Data
 
             var objType = obj.GetType();
 
-            if (memberName.Equals("this", StringComparison.OrdinalIgnoreCase)) //experimental
+            if (memberName.Equals("this", StringComparison.OrdinalIgnoreCase))
             {
+                System.Diagnostics.Debug.WriteLine("Using 'this' for bindings is experimental and hacky");
                 return new GetSet
                 {
                     type = objType,
@@ -47,8 +49,8 @@ namespace Takai.Data
 
             var indirections = memberName.Split(new[] { '.' }, MaxIndirection + 1);
 
-            //NOTE: if any part of the hierarchy changes, this binding will point to the old version
-            //this is technically leaky and otherwise generally not desirable
+            //todo: get returns the nested most object
+            //set: each layer sets value and rebinds children recursively. some trickiness here
 
             for (int i = 0; i < indirections.Length - 1; ++i)
             {
@@ -58,7 +60,7 @@ namespace Takai.Data
                 }
                 catch (AmbiguousMatchException)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Ambiguous: {indirections[i]} ({memberName})");
+                    //System.Diagnostics.Debug.WriteLine($"Ambiguous: {indirections[i]} ({memberName})");
                     prop = objType.GetProperty(indirections[i], finalLookupFlags | BindingFlags.DeclaredOnly);
                 }
                 if (prop != null)

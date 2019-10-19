@@ -190,20 +190,20 @@ namespace DyingAndMore.Game
                 BorderColor = Color.Gray
             });
 
-            renderSettingsPane = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor);
+            renderSettingsPane = GeneratePropSheet(Map.renderSettings);
             renderSettingsPane.Name = "Render Settings";
             settingsConsole.AddChild(renderSettingsPane);
 
-            updateSettingsPane = GeneratePropSheet(Map.updateSettings, DefaultFont, DefaultColor);
+            updateSettingsPane = GeneratePropSheet(Map.updateSettings);
             updateSettingsPane.Name = "Update Settings";
             settingsConsole.AddChild(updateSettingsPane);
 
-            gameplaySettingsPane = GeneratePropSheet(GameplaySettings, DefaultFont, DefaultColor);
+            gameplaySettingsPane = GeneratePropSheet(GameplaySettings);
             gameplaySettingsPane.Name = "Gameplay Settings";
             settingsConsole.AddChild(gameplaySettingsPane);
 
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
-            Map.Class.DebugFont = DefaultFont;
+            Map.Class.DebugFont = Font; //todo: revisit
 
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
@@ -559,7 +559,7 @@ namespace DyingAndMore.Game
                     new Vector2(player.camera.Viewport.Right, player.camera.Viewport.Bottom),
                     new Vector2(player.camera.Viewport.Left, player.camera.Viewport.Bottom)
                 );
-                DefaultFont.Draw(spriteBatch,
+                Font.Draw(spriteBatch,
                     $"Health:{player.actor.CurrentHealth}/{player.actor.Class.MaxHealth}\n" +
                     $"Weapon:{player.actor.Weapon}",
                     new Vector2(player.camera.Viewport.Left + 10, player.camera.Viewport.Top + 10),
@@ -585,7 +585,7 @@ namespace DyingAndMore.Game
                 particleCount += ptype.Value.Count;
 
 #if DEBUG
-            DefaultFont.Draw(spriteBatch,
+            Font.Draw(spriteBatch,
                 $"Total entities:{Map.AllEntities.Count()}" +
                 $"\nActive entities:{Map.UpdateStats.updatedEntities}" +
                 $"\nTotal particles:{particleCount}" +

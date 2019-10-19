@@ -202,9 +202,11 @@ namespace Takai.Game
             public int visibleActiveFluids;
             public int visibleDecals;
             public int trailPointCount;
+            public System.TimeSpan lastFrameDuration;
         }
         public MapRenderStats RenderStats => _renderStats;
         protected MapRenderStats _renderStats;
+        internal System.Diagnostics.Stopwatch renderClock = new System.Diagnostics.Stopwatch();
 
         protected struct RenderedLight
         {
@@ -375,6 +377,7 @@ namespace Takai.Game
         /// <param name="postEffect">An optional fullscreen post effect to render with</param>
         public virtual void Draw(Camera camera)
         {
+            renderClock.Restart();
             _renderStats = new MapRenderStats
             {
                 trailPointCount = renderedTrailPointCount
@@ -506,6 +509,8 @@ namespace Takai.Game
 
             if (renderSettings.drawScreenEffects)
                 DrawScreenEffects(ref context);
+
+            _renderStats.lastFrameDuration = renderClock.Elapsed;
         }
 
         //todo: many of these iterate over visible sectors in a loop. Possible opportunity to combine

@@ -1,0 +1,5 @@
+{
+	Static : {
+		Font: @"Fonts/test.fnt.tk";
+	}
+}

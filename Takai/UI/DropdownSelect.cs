@@ -171,7 +171,6 @@ namespace Takai.UI
 
         public virtual void CloseDropDown()
         {
-            //todo: some hierarchy fuckup around here
             dropdownContainer.RemoveFromParent();
         }
 

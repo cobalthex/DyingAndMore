@@ -141,7 +141,7 @@ namespace DyingAndMore.Editor
             {
                 editor.Map.DrawRect(activeTrigger.Region, Color.GreenYellow);
                 var textPos = new Vector2(activeTrigger.Region.X + 10, activeTrigger.Region.Y + 5);
-                DefaultFont?.Draw(spriteBatch, activeTrigger.Name, editor.Camera.WorldToScreen(textPos), Color.White);
+                Font?.Draw(spriteBatch, activeTrigger.Name, editor.Camera.WorldToScreen(textPos), Color.White);
             }
             base.DrawSelf(spriteBatch);
         }

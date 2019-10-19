@@ -29,12 +29,12 @@ namespace DyingAndMore.UI
         }
         private Direction _direction;
 
-        public Divider()
+        public Divider() : base()
         {
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Center;
 
-            Color = new Color(DefaultColor, 127);
+            Color = new Color(Color, 127);
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)

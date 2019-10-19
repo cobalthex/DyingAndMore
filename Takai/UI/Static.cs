@@ -7,6 +7,8 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using Takai.Input;
 
+using Stylesheet = System.Collections.Generic.Dictionary<string, object>;
+
 namespace Takai.UI
 {
     /// <summary>
@@ -215,7 +217,26 @@ namespace Takai.UI
 
         #region Properties
 
-        public static Dictionary<string, object> DefaultStyle { get; set; }
+        /// <summary>
+        /// All available/known styles (Apply custom styles using <see cref="ApplyStyles(Stylesheet, Static)"/>)
+        /// </summary>
+        public static Dictionary<string, Stylesheet> Styles { get; set; }
+
+        const string DefaultStyleName = nameof(Static);
+
+        public string Style
+        {
+            get => _style;
+            set
+            {
+                if (_style == value)
+                    return;
+
+                _style = value;
+                ApplyStyles(GetStyles(_style));
+            }
+        }
+        private string _style;
 
         /// <summary>
         /// A font to use for drawing debug info.
@@ -227,9 +248,6 @@ namespace Takai.UI
         /// The color to use when drawing the focus rectangle around the focused element
         /// </summary>
         public static Color FocusedBorderColor = Color.RoyalBlue;
-
-        [Data.Serializer.Ignored]
-        public object UserData { get; set; } = null;
 
         /// <summary>
         /// A unique name for this element. Can be null
@@ -244,17 +262,14 @@ namespace Takai.UI
             get => _text;
             set
             {
-                if (_text != value)
-                {
-                    _text = value;
-                    if (Font != null && _text != null)
-                        textSize = Font.MeasureString(_text);
-                    InvalidateMeasure();
-                }
+                if (_text == value)
+                    return;
+
+                _text = value;
+                InvalidateMeasure();
             }
         }
         private string _text;
-        protected Vector2 textSize;
 
         /// <summary>
         /// The font to draw the text of this element with.
@@ -265,13 +280,11 @@ namespace Takai.UI
             get => _font;
             set
             {
-                if (_font != value)
-                {
-                    _font = value;
-                    if (_font != null && Text != null)
-                        textSize = Font.MeasureString(Text);
-                    InvalidateMeasure();
-                }
+                if (_font == value)
+                    return;
+
+                _font = value;
+                InvalidateMeasure();
             }
         }
         private Graphics.BitmapFont _font;
@@ -280,7 +293,7 @@ namespace Takai.UI
         /// The color of this element. Usage varies between element types
         /// Usually applies to text color
         /// </summary>
-        public virtual Color Color { get; set; }
+        public virtual Color Color { get; set; } = Color.White;
 
         /// <summary>
         /// The color to draw the outline with, by default, transparent
@@ -566,6 +579,7 @@ namespace Takai.UI
             DebugTreePath = $"/{(GetType().Name)}({DebugId})";
 #endif
             lastMeasureContainerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
+            Style = GetType().Name;
         }
 
         /// <summary>
@@ -825,7 +839,9 @@ namespace Takai.UI
 
         #region Hierarchy/Cloning
 
-        protected virtual void OnParentChanged(Static oldParent) { } //this event should not bubble and is internal
+        protected virtual void OnParentChanged(Static oldParent)
+        {
+        } //this event should not bubble and is internal
 
         private void SetParentNoReflow(Static newParent) //todo: re-evaluate necessity
         {
@@ -1508,11 +1524,11 @@ namespace Takai.UI
 
                 if (isWidthAutoSize)
                     size.X = measuredSize.X; //stretched items do have intrinsic size
-                    //size.X = isHStretch ? 0 : measuredSize.X; //stretched items have no intrinsic size
+                                             //size.X = isHStretch ? 0 : measuredSize.X; //stretched items have no intrinsic size
 
                 if (isHeightAutoSize)
                     size.Y = measuredSize.Y; //stretched items do have intrinsic size
-                    //size.Y = isVStretch ? 0 : measuredSize.Y; //stretched items have no intrinsic size
+                                             //size.Y = isVStretch ? 0 : measuredSize.Y; //stretched items have no intrinsic size
             }
 
             var lastMeasuredSize = MeasuredSize;
@@ -1560,8 +1576,12 @@ namespace Takai.UI
         /// <returns>The preferred size of this element</returns>
         protected virtual Vector2 MeasureOverride(Vector2 availableSize)
         {
+            var textSize = new Point();
+            if (Font != null && Text != null)
+                textSize = Font.MeasureString(Text).ToPoint();
+
             var bounds = Rectangle.Union(
-                new Rectangle(0, 0, (int)textSize.X, (int)textSize.Y),
+                new Rectangle(0, 0, textSize.X, textSize.Y),
                 DefaultMeasureSomeChildren(availableSize, 0, Children.Count)
             );
             return new Vector2(bounds.Width, bounds.Height);
@@ -1595,6 +1615,9 @@ namespace Takai.UI
 #if DEBUG
         private static uint totalMeasureCount = 0; //set breakpoint for speicifc reflow
         private static uint totalArrangeCount = 0; //set breakpoint for speicifc reflow
+        private static System.TimeSpan lastUpdateDuration;
+        private static System.TimeSpan lastDrawDuration;
+        private static System.Diagnostics.Stopwatch boop = new System.Diagnostics.Stopwatch();//todo: should be one for update and one for draw
 #endif
 
         /// <summary>
@@ -1725,6 +1748,7 @@ namespace Takai.UI
         /// <param name="time">Game time</param>
         public virtual void Update(GameTime time)
         {
+            boop.Restart();
             Reflow();
 
             if (!IsEnabled)
@@ -1788,6 +1812,7 @@ namespace Takai.UI
                 if (i < 0) //todo: does this skip the first child?
                     toUpdate = toUpdate.Parent;
             }
+            lastUpdateDuration = boop.Elapsed;
         }
 
         /// <summary>
@@ -1981,6 +2006,7 @@ namespace Takai.UI
         /// <param name="spriteBatch">The spritebatch to use</param>
         public virtual void Draw(SpriteBatch spriteBatch)
         {
+            boop.Restart();
             if (!IsEnabled)
                 return;
 
@@ -2045,8 +2071,10 @@ namespace Takai.UI
                     using (var stream = new System.IO.StreamWriter(System.IO.File.OpenWrite("ui.tk")))
                         Data.Serializer.TextSerialize(stream, debugDraw, 0, false, false, true);
                 }
-        }
+            }
 #endif
+            
+            lastDrawDuration = boop.Elapsed;
         }
 
         private void BreakOnThis()
@@ -2090,7 +2118,7 @@ namespace Takai.UI
         /// <param name="spriteBatch">The spritebatch to use</param>
         protected virtual void DrawSelf(SpriteBatch spriteBatch)
         {
-            DrawText(spriteBatch, ((new Vector2(ContentArea.Width, ContentArea.Height) - textSize) / 2).ToPoint());
+            DrawText(spriteBatch, Point.Zero);
         }
 
         /// <summary>
@@ -2215,28 +2243,52 @@ namespace Takai.UI
                 Size = new Vector2(Size.Y, Data.Serializer.Cast<float>(height));
         }
 
-        protected T GetStyleRule<T>(Dictionary<string, object> props, string propName, T inheritedValue)
+        protected T GetStyleRule<T>(Stylesheet styleRules, string propName, T fallback)
         {
             //Cast?
-            if (!props.TryGetValue(propName, out var sProp) || !(sProp is T prop))
-                prop = inheritedValue;
+            if (styleRules == null || !styleRules.TryGetValue(propName, out var sProp) || !(sProp is T prop))
+                prop = fallback;
             return prop;
         }
 
-        public virtual void ApplyStyles(Dictionary<string, object> styleRules, Static parent = null)
+        public static Stylesheet GetStyles(string styleName)
         {
-            bool isParentNull = parent == null;
-            Color = GetStyleRule(styleRules, "Color", isParentNull ? Color.White : parent.Color);
-            Font = GetStyleRule(styleRules, "Font", isParentNull ? null : parent.Font);
-            BorderColor = GetStyleRule(styleRules, "BorderColor", isParentNull ? Color.Transparent : parent.BorderColor);
-            BackgroundColor = GetStyleRule(styleRules, "BackgroundColor", isParentNull ? Color.Transparent : parent.BackgroundColor);
-            BackgroundSprite = GetStyleRule(styleRules, "BackgroundSprite", isParentNull ? null : parent.BackgroundSprite);
+            Stylesheet styles = null;
+            if (styleName != null)
+                Styles.TryGetValue(styleName, out styles);
+            return styles;
+        }
 
-            HorizontalAlignment = GetStyleRule(styleRules, "HorizontalAlignment", isParentNull ? Alignment.Start : parent.HorizontalAlignment);
-            VerticalAlignment = GetStyleRule(styleRules, "VerticalAlignment", isParentNull ? Alignment.Start : parent.VerticalAlignment);
-            Position = GetStyleRule(styleRules, "Position", isParentNull ? Vector2.Zero : parent.Position);
-            Size = GetStyleRule(styleRules, "Size", isParentNull ? Vector2.One : parent.Size);
-            Padding = GetStyleRule(styleRules, "Padding", isParentNull ? Vector2.Zero : parent.Padding);
+        public virtual void ApplyStyles(Stylesheet styleRules)
+        {
+            if (styleRules != null && styleRules.TryGetValue("proto", out var proto))
+            {
+                if (proto is string str)
+                    ApplyStyles(GetStyles(str));
+                //support proto = dictionary
+            }
+            else
+            {
+                var sr = GetStyles(DefaultStyleName);
+                if (sr != styleRules)
+                    ApplyStyles(sr);
+            }
+            //if "proto" is explicitly null, then don't inherit
+
+            Color = GetStyleRule(styleRules, "Color", Color);
+            Font = GetStyleRule(styleRules, "Font", Font);
+
+            BorderColor = GetStyleRule(styleRules, "BorderColor", BorderColor);
+            BackgroundColor = GetStyleRule(styleRules, "BackgroundColor", BackgroundColor);
+            BackgroundSprite = GetStyleRule(styleRules, "BackgroundSprite", BackgroundSprite);
+
+            Padding = GetStyleRule(styleRules, "Padding", Padding);
+            HorizontalAlignment = GetStyleRule(styleRules, "HorizontalAlignment", HorizontalAlignment);
+            VerticalAlignment = GetStyleRule(styleRules, "VerticalAlignment", VerticalAlignment);
+            Position = GetStyleRule(styleRules, "Position", Position);
+            Size = GetStyleRule(styleRules, "Size", Size);
+
+            //base on rules
         }
 
         #region Helpers
@@ -2255,7 +2307,7 @@ namespace Takai.UI
             BubbleEvent(ClickEvent, ce);
         }
 
-        public static Static GeneratePropSheet(object obj, Graphics.BitmapFont font, Color color)
+        public static Static GeneratePropSheet(object obj)
         {
             var root = new List() { Margin = 2, Direction = Direction.Vertical };
 
@@ -2275,8 +2327,6 @@ namespace Takai.UI
                         {
                             Name = flag,
                             Text = Util.ToSentenceCase(flag),
-                            Font = font,
-                            Color = color,
                             IsChecked = @enum.HasFlag(value)
                         };
                         check.On(ClickEvent, delegate (Static sender, UIEventArgs e)
@@ -2323,20 +2373,14 @@ namespace Takai.UI
                         Bindings = new List<Data.Binding>
                         {
                             new Data.Binding(member.Name, "IsChecked", Data.BindingDirection.TwoWay)
-                        },
-                        Font = font,
-                        Color = color
+                        }
                     };
                     checkbox.BindTo(obj);
                     root.AddChild(checkbox);
                     continue;
                 }
 
-                root.AddChild(new Static(Util.ToSentenceCase(member.Name))
-                {
-                    Font = font,
-                    Color = color
-                }); //label
+                root.AddChild(new Static(Util.ToSentenceCase(member.Name))); //label
 
                 if (Data.Serializer.IsInt(member) ||
                     Data.Serializer.IsFloat(member))
@@ -2346,9 +2390,7 @@ namespace Takai.UI
                         Bindings = new List<Data.Binding>
                         {
                             new Data.Binding(member.Name, "Value", Data.BindingDirection.TwoWay)
-                        },
-                        Font = font,
-                        Color = color
+                        }
                     };
                     numeric.BindTo(obj);
                     root.AddChild(numeric);
@@ -2360,9 +2402,7 @@ namespace Takai.UI
                         Bindings = new List<Data.Binding>
                         {
                             new Data.Binding(member.Name, "Text", Data.BindingDirection.TwoWay)
-                        },
-                        Font = font,
-                        Color = color
+                        }
                     };
                     text.BindTo(obj);
                     root.AddChild(text);
