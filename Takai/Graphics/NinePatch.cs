@@ -14,6 +14,9 @@ namespace Takai.Graphics
 
         public static implicit operator NinePatch(Sprite sprite)
         {
+            if (sprite == null)
+                return new NinePatch(); //todo ?
+
             return new NinePatch
             {
                 Sprite = sprite,

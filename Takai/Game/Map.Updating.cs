@@ -27,11 +27,13 @@ namespace Takai.Game
         public struct MapUpdateStats
         {
             public int updatedEntities;
+            public TimeSpan lastFrameDuration;
         }
 
         [Data.Serializer.Ignored]
         public MapUpdateStats UpdateStats => _updateStats;
         protected MapUpdateStats _updateStats;
+        internal System.Diagnostics.Stopwatch updateClock = new System.Diagnostics.Stopwatch();
 
         public class UpdateSettings
         {
@@ -383,6 +385,7 @@ namespace Takai.Game
         /// <param name="Viewport">Where on screen to draw the map. The viewport is centered around the camera</param>
         public virtual void Update(GameTime realTime)
         {
+            updateClock.Restart();
             RealTime = realTime;
             _updateStats = new MapUpdateStats();
 
@@ -557,6 +560,7 @@ namespace Takai.Game
             #endregion
 
             currentScreenFadeElapsedTime += deltaTime;
+            _updateStats.lastFrameDuration = updateClock.Elapsed;
         }
     }
 }

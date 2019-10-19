@@ -183,8 +183,8 @@ namespace DyingAndMore.Editor
                         clampScale
                     );
 
-                    var squadNameSize = DefaultFont.MeasureString(squad.Key);
-                    DefaultFont.Draw(
+                    var squadNameSize = Font.MeasureString(squad.Key);
+                    Font.Draw(
                         spriteBatch,
                         squad.Key,
                         editor.Camera.WorldToScreen(squad.Value.SpawnPosition + new Vector2(0, squad.Value.SpawnRadius))

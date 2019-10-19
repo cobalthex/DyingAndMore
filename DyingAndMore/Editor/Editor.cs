@@ -210,7 +210,7 @@ namespace DyingAndMore.Editor
                 Padding = new Vector2(30, 20)
             };
 
-            AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings, DefaultFont, DefaultColor));
+            AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings));
             renderSettingsConsole.IsEnabled = false;
             renderSettingsConsole.Position = new Vector2(100, 0);
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;
