@@ -637,7 +637,7 @@ namespace Takai.Game
                     _drawEntsOutlined.Add(ent);
                 else
                 {
-                    var angle = (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
+                    var angle = Util.Angle(new Vector2(ent.Transform.M11, ent.Transform.M21));
 
                     foreach (var state in ent.ActiveAnimations)
                     {
@@ -645,10 +645,10 @@ namespace Takai.Game
 
                         state.Class?.Sprite?.Draw(
                             c.spriteBatch,
-                            ent.Position,
+                            new Vector2(ent.Transform.Translation.X, ent.Transform.Translation.Y),
                             stateAngle,
                             ent.TintColor,
-                            1,
+                            ent.Transform.M33,
                             state.ElapsedTime
                         );
 
@@ -667,8 +667,8 @@ namespace Takai.Game
 
                 if (renderSettings.drawBordersAroundNonDrawingEntities && !System.Linq.Enumerable.Any(ent.ActiveAnimations))
                 {
-                    Matrix transform = new Matrix(ent.Forward.X, ent.Forward.Y, 0, 0,
-                                                    -ent.Forward.Y, ent.Forward.X, 0, 0,
+                    Matrix transform = new Matrix(ent.Forward.X, -ent.Forward.Y, 0, 0,
+                                                    ent.Forward.Y, ent.Forward.X, 0, 0,
                                                     0, 0, 1, 0,
                                                     0, 0, 0, 1);
 
@@ -731,12 +731,13 @@ namespace Takai.Game
                     var sprite = state.Class.Sprite;
                     Class.outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
                     Class.outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
-                    sprite.Draw(
+
+                    state.Class?.Sprite?.Draw(
                         c.spriteBatch,
-                        ent.Position,
+                        new Vector2(ent.Transform.Translation.X, ent.Transform.Translation.Y),
                         stateAngle,
                         ent.OutlineColor,
-                        1,
+                        ent.Transform.M33,
                         state.ElapsedTime
                     );
 

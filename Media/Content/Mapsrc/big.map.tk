@@ -36,11 +36,10 @@ MapInstance {
             };
             MaxSpeed: 300;
             Weapon: GunInstance {
-                Class: @"Weapons/Boss.wpn.tk";
+                Class: @"Weapons/mg.wpn.tk";
                 CurrentAmmo: 1000;
                 LastAmmoRefillTime: 0;
                 OnlyRefillIfIdle: True;
-                Class: @"Weapons/Boss.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
@@ -57,6 +56,7 @@ MapInstance {
             SpawnTime: 237739;
             EventHandlers: Null;
         }
+
         WeaponPickupInstance {
             Weapon: GunInstance {
                 Class: @"Weapons/bfg.wpn.tk";

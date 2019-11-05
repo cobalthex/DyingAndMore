@@ -1,0 +1,10 @@
+EntityClass {
+    Name: "Thing";
+
+    DefaultBaseAnimation: "Idle";
+    Animations: {
+        Idle: {
+            Sprite: @"./thing.png";
+        };
+    };
+}
