@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System;
 
@@ -322,43 +321,7 @@ namespace Takai.Game
 
             foreach (var entity in activeEntities)
             {
-                var lastSectors = GetOverlappingSectors(entity.lastAABB);
-                var nextSectors = GetOverlappingSectors(entity.AxisAlignedBounds);
-
-                var eaabb = entity.AxisAlignedBounds;
-
-                //if (lastSectors != nextSectors)
-                {
-                    var diffSectors = Rectangle.Union(lastSectors, nextSectors);
-                    for (var y = diffSectors.Top; y < diffSectors.Bottom; ++y)
-                    {
-                        for (var x = diffSectors.Left; x < diffSectors.Right; ++x)
-                        {
-                            if (new Rectangle(
-                                x * Class.SectorPixelSize,
-                                y * Class.SectorPixelSize,
-                                Class.SectorPixelSize,
-                                Class.SectorPixelSize
-                            ).Intersects(eaabb))
-                            {
-                                Sectors[y, x].entities.Add(entity);
-                            }
-                            else
-                            {
-                                Sectors[y, x].entities.Remove(entity);
-                            }
-
-                            foreach (var trigger in Sectors[y, x].triggers)
-                            {
-                                if (trigger.Region.Intersects(eaabb))
-                                    trigger.TryEnter(entity);
-                                else
-                                    trigger.TryExit(entity);
-                            }
-                        }
-                    }
-                }
-                entity.lastAABB = eaabb;
+                UpdateEntitySectors(entity);
 
                 if (entity.Class.DestroyIfDeadAndOffscreen || entity.Class.DestroyIfOffscreen)
                     possibleOffscreenEntities.Add(entity);
@@ -371,8 +334,47 @@ namespace Takai.Game
                 if (updateSettings.isEntityLogicEnabled)
                     entity.Think(deltaTime);
             }
+        }
 
+        void UpdateEntitySectors(EntityInstance entity)
+        {
+            var lastSectors = GetOverlappingSectors(entity.lastAABB);
+            var nextSectors = GetOverlappingSectors(entity.AxisAlignedBounds);
 
+            var eaabb = entity.AxisAlignedBounds;
+
+            //if (lastSectors != nextSectors)
+            {
+                var diffSectors = Rectangle.Union(lastSectors, nextSectors);
+                for (var y = diffSectors.Top; y < diffSectors.Bottom; ++y)
+                {
+                    for (var x = diffSectors.Left; x < diffSectors.Right; ++x)
+                    {
+                        if (new Rectangle(
+                            x * Class.SectorPixelSize,
+                            y * Class.SectorPixelSize,
+                            Class.SectorPixelSize,
+                            Class.SectorPixelSize
+                        ).Intersects(eaabb))
+                        {
+                            Sectors[y, x].entities.Add(entity);
+                        }
+                        else
+                        {
+                            Sectors[y, x].entities.Remove(entity);
+                        }
+
+                        foreach (var trigger in Sectors[y, x].triggers)
+                        {
+                            if (trigger.Region.Intersects(eaabb))
+                                trigger.TryEnter(entity);
+                            else
+                                trigger.TryExit(entity);
+                        }
+                    }
+                }
+            }
+            entity.lastAABB = eaabb;
         }
 
         /// <summary>
@@ -561,6 +563,50 @@ namespace Takai.Game
 
             currentScreenFadeElapsedTime += deltaTime;
             _updateStats.lastFrameDuration = updateClock.Elapsed;
+        }
+
+        public void Attach(EntityInstance parent, EntityInstance child, Vector2 relativePosition)
+        {
+            if (parent == null || child == null)
+                throw new ArgumentNullException("Parent nor child can be null");
+            if (child == parent)
+                throw new ArgumentException("Parent cannot be child");
+
+            if (child.WorldParent != null)
+                Detach(child);
+
+            child.WorldParent = parent;
+            if (parent._worldChildren == null)
+                parent._worldChildren = new List<EntityInstance>(1);
+            parent._worldChildren.Add(child);
+
+            child.Velocity = Vector2.Zero;
+            child.Position = relativePosition;
+            child.ApplyTransform();
+
+            child.UpdateAxisAlignedBounds();
+            UpdateEntitySectors(child);
+            parent.UpdateAxisAlignedBounds();
+            UpdateEntitySectors(parent);
+        }
+
+        public void Detach(EntityInstance child)
+        {
+            if (child == null)
+                throw new ArgumentNullException("child cannot be null");
+
+            if (child.WorldParent == null)
+                return;
+
+            var parent = child.WorldParent;
+            parent._worldChildren?.Remove(child);
+            child.WorldParent = null;
+            child.Position = Vector2.Transform(child.Position, child.Transform); //todo: verify
+
+            child.UpdateAxisAlignedBounds();
+            UpdateEntitySectors(child);
+            parent.UpdateAxisAlignedBounds();
+            UpdateEntitySectors(parent);
         }
     }
 }

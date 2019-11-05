@@ -117,7 +117,7 @@ List {
 					Size: [300 NaN];
 					Children: [
 						Static { Text: "`_Spawns"; };
-						Static { Size: [1 1]; };
+						Static { };
 
 						Static { Text: "`_Leader (Randomized)"; };
 						ScrollBox {
@@ -145,7 +145,7 @@ List {
 										Children: [
 											Static {
 												Text: "Select actor";
-												Size: [NaN 48];
+												Padding: [0 10];
 												ChildBindScope: "this";
 												EventCommands: {
 													Click: [
@@ -226,7 +226,7 @@ List {
 										Children: [
 											Static {
 												Text: "Select actor";
-												Size: [NaN 48];
+												Padding: [0 10];
 												ChildBindScope: "this";
 												EventCommands: {
 													Click: [
@@ -288,8 +288,7 @@ List {
 		Static {
 			Text: "Close";
 			HorizontalAlignment: Alignment.Center;
-			Padding: 5;
-			Size: [100 NaN];
+			Padding: [10 5];
 			EventCommands: {
 				Click: ["CloseModal"];
 			};

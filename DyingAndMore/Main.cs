@@ -191,9 +191,9 @@ namespace DyingAndMore
             {
                 //solve this via tunneling?
 
-                if (!(arg is System.Collections.IList il) || il.Count < 2 || 
+                if (!(arg is System.Collections.IList il) || il.Count < 2 ||
                     !(il[0] is string name))
-                        return;
+                    return;
 
                 var namedUI = ui.GetRoot().FindChildByName(name);
                 if (namedUI != null)
@@ -238,7 +238,7 @@ namespace DyingAndMore
 #endif
             */
             Static childUI;
-
+            /*
             childUI = new FileList
             {
                 //Size = new Vector2(400, 600),
@@ -274,6 +274,19 @@ namespace DyingAndMore
                 }
                 return UIEventResult.Handled;
             });
+            */
+
+            var map = Cache.Load<MapInstance>("mapsrc/shootingrange.map.tk");
+            map.Attach(map.FindEntityById(1), map.FindEntityById(9), new Vector2(30));
+            map.TimeScale = 0.5f;
+
+            childUI = new Game.GameInstance(new Game.Game
+            {
+                Map = map
+            });
+
+            map.renderSettings.drawColliders = true;
+            map.renderSettings.drawEntityForwardVectors = true;
 
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)

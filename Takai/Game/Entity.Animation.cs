@@ -236,13 +236,7 @@ namespace Takai.Game
 
             Radius = Math.Max(Radius, animation.Radius);
             if (animation.Sprite != null)
-            {
-                if (animation.AlwaysDrawUpright)
-                    lastSizeFixed = Util.Max(lastSizeFixed, animation.Sprite.Size);
-                else
-                    lastSizeRotating = Util.Max(lastSizeRotating, animation.Sprite.Size);
-                UpdateAxisAlignedBounds();
-            }
+                UpdateAxisAlignedBounds(); //todo
 
             return true;
         }
@@ -299,7 +293,6 @@ namespace Takai.Game
         public virtual void UpdateAnimations(TimeSpan deltaTime)
         {
             Radius = 0;
-            lastSizeRotating = lastSizeFixed = Point.Zero;
             if (baseAnimation.Class != null)
             {
                 Radius = baseAnimation.Class.Radius;
@@ -310,14 +303,6 @@ namespace Takai.Game
                 {
                     baseAnimation.CompletionCallback?.Invoke();
                     baseAnimation.CompletionCallback = null;
-                }
-
-                if (baseAnimation.Class.Sprite != null)
-                {
-                    if (baseAnimation.Class.AlwaysDrawUpright)
-                        lastSizeFixed =  baseAnimation.Class.Sprite.Size;
-                    else
-                        lastSizeRotating = baseAnimation.Class.Sprite.Size;
                 }
 
                 if (baseAnimation.Class.Effect != null && Map != null)
@@ -345,14 +330,6 @@ namespace Takai.Game
                     Radius = Math.Max(Radius, animation.Class.Radius);
                     if (animation.Class != null)
                     {
-                        if (baseAnimation.Class.Sprite != null)
-                        {
-                            if (animation.Class.AlwaysDrawUpright)
-                                lastSizeFixed = Util.Max(lastSizeFixed, animation.Class.Sprite.Size);
-                            else
-                                lastSizeRotating = Util.Max(lastSizeRotating, animation.Class.Sprite.Size);
-                        }
-
                         if (baseAnimation.Class.Effect != null && Map != null)
                             Map.Spawn(baseAnimation.Class.Effect.Instantiate(this));
                     }

@@ -52,9 +52,8 @@ MapInstance {
             };
             MaxSpeed: 300;
             Weapon: GunInstance {
-                Class: @"Weapons/Plasma.wpn.tk";
+                Class: @"Weapons/mg.wpn.tk";
                 CurrentAmmo: 1000;
-                Class: @"Weapons/Plasma.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
@@ -71,6 +70,15 @@ MapInstance {
             SpawnTime: 0;
             EventHandlers: Null;
         }
+        EntityInstance {
+            Class: @"Scenery/thing.ent.tk";
+            Id: 9;
+            Position: [220 220];
+            Forward: [1 0];
+            Velocity: [0 0];
+            SpawnTime: 1;
+        }
+
         ActorInstance {
             Class: @"Actors/Target.ent.tk";
             Class: @"Actors/Target.ent.tk";

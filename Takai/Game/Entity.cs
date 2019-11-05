@@ -138,11 +138,6 @@ namespace Takai.Game
         /// </summary>
         public int Id { get; set; } = 0;
 
-        [Data.Serializer.Ignored]
-        public float Radius { get; private set; }
-        [Data.Serializer.Ignored]
-        public float RadiusSq => Radius * Radius; //todo: cache
-
         /// <summary>
         /// The class that this instance inherits from
         /// </summary>
@@ -154,65 +149,6 @@ namespace Takai.Game
         public string Name { get; set; } = null;
 
         public bool IsAlive { get; private set; } = true;
-
-        //todo: parent/child relationships
-
-        /// <summary>
-        /// The current position of the entity
-        /// </summary>
-        public Vector2 Position
-        {
-            get => _position;
-            set
-            {
-                var diff = value - _position;
-                _position = value;
-                lastTransform.Translation = new Vector3(value, 0);
-                AxisAlignedBounds = new Rectangle(
-                    AxisAlignedBounds.X + (int)diff.X,
-                    AxisAlignedBounds.Y + (int)diff.Y,
-                    AxisAlignedBounds.Width,
-                    AxisAlignedBounds.Height
-                );
-            }
-        }
-        private Vector2 _position;
-
-        /// <summary>
-        /// The (normalized) direction the entity is facing
-        /// </summary>
-        /// <remarks>This vector should always be normalized</remarks>
-        public Vector2 Forward
-        {
-            get => _forward;
-            set
-            {
-                _forward = value;
-                if (Class != null)
-                {
-                    lastTransform.M11 = lastTransform.M22 = value.X;
-                    lastTransform.M12 = -value.Y;
-                    lastTransform.M21 = value.Y;
-                    UpdateAxisAlignedBounds();
-                }
-            }
-        }
-        private Vector2 _forward = Vector2.UnitX;
-
-        /// <summary>
-        /// The velocity of the entity, separate from <see cref="Forward"/>
-        /// </summary>
-        /// <remarks>This vector should always be normalized</remarks>
-        public Vector2 Velocity { get; set; } = Vector2.Zero;
-
-        /// <summary>b
-        /// the axis aligned bounding box of this entity
-        /// updated whenever the state, position, or direction changes
-        /// </summary>
-        [Data.Serializer.Ignored]
-        public Rectangle AxisAlignedBounds { get; private set; }
-
-        internal Rectangle lastAABB; //used for tracking movement in spacial grid
 
         /// <summary>
         /// Draw an outline around the sprite. If A is 0, ignored
@@ -306,59 +242,6 @@ namespace Takai.Game
             return clone;
         }
 
-        Matrix lastTransform = Matrix.Identity;
-        Point lastSizeFixed = new Point(1, 1);
-        Point lastSizeRotating = new Point(1, 1);
-
-        /// <summary>
-        /// Update the axis aligned bounds
-        /// </summary>
-        internal void UpdateAxisAlignedBounds()
-        {
-            var r = new Rectangle(
-                lastSizeRotating.X / -2,
-                lastSizeRotating.Y / -2,
-                lastSizeRotating.X,
-                lastSizeRotating.Y
-            );
-
-            //todo: handle origin
-            //todo: needs to be on per-animation basis (perhaps sizeRotated, sizeFixed)
-
-            var min = new Vector2(float.MaxValue);
-            var max = new Vector2(float.MinValue);
-
-            var v = Vector2.Transform(new Vector2(r.X, r.Y), lastTransform);
-            min = Vector2.Min(min, v);
-            max = Vector2.Max(max, v);
-
-            v = Vector2.Transform(new Vector2(r.X + r.Width, r.Y), lastTransform);
-            min = Vector2.Min(min, v);
-            max = Vector2.Max(max, v);
-
-            v = Vector2.Transform(new Vector2(r.X + r.Width, r.Y + r.Height), lastTransform);
-            min = Vector2.Min(min, v);
-            max = Vector2.Max(max, v);
-
-            v = Vector2.Transform(new Vector2(r.X, r.Y + r.Height), lastTransform);
-            min = Vector2.Min(min, v);
-            max = Vector2.Max(max, v);
-
-            var size = max - min;
-            r = new Rectangle(0, 0, (int)Math.Ceiling(size.X), (int)Math.Ceiling(size.Y));
-            r = Rectangle.Union(
-                new Rectangle(
-                    lastSizeFixed.X / -2,
-                    lastSizeFixed.Y / -2,
-                    lastSizeFixed.X, 
-                    lastSizeFixed.Y
-                ), r
-            );
-            r.Offset((int)min.X, (int)min.Y);
-
-            AxisAlignedBounds = r;
-        }
-
         public override string ToString()
         {
             return $"{GetType().Name} ({Class?.Name}) {{{Id}}}";
@@ -403,27 +286,6 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Called when there is a collision between this instance and another
-        /// </summary>
-        /// <param name="collider">The instance collided with</param>
-        /// <param name="deltaTime">How long since the last frame (in map time)</param>
-        public virtual void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime) { }
-
-        /// <summary>
-        /// Called when there is a collision between this entity and the map
-        /// </summary>
-        /// <param name="tile">The tile on the map where the collision occurred</param>
-        /// <param name="deltaTime">How long since the last frame (in map time)</param>
-        public virtual void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime) { }
-
-        /// <summary>
-        /// Called when there is a collision between this entity and a Fluid
-        /// </summary>
-        /// <param name="fluid">The type of Fluid collided with</param>
-        /// <param name="deltaTime">How long since the last frame (in map time)</param>
-        public virtual void OnFluidCollision(FluidClass fluid, TimeSpan deltaTime) { }
-
-        /// <summary>
         /// Called when this instance is spawned
         /// </summary>
         public virtual void OnSpawn(MapBaseInstance map)
@@ -454,11 +316,6 @@ namespace Takai.Game
             }
             else
                 DisableNextDestructionEffect = false;
-        }
-        
-        public float ForwardSpeed()
-        {
-            return Vector2.Dot(Forward, Velocity);
         }
 
         /// <summary>
