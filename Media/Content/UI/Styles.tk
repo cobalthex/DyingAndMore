@@ -1,5 +1,8 @@
 {
-	Static : {
+	Static: {
 		Font: @"Fonts/test.fnt.tk";
+	}
+	Frame: {
+		BackgroundSprite: @"UI/test/test.9p.tk";
 	}
 }

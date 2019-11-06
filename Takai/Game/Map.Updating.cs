@@ -582,7 +582,6 @@ namespace Takai.Game
 
             child.Velocity = Vector2.Zero;
             child.Position = relativePosition;
-            child.ApplyTransform();
 
             child.UpdateAxisAlignedBounds();
             UpdateEntitySectors(child);

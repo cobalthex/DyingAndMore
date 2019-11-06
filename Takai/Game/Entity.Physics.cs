@@ -4,6 +4,9 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.Game
 {
+    //child objects do not currently have physics,
+    //aabb and transforms are updated however
+
     public partial class EntityInstance
     {
         /// <summary>
@@ -16,7 +19,7 @@ namespace Takai.Game
             {
                 var diff = value - _position;
                 _position = value;
-                ApplyTransform();
+                UpdateWorldState();
             }
         }
         private Vector2 _position;
@@ -31,8 +34,7 @@ namespace Takai.Game
             set
             {
                 _forward = value;
-                ApplyTransform();
-                UpdateAxisAlignedBounds();
+                UpdateWorldState();
             }
         }
         private Vector2 _forward = Vector2.UnitX;
@@ -70,34 +72,31 @@ namespace Takai.Game
 
         internal Rectangle lastAABB; //used for tracking movement in spacial grid
 
-        Matrix localTransform = Matrix.Identity;
+        internal Matrix localTransform = Matrix.Identity;
 
-        public Matrix Transform { get; private set; } = Matrix.Identity; //todo: make prop
+        public Matrix Transform { get; internal set; } = Matrix.Identity;
 
-        internal void ApplyTransform()
+        void UpdateWorldState()
         {
             localTransform = new Matrix(Forward.X, -Forward.Y, 0, 0, Forward.Y, Forward.X, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
             localTransform *= Matrix.CreateTranslation(_position.X, _position.Y, 0);
 
             Transform = localTransform;
-
-            //if (WorldParent != null)
-            //    Transform = WorldParent.Transform * localTransform;
-            //else
-            //    Transform = localTransform;
+            if (WorldParent != null)
+                Transform *= WorldParent.Transform;
 
             if (WorldChildren != null)
             {
+                //stack based impl?
                 foreach (var child in WorldChildren)
-                {
-                    child.Transform = child.localTransform * Transform;
-                }
+                    UpdateWorldState();
             }
         }
 
         internal void UpdateAxisAlignedBounds()
         {
-            //todo: use colliders
+            //todo: use colliders & calculate from there
+
             var rmin = new Vector2(-Radius);
             var rmax = new Vector2(Radius);
 
