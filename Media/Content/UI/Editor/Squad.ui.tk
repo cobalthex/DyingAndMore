@@ -5,7 +5,7 @@ List {
 	HorizontalAlignment: Alignment.Center;
 	VerticalAlignment: Alignment.Center;
 	Direction: Direction.Vertical;
-	BackgroundSprite: @"UI/test/test.9p.tk";
+	Style: "Frame";
 	Children: [
 		List {
 			Direction: Direction.Horizontal;
