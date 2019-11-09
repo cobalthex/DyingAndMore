@@ -567,6 +567,8 @@ namespace Takai.Game
 
         public void Attach(EntityInstance parent, EntityInstance child, Vector2 relativePosition)
         {
+            //limit depth?
+
             if (parent == null || child == null)
                 throw new ArgumentNullException("Parent nor child can be null");
             if (child == parent)

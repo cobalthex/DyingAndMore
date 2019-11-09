@@ -79,17 +79,16 @@ namespace Takai.Game
         void UpdateWorldState()
         {
             localTransform = new Matrix(Forward.X, -Forward.Y, 0, 0, Forward.Y, Forward.X, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-            localTransform *= Matrix.CreateTranslation(_position.X, _position.Y, 0);
+            localTransform *= Matrix.CreateTranslation(Position.X, Position.Y, 0);
 
             Transform = localTransform;
             if (WorldParent != null)
-                Transform *= WorldParent.Transform;
+                Transform = WorldParent.Transform * Transform;
 
             if (WorldChildren != null)
             {
-                //stack based impl?
                 foreach (var child in WorldChildren)
-                    UpdateWorldState();
+                    child.UpdateWorldState();
             }
         }
 
