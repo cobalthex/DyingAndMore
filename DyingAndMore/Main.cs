@@ -278,7 +278,7 @@ namespace DyingAndMore
 
             var map = Cache.Load<MapInstance>("mapsrc/shootingrange.map.tk");
             map.Attach(map.FindEntityById(1), map.FindEntityById(9), new Vector2(30));
-            map.TimeScale = 0.5f;
+            map.TimeScale = 1.5f;
 
             childUI = new Game.GameInstance(new Game.Game
             {

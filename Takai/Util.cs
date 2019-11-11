@@ -272,10 +272,10 @@ namespace Takai
 
         public static string PrettyPrintMatrix(Matrix m)
         {
-            return $"┌{m.M11,5} {m.M12,5} {m.M13,5} {m.M14,5}┐\n" +
-                   $"│{m.M21,5} {m.M22,5} {m.M23,5} {m.M24,5}│\n" +
-                   $"│{m.M31,5} {m.M32,5} {m.M33,5} {m.M34,5}│\n" +
-                   $"└{m.M41,5} {m.M42,5} {m.M43,5} {m.M44,5}┘\n";
+            return $"┌{m.M11,8:N3} {m.M12,8:N3} {m.M13,8:N3} {m.M14,8:N3}┐\n" +
+                   $"│{m.M21,8:N3} {m.M22,8:N3} {m.M23,8:N3} {m.M24,8:N3}│\n" +
+                   $"│{m.M31,8:N3} {m.M32,8:N3} {m.M33,8:N3} {m.M34,8:N3}│\n" +
+                   $"└{m.M41,8:N3} {m.M42,8:N3} {m.M43,8:N3} {m.M44,8:N3}┘\n";
         }
 
         public static bool PassChance(float passPercent)

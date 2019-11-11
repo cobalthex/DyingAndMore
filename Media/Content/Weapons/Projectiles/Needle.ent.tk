@@ -5,10 +5,11 @@ ProjectileClass {
     IgnoreTrace: True;
     Range: 100000;
     Drag: 0.0;
-    MinimumSpeed: 100;
+    MinimumSpeed: -100;
     MagnetismAnglePerSecond: 1200deg;
     InheritSourcePhysics: false;
     Damage: 25;
+    #Sticky: true;
 
     Trail: {
         #MaxPoints: 100;

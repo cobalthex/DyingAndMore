@@ -55,7 +55,7 @@ namespace Takai.Game
         /// Any entities attached to this one for physics/collisions
         /// May be null
         /// </summary>
-        public IReadOnlyCollection<EntityInstance> WorldChildren => _worldChildren?.AsReadOnly();
+        public IReadOnlyList<EntityInstance> WorldChildren => _worldChildren?.AsReadOnly();
         internal List<EntityInstance> _worldChildren = null;
 
         [Data.Serializer.Ignored]
@@ -76,20 +76,33 @@ namespace Takai.Game
 
         public Matrix Transform { get; internal set; } = Matrix.Identity;
 
-        void UpdateWorldState()
+        internal void UpdateWorldState()
         {
-            localTransform = new Matrix(Forward.X, -Forward.Y, 0, 0, Forward.Y, Forward.X, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-            localTransform *= Matrix.CreateTranslation(Position.X, Position.Y, 0);
+            var rot = new Matrix(
+                Forward.X, -Forward.Y, 0, 0,
+                Forward.Y,  Forward.X, 0, 0,
+                0,          0,         1, 0, 
+                0,          0,         0, 1
+            );
+            var trans = new Matrix(
+                1,          0,          0, 0,
+                0,          1,          0, 0,
+                0,          0,          1, 0,
+                Position.X, Position.Y, 0, 1
+            );
 
-            Transform = localTransform;
             if (WorldParent != null)
-                Transform = WorldParent.Transform * Transform;
+                Transform = (WorldParent.Transform * trans) * rot;
+            else
+                Transform = rot * trans;
 
             if (WorldChildren != null)
             {
                 foreach (var child in WorldChildren)
                     child.UpdateWorldState();
             }
+
+            UpdateAxisAlignedBounds();
         }
 
         internal void UpdateAxisAlignedBounds()
@@ -105,32 +118,25 @@ namespace Takai.Game
             var min = new Vector2(float.MaxValue);
             var max = new Vector2(float.MinValue);
 
-            var v = Vector2.Transform(new Vector2(rmin.X, rmin.Y), localTransform);
+            var v = Vector2.Transform(new Vector2(rmin.X, rmin.Y), Transform);
             min = Vector2.Min(min, v);
             max = Vector2.Max(max, v);
 
-            v = Vector2.Transform(new Vector2(rmax.X, rmin.Y), localTransform);
+            v = Vector2.Transform(new Vector2(rmax.X, rmin.Y), Transform);
             min = Vector2.Min(min, v);
             max = Vector2.Max(max, v);
 
-            v = Vector2.Transform(new Vector2(rmax.X, rmax.Y), localTransform);
+            v = Vector2.Transform(new Vector2(rmax.X, rmax.Y), Transform);
             min = Vector2.Min(min, v);
             max = Vector2.Max(max, v);
 
-            v = Vector2.Transform(new Vector2(rmin.X, rmax.Y), localTransform);
+            v = Vector2.Transform(new Vector2(rmin.X, rmax.Y), Transform);
             min = Vector2.Min(min, v);
             max = Vector2.Max(max, v);
 
             var size = max - min;
             var r = new Rectangle(0, 0, (int)Math.Ceiling(size.X), (int)Math.Ceiling(size.Y));
             r.Offset((int)min.X, (int)min.Y);
-
-            //children should be relative to rotation
-            //if (WorldChildren != null)
-            //{
-            //    foreach (var child in WorldChildren)
-            //        r = Rectangle.Intersect(r, child.AxisAlignedBounds);
-            //}
 
             AxisAlignedBounds = r;
         }
