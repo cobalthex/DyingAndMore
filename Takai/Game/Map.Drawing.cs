@@ -642,10 +642,10 @@ namespace Takai.Game
                     foreach (var state in ent.ActiveAnimations)
                     {
                         var stateAngle = state.Class.AlwaysDrawUpright ? 0 : angle;
-
+                        
                         state.Class?.Sprite?.Draw(
                             c.spriteBatch,
-                            new Vector2(ent.Transform.Translation.X, ent.Transform.Translation.Y),
+                            Vector2.Transform(Vector2.Zero, ent.Transform),
                             stateAngle,
                             ent.TintColor,
                             ent.Transform.M33,

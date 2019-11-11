@@ -16,8 +16,8 @@ EffectsClass {
                         [1 Color.Red];
                     ];
                 };
-                InitialSpeed: [-100 -400];
-                LifeSpan: [0.15sec 0.55sec];
+                InitialSpeed: [-200 -450];
+                LifeSpan: [0.05sec 0.35sec];
                 Drag: 15;
             }
             Count: [5 10];

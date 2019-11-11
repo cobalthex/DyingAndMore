@@ -5,4 +5,7 @@
 	Frame: {
 		BackgroundSprite: @"UI/test/test.9p.tk";
 	}
+	GameInstance: {
+		#Font: @"Fonts/UISmall.fnt.tk";
+	}
 }

@@ -1099,15 +1099,42 @@ namespace Takai.Data
             if (type != source.GetType())
                 throw new ArgumentException("Source object must be the same as target object");
 
-            foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            // todo: handle dictionaries
+
+
+            if (target is System.Collections.IList lt &&
+                source is System.Collections.IList ls)
             {
-                if (prop.CanWrite && prop.CanRead && !prop.IsDefined(typeof(IgnoredAttribute)))
-                    prop.SetValue(target, prop.GetValue(source));
+                //todo: should cast/throw if source is not list
+
+                lt.Clear();
+                foreach (var v in ls)
+                    lt.Add(v);
             }
-            foreach (var val in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+            else if (target is System.Collections.IDictionary dt &&
+                    source is System.Collections.IDictionary ds)
             {
-                if (!val.IsInitOnly && !val.IsDefined(typeof(IgnoredAttribute)))
-                    val.SetValue(target, val.GetValue(source));
+                var ke = ds.Keys.GetEnumerator();
+                var kv = ds.Values.GetEnumerator();
+                dt.Clear();
+                while (ke.MoveNext())
+                {
+                    kv.MoveNext();
+                    dt.Add(ke.Current, kv.Current);
+                }
+            }
+            else
+            {
+                foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (prop.CanWrite && prop.CanRead && !prop.IsDefined(typeof(IgnoredAttribute)))
+                        prop.SetValue(target, prop.GetValue(source));
+                }
+                foreach (var val in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (!val.IsInitOnly && !val.IsDefined(typeof(IgnoredAttribute)))
+                        val.SetValue(target, val.GetValue(source));
+                }
             }
         }
     }

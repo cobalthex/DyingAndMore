@@ -70,6 +70,11 @@ namespace DyingAndMore.Game.Entities
         public bool InheritSourcePhysics { get; set; } = false;
 
         /// <summary>
+        /// Sticks to an actor on collision
+        /// </summary>
+        public bool Sticky { get; set; } = false;
+
+        /// <summary>
         /// An effect spawned when the projectile goes out of <see cref="Range"/>, lives longer than <see cref="LifeSpan"/>, or below the <see cref="MinimumSpeed"/>
         /// </summary>
         public EffectsClass FadeEffect { get; set; }
@@ -252,7 +257,12 @@ namespace DyingAndMore.Game.Entities
 
             if (collider is ActorInstance actor &&
                 (collider != Source || Class.CanDamageSource))
+            {
                 actor.ReceiveDamage(Class.Damage, Source);
+
+                if (Class.Sticky)
+                    actor.Map.Attach(actor, this, Position - actor.Position);
+            }
         }
     }
 }
