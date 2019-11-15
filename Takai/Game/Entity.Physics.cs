@@ -78,9 +78,9 @@ namespace Takai.Game
 
         internal void UpdateWorldState()
         {
-            var rot = new Matrix(
-                Forward.X, -Forward.Y, 0, 0,
-                Forward.Y,  Forward.X, 0, 0,
+            var rot = new Matrix( //flip Y
+                 Forward.X, Forward.Y, 0, 0,
+                -Forward.Y, Forward.X, 0, 0,
                 0,          0,         1, 0, 
                 0,          0,         0, 1
             );
@@ -92,7 +92,7 @@ namespace Takai.Game
             );
 
             if (WorldParent != null)
-                Transform = (WorldParent.Transform * trans) * rot;
+                Transform = rot * trans * WorldParent.Transform;
             else
                 Transform = rot * trans;
 

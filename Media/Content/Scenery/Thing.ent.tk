@@ -5,6 +5,7 @@ EntityClass {
     Animations: {
         Idle: {
             Sprite: @"./thing.png";
+            AlwaysDrawUpright: true;
         };
     };
 }

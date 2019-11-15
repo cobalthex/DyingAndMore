@@ -633,11 +633,12 @@ namespace Takai.Game
 
             foreach (var ent in EnumerateEntitiesInSectors(c.visibleSectors))
             {
+                var entPos = new Vector2(ent.Transform.M41, ent.Transform.M42);
                 if (ent.OutlineColor.A > 0)
                     _drawEntsOutlined.Add(ent);
                 else
                 {
-                    var angle = Util.Angle(new Vector2(ent.Transform.M11, ent.Transform.M21));
+                    var angle = Util.Angle(new Vector2(ent.Transform.M11, ent.Transform.M12)); //flip Y
 
                     foreach (var state in ent.ActiveAnimations)
                     {
@@ -645,7 +646,7 @@ namespace Takai.Game
                         
                         state.Class?.Sprite?.Draw(
                             c.spriteBatch,
-                            Vector2.Transform(Vector2.Zero, ent.Transform),
+                            entPos,
                             stateAngle,
                             ent.TintColor,
                             ent.Transform.M33,
@@ -665,6 +666,7 @@ namespace Takai.Game
                     }
                 }
 
+                //todo: use transform
                 if (renderSettings.drawBordersAroundNonDrawingEntities && !System.Linq.Enumerable.Any(ent.ActiveAnimations))
                 {
                     Matrix transform = new Matrix(ent.Forward.X, -ent.Forward.Y, 0, 0,
@@ -701,8 +703,9 @@ namespace Takai.Game
                     DrawCircle(ent.Position, ent.Radius, Color.Gold);
                 }
 
+                //todo: use transform
                 if (renderSettings.drawEntityForwardVectors)
-                    DrawArrow(ent.Position, ent.Forward, ent.Radius * 1.3f, Color.Gold);
+                    DrawArrow(entPos, Vector2.TransformNormal(Vector2.UnitX, ent.Transform), ent.Radius * 1.3f, Color.Gold);
 
                 if (renderSettings.drawDebugInfo && Class.DebugFont != null)
                 {
@@ -734,7 +737,7 @@ namespace Takai.Game
 
                     state.Class?.Sprite?.Draw(
                         c.spriteBatch,
-                        new Vector2(ent.Transform.Translation.X, ent.Transform.Translation.Y),
+                        new Vector2(ent.Transform.M41, ent.Transform.M42),
                         stateAngle,
                         ent.OutlineColor,
                         ent.Transform.M33,
