@@ -1099,9 +1099,6 @@ namespace Takai.Data
             if (type != source.GetType())
                 throw new ArgumentException("Source object must be the same as target object");
 
-            // todo: handle dictionaries
-
-
             if (target is System.Collections.IList lt &&
                 source is System.Collections.IList ls)
             {

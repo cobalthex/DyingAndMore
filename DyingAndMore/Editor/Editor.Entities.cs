@@ -261,6 +261,8 @@ namespace DyingAndMore.Editor
 
         void MoveEnt(Takai.Game.EntityInstance ent, Vector2 newPosition, Vector2 newForward)
         {
+            //todo: use Map.MoveEnt
+
             var sectors = editor.Map.GetOverlappingSectors(ent.AxisAlignedBounds);
 
             //todo: move to Map

@@ -594,9 +594,6 @@ namespace DyingAndMore.Game
                 new Vector2(20, 200),
                 Color.Orange
             );
-
-            Font.Draw(spriteBatch, Util.PrettyPrintMatrix(players[0].actor.Transform), new Vector2(200, 600), Color.Gold, true);
-            Font.Draw(spriteBatch, Util.PrettyPrintMatrix(players[0].actor.WorldChildren[0].Transform), new Vector2(200, 720), Color.Salmon, true);
 #endif
         }
 
