@@ -76,6 +76,11 @@ namespace Takai.Game
 
         public Matrix Transform { get; internal set; } = Matrix.Identity;
 
+        /// <summary>
+        /// transformed position, with all parent transforms applied
+        /// </summary>
+        public Vector2 RealPosition => new Vector2(Transform.M41, Transform.M42);
+
         internal void UpdateWorldState()
         {
             var rot = new Matrix( //flip Y
@@ -91,10 +96,9 @@ namespace Takai.Game
                 Position.X, Position.Y, 0, 1
             );
 
+            Transform = rot * trans;
             if (WorldParent != null)
-                Transform = rot * trans * WorldParent.Transform;
-            else
-                Transform = rot * trans;
+                Transform *= WorldParent.Transform;
 
             if (WorldChildren != null)
             {

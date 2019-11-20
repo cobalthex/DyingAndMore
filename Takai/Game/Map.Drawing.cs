@@ -633,7 +633,7 @@ namespace Takai.Game
 
             foreach (var ent in EnumerateEntitiesInSectors(c.visibleSectors))
             {
-                var entPos = new Vector2(ent.Transform.M41, ent.Transform.M42);
+                var entPos = ent.RealPosition;
                 if (ent.OutlineColor.A > 0)
                     _drawEntsOutlined.Add(ent);
                 else
@@ -666,29 +666,22 @@ namespace Takai.Game
                     }
                 }
 
-                //todo: use transform
+                //todo: this should test if sprite is null
+                //currently this will never be hit
                 if (renderSettings.drawBordersAroundNonDrawingEntities && !System.Linq.Enumerable.Any(ent.ActiveAnimations))
                 {
-                    Matrix transform = new Matrix(ent.Forward.X, -ent.Forward.Y, 0, 0,
-                                                    ent.Forward.Y, ent.Forward.X, 0, 0,
-                                                    0, 0, 1, 0,
-                                                    0, 0, 0, 1);
-
-                    var iEntRadius = (int)ent.Radius;
-                    Rectangle rect = new Rectangle(-iEntRadius, -iEntRadius, iEntRadius * 2, iEntRadius * 2);
-                    var tl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Top), transform);
-                    var tr = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Top), transform);
-                    var bl = ent.Position + Vector2.TransformNormal(new Vector2(rect.Left, rect.Bottom), transform);
-                    var br = ent.Position + Vector2.TransformNormal(new Vector2(rect.Right, rect.Bottom), transform);
-
-                    var color = ent.OutlineColor.A == 0 ? Color.Cyan : ent.OutlineColor;
-                    DrawLine(tl, tr, color);
-                    DrawLine(tr, br, color);
-                    DrawLine(br, bl, color);
-                    DrawLine(bl, tl, color);
-
-                    DrawLine(tl, br, color);
-                    DrawLine(bl, tr, color);
+                    var r = ent.Radius / (float)System.Math.Sqrt(2); //apply transform scale?
+                    DrawLine(
+                        Vector2.Transform(-new Vector2(r, r), ent.Transform),
+                        Vector2.Transform( new Vector2(r, r), ent.Transform),
+                        Color.Tomato
+                    );
+                    DrawLine(
+                        Vector2.Transform(new Vector2(-r, r), ent.Transform),
+                        Vector2.Transform(new Vector2(r, -r), ent.Transform),
+                        Color.Tomato
+                    );
+                    DrawCircle(entPos, ent.Radius, Color.Tomato);
                 }
 
                 if (renderSettings.drawColliders)
@@ -700,17 +693,16 @@ namespace Takai.Game
                     DrawLine(new Vector2(rect.Right, rect.Bottom), new Vector2(rect.Left, rect.Bottom), color);
                     DrawLine(new Vector2(rect.Left, rect.Bottom), new Vector2(rect.Left, rect.Top), color);
 
-                    DrawCircle(ent.Position, ent.Radius, Color.Gold);
+                    DrawCircle(entPos, ent.Radius, Color.Gold); //apply transform scale?
                 }
 
-                //todo: use transform
                 if (renderSettings.drawEntityForwardVectors)
                     DrawArrow(entPos, Vector2.TransformNormal(Vector2.UnitX, ent.Transform), ent.Radius * 1.3f, Color.Gold);
 
                 if (renderSettings.drawDebugInfo && Class.DebugFont != null)
                 {
                     //todo: defer this drawing and draw outside of stencil
-                    var textPos = ent.Position + new Vector2(ent.Radius + 10);
+                    var textPos = entPos + new Vector2(ent.Radius + 10);
                     Class.DebugFont.Draw(c.spriteBatch, ent.GetDebugInfo(), textPos, Color.Gold);
                 }
             }
@@ -735,9 +727,10 @@ namespace Takai.Game
                     Class.outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
                     Class.outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
 
+                    var entPos = ent.RealPosition;
                     state.Class?.Sprite?.Draw(
                         c.spriteBatch,
-                        new Vector2(ent.Transform.M41, ent.Transform.M42),
+                        entPos,
                         stateAngle,
                         ent.OutlineColor,
                         ent.Transform.M33,
