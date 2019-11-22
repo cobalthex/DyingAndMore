@@ -173,7 +173,7 @@ namespace DyingAndMore.Editor
                 if (InputState.IsButtonDown(Keys.R))
                 {
                     //todo: sector modification?
-                    var diff = currentWorldPos - SelectedEntity.Position;
+                    var diff = currentWorldPos - SelectedEntity.RealPosition;
                     Vector2 newForward;
                     if (InputState.IsMod(KeyMod.Shift))
                     {
@@ -208,6 +208,7 @@ namespace DyingAndMore.Editor
             }
 
 #if DEBUG
+            //fill map with whatever the current entity template is (primarily for stress testing)
             if (InputState.IsPress(Keys.OemCloseBrackets) && selector.SelectedEntity != null)
             {
                 var ent = selector.SelectedEntity;
@@ -265,8 +266,6 @@ namespace DyingAndMore.Editor
 
             var sectors = editor.Map.GetOverlappingSectors(ent.AxisAlignedBounds);
 
-            //todo: move to Map
-
             for (int y = sectors.Top; y < sectors.Bottom; ++y)
             {
                 for (int x = sectors.Left; x < sectors.Right; ++x)
@@ -294,6 +293,30 @@ namespace DyingAndMore.Editor
         //todo: make work in both editor and game
         void DrawEntityInfo(SpriteBatch spriteBatch)
         {
+            if (SelectedEntity != null)
+            {
+                if (SelectedEntity.WorldParent != null)
+                {
+                    editor.Map.DrawLine(
+                        SelectedEntity.RealPosition,
+                        SelectedEntity.WorldParent.RealPosition,
+                        Color.CornflowerBlue,
+                        8
+                    );
+                }
+                if (SelectedEntity.WorldChildren != null)
+                {
+                    foreach (var child in SelectedEntity.WorldChildren)
+                    {
+                        editor.Map.DrawLine(
+                            child.RealPosition,
+                            SelectedEntity.RealPosition,
+                            Color.YellowGreen,
+                            4
+                        );
+                    }
+                }
+            }
             //todo: only draw around cursor?
 
             //foreach (var ent in editor.Map.ActiveEntities)

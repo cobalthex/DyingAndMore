@@ -78,6 +78,14 @@ MapInstance {
             Velocity: [0 0];
             SpawnTime: 1;
         }
+        EntityInstance {
+            Class: @"Scenery/thing.ent.tk";
+            Id: 10;
+            Position: [220 240];
+            Forward: [1 0];
+            Velocity: [0 0];
+            SpawnTime: 1;
+        }
 
         ActorInstance {
             Class: @"Actors/Target.ent.tk";

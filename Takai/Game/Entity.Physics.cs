@@ -17,7 +17,6 @@ namespace Takai.Game
             get => _position;
             set
             {
-                var diff = value - _position;
                 _position = value;
                 UpdateWorldState();
             }
@@ -77,9 +76,13 @@ namespace Takai.Game
         public Matrix Transform { get; internal set; } = Matrix.Identity;
 
         /// <summary>
-        /// transformed position, with all parent transforms applied
+        /// Position, with all parent transforms applied
         /// </summary>
         public Vector2 RealPosition => new Vector2(Transform.M41, Transform.M42);
+        /// <summary>
+        /// Forward, with all parent transforms applied
+        /// </summary>
+        public Vector2 RealForward => new Vector2(Transform.M11, Transform.M12);
 
         internal void UpdateWorldState()
         {
@@ -95,6 +98,8 @@ namespace Takai.Game
                 0,          0,          1, 0,
                 Position.X, Position.Y, 0, 1
             );
+
+            //todo: if applying scale, need to update code to apply scale to radius/etc
 
             Transform = rot * trans;
             if (WorldParent != null)
