@@ -173,7 +173,7 @@ namespace Takai.Game
 
             foreach (var ent in EnumerateEntitiesInSectors(sectors))
             {
-                if (Vector2.DistanceSquared(ent.Position, position) <= ent.RadiusSq + radiusSq)
+                if (Vector2.DistanceSquared(ent.RealPosition, position) <= ent.RadiusSq + radiusSq) //scale ent radius?
                     ents.Add(ent);
             }
 
@@ -222,7 +222,7 @@ namespace Takai.Game
 
             foreach (var ent in EnumerateEntitiesInSectors(sectors))
             {
-                var dist = Vector2.DistanceSquared(ent.Position, position);
+                var dist = Vector2.DistanceSquared(ent.RealPosition, position);
                 if ((searchRadius == 0 || dist <= radiusSq) && dist <= ent.RadiusSq + radiusSq)
                 {
                     minDist = dist;
@@ -290,7 +290,7 @@ namespace Takai.Game
 
             foreach (var ent in EnumerateEntitiesInSectors(sectors))
             {
-                var dist = Vector2.DistanceSquared(ent.Position, position);
+                var dist = Vector2.DistanceSquared(ent.RealPosition, position);
                 if ((searchRadius == 0 || dist <= radiusSq) && dist <= ent.RadiusSq + radiusSq)
                     return true;
             }
@@ -530,7 +530,7 @@ namespace Takai.Game
                 {
                     if (!ent.Class.IgnoreTrace &&
                         ent != ignored &&
-                        Intersects(ent.Position, ent.RadiusSq, start, direction, out var t0, out var t1) && //todo: maybe add source ent radius to search
+                        Intersects(ent.RealPosition, ent.RadiusSq, start, direction, out var t0, out var t1) && //todo: maybe add source ent radius to search
                         t0 < shortestDist)
                     {
                         shortest = ent;

@@ -300,10 +300,24 @@ namespace Takai.Game
         /// <param name="start">The start position of the line (in map space)</param>
         /// <param name="end">The end position of the line (in map space)</param>
         /// <param name="color">The color of the line</param>
-        public void DrawLine(Vector2 start, Vector2 end, Color color)
+        /// <param name="wingTipsSize">if >0 draw arrow wing tips with this length</param>
+        public void DrawLine(Vector2 start, Vector2 end, Color color, float wingTipsSize = 0)
         {
             renderedLines.Add(new VertexPositionColor(new Vector3(start, 0), color));
             renderedLines.Add(new VertexPositionColor(new Vector3(end, 0), color));
+
+            if (wingTipsSize > 0)
+            {
+                var direction = Vector2.Normalize(end - start);
+
+                renderedLines.Add(new VertexPositionColor(new Vector3(end, 0), color));
+                var z = end - (wingTipsSize * Vector2.TransformNormal(direction, arrowWingTransform));
+                renderedLines.Add(new VertexPositionColor(new Vector3(z, 0), color));
+
+                renderedLines.Add(new VertexPositionColor(new Vector3(end, 0), color));
+                z = end - (wingTipsSize * Vector2.TransformNormal(direction, Matrix.Invert(arrowWingTransform)));
+                renderedLines.Add(new VertexPositionColor(new Vector3(z, 0), color));
+            }
         }
 
         /// <summary>
@@ -350,8 +364,8 @@ namespace Takai.Game
             DrawLine(position, tip, Color.Yellow);
 
             magnitude = MathHelper.Clamp(magnitude * 0.333f, 5, 30);
-            DrawLine(tip, tip - (magnitude * Vector2.Transform(direction, arrowWingTransform)), color);
-            DrawLine(tip, tip - (magnitude * Vector2.Transform(direction, Matrix.Invert(arrowWingTransform))), color);
+            DrawLine(tip, tip - (magnitude * Vector2.TransformNormal(direction, arrowWingTransform)), color);
+            DrawLine(tip, tip - (magnitude * Vector2.TransformNormal(direction, Matrix.Invert(arrowWingTransform))), color);
         }
 
         private List<EntityInstance> _drawEntsOutlined = new List<EntityInstance>();

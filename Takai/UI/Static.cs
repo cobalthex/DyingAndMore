@@ -2143,6 +2143,7 @@ namespace Takai.UI
         /// <param name="b">The end of the line</param>
         protected void DrawLine(SpriteBatch spriteBatch, Color color, Vector2 a, Vector2 b)
         {
+            //todo: Map.DrawLine has color at end of arglist
             throw new System.NotImplementedException();
         }
 
