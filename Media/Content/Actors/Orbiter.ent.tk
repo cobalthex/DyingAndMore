@@ -1,0 +1,10 @@
+ActorClass {
+    Name: "Orbiter";
+
+    DefaultBaseAnimation: "Idle";
+    Animations: {
+        Idle: {
+            Sprite: @"./orbit.png";
+        };
+    };
+}

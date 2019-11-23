@@ -32,6 +32,8 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
                 //todo: needs friction
 
+                //todo: attach once close enough?
+
                 var rad2 = Vector2.DistanceSquared(AI.Actor.Position, actor.Position);
                 actor.Accelerate(Vector2.Normalize(AI.Actor.Position - actor.Position) * (Strength / rad2));
             }

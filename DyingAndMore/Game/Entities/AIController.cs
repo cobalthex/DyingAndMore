@@ -31,6 +31,7 @@ namespace DyingAndMore.Game.Entities
     {
         None           = 0b0000,
         RequiresTarget = 0b0001,
+        RequiresParent = 0b0010,
     }
 
     public abstract class Behavior
@@ -128,6 +129,8 @@ namespace DyingAndMore.Game.Entities
             var filters = BehaviorFilters.None;
             if (Target != null)
                 filters |= BehaviorFilters.RequiresTarget;
+            if (Actor.WorldParent != null)
+                filters |= BehaviorFilters.RequiresParent;
 
             foreach (var behavior in Behaviors)
             {
