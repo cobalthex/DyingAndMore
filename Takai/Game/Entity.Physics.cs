@@ -84,6 +84,20 @@ namespace Takai.Game
         /// </summary>
         public Vector2 RealForward => new Vector2(Transform.M11, Transform.M12);
 
+        /// <summary>
+        /// Set the local position to an already transformed point
+        /// </summary>
+        /// <param name="transformedPosition">The transformed (world space) position</param>
+        /// <returns>The new, local position</returns>
+        public Vector2 SetPositionTransformed(Vector2 transformedPosition)
+        {
+            if (WorldParent == null)
+                Position = transformedPosition;
+            else
+                Position = Vector2.Transform(transformedPosition, Matrix.Invert(WorldParent.Transform));
+            return Position;
+        }
+
         internal void UpdateWorldState()
         {
             var rot = new Matrix( //flip Y

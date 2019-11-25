@@ -93,6 +93,14 @@ namespace DyingAndMore.Game.Entities
                         Hud = Class.Hud.CloneHierarchy();
                         Hud.BindTo(this);
                     }
+
+                    //todo: re-evaluate if all of these should get set
+                    MaxSpeed = Class.MaxSpeed.Random();
+                    CurrentHealth = Class.MaxHealth;
+                    Factions = Class.DefaultFactions;
+
+                    Weapon = Util.Random(Class.DefaultWeapon)?.Instantiate();
+                    Controller = Util.Random(Class.DefaultController)?.Clone();
                 }
             }
         }
@@ -183,16 +191,6 @@ namespace DyingAndMore.Game.Entities
             : base(null)
         {
             Class = @class;
-
-            if (Class == null)
-                return;
-
-            MaxSpeed = Class.MaxSpeed.Random();
-            CurrentHealth = Class.MaxHealth;
-            Factions = Class.DefaultFactions;
-
-            Weapon = Util.Random(Class.DefaultWeapon)?.Instantiate();
-            Controller = Util.Random(Class.DefaultController)?.Clone();
         }
 
         public override EntityInstance Clone()
@@ -236,7 +234,7 @@ namespace DyingAndMore.Game.Entities
             Velocity = vel;
             lastVelocity = Velocity;
 
-            if (CurrentHealth <= 0)
+            if (CurrentHealth <= 0 && Class.MaxHealth > 0)
                 Kill();
 
             base.Think(deltaTime);
@@ -262,7 +260,7 @@ namespace DyingAndMore.Game.Entities
 
         public virtual void TurnTowards(Vector2 direction)
         {
-            Forward = direction;
+            Forward = direction; //todo: slerp?
         }
 
         public virtual void Accelerate(Vector2 direction)
@@ -298,7 +296,8 @@ namespace DyingAndMore.Game.Entities
         {
             return $"{base.GetDebugInfo()}\n" +
                    $"Health: {CurrentHealth}/{Class?.MaxHealth}\n" +
-                   $"Weapon: {Weapon}";
+                   $"Weapon: {Weapon}\n" +
+                   $"Controller: {Controller}";
         }
 
         #region Helpers

@@ -276,10 +276,10 @@ namespace DyingAndMore
             });
             */
 
-            var map = Cache.Load<MapInstance>("mapsrc/shootingrange.map.tk");
-            map.Attach(map.FindEntityById(1), map.FindEntityById(9), new Vector2(30));
-            map.Attach(map.FindEntityById(1), map.FindEntityById(10), new Vector2(30, -30));
-            map.TimeScale = 1.5f;
+            var map = Cache.Load<MapInstance>("mapsrc/big.map.tk");
+            map.Attach(map.FindEntityById(7), map.FindEntityById(15), new Vector2(30));
+            map.Attach(map.FindEntityById(7), map.FindEntityById(16), new Vector2(60, -60));
+            map.TimeScale = 1.0f;
 
             childUI = new Game.GameInstance(new Game.Game
             {

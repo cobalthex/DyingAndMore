@@ -269,6 +269,7 @@ namespace Takai.Game
             if (!IsAlive)
                 return;
 
+            //trail should terminate where entity dies
             if (Trail != null)
                 Trail.AddPoint(Position, Trail.CurrentDirection, true);
 

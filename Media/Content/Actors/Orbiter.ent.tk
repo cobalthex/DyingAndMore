@@ -7,4 +7,7 @@ ActorClass {
             Sprite: @"./orbit.png";
         };
     };
+
+    MaxSpeed: 100;
+    MoveForce: 30;
 }

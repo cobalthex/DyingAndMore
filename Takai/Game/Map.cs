@@ -293,6 +293,8 @@ namespace Takai.Game
             //instance.Id = 0;
             instance.Map = null;
 
+            Detach(instance);
+
             possibleOffscreenEntities.Remove(instance);
             activeEntities.Remove(instance);
             _allEntities.Remove(instance);

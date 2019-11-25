@@ -652,7 +652,7 @@ namespace Takai.Game
                     _drawEntsOutlined.Add(ent);
                 else
                 {
-                    var angle = Util.Angle(new Vector2(ent.Transform.M11, ent.Transform.M12)); //flip Y
+                    var angle = Util.Angle(ent.RealForward);
 
                     foreach (var state in ent.ActiveAnimations)
                     {
@@ -711,7 +711,7 @@ namespace Takai.Game
                 }
 
                 if (renderSettings.drawEntityForwardVectors)
-                    DrawArrow(entPos, Vector2.TransformNormal(Vector2.UnitX, ent.Transform), ent.Radius * 1.3f, Color.Gold);
+                    DrawArrow(entPos, ent.RealForward, ent.Radius * 1.3f, Color.Gold);
 
                 if (renderSettings.drawDebugInfo && Class.DebugFont != null)
                 {
@@ -728,7 +728,7 @@ namespace Takai.Game
 
             foreach (var ent in _drawEntsOutlined)
             {
-                var angle = (float)System.Math.Atan2(ent.Forward.Y, ent.Forward.X);
+                var angle = Util.Angle(ent.RealForward);
 
                 foreach (var state in ent.ActiveAnimations)
                 {

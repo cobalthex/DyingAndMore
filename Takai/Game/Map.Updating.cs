@@ -189,9 +189,11 @@ namespace Takai.Game
                     var normV = deltaV / deltaVLen;
 
                     var offset = entity.Radius + 1;
-                    var start = entity.Position + (offset * normV);
+                    var start = entity.RealPosition + (offset * normV);
                     var hit = Trace(start, normV, deltaVLen, entity);
                     var target = start + (normV * (hit.distance - offset));
+
+                    //todo: ignore collisions if child?
 
                     if (hit.didHit)
                     {
@@ -202,7 +204,7 @@ namespace Takai.Game
                         {
                             if (isMapCollisionEnabled) //cleanup
                             {
-                                entity.Position = target;
+                                entity.SetPositionTransformed(target);
 
                                 var interaction = Class.MaterialInteractions.Find(entity.Material, Class.TilesMaterial);
 
@@ -233,7 +235,7 @@ namespace Takai.Game
                         }
                         else if (isEntityCollisionEnabled)
                         {
-                            entity.Position = target;
+                            entity.SetPositionTransformed(target);
 
                             var cm = new CollisionManifold
                             {
@@ -336,6 +338,15 @@ namespace Takai.Game
             }
         }
 
+        public void MoveEnt(EntityInstance entity, Vector2 position, Vector2 forward)
+        {
+            entity.Position = position;
+            entity.Forward = Vector2.Normalize(forward);
+
+            UpdateEntitySectors(entity);
+
+        }
+
         void UpdateEntitySectors(EntityInstance entity)
         {
             var lastSectors = GetOverlappingSectors(entity.lastAABB);
@@ -375,6 +386,12 @@ namespace Takai.Game
                 }
             }
             entity.lastAABB = eaabb;
+
+            if (entity.WorldChildren != null)
+            {
+                foreach (var child in entity.WorldChildren)
+                    UpdateEntitySectors(child);
+            }
         }
 
         /// <summary>
@@ -565,6 +582,8 @@ namespace Takai.Game
             _updateStats.lastFrameDuration = updateClock.Elapsed;
         }
 
+        //todo: move ↓ to map.cs
+
         public void Attach(EntityInstance parent, EntityInstance child, Vector2 relativePosition)
         {
             //limit depth?
@@ -604,9 +623,7 @@ namespace Takai.Game
             child.WorldParent = null;
             child.Position = Vector2.Transform(child.Position, child.Transform); //todo: verify
 
-            child.UpdateAxisAlignedBounds();
             UpdateEntitySectors(child);
-            parent.UpdateAxisAlignedBounds();
             UpdateEntitySectors(parent);
         }
     }

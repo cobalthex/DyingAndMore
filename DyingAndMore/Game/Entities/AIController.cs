@@ -114,6 +114,10 @@ namespace DyingAndMore.Game.Entities
                 behaviorCosts[i] = new List<PrioritizedBehavior>();
         }
 
+        public override string ToString()
+        {
+            return $"{base.ToString()} ({string.Join(",", Behaviors)})";
+        }
         public override void Think(TimeSpan deltaTime)
         {
             if (GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isAiEnabled)
