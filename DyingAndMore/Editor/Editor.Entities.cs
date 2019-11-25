@@ -157,7 +157,7 @@ namespace DyingAndMore.Editor
             if (dea.button == 0 && SelectedEntity != null)
             {
                 var delta = editor.Camera.LocalToWorld(dea.delta);
-                MoveEnt(SelectedEntity, SelectedEntity.Position + delta, SelectedEntity.Forward);
+                editor.Map.MoveEnt(SelectedEntity, SelectedEntity.Position + delta, SelectedEntity.Forward);
                 return UIEventResult.Handled;
             }
 
@@ -172,12 +172,12 @@ namespace DyingAndMore.Editor
             {
                 if (InputState.IsButtonDown(Keys.R))
                 {
-                    //todo: sector modification?
+                    //needs to take into account parent rotations
                     var diff = currentWorldPos - SelectedEntity.RealPosition;
                     Vector2 newForward;
                     if (InputState.IsMod(KeyMod.Shift))
                     {
-                        var theta = (float)System.Math.Atan2(diff.Y, diff.X);
+                        var theta = Util.Angle(diff);
                         theta = (float)System.Math.Round(theta / editor.config.snapAngle) * editor.config.snapAngle;
                         newForward = new Vector2(
                             (float)System.Math.Cos(theta),
@@ -186,7 +186,12 @@ namespace DyingAndMore.Editor
                     }
                     else
                         newForward = diff;
-                    MoveEnt(SelectedEntity, SelectedEntity.Position, newForward);
+
+                    editor.Map.MoveEnt(
+                        SelectedEntity, 
+                        SelectedEntity.Position, 
+                        newForward
+                    );
                     return false;
                 }
 
@@ -258,29 +263,6 @@ namespace DyingAndMore.Editor
 #endif
 
             return base.HandleInput(time);
-        }
-
-        void MoveEnt(Takai.Game.EntityInstance ent, Vector2 newPosition, Vector2 newForward)
-        {
-            //todo: use Map.MoveEnt
-
-            var sectors = editor.Map.GetOverlappingSectors(ent.AxisAlignedBounds);
-
-            for (int y = sectors.Top; y < sectors.Bottom; ++y)
-            {
-                for (int x = sectors.Left; x < sectors.Right; ++x)
-                    editor.Map.Sectors[y, x].entities.Remove(ent);
-            }
-
-            ent.Position = newPosition;
-            ent.Forward = Vector2.Normalize(newForward);
-
-            sectors = editor.Map.GetOverlappingSectors(ent.AxisAlignedBounds);
-            for (int y = sectors.Top; y < sectors.Bottom; ++y)
-            {
-                for (int x = sectors.Left; x < sectors.Right; ++x)
-                    editor.Map.Sectors[y, x].entities.Add(ent);
-            }
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

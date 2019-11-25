@@ -23,13 +23,13 @@ namespace DyingAndMore.Game.Entities.Behaviors
         {
             var currentRadius = AI.Actor.Position.Length(); //assumes position relative to parent
             var currentTheta = Takai.Util.Angle(AI.Actor.Position);
-            var direction = 1; //positive for counterclockwise, negative for clockwise
-            //todo: calculate direction based on forward
 
-            var nextTheta = AI.Actor.Velocity.Length() / currentRadius; //do some arc math ?
+            float arcLen = 100;
+            var nextAngle = currentTheta - (arcLen / DesiredRadius);
+            var newForward = Takai.Util.Direction(nextAngle);
+            AI.Actor.Forward = newForward;
 
-            var newForward = Takai.Util.Direction(nextTheta);
-            //AI.Actor.Forward = newForward;
+            AI.Actor.Accelerate(AI.Actor.Forward);
         }
     }
 }

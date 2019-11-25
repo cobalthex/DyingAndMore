@@ -70,27 +70,6 @@ MapInstance {
             SpawnTime: 0;
             EventHandlers: Null;
         }
-        EntityInstance {
-            Class: @"Scenery/thing.ent.tk";
-            Id: 9;
-            Position: [220 220];
-            Forward: [1 0];
-            Velocity: [0 0];
-            SpawnTime: 1;
-        }
-        ActorInstance {
-            Class: @"Actors/orbiter.ent.tk";
-            Id: 10;
-            Position: [220 240];
-            Forward: [1 0];
-            Velocity: [0 0];
-            SpawnTime: 1;
-			Controller: AIController {
-				Behaviors: [
-					OrbitBehavior {}
-				]
-			};
-        }
 
         ActorInstance {
             Class: @"Actors/Target.ent.tk";

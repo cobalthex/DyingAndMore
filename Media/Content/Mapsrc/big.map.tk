@@ -56,6 +56,27 @@ MapInstance {
             SpawnTime: 237739;
             EventHandlers: Null;
         }
+        EntityInstance {
+            Class: @"Scenery/thing.ent.tk";
+            Id: 15;
+            Position: [220 220];
+            Forward: [1 0];
+            Velocity: [0 0];
+            SpawnTime: 1;
+        }
+        ActorInstance {
+            Class: @"Actors/orbiter.ent.tk";
+            Id: 16;
+            Position: [220 240];
+            Forward: [1 0];
+            Velocity: [10 0];
+            SpawnTime: 1;
+            Controller: AIController {
+                Behaviors: [
+                    OrbitBehavior {}
+                ]
+            };
+        }
 
         WeaponPickupInstance {
             Weapon: GunInstance {

@@ -543,9 +543,9 @@ namespace DyingAndMore.Game
 #if DEBUG
                 foreach (var ent in Map.ActiveEntities)
                 {
-                    if (ent is Entities.ActorInstance actor)
+                    if (ent is Entities.ActorInstance actor && actor.Class.MaxHealth > 0)
                     {
-                        var pos = player.camera.WorldToScreen(ent.Position - new Vector2(0, ent.Radius + 16));
+                        var pos = player.camera.WorldToScreen(ent.RealPosition - new Vector2(0, ent.Radius + 16));
                         DrawHealthBar(spriteBatch, pos, actor.CurrentHealth, actor.Class.MaxHealth);
                     }
                 }
