@@ -361,7 +361,7 @@ namespace Takai.Game
         {
             magnitude = System.Math.Max(magnitude, 8);
             var tip = position + (direction * magnitude);
-            DrawLine(position, tip, Color.Yellow);
+            DrawLine(position, tip, color);
 
             magnitude = MathHelper.Clamp(magnitude * 0.333f, 5, 30);
             DrawLine(tip, tip - (magnitude * Vector2.TransformNormal(direction, arrowWingTransform)), color);

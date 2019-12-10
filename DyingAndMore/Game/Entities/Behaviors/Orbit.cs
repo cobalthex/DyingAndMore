@@ -11,9 +11,6 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
         public override BehaviorFilters Filter => BehaviorFilters.RequiresParent;
 
-        public float Strength { get; set; } = 10;
-        public float Radius { get; set; } = 200;
-
         public override BehaviorPriority CalculatePriority()
         {
             return BehaviorPriority.Normal;
@@ -21,15 +18,28 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
         public override void Think(TimeSpan deltaTime)
         {
-            var currentRadius = AI.Actor.Position.Length(); //assumes position relative to parent
-            var currentTheta = Takai.Util.Angle(AI.Actor.Position);
+            Vector2 origin = Vector2.Zero;
 
-            float arcLen = 100;
-            var nextAngle = currentTheta - (arcLen / DesiredRadius);
-            var newForward = Takai.Util.Direction(nextAngle);
-            AI.Actor.Forward = newForward;
+            var diff = AI.Actor.Position - origin;
+            var diffN = Vector2.Normalize(diff);
 
-            AI.Actor.Accelerate(AI.Actor.Forward);
+            var r = diffN * DesiredRadius;
+
+            float orientation = Takai.Util.Determinant(r, AI.Actor.RealForward); //  check if 0
+            if (orientation == 0)
+                orientation = -1;
+            
+            float theta = MathHelper.PiOver4 * orientation;
+
+            AI.Actor.Map.DrawCircle(AI.Actor.WorldParent.RealPosition, DesiredRadius, Color.Gray);
+            AI.Actor.Map.DrawArrow(AI.Actor.RealPosition, diffN, DesiredRadius, Color.Red);
+
+            AI.Actor.Forward = Vector2.TransformNormal(AI.Actor.Forward, Matrix.CreateRotationZ(theta * (float)deltaTime.TotalSeconds));
+
+            //AI.Actor.Accelerate(AI.Actor.Forward);
         }
     }
 }
+
+//a = original, b = desired direction, proj = a on b
+//proj = a * unit(b) = (a.unit(b))*unit(b)
