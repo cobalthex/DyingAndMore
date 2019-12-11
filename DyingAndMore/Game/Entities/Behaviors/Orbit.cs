@@ -25,18 +25,20 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
             var r = diffN * DesiredRadius;
 
-            float orientation = Takai.Util.Determinant(r, AI.Actor.RealForward); //  check if 0
+            float orientation = Takai.Util.Determinant(r, AI.Actor.Forward); //  check if 0
+            Takai.DebugPropertyDisplay.AddRow("Orientation", orientation.ToString("N4"));
             if (orientation == 0)
                 orientation = -1;
             
             float theta = MathHelper.PiOver4 * orientation;
 
+            AI.Actor.Map.DrawX(AI.Actor.WorldParent.RealPosition + r, 5, Color.Orange);
             AI.Actor.Map.DrawCircle(AI.Actor.WorldParent.RealPosition, DesiredRadius, Color.Gray);
             AI.Actor.Map.DrawArrow(AI.Actor.RealPosition, diffN, DesiredRadius, Color.Red);
 
             AI.Actor.Forward = Vector2.TransformNormal(AI.Actor.Forward, Matrix.CreateRotationZ(theta * (float)deltaTime.TotalSeconds));
 
-            //AI.Actor.Accelerate(AI.Actor.Forward);
+            AI.Actor.Accelerate(AI.Actor.Forward);
         }
     }
 }

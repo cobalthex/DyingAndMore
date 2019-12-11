@@ -85,6 +85,27 @@ namespace Takai
         }
     }
 
+    public static class DebugPropertyDisplay
+    {
+        private static List<KeyValuePair<string, string>> rows = new List<KeyValuePair<string, string>>();
+
+        public static IReadOnlyList<KeyValuePair<string, string>> Entries => rows.AsReadOnly();
+
+        public static int KeyWidth { get; private set; }
+
+        public static void Reset()
+        {
+            rows.Clear();
+            KeyWidth = 0;
+        }
+
+        public static void AddRow(string key, object value)
+        {
+            rows.Add(new KeyValuePair<string, string>(key, value.ToString()));
+            KeyWidth = Math.Max(key.Length, KeyWidth);
+        }
+    }
+
     public class FpsGraph : UI.Static
     {
         struct FpsTick

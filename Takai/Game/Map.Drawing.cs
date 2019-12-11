@@ -368,6 +368,12 @@ namespace Takai.Game
             DrawLine(tip, tip - (magnitude * Vector2.TransformNormal(direction, Matrix.Invert(arrowWingTransform))), color);
         }
 
+        public void DrawX(Vector2 position, float edgeLength, Color color)
+        {
+            DrawLine(position - new Vector2(edgeLength), position + new Vector2(edgeLength), color);
+            DrawLine(position + new Vector2(-edgeLength, edgeLength), position + new Vector2(edgeLength, -edgeLength), color);
+        }
+
         private List<EntityInstance> _drawEntsOutlined = new List<EntityInstance>();
         private HashSet<Trigger> _drawTriggers = new HashSet<Trigger>();
 

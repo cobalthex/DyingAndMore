@@ -44,6 +44,7 @@ namespace DyingAndMore
 
         SpriteBatch sbatch;
         Static ui;
+        Takai.Graphics.BitmapFont debugFont;
 
         public Matrix uiMatrix;
 
@@ -92,6 +93,8 @@ namespace DyingAndMore
             GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
             gdm.ApplyChanges();
+
+            debugFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/mono.fnt.tk");
 
             #region Mouse Cursor
 #if WINDOWS
@@ -278,13 +281,15 @@ namespace DyingAndMore
 
             var map = Cache.Load<MapInstance>("mapsrc/big.map.tk");
             map.Attach(map.FindEntityById(7), map.FindEntityById(15), new Vector2(30));
-            map.Attach(map.FindEntityById(7), map.FindEntityById(16), new Vector2(60, -60));
-            map.TimeScale = 1.0f;
+            map.Attach(map.FindEntityById(7), map.FindEntityById(16), new Vector2(300));
 
             childUI = new Game.GameInstance(new Game.Game
             {
                 Map = map
-            });
+            })
+            {
+                IsPaused = true
+            };
 
             map.renderSettings.drawColliders = true;
             map.renderSettings.drawEntityForwardVectors = true;
@@ -333,6 +338,8 @@ namespace DyingAndMore
 
         protected override void Update(GameTime gameTime)
         {
+            Takai.DebugPropertyDisplay.Reset();
+
             InputState.Update(GraphicsDevice.Viewport.Bounds);
 
             if (InputState.IsPress(Keys.Q)
@@ -367,10 +374,19 @@ namespace DyingAndMore
                 if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
                 {
                     var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
-                    var sz = ui.Font.MeasureString(text);
-                    ui.Font.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
+                    var sz = debugFont.MeasureString(text);
+                    debugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
                 }
-                y -= ui.Font.MaxCharHeight;
+                y -= debugFont.MaxCharHeight;
+            }
+
+            y = 70;
+            foreach (var row in Takai.DebugPropertyDisplay.Entries)
+            {
+                var text = row.Key.PadLeft(Takai.DebugPropertyDisplay.KeyWidth) + $" = {row.Value}";
+                var sz = debugFont.MeasureString(text, true);
+                debugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - 300, y), Color.Cyan, true);
+                y += debugFont.MaxCharHeight;
             }
 
             sbatch.End();
