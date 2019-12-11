@@ -18,20 +18,20 @@ namespace Takai.Graphics
         /// </summary>
         public System.Collections.Generic.Dictionary<char, Rectangle> Characters
         {
-            get => characters;
+            get => _characters;
             protected set
             {
-                characters = value;
+                _characters = value;
                 MaxCharWidth = 0;
                 MaxCharHeight = 0;
-                foreach (var @char in characters)
+                foreach (var @char in _characters)
                 {
                     MaxCharWidth  = Math.Max(MaxCharWidth, @char.Value.Width);
                     MaxCharHeight = Math.Max(MaxCharHeight, @char.Value.Height);
                 }
             }
         }
-        private System.Collections.Generic.Dictionary<char, Rectangle> characters;
+        private System.Collections.Generic.Dictionary<char, Rectangle> _characters;
 
         /// <summary>
         /// The source texture holding all of the character images
@@ -80,7 +80,7 @@ namespace Takai.Graphics
             int x, y, w, h; char c;
             read.Read(block, 0, 4);
             int len = BitConverter.ToInt32(block, 0);
-            font.characters = new System.Collections.Generic.Dictionary<char, Rectangle>(len);
+            font._characters = new System.Collections.Generic.Dictionary<char, Rectangle>(len);
             font.MaxCharWidth = 0;
             font.MaxCharHeight = 0;
             for (int i = 0; i < len; ++i)
@@ -98,7 +98,7 @@ namespace Takai.Graphics
                 font.MaxCharWidth = Math.Max(font.MaxCharWidth, w);
                 font.MaxCharHeight = Math.Max(font.MaxCharHeight, h);
 
-                font.characters.Add(c, new Rectangle(x, y, w, h));
+                font._characters.Add(c, new Rectangle(x, y, w, h));
             }
             block = new byte[8];
             read.Read(block, 0, 8);
@@ -308,9 +308,9 @@ namespace Takai.Graphics
         /// <param name="String">the string to measure</param>
         /// <returns>The size in pixels of the string</returns>
         /// <remarks>Characters not 6in the font are ignored</remarks>
-        public Vector2 MeasureString(string String)
+        public Vector2 MeasureString(string String, bool monoSpace = false)
         {
-            return MeasureString(String, 0, -1);
+            return MeasureString(String, 0, -1, monoSpace);
         }
 
         /// <summary>

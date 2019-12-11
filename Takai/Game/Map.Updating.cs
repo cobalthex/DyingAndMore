@@ -375,7 +375,7 @@ namespace Takai.Game
                             Sectors[y, x].entities.Remove(entity);
                         }
 
-                        foreach (var trigger in Sectors[y, x].triggers)
+                        foreach (var trigger in Sectors[y, x].triggers) 
                         {
                             if (trigger.Region.Intersects(eaabb))
                                 trigger.TryEnter(entity);

@@ -69,7 +69,7 @@ MapInstance {
             Id: 16;
             Position: [220 240];
             Forward: [1 0];
-            Velocity: [10 0];
+            Velocity: [30 0];
             SpawnTime: 1;
             Controller: AIController {
                 Behaviors: [
