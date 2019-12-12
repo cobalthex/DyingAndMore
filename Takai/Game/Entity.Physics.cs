@@ -91,11 +91,27 @@ namespace Takai.Game
         /// <returns>The new, local position</returns>
         public Vector2 SetPositionTransformed(Vector2 transformedPosition)
         {
+            //todo: merge with RealPosition?
             if (WorldParent == null)
                 Position = transformedPosition;
             else
                 Position = Vector2.Transform(transformedPosition, Matrix.Invert(WorldParent.Transform));
             return Position;
+        }
+        /// <summary>
+        /// Set the local forward to an already transformed direction
+        /// </summary>
+        /// <param name="transformedForward">The transformed (world space) forward (does not need to be normalized)</param>
+        /// <returns>The new, local forward</returns>
+        public Vector2 SetForwardTransformed(Vector2 transformedForward)
+        {
+            transformedForward.Normalize();
+            //todo: merge with RealPosition?
+            if (WorldParent == null)
+                Forward = transformedForward;
+            else
+                Forward = Vector2.Transform(transformedForward, Matrix.Invert(WorldParent.Transform));
+            return Forward;
         }
 
         internal void UpdateWorldState()

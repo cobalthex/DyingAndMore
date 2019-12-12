@@ -1,0 +1,57 @@
+MapInstance {
+    Squads: Null;
+    Class: MapClass {
+        Name: "Twelve";
+        TileSize: 48;
+        Tileset: Tileset {
+            texture: "Tilesets/Tiles2.png";
+            size: 48;
+        };
+        MaterialInteractions: MaterialInteractions {
+            File: Null;
+            Interactions: [];
+        };
+        TilesMaterial: "Tiles";
+        TilesImage: "Tilesets/Tiles2.png";
+        Width: 12;
+        Height: 12;
+        Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    };
+    Sounds: [];
+    ElapsedTime: 24473.8787;
+    TimeScale: 1;
+    currentScreenFade: ScreenFade {
+        Duration: 0;
+        Colors: Null;
+        Blend: Null;
+    };
+    currentScreenFadeElapsedTime: 24473.8787;
+    Entities: [
+        ActorInstance {
+            Class: @"Actors/Player.ent.tk";
+            Factions: Factions [Player Ally];
+            Controller: InputController {
+                Inputs: Null;
+            };
+            CurrentHealth: 5000;
+            Conditions: {
+            };
+            MaxSpeed: 300;
+            Weapon: Null;
+            Id: 2;
+            Class: @"Actors/Player.ent.tk";
+            Name: Null;
+            OutlineColor: [255 215 0 255];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 20384.3361;
+            EventHandlers: Null;
+            Position: [288 288];
+            Forward: [1 0];
+            Velocity: [0 0];
+        }
+    ];
+    Triggers: [];
+    Fluids: [];
+}

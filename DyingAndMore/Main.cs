@@ -279,16 +279,22 @@ namespace DyingAndMore
             });
             */
 
-            var map = Cache.Load<MapInstance>("mapsrc/big.map.tk");
-            map.Attach(map.FindEntityById(7), map.FindEntityById(15), new Vector2(30));
-            map.Attach(map.FindEntityById(7), map.FindEntityById(16), new Vector2(300));
+            var map = Cache.Load<MapInstance>("mapsrc/twelve.map.tk");
+            var ent = map.Spawn(Cache.Load<Takai.Game.EntityClass>("Actors/orbiter.ent.tk"), new Vector2(200, 100), Vector2.UnitY, Vector2.Zero);
+            var actor = (Game.Entities.ActorInstance)ent;
+            actor.Controller = new Game.Entities.AIController()
+            {
+                Behaviors = new List<Game.Entities.Behavior> { new Game.Entities.Behaviors.OrbitBehavior() }
+            };
+            //map.Attach(map.FindEntityById(7), map.FindEntityById(15), new Vector2(30));
+            //map.Attach(map.FindEntityById(7), map.FindEntityById(16), new Vector2(120,0));
 
             childUI = new Game.GameInstance(new Game.Game
             {
                 Map = map
             })
             {
-                IsPaused = true
+                IsPaused = false
             };
 
             map.renderSettings.drawColliders = true;

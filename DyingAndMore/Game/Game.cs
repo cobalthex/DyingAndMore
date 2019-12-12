@@ -412,7 +412,6 @@ namespace DyingAndMore.Game
             Parent.ReplaceAllChildren(Editor.Editor.Current);
         }
 
-        System.Diagnostics.Stopwatch swatch = new System.Diagnostics.Stopwatch();
         protected override bool HandleInput(GameTime time)
         {
             /*if (player != null)
