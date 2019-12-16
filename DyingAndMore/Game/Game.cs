@@ -340,7 +340,7 @@ namespace DyingAndMore.Game
                 return;
 
             Map.updateSettings.SetGame();
-            Map.renderSettings.SetDefault();
+            //Map.renderSettings.SetDefault(); //store settings in editor/game and restore
             updateSettingsPane?.BindTo(Map.updateSettings);
             renderSettingsPane?.BindTo(Map.renderSettings);
 

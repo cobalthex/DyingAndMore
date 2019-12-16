@@ -38,7 +38,7 @@ MapInstance {
             };
             MaxSpeed: 300;
             Weapon: Null;
-            Id: 2;
+            Id: 1;
             Class: @"Actors/Player.ent.tk";
             Name: Null;
             OutlineColor: [255 215 0 255];
