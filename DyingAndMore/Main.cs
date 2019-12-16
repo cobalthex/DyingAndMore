@@ -280,12 +280,15 @@ namespace DyingAndMore
             */
 
             var map = Cache.Load<MapInstance>("mapsrc/twelve.map.tk");
-            var ent = map.Spawn(Cache.Load<Takai.Game.EntityClass>("Actors/orbiter.ent.tk"), new Vector2(200, 100), Vector2.UnitY, Vector2.Zero);
+            map.TimeScale = 1f;
+            var ent = map.Spawn(Cache.Load<Takai.Game.EntityClass>("Actors/orbiter.ent.tk"), new Vector2(100), Vector2.UnitY, Vector2.Zero);
             var actor = (Game.Entities.ActorInstance)ent;
             actor.Controller = new Game.Entities.AIController()
             {
                 Behaviors = new List<Game.Entities.Behavior> { new Game.Entities.Behaviors.OrbitBehavior() }
             };
+            map.Attach(map.FindEntityById(1), actor, new Vector2(50, 50));
+
             //map.Attach(map.FindEntityById(7), map.FindEntityById(15), new Vector2(30));
             //map.Attach(map.FindEntityById(7), map.FindEntityById(16), new Vector2(120,0));
 
@@ -294,11 +297,11 @@ namespace DyingAndMore
                 Map = map
             })
             {
-                IsPaused = false
+                IsPaused = false,
             };
 
-            map.renderSettings.drawColliders = true;
             map.renderSettings.drawEntityForwardVectors = true;
+            map.renderSettings.drawEntityHierarchies = true;
 
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)

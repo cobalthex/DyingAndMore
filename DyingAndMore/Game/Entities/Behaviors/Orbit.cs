@@ -3,9 +3,20 @@ using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Entities.Behaviors
 {
+    /// <summary>
+    /// Orbit around a point
+    /// (Does not perform astrodynamics)
+    /// Attempts to maintain orbit at standard acceleration speed and turn speed
+    /// </summary>
     public class OrbitBehavior : Behavior
     {
         public float DesiredRadius { get; set; } = 100; // include parent and self radius in this distance? (dist between edges or dist between centers)
+
+        /// <summary>
+        /// How fast to turn towards the desired orbit radius
+        /// Defaults to π
+        /// </summary>
+        public float TurnSpeed = MathHelper.Pi;
 
         public override BehaviorMask Mask => BehaviorMask.Movement;
 
@@ -18,22 +29,37 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
         public override void Think(TimeSpan deltaTime)
         {
-            Vector2 origin = new Vector2(50);
+            Vector2 origin = new Vector2(0); //make this programatic?
 
-            var diff = AI.Actor.Position - origin;
-            var diffN = Vector2.Normalize(diff);
+            var diff = origin - AI.Actor.Position;
+            var diffLen = diff.Length();
+            if (diffLen > DesiredRadius)
+            {
+                var a = (float)Math.Asin(DesiredRadius / diffLen);
+                var b = Takai.Util.Angle(diff); //can this be optimized? (w/ above)
 
-            var r = diffN * DesiredRadius;
+                float t;
+                Vector2 tr;
 
-            float orientation = Takai.Util.Determinant(r, (AI.Actor.Position - r));
-            Takai.DebugPropertyDisplay.AddRow("Orientation", orientation.ToString("N4"));
-            
-            float theta = MathHelper.PiOver4 * Math.Sign(orientation); //todo
+                var det = Takai.Util.Determinant(AI.Actor.Forward, Vector2.Normalize(diff)); //normalize necessary?
+                if (det > 0)
+                {
+                    t = b - a;
+                    tr = new Vector2((float)Math.Sin(t), (float)-Math.Cos(t)) * DesiredRadius;
+                }
+                else
+                {
+                    t = b + a;
+                    tr = new Vector2((float)-Math.Sin(t), (float)Math.Cos(t)) * DesiredRadius;
+                }
 
-            //AI.Actor.Map.DrawCircle(AI.Actor.WorldParent.RealPosition, DesiredRadius, Color.Gray);
-            AI.Actor.Map.DrawArrow(AI.Actor.RealPosition, diffN, DesiredRadius, Color.Red);
+                var tangentDir = Vector2.Normalize((origin + tr) - AI.Actor.Position);
 
-            AI.Actor.Forward = Vector2.TransformNormal(AI.Actor.Forward, Matrix.CreateRotationZ(theta * (float)deltaTime.TotalSeconds));
+                var cross = Takai.Util.Determinant(AI.Actor.Forward, tangentDir);
+                float angle = TurnSpeed * cross * (float)deltaTime.TotalSeconds;
+
+                AI.Actor.Forward = Vector2.TransformNormal(AI.Actor.Forward, Matrix.CreateRotationZ(angle));
+            }
             AI.Actor.Accelerate(AI.Actor.Forward);
         }
     }

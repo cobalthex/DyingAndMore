@@ -244,6 +244,7 @@ namespace Takai.Game
             public bool drawSectorsOnGrid;
             public bool drawBordersAroundNonDrawingEntities;
             public bool drawEntityForwardVectors;
+            public bool drawEntityHierarchies;
             public bool drawColliders;
             public bool drawPathHeuristic;
             public bool drawScreenEffects;
@@ -263,6 +264,7 @@ namespace Takai.Game
                 drawSectorsOnGrid = false;
                 drawBordersAroundNonDrawingEntities = false;
                 drawEntityForwardVectors = false;
+                drawEntityHierarchies = false;
                 drawColliders = false;
                 drawPathHeuristic = false;
                 drawDebugInfo = false;
@@ -718,6 +720,9 @@ namespace Takai.Game
 
                 if (renderSettings.drawEntityForwardVectors)
                     DrawArrow(entPos, ent.RealForward, ent.Radius * 1.3f, Color.Gold);
+
+                if (renderSettings.drawEntityHierarchies && ent.WorldParent != null)
+                    DrawLine(entPos, ent.WorldParent.RealPosition, Color.LightGreen, 10);
 
                 if (renderSettings.drawDebugInfo && Class.DebugFont != null)
                 {
