@@ -375,7 +375,7 @@ namespace Takai.Game
                             Sectors[y, x].entities.Remove(entity);
                         }
 
-                        foreach (var trigger in Sectors[y, x].triggers) 
+                        foreach (var trigger in Sectors[y, x].triggers)
                         {
                             if (trigger.Region.Intersects(eaabb))
                                 trigger.TryEnter(entity);
@@ -584,7 +584,7 @@ namespace Takai.Game
 
         //todo: move ↓ to map.cs
 
-        public void Attach(EntityInstance parent, EntityInstance child, Vector2 relativePosition)
+        public void Attach(EntityInstance parent, EntityInstance child)
         {
             //limit depth?
 
@@ -602,7 +602,8 @@ namespace Takai.Game
             parent._worldChildren.Add(child);
 
             child.Velocity = Vector2.Zero;
-            child.Position = relativePosition;
+            child.SetPositionTransformed(child.RealPosition);
+            child.SetForwardTransformed(child.RealForward);
 
             child.UpdateAxisAlignedBounds();
             UpdateEntitySectors(child);
@@ -621,7 +622,8 @@ namespace Takai.Game
             var parent = child.WorldParent;
             parent._worldChildren?.Remove(child);
             child.WorldParent = null;
-            child.Position = Vector2.Transform(child.Position, child.Transform); //todo: verify
+            child.Position = child.RealPosition;
+            child.Forward = child.RealForward;
 
             UpdateEntitySectors(child);
             UpdateEntitySectors(parent);

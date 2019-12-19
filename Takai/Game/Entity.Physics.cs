@@ -106,11 +106,11 @@ namespace Takai.Game
         public Vector2 SetForwardTransformed(Vector2 transformedForward)
         {
             transformedForward.Normalize();
-            //todo: merge with RealPosition?
+            //todo: merge with RealForward?
             if (WorldParent == null)
                 Forward = transformedForward;
             else
-                Forward = Vector2.Transform(transformedForward, Matrix.Invert(WorldParent.Transform));
+                Forward = Vector2.TransformNormal(transformedForward, Matrix.Invert(WorldParent.Transform));
             return Forward;
         }
 

@@ -232,11 +232,20 @@ namespace Takai.Game
                 Trail = Class.Trail.Instantiate();
         }
 
+        /// <summary>
+        /// Clone this entity
+        /// Sets map to null and removes hierarchies
+        /// </summary>
+        /// <returns>Cloned entity</returns>
         public virtual EntityInstance Clone()
         {
             var clone = (EntityInstance)MemberwiseClone();
             clone.Id = 0;
             clone.Map = null;
+            clone.WorldParent = null;
+            clone._worldChildren = null; //clone children? (option?)
+            clone.Position = clone.RealPosition;
+            clone.Forward = clone.RealForward;
             if (clone.Name != null && !clone.Name.EndsWith(" (Clone)"))
                 clone.Name += " (Clone)";
             return clone;

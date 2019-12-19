@@ -123,7 +123,7 @@ namespace DyingAndMore
             //var state = new Editor.Editor();
             //GameManager.PushState(state);
 
-            // = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/test.fnt.tk");
+            // = Cache.Load<Takai.Graphics.BitmapFneedle.ent.rtkont>("Fonts/test.fnt.tk");
 
             //todo: move elsewhere
             Static.GlobalCommands["AddUI"] = delegate (Static ui, object arg)
@@ -279,19 +279,7 @@ namespace DyingAndMore
             });
             */
 
-            var map = Cache.Load<MapInstance>("mapsrc/twelve.map.tk");
-            map.TimeScale = 1f;
-            var ent = map.Spawn(Cache.Load<Takai.Game.EntityClass>("Actors/orbiter.ent.tk"), new Vector2(100), Vector2.UnitY, Vector2.Zero);
-            var actor = (Game.Entities.ActorInstance)ent;
-            actor.Controller = new Game.Entities.AIController()
-            {
-                Behaviors = new List<Game.Entities.Behavior> { new Game.Entities.Behaviors.OrbitBehavior() }
-            };
-            map.Attach(map.FindEntityById(1), actor, new Vector2(50, 50));
-
-            //map.Attach(map.FindEntityById(7), map.FindEntityById(15), new Vector2(30));
-            //map.Attach(map.FindEntityById(7), map.FindEntityById(16), new Vector2(120,0));
-
+            var map = Cache.Load<MapInstance>("mapsrc/shootingrange.map.tk");
             childUI = new Game.GameInstance(new Game.Game
             {
                 Map = map
@@ -299,7 +287,6 @@ namespace DyingAndMore
             {
                 IsPaused = false,
             };
-
             map.renderSettings.drawEntityForwardVectors = true;
             map.renderSettings.drawEntityHierarchies = true;
 

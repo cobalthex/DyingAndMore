@@ -260,8 +260,8 @@ namespace DyingAndMore.Game.Entities
             {
                 actor.ReceiveDamage(Class.Damage, Source);
 
-                if (Class.Sticky)
-                    actor.Map.Attach(actor, this, Position - actor.Position);
+                if (Class.Sticky) //todo: test
+                    actor.Map.Attach(actor, this);
             }
         }
     }

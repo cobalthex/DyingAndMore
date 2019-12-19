@@ -284,6 +284,14 @@ namespace Takai.Game
         /// <param name="instance">the ent to destroy</param>
         protected void FinalDestroy(EntityInstance instance)
         {
+            //optimize this behavior?
+            Detach(instance);
+            if (instance.WorldChildren != null)
+            {
+                while (instance.WorldChildren.Count > 0)
+                    Detach(instance.WorldChildren[0]);
+            }
+
             foreach (var sector in EnumeratateSectorsInRegion(instance.AxisAlignedBounds))
                 foreach (var trigger in sector.triggers)
                     trigger.TryExit(instance);
