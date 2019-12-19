@@ -9,7 +9,7 @@ ProjectileClass {
     MagnetismAnglePerSecond: 1200deg;
     InheritSourcePhysics: false;
     Damage: 25;
-    #Sticky: true;
+    Sticky: true;
 
     Trail: {
         #MaxPoints: 100;

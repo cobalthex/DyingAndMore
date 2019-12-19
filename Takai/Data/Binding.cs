@@ -162,6 +162,10 @@ namespace Takai.Data
                     getset.set = null;
                     return getset;
                 }
+                else if (modifier[1].Equals("count", StringComparison.OrdinalIgnoreCase))
+                {
+                    //todo
+                }
                 else
                     System.Diagnostics.Debug.WriteLine($"Ignoring unknown binding modifier {modifier[0]}:{modifier[1]}");
             }

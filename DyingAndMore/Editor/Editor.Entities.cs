@@ -66,12 +66,14 @@ namespace DyingAndMore.Editor
         public override void Start()
         {
             editor.Map.renderSettings.drawEntityForwardVectors = true;
+            editor.Map.renderSettings.drawEntityHierarchies = true;
         }
 
         public override void End()
         {
             SelectedEntity = null;
             editor.Map.renderSettings.drawEntityForwardVectors = false;
+            editor.Map.renderSettings.drawEntityHierarchies = false;
         }
 
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
@@ -82,6 +84,7 @@ namespace DyingAndMore.Editor
 
             if (pea.button == 0)
             {
+                /*
 #if WINDOWS
                 //load entity from file
                 if (InputState.IsMod(KeyMod.Alt))
@@ -100,9 +103,15 @@ namespace DyingAndMore.Editor
                     return UIEventResult.Handled;
                 }
 #endif
-
-
+                */
                 var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, inputSearchRadius);
+
+                if (InputState.IsMod(KeyMod.Alt) && SelectedEntity != null && selected.Count > 0)
+                {
+                    editor.Map.Attach(selected[0], SelectedEntity);
+                    return UIEventResult.Handled;
+                }
+
                 if (selected.Count < 1)
                 {
                     if (editor.Map.Class.Bounds.Contains(currentWorldPos) && selector.ents.Count > 0)
@@ -118,6 +127,7 @@ namespace DyingAndMore.Editor
                     if (InputState.IsMod(KeyMod.Control))
                     {
                         SelectedEntity = SelectedEntity.Clone();
+                        //maintain hierarchy?
                         editor.Map.Spawn(SelectedEntity);
                     }
                 }
@@ -275,30 +285,6 @@ namespace DyingAndMore.Editor
         //todo: make work in both editor and game
         void DrawEntityInfo(SpriteBatch spriteBatch)
         {
-            if (SelectedEntity != null)
-            {
-                if (SelectedEntity.WorldParent != null)
-                {
-                    editor.Map.DrawLine(
-                        SelectedEntity.RealPosition,
-                        SelectedEntity.WorldParent.RealPosition,
-                        Color.CornflowerBlue,
-                        8
-                    );
-                }
-                if (SelectedEntity.WorldChildren != null)
-                {
-                    foreach (var child in SelectedEntity.WorldChildren)
-                    {
-                        editor.Map.DrawLine(
-                            child.RealPosition,
-                            SelectedEntity.RealPosition,
-                            Color.YellowGreen,
-                            4
-                        );
-                    }
-                }
-            }
             //todo: only draw around cursor?
 
             //foreach (var ent in editor.Map.ActiveEntities)
