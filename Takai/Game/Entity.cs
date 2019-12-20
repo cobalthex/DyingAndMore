@@ -199,7 +199,6 @@ namespace Takai.Game
                 if (effect is EffectsClass ec && Map != null) //todo: pass effects instance?
                 {
                     var ei = ec.Instantiate(null, this);
-                    ei.Position = Position;
                     Map.Spawn(ei);
                 }
             },

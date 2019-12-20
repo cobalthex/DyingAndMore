@@ -1,14 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Takai.Game;
 
+//todo: area effect container?
+
 namespace DyingAndMore.Game
 {
     /// <summary>
     /// A focused or area health (damage or boon) effect (for example, grenade) on actors
     /// </summary>
     public class HealthEffect : IGameEffect
-        //todo: rename to health effect
-    {
+    { //todo: split into HealthEffect and AreaHealthEffect
         public float MaxDamage { get; set; }
         /// <summary>
         /// If radius is zero, has zero area of affect and only hits target or actor directly on point

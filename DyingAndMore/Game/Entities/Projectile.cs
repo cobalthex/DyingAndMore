@@ -72,7 +72,15 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// Sticks to an actor on collision
         /// </summary>
-        public bool Sticky { get; set; } = false;
+        public bool Sticky { get; set; } = false; //sticky chance? (per material?)?
+
+        /// <summary>
+        /// If > 0, when there are >= N of the same type of projectile attached to an object
+        /// Supercombine and play the <see cref="SuperCombineEffect"/>
+        /// </summary>
+        public int SuperCombineCount { get; set; } = 0;
+
+        public EffectsClass SuperCombineEffect { get; set; }
 
         /// <summary>
         /// An effect spawned when the projectile goes out of <see cref="Range"/>, lives longer than <see cref="LifeSpan"/>, or below the <see cref="MinimumSpeed"/>
@@ -142,7 +150,7 @@ namespace DyingAndMore.Game.Entities
                 DisableNextDestructionEffect = true;
                 if (Class.FadeEffect != null)
                 {
-                    var fx = Class.FadeEffect.Instantiate(this);
+                    var fx = Class.FadeEffect.Instantiate(this, this);
                     Map.Spawn(fx);
                 }
                 Kill();
@@ -262,6 +270,26 @@ namespace DyingAndMore.Game.Entities
 
                 if (Class.Sticky) //todo: test
                     actor.Map.Attach(actor, this);
+
+                if (Class.SuperCombineCount > 0)
+                {
+                    int combined = 0;
+                    foreach (var attachment in actor.WorldChildren)
+                    {
+                        if (attachment.Class == Class)
+                            ++combined;
+                    }
+
+                    if (combined >= Class.SuperCombineCount)
+                    {
+                        actor.Map.Spawn(Class.SuperCombineEffect.Instantiate(Source, actor));
+                        foreach (var attachment in actor.WorldChildren)
+                        {
+                            if (attachment.Class == Class)
+                                attachment.Kill();
+                        }
+                    }
+                }
             }
         }
     }

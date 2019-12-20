@@ -44,13 +44,13 @@ namespace Takai.Game
         public EffectsInstance Instantiate(EntityInstance source, EntityInstance target = null)
         {
             var instance = Instantiate();
-            if (source != null)
+            instance.Source = source;
+            var spawn = target == null ? source : target;
+            if (target != null)
             {
-                instance.Map = source.Map;
-                instance.Position = source.Position;
-                instance.Direction = source.Forward;
-                instance.Velocity = source.Velocity;
-                instance.Source = source;
+                instance.Position = target.Position;
+                instance.Direction = target.Forward;
+                instance.Velocity = target.Velocity;
             }
             instance.Target = target;
 

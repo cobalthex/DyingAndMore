@@ -85,9 +85,6 @@ namespace Takai.Game
             if (OnEnterEffects != null && entity.Map != null)
             {
                 var fx = OnEnterEffects.Instantiate(null, entity);
-                fx.Position = entity.Position;
-                fx.Direction = entity.Forward;
-                fx.Velocity = entity.Velocity;
                 entity.Map.Spawn(fx);
             }
 
