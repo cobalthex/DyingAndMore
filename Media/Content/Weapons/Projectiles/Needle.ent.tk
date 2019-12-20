@@ -3,13 +3,17 @@ ProjectileClass {
     MuzzleVelocity: [800 980];
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
-    Range: 100000;
     Drag: 0.0;
-    MinimumSpeed: -100;
     MagnetismAnglePerSecond: 1200deg;
     InheritSourcePhysics: false;
     Damage: 25;
+
+    Range: 100000;
+    MinimumSpeed: -100;
+    LifeSpan: 10sec;
     Sticky: true;
+    SuperCombineCount: 3;
+    SuperCombineEffect: @"Effects/Explosion.fx.tk";
 
     Trail: {
         #MaxPoints: 100;
