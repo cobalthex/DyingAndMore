@@ -70,11 +70,6 @@ namespace DyingAndMore.Game.Entities
         public bool InheritSourcePhysics { get; set; } = false;
 
         /// <summary>
-        /// Sticks to an actor on collision
-        /// </summary>
-        public bool Sticky { get; set; } = false; //sticky chance? (per material?)?
-
-        /// <summary>
         /// If > 0, when there are >= N of the same type of projectile attached to an object
         /// Supercombine and play the <see cref="SuperCombineEffect"/>
         /// </summary>
@@ -246,30 +241,16 @@ namespace DyingAndMore.Game.Entities
 
         public override void OnMapCollision(Point tile, Vector2 point, TimeSpan deltaTime)
         {
-            Kill();
         }
 
         public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
         {
-            //if (collider.Material != null &&
-            //    Material != null &&
-            //    Class.MaterialResponses != null && Class.MaterialResponses.TryGetValue(collider.Material, out var mtl))
-            //{
-            //    //collision angle, collision depth, etc
-            //}
-            //else
-            {
-                Velocity = Vector2.Zero; //todo: physics should handle this
-                //Kill();
-            }
+            //effects scalars? (multiply x by damage)
 
             if (collider is ActorInstance actor &&
                 (collider != Source || Class.CanDamageSource))
             {
                 actor.ReceiveDamage(Class.Damage, Source);
-
-                if (Class.Sticky) //todo: test
-                    actor.Map.Attach(actor, this);
 
                 if (Class.SuperCombineCount > 0)
                 {
