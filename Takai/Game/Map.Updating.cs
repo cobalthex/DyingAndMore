@@ -10,6 +10,8 @@ namespace Takai.Game
         public Vector2 direction;
         public float depth;
 
+        //response?
+
         public CollisionManifold Reciprocal()
         {
             return new CollisionManifold
@@ -214,7 +216,7 @@ namespace Takai.Game
                                 if (Math.Acos(Math.Abs(Vector2.Dot(tangent, normV))) <= interaction.MaxBounceAngle)
                                 {
                                     //add remaining distance to relfection? (trace that)
-                                    entity.Velocity = Vector2.Reflect(entity.Velocity, colNorm) * (1 - interaction.Friction.Random());
+                                    entity.Velocity = Vector2.Reflect(entity.Velocity, colNorm) * (1 - interaction.Friction);
                                     entity.Forward = Vector2.Reflect(entity.Forward, colNorm);
                                 }
                                 else
@@ -253,6 +255,9 @@ namespace Takai.Game
                                 var diff = Vector2.Normalize(hit.entity.Position - entity.Position);
                                 entity.Velocity -= diff * Vector2.Dot(entity.Velocity, diff);
                             }
+
+                            //if (Util.RandomGenerator.NextDouble() >= interaction.StickChance)
+                            //    Attach(hit.entity, entity);
 
                             if (interaction.Effect != null)
                             {

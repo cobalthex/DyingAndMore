@@ -2,12 +2,32 @@
 
 namespace Takai.Game
 {
+    public enum InteractionResponse
+    {
+        Fizzle, //impact without effect
+        Impact,
+        Reflect, //parallel and perpendicular friction
+        Attach,
+        TODO_Overpenetrate,
+    }
+
     /// <summary>
     /// material interactions that occur when two materials collide
     /// </summary>
     public struct MaterialInteraction
     {
+        //effects inheritance?
+
         public EffectsClass Effect { get; set; }
+
+        public InteractionResponse DefaultResponse { get; set; }
+
+        public InteractionResponse PotentialResponse { get; set; }
+
+        /// <summary>
+        /// If random >= <see cref="PotentialChance"/>, use <see cref="PotentialResponse"/> instead of <see cref="DefaultResponse"/>
+        /// </summary>
+        public float PotentialChance { get; set; }
 
         /// <summary>
         /// If the angle of collision is within this range, the projectile will bounce
@@ -22,10 +42,11 @@ namespace Takai.Game
         /// <summary>
         /// Energy lost, as a fraction of the total energy
         /// </summary>
-        public Range<float> Friction { get; set; }
+        public float Friction { get; set; } //range?
+
+        //restitution
 
         //Overpenetrate (glass/breakable materials?) -- enemies
-        //attach
 
         //refraction (reflection offset jitter?)
     }
