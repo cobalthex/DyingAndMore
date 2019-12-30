@@ -16,6 +16,7 @@ MaterialInteractions {
         }]
 
         ["Needle" "*" MaterialInteraction {
+            AttachChance: 1;
             Effect: @"Effects/Shards.fx.tk";
         }]
     ];
