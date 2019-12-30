@@ -30,10 +30,7 @@ namespace Takai.Game
         public bool IsPhysical { get; set; } = true;
 
         /// <summary>
-        /// The mass of this object.
-        /// 0 for light objects
-        /// 1 for 'normal' mass objects
-        /// 10 for very heavy objects
+        /// The mass of this object, in (virtual) kilograms 
         /// </summary>
         public float Mass { get; set; } = 1;
 

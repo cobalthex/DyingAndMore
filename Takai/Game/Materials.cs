@@ -2,15 +2,6 @@
 
 namespace Takai.Game
 {
-    public enum InteractionResponse
-    {
-        Fizzle, //impact without effect
-        Impact,
-        Reflect, //parallel and perpendicular friction
-        Attach,
-        TODO_Overpenetrate,
-    }
-
     /// <summary>
     /// material interactions that occur when two materials collide
     /// </summary>
@@ -18,31 +9,47 @@ namespace Takai.Game
     {
         //effects inheritance?
 
-        public EffectsClass Effect { get; set; }
+        public EffectsClass Effect { get; set; } //different effects for different situations?
 
-        public InteractionResponse DefaultResponse { get; set; }
 
-        public InteractionResponse PotentialResponse { get; set; }
+        /* order of presedence:
+            Attach,
+            Overpenetrate
+            Reflect, //parallel and perpendicular friction
+            shatter/explode/break ?
+            Impact,
+            Fizzle, //impact without effect
+        */
 
         /// <summary>
-        /// If random >= <see cref="PotentialChance"/>, use <see cref="PotentialResponse"/> instead of <see cref="DefaultResponse"/>
+        /// How likely the collider is to attach to the colliding object
         /// </summary>
-        public float PotentialChance { get; set; }
+        public float AttachChance { get; set; }
 
         /// <summary>
-        /// If the angle of collision is within this range, the projectile will bounce
+        /// Overpenetrate 
+        /// </summary>
+        public float MinimumOverpenetrateForce { get; set; }
+
+        /// <summary>
+        /// If the angle of collision is within this range, the projectile will bounce (reflect)
         /// </summary>
         /// <remarks>The maximum angle difference to bounce from</remarks>
         public float MaxBounceAngle { get; set; }
         /// <summary>
         /// Speeds required to bounce
         /// </summary>
-        public Range<float> BounceSpeedRange { get; set; }
+        //public Range<float> BounceSpeedRange { get; set; }
+        
+        /// <summary>
+        /// MInimum force required to impact, if not met collider 'fizzles'
+        /// </summary>
+        public float MinimumImpactForce { get; set; }
 
         /// <summary>
         /// Energy lost, as a fraction of the total energy
         /// </summary>
-        public float Friction { get; set; } //range?
+        public float Friction { get; set; } //range? (parallel vs perpendicular)
 
         //restitution
 

@@ -210,12 +210,19 @@ namespace Takai.Game
 
                                 var interaction = Class.MaterialInteractions.Find(entity.Material, Class.TilesMaterial);
 
+                                //f = m * v² / (2 * d)
+                                //d = radius of object?
+                                var impactForce = entity.Class.Mass * entity.Velocity.LengthSquared();
+                                LogBuffer.Append(impactForce.ToString());
+
+                                //overpenetrate?
+
                                 var tangent = GetTilesCollisionTangent(target, normV);
                                 //tangent = Vector2.UnitX;
                                 var colNorm = -tangent.Ortho();
                                 if (Math.Acos(Math.Abs(Vector2.Dot(tangent, normV))) <= interaction.MaxBounceAngle)
                                 {
-                                    //add remaining distance to relfection? (trace that)
+                                    //add remaining distance to reflection? (trace that)
                                     entity.Velocity = Vector2.Reflect(entity.Velocity, colNorm) * (1 - interaction.Friction);
                                     entity.Forward = Vector2.Reflect(entity.Forward, colNorm);
                                 }
@@ -256,8 +263,13 @@ namespace Takai.Game
                                 entity.Velocity -= diff * Vector2.Dot(entity.Velocity, diff);
                             }
 
-                            //if (Util.RandomGenerator.NextDouble() >= interaction.StickChance)
-                            //    Attach(hit.entity, entity);
+                            if (Util.RandomGenerator.NextDouble() <= interaction.AttachChance)
+                                Attach(hit.entity, entity);
+
+                            //todo: overpenetrate
+
+                            //todo: reflect
+                            //todo: minimum impact force
 
                             if (interaction.Effect != null)
                             {

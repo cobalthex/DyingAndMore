@@ -4,6 +4,7 @@ ProjectileClass {
     DestroyIfOffscreen: True;
     IgnoreTrace: True;
     Range: 2000;
+    Mass: 0.015; # 15 grams (.45 cal bullet)
     Drag: 1.0;
     MinimumSpeed: 100;
 

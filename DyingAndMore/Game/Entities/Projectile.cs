@@ -252,7 +252,7 @@ namespace DyingAndMore.Game.Entities
             {
                 actor.ReceiveDamage(Class.Damage, Source);
 
-                if (Class.SuperCombineCount > 0)
+                if (Class.SuperCombineCount > 0 && actor.WorldChildren != null)
                 {
                     int combined = 0;
                     foreach (var attachment in actor.WorldChildren)
