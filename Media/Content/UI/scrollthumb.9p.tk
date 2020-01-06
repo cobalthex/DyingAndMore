@@ -1,0 +1,7 @@
+NinePatch {
+	Sprite: {
+		Texture: @"./scrollthumb.png";
+		Center: false;
+	}
+	CenterRegion: [3 3 2 2];
+}
