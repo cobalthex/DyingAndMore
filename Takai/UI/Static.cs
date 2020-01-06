@@ -443,6 +443,8 @@ namespace Takai.UI
         [Data.DebugSerialize]
         public Rectangle VisibleBounds { get; private set; }
 
+        public Point VisibleOffset => new Point(VisibleContentArea.X - OffsetContentArea.X, VisibleContentArea.Y - OffsetContentArea.Y);
+
         /// <summary>
         /// Does this element currently have focus?
         /// </summary>
@@ -789,7 +791,7 @@ namespace Takai.UI
             if (ChildBindScope == null)
                 return null;
 
-            return bindScopeGetset.cachedValue; 
+            return bindScopeGetset.cachedValue;
         }
 
         protected void BubbleEvent(string @event, UIEventArgs args)
@@ -812,9 +814,9 @@ namespace Takai.UI
             var target = source;
             while (target != null)
             {
-                if (target._eventCommands != null && target.EventCommands.TryGetValue(@event, out var command) && 
+                if (target._eventCommands != null && target.EventCommands.TryGetValue(@event, out var command) &&
                     BubbleCommand(command.command, command.argument))
-                        return;
+                    return;
 
                 if ((target.events != null && target.events.TryGetValue(@event, out var handlers) &&
                     handlers.Invoke(target, eventArgs) == UIEventResult.Handled) ||
@@ -1677,10 +1679,11 @@ namespace Takai.UI
                 finalSize.Y = float.IsNaN(Size.Y) ? container.Height : Size.Y;
 
             var localPos = new Vector2(
-                GetLocalOffset(HorizontalAlignment, Position.X, finalSize.X, Padding.X, container.Width),
-                GetLocalOffset(VerticalAlignment, Position.Y, finalSize.Y, Padding.Y, container.Height)
+                GetAlignedPosition(HorizontalAlignment, Position.X, finalSize.X, Padding.X, container.Width),
+                GetAlignedPosition(VerticalAlignment, Position.Y, finalSize.Y, Padding.Y, container.Height)
             );
             var bounds = new Rectangle((int)localPos.X, (int)localPos.Y, (int)(finalSize.X), (int)(finalSize.Y));
+            //todo: broken ^
 
             bounds.Width -= (int)(Padding.X * 2 + Position.X);
             bounds.Height -= (int)(Padding.Y * 2 + Position.Y);
@@ -1701,7 +1704,7 @@ namespace Takai.UI
             lastMeasureContainerBounds = container;
         }
 
-        public float GetLocalOffset(Alignment alignment, float position, float size, float padding, float containerSize)
+        public float GetAlignedPosition(Alignment alignment, float position, float size, float padding, float containerSize)
         {
             switch (alignment)
             {
@@ -1714,7 +1717,7 @@ namespace Takai.UI
                     return position + padding;
             }
         }
-        
+
         static List<Static> measureQueue = new List<Static>();
         static List<Static> arrangeQueue = new List<Static>();
 
@@ -1737,7 +1740,7 @@ namespace Takai.UI
             }
             arrangeQueue.Clear();
         }
-        
+
         #endregion
 
         #region Updating/Drawing
@@ -1913,7 +1916,9 @@ namespace Takai.UI
             }
 
             var mouse = InputState.MousePoint;
-            return HandleMouseInput(mouse, MouseButtons.Left);
+            return HandleMouseInput(mouse, MouseButtons.Left) &&
+                HandleMouseInput(mouse, MouseButtons.Right) &&
+                HandleMouseInput(mouse, MouseButtons.Middle);
         }
 
         bool HandleTouchInput()
@@ -1941,6 +1946,8 @@ namespace Takai.UI
 
         bool HandleMouseInput(Point mousePosition, MouseButtons button)
         {
+            //create a button map?
+
             if (InputState.IsPress(button) && VisibleBounds.Contains(mousePosition))
             {
                 var pea = new PointerEventArgs(this)
@@ -1951,7 +1958,7 @@ namespace Takai.UI
                 };
                 BubbleEvent(PressEvent, pea);
 
-                didPress = true;
+                didPress = true; //todo: should be per button
                 if (CanFocus)
                 {
                     HasFocus = true;
@@ -1989,10 +1996,12 @@ namespace Takai.UI
                         (int)button,
                         DeviceType.Mouse
                     );
-                    didPress = false;
+                    if (InputState.IsClick(button))
+                        didPress = false;
                     return false;
                 }
-                didPress = false;
+                if (InputState.IsClick(button))
+                    didPress = false;
             }
 
             return true;
@@ -2073,7 +2082,7 @@ namespace Takai.UI
                 }
             }
 #endif
-            
+
             lastDrawDuration = boop.Elapsed;
         }
 
@@ -2092,7 +2101,7 @@ namespace Takai.UI
             rect.Inflate(Padding.X, Padding.Y);
             Graphics.Primitives2D.DrawRect(spriteBatch, Color.OrangeRed, rect);
 
-            string info = $"{GetType().Name}\n"
+            string info = $"`_{GetType().Name}`_\n"
 #if DEBUG
                          + $"ID: {DebugId}\n"
 #endif
@@ -2183,6 +2192,15 @@ namespace Takai.UI
                 return;
 
             Graphics.Primitives2D.DrawLine(spriteBatch, color, new Vector2(x1, y), new Vector2(x2, y));
+        }
+
+        protected void DrawRect(SpriteBatch spriteBatch, Color color, Rectangle rect)
+        {
+            var offset = OffsetContentArea.Location.ToVector2();
+            DrawHLine(spriteBatch, color, rect.Top, rect.Left, rect.Right, offset, VisibleContentArea);
+            DrawVLine(spriteBatch, color, rect.Right, rect.Top, rect.Bottom, offset, VisibleContentArea);
+            DrawHLine(spriteBatch, color, rect.Bottom, rect.Left, rect.Right, offset, VisibleContentArea);
+            DrawVLine(spriteBatch, color, rect.Left, rect.Top, rect.Bottom, offset, VisibleContentArea);
         }
 
         protected void DrawSprite(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle destRect)

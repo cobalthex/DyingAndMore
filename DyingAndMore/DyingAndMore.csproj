@@ -109,6 +109,7 @@
     <Compile Include="UI\EntViewer.cs" />
     <Compile Include="UI\Selects.cs" />
     <Compile Include="UI\TestSizer.cs" />
+    <Compile Include="UI\UIDesigner.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <Content Include="$(MediaDir)Content\**\*.*">

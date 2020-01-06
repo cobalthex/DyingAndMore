@@ -44,6 +44,11 @@ namespace Takai.UI
             (Direction == Direction.Horizontal ? ContentArea.Width : ContentArea.Height) < ContentSize;
 
         /// <summary>
+        /// Sprite to draw over the drag thumb for the scrollbar
+        /// </summary>
+        public Graphics.NinePatch ThumbSprite { get; set; }
+
+        /// <summary>
         /// Where the content is scrolled to
         /// </summary>
         public float ContentPosition
@@ -75,8 +80,6 @@ namespace Takai.UI
         /// </summary>
         public Direction Direction { get; set; } = Direction.Vertical;
 
-        public Color ThumbColor { get; set; } = Color.White;
-
         protected bool didPressThumb = false;
 
         public override bool CanFocus => IsThumbVisible;
@@ -99,8 +102,14 @@ namespace Takai.UI
 
         public ScrollBar()
         {
-            BorderColor = ThumbColor;
+            BorderColor = Color;
             On(PressEvent, OnPress);
+        }
+
+        public override void ApplyStyles(Dictionary<string, object> styleRules)
+        {
+            base.ApplyStyles(styleRules);
+            ThumbSprite = GetStyleRule(styleRules, "ThumbSprite", ThumbSprite);
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
@@ -270,7 +279,8 @@ namespace Takai.UI
 
             var thumb = GetThumbBounds();
             thumb.Offset(OffsetContentArea.Location);
-            Graphics.Primitives2D.DrawFill(spriteBatch, ThumbColor, Rectangle.Intersect(VisibleContentArea, thumb));
+            Graphics.Primitives2D.DrawFill(spriteBatch, Color, Rectangle.Intersect(VisibleContentArea, thumb));
+            ThumbSprite.Draw(spriteBatch, thumb);
         }
     }
 
@@ -372,6 +382,20 @@ namespace Takai.UI
                 var self = (ScrollBox)sender;
                 self.InvalidateArrange();
                 return UIEventResult.Handled;
+            });
+
+            On(DragEvent, delegate (Static sender, UIEventArgs e)
+            {
+                var dea = (DragEventArgs)e;
+                if (dea.device == DeviceType.Mouse && dea.button == (int)MouseButtons.Middle)
+                {
+                    //todo: not working in child
+                    horizontalScrollbar.Scroll(-(int)dea.delta.X);
+                    verticalScrollbar.Scroll(-(int)dea.delta.Y); //todo: scale by viewport size
+                    return UIEventResult.Handled;
+                }
+
+                return UIEventResult.Continue;
             });
         }
 
