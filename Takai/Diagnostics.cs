@@ -130,7 +130,10 @@ namespace Takai
         public TimeSpan SampleRate { get; set; } = TimeSpan.FromMilliseconds(10);
         TimeSpan lastSampleTime = TimeSpan.MinValue;
 
-        public FpsGraph(int maxTicks = 256)
+        public FpsGraph()
+            : this(256) { }
+
+        public FpsGraph(int maxTicks)
         {
             buffer = new RingBuffer<FpsTick>(maxTicks);
         }

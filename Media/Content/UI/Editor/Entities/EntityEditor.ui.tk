@@ -3,8 +3,8 @@ List {
     IsModal: true;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
-    BackgroundSprite: @"UI/test/test.9p.tk";
-    Margin: 10;
+	Style: "Frame";
+	Margin: 10;
     Padding: 10;
 
     Children: [

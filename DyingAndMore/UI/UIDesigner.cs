@@ -20,6 +20,7 @@ namespace DyingAndMore.UI
 
         bool sizing;
         Rectangle sizingRect;
+        const int sizingEpsilon = 5;
 
         bool showTargeter;
         Vector2 targetPoint;
@@ -33,8 +34,35 @@ namespace DyingAndMore.UI
                     Padding = new Vector2(5),
                     Bindings = new List<Takai.Data.Binding> {
                         new Takai.Data.Binding("Name", "Text")
-                    }
-                }
+                    },
+                },
+                AllowSelection = true
+            };
+            newItemMenu.On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
+            {
+                var sea = (SelectionChangedEventArgs)e;
+                if (sea.newIndex < 0)
+                    return UIEventResult.Continue;
+
+                var list = (ItemList<System.Type>)sender;
+                var selectedItem = list.Items[sea.newIndex];
+                sender.BubbleCommand("CreateElement", selectedItem);
+                list.SelectedItem = null;
+                return UIEventResult.Handled;
+            });
+
+            CommandActions["CreateElement"] = delegate (Static sender, object arg)
+            {
+                var self = (UIDesigner)sender;
+                self.sizing = false;
+
+                var newElement = (Static)System.Activator.CreateInstance((System.Type)arg); //list of Statics?
+                if (sizingRect.Width > sizingEpsilon || sizingRect.Height > sizingEpsilon)
+                    newElement.Size = new Vector2(self.sizingRect.Width, self.sizingRect.Height);
+                newElement.Position = new Vector2(self.sizingRect.X, self.sizingRect.Y);
+
+                self.AddChild(newElement);
+                self.RemoveChild(newItemPopup);
             };
 
             var typeInfo = typeof(Static).GetTypeInfo();
@@ -49,7 +77,7 @@ namespace DyingAndMore.UI
             {
                 Style = "Frame",
                 Size = new Vector2(160, 300),
-                //IsModal = true
+                IsModal = true
             };
 
             On(PressEvent, OnPress);
@@ -57,36 +85,39 @@ namespace DyingAndMore.UI
             On(ClickEvent, OnClick);
         }
 
-        UIEventResult OnPress(Static sender, UIEventArgs args)
+        //todo: route event objects correctly
+        static UIEventResult OnPress(Static sender, UIEventArgs args)
         {
+            var self = (UIDesigner)sender;
             var pea = (PointerEventArgs)args;
             if (pea.device == Takai.Input.DeviceType.Mouse && pea.deviceIndex == 0)
             {
-                var pos = showTargeter ? targetPoint : pea.position;
-                sizing = true;
-                sizingRect = new Rectangle((int)pos.X, (int)pos.Y, 0, 0);
+                var pos = self.showTargeter ? self.targetPoint : pea.position;
+                self.sizing = true;
+                self.sizingRect = new Rectangle((int)pos.X, (int)pos.Y, 0, 0);
                 return UIEventResult.Handled;
             }
             return UIEventResult.Continue;
         }
-        UIEventResult OnDrag(Static sender, UIEventArgs args)
+        static UIEventResult OnDrag(Static sender, UIEventArgs args)
         {
+            var self = (UIDesigner)sender;
             var dea = (DragEventArgs)args;
-            if (sizing && dea.device == Takai.Input.DeviceType.Mouse && dea.deviceIndex == 0)
+            if (self.sizing && dea.device == Takai.Input.DeviceType.Mouse && dea.deviceIndex == 0)
             {
-                sizingRect = Util.AbsRectangle(sizingRect.Location, (showTargeter ? targetPoint : dea.position).ToPoint());
+                self.sizingRect = Util.AbsRectangle(self.sizingRect.Location, (self.showTargeter ? self.targetPoint : dea.position).ToPoint());
                 return UIEventResult.Handled;
             }
             return UIEventResult.Continue;
         }
-        UIEventResult OnClick(Static sender, UIEventArgs args)
+        static UIEventResult OnClick(Static sender, UIEventArgs args)
         {
+            var self = (UIDesigner)sender;
             var pea = (PointerEventArgs)args;
-            if (sizing && pea.device == Takai.Input.DeviceType.Mouse && pea.deviceIndex == 0)
+            if (self.sizing && pea.device == Takai.Input.DeviceType.Mouse && pea.deviceIndex == 0)
             {
-                sizing = false;
-                newItemPopup.Position = pea.position;
-                AddChild(newItemPopup);
+                self.newItemPopup.Position = pea.position;
+                self.AddChild(self.newItemPopup);
                 return UIEventResult.Handled;
             }
             return UIEventResult.Continue;

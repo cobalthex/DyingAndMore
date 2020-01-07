@@ -116,7 +116,7 @@ namespace DyingAndMore.Game.Entities
 
         public override string ToString()
         {
-            return $"{base.ToString()} ({string.Join(",", Behaviors)})";
+            return $"{base.ToString()} ({(Behaviors == null ? "no behaviors" : string.Join(",", Behaviors))})";
         }
         public override void Think(TimeSpan deltaTime)
         {
