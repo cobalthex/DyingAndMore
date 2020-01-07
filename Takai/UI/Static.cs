@@ -366,7 +366,7 @@ namespace Takai.UI
                 if (_position != value)
                 {
                     _position = value;
-                    InvalidateArrange();
+                    InvalidateMeasure(); //measured size includes position
                 }
             }
         }
@@ -622,6 +622,8 @@ namespace Takai.UI
         /// <summary>
         /// Commands that can be bound to an action
         /// Commands are routed until an element has a matching action
+        /// 
+        /// Action&lt;Static, object&gt; Static is the sender (not source), object is an optional argument
         /// </summary>
         [Data.Serializer.Ignored]
         public Dictionary<string, System.Action<Static, object>> CommandActions =>
@@ -955,7 +957,7 @@ namespace Takai.UI
             if (child.HasFocus && !ignoreFocus)
                 child.HasFocus = true;
 
-            if (reflow)
+            if (reflow) //force rebase now (prevents elements from popping in) ?
                 OnChildRemeasure(child);
 
             return true;
@@ -1683,7 +1685,6 @@ namespace Takai.UI
                 GetAlignedPosition(VerticalAlignment, Position.Y, finalSize.Y, Padding.Y, container.Height)
             );
             var bounds = new Rectangle((int)localPos.X, (int)localPos.Y, (int)(finalSize.X), (int)(finalSize.Y));
-            //todo: broken ^
 
             bounds.Width -= (int)(Padding.X * 2 + Position.X);
             bounds.Height -= (int)(Padding.Y * 2 + Position.Y);

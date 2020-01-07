@@ -40,7 +40,7 @@ MapInstance {
             Weapon: Null;
             Id: 1;
             Class: @"Actors/Player.ent.tk";
-            Name: Null;
+            Name: "Player";
             OutlineColor: [255 215 0 255];
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
@@ -51,7 +51,21 @@ MapInstance {
             Forward: [1 0];
             Velocity: [0 0];
         }
+        ActorInstance {
+            Class: @"Actors/Orbiter.ent.tk";
+			Id: 2;
+			Name: "Orbiter";
+			Position: [100 100];
+			Controller: AIController {
+				Behaviors: [
+					OrbitBehavior { }
+				]
+			}
+		};
     ];
+	EntityAttachments: [
+		[ *ActorInstance.Player *ActorInstance.Orbiter ] 
+	]
     Triggers: [];
     Fluids: [];
 }

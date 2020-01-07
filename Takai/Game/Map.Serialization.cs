@@ -143,11 +143,28 @@ namespace Takai.Game
             Data.Serializer.TextSerialize(file, this);
             File = file;
         }
+
+        struct EntityAttachment
+        {
+            [Data.Serializer.AsReference]
+            public EntityInstance parent;
+            [Data.Serializer.AsReference]
+            public EntityInstance child;
+        }
         
         public virtual Dictionary<string, object> DerivedSerialize()
         {
+            var attachments = new List<EntityAttachment>();
             var triggers = new HashSet<Trigger>();
             var fluids = new List<FluidInstance>(LiveFluids); //todo: optimize
+
+            foreach (var ent in AllEntities)
+            {
+                //todo: requires non-null name
+                //todo: needs to store correct (transformed) position
+                if (ent.WorldParent != null)
+                    attachments.Add(new EntityAttachment { parent = ent.WorldParent, child = ent });
+            }
 
             foreach (var sector in Sectors)
             {
@@ -158,6 +175,7 @@ namespace Takai.Game
             return new Dictionary<string, object>
             {
                 ["Entities"] = AllEntities,
+                ["EntityAttachments"] = attachments,
                 ["Triggers"] = triggers,
                 ["Fluids"] = fluids
             };
@@ -169,6 +187,12 @@ namespace Takai.Game
             {
                 foreach (var ent in Data.Serializer.Cast<List<EntityInstance>>(ents))
                     Spawn(ent, false);
+            }
+
+            if (props.TryGetValue("EntityAttachments", out var attachments))
+            {
+                foreach (var attach in Data.Serializer.Cast<List<EntityAttachment>>(attachments))
+                    Attach(attach.parent, attach.child);
             }
 
             if (props.TryGetValue("Fluids", out var fluids)) //todo: load from class?

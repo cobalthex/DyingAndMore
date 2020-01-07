@@ -259,7 +259,7 @@ namespace Takai.Game
         public virtual void Think(TimeSpan deltaTime)
         {
             if (Trail != null && Velocity != Vector2.Zero)
-                Trail.Advance(Position, Vector2.Normalize(Velocity)); //todo: width?
+                Trail.Advance(RealPosition, Vector2.Normalize(Velocity)); //todo: width?
 
             if (TintColorDuration > TimeSpan.Zero)
             {
@@ -276,7 +276,7 @@ namespace Takai.Game
 
             //trail should terminate where entity dies
             if (Trail != null)
-                Trail.AddPoint(Position, Trail.CurrentDirection, true);
+                Trail.AddPoint(RealPosition, Trail.CurrentDirection, true);
 
             PlayAnimation("Dead", () => { if (Class.DestroyOnDeath) Map?.Destroy(this); });
             IsAlive = false;
@@ -304,7 +304,7 @@ namespace Takai.Game
                 Map.Spawn(fx.Value);
 
             if (Trail != null && Velocity != Vector2.Zero)
-                Trail.AddPoint(Position, Vector2.Normalize(Velocity));
+                Trail.AddPoint(RealPosition, Vector2.Normalize(Velocity));
         }
         /// <summary>
         /// Called when this instance is marked for deletion

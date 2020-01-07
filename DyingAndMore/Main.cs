@@ -279,16 +279,16 @@ namespace DyingAndMore
             });
             */
 
-            //var map = Cache.Load<MapInstance>("mapsrc/shootingrange.map.tk");
-            //childUI = new Game.GameInstance(new Game.Game
-            //{
-            //    Map = map
-            //})
-            //{
-            //    IsPaused = false,
-            //};
-            //map.renderSettings.drawEntityForwardVectors = true;
-            //map.renderSettings.drawEntityHierarchies = true;
+            var map = Cache.Load<MapInstance>("mapsrc/twelve.map.tk");
+            childUI = new Game.GameInstance(new Game.Game
+            {
+                Map = map
+            })
+            {
+                IsPaused = false,
+            };
+            map.renderSettings.drawEntityForwardVectors = true;
+            map.renderSettings.drawEntityHierarchies = true;
 
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)
@@ -305,20 +305,19 @@ namespace DyingAndMore
             //    };
             //}
 
-            childUI = new UI.UIDesigner()
-            {
-                Size = new Vector2(3000, 2000)
-            };
+            //childUI = new UI.UIDesigner()
+            //{
+            //    Size = new Vector2(3000, 2000)
+            //};
 
 
-            ui = new ScrollBox
+            ui = new Static
             {
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch,
-                Style = "Static"
             };
             ui.AddChild(childUI);
-            
+
             //Static.DebugFont = Static.DefaultFont;
 
             //fpsGraph = new Takai.FpsGraph()

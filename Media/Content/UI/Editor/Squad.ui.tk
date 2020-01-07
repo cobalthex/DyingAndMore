@@ -158,7 +158,7 @@ List {
 															Padding: 10;
 															Margin: 10;
 															Direction: Direction.Vertical;
-															BackgroundSprite: @"UI/test/test.9p.tk";
+															Style: "Frame";
 															Children: [
 																EntitySelector {
 																	SearchPaths: ["Actors"];
@@ -239,7 +239,7 @@ List {
 															Padding: 10;
 															Margin: 10;
 															Direction: Direction.Vertical;
-															BackgroundSprite: @"UI/test/test.9p.tk";
+															Style: "Frame";
 															Children: [
 																EntitySelector {
 																	SearchPaths: ["Actors"];
