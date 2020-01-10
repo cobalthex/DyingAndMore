@@ -192,7 +192,13 @@ namespace Takai.Game
             if (props.TryGetValue("EntityAttachments", out var attachments))
             {
                 foreach (var attach in Data.Serializer.Cast<List<EntityAttachment>>(attachments))
+                {
+                    var childPos = attach.child.Position;
+                    var childFwd = attach.child.Forward;
                     Attach(attach.parent, attach.child);
+                    attach.child.Position = childPos; //ghetto (send RealPosition through ent.DerivedSerialize instead?)
+                    attach.child.Forward = childFwd; //ditto
+                }
             }
 
             if (props.TryGetValue("Fluids", out var fluids)) //todo: load from class?

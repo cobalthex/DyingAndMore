@@ -356,10 +356,3 @@ namespace Takai.Game
         }
     }
 }
-
-/*
- * Entity commands and actions
- *  Entities have events that are defined by the entity (e.g OnDeath)
- *  Call any EventHandlers
- *  EventHandlers have Commands. Commands can trigger actions, either on entities, game settings, etc
-*/

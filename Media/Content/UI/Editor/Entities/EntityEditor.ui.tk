@@ -11,10 +11,6 @@ List {
         Scrollbox {
             Size: [300 400];
             InnerPadding: 10;
-            ScrollBarUI: {
-                Padding: 3;
-                BorderColor: Color.White;
-            }
             Children: [
                 List {
                     Direction: Direction.Vertical;
