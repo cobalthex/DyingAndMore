@@ -90,14 +90,15 @@ namespace Takai.UI
             else
                 stretchSize = System.Math.Max(0, (availableSize.Y - MeasuredSize.Y) / stretches);
 
-            float t = 0;
+            float front = 0;
+            float back = 0;
             for (int i = 0, n = 0; i < Children.Count; ++i)
             {
                 if (!Children[i].IsEnabled)
                     continue;
 
                 if (n++ > 0)
-                    t += Margin;
+                    front += Margin;
 
                 float itemSize;
                 if (Direction == Direction.Horizontal)
@@ -107,13 +108,27 @@ namespace Takai.UI
                     else
                         itemSize = Children[i].MeasuredSize.X;
 
-                    Children[i].Arrange(new Rectangle(
-                        (int)t,
-                        (int)0,
-                        (int)itemSize,
-                        (int)availableSize.Y
-                    ));
-                    t += itemSize;
+                    if (Children[i].HorizontalAlignment == Alignment.End)
+                    {
+                        back += itemSize;
+                        Children[i].Arrange(new Rectangle(
+                            (int)(availableSize.X - back),
+                            (int)0,
+                            (int)itemSize,
+                            (int)availableSize.Y
+                        ));
+                    }
+                    else
+                    {
+                        Children[i].Arrange(new Rectangle(
+                            (int)front,
+                            (int)0,
+                            (int)itemSize,
+                            (int)availableSize.Y
+                        ));
+                        front += itemSize;
+                    }
+                    //center?
                 }
                 else
                 {
@@ -122,13 +137,27 @@ namespace Takai.UI
                     else
                         itemSize = Children[i].MeasuredSize.Y;
 
-                    Children[i].Arrange(new Rectangle(
-                        (int)0,
-                        (int)t,
-                        (int)availableSize.X,
-                        (int)itemSize
-                    ));
-                    t += itemSize;
+                    if (Children[i].VerticalAlignment == Alignment.End)
+                    {
+                        back += itemSize;
+                        Children[i].Arrange(new Rectangle(
+                            (int)0,
+                            (int)(availableSize.Y - back),
+                            (int)availableSize.X,
+                            (int)itemSize
+                        ));
+                    }
+                    else
+                    {
+                        Children[i].Arrange(new Rectangle(
+                            (int)0,
+                            (int)front,
+                            (int)availableSize.X,
+                            (int)itemSize
+                        ));
+                        front += itemSize;
+                    }
+                    //center?
                 }
             }
         }

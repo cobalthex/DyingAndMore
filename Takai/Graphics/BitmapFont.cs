@@ -209,7 +209,7 @@ namespace Takai.Graphics
                     underlineX = 0;
                     continue;
                 }
-                else if (ch == '`' && i + 1 < length) //colors (`RGB (hex)) and `x to end
+                else if (ch == '`' && i + 1 < text.Length && i + 1 < length) //colors (`RGB (hex)) and `x to end
                 {
                     //reset all
                     if (text[i + 1] == 'x')
@@ -344,7 +344,7 @@ namespace Takai.Graphics
                     row = Vector2.Zero;
                     continue;
                 }
-                else if (text[i] == '`' && i + 1 < length) //colors (`RGB (hex)) and `x to end
+                else if (text[i] == '`' && i + 1 < text.Length && i + 1 < length) //colors (`RGB (hex)) and `x to end
                 {
                     // `n ?
                     if (text[i + 1] == 'x')

@@ -632,40 +632,6 @@ namespace Takai.UI
         private Dictionary<string, System.Action<Static, object>> _commandActions;
 
         /// <summary>
-        /// Bubble a command up to the root element and then global handlers
-        /// Stops once an element has the required handler
-        /// </summary>
-        /// <param name="command">The command to run</param>
-        /// <param name="argument">An optional argument to pass thru</param>
-        /// <returns>True if the command had a matching action. False otherwise or if command was null</returns>
-        public bool BubbleCommand(string command, object argument = null)
-        {
-            if (command == null)
-                return false;
-
-            var target = this;
-            while (target != null)
-            {
-                if (target._commandActions != null && target.CommandActions.TryGetValue(command, out var caction))
-                {
-                    //check if modal?
-                    caction.Invoke(target /*this?*/, argument);
-                    return true;
-                }
-
-                target = target.Parent;
-            }
-
-            if (target == null && GlobalCommands.TryGetValue(command, out var action))
-            {
-                action.Invoke(this, argument);
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// A map from events to commands
         /// e.g. Click->SpawnEntity
         /// Multiple commands can be called for a single event
@@ -759,9 +725,9 @@ namespace Takai.UI
         /// Can be overriden to customize this behavior
         /// </summary>
         /// <param name="source">The source object for the bindings</param>
-        public virtual void BindTo(object source)
+        public virtual void BindTo(object source, Dictionary<string, object> customBindProps = null)
         {
-            BindToThis(source);
+            BindToThis(source, customBindProps);
 
             var childScope = source;
             if (ChildBindScope != null)
@@ -772,20 +738,20 @@ namespace Takai.UI
             }
 
             foreach (var child in Children)
-                child.BindTo(childScope);
+                child.BindTo(childScope, customBindProps);
         }
 
         /// <summary>
         /// Update bindings only this element and not children
         /// </summary>
         /// <param name="source">The source object for the binding</param>
-        protected void BindToThis(object source)
+        protected void BindToThis(object source, Dictionary<string, object> customBindProps = null)
         {
             if (Bindings == null)
                 return;
 
             foreach (var binding in Bindings)
-                binding.BindTo(source, this);
+                binding.BindTo(source, this, customBindProps);
         }
 
         public object GetChildBindScope()
@@ -813,6 +779,8 @@ namespace Takai.UI
             if (source == null || @event == null)
                 return;
 
+            //System.Diagnostics.Debug.WriteLine($"Bubbling event {@event} from {GetType().Name}({DebugId})");
+
             var target = source;
             while (target != null)
             {
@@ -828,6 +796,43 @@ namespace Takai.UI
                 target = target.Parent;
             }
         }
+
+        /// <summary>
+        /// Bubble a command up to the root element and then global handlers
+        /// Stops once an element has the required handler
+        /// </summary>
+        /// <param name="command">The command to run</param>
+        /// <param name="argument">An optional argument to pass thru</param>
+        /// <returns>True if the command had a matching action. False otherwise or if command was null</returns>
+        public bool BubbleCommand(string command, object argument = null)
+        {
+            if (command == null)
+                return false;
+
+            //System.Diagnostics.Debug.WriteLine($"Bubbling command {command} from {GetType().Name}({DebugId})");
+
+            var target = this;
+            while (target != null)
+            {
+                if (target._commandActions != null && target.CommandActions.TryGetValue(command, out var caction))
+                {
+                    //check if modal?
+                    caction.Invoke(target /*this?*/, argument);
+                    return true;
+                }
+
+                target = target.Parent;
+            }
+
+            if (target == null && GlobalCommands.TryGetValue(command, out var action))
+            {
+                action.Invoke(this, argument);
+                return true;
+            }
+
+            return false;
+        }
+
 
         //protected void TunnelEvent(string @event, UIEventArgs args)
         //{
@@ -2113,7 +2118,8 @@ namespace Takai.UI
                          + $"Children: {Children?.Count ?? 0}\n"
                          + $"Bounds: {OffsetContentArea}\n" //visible bounds?
                          + $"Position: {Position}, Size: {Size}, Padding: {Padding}\n"
-                         + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}";
+                         + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}\n"
+                         + $"Bindings: {(Bindings == null ? "(None)" : string.Join(",", Bindings))}";
 
             var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);
             var size = DebugFont.MeasureString(info);

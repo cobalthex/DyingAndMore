@@ -213,6 +213,45 @@ namespace Takai.Data
     }
 
     /// <summary>
+    /// Basic math converter (+ - * /)
+    /// Subtraction is negative addition
+    /// Division is fracional multiplication
+    /// </summary>
+    public class BasicMathConverter : Converter
+    {
+        /// <summary>
+        /// The right hand side of the operation
+        /// </summary>
+        public double Factor { get; set; }
+
+        /// <summary>
+        /// Multiply the factor instead of adding 
+        /// </summary>
+        public bool Multiply { get; set; }
+
+        public BasicMathConverter() { }
+        public BasicMathConverter(float factor, bool multiply)
+        {
+            Factor = factor;
+            Multiply = multiply;
+        }
+
+        //todo: more comparison operators
+
+        public override object Convert(Type destType, object source)
+        {
+            var x = System.Convert.ToDouble(source);
+            double y;
+            if (Multiply)
+                y = x * Factor;
+            else
+                y = x + Factor;
+            return base.Convert(destType, y);
+        }
+    }
+
+
+    /// <summary>
     /// A converter that converts text to the specified case.
     /// Non text bindings are ignored
     /// </summary>
@@ -252,6 +291,28 @@ namespace Takai.Data
             }
 
             return target;
+        }
+    }
+
+    /// <summary>
+    /// Format the source value with the specified format string
+    /// Returns the output as a string
+    /// </summary>
+    public class StringFormatConverter : Converter
+    {
+        public Converter PreConverter { get; set; }
+
+        public string Format { get; set; }
+
+        public StringFormatConverter() { }
+        public StringFormatConverter(string format)
+        {
+            Format = format;
+        }
+
+        public override object Convert(Type destType, object source)
+        {
+            return string.Format(Format, PreConverter == null ? source : PreConverter.Convert(source.GetType(), source));
         }
     }
 
@@ -326,7 +387,8 @@ namespace Takai.Data
         /// </summary>
         /// <param name="sourceObj">The backing object to bind against</param>
         /// <param name="targetObj">The object to send/recieve data to/from the source</param>
-        public virtual void BindTo(object sourceObj, object targetObj, bool allowNonPublic = false)
+        /// <param name="allowNonPublic">Custom properties to bind to, allows for things like :index in lists</param>
+        public virtual void BindTo(object sourceObj, object targetObj, Dictionary<string, object> customBindProps = null, bool allowNonPublic = false)
         {
             if (Source == null || Target == null)
                 return;
@@ -336,8 +398,8 @@ namespace Takai.Data
             targetObject = targetObj;
 #endif
 
-            sourceAccessors = GetAccessors(Source, sourceObj, allowNonPublic);
-            targetAccessors = GetAccessors(Target, targetObj, allowNonPublic);
+            sourceAccessors = GetAccessors(Source, sourceObj, customBindProps, allowNonPublic);
+            targetAccessors = GetAccessors(Target, targetObj, customBindProps, allowNonPublic);
 
             //set initial value
             if (targetAccessors.set != null)
@@ -352,7 +414,7 @@ namespace Takai.Data
             }
         }
 
-        public static GetSet GetAccessors(string binding, object obj, bool allowNonPublic = false)
+        public static GetSet GetAccessors(string binding, object obj, Dictionary<string, object> customBindProps = null, bool allowNonPublic = false)
         {
             if (obj == null)
                 return new GetSet();
@@ -370,6 +432,15 @@ namespace Takai.Data
                         return value;
                     },
                     set = (value) => Globals[bindName] = value
+                };
+            }
+            else if (customBindProps != null && customBindProps.TryGetValue(binding, out var customBind))
+            {
+                getset = new GetSet
+                {
+                    type = customBind.GetType(),
+                    get = () => customBind
+                    //currently readonly (todo?)
                 };
             }
             else

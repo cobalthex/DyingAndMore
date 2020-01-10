@@ -76,7 +76,6 @@ namespace DyingAndMore.UI
         }
     }
 
-
     class SquadSelect : DropdownSelect<Game.Entities.Squad>
     {
         public override void OpenDropdown() //hacky
@@ -89,6 +88,18 @@ namespace DyingAndMore.UI
                     Items.Add(squad.Value);
             }
             base.OpenDropdown();
+        }
+    }
+
+    class ActorList : ItemList<Game.Entities.ActorClass> { } //object select?
+
+    class BehaviorList : ItemList<Game.Entities.Behavior> { }
+
+    class BehaviorSelect : TypeSelect
+    {
+        public BehaviorSelect()
+        {
+            AddTypeTree<Game.Entities.Behavior>();
         }
     }
 }

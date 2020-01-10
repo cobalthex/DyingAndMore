@@ -118,12 +118,12 @@ namespace Takai.UI
 			//todo: move labels to to containers with counters to hide/show combo
         }
 
-        public override void BindTo(object source)
+        public override void BindTo(object source, System.Collections.Generic.Dictionary<string, object> customBindProps = null)
         {
-            BindToThis(source);
-            minutesContainer.BindTo(this);
-            secondsContainer.BindTo(this);
-            millisecondsContainer.BindTo(this);
+            BindToThis(source, customBindProps);
+            minutesContainer.BindTo(this, customBindProps);
+            secondsContainer.BindTo(this, customBindProps);
+            millisecondsContainer.BindTo(this, customBindProps);
         }
 
         protected override void UpdateSelf(GameTime time)

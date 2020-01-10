@@ -82,10 +82,10 @@ namespace Takai.UI
             });
         }
 
-        public override void BindTo(object source)
+        public override void BindTo(object source, System.Collections.Generic.Dictionary<string, object> customBindProps = null)
         {
             //internal UI elements have their own bindings
-            BindToThis(source);
+            BindToThis(source, customBindProps);
         }
 
         protected UIEventResult OnSelectionChanged_Dropdown(Static sender, UIEventArgs e)

@@ -69,13 +69,14 @@ Table {
                 }
             ];
         };
-		
+
         Static { Text: "Child Count"; };
         Static {
             Bindings: [
                 {
                     Source: "WorldChildren.Count";
                     Target: "Text";
+                    DefaultValue: "0";
                 }
             ];
         };

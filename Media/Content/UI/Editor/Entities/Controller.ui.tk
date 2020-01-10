@@ -1,4 +1,7 @@
 List {
+	BorderColor: [255 255 255 64];
+	Padding: 10;
+
     HorizontalAlignment: Alignment.Stretch;
     Children: [
         ControllerSelect {
@@ -11,6 +14,7 @@ List {
             ];
         };
 		Switch {
+    		HorizontalAlignment: Alignment.Stretch;
 			Bindings: [
 			    Binding {
 			        Source: "Controller:typename";
@@ -19,6 +23,7 @@ List {
 			];
 			Items: {
 			    ArtilleryController: List {
+    				HorizontalAlignment: Alignment.Stretch;
 					Direction: Direction.Vertical;
 					Margin: 10;
 					Children: [
@@ -51,8 +56,73 @@ List {
 					];
 			    };
 
-			    AIController: {
-			        Text: "[Todo AI]";
+			    AIController: BehaviorList {
+			    	ChildBindScope: "Controller";
+					HorizontalAlignment: Alignment.Stretch;
+			        Bindings: [
+			            Binding {
+			                Source: "Controller.Behaviors";
+			                Target: "Items";
+			                Direction: BindingDirection.TwoWay;
+			            }
+			        ];
+
+			    	ItemUI: List {
+    					HorizontalAlignment: Alignment.Stretch;
+    					Direction: Direction.Horizontal;
+    					Children: [
+    						Static {
+				    			VerticalAlignment: ALignment.Center;
+					    		Bindings: [
+					    			Binding {
+						    			Converter: StringFormatConverter {
+						    				Format: "{0}) ";
+						    				PreConverter : BasicMathConverter {
+							    				Factor: 1;
+							    			};
+							    		};
+					    				Source: ":index";
+					    				Target: "Text";
+					    			};
+				    			];
+				    		};
+
+				    		Static {
+				    			VerticalAlignment: Alignment.Center;
+					    		#todo: switch on type (fill in details)?
+					    		Bindings: [
+					    			Binding {
+					    				Source: ":typename";
+					    				Target: "Text";
+					    			};
+				    			];
+				    		};
+
+				    		Static { # todo: create generic version of this & import?
+				    			Text: "X";
+				    			Color: Color.Tomato;
+				    			Padding: 5;
+				    			HorizontalAlignment: Alignment.Right;
+				    			EventCommands: {
+				    				Click: "RemoveSelf";
+				    			}
+				    		}
+			    		];
+			    	};
+
+			    	AddItemUI: BehaviorSelect {
+    					HorizontalAlignment: Alignment.Stretch;
+			            Bindings: [
+			                Binding {
+			                    Source: "item";
+			                    Target: "Instance";
+			                    Direction: BindingDirection.TwoWay;
+			                }
+			            ];
+			    		EventCommands: {
+			    			SelectionChanged: "AddItem";
+			    		};
+			    	};
 			    };
 			};
 		};
