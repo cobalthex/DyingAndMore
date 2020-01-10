@@ -143,7 +143,8 @@ namespace Takai.Data
             var context = new DeserializationContext
             {
                 file = file,
-                reader = new StreamReader(File.OpenRead(file))
+                // ↓ FileShare.Readwrite may not be wanted
+                reader = new StreamReader(new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             };
             return TextDeserialize<T>(context);
         }

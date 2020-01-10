@@ -24,6 +24,9 @@ namespace Takai.UI
     /// <typeparam name="T">The type of each data-bound item</typeparam>
     public class ItemList<T> : List
     {
+        public const string AddItemCommand = "AddItem";
+        public const string RemoveItemCommand = "RemoveItem";
+
         public ObservableCollection<T> Items
         {
             get => _items;
@@ -155,7 +158,8 @@ namespace Takai.UI
 
             public NewItemContainer(NewItemContainer proto)
             {
-                item = (T)Util._ShallowClone_Slow(proto.item);
+                //maybe not nullable?
+                item = proto.item == null ? default : (T)Util._ShallowClone_Slow(proto.item);
             }
         }
 
@@ -217,7 +221,7 @@ namespace Takai.UI
                 ((ItemList<T>)sender).SelectedIndex = (int)arg;
             };
 
-            CommandActions["AddItem"] = delegate (Static sender, object arg)
+            CommandActions[AddItemCommand] = delegate (Static sender, object arg)
             {
                 var il = (ItemList<T>)sender;
 
@@ -229,7 +233,7 @@ namespace Takai.UI
                 il.AddItemUI.BindTo(il.newItem);
             };
 
-            CommandActions["RemoveItem"] = delegate (Static sender, object arg)
+            CommandActions[RemoveItemCommand] = delegate (Static sender, object arg)
             {
                 var il = (ItemList<T>)sender;
                 if (arg is int i)
@@ -280,10 +284,10 @@ namespace Takai.UI
             base.FinalizeClone();
         }
 
-        public override void BindTo(object source)
+        public override void BindTo(object source, System.Collections.Generic.Dictionary<string, object> customBindProps = null)
         {
             Items.Clear();
-            BindToThis(source);
+            BindToThis(source, customBindProps);
         }
 
         protected void Items_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -298,6 +302,8 @@ namespace Takai.UI
                 for (int i = 0; i < e.OldItems.Count; ++i)
                     Container.RemoveChildAt(e.OldStartingIndex + i);
 
+                //re-index children
+
                 if (SelectedIndex >= e.OldStartingIndex)
                     SelectedIndex -= e.OldItems.Count;
             }
@@ -307,7 +313,7 @@ namespace Takai.UI
                     SelectedIndex = -1;
 
                 for (int i = 0; i < e.NewItems.Count; ++i)
-                    Container.ReplaceChild(CreateItemEntry((T)e.NewItems[i]), e.NewStartingIndex + i);
+                    Container.ReplaceChild(CreateItemEntry((T)e.NewItems[i], e.NewStartingIndex + i), e.NewStartingIndex + i);
             }
             else if (e.Action == NotifyCollectionChangedAction.Move)
             {
@@ -316,7 +322,7 @@ namespace Takai.UI
             else if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 for (int i = 0; i < e.NewItems.Count; ++i)
-                    Container.InsertChild(CreateItemEntry((T)e.NewItems[i]), e.NewStartingIndex + i);
+                    Container.InsertChild(CreateItemEntry((T)e.NewItems[i], e.NewStartingIndex + i), e.NewStartingIndex + i);
             }
 
             _Hack_CommitChanges();
@@ -343,13 +349,13 @@ namespace Takai.UI
         /// </summary>
         /// <param name="value">The item value to use for binding</param>
         /// <returns>The item created</returns>
-        protected Static CreateItemEntry(T value)
+        protected Static CreateItemEntry(T value, int index = -1)
         {
             if (ItemUI == null)
-                throw new NullReferenceException("ItemTemplate cannot be null");
+                throw new NullReferenceException(nameof(ItemUI) + " cannot be null");
 
             var item = ItemUI.CloneHierarchy();
-            item.BindTo(value);
+            item.BindTo(value, new System.Collections.Generic.Dictionary<string, object> { [":index"] = index });
             item.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
                 sender.BubbleCommand("ChangeSelection", sender.ChildIndex);
@@ -357,7 +363,7 @@ namespace Takai.UI
             });
             item.CommandActions["RemoveSelf"] = delegate (Static sender, object arg)
             {
-                sender.BubbleCommand("RemoveItem", sender.ChildIndex);
+                sender.BubbleCommand(RemoveItemCommand, sender.ChildIndex);
             };
             return item;
         }

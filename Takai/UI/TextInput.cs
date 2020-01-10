@@ -335,6 +335,8 @@ namespace Takai.UI
                             InsertAtCaret(isShift ? '<' : ',');
                         else if (key == Keys.OemPeriod)
                             InsertAtCaret(isShift ? '>' : '.');
+                        else if (key == Keys.OemTilde)
+                            InsertAtCaret(isShift ? '~' : '`');
                     }
                     else
                         continue;
