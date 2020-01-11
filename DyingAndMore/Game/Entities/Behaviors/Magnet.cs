@@ -24,7 +24,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
         public override void Think(TimeSpan deltaTime)
         {
-            var ents = AI.Actor.Map.FindEntitiesInRegion(AI.Actor.Position, Radius);
+            var ents = AI.Actor.Map.FindEntitiesInRegion(AI.Actor.WorldPosition, Radius);
             foreach (var ent in ents)
             {
                 if (ent == AI.Actor || !(ent is ActorInstance actor))
@@ -34,8 +34,8 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
                 //todo: attach once close enough?
 
-                var rad2 = Vector2.DistanceSquared(AI.Actor.Position, actor.Position);
-                actor.Accelerate(Vector2.Normalize(AI.Actor.Position - actor.Position) * (Strength / rad2));
+                var rad2 = Vector2.DistanceSquared(AI.Actor.WorldPosition, actor.WorldPosition);
+                actor.Accelerate(Vector2.Normalize(AI.Actor.WorldPosition - actor.WorldPosition) * (Strength / rad2));
             }
         }
     }

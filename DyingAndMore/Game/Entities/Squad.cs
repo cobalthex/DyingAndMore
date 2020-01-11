@@ -76,9 +76,9 @@ namespace DyingAndMore.Game.Entities
         {
             for (int i = 0; i < 10; ++i) //# of retries to find spawn point - todo: don't hard code (maybe based off radius)
             {
-                unit.Position = Takai.Util.RandomCircle(SpawnPosition, SpawnRadius);
+                unit.SetPositionTransformed(Takai.Util.RandomCircle(SpawnPosition, SpawnRadius));
 
-                if (map.TestRegionForEntities(unit.Position, unit.Radius / 2))
+                if (map.TestRegionForEntities(unit.WorldPosition, unit.Radius / 2))
                     continue;
 
                 //todo: set other entity props here

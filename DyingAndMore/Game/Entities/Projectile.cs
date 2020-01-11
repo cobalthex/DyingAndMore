@@ -156,13 +156,13 @@ namespace DyingAndMore.Game.Entities
             {
                 if (CurrentMagnet != null)
                 {
-                    var diff = CurrentMagnet.Position - Position;
+                    var diff = CurrentMagnet.WorldPosition - WorldPosition;
 
-                    if (CurrentMagnet.IsAliveIn(Map) && Vector2.Dot(diff, Forward) > 0)
+                    if (CurrentMagnet.IsAliveIn(Map) && Vector2.Dot(diff, WorldForward) > 0)
                     {
-                        //todo: pid controller
+                        //todo: pid controller?
 
-                        var sign = Takai.Util.Determinant(Forward, Vector2.Normalize(diff));
+                        var sign = Takai.Util.Determinant(WorldForward, Vector2.Normalize(diff));
 
                         Forward = Vector2.TransformNormal(Forward, Matrix.CreateRotationZ(sign * Class.MagnetismAnglePerSecond * (float)deltaTime.TotalSeconds));
                         Velocity = Forward * Velocity.Length();
@@ -198,17 +198,17 @@ namespace DyingAndMore.Game.Entities
 
             int n = 0;
             //search out in triangle?
-            foreach (var sector in Map.TraceSectors(Position, Forward, Class.Range))
+            foreach (var sector in Map.TraceSectors(WorldPosition, WorldForward, Class.Range))
             {
                 ++n;
                 foreach (var ent in sector.entities)
                 {
                     if (ent != this && ent is ActorInstance actor && !actor.IsAlliedWith(sourceFaction))
                     {
-                        var diff = ent.Position - Position;
+                        var diff = ent.WorldPosition - WorldPosition;
                         var length = diff.Length();
                         var norm = diff / length;
-                        var dot = Vector2.Dot(norm, Forward);
+                        var dot = Vector2.Dot(norm, WorldForward);
 
                         if (dot <= 0) //ignore targets behind
                             continue;

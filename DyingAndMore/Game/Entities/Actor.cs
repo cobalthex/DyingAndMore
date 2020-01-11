@@ -304,30 +304,32 @@ namespace DyingAndMore.Game.Entities
 
         /// <summary>
         /// Can this actor see a point given its field of view?
+        /// (in world space)
         /// </summary>
         /// <param name="Point">The point to check</param>
         /// <returns>True if this entity is facing Point</returns>
         public bool IsFacing(Vector2 Point)
         {
-            var diff = Point - Position;
+            var diff = Point - WorldPosition;
             diff.Normalize();
 
-            var dot = Vector2.Dot(Forward, diff);
+            var dot = Vector2.Dot(WorldForward, diff);
 
             return (dot > (1 - (Class.FieldOfView / 2 / MathHelper.Pi)));
         }
 
         /// <summary>
         /// Is this entity behind another (The other entity cannot see this one)
+        /// (in world space)
         /// </summary>
         /// <param name="Ent">The entity to check</param>
         /// <returns>True if this entity is behind Ent</returns>
         public bool IsBehind(ActorInstance Ent)
         {
-            var diff = Ent.Position - Position;
+            var diff = Ent.WorldPosition - WorldPosition;
             diff.Normalize();
 
-            var dot = Vector2.Dot(diff, Ent.Forward);
+            var dot = Vector2.Dot(diff, Ent.WorldForward);
             return (dot > (Class.FieldOfView / 2 / MathHelper.Pi) - 1);
         }
 

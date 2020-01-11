@@ -43,8 +43,8 @@ namespace DyingAndMore.Game.Entities
             {
                 Takai.Game.TraceHit hit;
 
-                if (Actor.IsFacing(trackedActor.Position))
-                    hit = Actor.Map.Trace(Actor.Position, Vector2.Normalize(trackedActor.Position - Actor.Position), MaxRange, Actor);
+                if (Actor.IsFacing(trackedActor.WorldPosition))
+                    hit = Actor.Map.Trace(Actor.WorldPosition, Vector2.Normalize(trackedActor.WorldPosition - Actor.WorldPosition), MaxRange, Actor);
                 else
                     hit = new Takai.Game.TraceHit();
 
@@ -52,20 +52,20 @@ namespace DyingAndMore.Game.Entities
                 {
                     //todo: maybe shoot w/ lead (shoot towards target's next position)
                     if (CanRotate)
-                        Actor.Forward = Vector2.Normalize(trackedActor.Position - Actor.Position); //todo: slerp
+                        Actor.SetForwardTransformed(Vector2.Normalize(trackedActor.WorldPosition - Actor.WorldPosition)); //todo: slerp
                     Actor.Weapon?.TryUse();
-                    Actor.Map.DrawLine(Actor.Position, hit.entity.Position, Color.Orange);
+                    Actor.Map.DrawLine(Actor.WorldPosition, hit.entity.WorldPosition, Color.Orange);
                 }
                 else
                     trackedActor = null;
             }
             else
             {
-                var ents = Actor.Map.FindEntitiesInRegion(Actor.Position, MaxRange);
+                var ents = Actor.Map.FindEntitiesInRegion(Actor.WorldPosition, MaxRange);
                 foreach (var ent in ents)
                 {
                     if (ent != Actor && ent is ActorInstance nearbyActor && (nearbyActor.Factions & Actor.Factions) == 0 &&
-                        Actor.IsFacing(nearbyActor.Position))
+                        Actor.IsFacing(nearbyActor.WorldPosition))
                     {
                         trackedActor = nearbyActor;
                         break;
@@ -77,13 +77,13 @@ namespace DyingAndMore.Game.Entities
                 {
                     void ScanRay(Vector2 direction, Color color)
                     {
-                        var hit = Actor.Map.Trace(Actor.Position, direction, MaxRange, Actor);
-                        Actor.Map.DrawLine(Actor.Position, Actor.Position + direction * hit.distance, color);
+                        var hit = Actor.Map.Trace(Actor.WorldPosition, direction, MaxRange, Actor);
+                        Actor.Map.DrawLine(Actor.WorldPosition, Actor.WorldPosition + direction * hit.distance, color);
                     }
                     Vector2 TransformDirection(float radians)
                     {
                         return Vector2.TransformNormal(
-                            Actor.Forward,
+                            Actor.WorldForward,
                             Matrix.CreateRotationZ(radians)
                         );
                     }

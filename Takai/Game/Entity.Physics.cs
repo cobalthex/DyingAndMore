@@ -41,6 +41,7 @@ namespace Takai.Game
         /// <summary>
         /// The velocity of the entity, separate from <see cref="Forward"/>
         /// Ignored if <see cref="WorldParent"/> is not null
+        /// Local velocity
         /// </summary>
         /// <remarks>This vector should always be normalized</remarks>
         public Vector2 Velocity { get; set; } = Vector2.Zero;
@@ -78,11 +79,11 @@ namespace Takai.Game
         /// <summary>
         /// Position, with all parent transforms applied
         /// </summary>
-        public Vector2 RealPosition => new Vector2(Transform.M41, Transform.M42);
+        public Vector2 WorldPosition => new Vector2(Transform.M41, Transform.M42);
         /// <summary>
         /// Forward, with all parent transforms applied
         /// </summary>
-        public Vector2 RealForward => new Vector2(Transform.M11, Transform.M12);
+        public Vector2 WorldForward => new Vector2(Transform.M11, Transform.M12);
 
         /// <summary>
         /// Set the local position to an already transformed point

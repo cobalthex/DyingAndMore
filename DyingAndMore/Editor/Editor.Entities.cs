@@ -183,7 +183,7 @@ namespace DyingAndMore.Editor
                 if (InputState.IsButtonDown(Keys.R))
                 {
                     //needs to take into account parent rotations
-                    var diff = currentWorldPos - SelectedEntity.RealPosition;
+                    var diff = currentWorldPos - SelectedEntity.WorldPosition;
                     Vector2 newForward;
                     if (InputState.IsMod(KeyMod.Shift))
                     {
