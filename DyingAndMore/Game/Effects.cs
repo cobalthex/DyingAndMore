@@ -38,7 +38,7 @@ namespace DyingAndMore.Game
                     targetActor.ReceiveDamage(MaxDamage, instance.Source);
                 else
                 {
-                    var distSq = Vector2.DistanceSquared(instance.Position, instance.Target.Position);
+                    var distSq = Vector2.DistanceSquared(instance.Position, instance.Target.WorldPosition);
                     if (distSq <= rSq)
                         targetActor.ReceiveDamage(MaxDamage * (rSq - distSq) / rSq, instance.Source); //falloff curve?
                 }
@@ -52,14 +52,14 @@ namespace DyingAndMore.Game
                         !(ent is Entities.ActorInstance actor))
                         continue;
 
-                    var distSq = Vector2.DistanceSquared(instance.Position, ent.Position);
+                    var distSq = Vector2.DistanceSquared(instance.Position, ent.WorldPosition);
 
                     if (rSq == 0)
                         actor.ReceiveDamage(MaxDamage, instance.Source); //source?
                     else if (distSq <= rSq)
                         actor.ReceiveDamage(MaxDamage * (rSq - distSq) / rSq, instance.Source); //falloff curve?
 
-                    instance.Map.DrawCircle(instance.Position, Radius, Color.Gold);
+                    //instance.Map.DrawCircle(instance.Position, Radius, Color.Gold);
                 }
             }
         }

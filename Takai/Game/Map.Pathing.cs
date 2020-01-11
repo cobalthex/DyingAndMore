@@ -319,7 +319,7 @@ namespace Takai.Game
         /// <param name="region">The region to block out (in pixels)</param>
         /// <param name="weight">How strong the block</param>
         /// <param name="weightRadius">A falloff curve for the weight. 0 for constant</param>
-        public void AddObstacle(Rectangle region, float weight = 4, float weightRadius = 0)
+        public void AddPathObstacle(Rectangle region, float weight = 4, float weightRadius = 0)
         {
             region.X /= Class.TileSize;
             region.Y /= Class.TileSize;

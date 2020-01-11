@@ -7,6 +7,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
     /// Orbit around a point
     /// (Does not perform astrodynamics)
     /// Attempts to maintain orbit at standard acceleration speed and turn speed
+    /// Turns towards tangent
     /// </summary>
     public class OrbitBehavior : Behavior
     {

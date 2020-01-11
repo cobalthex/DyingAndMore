@@ -48,8 +48,8 @@ namespace Takai.Game
             var spawn = target == null ? source : target;
             if (target != null)
             {
-                instance.Position = target.Position;
-                instance.Direction = target.Forward;
+                instance.Position = target.WorldPosition;
+                instance.Direction = target.WorldForward;
                 instance.Velocity = target.Velocity;
             }
             instance.Target = target;
@@ -286,7 +286,7 @@ namespace Takai.Game
                 if (!ent.Class.IsPhysical || ent == instance.Source)
                     continue;
 
-                var d = ent.Position - instance.Position;
+                var d = ent.WorldPosition - instance.Position;
                 var l = d.Length();
                 ent.Velocity += (d / l) * (Force);
             }

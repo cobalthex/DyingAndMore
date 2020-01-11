@@ -137,7 +137,7 @@ namespace DyingAndMore.Game.Weapons
                 for (int i = 0; i < Class.ProjectilesPerRound; ++i)
                 {
                     var projectile = (ProjectileInstance)Class.Projectile.Instantiate();
-                    projectile.Position = Actor.Position + (Actor.Forward * (Actor.Radius + projectile.Radius + Class.SpawnOffset));
+                    projectile.SetPositionTransformed(Actor.WorldPosition + (Actor.WorldForward * (Actor.Radius + projectile.Radius + Class.SpawnOffset)));
 
                     var error = Class.ErrorAngle.Random();
                     projectile.Forward = Vector2.TransformNormal(Actor.Forward, Matrix.CreateRotationZ(error));

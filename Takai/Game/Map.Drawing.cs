@@ -655,12 +655,12 @@ namespace Takai.Game
 
             foreach (var ent in EnumerateEntitiesInSectors(c.visibleSectors))
             {
-                var entPos = ent.RealPosition;
+                var entPos = ent.WorldPosition;
                 if (ent.OutlineColor.A > 0)
                     _drawEntsOutlined.Add(ent);
                 else
                 {
-                    var angle = Util.Angle(ent.RealForward);
+                    var angle = Util.Angle(ent.WorldForward);
 
                     foreach (var state in ent.ActiveAnimations)
                     {
@@ -681,7 +681,7 @@ namespace Takai.Game
                             {
                                 light = state.Class.Light,
                                 angle = stateAngle,
-                                position = ent.Position,
+                                position = entPos,
                                 spriteElapsedTime = state.ElapsedTime
                             });
                         }
@@ -719,10 +719,10 @@ namespace Takai.Game
                 }
 
                 if (renderSettings.drawEntityForwardVectors)
-                    DrawArrow(entPos, ent.RealForward, ent.Radius * 1.3f, Color.Gold);
+                    DrawArrow(entPos, ent.WorldForward, ent.Radius * 1.3f, Color.Gold);
 
                 if (renderSettings.drawEntityHierarchies && ent.WorldParent != null)
-                    DrawLine(entPos, ent.WorldParent.RealPosition, Color.LightGreen, 10);
+                    DrawLine(entPos, ent.WorldParent.WorldPosition, Color.LightGreen, 10);
 
                 if (renderSettings.drawDebugInfo && Class.DebugFont != null)
                 {
@@ -739,7 +739,7 @@ namespace Takai.Game
 
             foreach (var ent in _drawEntsOutlined)
             {
-                var angle = Util.Angle(ent.RealForward);
+                var angle = Util.Angle(ent.WorldForward);
 
                 foreach (var state in ent.ActiveAnimations)
                 {
@@ -752,7 +752,7 @@ namespace Takai.Game
                     Class.outlineEffect.Parameters["TexNormSize"].SetValue(new Vector2(1.0f / sprite.Texture.Width, 1.0f / sprite.Texture.Height));
                     Class.outlineEffect.Parameters["FrameSize"].SetValue(new Vector2(sprite.Width, sprite.Height));
 
-                    var entPos = ent.RealPosition;
+                    var entPos = ent.WorldPosition;
                     state.Class?.Sprite?.Draw(
                         c.spriteBatch,
                         entPos,
@@ -768,7 +768,7 @@ namespace Takai.Game
                         {
                             light = state.Class.Light,
                             angle = stateAngle,
-                            position = ent.Position,
+                            position = entPos,
                             spriteElapsedTime = state.ElapsedTime
                         });
                     }

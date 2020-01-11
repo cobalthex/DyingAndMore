@@ -191,7 +191,7 @@ namespace Takai.Game
                     var normV = deltaV / deltaVLen;
 
                     var offset = entity.Radius + 1;
-                    var start = entity.RealPosition + (offset * normV);
+                    var start = entity.WorldPosition + (offset * normV);
                     var hit = Trace(start, normV, deltaVLen, entity);
                     var target = start + (normV * (hit.distance - offset));
 
@@ -224,7 +224,7 @@ namespace Takai.Game
                                 {
                                     //add remaining distance to reflection? (trace that)
                                     entity.Velocity = Vector2.Reflect(entity.Velocity, colNorm) * (1 - interaction.Friction);
-                                    entity.Forward = Vector2.Reflect(entity.Forward, colNorm);
+                                    entity.SetForwardTransformed(Vector2.Reflect(entity.WorldForward, colNorm));
                                 }
                                 else
                                     //todo: improve
@@ -249,7 +249,7 @@ namespace Takai.Game
                             var cm = new CollisionManifold
                             {
                                 point = target,
-                                direction = entity.Forward,
+                                direction = entity.WorldForward,
                                 depth = deltaVLen - hit.distance //todo: distance between origins minus radii
                             };
 
@@ -259,7 +259,7 @@ namespace Takai.Game
 
                             if (entity.Class.IsPhysical)
                             {
-                                var diff = Vector2.Normalize(hit.entity.Position - entity.Position);
+                                var diff = Vector2.Normalize(hit.entity.WorldPosition - entity.WorldPosition);
                                 entity.Velocity -= diff * Vector2.Dot(entity.Velocity, diff);
                             }
 
@@ -277,7 +277,7 @@ namespace Takai.Game
                                 fx.Source = entity;
                                 fx.Target = hit.entity;
                                 fx.Position = target;
-                                fx.Direction = -Vector2.Reflect(entity.Forward, Vector2.Normalize(target - hit.entity.Position));
+                                fx.Direction = -Vector2.Reflect(entity.WorldForward, Vector2.Normalize(target - hit.entity.WorldPosition));
                                 Spawn(fx);
                             }
 
@@ -313,8 +313,8 @@ namespace Takai.Game
                         foreach (var fluid in collidingFluids)
                         {
                             var fx = fluid.Class.EntityCollisionEffect.Instantiate();
-                            fx.Position = entity.Position;
-                            fx.Direction = Vector2.Normalize(entity.Position - fluid.position);
+                            fx.Position = entity.WorldPosition;
+                            fx.Direction = Vector2.Normalize(entity.WorldPosition - fluid.position);
                             Spawn(fx);
                         }
                         collidingFluids.Clear();
@@ -330,7 +330,7 @@ namespace Takai.Game
                 {
                     var entBounds = entity.AxisAlignedBounds;
                     entBounds = Rectangle.Union(entBounds, lastBounds);
-                    AddObstacle(entBounds, 4, entity.Radius);
+                    AddPathObstacle(entBounds, 4, entity.Radius);
                 }
             }
 
@@ -355,13 +355,12 @@ namespace Takai.Game
             }
         }
 
-        public void MoveEnt(EntityInstance entity, Vector2 position, Vector2 forward)
+        public void MoveEnt(EntityInstance entity, Vector2 localPosition, Vector2 localForward)
         {
-            entity.Position = position;
-            entity.Forward = Vector2.Normalize(forward);
+            entity.Position = localPosition;
+            entity.Forward = Vector2.Normalize(localForward);
 
             UpdateEntitySectors(entity);
-
         }
 
         void UpdateEntitySectors(EntityInstance entity)
@@ -562,9 +561,9 @@ namespace Takai.Game
 
                     if (s.Owner != null)
                     {
-                        s.Position = s.Owner.Position;
-                        s.Forward = s.Owner.Forward;
-                        s.Velocity = s.Owner.Velocity;
+                        s.Position = s.Owner.WorldPosition;
+                        s.Forward = s.Owner.WorldForward;
+                        s.Velocity = s.Owner.Velocity; //todo, needs to transform to world
 
                         if (!s.Owner.IsAliveIn(this) && s.Class.DestroyIfOwnerDies)
                         {
@@ -619,8 +618,8 @@ namespace Takai.Game
             parent._worldChildren.Add(child);
 
             child.Velocity = Vector2.Zero;
-            child.SetPositionTransformed(child.RealPosition);
-            child.SetForwardTransformed(child.RealForward);
+            child.SetPositionTransformed(child.WorldPosition);
+            child.SetForwardTransformed(child.WorldForward);
 
             child.UpdateAxisAlignedBounds();
             UpdateEntitySectors(child);
@@ -639,8 +638,8 @@ namespace Takai.Game
             var parent = child.WorldParent;
             parent._worldChildren?.Remove(child);
             child.WorldParent = null;
-            child.Position = child.RealPosition;
-            child.Forward = child.RealForward;
+            child.Position = child.WorldPosition;
+            child.Forward = child.WorldForward;
 
             UpdateEntitySectors(child);
             UpdateEntitySectors(parent);

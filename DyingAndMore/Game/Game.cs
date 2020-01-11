@@ -374,7 +374,7 @@ namespace DyingAndMore.Game
                     var region = players[i].camera.VisibleRegion; //todo: clip to some size
                     region.Inflate(Map.Class.SectorPixelSize, Map.Class.SectorPixelSize);
 
-                    Map.BuildHeuristic((players[i].actor.Position / Map.Class.TileSize).ToPoint(), region, i > 0);
+                    Map.BuildHeuristic((players[i].actor.WorldPosition / Map.Class.TileSize).ToPoint(), region, i > 0);
 
                     players[i].camera.Update(time);
                     Map.MarkRegionActive(players[i].camera);
@@ -544,7 +544,7 @@ namespace DyingAndMore.Game
                 {
                     if (ent is Entities.ActorInstance actor && actor.Class.MaxHealth > 0)
                     {
-                        var pos = player.camera.WorldToScreen(ent.RealPosition - new Vector2(0, ent.Radius + 16));
+                        var pos = player.camera.WorldToScreen(ent.WorldPosition - new Vector2(0, ent.Radius + 16));
                         DrawHealthBar(spriteBatch, pos, actor.CurrentHealth, actor.Class.MaxHealth);
                     }
                 }

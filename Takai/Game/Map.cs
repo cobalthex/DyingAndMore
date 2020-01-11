@@ -216,17 +216,17 @@ namespace Takai.Game
         /// Spawn a new entity
         /// </summary>
         /// <param name="entity">The entity class to create from</param>
-        /// <param name="position">Where to spawn the entity</param>
-        /// <param name="forward">Where the entity should face</param>
+        /// <param name="worldPosition">Where to spawn the entity (World relative)</param>
+        /// <param name="worldForward">Where the entity should face (World relative)</param>
         /// <param name="velocity">How fast the entity is moving</param>
         /// <param name="name">The name of the entity to spawn</param>
         /// <returns>The spawned entity</returns>
-        public EntityInstance Spawn(EntityClass entity, Vector2 position, Vector2 forward, Vector2 velocity, string name = null)
+        public EntityInstance Spawn(EntityClass entity, Vector2 worldPosition, Vector2 worldForward, Vector2 velocity, string name = null)
         {
             var instance = entity.Instantiate();
 
-            instance.Position = position;
-            instance.Forward = forward;
+            instance.SetPositionTransformed(worldPosition);
+            instance.SetForwardTransformed(worldForward);
             instance.Velocity = velocity;
             instance.Name = name;
 
@@ -462,7 +462,7 @@ namespace Takai.Game
             var allEnts = new List<EntityInstance>(AllEntities);
             RemoveAllEntities();
             for (int i = 0; i < allEnts.Count; ++i)
-                Spawn(allEnts[i].Class, allEnts[i].Position, allEnts[i].Forward, allEnts[i].Velocity, allEnts[i].Name);
+                Spawn(allEnts[i].Class, allEnts[i].WorldPosition, allEnts[i].WorldForward, allEnts[i].Velocity, allEnts[i].Name);
         }
 
         #endregion

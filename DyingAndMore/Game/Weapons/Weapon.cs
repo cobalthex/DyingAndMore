@@ -264,7 +264,7 @@ namespace DyingAndMore.Game.Weapons
             if (Class.DischargeEffect != null)
             {
                 var fx = Class.DischargeEffect.Instantiate(Actor, Actor);
-                fx.Position += (Actor.Forward * (Actor.Radius + Class.SpawnOffset));
+                fx.Position += (Actor.WorldForward * (Actor.Radius + Class.SpawnOffset));
                 Actor.Map.Spawn(fx);
             }
         }

@@ -95,8 +95,8 @@ namespace Takai.Game
                 Instance.Volume = Class.Gain;
             }
 
-            Position = instance.Position;
-            Forward = instance.Forward;
+            Position = instance.WorldPosition;
+            Forward = instance.WorldForward;
             Velocity = instance.Velocity;
         }
     }

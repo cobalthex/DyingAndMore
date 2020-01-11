@@ -23,20 +23,20 @@ namespace DyingAndMore.Game.Entities.Behaviors
         {
             if (AI.Target == null || !AI.Target.IsAlive || AI.Target.Map != AI.Actor.Map)
             {
-                var ents = AI.Actor.Map.FindEntitiesInRegion(AI.Actor.Position, SightDistance);
+                var ents = AI.Actor.Map.FindEntitiesInRegion(AI.Actor.WorldPosition, SightDistance);
                 var possibles = new List<ActorInstance>();
                 foreach (var ent in ents)
                 {
                     if (ent != AI.Actor &&
                         ent is ActorInstance actor &&
                         !actor.IsAlliedWith(AI.Actor.Factions) &&
-                        AI.Actor.IsFacing(actor.Position))
+                        AI.Actor.IsFacing(actor.WorldPosition))
                         possibles.Add(actor);
                 }
                 possibles.Sort(delegate (ActorInstance a, ActorInstance b)
                 {
-                    var afw = Vector2.Dot(a.Forward, AI.Actor.Forward);
-                    var bfw = Vector2.Dot(b.Forward, AI.Actor.Forward);
+                    var afw = Vector2.Dot(a.WorldForward, AI.Actor.WorldForward);
+                    var bfw = Vector2.Dot(b.WorldForward, AI.Actor.WorldForward);
                     return (afw == bfw ? 0 : (int)Math.Ceiling(bfw - afw));
                 });
 
@@ -55,8 +55,8 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
             //enemies close by, if have melee weapon, higher threat
 
-            else if (Vector2.DistanceSquared(AI.Target.Position, AI.Actor.Position) >= SightDistance * SightDistance ||
-                AI.Actor.IsFacing(AI.Actor.Position))
+            else if (Vector2.DistanceSquared(AI.Target.WorldPosition, AI.Actor.WorldPosition) >= SightDistance * SightDistance ||
+                AI.Actor.IsFacing(AI.Actor.WorldPosition))
             {
                 //AI.Target.OutlineColor = Color.Transparent;
                 AI.SetNextTarget(null);
@@ -84,7 +84,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
         public override BehaviorPriority CalculatePriority()
         {
-            var distance = Vector2.DistanceSquared(AI.Actor.Position, AI.Target.Position);
+            var distance = Vector2.DistanceSquared(AI.Actor.WorldPosition, AI.Target.WorldPosition);
             if (distance < Radius * Radius)
                 return BehaviorPriority.High;
             return BehaviorPriority.Never;
@@ -118,7 +118,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
         public override BehaviorPriority CalculatePriority()
         {
-            var flow = AI.Actor.Map.PathInfoAt(AI.Actor.Position);
+            var flow = AI.Actor.Map.PathInfoAt(AI.Actor.WorldPosition);
             if (flow.heuristic <= Bias)
                 return BehaviorPriority.High;
             return BehaviorPriority.Never;
@@ -143,7 +143,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
         public override BehaviorPriority CalculatePriority()
         {
-            var curPI = AI.Actor.Map.PathInfoAt(AI.Actor.Position);
+            var curPI = AI.Actor.Map.PathInfoAt(AI.Actor.WorldPosition);
             if (curPI.heuristic * AI.Actor.Map.Class.TileSize > 10000) //todo: sight range per actor
                 return BehaviorPriority.Never;
             return BehaviorPriority.Normal;
@@ -166,7 +166,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
         {
             var min = uint.MaxValue;
             minimums.Clear();
-            var pos = (AI.Actor.Position / AI.Actor.Map.Class.TileSize).ToPoint();
+            var pos = (AI.Actor.WorldPosition / AI.Actor.Map.Class.TileSize).ToPoint();
             foreach (var dir in NavigationDirections)
             {
                 var target = pos + dir;
@@ -185,6 +185,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
             var next = Vector2.Normalize(minimums[0].ToVector2());
 
+            //todo: fix/verify for nested objects
             AI.Actor.Forward = Vector2.Lerp(AI.Actor.Forward, next, MathHelper.PiOver2 * (float)deltaTime.TotalSeconds); //factor in speed (tighter turns over speed)
             AI.Actor.Forward.Normalize();
 
@@ -201,7 +202,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
         public override BehaviorPriority CalculatePriority()
         {
-            if (AI.Actor.Weapon == null || !AI.Actor.IsFacing(AI.Target.Position))
+            if (AI.Actor.Weapon == null || !AI.Actor.IsFacing(AI.Target.WorldPosition))
                 return BehaviorPriority.Never;
 
             return BehaviorPriority.Normal;
@@ -236,8 +237,8 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
         public override void Think(TimeSpan deltaTime)
         {
-            var diff = Vector2.Normalize(AI.Target.Position - AI.Actor.Position);
-            var det = Takai.Util.Determinant(AI.Actor.Forward, diff);
+            var diff = Vector2.Normalize(AI.Target.WorldPosition - AI.Actor.WorldPosition);
+            var det = Takai.Util.Determinant(AI.Actor.WorldForward, diff);
             var maxTurn = MathHelper.Clamp(MaxTurn / (AI.Actor.Velocity.Length() / 20), 0, MaxTurn);
             var angle = det * maxTurn;
 
