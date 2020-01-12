@@ -1,11 +1,18 @@
   ☐  Tkz format that uses gzip. Add serializer helpers to check for compression (based on header) and automatically run correct handlers
 
-  Conditions:
+Bugs:
+    ☐ Squad select scrollbox not sizing correctly
+    ☐ Checkbox needs to clip check sprite
+    ☐ Nine-patch relative clipping
+    ☐ Sprite clipping in entity select
+    ☐ Evaluate [perf of] casting style args to correct type
+    ☐ material interaction physics
+
+Conditions:
     ☐  Invisibility
     ☐  Invincibility
 
-  Game AI:
-    ✔  Squads/Platoons @done (19-02-25 01:08)
+Game AI:
     ☐  Cover
     ☐  Waypoints
     ☐  Objectives/navpoints
@@ -16,7 +23,7 @@
     ☐  conditions/senses
     ☐  enemies that attach to walls and affect map (rumbling, destruction, etc)
 
-  Gases:
+Gases:
     ☐  Behavior changing
     ☐  AI avoidance
 
@@ -36,26 +43,18 @@
     ☐  proper collidable shapes
     ☐  collision graph (necessary?) Dictionary<Collider, HashSet<Collider>>
 
-  ✘  unified entity system? (basic entities) vs ecs esque design @cancelled (19-01-13 03:23)
 
-  ☐  editorable commands
+Serializer:
+    ☐ Implicit children
+    ☐ Parametric imports ($0 $1 $2 for arguments as templates)
 
-  ☐  named reference objects from files? (necessary?)
-  `$taco Sprite { ... }`
-    visible from code, and deserializer as &var.taco
-
-  UI:
+UI:
     ☐ default buttons (click enter in text box to submit)
     ☐ display scaling
     ☐ tab focus should not be able to escape modal
-    ✔ global commands ($Close should close nearest modal) @done (19-02-25 01:08)
     ☐ when adding a modal to UI, should switch focus
     ☐ cache previous focus in modal?
     ☐ special modal element?
-    Refactor:
-      ✔ DropdownSelect @done (19-01-13 03:23)
-      ✔ Reflow on all elements @done (19-01-13 03:23)
-      ✔ Inputs @done (19-01-13 03:23)
 
   ☐  Think only when alive?
 
@@ -94,6 +93,12 @@
  ☐ make polarinput actually polar (via radius, cap at 1)
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ global commands ($Close should close nearest modal) @done (19-02-25 01:08) @project(UI)
+ ✔  Squads/Platoons @done (19-02-25 01:08) @project(Bugs / Game AI)
+ ✘  unified entity system? (basic entities) vs ecs esque design @cancelled (19-01-13 03:23) @project(Bugs)
+ ✔ Reflow on all elements @done (19-01-13 03:23) @project(Refactor)
+ ✔ Inputs @done (19-01-13 03:23) @project(Refactor)
+ ✔ DropdownSelect @done (19-01-13 03:23) @project(Refactor)
  ✔ material reflections off entities @done (18-09-04 02:04)
 ✔ new binding system: 'Bindings: ['varname', 'input'] <- update every frame and refresh when input value changes @done (18-09-04 01:57) @project(UI)
 ✔  player input system @done (18-07-21 22:11)

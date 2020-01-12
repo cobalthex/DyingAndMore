@@ -115,7 +115,6 @@ namespace Takai.UI
         public TextInput()
         {
             ignoreSpaceKey = true;
-            BorderColor = Color;
 
             On(PressEvent, OnInputBoxPressed);
         }

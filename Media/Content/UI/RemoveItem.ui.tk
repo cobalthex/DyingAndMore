@@ -1,0 +1,9 @@
+Graphic {
+	Sprite: @"./X.png";
+	Padding: 5;
+	HorizontalAlignment: Alignment.Right;
+	VerticalAlignment: Alignment.Center;
+	EventCommands: {
+		Click: "RemoveSelf";
+	}
+}

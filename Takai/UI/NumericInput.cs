@@ -98,14 +98,13 @@ namespace Takai.UI
         {
             textInput = new TextInput
             {
-                Name = "clarq",
                 Text = "0",
+                Style = "NumericInput.TextInput",
                 AllowLetters = false,
                 AllowNumbers = true,
                 AllowSpaces = false,
                 AllowSpecialCharacters = false,
                 MaxLength = 20,
-                BorderColor = Color.Transparent,
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
             };
@@ -123,17 +122,17 @@ namespace Takai.UI
                 return UIEventResult.Continue;
             });
 
-            BorderColor = Color;
-
             var upButton = new Static
             {
                 Text = "+",
+                Style = "NumericInput.Button",
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
             };
             var downButton = new Static
             {
                 Text = "-",
+                Style = "NumericInput.Button",
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
             };
@@ -181,7 +180,7 @@ namespace Takai.UI
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            var buttonSize = textInput.MeasuredSize.Y;
+            var buttonSize = textInput.MeasuredSize.Y; //todo: use button measured size
             var shift = (int)(availableSize.X - buttonSize * (Children.Count - 1));
             //todo: hacky
             Children[0].Arrange(new Rectangle(0, 0, shift, (int)availableSize.Y));

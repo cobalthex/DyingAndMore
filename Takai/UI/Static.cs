@@ -1844,7 +1844,6 @@ namespace Takai.UI
                 var newHash = (newVal ?? 0).GetHashCode();
                 if (newHash != bindScopeGetset.cachedHash)
                 {
-                    bindScopeGetset = Data.GetSet.GetMemberAccessors(newVal, ChildBindScope);
                     bindScopeGetset.cachedValue = newVal;
                     bindScopeGetset.cachedHash = newHash;
 
@@ -2002,12 +2001,10 @@ namespace Takai.UI
                         (int)button,
                         DeviceType.Mouse
                     );
-                    if (InputState.IsClick(button))
-                        didPress = false;
+                    didPress = false;
                     return false;
                 }
-                if (InputState.IsClick(button))
-                    didPress = false;
+                didPress = false;
             }
 
             return true;

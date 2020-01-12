@@ -48,13 +48,11 @@ namespace Takai.UI
 
         public ObjectSelect()
         {
-            BorderColor = Microsoft.Xna.Framework.Color.White;
-
             ItemUI = new Static
             {
                 Bindings = new List<Data.Binding>
                 {
-                    new Data.Binding("Name", "Text")
+                    new Data.Binding("Name", "Text", Data.BindingDirection.OneWay, "(None)")
                 }
             };
 

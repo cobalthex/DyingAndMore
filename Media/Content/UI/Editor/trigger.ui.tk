@@ -4,17 +4,11 @@ List {
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
 	Style: "Frame";
-    Margin: 10;
-    Padding: 10;
 
     Children: [
         Scrollbox {
             Size: [400 400];
             InnerPadding: 10;
-            ScrollBarUI: {
-                Padding: 3;
-                BorderColor: Color.White;
-            }
             Children: [
                 List {
                     Direction: Direction.Vertical;
@@ -234,6 +228,7 @@ List {
         };
 
         Static {
+            Style: "Button";
             Padding: [10 5];
             HorizontalAlignment: Alignment.Middle;
             Text: "Close";

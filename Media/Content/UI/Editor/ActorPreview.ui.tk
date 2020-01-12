@@ -20,15 +20,7 @@ List {
 			];
 			VerticalAlignment: Alignment.Middle;
 		}
-		Static {
-			Text: "X"; #todo
-			VerticalAlignment: Alignment.Middle;
-			HorizontalAlignment: Alignment.Right;
-			padding: 10;
-			Color: Color.Tomato;
-			EventCommands: {
-				Click: "RemoveSelf";
-			}
-		}
+
+		@"UI/RemoveItem.ui.tk";
 	];
 }

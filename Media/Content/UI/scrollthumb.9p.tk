@@ -1,7 +1,8 @@
 NinePatch {
 	Sprite: {
-		Texture: @"./scrollthumb.png";
+		Texture: @"./scroll.png";
 		Center: false;
+		ClipRect: [0 0 8 8]
 	}
 	CenterRegion: [3 3 2 2];
 }

@@ -41,7 +41,6 @@ namespace Takai.UI
                 _items = value;
                 _items.CollectionChanged += Items_CollectionChanged;
                 Container.RemoveAllChildren();
-                Items_CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _items, 0));
             }
         }
         private ObservableCollection<T> _items;
@@ -323,6 +322,13 @@ namespace Takai.UI
             {
                 for (int i = 0; i < e.NewItems.Count; ++i)
                     Container.InsertChild(CreateItemEntry((T)e.NewItems[i], e.NewStartingIndex + i), e.NewStartingIndex + i);
+            }
+
+            var sb = new System.Text.StringBuilder();
+            if (e.NewItems != null)
+            {
+                foreach (var item in e.NewItems)
+                    sb.Append($"+{item}\n");
             }
 
             _Hack_CommitChanges();

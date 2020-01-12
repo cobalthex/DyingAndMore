@@ -1,7 +1,5 @@
 List {
 	IsModal: true;
-	Padding: 10;
-	Margin: 10;
 	HorizontalAlignment: Alignment.Center;
 	VerticalAlignment: Alignment.Center;
 	Direction: Direction.Vertical;
@@ -286,6 +284,7 @@ List {
 		};
 
 		Static {
+            Style: "Button";
 			Text: "Close";
 			HorizontalAlignment: Alignment.Center;
 			Padding: [10 5];

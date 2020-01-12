@@ -67,12 +67,8 @@ namespace DyingAndMore.Editor
         public Color ActiveColor { get; set; } = Color.White;
         public Color InactiveColor { get; set; } = Color.LightGray;
 
-        public ModeSelector(Takai.Graphics.BitmapFont activeFont,
-                            Takai.Graphics.BitmapFont inactiveFont)
+        public ModeSelector()
         {
-            ActiveFont = activeFont;
-            InactiveFont = inactiveFont;
-
             AddChild(tabs = new List()
             {
                 Position = new Vector2(0, 40),
@@ -84,9 +80,28 @@ namespace DyingAndMore.Editor
             Modes = modes.AsReadOnly();
 
             CommandActions["SetMode"] = delegate (Static sender, object arg)
-            { 
+            {
                 ModeIndex = (int)arg;
             };
+        }
+
+        public ModeSelector(Takai.Graphics.BitmapFont activeFont,
+                            Takai.Graphics.BitmapFont inactiveFont)
+            : this()
+        {
+            ActiveFont = activeFont;
+            InactiveFont = inactiveFont;
+        }
+
+        public override void ApplyStyles(Dictionary<string, object> styleRules)
+        {
+            base.ApplyStyles(styleRules);
+
+            ActiveColor = GetStyleRule(styleRules, "ActiveColor", ActiveColor);
+            InactiveColor = GetStyleRule(styleRules, "InactiveColor", InactiveColor);
+
+            ActiveFont = GetStyleRule(styleRules, "ActiveFont", ActiveFont);
+            InactiveFont = GetStyleRule(styleRules, "InactiveFont", InactiveFont);
         }
 
         public void AddMode(EditorMode mode)
