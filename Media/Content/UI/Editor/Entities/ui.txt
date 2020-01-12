@@ -1,0 +1,23 @@
+UIElement:
+	Name
+	ID
+	Position
+	Size
+	[Internal layout structs]
+
+	Measure()
+	Arrange()
+
+
+Traits
+¯¯¯¯¯¯
+Container:
+	Children
+	ArrangeChildren()
+
+Input:
+	OnInput()
+
+Animator:
+
+Value:

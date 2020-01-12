@@ -6,9 +6,7 @@
 }*#
 
 List {
-    BackgroundColor: Color.Gray;
-    Margin: 10;
-    Padding: [10 10];
+    Style: "Frame";
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
     IsModal: true;
@@ -77,23 +75,26 @@ List {
             HorizontalAlignment: Alignment.Stretch;
             Children: [
                 Static {
+                    Style: "Button";
                     EventCommands: {
                         Click: ["Create"];
                     };
                     Text: "Create";
-                    Font: @"Fonts/UILarge.bfnt";
-                    HorizontalAlignment: Alignment.Stretch;
+                    HorizontalAlignment: Alignment.Center;
+                    VerticalAlignment: Alignment.Center;
                 }
 
                 Static {
+                    Style: "Button";
                     EventCommands: {
                         Click: ["CloseModal"];
                     };
                     Text: "Cancel";
-                    Font: @"Fonts/UILarge.bfnt";
-                    HorizontalAlignment: Alignment.Stretch;
+                    HorizontalAlignment: Alignment.Center;
+                    VerticalAlignment: Alignment.Center;
                 }
             ]
         }
     ]
 }
+#todo: cleanup styling here

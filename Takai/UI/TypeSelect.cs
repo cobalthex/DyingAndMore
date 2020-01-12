@@ -11,7 +11,7 @@ namespace Takai.UI
         {
             get
             {
-                if (SelectedIndex >= 0)
+                if (SelectedIndex >= 0 && SelectedItem != null)
                     return (_instance ?? (_instance = Activator.CreateInstance(SelectedItem)));
                 else
                     return null;
@@ -37,7 +37,7 @@ namespace Takai.UI
             {
                 Bindings = new List<Data.Binding>
                 {
-                    new Data.Binding("Name", "Text")
+                    new Data.Binding("Name", "Text", Data.BindingDirection.OneWay, "(None)")
                 }
             };
 

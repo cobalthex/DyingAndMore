@@ -34,9 +34,26 @@ namespace Takai.UI
 
         public override bool CanFocus => true;
 
+        public bool AllowDefaultValue
+        {
+            get => _allowDefaultValue;
+            set
+            {
+                if (value == _allowDefaultValue)
+                    return;
+
+                _allowDefaultValue = value;
+                if (_allowDefaultValue)
+                    Items.Insert(0, default);
+                else
+                    Items.Remove(default);
+            }
+        }
+        bool _allowDefaultValue;
+
         public DropdownSelect()
         {
-            BorderColor = Color.White;
+            Style = "DropdownSelect";
 
             list = new ItemList<T>()
             {
@@ -45,9 +62,7 @@ namespace Takai.UI
 
             dropdown = new ScrollBox(list)
             {
-                BorderColor = Color.White,
-                BackgroundColor = new Color(32, 0, 128),
-                Padding = new Vector2(2)
+                Style = "Dropdown"
             };
 
             dropdownContainer = new Static(dropdown)

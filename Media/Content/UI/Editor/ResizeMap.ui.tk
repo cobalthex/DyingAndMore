@@ -1,13 +1,10 @@
 List {
-	Name:"asdf";
+	Style: "Frame";
 	Direction: Direction.Vertical;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
-	Margin: 10;
-	Padding: 10;
 
 	IsModal: True;
-	BackgroundColor: [0 0 0 220];
 
     Children: [
     	Static {
@@ -24,7 +21,7 @@ List {
 
 					Children: [
 						Static {
-							Text: "Width";
+							Text: "`_Width";
 						}
 
 						NumericInput {
@@ -47,7 +44,7 @@ List {
 
 					Children: [
 						Static {
-							Text: "Height";
+							Text: "`_Height";
 						}
 
 						NumericInput {
@@ -71,20 +68,20 @@ List {
 			Direction: Direction.Horizontal;
 			HorizontalAlignment: Alignment.Stretch;
 			Margin: 10;
-			BorderColor: [0 192 255 255];
 
 			Children: [
 				Static {
+                    Style: "Button";
 					EventCommands: {
 						Click: "ResizeMap";
 					};
 					Text: "Resize";
 					HorizontalAlignment: Alignment.Stretch;
-					BorderColor: [255 192 0 255];
 				}
 				Static {
+                    Style: "Button";
 					EventCommands: {
-						Click: "$CloseModal";
+						Click: "CloseModal";
 					};
 					Text: "Cancel";
 					HorizontalAlignment: Alignment.Stretch;

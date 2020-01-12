@@ -137,7 +137,7 @@ Table {
         Static {
             Bindings: [
                 {
-                    Source: "Controller";
+                    Source: "Controller:typename";
                     Target: "Text";
                 }
             ];

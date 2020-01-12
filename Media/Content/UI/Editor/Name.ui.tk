@@ -1,8 +1,6 @@
 List {
-	Name: "foo";
+	Style: "Frame";
 	IsModal: true;
-	Padding: 10;
-	Margin: 10;
 	Direction: Direction.Vertical;
 	HorizontalAlignment: Alignment.Center;
 	VerticalAlignment: Alignment.Center;
@@ -47,6 +45,7 @@ List {
 			Margin: 10;
 			Children: [
 				Static {
+                    Style: "Button";
 					Text: "Accept";
 					HorizontalAlignment: Alignment.Stretch;
 					EventCommands: {
@@ -55,6 +54,7 @@ List {
 				}
 
 				Static {
+                    Style: "Button";
 					Text: "Cancel";
 					HorizontalAlignment: Alignment.Stretch;
 					EventCommands: {

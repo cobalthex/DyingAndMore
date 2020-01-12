@@ -98,7 +98,7 @@ namespace Takai.UI
                     continue;
 
                 if (n++ > 0)
-                    front += Margin;
+                    front += Margin; //todo: this doesnt apply on right aligned correctly
 
                 float itemSize;
                 if (Direction == Direction.Horizontal)

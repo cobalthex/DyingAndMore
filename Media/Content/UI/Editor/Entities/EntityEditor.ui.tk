@@ -5,7 +5,6 @@ List {
     VerticalAlignment: Alignment.Middle;
 	Style: "Frame";
 	Margin: 10;
-    Padding: 10;
 
     Children: [
         Scrollbox {
@@ -32,6 +31,7 @@ List {
                         };
 
                         List {
+                            HorizontalAlignment: Alignment.Stretch;
                             margin: 10;
                             Children: [
         						Static { Text: "Actor Properties"; };
@@ -78,6 +78,7 @@ List {
         };
 
         Static {
+            Style: "Button";
             Padding: [10 5];
             HorizontalAlignment: Alignment.Middle;
             Text: "Close";

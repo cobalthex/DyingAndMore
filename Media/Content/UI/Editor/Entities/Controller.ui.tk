@@ -1,10 +1,13 @@
 List {
 	BorderColor: [255 255 255 64];
 	Padding: 10;
-
+	Margin: 10;
     HorizontalAlignment: Alignment.Stretch;
+
     Children: [
         ControllerSelect {
+    		HorizontalAlignment: Alignment.Stretch;
+    		AllowDefaultValue: true;
             Bindings: [
                 Binding {
                     Source: "Controller";
@@ -14,6 +17,7 @@ List {
             ];
         };
 		Switch {
+	    	ChildBindScope: "Controller";
     		HorizontalAlignment: Alignment.Stretch;
 			Bindings: [
 			    Binding {
@@ -32,7 +36,7 @@ List {
 							Minimum: 1;
 							Maximum: 1000;
 							Bindings: [{
-								Source: "Controller.MaxRange"; #todo: this doesnt rebind ;; binding scope?
+								Source: "MaxRange"; #todo: this doesnt rebind ;; binding scope?
 								Target: "Value";
 								Direction: BindingDirection.TwoWay;
 							}];
@@ -40,7 +44,7 @@ List {
 						CheckBox {
 							Text: "Can rotate to face target";
 							Bindings: [{
-								Source: "Controller.CanRotate"; #todo: this doesnt rebind ;; binding scope?
+								Source: "CanRotate"; #todo: this doesnt rebind ;; binding scope?
 								Target: "IsChecked";
 								Direction: BindingDirection.TwoWay;
 							}];
@@ -48,7 +52,7 @@ List {
 						CheckBox {
 							Text: "Show targeting sweep lines";
 							Bindings: [{
-								Source: "Controller.ShowSweepLines"; #todo: this doesnt rebind ;; binding scope?
+								Source: "ShowSweepLines"; #todo: this doesnt rebind ;; binding scope?
 								Target: "IsChecked";
 								Direction: BindingDirection.TwoWay;
 							}];
@@ -57,11 +61,11 @@ List {
 			    };
 
 			    AIController: BehaviorList {
-			    	ChildBindScope: "Controller";
+			    	Margin: 10;
 					HorizontalAlignment: Alignment.Stretch;
 			        Bindings: [
 			            Binding {
-			                Source: "Controller.Behaviors";
+			                Source: "Behaviors";
 			                Target: "Items";
 			                Direction: BindingDirection.TwoWay;
 			            }
@@ -98,15 +102,7 @@ List {
 				    			];
 				    		};
 
-				    		Static { # todo: create generic version of this & import?
-				    			Text: "X";
-				    			Color: Color.Tomato;
-				    			Padding: 5;
-				    			HorizontalAlignment: Alignment.Right;
-				    			EventCommands: {
-				    				Click: "RemoveSelf";
-				    			}
-				    		}
+				    		@"UI/RemoveItem.ui.tk";
 			    		];
 			    	};
 

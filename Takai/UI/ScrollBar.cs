@@ -436,7 +436,7 @@ namespace Takai.UI
                 var cm = Children[i].Measure(availableSize - new Vector2(vs.X, hs.Y));
                 bounds = Rectangle.Union(bounds, new Rectangle(0, 0, (int)cm.X, (int)cm.Y));
             }
-            ContentSize = new Vector2(bounds.Width, bounds.Height);
+            ContentSize = new Vector2(bounds.Width + 1, bounds.Height + 1);
             return ContentSize;
         }
 

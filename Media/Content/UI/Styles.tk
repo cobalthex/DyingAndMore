@@ -1,16 +1,75 @@
+# types must be explicit here
 {
 	Static: {
 		Font: @"Fonts/test.fnt.tk";
 	}
+
 	ScrollBar: {
+		BackgroundSprite: @"UI/scrollback.9p.tk";
 		ThumbSprite: @"UI/scrollthumb.9p.tk";
 		Color: Color.Transparent;
 		BorderColor: Color [48 0 128 255];
 	}
+
 	Frame: {
 		BackgroundSprite: @"UI/frame.9p.tk";
-		Padding: Vector2 [4 4];
+		Padding: Vector2 [10 10];
+    	Margin: 10;
 	}
+
+	DropdownSelect: {
+		BackgroundSprite: @"UI/input.9p.tk";
+		BorderColor: Color.Transparent;
+	}
+	Dropdown: {
+		BackgroundSprite: @"UI/frame.9p.tk";
+		Padding: Vector2 [6 6];
+	}
+
+	NumericInput: {
+		BackgroundSprite: @"UI/input.9p.tk";
+		BorderColor: Color.Transparent;
+	}
+	NumericInput.TextInput: {
+		BackgroundSprite: NinePatch { };
+		Padding: Vector2 [2 0];
+		BorderColor: Color.Transparent;
+	}
+	NumericInput.Button: {
+		Padding: Vector2 [2 0];
+	}
+
+	TextInput: {
+		BackgroundSprite: @"UI/input.9p.tk";
+		BorderColor: Color.Transparent;
+	}
+
+	FileInput: {
+		BackgroundSprite: @"UI/input.9p.tk";
+		BorderColor: Color.Transparent;
+	}
+
+	CheckBox: {
+		CheckColor: Color.Transparent;
+		BoxSprite: @"UI/input.9p.tk";
+		Margin: 10;
+		CheckSprite: Sprite {
+			Texture: @"UI/checkbox.png";
+			Center: false;
+			ClipRect: [8 0 13 12];
+			ShrinkToFit: True;
+		}
+	}
+
+	Button: {
+
+	}
+
+	ModeSelector: {
+		ActiveColor: Color [220 220 255];
+		InactiveColor: Color [150 150 255];
+	}
+
 	GameInstance: {
 		#Font: @"Fonts/UISmall.fnt.tk";
 	}

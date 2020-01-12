@@ -4,6 +4,7 @@ List {
     Children: [
 	    WeaponSelect {
             HorizontalAlignment: Alignment.Stretch;
+            AllowDefaultValue: true;
 	        Bindings: [
 	            Binding {
 	                Direction: BindingDirection.TwoWay;
@@ -14,6 +15,7 @@ List {
 	    };
 
 		Switch {
+    		HorizontalAlignment: Alignment.Stretch;
 			ChildBindScope: "Weapon";
 			Bindings: [
 			    Binding {
@@ -23,9 +25,11 @@ List {
 			];
 			Items: {
 			    GunInstance: List {
+    				HorizontalAlignment: Alignment.Stretch;
 			    	Children: [
 					    Static { Text: "Ammo count"; };
 					    NumericInput {
+    						HorizontalAlignment: Alignment.Stretch;
 					    	Minimum: 0;
 							Bindings: [
 							    Binding {
@@ -38,10 +42,11 @@ List {
 				    ];
 			    };
 			    SpawnerInstance: List {
+    				HorizontalAlignment: Alignment.Stretch;
 			    	Children: [
 					    Static { Text: "Squad"; };
 			    		SquadSelect {
-			    			Name: "SquadSel";
+							HorizontalAlignment: Alignment.Stretch;
 			    			Bindings: [
 			    				Binding {
 			    					Source: "Squad";
@@ -50,7 +55,6 @@ List {
 			    				}
 			    			];
 			    			ItemUI: List {
-			    				HorizontalAlignment: Alignment.Stretch;
 			    				Children: [
 			    					Static {
 			    						Bindings: [
@@ -64,22 +68,26 @@ List {
 			    						Direction: Direction.Horizontal;
 			    						Margin: 10;
 				    					Children: [
-				    						Static {Text: "Leader: "; };
 					    					Static {
 					    						Bindings: [
 												    Binding {
 												        Source: "Leader.Name";
 												        Target: "Text";
 												        DefaultValue: "(None)";
+												        Converter: StringFormatConverter {
+												        	Format: "Leader: {0}";
+												        }
 												    };
 												];
 					    					};
-				    						Static {Text: "- Units: "; };
 					    					Static {
 					    						Bindings: [
 												    Binding {
 												        Source: "Units.Count";
 												        Target: "Text";
+												        Converter: StringFormatConverter {
+												        	Format: "- Units: {0}";
+												        }
 												    };
 												];
 											};
