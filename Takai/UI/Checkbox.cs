@@ -80,7 +80,8 @@ namespace Takai.UI
             {
                 checkBounds.Inflate(checkboxSize * -0.2f, checkboxSize * -0.2f);
                 Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, Rectangle.Intersect(checkBounds, VisibleContentArea));
-                CheckSprite?.Draw(spriteBatch, checkBounds, 0); //todo: clip
+                var relClip = new Rectangle(VisibleOffset, VisibleContentArea.Size - VisibleOffset);
+                CheckSprite?.Draw(spriteBatch, new Rectangle(checkBounds.Location, relClip.Size), relClip, 0, Color.White, CheckSprite.ElapsedTime);
             }
 
             DrawText(spriteBatch, new Point(checkboxSize + Margin, 0));
