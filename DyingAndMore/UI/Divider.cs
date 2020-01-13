@@ -33,8 +33,6 @@ namespace DyingAndMore.UI
         {
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Center;
-
-            Color = new Color(Color, 127);
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
