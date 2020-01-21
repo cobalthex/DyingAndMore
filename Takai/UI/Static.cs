@@ -2219,30 +2219,46 @@ namespace Takai.UI
             if (sprite?.Texture == null || destRect.Width == 0 || destRect.Height == 0)
                 return;
 
-            var sx = sprite.Width / (float)destRect.Width;
-            var sy = sprite.Height / (float)destRect.Height;
+            //var sx = sprite.Width / (float)destRect.Width;
+            //var sy = sprite.Height / (float)destRect.Height;
 
-            var dx = VisibleContentArea.X - OffsetContentArea.X;
-            var dy = VisibleContentArea.Y - OffsetContentArea.Y;
+            //var dx = VisibleContentArea.X - OffsetContentArea.X;
+            //var dy = VisibleContentArea.Y - OffsetContentArea.Y;
 
-            destRect.X += clipRegion.X - dx;
-            destRect.Y += clipRegion.Y - dy;
-            //destRect.Width = System.Math.Min(destRect.Width, clipRegion.Width);
-            //destRect.Height = System.Math.Min(destRect.Height, clipRegion.Height);
-            var finalRect = Rectangle.Intersect(destRect, clipRegion);
+            //destRect.X += clipRegion.X - dx;
+            //destRect.Y += clipRegion.Y - dy;
+            ////destRect.Width = System.Math.Min(destRect.Width, clipRegion.Width);
+            ////destRect.Height = System.Math.Min(destRect.Height, clipRegion.Height);
+            //var finalRect = Rectangle.Intersect(destRect, clipRegion);
 
-            var vx = -(int)((finalRect.Width - destRect.Width) * sx);
-            var vy = -(int)((finalRect.Height - destRect.Height) * sy);
+            //var vx = -(int)((finalRect.Width - destRect.Width) * sx);
+            //var vy = -(int)((finalRect.Height - destRect.Height) * sy);
+            //var clip = new Rectangle(
+            //    vx,
+            //    vy,
+            //    sprite.Width - vx,
+            //    sprite.Height - vy
+            //);
+
+            //sprite.Draw(spriteBatch, finalRect, clip, 0, Color.White, sprite.ElapsedTime);
+
+
+            var dest = destRect;
+            dest.Offset(OffsetContentArea.Location);
+            dest = Rectangle.Intersect(dest, clipRegion);
+
+            var vof = VisibleOffset;
+            var relx = (float)dest.Width / destRect.Width;
+            var rely = (float)dest.Height / destRect.Height;
             var clip = new Rectangle(
-                vx,
-                vy,
-                sprite.Width - vx,
-                sprite.Height - vy
+                0,//(int)(vof.X * relx),
+                0,//(int)(vof.Y * rely),
+                (int)(sprite.ClipRect.Width * relx),
+                (int)(sprite.ClipRect.Height * rely)
             );
-
-            sprite.Draw(spriteBatch, finalRect, clip, 0, Color.White, sprite.ElapsedTime);
-
-            //Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, finalRect);
+            
+            sprite.Draw(spriteBatch, dest, clip, 0, Color.White, sprite.ElapsedTime);
+            Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, dest);
         }
 
         #endregion

@@ -232,13 +232,13 @@ namespace Takai.UI
                     {
                         if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Up))
                         {
-                            _contentPosition -= (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                            _contentPosition -= 1;// (float)(400 * time.ElapsedGameTime.TotalSeconds);
                             return false;
                         }
 
                         if (InputState.IsButtonDown(Microsoft.Xna.Framework.Input.Keys.Down))
                         {
-                            _contentPosition += (float)(400 * time.ElapsedGameTime.TotalSeconds);
+                            _contentPosition += 1;//(float)(400 * time.ElapsedGameTime.TotalSeconds);
                             return false;
                         }
                     }
