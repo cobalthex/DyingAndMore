@@ -174,6 +174,11 @@ namespace Takai.UI
         public const string ValueChangedEvent = "ValueChanged";
         public const string SelectionChangedEvent = "SelectionChanged";
 
+        //some common style states
+        public const string HoverState = "Hover";
+        public const string ActiveState = "Active";
+        public const string FocusState = "Focus";
+
         public static readonly HashSet<string> InputEvents = new HashSet<string> { PressEvent, ClickEvent, DragEvent };
 
         /// <summary>
@@ -466,6 +471,8 @@ namespace Takai.UI
                     while (defocusing.Count > 0)
                     {
                         next = defocusing.Pop();
+                        if (next._hasFocus)
+                            ApplyStyles(GetStyles(Style, "Focus")); //needs to not overwrite other states (eg both focus and hover)
                         next._hasFocus = false;
 
                         foreach (var child in next.Children)
@@ -833,7 +840,6 @@ namespace Takai.UI
             return false;
         }
 
-
         //protected void TunnelEvent(string @event, UIEventArgs args)
         //{
         //    TunnelEvent(this, @event, args);
@@ -844,13 +850,13 @@ namespace Takai.UI
         //    //from root to source
         //}
 
-        #endregion
-
-        #region Hierarchy/Cloning
-
         protected virtual void OnParentChanged(Static oldParent)
         {
         } //this event should not bubble and is internal
+
+        #endregion
+
+        #region Hierarchy/Cloning
 
         private void SetParentNoReflow(Static newParent) //todo: re-evaluate necessity
         {
@@ -2036,7 +2042,7 @@ namespace Takai.UI
 
                 toDraw.DrawSelf(spriteBatch);
 
-                var borderColor = (toDraw.HasFocus && toDraw.CanFocus) ? FocusedBorderColor : toDraw.BorderColor;
+                var borderColor = /*(toDraw.HasFocus && toDraw.CanFocus) ? FocusedBorderColor : */toDraw.BorderColor;
                 if (DebugFont != null && borderColor == Color.Transparent)
                     borderColor = isMeasureValid && isArrangeValid ? Color.SteelBlue : Color.Tomato;
 
@@ -2290,16 +2296,18 @@ namespace Takai.UI
             return prop;
         }
 
-        public static Stylesheet GetStyles(string styleName)
+        public static Stylesheet GetStyles(string styleName, string styleState = "")
         {
             Stylesheet styles = null;
             if (styleName != null)
-                Styles.TryGetValue(styleName, out styles);
+                Styles.TryGetValue(styleName + (styleState != "" ? "." + styleState : ""), out styles);
             return styles;
         }
 
         public virtual void ApplyStyles(Stylesheet styleRules)
         {
+            //todo: switch to enumeration based method? (enumerate dictionary vs try and fetch)
+
             if (styleRules != null && styleRules.TryGetValue("proto", out var proto))
             {
                 if (proto is string str)
