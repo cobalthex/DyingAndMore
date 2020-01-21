@@ -400,7 +400,7 @@ namespace Takai.Graphics
             bounds.X += (int)(oc.X * bounds.Width);
             bounds.Y += (int)(oc.Y * bounds.Height);
 
-            oc *= new Vector2(relativeClip.Width, relativeClip.Height);
+            //oc *= new Vector2(relativeClip.Width, relativeClip.Height);
 
             var tween = GetTween(fd, Tween);
             spriteBatch.Draw(

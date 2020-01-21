@@ -66,25 +66,34 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            //todo: modernize
+            var bounds = VisibleContentArea;
+            var checkSize = System.Math.Min(ContentArea.Width, ContentArea.Height);
+            bounds.Width = System.Math.Min(bounds.Width, checkSize);
+            bounds.Height = System.Math.Min(bounds.Height, checkSize);
 
-            var checkboxSize = (int)System.Math.Min(ContentArea.Width, ContentArea.Height);
-            var checkBounds = new Rectangle(OffsetContentArea.X, OffsetContentArea.Y, checkboxSize, checkboxSize);
-            var checkboxBounds = Rectangle.Intersect(checkBounds, VisibleContentArea);
-            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, checkboxBounds);
-            checkboxBounds.Inflate(-1, -1);
-            Graphics.Primitives2D.DrawRect(spriteBatch, CheckColor, checkboxBounds);
-            BoxSprite.Draw(spriteBatch, checkboxBounds);
+            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, bounds);
+            BoxSprite.Draw(spriteBatch, bounds);
 
             if (IsChecked)
             {
-                checkBounds.Inflate(checkboxSize * -0.2f, checkboxSize * -0.2f);
-                Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, Rectangle.Intersect(checkBounds, VisibleContentArea));
-                var relClip = new Rectangle(VisibleOffset, VisibleContentArea.Size - VisibleOffset);
-                CheckSprite?.Draw(spriteBatch, new Rectangle(checkBounds.Location, relClip.Size), relClip, 0, Color.White, CheckSprite.ElapsedTime);
+                var checkBounds = bounds;
+                checkBounds.Inflate(-2, -2);
+                if (checkBounds.Width > 0 && checkBounds.Height > 0)
+                {
+                    Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, checkBounds);
+                    var rely = (bounds.Height / (float)checkSize);
+                    var relClip = new Rectangle(
+                        VisibleOffset.X,
+                        (int)(VisibleOffset.Y * rely),
+                        CheckSprite.Width - VisibleOffset.X,
+                        (int)(CheckSprite.Height * rely)
+                    );
+                    CheckSprite?.Draw(spriteBatch, checkBounds, relClip, 0, Color.White, CheckSprite.ElapsedTime);
+                }
             }
 
-            DrawText(spriteBatch, new Point(checkboxSize + Margin, 0));
+            DrawText(spriteBatch, new Point(bounds.Width + Margin, 0));
         }
     }
 }
+ 
