@@ -394,13 +394,14 @@ namespace Takai.Graphics
             if (!ShrinkToFit) //todo: fit/contain
                 bounds = GetFitRect(Width, Height, bounds);
 
-            var oc = Origin / new Vector2(Width, Height);
+            var relOrigin = Origin / new Vector2(Width, Height); //get origin position from 0-1
 
-            //scale origin and apply
-            bounds.X += (int)(oc.X * bounds.Width);
-            bounds.Y += (int)(oc.Y * bounds.Height);
+            //offset drawing by origin
+            bounds.X += (int)(relOrigin.X * bounds.Width);
+            bounds.Y += (int)(relOrigin.Y * bounds.Height);
 
-            //oc *= new Vector2(relativeClip.Width, relativeClip.Height);
+            //origin is scaled based on clip rect size
+            relOrigin *= new Vector2(relativeClip.Width, relativeClip.Height);
 
             var tween = GetTween(fd, Tween);
             spriteBatch.Draw(
@@ -409,7 +410,7 @@ namespace Takai.Graphics
                 GetFrameRect(cf, relativeClip),
                 Color.Lerp(color, Color.Transparent, tween.current),
                 angle,
-                oc,
+                relOrigin,
                 SpriteEffects.None,
                 0
             );
@@ -419,7 +420,7 @@ namespace Takai.Graphics
                 GetFrameRect(nf, relativeClip),
                 Color.Lerp(color, Color.Transparent, tween.next),
                 angle,
-                oc,
+                relOrigin,
                 SpriteEffects.None,
                 0
             );

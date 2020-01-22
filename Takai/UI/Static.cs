@@ -2154,18 +2154,6 @@ namespace Takai.UI
             Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleContentArea, position, Color);
         }
 
-        /// <summary>
-        /// Draw a line clipped to the visible region of this element
-        /// </summary>
-        /// <param name="spriteBatch">The spritebatch to use</param>
-        /// <param name="a">The start of the line</param>
-        /// <param name="b">The end of the line</param>
-        protected void DrawLine(SpriteBatch spriteBatch, Color color, Vector2 a, Vector2 b)
-        {
-            //todo: Map.DrawLine has color at end of arglist
-            throw new System.NotImplementedException();
-        }
-
         protected void DrawVLine(SpriteBatch spriteBatch, Color color, float x, float y1, float y2)
         {
             DrawVLine(spriteBatch, color, x, y1, y2, OffsetContentArea.Location.ToVector2(), VisibleContentArea);
@@ -2204,67 +2192,51 @@ namespace Takai.UI
             Graphics.Primitives2D.DrawLine(spriteBatch, color, new Vector2(x1, y), new Vector2(x2, y));
         }
 
-        protected void DrawRect(SpriteBatch spriteBatch, Color color, Rectangle rect)
+        protected void DrawRect(SpriteBatch spriteBatch, Color color, Rectangle localRect)
         {
             var offset = OffsetContentArea.Location.ToVector2();
-            DrawHLine(spriteBatch, color, rect.Top, rect.Left, rect.Right, offset, VisibleContentArea);
-            DrawVLine(spriteBatch, color, rect.Right, rect.Top, rect.Bottom, offset, VisibleContentArea);
-            DrawHLine(spriteBatch, color, rect.Bottom, rect.Left, rect.Right, offset, VisibleContentArea);
-            DrawVLine(spriteBatch, color, rect.Left, rect.Top, rect.Bottom, offset, VisibleContentArea);
+            DrawHLine(spriteBatch, color, localRect.Top, localRect.Left, localRect.Right, offset, VisibleContentArea);
+            DrawVLine(spriteBatch, color, localRect.Right, localRect.Top, localRect.Bottom, offset, VisibleContentArea);
+            DrawHLine(spriteBatch, color, localRect.Bottom, localRect.Left, localRect.Right, offset, VisibleContentArea);
+            DrawVLine(spriteBatch, color, localRect.Left, localRect.Top, localRect.Bottom, offset, VisibleContentArea);
         }
 
-        protected void DrawSprite(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle destRect)
+        protected void DrawSprite(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle localRect)
         {
-            DrawSpriteCustomRegion(spriteBatch, sprite, destRect, VisibleContentArea);
+            DrawSpriteCustomRegion(spriteBatch, sprite, localRect, VisibleContentArea);
         }
 
-        void DrawSpriteCustomRegion(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle destRect, Rectangle clipRegion)
+        void DrawSpriteCustomRegion(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle localRect, Rectangle clipRegion)
         {
-            //todo: use this w/ background sprite
-
-            if (sprite?.Texture == null || destRect.Width == 0 || destRect.Height == 0)
+            if (sprite?.Texture == null || localRect.Width == 0 || localRect.Height == 0)
                 return;
 
-            //var sx = sprite.Width / (float)destRect.Width;
-            //var sy = sprite.Height / (float)destRect.Height;
+            //adjust sprite based on offset of container and clip to clipRegion
+            localRect.Offset(clipRegion.Location - VisibleOffset);
+            var finalRect = Rectangle.Intersect(localRect, clipRegion);
 
-            //var dx = VisibleContentArea.X - OffsetContentArea.X;
-            //var dy = VisibleContentArea.Y - OffsetContentArea.Y;
+            //scale the clip region by the size of the destRect
+            //to get a relative clip size
+            var sx = sprite.Width / (float)localRect.Width;
+            var sy = sprite.Height / (float)localRect.Height;
 
-            //destRect.X += clipRegion.X - dx;
-            //destRect.Y += clipRegion.Y - dy;
-            ////destRect.Width = System.Math.Min(destRect.Width, clipRegion.Width);
-            ////destRect.Height = System.Math.Min(destRect.Height, clipRegion.Height);
-            //var finalRect = Rectangle.Intersect(destRect, clipRegion);
-
-            //var vx = -(int)((finalRect.Width - destRect.Width) * sx);
-            //var vy = -(int)((finalRect.Height - destRect.Height) * sy);
-            //var clip = new Rectangle(
-            //    vx,
-            //    vy,
-            //    sprite.Width - vx,
-            //    sprite.Height - vy
-            //);
-
-            //sprite.Draw(spriteBatch, finalRect, clip, 0, Color.White, sprite.ElapsedTime);
-
-
-            var dest = destRect;
-            dest.Offset(OffsetContentArea.Location);
-            dest = Rectangle.Intersect(dest, clipRegion);
-
-            var vof = VisibleOffset;
-            var relx = (float)dest.Width / destRect.Width;
-            var rely = (float)dest.Height / destRect.Height;
+            var vx = (int)((localRect.Width - finalRect.Width) * sx);
+            var vy = (int)((localRect.Height - finalRect.Height) * sy);
             var clip = new Rectangle(
-                0,//(int)(vof.X * relx),
-                0,//(int)(vof.Y * rely),
-                (int)(sprite.ClipRect.Width * relx),
-                (int)(sprite.ClipRect.Height * rely)
+                vx,
+                vy,
+                sprite.Width - vx,
+                sprite.Height - vy
             );
-            
-            sprite.Draw(spriteBatch, dest, clip, 0, Color.White, sprite.ElapsedTime);
-            Graphics.Primitives2D.DrawRect(spriteBatch, Color.Gold, dest);
+
+            //todo: do this without conditionals
+            if (finalRect.Right == clipRegion.Right)
+                clip.X = 0;
+            if (finalRect.Bottom == clipRegion.Bottom)
+                clip.Y = 0;
+
+            sprite.Draw(spriteBatch, finalRect, clip, 0, Color.White, sprite.ElapsedTime);
+            //Graphics.Primitives2D.DrawRect(spriteBatch, Color.LightSteelBlue, finalRect);
         }
 
         #endregion
