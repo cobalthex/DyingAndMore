@@ -33,7 +33,7 @@ namespace DyingAndMore.Editor.Selectors
 
             bounds.Offset(OffsetContentArea.Location);
             bounds = Rectangle.Intersect(bounds, VisibleContentArea);
-            //todo: clip clip to visible area
+            //todo: clip clip to visible area (see DrawSpriteCustomRegion)
             spriteBatch.Draw(tileset.texture, bounds, clip, Color.White);
         }
     }
