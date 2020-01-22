@@ -46,8 +46,6 @@ namespace DyingAndMore
         Static ui;
         Takai.Graphics.BitmapFont debugFont;
 
-        public Matrix uiMatrix;
-
         /// <summary>
         /// Create the game
         /// </summary>

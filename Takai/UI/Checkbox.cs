@@ -66,33 +66,18 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var bounds = VisibleContentArea;
             var checkSize = System.Math.Min(ContentArea.Width, ContentArea.Height);
-            bounds.Width = System.Math.Min(bounds.Width, checkSize);
-            bounds.Height = System.Math.Min(bounds.Height, checkSize);
 
-            Graphics.Primitives2D.DrawRect(spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, bounds);
-            BoxSprite.Draw(spriteBatch, bounds);
+            var boxBounds = new Rectangle(0, 0, checkSize, checkSize);
+            DrawRect(spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, boxBounds);
+            //todo: DrawNinePatch that is localized
+            boxBounds.Offset(OffsetContentArea.Location);
+            BoxSprite.Draw(spriteBatch, Rectangle.Intersect(boxBounds, VisibleContentArea));
 
             if (IsChecked)
-            {
-                var checkBounds = bounds;
-                checkBounds.Inflate(-2, -2);
-                if (checkBounds.Width > 0 && checkBounds.Height > 0)
-                {
-                    Graphics.Primitives2D.DrawFill(spriteBatch, CheckColor, checkBounds);
-                    var rely = (bounds.Height / (float)checkSize);
-                    var relClip = new Rectangle(
-                        VisibleOffset.X,
-                        (int)(VisibleOffset.Y * rely),
-                        CheckSprite.Width - VisibleOffset.X,
-                        (int)(CheckSprite.Height * rely)
-                    );
-                    CheckSprite?.Draw(spriteBatch, checkBounds, relClip, 0, Color.White, CheckSprite.ElapsedTime);
-                }
-            }
+                DrawSprite(spriteBatch, CheckSprite, new Rectangle(2, 2, checkSize - 4, checkSize - 4));
 
-            DrawText(spriteBatch, new Point(bounds.Width + Margin, 0));
+            DrawText(spriteBatch, new Point(checkSize + Margin, 0));
         }
     }
 }
