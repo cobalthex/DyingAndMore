@@ -9,7 +9,7 @@ ProjectileClass {
     Damage: 25;
 
     Range: 100000;
-    MinimumSpeed: -100;
+    MinimumSpeed: 1;
     LifeSpan: 10sec;
     SuperCombineCount: 5;
     SuperCombineEffect: @"Effects/PinkMist.fx.tk";

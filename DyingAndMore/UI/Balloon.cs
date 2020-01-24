@@ -34,7 +34,7 @@ namespace DyingAndMore.UI
 
         protected override void OnParentChanged(Static oldParent)
         {
-            elapsedTime = TimeSpan.Zero;
+            ResetTimer();
             base.OnParentChanged(oldParent);
         }
 

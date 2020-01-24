@@ -260,7 +260,8 @@ namespace Takai.Game
                             if (entity.Class.IsPhysical)
                             {
                                 var diff = Vector2.Normalize(hit.entity.WorldPosition - entity.WorldPosition);
-                                entity.Velocity -= diff * Vector2.Dot(entity.Velocity, diff);
+                                //entity.Velocity -= diff * Vector2.Dot(entity.Velocity, diff);
+                                entity.Velocity = Vector2.Zero; //todo
                             }
 
                             if (Util.RandomGenerator.NextDouble() <= interaction.AttachChance)

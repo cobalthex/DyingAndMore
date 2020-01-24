@@ -15,8 +15,18 @@ List {
 					Size: [300 NaN];
 					Margin: 10;
 					Children: [
-						Static { Text: "`_Options"; };
-						Static { Size: [1 1]; };
+						Static { Text: "`_Name"; };
+						TextInput {
+							Bindings: [
+								Binding {
+									Source: "Name";
+									Target: "Text";
+									Direction: BindingDirection.TwoWay;
+								};
+							];
+						};
+
+						Static { }
 
 						CheckBox {
 							Text: "Don't spawn units\nautomatically";
@@ -86,11 +96,12 @@ List {
 						};
 
 						Static { Text: "`_Current Spawn Count"; }
-						Static {
+						NumericInput {
 							Bindings: [
 								Binding {
 									Source: "TotalSpawnCount";
-									Target: "Text";
+									Target: "Value";
+									Direction: BindingDirection.TwoWay;
 								};
 							];
 						};
