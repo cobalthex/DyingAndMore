@@ -277,16 +277,10 @@ namespace DyingAndMore
             });
             */
 
-            var map = Cache.Load<MapInstance>("mapsrc/twelve.map.tk");
-            childUI = new Game.GameInstance(new Game.Game
-            {
-                Map = map
-            })
-            {
-                IsPaused = false,
-            };
-            map.renderSettings.drawEntityForwardVectors = true;
-            map.renderSettings.drawEntityHierarchies = true;
+            var map = Cache.Load<MapInstance>("mapsrc/hell.map.tk");
+            childUI = new Editor.Editor(map);
+            //map.renderSettings.drawEntityForwardVectors = true;
+            //map.renderSettings.drawEntityHierarchies = true;
 
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)

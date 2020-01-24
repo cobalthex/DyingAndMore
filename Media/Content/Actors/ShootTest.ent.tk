@@ -20,6 +20,29 @@ ActorClass {
 
     DefaultWeapon: [@"Weapons/Plasma.wpn.tk"];
 
+    Trail: {
+        LifeSpan: 0.4sec;
+        CaptureDelay: 60Hz;
+        Color: {
+            Values: [
+                [0.0 [0 0 128 255]];
+                [0.4 [128 255 64 255]];
+                [0.7 [255 128 8 2355]];
+                [1 [255 0 64 128]];
+            ]
+        }
+        SpriteScale: 2;
+
+        width: {
+            values: [
+                [0 0]
+                [0.1 32]
+                [0.3 64]
+                [1 0]
+            ]
+        }
+    }
+
     Animations: {
         Idle: {
             Sprite: {

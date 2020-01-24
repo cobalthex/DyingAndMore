@@ -334,13 +334,13 @@ namespace DyingAndMore.Game
                     + $"{time.Milliseconds:D3}";
         }
 
-        protected override void OnParentChanged(Static oldParent)
+        static void OnParentChanged(Static oldParent)
         {
             if (Parent == null)
                 return;
 
             Map.updateSettings.SetGame();
-            //Map.renderSettings.SetDefault(); //store settings in editor/game and restore
+            Map.renderSettings.SetDefault(); //store settings in editor/game and restore
             updateSettingsPane?.BindTo(Map.updateSettings);
             renderSettingsPane?.BindTo(Map.renderSettings);
 
@@ -598,13 +598,13 @@ namespace DyingAndMore.Game
 
         protected void DrawHealthBar(SpriteBatch spriteBatch, Vector2 screenPosition, float health, float maxHealth)
         {
-            var pc = (maxHealth == 0 ? 0 : Math.Max(0, health) / maxHealth);
+            var pc = (maxHealth == 0 ? 0 : MathHelper.Clamp(health, 0, maxHealth) / maxHealth);
 
             var rect = new Rectangle((int)screenPosition.X - 30, (int)screenPosition.Y - 3, 60, 6);
             Takai.Graphics.Primitives2D.DrawFill(spriteBatch, Color.Tomato, rect);
             Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Brown, rect);
             rect.Width = (int)(rect.Width * pc);
-            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, Color.LawnGreen, rect);
+            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, health > maxHealth ? Color.LightSteelBlue : Color.LawnGreen, rect);
             Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Teal, rect);
         }
     }

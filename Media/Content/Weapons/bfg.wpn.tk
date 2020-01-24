@@ -4,7 +4,7 @@ GunClass {
 
     MaxAmmo: 5000;
     RoundsPerBurst: 1;
-    ProjectilesPerRound: 25;
+    ProjectilesPerRound: 5;
     MaxBursts: 0;
     ChargeTime: 10msec;
     DischargeTime: 10msec;

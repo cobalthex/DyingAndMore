@@ -5,7 +5,7 @@ ActorClass {
     DefaultController: [InputController { }];
 
     FieldOfView: 2.356194;
-    MaxSpeed: 300;
+    MaxSpeed: 400;
     MoveForce: 200;
     IsPhysical: True;
     IgnoreTrace: False;

@@ -33,8 +33,6 @@ Gases:
 
   ☐  Fix pathfinding for non full tiles
 
-  ☐  fill out AI more and create demo for game
-
   ☐  tile patches in sectors. allows for destructable/modifyable tiles
 
   ☐  non destroying/pickupable projectiles (arrows)
@@ -54,7 +52,7 @@ UI:
     ☐ tab focus should not be able to escape modal
     ☐ when adding a modal to UI, should switch focus
     ☐ cache previous focus in modal?
-    ☐ special modal element?
+    ✘ special modal element? @cancelled (20-01-23 14:00)
 
   ☐  Think only when alive?
 
@@ -76,11 +74,11 @@ UI:
   ☐ Game story should be genericized to support MP (level rotations)
 
   ☐ Dynamic render quality, esp for split screen
-  ☐ Pixel shader to draw tilemap (use tilemap as texture)
+  ✔ Pixel shader to draw tilemap (use tilemap as texture) @done (20-01-23 13:59)
 
-  ☐ Falloff range for magnetism
+  ✔ Falloff range for magnetism @done (20-01-23 13:59)
 
-  ☐ update/render settings dialogs dont work when switching between modes
+  ✔ update/render settings dialogs dont work when switching between modes @done (20-01-23 13:59)
 
   ☐ GetTileCollisionTangent doesnt work. Also may be more efficient as GetNormal
 

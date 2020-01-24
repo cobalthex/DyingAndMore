@@ -852,6 +852,7 @@ namespace Takai.UI
 
         protected virtual void OnParentChanged(Static oldParent)
         {
+            //modal issues command?
         } //this event should not bubble and is internal
 
         #endregion

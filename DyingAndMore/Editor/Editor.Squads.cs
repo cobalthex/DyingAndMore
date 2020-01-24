@@ -141,7 +141,7 @@ namespace DyingAndMore.Editor
                 {
                     var ui = editUI;//.CloneHierarchy();
                     ui.BindTo(SelectedSquad);
-
+                    
                     //todo: changing name (if allowed?) will break map dictionary
 
                     AddChild(ui);
@@ -183,7 +183,7 @@ namespace DyingAndMore.Editor
                         clampScale
                     );
 
-                    var squadNameSize = Font.MeasureString(squad.Key);
+                    var squadNameSize = Font.MeasureString(squad.Value.Name);
                     Font.Draw(
                         spriteBatch,
                         squad.Key,
