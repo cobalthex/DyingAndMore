@@ -501,6 +501,7 @@ namespace DyingAndMore.Editor
                             try
                             {
                                 Map.Save(sfd.FileName);
+                                AddChild(new UI.Balloon("Saved map to " + sfd.FileName));
                             }
                             catch
                             {

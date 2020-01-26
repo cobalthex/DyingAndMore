@@ -46,12 +46,12 @@ namespace DyingAndMore.Editor
                 {
                     foreach (var squad in editor.Map.Squads) //search backwards?
                     {
-                        var dist = Vector2.DistanceSquared(squad.Value.SpawnPosition, worldPos);
-                        if (dist <= (squad.Value.SpawnRadius * squad.Value.SpawnRadius) &&
+                        var dist = Vector2.DistanceSquared(squad.SpawnPosition, worldPos);
+                        if (dist <= (squad.SpawnRadius * squad.SpawnRadius) &&
                             dist < lastDist)
                         {
                             lastDist = dist;
-                            SelectedSquad = squad.Value;
+                            SelectedSquad = squad;
                         }
                     }
 
@@ -61,7 +61,7 @@ namespace DyingAndMore.Editor
                         {
                             var newSquad = SelectedSquad.Clone();
                             newSquad.Name = Takai.Util.IncrementName(newSquad.Name);
-                            editor.Map.Squads[newSquad.Name] = newSquad;
+                            editor.Map.Squads.Add(newSquad);
                             SelectedSquad = newSquad;
                         }
 
@@ -133,7 +133,7 @@ namespace DyingAndMore.Editor
             {
                 if (InputState.IsPress(Keys.Delete))
                 {
-                    editor.Map.Squads.Remove(SelectedSquad.Name);
+                    editor.Map.Squads.Remove(SelectedSquad);
                     return false;
                 }
 
@@ -174,20 +174,20 @@ namespace DyingAndMore.Editor
             {
                 foreach (var squad in editor.Map.Squads)
                 {
-                    editor.Map.DrawCircle(squad.Value.SpawnPosition, squad.Value.SpawnRadius, SelectedSquad == squad.Value ? Color.Gold : Color.Cyan);
+                    editor.Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, SelectedSquad == squad ? Color.Gold : Color.Cyan);
                     SquadIcon.Draw(
                         spriteBatch,
-                        editor.Camera.WorldToScreen(squad.Value.SpawnPosition),
+                        editor.Camera.WorldToScreen(squad.SpawnPosition),
                         0,
                         Color.White,
                         clampScale
                     );
 
-                    var squadNameSize = Font.MeasureString(squad.Value.Name);
+                    var squadNameSize = Font.MeasureString(squad.Name);
                     Font.Draw(
                         spriteBatch,
-                        squad.Key,
-                        editor.Camera.WorldToScreen(squad.Value.SpawnPosition + new Vector2(0, squad.Value.SpawnRadius))
+                        squad.Name,
+                        editor.Camera.WorldToScreen(squad.SpawnPosition + new Vector2(0, squad.SpawnRadius))
                             + new Vector2(squadNameSize.X / -2, 10 * clampScale),
                         Color.White
                     );

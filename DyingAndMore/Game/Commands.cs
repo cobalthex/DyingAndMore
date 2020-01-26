@@ -33,9 +33,14 @@ namespace DyingAndMore.Game
             var minst = (MapInstance)map;
             if (minst == null)
                 return;
-            var squad = minst.Squads[SquadName];
-            if (squad != null)
-                minst.Spawn(squad);
+            foreach (var squad in minst.Squads)
+            {
+                if (squad.Name == SquadName)
+                {
+                    minst.Spawn(squad);
+                    break;
+                }
+            }
         }
 
         public override string ToString()

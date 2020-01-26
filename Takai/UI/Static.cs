@@ -852,7 +852,7 @@ namespace Takai.UI
 
         protected virtual void OnParentChanged(Static oldParent)
         {
-            //modal issues command?
+            //todo: make pubically accessable (on modal closed e.g.)
         } //this event should not bubble and is internal
 
         #endregion

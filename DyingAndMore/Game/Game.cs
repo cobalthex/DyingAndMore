@@ -334,7 +334,7 @@ namespace DyingAndMore.Game
                     + $"{time.Milliseconds:D3}";
         }
 
-        static void OnParentChanged(Static oldParent)
+        protected override void OnParentChanged(Static oldParent)
         {
             if (Parent == null)
                 return;
@@ -542,7 +542,7 @@ namespace DyingAndMore.Game
 #if DEBUG
                 foreach (var ent in Map.ActiveEntities)
                 {
-                    if (ent is Entities.ActorInstance actor && actor.Class.MaxHealth > 0)
+                    if (ent is Entities.ActorInstance actor && actor.Class.MaxHealth > 0 && ent.IsAlive)
                     {
                         var pos = player.camera.WorldToScreen(ent.WorldPosition - new Vector2(0, ent.Radius + 16));
                         DrawHealthBar(spriteBatch, pos, actor.CurrentHealth, actor.Class.MaxHealth);
