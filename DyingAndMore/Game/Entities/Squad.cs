@@ -10,7 +10,7 @@ namespace DyingAndMore.Game.Entities
     /// Squads can spawn a variable number of members and are optionally directed by a leader.
     /// Squads can respawn per rules set in this class
     /// </summary>
-    public class Squad
+    public class Squad : Takai.Data.IReferenceable
     {
         public string Name { get; set; } //todo: this should auto-generate
 

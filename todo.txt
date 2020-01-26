@@ -4,9 +4,10 @@ Bugs:
     ☐ Squad select scrollbox not sizing correctly
     ☐ Checkbox needs to clip check sprite
     ☐ Nine-patch relative clipping
-    ☐ Sprite clipping in entity select
+    ✔ Sprite clipping in entity select @done (20-01-23 14:16)
     ☐ Evaluate [perf of] casting style args to correct type
     ☐ material interaction physics
+    ☐ 'new Class' super slow
 
 Conditions:
     ☐  Invisibility

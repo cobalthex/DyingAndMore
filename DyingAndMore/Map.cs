@@ -16,7 +16,7 @@ namespace DyingAndMore
     public class MapInstance : MapBaseInstance
     {
         [Takai.Data.Serializer.AsReference]
-        public Dictionary<string, Game.Entities.Squad> Squads
+        public HashSet<Game.Entities.Squad> Squads
         {
             get => _squads;
             set
@@ -28,7 +28,7 @@ namespace DyingAndMore
                 Takai.Data.Binding.Globals["Map.Squads"] = _squads;
             }
         }
-        Dictionary<string, Game.Entities.Squad> _squads;
+        HashSet<Game.Entities.Squad> _squads; //List?
 
         public MapInstance() : this(null) { }
         public MapInstance(MapClass @class)
@@ -45,15 +45,14 @@ namespace DyingAndMore
         public void Spawn(Game.Entities.Squad squad)
         {
             if (Squads == null)
-            {
-                Squads = new Dictionary<string, Game.Entities.Squad>();
-            }
+                Squads = new HashSet<Game.Entities.Squad>();
+            
             //if (!Squads.ContainsKey(squad.Name))
             {
                 if (squad.Name == null)
                     squad.Name = Takai.Util.RandomString();
                 //todo: prevent empty name (or generate one)
-                Squads[squad.Name] = squad;
+                Squads.Add(squad);
                 squad.SpawnUnits(this);
             }
         }
@@ -67,7 +66,7 @@ namespace DyingAndMore
                 if (Squads != null)
                 {
                     foreach (var squad in Squads)
-                        squad.Value.Update(this, deltaTime);
+                        squad.Update(this, deltaTime);
                 }
             }
 

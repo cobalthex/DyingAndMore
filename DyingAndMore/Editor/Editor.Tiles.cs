@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Takai.Input;
+using Takai.UI;
 
 namespace DyingAndMore.Editor
 {
@@ -27,7 +28,6 @@ namespace DyingAndMore.Editor
                 editor.Map.Class.TileSize
             );
         }
-
         protected override bool HandleInput(GameTime time)
         {
             lastWorldPos = currentWorldPos;
@@ -38,64 +38,36 @@ namespace DyingAndMore.Editor
                 isPosSaved = true;
                 savedWorldPos = currentWorldPos;
             }
-            else if (InputState.IsClick(Keys.LeftControl) || InputState.IsClick(Keys.RightControl))
+            else if (InputState.IsButtonUp(Keys.LeftControl) && InputState.IsButtonUp(Keys.RightControl))
                 isPosSaved = false;
 
             var tile = short.MinValue;
 
-            if (InputState.IsButtonDown(MouseButtons.Left))
+            if (DidPressInside(MouseButtons.Left))
                 tile = InputState.IsMod(KeyMod.Alt) ? (short)-1 : (short)selector.SelectedIndex;
-            else if (InputState.IsButtonDown(MouseButtons.Right))
+            else if (DidPressInside(MouseButtons.Right))
                 tile = -1;
 
             if (tile > short.MinValue)
             {
+                var curTile = Takai.Util.Ceiling(currentWorldPos / editor.Map.Class.TileSize).ToPoint();
                 if (isPosSaved)
                 {
+                    var savedTile = (savedWorldPos / editor.Map.Class.TileSize).ToPoint();
                     //draw rect
                     if (InputState.IsMod(KeyMod.Shift))
-                    {
-                        //todo: use Takai.Util.AbsRectangle
-
-                        var start = (savedWorldPos / editor.Map.Class.TileSize).ToPoint();
-                        var end = Takai.Util.Ceiling(currentWorldPos / editor.Map.Class.TileSize).ToPoint();
-
-                        if (start.X > end.X)
-                        {
-                            var tmp = start.X;
-                            start.X = end.X;
-                            end.X = tmp;
-                        }
-                        if (start.Y > end.Y)
-                        {
-                            var tmp = start.Y;
-                            start.Y = end.Y;
-                            end.Y = tmp;
-                        }
-
-                        var bounds = new Rectangle(0, 0, editor.Map.Class.Width, editor.Map.Class.Height);
-                        for (var y = start.Y; y < end.Y; ++y)
-                        {
-                            for (var x = start.X; x < end.X; ++x)
-                            {
-                                if (bounds.Contains(x, y))
-                                    editor.Map.Class.Tiles[y, x] = tile;
-                            }
-                        }
-
-                        editor.Map.Class.PatchTileLayoutTexture(new Rectangle(start, end - start));
-                    }
+                        TileRect(savedTile, curTile, tile);
                     else
-                        TileLine(savedWorldPos, currentWorldPos, tile);
+                        TileLine(savedTile, curTile, tile);
 
                     savedWorldPos = currentWorldPos;
                 }
 
                 //todo: fix when coming out of selector
                 else if (InputState.IsMod(KeyMod.Shift))
-                    TileFill(currentWorldPos, tile);
+                    TileFlood(curTile - new Point(1), tile);
                 else
-                    TileLine(lastWorldPos, currentWorldPos, tile);
+                    TileLine((lastWorldPos / editor.Map.Class.TileSize).ToPoint(), curTile - new Point(1), tile);
 
                 return false;
             }
@@ -126,6 +98,7 @@ namespace DyingAndMore.Editor
 
                 if (InputState.IsMod(KeyMod.Shift))
                 {
+                    //todo: snap to tiles
                     editor.Map.DrawRect(new Rectangle((int)savedWorldPos.X, (int)savedWorldPos.Y, (int)diff.X, (int)diff.Y), Color.GreenYellow);
 
                     var w = (System.Math.Abs((int)diff.X) - 1) / editor.Map.Class.TileSize + 1;
@@ -146,12 +119,39 @@ namespace DyingAndMore.Editor
             }
         }
 
-        //Tile a line, start and end in world coords
-        void TileLine(Vector2 Start, Vector2 End, short TileValue)
+        void TileRect(Point start, Point end, short value)
         {
-            var start = new Vector2((int)Start.X / editor.Map.Class.TileSize, (int)Start.Y / editor.Map.Class.TileSize).ToPoint();
-            var end = new Vector2((int)End.X / editor.Map.Class.TileSize, (int)End.Y / editor.Map.Class.TileSize).ToPoint();
+            //use Util.AbsRectangle
+            if (start.X > end.X)
+            {
+                var tmp = start.X;
+                start.X = end.X;
+                end.X = tmp;
+            }
+            if (start.Y > end.Y)
+            {
+                var tmp = start.Y;
+                start.Y = end.Y;
+                end.Y = tmp;
+            }
 
+            var bounds = new Rectangle(0, 0, editor.Map.Class.Width, editor.Map.Class.Height);
+            for (var y = start.Y; y < end.Y; ++y)
+            {
+                for (var x = start.X; x < end.X; ++x)
+                {
+                    if (bounds.Contains(x, y))
+                        editor.Map.Class.Tiles[y, x] = value;
+                }
+            }
+
+            //todo: first row/col dont render
+
+            editor.Map.Class.PatchTileLayoutTexture(new Rectangle(start, end - start));
+        }
+
+        void TileLine(Point start, Point end, short value)
+        {
             var diff = end - start;
             var sx = diff.X > 0 ? 1 : -1;
             var sy = diff.Y > 0 ? 1 : -1;
@@ -160,11 +160,11 @@ namespace DyingAndMore.Editor
 
             var err = (diff.X > diff.Y ? diff.X : -diff.Y) / 2;
 
-            var bounds = new Rectangle(0, 0, editor.Map.Class.Width, editor.Map.Class.Height);
+            var bounds = editor.Map.Class.TileBounds;
             while (true)
             {
                 if (bounds.Contains(start))
-                    editor.Map.Class.Tiles[start.Y, start.X] = TileValue;
+                    editor.Map.Class.Tiles[start.Y, start.X] = value;
 
                 if (start.X == end.X && start.Y == end.Y)
                     break;
@@ -197,22 +197,20 @@ namespace DyingAndMore.Editor
             editor.Map.Class.PatchTileLayoutTexture(new Rectangle(start, Takai.Util.Max(new Point(1), end - start)));
         }
 
-        void TileFill(Vector2 Position, short TileValue)
+        void TileFlood(Point tile, short value)
         {
-            if (!editor.Map.Class.Bounds.Contains(Position))
+            if (!editor.Map.Class.TileBounds.Contains(tile))
                 return;
 
-            var initial = (Position / editor.Map.Class.TileSize).ToPoint();
-            var initialValue = editor.Map.Class.Tiles[initial.Y, initial.X];
-
-            if (initialValue == TileValue)
+            var initialValue = editor.Map.Class.Tiles[tile.Y, tile.X];
+            if (initialValue == value)
                 return;
 
             Point min = editor.Map.Class.TileBounds.Size;
             Point max = new Point(0);
 
             var queue = new System.Collections.Generic.Queue<Point>();
-            queue.Enqueue(initial);
+            queue.Enqueue(tile);
             while (queue.Count > 0)
             {
                 var first = queue.Dequeue();
@@ -224,7 +222,7 @@ namespace DyingAndMore.Editor
 
                 for (; left <= right; ++left)
                 {
-                    editor.Map.Class.Tiles[first.Y, left] = TileValue;
+                    editor.Map.Class.Tiles[first.Y, left] = value;
 
                     if (first.Y > 0 && editor.Map.Class.Tiles[first.Y - 1, left] == initialValue)
                         queue.Enqueue(new Point(left, first.Y - 1));

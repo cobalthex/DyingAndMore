@@ -63,7 +63,7 @@ namespace DyingAndMore.Game.Weapons
             //todo: bind to squad?
 
             //spawn leader last?
-            if (Squad.LeaderTemplate.Count > 0)
+            if (Squad.LeaderTemplate != null && Squad.LeaderTemplate.Count > 0)
                 SpawnQueue.Enqueue(Takai.Util.Random(Squad.LeaderTemplate));
 
             if (Squad.UnitsTemplate.Count > 0)

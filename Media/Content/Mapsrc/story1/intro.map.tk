@@ -1,0 +1,472 @@
+MapInstance {
+    Squads: Null;
+    Class: MapClass {
+        Name: "Intro";
+        TileSize: 48;
+        Tileset: Tileset {
+            texture: "B:/Code/DyingAndMore/Media/Content/Tilesets/Tiles.png";
+            size: 48;
+        };
+        MaterialInteractions: MaterialInteractions {
+            File: Null;
+            Interactions: [];
+        };
+        TilesMaterial: "Tiles";
+        TilesImage: "B:/Code/DyingAndMore/Media/Content/Tilesets/Tiles.png";
+        Width: 100;
+        Height: 12;
+        Tiles: [-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 9 -1 -1 -1 -1 8 0 0 0 0 0 0 0 0 0 0 57 41 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 0 0 0 0 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 0 0 0 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 0 0 0 0 0 0 0 0 -1 -1 0 0 0 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 -1 -1 0 0 0 0 24 -1 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 -1 -1 0 0 0 39 -1 94 0 0 0 0 0 0 0 0 0 0 -1 -1 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 -1 -1 0 0 0 77 -1 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 -1 -1 10 0 0 0 0 0 0 0 0 0 11];
+    };
+    Sounds: [];
+    ElapsedTime: 322230.4654;
+    TimeScale: 1;
+    currentScreenFade: ScreenFade {
+        Duration: 0;
+        Colors: Null;
+        Blend: Null;
+    };
+    currentScreenFadeElapsedTime: 322230.4654;
+    Entities: [
+        ActorInstance {
+            Class: @"Actors/Player.ent.tk";
+            Class: @"Actors/Player.ent.tk";
+            CurrentHealth: 5000;
+            Factions: Factions [Player Ally];
+            Controller: InputController {
+                Inputs: Null;
+            };
+            Conditions: {
+            };
+            MaxSpeed: 400;
+            Weapon: GunInstance {
+                Class: @"Weapons/Laser.wpn.tk";
+                Class: @"Weapons/Laser.wpn.tk";
+                CurrentAmmo: 4000;
+                LastAmmoRefillTime: 0;
+                OnlyRefillIfIdle: True;
+                StateTime: 0;
+                Charge: 0;
+            };
+            Id: 1;
+            Name: "p1";
+            OutlineColor: [255 215 0 255];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 276741;
+            EventHandlers: Null;
+            Position: [207.4689 320.1307];
+            Forward: [1 0];
+            Velocity: [0 0];
+        }
+    ];
+    EntityAttachments: [];
+    Triggers: [];
+    Fluids: [
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [428.7125 161.9144];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [447.9417 135.4744];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [462.3636 109.0343];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [479.1891 101.8233];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [505.6291 101.8233];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [517.6473 99.41971];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [522.4547 94.61242];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [404.6753 104.227];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [467.17 80.19059];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [529.6648 36.92501];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [558.5085 20.09951];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [565.7194 17.69587];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [505.6283 36.92501];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [488.8028 44.13594];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [462.3628 56.15416];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [428.7118 111.438];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [404.6753 149.8962];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [397.4644 171.529];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [392.6571 190.7582];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [440.73 185.9509];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [459.9591 166.7217];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [469.5737 164.3181];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [483.9955 173.9327];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [496.0138 169.1254];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [512.8393 152.2999];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [534.472 140.2817];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [546.4903 125.8598];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [558.5085 99.41974];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [565.7194 89.80516];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [587.3522 84.99788];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [608.985 80.19059];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [623.4069 80.19059];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [625.8105 68.17242];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [625.8105 68.17242];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [625.8105 68.17242];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [128.2571 375.8386];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [123.4498 354.2058];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [118.6425 354.2058];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [94.60604 354.2058];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [121.0462 383.0496];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [56.14779 361.4168];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [32.11135 346.9949];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [116.2388 308.5367];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [106.6243 298.9221];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [101.817 255.6565];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [190.7512 193.1618];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [272.4757 375.8386];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [354.1996 205.18];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [378.236 197.9691];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [378.2353 231.6201];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [368.6207 243.6383];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [344.5843 262.8675];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [334.9697 284.5003];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [337.3733 284.5003];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [291.7042 219.6019];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [282.0896 209.9874];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [282.0896 202.7764];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [286.8969 202.7764];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [277.2823 200.3728];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [214.7876 195.5655];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [390.2542 197.9691];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [399.8688 197.9691];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [409.4834 193.1618];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [392.6571 193.1618];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [397.4644 231.6201];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Bile;
+            position: [416.6935 207.5837];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [181.1373 404.6824];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [164.3117 395.0678];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [133.0644 395.0678];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [121.0462 404.6824];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [121.0462 426.3152];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [118.6425 433.5261];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [84.99152 385.4532];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [279.6866 404.6823];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [282.0903 402.2787];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [253.2466 414.2969];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [221.9992 423.9115];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [243.632 397.4714];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [270.0721 390.2605];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [205.1737 428.7188];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: *FluidClass.Large Blood;
+            position: [200.3664 421.5079];
+            velocity: [0 0];
+        }
+    ];
+}

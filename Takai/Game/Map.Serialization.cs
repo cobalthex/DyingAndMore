@@ -207,6 +207,7 @@ namespace Takai.Game
                     Spawn(fluid);
             }
 
+
             if (props.TryGetValue("Triggers", out var triggers)) //todo: load from class?
             {
                 foreach (var trigger in Data.Serializer.Cast<List<Trigger>>(triggers))

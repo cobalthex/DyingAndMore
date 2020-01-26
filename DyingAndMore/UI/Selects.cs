@@ -82,10 +82,10 @@ namespace DyingAndMore.UI
         {
             Items.Clear();
             if (Takai.Data.Binding.Globals.TryGetValue("Map.Squads", out var squads) &&
-                squads is System.Collections.Generic.Dictionary<string, Game.Entities.Squad> sqDict)
+                squads is System.Collections.Generic.HashSet<Game.Entities.Squad> sqSet)
             {
-                foreach (var squad in sqDict)
-                    Items.Add(squad.Value);
+                foreach (var squad in sqSet)
+                    Items.Add(squad);
             }
             base.OpenDropdown();
         }

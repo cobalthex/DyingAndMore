@@ -66,7 +66,6 @@ namespace Takai.Game
     /// </summary>
     public struct FluidInstance : Data.IInstance<FluidClass>
     {
-        [Data.Serializer.AsReference]
         public FluidClass Class { get; set; }
         public Vector2 position;
         public Vector2 velocity;

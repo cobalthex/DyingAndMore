@@ -1,0 +1,4 @@
+Tileset {
+	texture: @"./Tiles.png";
+	size: 48;
+}
