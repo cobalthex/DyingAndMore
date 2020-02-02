@@ -8,6 +8,18 @@ Table {
     Width: 300;
     Padding: [10 5];
 
+    IsEnabled: false;
+    Bindings: [
+        {
+            Source: "this";
+            Target: "IsEnabled";
+            Converter: ConditionalConverter {
+                DesiredValue: null;
+                Negate: true;
+            }
+        }
+    ]
+
     Children: [
         Static { Text: "Name"; };
         Static {

@@ -198,6 +198,11 @@ namespace Takai.Data
         /// </summary>
         public object DesiredValue { get; set; }
 
+        /// <summary>
+        /// Invert the logic condition (!=)
+        /// </summary>
+        public bool Negate { get; set; }
+
         public ConditionalConverter() { }
         public ConditionalConverter(object desiredValue)
         {
@@ -208,7 +213,9 @@ namespace Takai.Data
 
         public override object Convert(Type destType, object source)
         {
-            return base.Convert(destType, source.Equals(DesiredValue));
+            if (source == null)
+                return Negate ^ (source == DesiredValue); //todo: verify
+            return base.Convert(destType, Negate ^ source.Equals(DesiredValue));
         }
     }
 
