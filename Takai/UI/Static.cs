@@ -587,7 +587,8 @@ namespace Takai.UI
 #if DEBUG
             DebugTreePath = $"/{(GetType().Name)}({DebugId})";
 #endif
-            lastMeasureContainerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
+            if (Runtime.GraphicsDevice != null)
+                lastMeasureContainerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
             Style = GetType().Name;
         }
 
