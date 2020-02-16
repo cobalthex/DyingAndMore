@@ -208,6 +208,41 @@ namespace Takai.Game
         protected MapRenderStats _renderStats;
         internal System.Diagnostics.Stopwatch renderClock = new System.Diagnostics.Stopwatch();
 
+
+        protected struct CircleVertex : IVertexType
+        {
+            public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(new[] {
+                new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0),
+                new VertexElement( 8, VertexElementFormat.Single, VertexElementUsage.Position, 1),
+                new VertexElement(12, VertexElementFormat.Single, VertexElementUsage.Position, 2),
+                new VertexElement(16, VertexElementFormat.Single, VertexElementUsage.Position, 3),
+                new VertexElement(20, VertexElementFormat.Single, VertexElementUsage.Position, 4),
+                new VertexElement(24, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+                new VertexElement(28, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
+            });
+
+            public Vector2 position;
+            public float radius;
+            public float thickness;
+            public float dashLength;
+            public float dashOffset; //use multiples of Pi for smooth transition between beginning/end of circle
+            public Color color;
+            public Vector2 texcoord;
+
+            public CircleVertex(Vector2 position, float radius, float thickness, float dashLength, float dashOffset, Color color, Vector2 texcoord)
+            {
+                this.position = position;
+                this.radius = radius;
+                this.thickness = thickness;
+                this.dashLength = dashLength;
+                this.dashOffset = dashOffset;
+                this.color = color;
+                this.texcoord = texcoord;
+            }
+
+            VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
+        }
+
         protected struct RenderedLight
         {
             public Light light;
@@ -218,7 +253,7 @@ namespace Takai.Game
 
         //a collection of primatives to draw next frame (for one frame)
         protected List<VertexPositionColor> renderedLines = new List<VertexPositionColor>(32);
-        protected List<VertexPositionColorTexture> renderedCircles = new List<VertexPositionColorTexture>(32);
+        protected List<CircleVertex> renderedCircles = new List<CircleVertex>(32);
         protected List<RenderedLight> renderedLights = new List<RenderedLight>(128);
 
         protected int renderedTrailPointCount = 0;
@@ -341,15 +376,16 @@ namespace Takai.Game
         /// <param name="center">The center of the circle (in map space)</param>
         /// <param name="radius">The radius of the circle</param>
         /// <param name="color">The color to use</param>
-        public void DrawCircle(Vector2 center, float radius, Color color)
+        public void DrawCircle(Vector2 center, float radius, Color color, float thickness = 2, float dashLength = 0, float dashOffset = 0)
         {
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius), radius), color, new Vector2(0)));
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius, -radius), radius), color, new Vector2(1, 0)));
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius, radius), radius), color, new Vector2(0, 1)));
+            //switch to instancing? (not necessary for this amount of data)
+            renderedCircles.Add(new CircleVertex(center + new Vector2(-radius), radius, thickness, dashLength, dashOffset, color, new Vector2(0)));
+            renderedCircles.Add(new CircleVertex(center + new Vector2(radius, -radius), radius, thickness, dashLength, dashOffset, color, new Vector2(1, 0)));
+            renderedCircles.Add(new CircleVertex(center + new Vector2(-radius, radius), radius, thickness, dashLength, dashOffset, color, new Vector2(0, 1)));
 
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(-radius, radius), radius), color, new Vector2(0, 1)));
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius, -radius), radius), color, new Vector2(1, 0)));
-            renderedCircles.Add(new VertexPositionColorTexture(new Vector3(center + new Vector2(radius), radius), color, new Vector2(1)));
+            renderedCircles.Add(new CircleVertex(center + new Vector2(-radius, radius), radius, thickness, dashLength, dashOffset, color, new Vector2(0, 1)));
+            renderedCircles.Add(new CircleVertex(center + new Vector2(radius, -radius), radius, thickness, dashLength, dashOffset, color, new Vector2(1, 0)));
+            renderedCircles.Add(new CircleVertex(center + new Vector2(radius), radius, thickness, dashLength, dashOffset, color, new Vector2(1)));
         }
 
         static readonly Matrix arrowWingTransform = Matrix.CreateRotationZ(120);
@@ -411,13 +447,7 @@ namespace Takai.Game
 
             var visibleRegion = Rectangle.Intersect(camera.VisibleRegion, Class.Bounds);
             var cameraTransform = camera.Transform;
-            var projection = Matrix.CreateOrthographicOffCenter(
-                Runtime.GraphicsDevice.Viewport.Bounds.Left,
-                Runtime.GraphicsDevice.Viewport.Bounds.Right,
-                Runtime.GraphicsDevice.Viewport.Bounds.Bottom,
-                Runtime.GraphicsDevice.Viewport.Bounds.Top,
-                0, 1
-            );
+            var projection = Matrix.CreateOrthographicOffCenter(camera.Viewport, 0, 1);
             RenderContext context = new RenderContext
             {
                 spriteBatch = Class.spriteBatch,
@@ -463,7 +493,7 @@ namespace Takai.Game
             Runtime.GraphicsDevice.SetRenderTargets(Class.preRenderTarget);
 
             if (renderSettings.drawTiles && Class.TilesImage != null)
-                DrawTiles(ref context);
+                DrawTiles(ref context, Color.White);
             else
                 Runtime.GraphicsDevice.Clear(ClearOptions.Stencil, Color.Transparent, 0, 1);
 
@@ -561,30 +591,31 @@ namespace Takai.Game
             c.spriteBatch.End();
         }
 
-        public void DrawTiles(ref RenderContext c)
+        public void DrawTiles(ref RenderContext c, Color renderColor)
         {
             //todo: store in vbuf
-            var width = Class.TileSize * Class.Width;
-            var height = Class.TileSize * Class.Height;
-            var verts = new []
-            {
-                new VertexPositionColorTexture(new Vector3(0, 0, 0), Color.White, new Vector2(0, 0)),
-                new VertexPositionColorTexture(new Vector3(width, 0, 0), Color.White, new Vector2(1, 0)),
-                new VertexPositionColorTexture(new Vector3(0, height, 0), Color.White, new Vector2(0, 1)),
-                new VertexPositionColorTexture(new Vector3(width, height, 0), Color.White, new Vector2(1, 1)),
-            };
+            float width = Class.TileSize * Class.Width;
+            float height = Class.TileSize * Class.Height;
 
-            //todo: this needs to clip to viewport
+            var verts = new[]
+            { // possibly clip  to size and transform uv coords
+                 new VertexPositionColorTexture(new Vector3(0, 0, 0), renderColor, new Vector2(0, 0)),
+                 new VertexPositionColorTexture(new Vector3(width, 0, 0), renderColor, new Vector2(1, 0)),
+                 new VertexPositionColorTexture(new Vector3(0, height, 0), renderColor, new Vector2(0, 1)),
+                 new VertexPositionColorTexture(new Vector3(width, height, 0), renderColor, new Vector2(1, 1)),
+             };
 
             Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             Runtime.GraphicsDevice.DepthStencilState = Class.stencilWrite;
             Runtime.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+            Runtime.GraphicsDevice.ScissorRectangle = c.camera.Viewport;
             Class.tilesEffect.Parameters["Transform"].SetValue(c.viewTransform);
             foreach (EffectPass pass in Class.tilesEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, verts, 0, 2);
             }
+            Runtime.GraphicsDevice.ScissorRectangle = Runtime.GraphicsDevice.Viewport.Bounds;
         }
 
         public void DrawFluids(ref RenderContext c)
@@ -946,12 +977,6 @@ namespace Takai.Game
             if (renderedCircles.Count > 0)
             {
                 Class.circleEffect.Parameters["Transform"].SetValue(c.viewTransform);
-                Class.circleEffect.Parameters["Thickness"].SetValue(3f);
-                //float seglen = 16;
-                //Class.circleEffect.Parameters["SegmentLength"].SetValue(seglen);
-                //Class.circleEffect.Parameters["SegmentOffset"].SetValue(((float)ElapsedTime.TotalSeconds * 50) % (seglen * 2));
-
-                //instance buffer/custom vertex type for more shader params?
 
                 Runtime.GraphicsDevice.RasterizerState = Class.shapeRaster;
                 Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;

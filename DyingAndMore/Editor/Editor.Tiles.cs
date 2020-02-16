@@ -11,6 +11,8 @@ namespace DyingAndMore.Editor
         bool isPosSaved = false;
         Vector2 savedWorldPos, lastWorldPos, currentWorldPos;
 
+        short[,] clipboard;
+
         public TilesEditorMode(Editor editor)
             : base("Tiles", editor, new Selectors.TileSelector(editor.Map.Class.Tileset))
         {
@@ -54,8 +56,17 @@ namespace DyingAndMore.Editor
                 if (isPosSaved)
                 {
                     var savedTile = (savedWorldPos / editor.Map.Class.TileSize).ToPoint();
-                    //draw rect
-                    if (InputState.IsMod(KeyMod.Shift))
+
+                    /*if (InputState.IsButtonDown(Keys.C))
+                    {
+                        var copyRect = Takai.Util.AbsRectangle(
+                            currentWorldPos / editor.Map.Class.TileSize,
+                            savedWorldPos / editor.Map.Class.TileSize
+                        );
+                        clipboard = Takai.Util.Copy(editor.Map.Class.Tiles, copyRect);
+                    }
+
+                    else*/ if (InputState.IsMod(KeyMod.Shift))
                         TileRect(savedTile, curTile, tile);
                     else
                         TileLine(savedTile, curTile, tile);
@@ -65,9 +76,9 @@ namespace DyingAndMore.Editor
 
                 //todo: fix when coming out of selector
                 else if (InputState.IsMod(KeyMod.Shift))
-                    TileFlood(curTile - new Point(1), tile);
+                    TileFlood(curTile - new Point(1), tile); //not -1?
                 else
-                    TileLine((lastWorldPos / editor.Map.Class.TileSize).ToPoint(), curTile - new Point(1), tile);
+                    TileLine((lastWorldPos / editor.Map.Class.TileSize).ToPoint(), curTile + new Point(1), tile);
 
                 return false;
             }
@@ -75,6 +86,7 @@ namespace DyingAndMore.Editor
             return base.HandleInput(time);
         }
 
+        //Takai.Game.Camera clipCam = new Takai.Game.Camera();
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             //draw rect around tile under cursor
@@ -103,7 +115,7 @@ namespace DyingAndMore.Editor
 
                     var w = (System.Math.Abs((int)diff.X) - 1) / editor.Map.Class.TileSize + 1;
                     var h = (System.Math.Abs((int)diff.Y) - 1) / editor.Map.Class.TileSize + 1;
-                    Font.Draw(spriteBatch, $"w:{w}, h:{w}", editor.Camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
+                    Font.Draw(spriteBatch, $"w:{w}, h:{h}", editor.Camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
                 else
                 {
@@ -117,6 +129,22 @@ namespace DyingAndMore.Editor
                         editor.Camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
             }
+
+            //else if (clipboard != null && clipboard.Length > 0)
+            //{
+            //    var context = new Takai.Game.MapBaseInstance.RenderContext();
+            //    var view = new Rectangle(
+            //        InputState.MousePoint.X,
+            //        InputState.MousePoint.Y,
+            //        clipboard.GetLength(1) * editor.Map.Class.TileSize,
+            //        clipboard.GetLength(0) * editor.Map.Class.TileSize
+            //    );
+            //    context.viewTransform = editor.Camera.Transform * Matrix.CreateOrthographicOffCenter(view, 0, 1);
+            //    context.camera = clipCam;
+            //    cam.Viewport = view;
+            //    editor.Map.DrawTiles(ref context, new Color(255, 255, 255, 127));
+            //    Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Aquamarine, view);
+            //}
         }
 
         void TileRect(Point start, Point end, short value)
@@ -161,40 +189,43 @@ namespace DyingAndMore.Editor
             var err = (diff.X > diff.Y ? diff.X : -diff.Y) / 2;
 
             var bounds = editor.Map.Class.TileBounds;
+            var cur = start;
             while (true)
             {
-                if (bounds.Contains(start))
-                    editor.Map.Class.Tiles[start.Y, start.X] = value;
+                if (bounds.Contains(cur))
+                    editor.Map.Class.Tiles[cur.Y, cur.X] = value;
 
-                if (start.X == end.X && start.Y == end.Y)
+                if (cur.X == end.X && cur.Y == end.Y)
                     break;
 
                 var e2 = err;
                 if (e2 > -diff.X)
                 {
                     err -= diff.Y;
-                    start.X += sx;
+                    cur.X += sx;
                 }
                 if (e2 < diff.Y)
                 {
                     err += diff.X;
-                    start.Y += sy;
+                    cur.Y += sy;
                 }
             }
 
-            if (start.X < end.X)
+            if (cur.X < end.X)
             {
-                var s = start.X;
-                start.X = end.X;
+                var s = cur.X;
+                cur.X = end.X;
                 end.X = s;
             }
-            if (start.Y < end.Y)
+            if (cur.Y < end.Y)
             {
-                var s = start.Y;
-                start.Y = end.Y;
+                var s = cur.Y;
+                cur.Y = end.Y;
                 end.Y = s;
             }
-            editor.Map.Class.PatchTileLayoutTexture(new Rectangle(start, Takai.Util.Max(new Point(1), end - start)));
+
+            //todo:broken
+            editor.Map.Class.PatchTileLayoutTexture(Takai.Util.AbsRectangle(start, end + new Point(1)));
         }
 
         void TileFlood(Point tile, short value)
@@ -236,8 +267,8 @@ namespace DyingAndMore.Editor
                 max.X = System.Math.Max(max.X, right);
                 max.Y = System.Math.Max(max.Y, first.Y);
             }
-            //editor.Map.Class.PatchTileLayoutTexture(new Rectangle(min, Takai.Util.Max(new Point(1), max - min)));
-            editor.Map.Class.PatchTileLayoutTexture(editor.Map.Class.TileBounds);
+            editor.Map.Class.PatchTileLayoutTexture(new Rectangle(min, max - min));
+            //ditor.Map.Class.PatchTileLayoutTexture(editor.Map.Class.TileBounds);
         }
     }
 }

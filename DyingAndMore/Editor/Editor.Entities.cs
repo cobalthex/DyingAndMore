@@ -279,6 +279,19 @@ namespace DyingAndMore.Editor
         {
             base.DrawSelf(spriteBatch);
 
+            foreach (var squad in editor.Map.Squads)
+            {
+                editor.Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, new Color(Color.Cyan, 0.6f), 3, 4 * MathHelper.Pi);
+
+                var squadNameSize = Font.MeasureString(squad.Name);
+                Font.Draw(
+                    spriteBatch,
+                    squad.Name,
+                    editor.Camera.WorldToScreen(squad.SpawnPosition) - (squadNameSize / 2),
+                    new Color(Color.White, 0.4f)
+                );
+            }
+
             DrawEntityInfo(spriteBatch);
         }
 

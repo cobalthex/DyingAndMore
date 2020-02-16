@@ -37,26 +37,22 @@ SamplerState LayoutSampler
 
 float4 pmain(float4 position : SV_Position, float4 color : COLOR0, float2 rpos : TEXCOORD0) : SV_Target
 {
-    uint2 tsize;
-    TilesLayout.GetDimensions(tsize.x, tsize.y);
-
     //surface format color (unorm)
     //float4 tilec = TilesLayout.Load(uint3(rpos * MapSize, 0));
     //uint tile = ((uint)(tilec.a * 255) << 24) + ((uint)(tilec.b * 255) << 16) + ((uint)(tilec.g * 255) << 8) + ((uint)(tilec.r * 255) << 0);
 
     uint tile = TilesLayout.Load(uint3(rpos * MapSize, 0));
 
-    if (tile == 0xffffffff)
-        discard;
+	if (tile == 0xffffffff)
+		discard;
 
+	uint2 tsize;
     TilesImage.GetDimensions(tsize.x, tsize.y);
     float2 tdiv = tsize / TileSize;
     float2 cell = float2(tile % TilesPerRow, tile / TilesPerRow);
     float2 local = (rpos % (1 / MapSize)) * MapSize;
 
     float4 ti = TilesImage.Sample(Sampler, (cell + local) / tdiv);
-	if (ti.a == 0)
-		discard; //todo: this shouldnt be necessary
 	return color * ti;
 }
 
