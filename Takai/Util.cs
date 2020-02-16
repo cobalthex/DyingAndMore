@@ -72,6 +72,27 @@ namespace Takai
             return mean + standardDeviation * randStdNormal; //random normal(mean,stdDev^2)
         }
 
+        public static T[,] Copy<T>(this T[,] original, Rectangle area)
+        {
+            var newArray = new T[
+                Math.Min(area.Right, original.GetLength(1)) - area.X,
+                Math.Min(area.Bottom, original.GetLength(0)) - area.Y
+            ];
+
+            for (int i = 0; i < newArray.GetLength(0); ++i)
+            {
+                Array.Copy(
+                    original,
+                    (i + area.X) * original.GetLength(1), 
+                    newArray, 
+                    i * newArray.GetLength(1), 
+                    newArray.GetLength(1)
+                );
+            }
+
+            return newArray;
+        }
+
         /// <summary>
         /// Resize an array
         /// </summary>

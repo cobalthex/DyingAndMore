@@ -159,29 +159,40 @@ namespace Takai.Input
         public Dictionary<TAction, float> CurrentInputs { get; set; } = new Dictionary<TAction, float>();
 
         /// <summary>
+        /// The most recent input device type used
+        /// </summary>
+        public DeviceType LastInputDevice { get; private set; }
+
+        /// <summary>
         /// Set the state of one input
         /// </summary>
         /// <param name="binding">The input binding</param>
         /// <param name="magnitude">the magnitude multiplier (e.g. analog inputs)</param>
-        protected void SetInput(InputBinding<TAction> binding, float magnitude = 1)
+        protected void SetInput(InputBinding<TAction> binding, DeviceType device, float magnitude = 1)
         {
             magnitude *= binding.magnitude;
             if (CurrentInputs.TryGetValue(binding.action, out var input) && input != 0)
                 magnitude = (input + magnitude) / 2;
             CurrentInputs[binding.action] = magnitude;
+
+            if (magnitude > 0)
+                LastInputDevice = device;
         }
 
         public void Update(PlayerIndex player, Rectangle viewport)
         {
+            //todo: optimize?
+
             foreach (var key in InputState.GetPressedKeys())
             {
                 if (Keys.TryGetValue(key, out var binding))
-                    SetInput(binding);
+                    SetInput(binding, DeviceType.Keyboard);
             }
+
             foreach (var binding in GamepadButtons)
             {
                 if (player < PlayerIndex.Four && InputState.IsButtonDown(binding.Key, player))
-                    SetInput(binding.Value);
+                    SetInput(binding.Value, DeviceType.Gamepad);
             }
 
             if (viewport.Contains(InputState.MousePoint))
@@ -189,7 +200,7 @@ namespace Takai.Input
                 foreach (var binding in MouseButtons)
                 {
                     if (InputState.IsButtonDown(binding.Key))
-                        SetInput(binding.Value);
+                        SetInput(binding.Value, DeviceType.Mouse);
                 }
 
                 var mouse = InputState.MouseVector;
@@ -202,23 +213,25 @@ namespace Takai.Input
                     if (new Rectangle(absMin.X, absMin.Y, rv.X, rv.Y).Contains(mouse))
                     {
                         var polar = Vector2.Normalize(mouse - (absMin + absMax).ToVector2() / 2);
-                        SetInput(Mouse.horizontal, polar.X);
-                        SetInput(Mouse.vertical, polar.Y);
+                        SetInput(Mouse.horizontal, DeviceType.Mouse, polar.X);
+                        SetInput(Mouse.vertical, DeviceType.Mouse, polar.Y);
                     }
                 }
                 if (InputState.HasScrolled())
-                    SetInput(MouseWheel, System.Math.Sign(InputState.ScrollDelta()));
+                    SetInput(MouseWheel, DeviceType.Mouse, System.Math.Sign(InputState.ScrollDelta()));
+
+                //set last device to mouse?
             }
 
             var thumbsticks = InputState.Thumbsticks(player);
-            SetInput(GamepadLeftThumbstick.horizontal, thumbsticks.Left.X);
-            SetInput(GamepadLeftThumbstick.vertical, thumbsticks.Left.Y);
-            SetInput(GamepadRightThumbstick.horizontal, thumbsticks.Right.X);
-            SetInput(GamepadRightThumbstick.vertical, thumbsticks.Right.Y);
+            SetInput(GamepadLeftThumbstick.horizontal, DeviceType.Gamepad, thumbsticks.Left.X);
+            SetInput(GamepadLeftThumbstick.vertical, DeviceType.Gamepad, thumbsticks.Left.Y);
+            SetInput(GamepadRightThumbstick.horizontal, DeviceType.Gamepad, thumbsticks.Right.X);
+            SetInput(GamepadRightThumbstick.vertical, DeviceType.Gamepad, thumbsticks.Right.Y);
 
             var triggers = InputState.Triggers(player);
-            SetInput(GamepadLeftTrigger, triggers.Left);
-            SetInput(GamepadRightTrigger, triggers.Right);
+            SetInput(GamepadLeftTrigger, DeviceType.Gamepad, triggers.Left);
+            SetInput(GamepadRightTrigger, DeviceType.Gamepad, triggers.Right);
 
             //todo: convert to circle (allow for magnitude)
             foreach (var touch in InputState.touches)
@@ -234,8 +247,8 @@ namespace Takai.Input
 
                     var polar = (touch.Position - ((absMin + absMax).ToVector2() / 2)) / rv.ToVector2();
                     polar.Normalize();
-                    SetInput(touchAction.horizontal, polar.X);
-                    SetInput(touchAction.vertical, polar.Y);
+                    SetInput(touchAction.horizontal, DeviceType.Touch, polar.X);
+                    SetInput(touchAction.vertical, DeviceType.Touch, polar.Y);
                 }
             }
         }

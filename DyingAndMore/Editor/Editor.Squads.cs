@@ -127,6 +127,11 @@ namespace DyingAndMore.Editor
             return UIEventResult.Continue;
         }
 
+        protected override void UpdateSelf(GameTime time)
+        {
+            base.UpdateSelf(time);
+        }
+
         protected override bool HandleInput(GameTime time)
         {
             if (SelectedSquad?.Name != null)
@@ -174,28 +179,20 @@ namespace DyingAndMore.Editor
             {
                 foreach (var squad in editor.Map.Squads)
                 {
-                    editor.Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, SelectedSquad == squad ? Color.Gold : Color.Cyan);
-                    SquadIcon.Draw(
-                        spriteBatch,
-                        editor.Camera.WorldToScreen(squad.SpawnPosition),
-                        0,
-                        Color.White,
-                        clampScale
-                    );
-
+                    editor.Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, SelectedSquad == squad ? Color.Gold : Color.Cyan, 3);
+                    
                     var squadNameSize = Font.MeasureString(squad.Name);
                     Font.Draw(
                         spriteBatch,
                         squad.Name,
-                        editor.Camera.WorldToScreen(squad.SpawnPosition + new Vector2(0, squad.SpawnRadius))
-                            + new Vector2(squadNameSize.X / -2, 10 * clampScale),
+                        editor.Camera.WorldToScreen(squad.SpawnPosition) - (squadNameSize / 2),
                         Color.White
                     );
                 }
             }
 
             if (creatingSquad && SelectedSquad != null)
-                editor.Map.DrawCircle(SelectedSquad.SpawnPosition, SelectedSquad.SpawnRadius, new Color(Color.White, 0.6f));
+                editor.Map.DrawCircle(SelectedSquad.SpawnPosition, SelectedSquad.SpawnRadius, new Color(Color.White, 0.6f), 3, 4 * MathHelper.Pi, (float)editor.Map.RealTime.TotalGameTime.TotalSeconds * 40);
         }
     }
 }

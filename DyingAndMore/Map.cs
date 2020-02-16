@@ -63,6 +63,7 @@ namespace DyingAndMore
         {
             if (updateSettings.isEntityLogicEnabled)
             {
+                //todo: only squads in sector
                 if (Squads != null)
                 {
                     foreach (var squad in Squads)

@@ -27,7 +27,7 @@ namespace DyingAndMore.Editor
 
         public override void End()
         {
-            editor.Map.renderSettings.drawTriggers = false;
+            //editor.Map.renderSettings.drawTriggers = false;
         }
 
         protected override bool HandleInput(GameTime time)
