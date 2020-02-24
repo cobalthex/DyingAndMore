@@ -177,7 +177,7 @@ namespace DyingAndMore.Editor
         protected override bool HandleInput(GameTime time)
         {
             currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
-
+            //todo: child entity movement can sometimes break
             if (SelectedEntity != null)
             {
                 if (InputState.IsButtonDown(Keys.R))

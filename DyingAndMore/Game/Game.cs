@@ -583,17 +583,13 @@ namespace DyingAndMore.Game
             foreach (var ptype in Map.Particles)
                 particleCount += ptype.Value.Count;
 
-#if DEBUG
-            Font.Draw(spriteBatch,
-                $"Total entities:{Map.AllEntities.Count()}" +
-                $"\nActive entities:{Map.UpdateStats.updatedEntities}" +
-                $"\nTotal particles:{particleCount}" +
-                $"\nVisible fluids:A={Map.RenderStats.visibleActiveFluids} I={Map.RenderStats.visibleInactiveFluids}" +
-                $"\nTrail points:{Map.RenderStats.trailPointCount}",
-                new Vector2(20, 200),
-                Color.Orange
-            );
-#endif
+
+            DebugPropertyDisplay.AddRow("Total entities", Map.AllEntities.Count());
+            DebugPropertyDisplay.AddRow("Active entities", Map.UpdateStats.updatedEntities);
+            DebugPropertyDisplay.AddRow("Total particles", particleCount);
+            DebugPropertyDisplay.AddRow("Trail points", Map.RenderStats.trailPointCount);
+            DebugPropertyDisplay.AddRow("Visible fluids (active)", Map.RenderStats.visibleActiveFluids);
+            DebugPropertyDisplay.AddRow("Visible fluids (inactive)", Map.RenderStats.visibleInactiveFluids);
         }
 
         protected void DrawHealthBar(SpriteBatch spriteBatch, Vector2 screenPosition, float health, float maxHealth)

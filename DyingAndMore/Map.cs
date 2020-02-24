@@ -49,9 +49,8 @@ namespace DyingAndMore
             
             //if (!Squads.ContainsKey(squad.Name))
             {
-                if (squad.Name == null)
-                    squad.Name = Takai.Util.RandomString();
-                //todo: prevent empty name (or generate one)
+                if (string.IsNullOrEmpty(squad.Name))
+                    squad.Name = Takai.Util.RandomString(prefix: "squad_");
                 Squads.Add(squad);
                 squad.SpawnUnits(this);
             }

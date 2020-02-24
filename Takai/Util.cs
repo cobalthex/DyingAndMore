@@ -359,13 +359,20 @@ namespace Takai
 
         const string randChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; //first 62 chars of base64
 
-        public static string RandomString(int minLength = 8, int maxLength = 8)
+        public static string RandomString(int minLength = 8, int maxLength = 8, string prefix = null)
         {
             var len = RandomGenerator.Next(minLength, maxLength + 1);
-            var sb = new System.Text.StringBuilder(len);
+            var sb = new System.Text.StringBuilder(prefix, len);
             for (int i = 0; i < len; ++i)
                 sb.Append(randChars[RandomGenerator.Next(0, randChars.Length)]);
             return sb.ToString();
+        }
+
+        public static string Ellipsis(this string str, int maxLength)
+        {
+            if (str.Length > maxLength)
+                return str.Substring(0, maxLength - 1) + '…';
+            return str;
         }
 
         /// <summary>
