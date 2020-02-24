@@ -83,7 +83,14 @@ namespace DyingAndMore.Editor
                 if (InputState.IsButtonDown(MouseButtons.Left))
                 {
                     var delta = currentWorldPos - lastWorldPos;
+                    var oldSector = GetDecalSector(selectedDecal);
                     selectedDecal.position += delta;
+                    var newSector = GetDecalSector(selectedDecal);
+                    if (oldSector != newSector)
+                    {
+                        oldSector.decals.Remove(selectedDecal);
+                        newSector.decals.Add(selectedDecal);
+                    }
                     return false;
                 }
 
@@ -124,6 +131,7 @@ namespace DyingAndMore.Editor
                 {
                     GetDecalSector(selectedDecal).decals.Remove(selectedDecal);
                     selectedDecal = null;
+                    //todo: fix sector movement
                     return false;
                 }
 
@@ -138,10 +146,13 @@ namespace DyingAndMore.Editor
             var visibleRegion = editor.Camera.VisibleRegion;
             var visibleSectors = editor.Map.GetOverlappingSectors(visibleRegion);
 
+            int visibleDecals = 0;
+
             for (var y = visibleSectors.Top; y < visibleSectors.Bottom; ++y)
             {
                 for (var x = visibleSectors.Left; x < visibleSectors.Right; ++x)
                 {
+                    visibleDecals += editor.Map.Sectors[y, x].decals.Count;
                     foreach (var decal in editor.Map.Sectors[y, x].decals)
                     {
                         var transform = Matrix.CreateScale(decal.scale)
@@ -163,12 +174,15 @@ namespace DyingAndMore.Editor
                     }
                 }
             }
+
+            Takai.DebugPropertyDisplay.AddRow("Visible Decals", visibleDecals);
         }
 
         bool SelectDecal(Vector2 worldPosition)
         {
             //find closest decal
             var sectors = editor.Map.GetOverlappingSectors(new Rectangle((int)worldPosition.X - 5, (int)worldPosition.Y - 5, 10, 10)); //todo: fuzzing here should be global setting
+
 
             for (int y = sectors.Top; y < sectors.Bottom; ++y)
             {
@@ -185,7 +199,7 @@ namespace DyingAndMore.Editor
 
 
                         //todo: use correct box checking (invert transform rectangle check)
-                        if (Vector2.DistanceSquared(decal.position, worldPosition) < decal.texture.Width * decal.texture.Height * decal.scale)
+                        if (Vector2.DistanceSquared(Vector2.Transform(Vector2.Zero, transform), worldPosition) < decal.texture.Width * decal.texture.Height * decal.scale)
                         {
                             selectedDecal = decal;
                             return true;

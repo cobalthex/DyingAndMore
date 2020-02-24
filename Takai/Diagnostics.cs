@@ -92,17 +92,21 @@ namespace Takai
         public static IReadOnlyList<KeyValuePair<string, string>> Entries => rows.AsReadOnly();
 
         public static int KeyWidth { get; private set; }
+        public static int ValueWidth { get; private set; }
 
         public static void Reset()
         {
             rows.Clear();
             KeyWidth = 0;
+            ValueWidth = 0;
         }
 
-        public static void AddRow(string key, object value)
+        public static void AddRow(string key, object value, int maxValueCharacters = 32)
         {
-            rows.Add(new KeyValuePair<string, string>(key, value.ToString()));
+            var valueStr = value.ToString().Ellipsis(maxValueCharacters);
+            rows.Add(new KeyValuePair<string, string>(key, valueStr));
             KeyWidth = Math.Max(key.Length, KeyWidth);
+            ValueWidth = Math.Max(valueStr.Length, ValueWidth);
         }
     }
 

@@ -2139,7 +2139,7 @@ namespace Takai.UI
         /// <param name="spriteBatch">The spritebatch to use</param>
         protected virtual void DrawSelf(SpriteBatch spriteBatch)
         {
-            DrawText(spriteBatch, Point.Zero);
+            DrawElementText(spriteBatch, Point.Zero);
         }
 
         /// <summary>
@@ -2147,7 +2147,7 @@ namespace Takai.UI
         /// </summary>
         /// <param name="spriteBatch">The spritebatch to use</param>
         /// <param name="position">The relative position (to the element) to draw this text</param>
-        protected void DrawText(SpriteBatch spriteBatch, Point position)
+        protected void DrawElementText(SpriteBatch spriteBatch, Point position)
         {
             if (Font == null || Text == null)
                 return;

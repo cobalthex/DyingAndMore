@@ -77,7 +77,7 @@ namespace Takai.UI
             if (IsChecked)
                 DrawSprite(spriteBatch, CheckSprite, new Rectangle(2, 2, checkSize - 4, checkSize - 4));
 
-            DrawText(spriteBatch, new Point(checkSize + Margin, 0));
+            DrawElementText(spriteBatch, new Point(checkSize + Margin, 0));
         }
     }
 }

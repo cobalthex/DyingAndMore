@@ -378,7 +378,16 @@ namespace DyingAndMore
             {
                 var text = row.Key.PadLeft(Takai.DebugPropertyDisplay.KeyWidth) + $" = {row.Value}";
                 var sz = debugFont.MeasureString(text, true);
-                debugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - 300, y), Color.Cyan, true);
+                debugFont.Draw(
+                    sbatch, 
+                    text, 
+                    new Vector2(
+                        GraphicsDevice.Viewport.Width - 20 - ((Takai.DebugPropertyDisplay.KeyWidth + Takai.DebugPropertyDisplay.ValueWidth + 3) * debugFont.MaxCharWidth), 
+                        y
+                    ),
+                    Color.Cyan, 
+                    true
+                );
                 y += debugFont.MaxCharHeight;
             }
 
