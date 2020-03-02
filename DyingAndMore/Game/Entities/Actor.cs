@@ -79,30 +79,38 @@ namespace DyingAndMore.Game.Entities
 
     public class ActorInstance : EntityInstance
     {
-        [Takai.Data.Serializer.ReadOnly]
-        public new ActorClass Class
+        public override EntityClass Class
         {
-            get => (ActorClass)base.Class;
+            get => base.Class;
             set
             {
                 base.Class = value;
                 if (base.Class != null)
                 {
-                    if (Class.Hud != null)
+                    System.Diagnostics.Contracts.Contract.Assert(value.GetType() == typeof(ActorClass));
+                    var actorClass = (ActorClass)value;
+                    if (actorClass.Hud != null)
                     {
-                        Hud = Class.Hud.CloneHierarchy();
+                        Hud = actorClass.Hud.CloneHierarchy();
                         Hud.BindTo(this);
                     }
 
                     //todo: re-evaluate if all of these should get set
-                    MaxSpeed = Class.MaxSpeed.Random();
-                    CurrentHealth = Class.MaxHealth;
-                    Factions = Class.DefaultFactions;
+                    MaxSpeed = actorClass.MaxSpeed.Random();
+                    CurrentHealth = actorClass.MaxHealth;
+                    Factions = actorClass.DefaultFactions;
 
-                    Weapon = Util.Random(Class.DefaultWeapon)?.Instantiate();
-                    Controller = Util.Random(Class.DefaultController)?.Clone();
+                    Weapon = Util.Random(actorClass.DefaultWeapon)?.Instantiate();
+                    Controller = Util.Random(actorClass.DefaultController)?.Clone();
                 }
             }
+        }
+
+        [Takai.Data.Serializer.Ignored]
+        public ActorClass _Class
+        {
+            get => (ActorClass)base.Class;
+            set => Class = value;
         }
 
         /// <summary>
@@ -234,7 +242,7 @@ namespace DyingAndMore.Game.Entities
             Velocity = vel;
             lastVelocity = Velocity;
 
-            if (CurrentHealth <= 0 && Class.MaxHealth > 0)
+            if (CurrentHealth <= 0 && _Class.MaxHealth > 0)
                 Kill();
 
             base.Think(deltaTime);
@@ -265,7 +273,7 @@ namespace DyingAndMore.Game.Entities
 
         public virtual void Accelerate(Vector2 direction)
         {
-            var vel = Velocity + (direction * Class.MoveForce.Random());
+            var vel = Velocity + (direction * _Class.MoveForce.Random());
             var lSq = vel.LengthSquared();
             if (lSq > MaxSpeed * MaxSpeed)
                 vel = (vel / (float)Math.Sqrt(lSq)) * MaxSpeed;
@@ -295,7 +303,7 @@ namespace DyingAndMore.Game.Entities
         public override string GetDebugInfo()
         {
             return $"{base.GetDebugInfo()}\n" +
-                   $"Health: {CurrentHealth}/{Class?.MaxHealth}\n" +
+                   $"Health: {CurrentHealth}/{_Class?.MaxHealth}\n" +
                    $"Weapon: {Weapon}\n" +
                    $"Controller: {Controller}";
         }
@@ -315,7 +323,7 @@ namespace DyingAndMore.Game.Entities
 
             var dot = Vector2.Dot(WorldForward, diff);
 
-            return (dot > (1 - (Class.FieldOfView / 2 / MathHelper.Pi)));
+            return (dot > (1 - (_Class.FieldOfView / 2 / MathHelper.Pi)));
         }
 
         /// <summary>
@@ -330,7 +338,7 @@ namespace DyingAndMore.Game.Entities
             diff.Normalize();
 
             var dot = Vector2.Dot(diff, Ent.WorldForward);
-            return (dot > (Class.FieldOfView / 2 / MathHelper.Pi) - 1);
+            return (dot > (_Class.FieldOfView / 2 / MathHelper.Pi) - 1);
         }
 
         public bool IsAlliedWith(Factions factions)

@@ -51,7 +51,7 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            var size = base.MeasureOverride(availableSize);
+            var size = Vector2.Max(new Vector2(Font.MaxCharWidth, Font.MaxCharHeight), Font.MeasureString(Text));
             return size + new Vector2(size.Y + Margin, 0);
         }
 

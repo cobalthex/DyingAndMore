@@ -55,14 +55,14 @@ namespace DyingAndMore.Game.Weapons
 
     public class GunInstance : WeaponInstance
     {
-        [Takai.Data.Serializer.ReadOnly]
-        public new GunClass Class
+        [Takai.Data.Serializer.Ignored]
+        public GunClass _Class
         {
             get => (GunClass)base.Class;
             set => base.Class = value;
         }
 
-        public int MaxAmmo => Class.MaxAmmo;
+        public int MaxAmmo => _Class.MaxAmmo;
 
         public int CurrentAmmo { get; set; }
         public TimeSpan LastAmmoRefillTime { get; set; }
@@ -87,13 +87,13 @@ namespace DyingAndMore.Game.Weapons
 
         public override bool IsDepleted()
         {
-            return Class.MaxAmmo > 0 && CurrentAmmo <= 0;
+            return _Class.MaxAmmo > 0 && CurrentAmmo <= 0;
         }
 
         public override bool CanUse(TimeSpan elapsedTime)
         {
-            return (Class.MaxBursts == 0 || burstCount < Class.MaxBursts)
-                && (burstCount == 0 || currentBurstShotCount > 0 || elapsedTime > StateTime + Class.BurstCooldownTime)
+            return (_Class.MaxBursts == 0 || burstCount < _Class.MaxBursts)
+                && (burstCount == 0 || currentBurstShotCount > 0 || elapsedTime > StateTime + _Class.BurstCooldownTime)
                 && base.CanUse(elapsedTime);
         }
 
@@ -104,7 +104,7 @@ namespace DyingAndMore.Game.Weapons
 
             if (currentBurstShotCount > 0)
             {
-                if (currentBurstShotCount < Class.RoundsPerBurst && !IsDepleted())
+                if (currentBurstShotCount < _Class.RoundsPerBurst && !IsDepleted())
                     base.TryUse();
                 else
                 {
@@ -114,14 +114,14 @@ namespace DyingAndMore.Game.Weapons
             }
 
             if (LastAmmoRefillTime == TimeSpan.Zero ||
-                (State == WeaponState.Idle && Class.OnlyRefillWhileIdle)) //ugly
+                (State == WeaponState.Idle && _Class.OnlyRefillWhileIdle)) //ugly
                 LastAmmoRefillTime = Actor.Map.ElapsedTime;
 
             var timeSinceLastRefill = Actor.Map.ElapsedTime - LastAmmoRefillTime;
-            if (Class.AmmoRefillSpeed != TimeSpan.Zero &&
-                timeSinceLastRefill.Ticks >= Math.Abs(Class.AmmoRefillSpeed.Ticks))
+            if (_Class.AmmoRefillSpeed != TimeSpan.Zero &&
+                timeSinceLastRefill.Ticks >= Math.Abs(_Class.AmmoRefillSpeed.Ticks))
             {
-                CurrentAmmo = MathHelper.Clamp(CurrentAmmo + (int)(timeSinceLastRefill.Ticks / Class.AmmoRefillSpeed.Ticks), 0, MaxAmmo);
+                CurrentAmmo = MathHelper.Clamp(CurrentAmmo + (int)(timeSinceLastRefill.Ticks / _Class.AmmoRefillSpeed.Ticks), 0, MaxAmmo);
                 LastAmmoRefillTime = Actor.Map.ElapsedTime;
             }
 
@@ -132,17 +132,17 @@ namespace DyingAndMore.Game.Weapons
         {
             //todo: at high rates of fire, occasionally discharge effect doesnt play (or at least doesnt play correctly)
 
-            if (Class.Projectile != null)
+            if (_Class.Projectile != null)
             {
-                for (int i = 0; i < Class.ProjectilesPerRound; ++i)
+                for (int i = 0; i < _Class.ProjectilesPerRound; ++i)
                 {
-                    var projectile = (ProjectileInstance)Class.Projectile.Instantiate();
-                    projectile.SetPositionTransformed(Actor.WorldPosition + (Actor.WorldForward * (Actor.Radius + projectile.Radius + Class.SpawnOffset)));
+                    var projectile = (ProjectileInstance)_Class.Projectile.Instantiate();
+                    projectile.SetPositionTransformed(Actor.WorldPosition + (Actor.WorldForward * (Actor.Radius + projectile.Radius + _Class.SpawnOffset)));
 
-                    var error = Class.ErrorAngle.Random();
+                    var error = _Class.ErrorAngle.Random();
                     projectile.Forward = Vector2.TransformNormal(Actor.Forward, Matrix.CreateRotationZ(error));
-                    projectile.Velocity = projectile.Forward * Class.Projectile.MuzzleVelocity.Random();
-                    if (Class.Projectile.InheritSourcePhysics)
+                    projectile.Velocity = projectile.Forward * _Class.Projectile.MuzzleVelocity.Random();
+                    if (_Class.Projectile.InheritSourcePhysics)
                         projectile.Velocity += Actor.Velocity;
                     projectile.Source = Actor;
                     Actor.Map.Spawn(projectile);
@@ -164,14 +164,14 @@ namespace DyingAndMore.Game.Weapons
 
             var gun = (GunInstance)other;
             var lastAmmoCount = CurrentAmmo;
-            CurrentAmmo = Math.Min(Class.MaxAmmo, CurrentAmmo + (gun.CurrentAmmo));
+            CurrentAmmo = Math.Min(_Class.MaxAmmo, CurrentAmmo + (gun.CurrentAmmo));
             gun.CurrentAmmo -= CurrentAmmo - lastAmmoCount;
             return true;
         }
 
         public override string ToString()
         {
-            return $"{base.ToString()} ({CurrentAmmo}/{Class?.MaxAmmo})";
+            return $"{base.ToString()} ({CurrentAmmo}/{_Class?.MaxAmmo})";
         }
     }
 }

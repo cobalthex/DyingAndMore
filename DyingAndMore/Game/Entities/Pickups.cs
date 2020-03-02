@@ -28,13 +28,13 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public Weapons.WeaponInstance Weapon
         {
-            get => _weapon ?? (_weapon = Class?.Weapon?.Instantiate()) ?? null;
+            get => _weapon ?? (_weapon = _Class?.Weapon?.Instantiate()) ?? null;
             set => _weapon = value;
         }
         private Weapons.WeaponInstance _weapon;
 
-        [Takai.Data.Serializer.ReadOnly]
-        public new WeaponPickupClass Class
+        [Takai.Data.Serializer.Ignored]
+        public WeaponPickupClass _Class
         {
             get => (WeaponPickupClass)base.Class;
             set => base.Class = value;
@@ -73,10 +73,10 @@ namespace DyingAndMore.Game.Entities
             if (weapon != null && weapon.Class == thisWeapon.Class)
             {
                 weapon.Combine(thisWeapon);
-                if (!Class.OnlyDestroyWhenDepleted || thisWeapon.IsDepleted())
+                if (!_Class.OnlyDestroyWhenDepleted || thisWeapon.IsDepleted())
                 {
                     Weapon = null;
-                    NextRespawnTime = Map.ElapsedTime + Class.RespawnTime;
+                    NextRespawnTime = Map.ElapsedTime + _Class.RespawnTime;
                     Kill();
                 }
             }
@@ -84,7 +84,7 @@ namespace DyingAndMore.Game.Entities
             {
                 weapon = thisWeapon.Clone();
                 Weapon = null;
-                NextRespawnTime = Map.ElapsedTime.Add(Class.RespawnTime);
+                NextRespawnTime = Map.ElapsedTime.Add(_Class.RespawnTime);
                 Kill();
             }
 

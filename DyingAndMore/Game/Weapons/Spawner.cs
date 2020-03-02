@@ -32,7 +32,8 @@ namespace DyingAndMore.Game.Weapons
         }
         private Squad _squad;
 
-        public new SpawnerClass Class
+        [Takai.Data.Serializer.Ignored]
+        public SpawnerClass _Class
         {
             get => (SpawnerClass)base.Class;
             set => base.Class = value;

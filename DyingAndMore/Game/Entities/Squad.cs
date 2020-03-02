@@ -91,11 +91,7 @@ namespace DyingAndMore.Game.Entities
 
         public virtual void OnDestroy(MapBaseInstance map)
         {
-            foreach (var unit in Units)
-                unit.Kill();
-
-            Units.Clear();
-            Leader = null;
+            DestroyAllUnits();
         }
 
         public void Update(MapBaseInstance map, TimeSpan deltaTime)
@@ -103,7 +99,7 @@ namespace DyingAndMore.Game.Entities
             //udpate live count (remove dead units)
             for (int i = 0; i < Units.Count; ++i)
             {
-                if (!Units[i].IsAlive)
+                if (!Units[i].IsAlive || Units[i].Map != map)
                 {
                     if (Units[i] == Leader)
                     {
@@ -140,6 +136,23 @@ namespace DyingAndMore.Game.Entities
 
             if (Units.Count > liveUnits)
                 LastSpawnTime = map.ElapsedTime;
+        }
+
+        public override string ToString()
+        {
+            return nameof(Squad) + ": " + Name;
+        }
+
+        /// <summary>
+        /// Destroy all units, including the leader
+        /// </summary>
+        public void DestroyAllUnits()
+        {
+            foreach (var unit in Units)
+                unit.Kill();
+
+            Units.Clear();
+            Leader = null;
         }
     }
 }

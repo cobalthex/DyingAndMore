@@ -504,7 +504,7 @@ namespace Takai.Data
                     SkipIgnored(context.reader);
                     var staticVal = ReadWord(context.reader);
 
-                    var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveIdentifiers ? 0 :  BindingFlags.IgnoreCase));
+                    var field = type.GetField(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveIdentifiers ? 0 : BindingFlags.IgnoreCase));
                     if (field != null)
                         return field.GetValue(null);
 
@@ -706,56 +706,47 @@ namespace Takai.Data
             return destObject;
         }
 
-        public static bool IsInt(object o)
+        public static bool IsInt(Type t)
         {
-            if (o is IConvertible c)
+            switch (Type.GetTypeCode(t))
             {
-                switch (Convert.GetTypeCode(c))
-                {
-                    case TypeCode.SByte:
-                    case TypeCode.Byte:
-                    case TypeCode.Int16:
-                    case TypeCode.UInt16:
-                    case TypeCode.Int32:
-                    case TypeCode.UInt32:
-                    case TypeCode.Int64:
-                    case TypeCode.UInt64:
-                    case TypeCode.Char:
-                        return true;
-                    default:
+                case TypeCode.SByte:
+                case TypeCode.Byte:
+                case TypeCode.Int16:
+                case TypeCode.UInt16:
+                case TypeCode.Int32:
+                case TypeCode.UInt32:
+                case TypeCode.Int64:
+                case TypeCode.UInt64:
+                case TypeCode.Char:
+                    return true;
+
+                default:
+                    {
+                        var ti = t.GetTypeInfo();
+                        if (ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(Nullable<>))
+                            return IsInt(Nullable.GetUnderlyingType(t));
                         return false;
-                }
-            }
-            else
-            {
-                var ty = o.GetType();
-                var tyi = ty.GetTypeInfo();
-                if (tyi.IsGenericType && tyi.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    return IsInt(Nullable.GetUnderlyingType(ty));
-                return false;
+                    }
             }
         }
 
-        public static bool IsFloat(object o)
+        public static bool IsFloat(Type t)
         {
-            if (o is IConvertible c)
+            switch (Type.GetTypeCode(t))
             {
-                switch (Convert.GetTypeCode(c))
-                {
-                    case TypeCode.Single:
-                    case TypeCode.Double:
-                        return true;
-                    default:
+                case TypeCode.Single:
+                case TypeCode.Double:
+                //case TypeCode.Decimal:
+                    return true;
+
+                default:
+                    {
+                        var ti = t.GetTypeInfo();
+                        if (ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(Nullable<>))
+                            return IsFloat(Nullable.GetUnderlyingType(t));
                         return false;
-                }
-            }
-            else
-            {
-                var ty = o.GetType();
-                var tyi = ty.GetTypeInfo();
-                if (tyi.IsGenericType && tyi.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    return IsFloat(Nullable.GetUnderlyingType(ty));
-                return false;
+                    }
             }
         }
 
@@ -763,7 +754,7 @@ namespace Takai.Data
                                                       | BindingFlags.Instance
                                                       | BindingFlags.Public;
 
-        public static T Cast<T>(object source, DeserializationContext context = default(DeserializationContext))
+        public static T Cast<T>(object source, DeserializationContext context = default)
         {
             return (T)Cast(typeof(T), source, context);
         }
@@ -776,7 +767,7 @@ namespace Takai.Data
         /// <param name="source">The source object</param>
         /// <param name="isStrict">Should only cast between equivelent types (If true, casting int to bool would fail)</param>
         /// <returns>The correctly casted object</returns>
-        public static object Cast(Type destType, object source, DeserializationContext context = default(DeserializationContext))
+        public static object Cast(Type destType, object source, DeserializationContext context = default)
         {
             if (source == null)
                 return null;
@@ -892,7 +883,7 @@ namespace Takai.Data
 
                         for (int i = 0; i < sourceList.Count; ++i)
                             sourceList[i] = Cast(genericArgs[i], sourceList[i], context);
-                        return Activator.CreateInstance(destType,  sourceList);
+                        return Activator.CreateInstance(destType, sourceList);
                     }
 
                     //if (typeof(IEnumerable<>).IsAssignableFrom(genericType) && genericArgs.Count() == 1)
@@ -917,8 +908,8 @@ namespace Takai.Data
                         for (var i = 0; i < sourceList.Count; ++i)
                             sourceList[i] = Cast(genericArgs[0], sourceList[i], context);
                         var casted = CastMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { sourceList });
-                        //return Activator.CreateInstance(destType, new[] { casted });
                         return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
+                        //return Activator.CreateInstance(destType, new[] { casted });
                     }
                 }
             }
@@ -972,17 +963,22 @@ namespace Takai.Data
 
             bool canConvert = false;
 
-            bool isSourceInt = IsInt(source);
-            bool isSourceFloat = IsFloat(source);
+            bool isSourceInt = IsInt(sourceType);
+            bool isSourceFloat = IsFloat(sourceType);
 
-            bool isDestInt = IsInt(source);
-            bool isDestFloat = IsFloat(source);
+            bool isDestInt = IsInt(sourceType);
+            bool isDestFloat = IsFloat(sourceType);
 
             canConvert |= (isDestInt && isSourceInt);
             canConvert |= (isDestFloat || isDestInt) && (isSourceFloat || isSourceInt);
 
             if (canConvert)
+            {
+                if (destTypeInfo.IsEnum)
+                    return Enum.ToObject(destType, source);
+
                 return Convert.ChangeType(source, destType);
+            }
 
             if (destType == typeof(string))
                 return source.ToString();

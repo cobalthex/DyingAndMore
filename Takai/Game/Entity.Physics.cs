@@ -49,12 +49,14 @@ namespace Takai.Game
         /// <summary>
         /// The parent of this element for physics/collision
         /// </summary>
+        [Data.Serializer.Ignored]
         public EntityInstance WorldParent { get; internal set; } = null;
 
         /// <summary>
         /// Any entities attached to this one for physics/collisions
         /// May be null
         /// </summary>
+        [Data.Serializer.Ignored]
         public IReadOnlyList<EntityInstance> WorldChildren => _worldChildren?.AsReadOnly();
         internal List<EntityInstance> _worldChildren = null;
 
@@ -72,8 +74,10 @@ namespace Takai.Game
 
         internal Rectangle lastAABB; //used for tracking movement in spacial grid
 
+        [Data.Serializer.Ignored]
         internal Matrix localTransform = Matrix.Identity;
 
+        [Data.Serializer.Ignored]
         public Matrix Transform { get; internal set; } = Matrix.Identity;
 
         /// <summary>

@@ -277,8 +277,11 @@ namespace DyingAndMore
             });
             */
 
-            var map = Cache.Load<MapInstance>("mapsrc/hell.map.tk");
-            childUI = new Editor.Editor(map);
+            childUI = Static.GeneratePropSheet<Game.Entities.Squad>();
+            //childUI.Size = new Vector2(400, 500);
+
+            //var map = Cache.Load<MapInstance>("mapsrc/hell.map.tk");
+            //childUI = new Editor.Editor(map);
             //map.renderSettings.drawEntityForwardVectors = true;
             //map.renderSettings.drawEntityHierarchies = true;
 
@@ -303,7 +306,8 @@ namespace DyingAndMore
             //};
 
 
-            ui = new Static
+            //ui = new Static
+            ui = new ScrollBox
             {
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch,

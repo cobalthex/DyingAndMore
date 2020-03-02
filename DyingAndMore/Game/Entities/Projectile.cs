@@ -105,8 +105,8 @@ namespace DyingAndMore.Game.Entities
 
     public class ProjectileInstance : EntityInstance
     {
-        [Takai.Data.Serializer.ReadOnly]
-        public new ProjectileClass Class
+        [Takai.Data.Serializer.Ignored]
+        public ProjectileClass _Class
         {
             get => (ProjectileClass)base.Class;
             set => base.Class = value;
@@ -138,14 +138,14 @@ namespace DyingAndMore.Game.Entities
             lastPosition = Position;    
 
             if (IsAlive &&
-                (ForwardSpeed() < Class.MinimumSpeed ||
-                (Class.LifeSpan > TimeSpan.Zero && Map.ElapsedTime > SpawnTime + Class.LifeSpan) ||
-                (Class.Range != 0 && distanceTraveled > Class.Range)))
+                (ForwardSpeed() < _Class.MinimumSpeed ||
+                (_Class.LifeSpan > TimeSpan.Zero && Map.ElapsedTime > SpawnTime + _Class.LifeSpan) ||
+                (_Class.Range != 0 && distanceTraveled > _Class.Range)))
             {
                 DisableNextDestructionEffect = true;
-                if (Class.FadeEffect != null)
+                if (_Class.FadeEffect != null)
                 {
-                    var fx = Class.FadeEffect.Instantiate(this, this);
+                    var fx = _Class.FadeEffect.Instantiate(this, this);
                     Map.Spawn(fx);
                 }
                 Kill();
@@ -164,21 +164,21 @@ namespace DyingAndMore.Game.Entities
 
                         var sign = Takai.Util.Determinant(WorldForward, Vector2.Normalize(diff));
 
-                        Forward = Vector2.TransformNormal(Forward, Matrix.CreateRotationZ(sign * Class.MagnetismAnglePerSecond * (float)deltaTime.TotalSeconds));
+                        Forward = Vector2.TransformNormal(Forward, Matrix.CreateRotationZ(sign * _Class.MagnetismAnglePerSecond * (float)deltaTime.TotalSeconds));
                         Velocity = Forward * Velocity.Length();
                     }
                     else
                         CurrentMagnet = null;
                 }
-                else if (Class.MagnetismAnglePerSecond != 0 && Map?.RealTime.TotalGameTime >= nextTargetSearchTime) //? shouldnt be necessarily
+                else if (_Class.MagnetismAnglePerSecond != 0 && Map?.RealTime.TotalGameTime >= nextTargetSearchTime) //? shouldnt be necessarily
                 {
                     CurrentMagnet = FindTarget();
                     nextTargetSearchTime = Map.RealTime.TotalGameTime + TimeSpan.FromMilliseconds(50); //store delay in editor config?
                 }
 
-                if (Class.DirectionMod != null)
+                if (_Class.DirectionMod != null)
                 {
-                    var newDirection = Class.DirectionMod.GetNextDirection(distanceTraveled, Forward, ForwardSpeed(), randomSeed, (float)deltaTime.TotalSeconds);
+                    var newDirection = _Class.DirectionMod.GetNextDirection(distanceTraveled, Forward, ForwardSpeed(), randomSeed, (float)deltaTime.TotalSeconds);
                     Forward = newDirection;
                     Velocity = Forward * Velocity.Length();
                 }
@@ -198,7 +198,7 @@ namespace DyingAndMore.Game.Entities
 
             int n = 0;
             //search out in triangle?
-            foreach (var sector in Map.TraceSectors(WorldPosition, WorldForward, Class.Range))
+            foreach (var sector in Map.TraceSectors(WorldPosition, WorldForward, _Class.Range))
             {
                 ++n;
                 foreach (var ent in sector.entities)
@@ -232,7 +232,7 @@ namespace DyingAndMore.Game.Entities
         public override void OnSpawn(MapBaseInstance map)
         {
             lastPosition = Position;
-            if (Class.InheritSourcePhysics && Source != null) //todo: this should be part of entity spawning?
+            if (_Class.InheritSourcePhysics && Source != null) //todo: this should be part of entity spawning?
             {
                 Velocity += Source.Velocity;
             }
@@ -248,11 +248,11 @@ namespace DyingAndMore.Game.Entities
             //effects scalars? (multiply x by damage)
 
             if (collider is ActorInstance actor &&
-                (collider != Source || Class.CanDamageSource))
+                (collider != Source || _Class.CanDamageSource))
             {
-                actor.ReceiveDamage(Class.Damage, Source);
+                actor.ReceiveDamage(_Class.Damage, Source);
 
-                if (Class.SuperCombineCount > 0 && actor.WorldChildren != null)
+                if (_Class.SuperCombineCount > 0 && actor.WorldChildren != null)
                 {
                     int combined = 0;
                     foreach (var attachment in actor.WorldChildren)
@@ -261,9 +261,9 @@ namespace DyingAndMore.Game.Entities
                             ++combined;
                     }
 
-                    if (combined >= Class.SuperCombineCount)
+                    if (combined >= _Class.SuperCombineCount)
                     {
-                        actor.Map.Spawn(Class.SuperCombineEffect.Instantiate(Source, actor));
+                        actor.Map.Spawn(_Class.SuperCombineEffect.Instantiate(Source, actor));
                         foreach (var attachment in actor.WorldChildren)
                         {
                             if (attachment.Class == Class)
