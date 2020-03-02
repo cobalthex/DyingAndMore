@@ -162,7 +162,7 @@ namespace Takai.UI
     /// <summary>
     /// The basic UI element
     /// </summary>
-    public class Static : Data.IDerivedDeserialize
+    public partial class Static : Data.IDerivedDeserialize
     {
         #region Events + Command Definitions
 
@@ -2326,119 +2326,6 @@ namespace Takai.UI
                 deviceIndex = deviceIndex
             };
             BubbleEvent(ClickEvent, ce);
-        }
-
-        public static Static GeneratePropSheet(object obj)
-        {
-            var root = new List() { Margin = 2, Direction = Direction.Vertical };
-
-            var type = obj.GetType();
-            var typeInfo = type.GetTypeInfo();
-
-            if (typeInfo.IsEnum)
-            {
-                var @enum = obj as System.Enum;
-                var enumValues = System.Enum.GetNames(type);
-                foreach (var flag in enumValues)
-                {
-                    var value = (System.Enum)System.Enum.Parse(type, flag);
-                    if (System.Convert.ToUInt64(value) != 0)
-                    {
-                        var check = new CheckBox()
-                        {
-                            Name = flag,
-                            Text = Util.ToSentenceCase(flag),
-                            IsChecked = @enum.HasFlag(value)
-                        };
-                        check.On(ClickEvent, delegate (Static sender, UIEventArgs e)
-                        {
-                            throw new System.NotImplementedException(); //verify that the code below works
-
-                            var chkbx = (CheckBox)sender;
-                            var parsed = System.Convert.ToUInt64(System.Enum.Parse(type, chkbx.Name));
-                            var n = System.Convert.ToUInt64(@enum);
-
-                            if (chkbx.IsChecked)
-                                obj = System.Enum.ToObject(type, n | parsed);
-                            else
-                                obj = System.Enum.ToObject(type, n & ~parsed);
-
-                            return UIEventResult.Handled;
-                        });
-                        root.AddChild(check);
-                    }
-                }
-                return root;
-            }
-
-            //todo: item spacing (can't use list margin without nesting)
-
-            var members = type.GetMembers(BindingFlags.Instance | BindingFlags.Public);
-
-            //todo: move these into type handlers
-            foreach (var member in members)
-            {
-                System.Type mt;
-                if (member is FieldInfo fi)
-                    mt = fi.FieldType;
-                else if (member is PropertyInfo pi)
-                    mt = pi.PropertyType;
-                else
-                    continue;
-
-                if (mt == typeof(bool))
-                {
-                    var checkbox = new CheckBox
-                    {
-                        Text = Util.ToSentenceCase(member.Name),
-                        Bindings = new List<Data.Binding>
-                        {
-                            new Data.Binding(member.Name, "IsChecked", Data.BindingDirection.TwoWay)
-                        }
-                    };
-                    checkbox.BindTo(obj);
-                    root.AddChild(checkbox);
-                    continue;
-                }
-
-                root.AddChild(new Static(Util.ToSentenceCase(member.Name))); //label
-
-                if (Data.Serializer.IsInt(member) ||
-                    Data.Serializer.IsFloat(member))
-                {
-                    var numeric = new NumericInput
-                    {
-                        Bindings = new List<Data.Binding>
-                        {
-                            new Data.Binding(member.Name, "Value", Data.BindingDirection.TwoWay)
-                        }
-                    };
-                    numeric.BindTo(obj);
-                    root.AddChild(numeric);
-                }
-                else if (mt == typeof(string))
-                {
-                    var text = new TextInput
-                    {
-                        Bindings = new List<Data.Binding>
-                        {
-                            new Data.Binding(member.Name, "Text", Data.BindingDirection.TwoWay)
-                        }
-                    };
-                    text.BindTo(obj);
-                    root.AddChild(text);
-                }
-                else if (mt == typeof(Dictionary<,>))
-                {
-                    //todo
-                }
-                else if (mt == typeof(IEnumerable<>))
-                {
-                    //todo: must generate for list not object
-                }
-            }
-
-            return root;
         }
 
         #endregion

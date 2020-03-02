@@ -542,10 +542,10 @@ namespace DyingAndMore.Game
 #if DEBUG
                 foreach (var ent in Map.ActiveEntities)
                 {
-                    if (ent is Entities.ActorInstance actor && actor.Class.MaxHealth > 0 && ent.IsAlive)
+                    if (ent is Entities.ActorInstance actor && actor._Class.MaxHealth > 0 && ent.IsAlive)
                     {
                         var pos = player.camera.WorldToScreen(ent.WorldPosition - new Vector2(0, ent.Radius + 16));
-                        DrawHealthBar(spriteBatch, pos, actor.CurrentHealth, actor.Class.MaxHealth);
+                        DrawHealthBar(spriteBatch, pos, actor.CurrentHealth, actor._Class.MaxHealth);
                     }
                 }
 #endif
@@ -559,7 +559,7 @@ namespace DyingAndMore.Game
                     new Vector2(player.camera.Viewport.Left, player.camera.Viewport.Bottom)
                 );
                 Font.Draw(spriteBatch,
-                    $"Health:{player.actor.CurrentHealth}/{player.actor.Class.MaxHealth}\n" +
+                    $"Health:{player.actor.CurrentHealth}/{player.actor._Class.MaxHealth}\n" +
                     $"Weapon:{player.actor.Weapon}",
                     new Vector2(player.camera.Viewport.Left + 10, player.camera.Viewport.Top + 10),
                     Color.Cyan
@@ -582,7 +582,12 @@ namespace DyingAndMore.Game
             var particleCount = 0;
             foreach (var ptype in Map.Particles)
                 particleCount += ptype.Value.Count;
-
+            
+            foreach (var squad in Map.Squads)
+            {
+                Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, Color.Cyan, 2);
+                Font.Draw(spriteBatch, squad.Name, players[0].camera.WorldToScreen(squad.SpawnPosition), Color.White);
+            }
 
             DebugPropertyDisplay.AddRow("Total entities", Map.AllEntities.Count());
             DebugPropertyDisplay.AddRow("Active entities", Map.UpdateStats.updatedEntities);

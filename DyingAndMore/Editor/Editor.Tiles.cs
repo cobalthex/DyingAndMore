@@ -11,7 +11,7 @@ namespace DyingAndMore.Editor
         bool isPosSaved = false;
         Vector2 savedWorldPos, lastWorldPos, currentWorldPos;
 
-        short[,] clipboard;
+        //short[,] clipboard;
 
         public TilesEditorMode(Editor editor)
             : base("Tiles", editor, new Selectors.TileSelector(editor.Map.Class.Tileset))

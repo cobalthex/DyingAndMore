@@ -76,9 +76,8 @@ namespace DyingAndMore.Editor
 
             selectorDrawer = new Drawer
             {
-                Position = new Vector2(10),
-                Size = new Vector2(400, 400),
-                BackgroundColor = Color.Gray,
+                Size = new Vector2(400, float.NaN),
+                BackgroundColor = new Color(48, 48, 48, 192),
                 HorizontalAlignment = Alignment.Right,
                 VerticalAlignment = Alignment.Stretch,
                 IsEnabled = false

@@ -48,4 +48,32 @@ namespace DyingAndMore.Game
             return nameof(SpawnSquadCommand) + $" - Squad: {SquadName}";
         }
     }
+
+    class DestroySquadUnitsCommand : ICommand
+    {
+        string ICommand.ActionName { get; set; }
+        object ICommand.ActionParameter { get; set; }
+
+        public string SquadName { get; set; } = null;
+
+        public void Invoke(MapBaseInstance map)
+        {
+            var minst = (MapInstance)map;
+            if (minst == null)
+                return;
+            foreach (var squad in minst.Squads)
+            {
+                if (squad.Name == SquadName)
+                {
+                    squad.DestroyAllUnits();
+                    break;
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            return nameof(DestroySquadUnitsCommand) + $" - Squad: {SquadName}";
+        }
+    }
 }

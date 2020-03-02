@@ -113,6 +113,7 @@
     <Compile Include="UI\EnumSelect.cs" />
     <Compile Include="UI\FileInput.cs" />
     <Compile Include="UI\FileList.cs" />
+    <Compile Include="UI\Generator.cs" />
     <Compile Include="UI\Graphic.cs" />
     <Compile Include="UI\ItemList.cs" />
     <Compile Include="UI\ObjectSelect.cs" />

@@ -394,7 +394,7 @@ namespace Takai.UI
             if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
             {
                 var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition;
-                DrawVLine(spriteBatch, Color, x + 1, 0, ContentArea.Height);
+                DrawVLine(spriteBatch, Color, x + 3, 2, ContentArea.Height - 2);
             }
         }
     }

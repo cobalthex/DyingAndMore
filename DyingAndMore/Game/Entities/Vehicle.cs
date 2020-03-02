@@ -11,8 +11,8 @@ namespace DyingAndMore.Game.Entities
 
     public class VehicleInstance : EntityInstance
     {
-        [Takai.Data.Serializer.ReadOnly]
-        public new VehicleClass Class
+        [Takai.Data.Serializer.Ignored]
+        public VehicleClass _Class
         {
             get => (VehicleClass)base.Class;
             set => base.Class = value;
