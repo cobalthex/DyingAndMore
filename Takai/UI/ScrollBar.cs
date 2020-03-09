@@ -279,7 +279,8 @@ namespace Takai.UI
 
             var thumb = GetThumbBounds();
             thumb.Offset(OffsetContentArea.Location);
-            Graphics.Primitives2D.DrawFill(spriteBatch, Color, Rectangle.Intersect(VisibleContentArea, thumb));
+            thumb = Rectangle.Intersect(VisibleContentArea, thumb);
+            Graphics.Primitives2D.DrawFill(spriteBatch, Color, thumb);
             ThumbSprite.Draw(spriteBatch, thumb);
         }
     }

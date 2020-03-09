@@ -161,11 +161,11 @@ namespace DyingAndMore.Game.Entities.Behaviors
             new Point( 1,  1),
         };
 
-        List<Point> minimums = new List<Point>(8);
+        List<Point> possibles = new List<Point>(8);
         public override void Think(TimeSpan deltaTime)
         {
             var min = uint.MaxValue;
-            minimums.Clear();
+            possibles.Clear();
             var pos = (AI.Actor.WorldPosition / AI.Actor.Map.Class.TileSize).ToPoint();
             foreach (var dir in NavigationDirections)
             {
@@ -175,21 +175,18 @@ namespace DyingAndMore.Game.Entities.Behaviors
                 var h = AI.Actor.Map.PathInfo[target.Y, target.X].heuristic;
                 if (h < min)
                 {
-                    minimums.Clear();
-                    minimums.Add(dir);
+                    possibles.Clear();
+                    possibles.Add(dir);
                     min = h;
                 }
                 else if (h == min)
-                    minimums.Add(dir);
+                    possibles.Add(dir);
             }
 
-            var next = Vector2.Normalize(minimums[0].ToVector2());
+            //todo: support moving to higher ground
 
-            //todo: fix/verify for nested objects
-            AI.Actor.Forward = Vector2.Lerp(AI.Actor.Forward, next, MathHelper.PiOver2 * (float)deltaTime.TotalSeconds); //factor in speed (tighter turns over speed)
-            AI.Actor.Forward.Normalize();
-
-            //AI.Actor.Forward = next.ToVector2();
+            var next = Vector2.Normalize(possibles[0].ToVector2());
+            AI.Actor.TurnTowards(next, deltaTime);
             AI.Actor.Accelerate(AI.Actor.Forward);
         }
     }
@@ -267,3 +264,5 @@ namespace DyingAndMore.Game.Entities.Behaviors
         }
     }
 }
+
+// A*/similar navigation

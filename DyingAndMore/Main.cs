@@ -277,37 +277,38 @@ namespace DyingAndMore
             });
             */
 
-            childUI = Static.GeneratePropSheet<Game.Entities.Squad>();
+            //sp = new Takai.Graphics.Sprite();
+            //childUI = Static.GeneratePropSheet(sp);
             //childUI.Size = new Vector2(400, 500);
-
-            //var map = Cache.Load<MapInstance>("mapsrc/hell.map.tk");
-            //childUI = new Editor.Editor(map);
-            //map.renderSettings.drawEntityForwardVectors = true;
-            //map.renderSettings.drawEntityHierarchies = true;
-
-            //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
-            //if (ui is Game.StorySelect ss)
-            //{
-            //    ss.StorySelected += delegate (object _sender, Game.GameStory story)
-            //    {
-            //        //var game = new Game.Game
-            //        //{
-            //        //    Story = story,
-            //        //};
-            //        //game.LoadNextStoryMap();
-            //        //ui.ReplaceAllChildren(new Game.GameInstance(game));
-            //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
-            //    };
-            //}
 
             //childUI = new UI.UIDesigner()
             //{
             //    Size = new Vector2(3000, 2000)
             //};
 
+            var map = Cache.Load<MapInstance>("mapsrc/hell.map.tk");
+            childUI = new Editor.Editor(map);
+            map.renderSettings.drawEntityForwardVectors = true;
+            map.renderSettings.drawEntityHierarchies = true;
 
-            //ui = new Static
-            ui = new ScrollBox
+            //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
+            //if (ui is Game.StorySelect ss)
+            //{
+            //    ss.StorySelected += delegate (object _sender, Game.GameStory story)
+            //    {
+            //        var game = new Game.Game
+            //        {
+            //            Story = story,
+            //        };
+            //        game.LoadNextStoryMap();
+            //        ui.ReplaceAllChildren(new Game.GameInstance(game));
+            //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
+            //    };
+            //}
+
+
+            ui = new Static
+            //ui = new ScrollBox
             {
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch,
@@ -332,7 +333,7 @@ namespace DyingAndMore
             ui.HasFocus = true;
             base.Initialize();
         }
-
+        Takai.Graphics.Sprite sp;
         protected override void Update(GameTime gameTime)
         {
             Takai.DebugPropertyDisplay.Reset();

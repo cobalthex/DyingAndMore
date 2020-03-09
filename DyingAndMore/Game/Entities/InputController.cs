@@ -72,7 +72,7 @@ namespace DyingAndMore.Game.Entities
                 faceDirection.Y = magnitude;
 
             if (faceDirection != Vector2.Zero)
-                Actor.TurnTowards(Vector2.Normalize(faceDirection));
+                Actor.Forward = Vector2.Normalize(faceDirection); //todo: RealForward?
             Actor.Accelerate(moveDirection);
 
             Inputs.CurrentInputs.Clear();

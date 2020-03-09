@@ -266,9 +266,10 @@ namespace DyingAndMore.Game.Entities
             Controller?.OnFluidCollision(fluid, deltaTime);
         }
 
-        public virtual void TurnTowards(Vector2 direction)
+        public virtual void TurnTowards(Vector2 direction, TimeSpan deltaTime)
         {
-            Forward = direction; //todo: slerp?
+            //slerp?
+            Forward = Vector2.Normalize(Vector2.Lerp(Forward, direction, MathHelper.PiOver2 * (float)deltaTime.TotalSeconds));
         }
 
         public virtual void Accelerate(Vector2 direction)
@@ -344,6 +345,16 @@ namespace DyingAndMore.Game.Entities
         public bool IsAlliedWith(Factions factions)
         {
             return (Factions & factions) != Factions.None;
+        }
+
+        /// <summary>
+        /// The distance between this entity and another (excluding radii), in world units
+        /// </summary>
+        /// <param name="entity">The entity to check distance against</param>
+        /// <returns>The distance</returns>
+        public float DistanceBetween(EntityInstance entity)
+        {
+            return Vector2.Distance(WorldPosition, entity.WorldPosition) - Radius - entity.Radius;
         }
 
         #endregion

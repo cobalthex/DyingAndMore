@@ -29,9 +29,9 @@ namespace DyingAndMore.Game.Entities
 
     public enum BehaviorFilters : uint
     {
-        None           = 0b0000,
-        RequiresTarget = 0b0001,
-        RequiresParent = 0b0010,
+        None               = 0b00000000,
+        RequiresTarget     = 0b00000001,
+        RequiresParent     = 0b00010000,
     }
 
     public abstract class Behavior
@@ -51,6 +51,8 @@ namespace DyingAndMore.Game.Entities
         [Takai.Data.Serializer.Ignored]
         public virtual BehaviorFilters Filter => BehaviorFilters.None;
 
+        public Range<TimeSpan> ActiveTime { get; set; } = TimeSpan.FromSeconds(2);
+
         /// <summary>
         /// Calculate the priority of this action. Return <see cref="BehaviorPriority.Never"/> to disregard
         /// The behavior with the highest priority will be chosen
@@ -68,25 +70,17 @@ namespace DyingAndMore.Game.Entities
 
     public class AIController : Controller
     {
-        public struct PrioritizedBehavior
+        protected struct ChosenBehavior
         {
-            public BehaviorPriority priority;
             public Behavior behavior;
-
-            public PrioritizedBehavior(BehaviorPriority priority, Behavior behavior)
-            {
-                this.priority = priority;
-                this.behavior = behavior;
-            }
+            public BehaviorPriority priority;
+            public TimeSpan endTime;
         }
 
         public List<Behavior> Behaviors { get; set; }
 
-        List<PrioritizedBehavior>[] behaviorCosts
-            = new List<PrioritizedBehavior>[(int)BehaviorMask._Count_];
-
         [Takai.Data.Serializer.Ignored]
-        public Behavior[] ChosenBehaviors { get; set; } = new Behavior[(int)BehaviorMask._Count_];
+        protected ChosenBehavior[] chosenBehaviors = new ChosenBehavior[(int)BehaviorMask._Count_];
 
         [Takai.Data.Serializer.AsReference]
         public ActorInstance Target
@@ -94,6 +88,8 @@ namespace DyingAndMore.Game.Entities
             get => _target;
             set => SetNextTarget(value);
         }
+
+        public uint TargetFlowSeekValue { get; set; } = 0;
 
         private ActorInstance _target, nextTarget;
         private bool isNextTargetSet;
@@ -110,8 +106,6 @@ namespace DyingAndMore.Game.Entities
 
         public AIController()
         {
-            for (int i = 0; i < behaviorCosts.Length; ++i)
-                behaviorCosts[i] = new List<PrioritizedBehavior>();
         }
 
         public override string ToString()
@@ -120,14 +114,26 @@ namespace DyingAndMore.Game.Entities
         }
         public override void Think(TimeSpan deltaTime)
         {
-            if (GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isAiEnabled)
+            if ((GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isAiEnabled) ||
+                Actor.Map == null) //this shouldnt be necessary
                 return;
 
             if (isNextTargetSet)
             {
                 _target = nextTarget;
-                TargetTime = Actor.Map?.ElapsedTime ?? TimeSpan.Zero;
+                TargetTime = Actor.Map.ElapsedTime;
                 isNextTargetSet = false;
+
+                if (_target == null)
+                {
+                    for (int i = 0; i < chosenBehaviors.Length; ++i)
+                    {
+                        if (chosenBehaviors[i].behavior != null &&
+                            (chosenBehaviors[i].behavior.Filter & BehaviorFilters.RequiresTarget) == 0)
+                            chosenBehaviors[i].behavior = null;
+                        System.Diagnostics.Debug.WriteLine("@" + chosenBehaviors[i].behavior?.GetType().Name);
+                    } //todo: repeat for any filter
+                }
             }
 
             var filters = BehaviorFilters.None;
@@ -136,7 +142,8 @@ namespace DyingAndMore.Game.Entities
             if (Actor.WorldParent != null)
                 filters |= BehaviorFilters.RequiresParent;
 
-            foreach (var behavior in Behaviors)
+            System.Diagnostics.Debug.WriteLine("-- " + filters);
+            foreach (var behavior in Behaviors) //allow higher priority behaviors to co-opt
             {
                 behavior.AI = this;
 
@@ -150,34 +157,35 @@ namespace DyingAndMore.Game.Entities
                 if (priority == BehaviorPriority.Never)
                     continue;
 
-                if (behaviorCosts[mask].Count > 0)
+                if (chosenBehaviors[mask].behavior != null)
                 {
-                    if (priority < behaviorCosts[mask][0].priority)
+                    if (Actor.Map.ElapsedTime >= chosenBehaviors[mask].endTime)
+                        chosenBehaviors[mask].behavior = null;
+                    else if (priority <= chosenBehaviors[mask].priority)
                         continue;
-
-                    if (priority > behaviorCosts[mask][0].priority)
-                        behaviorCosts[mask].Clear();
                 }
-                behaviorCosts[mask].Add(new PrioritizedBehavior(priority, behavior));
+                if (Util.RandomGenerator.Next(0, 10) < 4) //todo: make this make sense
+                {
+                    chosenBehaviors[mask] = new ChosenBehavior
+                    {
+                        behavior = behavior,
+                        priority = priority,
+                        endTime = Actor.Map.ElapsedTime + behavior.ActiveTime.Random()
+                    };
+                }
             }
 
-            for (int i = 0; i < behaviorCosts.Length; ++i)
+            foreach (var behavior in chosenBehaviors)
             {
-                if (behaviorCosts[i].Count > 0)
-                {
-                    var choice = Util.RandomGenerator.Next(0, behaviorCosts[i].Count);
-                    ChosenBehaviors[i] = behaviorCosts[i][choice].behavior;
-                    ChosenBehaviors[i].Think(deltaTime);
-                    behaviorCosts[i].Clear();
-                }
+                if (behavior.behavior == null)
+                    continue;
+
+                //todo: this shouldnt be necessaryh
+                var behaviorFilters = behavior.behavior.Filter;
+                if ((filters & behaviorFilters) != behaviorFilters)
+                    continue;
+                behavior.behavior.Think(deltaTime);
             }
         }
     }
 }
-
-
-/*
- * target finding based on origins for flow field
- * navigate using flow field
- * navigate using A*
-*/

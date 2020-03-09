@@ -79,30 +79,33 @@ namespace Takai.UI
                 if (member.IsDefined(typeof(Serializer.IgnoredAttribute)))
                     continue;
 
-                Type mt;
+                Type memberType;
                 var fi = member as FieldInfo;
                 var pi = member as PropertyInfo;
+                object memberVal;
                 if (fi != null)
                 {
                     if (fi.IsInitOnly)
                         continue;
-                    mt = fi.FieldType;
+                    memberType = fi.FieldType;
+                    memberVal = fi.GetValue(obj);
                 }
                 else if (pi != null)
                 {
                     if (!pi.CanWrite)
                         continue;
-                    mt = pi.PropertyType;
+                    memberType = pi.PropertyType;
+                    memberVal = pi.GetValue(obj);
                 }
                 else
                     continue;
 
-                if (mt == typeof(Type))
+                if (memberType == typeof(Type))
                     continue;
 
                 root.AddChild(new Static(Util.ToSentenceCase(member.Name))); //label
 
-                if (typeof(ISerializeExternally).IsAssignableFrom(mt))
+                if (typeof(ISerializeExternally).IsAssignableFrom(memberType))
                 {
                     var input = new FileInput
                     {
@@ -112,7 +115,7 @@ namespace Takai.UI
                     root.AddChild(input);
                 }
 
-                else if (mt == typeof(bool))
+                else if (memberType == typeof(bool))
                 {
                     var checkbox = new CheckBox
                     {
@@ -125,8 +128,8 @@ namespace Takai.UI
                     root.AddChild(checkbox);
                 }
 
-                else if (Serializer.IsInt(mt) ||
-                    Serializer.IsFloat(mt))
+                else if (Serializer.IsInt(memberType) ||
+                    Serializer.IsFloat(memberType))
                 {
                     var input = new NumericInput
                     {
@@ -139,7 +142,7 @@ namespace Takai.UI
                     input.BindTo(obj);
                     root.AddChild(input);
                 }
-                else if (mt == typeof(string))
+                else if (memberType == typeof(string))
                 {
                     var input = new TextInput
                     {
@@ -152,7 +155,7 @@ namespace Takai.UI
                     input.BindTo(obj);
                     root.AddChild(input);
                 }
-                else if (mt == typeof(TimeSpan))
+                else if (memberType == typeof(TimeSpan))
                 {
                     var input = new DurationInput
                     {
@@ -165,17 +168,17 @@ namespace Takai.UI
                     input.BindTo(obj);
                     root.AddChild(input);
                 }
-                else if (mt.IsEnum)
+                else if (memberType.IsEnum)
                 {
                     //todo
                     root.AddChild(new Static("(Enum)"));
                 }
-                else if (mt.IsGenericType)
+                else if (memberType.IsGenericType)
                 {
-                    var genericType = mt.GetGenericTypeDefinition();
+                    var genericType = memberType.GetGenericTypeDefinition();
                     if (genericType == typeof(List<>)) //todo: make this work for any ienumerable
                     {
-                        var gt = mt.GenericTypeArguments[0];
+                        var gt = memberType.GenericTypeArguments[0];
 
                         var tList = typeof(ItemList<>).MakeGenericType(gt);
                         var list = Activator.CreateInstance(tList);
@@ -203,14 +206,14 @@ namespace Takai.UI
                     }
                     //Dictionary
                     else
-                        root.AddChild(new Static($"({genericType.Name}<{(string.Join(",", (object[])mt.GenericTypeArguments))}>)"));
+                        root.AddChild(new Static($"({genericType.Name}<{(string.Join(",", (object[])memberType.GenericTypeArguments))}>)"));
                 }
-                else if (mt.IsArray)
+                else if (memberType.IsArray)
                 {
                     root.AddChild(new Static("(Array)"));
                 }
                 else
-                    root.AddChild(GeneratePropSheet(mt, default) ?? new Static("?"));
+                    root.AddChild(GeneratePropSheet(memberType, memberVal) ?? new Static("?"));
             }
 
             return root;

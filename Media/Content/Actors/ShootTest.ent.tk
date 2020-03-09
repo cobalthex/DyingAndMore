@@ -13,7 +13,9 @@ ActorClass {
     DefaultController: [AIController {
         Behaviors: [
             TargetEnemyBehavior {};
-            FlowSeekBehavior {};
+            OrbitBehavior {
+                DesiredDistance: 200;
+            };
             ShootBehavior {};
         ];
     }];
