@@ -11,7 +11,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
     /// </summary>
     public class OrbitBehavior : Behavior
     {
-        public float DesiredRadius { get; set; } = 100; // include parent and self radius in this distance? (dist between edges or dist between centers)
+        public float DesiredDistance { get; set; } = 150; // include parent and self radius in this distance? (dist between edges or dist between centers)
 
         /// <summary>
         /// How fast to turn towards the desired orbit radius
@@ -20,8 +20,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
         public float TurnSpeed = MathHelper.Pi;
 
         public override BehaviorMask Mask => BehaviorMask.Movement;
-
-        //public override BehaviorFilters Filter => BehaviorFilters.RequiresParent;
+        public override BehaviorFilters Filter => BehaviorFilters.RequiresTarget;
 
         public override BehaviorPriority CalculatePriority()
         {
@@ -30,28 +29,30 @@ namespace DyingAndMore.Game.Entities.Behaviors
 
         public override void Think(TimeSpan deltaTime)
         {
-            Vector2 origin = new Vector2(0); //make this programatic?
+            var origin = AI.Target.WorldPosition;
+                //new Vector2(0); //orbit around parent
 
             var diff = origin - AI.Actor.Position;
             var diffLen = diff.Length();
-            if (diffLen > DesiredRadius)
+            //var diffSpacing = difflen - ai.actor.radius - ai.target.radius :: use below and in a
+            if (diffLen > DesiredDistance)
             {
-                var a = (float)Math.Asin(DesiredRadius / diffLen);
+                var a = (float)Math.Asin(DesiredDistance / diffLen);
                 var b = Takai.Util.Angle(diff); //can this be optimized? (w/ above)
 
                 float t;
                 Vector2 tr;
 
-                var det = Takai.Util.Determinant(AI.Actor.Forward, Vector2.Normalize(diff)); //normalize necessary?
+                var det = Takai.Util.Determinant(AI.Actor.Forward, diff / diffLen); //normalize necessary?
                 if (det > 0)
                 {
                     t = b - a;
-                    tr = new Vector2((float)Math.Sin(t), (float)-Math.Cos(t)) * DesiredRadius;
+                    tr = new Vector2((float)Math.Sin(t), (float)-Math.Cos(t)) * DesiredDistance;
                 }
                 else
                 {
                     t = b + a;
-                    tr = new Vector2((float)-Math.Sin(t), (float)Math.Cos(t)) * DesiredRadius;
+                    tr = new Vector2((float)-Math.Sin(t), (float)Math.Cos(t)) * DesiredDistance;
                 }
 
                 var tangentDir = Vector2.Normalize((origin + tr) - AI.Actor.Position);
@@ -59,11 +60,10 @@ namespace DyingAndMore.Game.Entities.Behaviors
                 var cross = Takai.Util.Determinant(AI.Actor.Forward, tangentDir);
                 float angle = TurnSpeed * cross * (float)deltaTime.TotalSeconds;
 
+                //turn towards?
                 AI.Actor.Forward = Vector2.TransformNormal(AI.Actor.Forward, Matrix.CreateRotationZ(angle));
             }
             AI.Actor.Accelerate(AI.Actor.Forward);
         }
     }
 }
-
-//r x (o - r)
