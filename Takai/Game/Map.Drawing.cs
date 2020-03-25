@@ -87,6 +87,16 @@ namespace Takai.Game
             AlphaBlendFunction = BlendFunction.Add
         };
 
+        internal static readonly BlendState FluidBlendState = new BlendState
+        {
+            ColorBlendFunction = BlendFunction.Add,
+            ColorSourceBlend = Blend.SourceAlpha,
+            ColorDestinationBlend = Blend.InverseSourceAlpha,
+            AlphaSourceBlend = Blend.SourceAlpha,
+            AlphaDestinationBlend = Blend.One,
+            AlphaBlendFunction = BlendFunction.Add
+        };
+
         public Texture2D TilesImage
         {
             get => _tilesImage;
@@ -516,7 +526,7 @@ namespace Takai.Game
             {
                 //todo: reflections aren't scaled correctly
 
-                context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, Class.stencilRead, null, Class.fluidEffect);
+                context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, Class.stencilRead, null, Class.fluidEffect);
                 Class.fluidEffect.Parameters["Mask"].SetValue(Class.reflectionRenderTarget);
                 Class.fluidEffect.Parameters["Reflection"].SetValue(renderSettings.drawReflections ? Class.reflectedRenderTarget : null);
                 context.spriteBatch.Draw(Class.fluidsRenderTarget, Vector2.Zero, Color.White);
@@ -620,7 +630,9 @@ namespace Takai.Game
 
         public void DrawFluids(ref RenderContext c)
         {
-            c.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, null, null, null, Class.reflectionEffect, c.cameraTransform);
+            c.spriteBatch.Begin(SpriteSortMode.Deferred, MapBaseClass.FluidBlendState, null, null, null, Class.reflectionEffect, c.cameraTransform);
+
+            //todo: might be double drawing in certain camera spots
 
             //inactive fluids
             for (var y = c.visibleSectors.Top; y < c.visibleSectors.Bottom; ++y)
@@ -633,7 +645,7 @@ namespace Takai.Game
                         Class.reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
 
                         var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
-                        c.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, new Color(1, 1, 1, fluid.Class.Alpha), 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
+                        c.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, Color.White, 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
                     }
                 }
             }
@@ -644,7 +656,7 @@ namespace Takai.Game
                 Class.reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
 
                 var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
-                c.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, new Color(1, 1, 1, fluid.Class.Alpha), 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
+                c.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, Color.White, 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
             }
 
             c.spriteBatch.End();

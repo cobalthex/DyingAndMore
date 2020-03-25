@@ -21,8 +21,8 @@ namespace Takai.UI
                 ColumnCount = 2,
                 Margin = new Vector2(5),
                 Padding = new Vector2(5),
-                BorderColor = Color.White,
-                BackgroundColor = new Color(1, 1, 1, 0.1f)
+                BackgroundColor = new Color(1, 1, 1, 0.1f),
+                Style = "Frame"
             };
 
             if (obj == default)

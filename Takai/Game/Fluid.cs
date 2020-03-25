@@ -25,11 +25,6 @@ namespace Takai.Game
         public Texture2D Reflection { get; set; }
 
         /// <summary>
-        /// The alpha value to draw the texture with
-        /// </summary>
-        public float Alpha { get; set; } = 1;
-
-        /// <summary>
         /// The scale of the textures. Does not affect radius
         /// </summary>
         public float Scale { get; set; } = 1;

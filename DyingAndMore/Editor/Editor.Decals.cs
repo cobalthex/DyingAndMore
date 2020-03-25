@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Takai.Input;
 using Takai.UI;
+using Takai;
 
 namespace DyingAndMore.Editor
 {
@@ -13,6 +14,10 @@ namespace DyingAndMore.Editor
 
         Vector2 currentWorldPos, lastWorldPos;
         //todo: start,end to update selected
+
+        bool isBatchDeleting = false;
+        Vector2 savedWorldPos;
+        Rectangle deleteRect;
 
         public DecalsEditorMode(Editor editor)
             : base("Decals", editor)
@@ -136,6 +141,38 @@ namespace DyingAndMore.Editor
                 }
 
                 //todo: clone
+            }
+
+            if (InputState.IsPress(Keys.X))
+            {
+                isBatchDeleting = true;
+                savedWorldPos = currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+                if (float.IsNaN(currentWorldPos.X) || float.IsNaN(currentWorldPos.Y))
+                {
+                    savedWorldPos = currentWorldPos = new Vector2();
+                }
+                return false;
+            }
+
+            if (isBatchDeleting)
+            {
+                deleteRect = Util.AbsRectangle(savedWorldPos, currentWorldPos);
+                editor.Map.DrawRect(deleteRect, Color.Red);
+            }
+
+            if (InputState.IsClick(Keys.X))
+            {
+                isBatchDeleting = false;
+                foreach (var sector in editor.Map.EnumeratateSectorsInRegion(deleteRect))
+                {
+                    for (int i = 0; i < sector.decals.Count; ++i)
+                    {
+                        if (deleteRect.Contains(sector.decals[i].position)) //todo: check texture bounds?
+                            sector.decals.SwapAndDrop(i--);
+                    }
+                }
+
+                return false;
             }
 
             return base.HandleInput(time);
