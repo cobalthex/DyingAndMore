@@ -153,6 +153,17 @@ namespace Takai
             return array;
         }
 
+        public static T SwapAndDrop<T>(this System.Collections.Generic.IList<T> list, int index)
+        {
+            if (index < 0 || index >= list.Count)
+                throw new IndexOutOfRangeException($"{nameof(index)} must be within the bounds of {nameof(list)}");
+
+            var drop = list[index];
+            list[index] = list[list.Count - 1];
+            list.RemoveAt(list.Count - 1);
+            return drop;
+        }
+
         public static Vector2 Reject(this Vector2 a, Vector2 b)
         {
             var ab = Vector2.Dot(a, b);

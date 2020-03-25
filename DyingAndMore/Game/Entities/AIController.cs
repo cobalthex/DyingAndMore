@@ -180,7 +180,7 @@ namespace DyingAndMore.Game.Entities
                 if (behavior.behavior == null)
                     continue;
 
-                //todo: this shouldnt be necessaryh
+                //todo: this shouldnt be necessary
                 var behaviorFilters = behavior.behavior.Filter;
                 if ((filters & behaviorFilters) != behaviorFilters)
                     continue;

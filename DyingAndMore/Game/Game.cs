@@ -186,8 +186,7 @@ namespace DyingAndMore.Game
                 Position = new Vector2(100, 200),
                 Padding = new Vector2(10, 5),
                 Margin = 10,
-                BackgroundColor = new Color(40, 40, 40),
-                BorderColor = Color.Gray
+                BackgroundColor = new Color(40, 40, 40)
             });
 
             renderSettingsPane = GeneratePropSheet(Map.renderSettings);

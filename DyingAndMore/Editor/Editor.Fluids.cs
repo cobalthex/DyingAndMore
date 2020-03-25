@@ -9,6 +9,10 @@ namespace DyingAndMore.Editor
     {
         System.TimeSpan lastFluidTime = System.TimeSpan.Zero;
 
+        bool isBatchDeleting = false;
+        Vector2 savedWorldPos;
+        Rectangle deleteRect;
+
         public FluidsEditorMode(Editor editor)
             : base("Fluids", editor)
         {
@@ -34,7 +38,7 @@ namespace DyingAndMore.Editor
 
             if (selector.SelectedIndex >= 0 && time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
             {
-            var selectedFluid = selector.fluids[selector.SelectedIndex];
+                var selectedFluid = selector.fluids[selector.SelectedIndex];
                 lastFluidTime = time.TotalGameTime;
 
                 if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Class.Bounds.Contains(currentWorldPos.ToPoint()))
@@ -68,6 +72,38 @@ namespace DyingAndMore.Editor
 
                     return false;
                 }
+            }
+
+            if (InputState.IsPress(Keys.X))
+            {
+                isBatchDeleting = true;
+                savedWorldPos = currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
+                if (float.IsNaN(currentWorldPos.X) || float.IsNaN(currentWorldPos.Y))
+                {
+                    savedWorldPos = currentWorldPos = new Vector2();
+                }
+                return false;
+            }
+
+            if (isBatchDeleting)
+            {
+                deleteRect = Util.AbsRectangle(savedWorldPos, currentWorldPos);
+                editor.Map.DrawRect(deleteRect, Color.Red);
+            }
+
+            if (InputState.IsClick(Keys.X))
+            {
+                isBatchDeleting = false;
+                foreach (var sector in editor.Map.EnumeratateSectorsInRegion(deleteRect))
+                {
+                    for (int i = 0; i < sector.fluids.Count; ++i)
+                    {
+                        if (deleteRect.Contains(sector.fluids[i].position))
+                            sector.fluids.SwapAndDrop(i--);
+                    }
+                }
+
+                return false;
             }
 
             return base.HandleInput(time);

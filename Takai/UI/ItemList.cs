@@ -224,7 +224,7 @@ namespace Takai.UI
             {
                 var il = (ItemList<T>)sender;
 
-                if (il.newItem.item == default)
+                if (il.newItem.item == null)
                     return;
 
                 il.Items.Add(il.newItem.item);
