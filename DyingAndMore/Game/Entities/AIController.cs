@@ -142,7 +142,6 @@ namespace DyingAndMore.Game.Entities
             if (Actor.WorldParent != null)
                 filters |= BehaviorFilters.RequiresParent;
 
-            System.Diagnostics.Debug.WriteLine("-- " + filters);
             foreach (var behavior in Behaviors) //allow higher priority behaviors to co-opt
             {
                 behavior.AI = this;
@@ -157,13 +156,9 @@ namespace DyingAndMore.Game.Entities
                 if (priority == BehaviorPriority.Never)
                     continue;
 
-                if (chosenBehaviors[mask].behavior != null)
-                {
-                    if (Actor.Map.ElapsedTime >= chosenBehaviors[mask].endTime)
-                        chosenBehaviors[mask].behavior = null;
-                    else if (priority <= chosenBehaviors[mask].priority)
-                        continue;
-                }
+                if (chosenBehaviors[mask].behavior != null && priority <= chosenBehaviors[mask].priority)
+                    continue;
+
                 if (Util.RandomGenerator.Next(0, 10) < 4) //todo: make this make sense
                 {
                     chosenBehaviors[mask] = new ChosenBehavior
@@ -175,16 +170,22 @@ namespace DyingAndMore.Game.Entities
                 }
             }
 
-            foreach (var behavior in chosenBehaviors)
+            for (int i = 0; i < chosenBehaviors.Length; ++i)
             {
-                if (behavior.behavior == null)
+                if (chosenBehaviors[i].behavior == null)
                     continue;
 
+                if (Actor.Map.ElapsedTime >= chosenBehaviors[i].endTime)
+                {
+                    chosenBehaviors[i].behavior = null;
+                    continue;
+                }
+
                 //todo: this shouldnt be necessary
-                var behaviorFilters = behavior.behavior.Filter;
+                var behaviorFilters = chosenBehaviors[i].behavior.Filter;
                 if ((filters & behaviorFilters) != behaviorFilters)
                     continue;
-                behavior.behavior.Think(deltaTime);
+                chosenBehaviors[i].behavior.Think(deltaTime);
             }
         }
     }
