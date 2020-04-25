@@ -11,15 +11,14 @@ ActorClass {
 
     DefaultController: [AIController {
         Behaviors: [
-            FlowSeekBehavior { };
-
-            #TargetEnemyBehavior { };
-            #FocusBehavior { };
-
-            FlowKamikazeBehavior {
-                Effect: @"Effects/Damage.fx.tk";
-            };
-        ];
+            Behavior {
+                Name: "Kamikazi";
+                Tasks: [
+                    NavigateGradient { }
+                    Suicide { };
+                ];
+            }
+        ]
     }];
 
     DestructionEffect: @"Effects/Splatter.fx.tk";

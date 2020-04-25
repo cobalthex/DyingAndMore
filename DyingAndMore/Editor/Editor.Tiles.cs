@@ -77,11 +77,14 @@ namespace DyingAndMore.Editor
                 //todo: fix when coming out of selector
                 else if (InputState.IsMod(KeyMod.Shift))
                     TileFlood(curTile - new Point(1), tile); //not -1?
-                else
-                    TileLine((lastWorldPos / editor.Map.Class.TileSize).ToPoint(), curTile + new Point(1), tile);
+                else //free draw
+                    TileLine((lastWorldPos / editor.Map.Class.TileSize).ToPoint(), curTile - new Point(1), tile); //todo: not working as intended
 
                 return false;
             }
+
+            if (InputState.IsPress(Keys.R))
+                editor.Map.Class.PatchTileLayoutTexture(editor.Map.Class.TileBounds);
 
             return base.HandleInput(time);
         }
@@ -248,10 +251,10 @@ namespace DyingAndMore.Editor
 
                 var left = first.X;
                 var right = first.X;
-                for (; left > 0 && editor.Map.Class.Tiles[first.Y, left - 1] == initialValue; --left) ;
-                for (; right < editor.Map.Class.Width - 1 && editor.Map.Class.Tiles[first.Y, right + 1] == initialValue; ++right) ;
+                for (; left > 0 && editor.Map.Class.Tiles[first.Y, left] == initialValue; --left) ;
+                for (; right < editor.Map.Class.Width && editor.Map.Class.Tiles[first.Y, right] == initialValue; ++right) ;
 
-                for (; left <= right; ++left)
+                for (; left < right; ++left)
                 {
                     editor.Map.Class.Tiles[first.Y, left] = value;
 
@@ -267,8 +270,9 @@ namespace DyingAndMore.Editor
                 max.X = System.Math.Max(max.X, right);
                 max.Y = System.Math.Max(max.Y, first.Y);
             }
-            editor.Map.Class.PatchTileLayoutTexture(new Rectangle(min, max - min));
-            //ditor.Map.Class.PatchTileLayoutTexture(editor.Map.Class.TileBounds);
+            var bnd = new Rectangle(min, max - min);
+            bnd.Inflate(1, 1);
+            editor.Map.Class.PatchTileLayoutTexture(bnd);
         }
     }
 }

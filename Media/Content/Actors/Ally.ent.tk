@@ -4,12 +4,6 @@ ActorClass {
     DefaultFactions: Factions [Ally];
 
     DefaultController: [AIController {
-        Behaviors: [
-            ShootBehavior {}
-            TargetEnemyBehavior {};
-            FlowSeekBehavior {};
-            ShootBehavior {};
-        ];
     }];
 
     DefaultWeapon: [@"Weapons/Flamethrower.wpn.tk"];

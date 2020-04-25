@@ -46,13 +46,13 @@ namespace Takai.Game
             var instance = Instantiate();
             instance.Source = source;
             var spawn = target == null ? source : target;
-            if (target != null)
+            if (spawn != null)
             {
-                instance.Position = target.WorldPosition;
-                instance.Direction = target.WorldForward;
-                instance.Velocity = target.Velocity;
+                instance.Position = spawn.WorldPosition;
+                instance.Direction = spawn.WorldForward;
+                instance.Velocity = spawn.Velocity;
             }
-            instance.Target = target;
+            instance.Target = spawn;
 
             return instance;
         }

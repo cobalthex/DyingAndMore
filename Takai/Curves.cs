@@ -39,6 +39,15 @@ namespace Takai
             Values.Add(new CurveValue<TValue>(t, value));
             Values.Sort();
         }
+        public virtual TValue RemoveValue(float t)
+        {
+            var find = Values.BinarySearch(new CurveValue<TValue>(t, default));
+            if (find < 0)
+                return default;
+            var outv = Values[find];
+            Values.RemoveAt(find);
+            return outv.value;
+        }
 
         int GetClosestIndex(float t)
         {
@@ -56,7 +65,7 @@ namespace Takai
         public TValue Evaluate(float t)
         {
             if (Values.Count == 0)
-                return default(TValue);
+                return default;
             if (Values.Count == 1)
                 return Values[0].value;
 
@@ -131,7 +140,8 @@ namespace Takai
     public enum ChromaMode
     {
         HSL,
-        HSV
+        HSV,
+        RGB
     }
 
     public class ColorCurve : Data.IDerivedDeserialize
@@ -153,7 +163,20 @@ namespace Takai
             get
             {
                 foreach (var value in curve.Values)
-                    yield return new CurveValue<Color>(value.position, Graphics.ColorUtil.ColorFromHSV(value.value));
+                {
+                    switch (Mode)
+                    {
+                        case ChromaMode.HSL:
+                            yield return new CurveValue<Color>(value.position, Graphics.ColorUtil.ColorFromHSL(value.value));
+                            break;
+                        case ChromaMode.HSV:
+                            yield return new CurveValue<Color>(value.position, Graphics.ColorUtil.ColorFromHSV(value.value));
+                            break;
+                        default:
+                            yield return new CurveValue<Color>(value.position, Color.FromNonPremultiplied(value.value));
+                            break;
+                    }
+                }
             }
         }
 
@@ -171,6 +194,23 @@ namespace Takai
                 case ChromaMode.HSV:
                    curve.AddValue(t, Graphics.ColorUtil.ColorToHSV(c));
                     break;
+                default:
+                    curve.AddValue(t, c.ToVector4());
+                    break;
+            }
+        }
+
+        public Color RemoveValue(float t)
+        {
+            var v = curve.RemoveValue(t);
+            switch (Mode)
+            {
+                case ChromaMode.HSL:
+                    return Graphics.ColorUtil.ColorFromHSL(v);
+                case ChromaMode.HSV:
+                    return Graphics.ColorUtil.ColorFromHSV(v);
+                default:
+                    return Color.FromNonPremultiplied(v);
             }
         }
 
@@ -183,7 +223,7 @@ namespace Takai
                 case ChromaMode.HSV:
                     return Graphics.ColorUtil.ColorFromHSV(curve.Evaluate(t));
                 default:
-                    return new Color();
+                    return Color.FromNonPremultiplied(curve.Evaluate(t));
             }
         }
 
@@ -214,6 +254,9 @@ namespace Takai
                             break;
                         case ChromaMode.HSV:
                             curve.Values.Add(new CurveValue<Vector4>(v.position, Graphics.ColorUtil.ColorToHSV(v.value)));
+                            break;
+                        default:
+                            curve.Values.Add(new CurveValue<Vector4>(v.position, v.value.ToVector4()));
                             break;
                     }
                 }

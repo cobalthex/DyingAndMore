@@ -1,13 +1,8 @@
   ☐  Tkz format that uses gzip. Add serializer helpers to check for compression (based on header) and automatically run correct handlers
 
 Bugs:
-    ☐ Squad select scrollbox not sizing correctly
-    ☐ Checkbox needs to clip check sprite
     ☐ Nine-patch relative clipping
-    ✔ Sprite clipping in entity select @done (20-01-23 14:16)
     ☐ Evaluate [perf of] casting style args to correct type
-    ☐ material interaction physics
-    ☐ 'new Class' super slow
 
 Conditions:
     ☐  Invisibility
@@ -49,13 +44,12 @@ Serializer:
 
 UI:
     ☐ default buttons (click enter in text box to submit)
-    ☐ display scaling
+    ☐ display scaling/transforms
     ☐ tab focus should not be able to escape modal
     ☐ when adding a modal to UI, should switch focus
     ☐ cache previous focus in modal?
-    ✘ special modal element? @cancelled (20-01-23 14:00)
 
-  ☐  Think only when alive?
+  ✔  Think only when alive? @done (20-04-10 22:48)
 
   ☐  Update cache hotloader to use Deserialize into object
 
@@ -75,11 +69,8 @@ UI:
   ☐ Game story should be genericized to support MP (level rotations)
 
   ☐ Dynamic render quality, esp for split screen
-  ✔ Pixel shader to draw tilemap (use tilemap as texture) @done (20-01-23 13:59)
 
-  ✔ Falloff range for magnetism @done (20-01-23 13:59)
 
-  ✔ update/render settings dialogs dont work when switching between modes @done (20-01-23 13:59)
 
   ☐ GetTileCollisionTangent doesnt work. Also may be more efficient as GetNormal
 
@@ -92,6 +83,15 @@ UI:
  ☐ make polarinput actually polar (via radius, cap at 1)
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ material interaction physics @done (20-04-10 21:55) @project(Bugs)
+ ✔ Squad select scrollbox not sizing correctly @done (20-04-10 21:55) @project(Bugs)
+ ✔ Checkbox needs to clip check sprite @done (20-04-10 21:55) @project(Bugs)
+ ✔ 'new Class' super slow @done (20-04-10 21:55) @project(Bugs)
+ ✔ Sprite clipping in entity select @done (20-01-23 14:16) @project(Bugs)
+ ✘ special modal element? @cancelled (20-01-23 14:00) @project(UI)
+ ✔ update/render settings dialogs dont work when switching between modes @done (20-01-23 13:59) @project(UI)
+ ✔ Pixel shader to draw tilemap (use tilemap as texture) @done (20-01-23 13:59) @project(UI)
+ ✔ Falloff range for magnetism @done (20-01-23 13:59) @project(UI)
  ✔ global commands ($Close should close nearest modal) @done (19-02-25 01:08) @project(UI)
  ✔  Squads/Platoons @done (19-02-25 01:08) @project(Bugs / Game AI)
  ✘  unified entity system? (basic entities) vs ecs esque design @cancelled (19-01-13 03:23) @project(Bugs)
