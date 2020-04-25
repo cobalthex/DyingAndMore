@@ -244,6 +244,23 @@ namespace Takai
             return AbsRectangle(a.ToPoint(), b.ToPoint());
         }
 
+        public static Rectangle Capture(Rectangle rectangle, Point p)
+        {
+            var left = rectangle.Left;
+            var right = rectangle.Right;
+            var top = rectangle.Top;
+            var bottom = rectangle.Bottom;
+            if (p.X < left)
+                left = p.X;
+            if (p.Y < top)
+                top = p.Y;
+            if (p.X > right)
+                right = p.X;
+            if (p.Y > bottom)
+                bottom = p.Y;
+            return new Rectangle(left, top, right - left, bottom - top);
+        }
+
         /// <summary>
         /// Clamp <see cref="rect"/> to <see cref="container"/> without resizing (overflow will happen if rect is larger than container)
         /// </summary>

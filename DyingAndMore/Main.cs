@@ -45,6 +45,7 @@ namespace DyingAndMore
         SpriteBatch sbatch;
         Static ui;
         Takai.Graphics.BitmapFont debugFont;
+        Takai.FpsGraph fpsGraph;
 
         /// <summary>
         /// Create the game
@@ -202,7 +203,13 @@ namespace DyingAndMore
                     var cmd = Serializer.Cast<EventCommandBinding>(il[1]);
                     namedUI.BubbleCommand(cmd.command, cmd.argument);
                 }
+            };
 
+            fpsGraph = new Takai.FpsGraph
+            {
+                Position = new Vector2(0, 20),
+                Size = new Vector2(600, 100),
+                HorizontalAlignment = Alignment.Center,
             };
 
             /*
@@ -286,7 +293,7 @@ namespace DyingAndMore
             //    Size = new Vector2(3000, 2000)
             //};
 
-            var map = Cache.Load<MapInstance>("mapsrc/hell.map.tk");
+            var map = Cache.Load<MapInstance>("mapsrc/aitest.map.tk");
             childUI = new Editor.Editor(map);
             map.renderSettings.drawEntityForwardVectors = true;
             map.renderSettings.drawEntityHierarchies = true;
@@ -333,7 +340,6 @@ namespace DyingAndMore
             ui.HasFocus = true;
             base.Initialize();
         }
-        Takai.Graphics.Sprite sp;
         protected override void Update(GameTime gameTime)
         {
             Takai.DebugPropertyDisplay.Reset();
@@ -348,6 +354,14 @@ namespace DyingAndMore
             {
                 Exit();
                 return;
+            }
+
+            else if (InputState.IsPress(Keys.F8))
+            {
+                if (fpsGraph.Parent == null)
+                    ui.AddChild(fpsGraph);
+                else
+                    fpsGraph.RemoveFromParent();
             }
 
             //F9 used in UI code

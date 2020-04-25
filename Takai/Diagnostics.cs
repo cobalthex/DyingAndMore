@@ -166,7 +166,7 @@ namespace Takai
         protected override void DrawSelf(SpriteBatch sbatch)
         {
             var bounds = VisibleContentArea;
-            var average = this.Average;
+            var average = Average;
 
             var min = average - average / 2;
             var max = average + average / 2;
@@ -174,15 +174,15 @@ namespace Takai
             //todo: rewrite
 
             var smax = Font.MeasureString(max.ToString("N2"));
-            Font.Draw(sbatch, max.ToString("N2"), bounds.Location.ToVector2(), Color.Aquamarine);
+            Font.Draw(sbatch, max.ToString("N2"), bounds.Location.ToVector2(), Color.RoyalBlue);
             var smin = Font.MeasureString(min.ToString("N2"));
-            Font.Draw(sbatch, min.ToString("N2"), new Vector2(bounds.Left + smax.X - smin.X, bounds.Bottom - smin.Y), Color.Aquamarine);
+            Font.Draw(sbatch, min.ToString("N2"), new Vector2(bounds.Left + smax.X - smin.X, bounds.Bottom - smin.Y), Color.RoyalBlue);
 
             float dy = (max - min);
 
             float y = bounds.Bottom - ((dy / buffer.Count) - min) / dy * bounds.Height;
             var savg = Font.MeasureString(average.ToString("N2"));
-            Font.Draw(sbatch, average.ToString("N2"), new Vector2(bounds.Left + smax.X - savg.X, bounds.Top + (bounds.Height - savg.Y) / 2), Color.RoyalBlue);
+            Font.Draw(sbatch, average.ToString("N2"), new Vector2(bounds.Left + smax.X - savg.X, bounds.Top + (bounds.Height - savg.Y) / 2), Color.Azure);
 
             var advance = ((int)(smax.X - 1) / 5 + 1) * 5;
             bounds.X += advance + 5;
@@ -190,7 +190,7 @@ namespace Takai
             P2D.DrawRect(sbatch, Color.White, bounds);
             bounds.Inflate(-5, -5);
 
-            P2D.DrawLine(sbatch, Color.RoyalBlue, new Vector2(bounds.Left, bounds.Center.Y), new Vector2(bounds.Right, bounds.Center.Y));
+            P2D.DrawLine(sbatch, Color.Azure, new Vector2(bounds.Left, bounds.Center.Y), new Vector2(bounds.Right, bounds.Center.Y));
 
             float step = (float)bounds.Width / buffer.Count;
 

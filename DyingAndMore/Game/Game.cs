@@ -581,11 +581,14 @@ namespace DyingAndMore.Game
             var particleCount = 0;
             foreach (var ptype in Map.Particles)
                 particleCount += ptype.Value.Count;
-            
-            foreach (var squad in Map.Squads)
+
+            if (Map.Squads != null)
             {
-                Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, Color.Cyan, 2);
-                Font.Draw(spriteBatch, squad.Name, players[0].camera.WorldToScreen(squad.SpawnPosition), Color.White);
+                foreach (var squad in Map.Squads)
+                {
+                    Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, Color.Cyan, 2);
+                    Font.Draw(spriteBatch, squad.Name, players[0].camera.WorldToScreen(squad.SpawnPosition), Color.White);
+                }
             }
 
             DebugPropertyDisplay.AddRow("Total entities", Map.AllEntities.Count());

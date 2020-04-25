@@ -16,6 +16,8 @@ namespace Takai.Game
 
         public float ApproximateTotalLength { get; private set; } = 0;
 
+        public Rectangle Bounds { get; private set; }
+
         protected override Vector2 Function(Vector2 a, Vector2 b, Vector2 c, Vector2 d, float t)
         {
             return Vector2.CatmullRom(a, b, c, d, t);
@@ -29,11 +31,12 @@ namespace Takai.Game
         public override void AddValue(float t, Vector2 value)
         {
             base.AddValue(t, value);
+            var index = Values.BinarySearch(new CurveValue<Vector2>(t, value));
             if (Values.Count > 1)
             {
                 var last = Values[Values.Count - 2];
                 var coarseLength = Vector2.Distance(last.value, value);
-                coarseLength = System.Math.Min(5, coarseLength / 10);
+                coarseLength = System.Math.Min(5, coarseLength / 20);
 
                 var tinc = (t - last.position) / coarseLength;
 
@@ -44,12 +47,36 @@ namespace Takai.Game
                     var p = Evaluate(last.position + (tinc * i));
                     length += Vector2.DistanceSquared(lastP, p);
                     lastP = p;
+                    Bounds = Util.Capture(Bounds, p.ToPoint());
                 }
+                //todo: ^ one rung short
 
                 length = (float)System.Math.Sqrt(length);
-                sectionLengths.Add(length);
+                if (index == Count - 1)
+                    sectionLengths.Add(length);
+                else
+                    sectionLengths.Insert(index, length);
                 ApproximateTotalLength += length;
+
+
+                //Bounds = Util.Capture(Bounds, value.ToPoint());
             }
+            else
+                Bounds = new Rectangle(value.ToPoint(), new Point(1));
+        }
+
+        public override Vector2 RemoveValue(float t)
+        {
+            var find = Values.BinarySearch(new CurveValue<Vector2>(t, default));
+            if (find < 0)
+                return default;
+
+            var outv = Values[find];
+            Values.RemoveAt(find);
+            ApproximateTotalLength -= sectionLengths[find];
+            sectionLengths.RemoveAt(find);
+            //todo: recalc aabb
+            return outv.value;
         }
     }
 

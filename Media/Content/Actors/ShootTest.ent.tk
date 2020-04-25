@@ -11,13 +11,6 @@ ActorClass {
     DefaultFactions: Factions [Enemy];
 
     DefaultController: [AIController {
-        Behaviors: [
-            TargetEnemyBehavior {};
-            OrbitBehavior {
-                DesiredDistance: 200;
-            };
-            ShootBehavior {};
-        ];
     }];
 
     DefaultWeapon: [@"Weapons/Plasma.wpn.tk"];

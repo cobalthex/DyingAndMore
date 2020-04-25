@@ -3,9 +3,6 @@ ActorClass {
 	MaxHealth: 5000;
 
     DefaultController: [AIController {
-        Behaviors: [
-            DebugShootBehavior {};
-        ];
     }];
 
     DefaultWeapon: [@"Weapons/autocannon.wpn.tk"];

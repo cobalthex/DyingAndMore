@@ -12,10 +12,6 @@ ActorClass {
     };
 
     DefaultController: [AIController {
-        Behaviors: [
-            TargetEnemyBehavior {
-            };
-        ];
     }];
 
     FieldOfView: 0.667pi;

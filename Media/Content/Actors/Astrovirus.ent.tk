@@ -10,12 +10,6 @@ ActorClass {
     IgnoreTrace: false;
 
     DefaultController: [AIController {
-        Behaviors: [
-            FlowSeekBehavior { };
-
-            TargetEnemyBehavior { };
-            FocusBehavior { };
-        ];
     }];
 
 	Animations: {

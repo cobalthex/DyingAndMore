@@ -122,6 +122,12 @@ namespace DyingAndMore.Editor
 #pragma warning restore 0649
     }
 
+    public struct NamedPath
+    {
+        public string name;
+        public VectorCurve path;
+    }
+
     public class Editor : Static
     {
         public static Editor Current { get; set; }
@@ -158,7 +164,7 @@ namespace DyingAndMore.Editor
 
         public EditorConfiguration config;
 
-        public System.Collections.Generic.List<VectorCurve> Paths { get; set; } = new System.Collections.Generic.List<VectorCurve>();
+        public System.Collections.Generic.List<NamedPath> Paths { get; set; } = new System.Collections.Generic.List<NamedPath>();
 
         public Editor(MapInstance map)
         {
@@ -232,7 +238,7 @@ namespace DyingAndMore.Editor
             modes.AddMode(new FluidsEditorMode(this));
             modes.AddMode(new EntitiesEditorMode(this));
             modes.AddMode(new SquadsEditorMode(this));
-            //modes.AddMode(new PathsEditorMode(this));
+            modes.AddMode(new PathsEditorMode(this));
             modes.AddMode(new TriggersEditorMode(this));
             //modes.AddMode(new TestEditorMode(this));
         }

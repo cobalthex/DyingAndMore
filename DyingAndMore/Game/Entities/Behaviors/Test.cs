@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Entities.Behaviors
 {
+    /*
     class TargetEnemyBehavior : Behavior
     {
         //break out into individual targets that get added to the behavior list
@@ -73,7 +74,6 @@ namespace DyingAndMore.Game.Entities.Behaviors
     class KamikazeBehavior : Behavior
     {
         public override BehaviorMask Mask => BehaviorMask.Weapons;
-        public override BehaviorFilters Filter => BehaviorFilters.RequiresTarget;
 
         public float Radius { get; set; } = 0;
 
@@ -104,7 +104,6 @@ namespace DyingAndMore.Game.Entities.Behaviors
     class FlowKamikazeBehavior : Behavior
     {
         public override BehaviorMask Mask => BehaviorMask.Weapons;
-        public override BehaviorFilters Filter => BehaviorFilters.None;
 
         /// <summary>
         /// maximum flow map value to find to suicide
@@ -195,8 +194,6 @@ namespace DyingAndMore.Game.Entities.Behaviors
     {
         public override BehaviorMask Mask => BehaviorMask.Weapons;
 
-        public override BehaviorFilters Filter => BehaviorFilters.RequiresTarget;
-
         public override BehaviorPriority CalculatePriority()
         {
             if (AI.Actor.Weapon == null || !AI.Actor.IsFacing(AI.Target.WorldPosition))
@@ -217,8 +214,6 @@ namespace DyingAndMore.Game.Entities.Behaviors
     class FocusBehavior : Behavior
     {
         public override BehaviorMask Mask => BehaviorMask.Movement;
-
-        public override BehaviorFilters Filter => BehaviorFilters.RequiresTarget;
 
         /// <summary>
         /// Max turn angle (in radians) per second
@@ -251,7 +246,6 @@ namespace DyingAndMore.Game.Entities.Behaviors
     class DebugShootBehavior : Behavior
     {
         public override BehaviorMask Mask => BehaviorMask.Weapons;
-        public override BehaviorFilters Filter => BehaviorFilters.None;
 
         public override BehaviorPriority CalculatePriority()
         {
@@ -263,6 +257,7 @@ namespace DyingAndMore.Game.Entities.Behaviors
             AI.Actor.Weapon.TryUse();
         }
     }
+    */
 }
 
 // A*/similar navigation
