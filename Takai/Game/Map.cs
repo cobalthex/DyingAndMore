@@ -35,10 +35,16 @@ namespace Takai.Game
         public string Name { get; set; }
 
         /// <summary>
-        /// The collision mask for the tilemap
+        /// The SDF based collision mask for the map.
+        /// Values represent how far from point in a circle to an map edge (capped at 255)
         /// </summary>
         [Data.Serializer.Ignored]
-        public System.Collections.BitArray CollisionMask { get; set; }
+        public Byte[,] CollisionMask { get; set; }
+        /// <summary>
+        /// The rshift multiple for the collision mask of the map size
+        /// e.g. MapWidth >> <see cref="CollisionMaskScale"/>
+        /// </summary>
+        const int CollisionMaskScale = 2;
 
         /// <summary>
         /// All of the tiles in the map (y,x)

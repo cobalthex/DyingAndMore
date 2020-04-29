@@ -40,9 +40,9 @@ namespace DyingAndMore.Editor
             }
             if (InputState.IsButtonDown(MouseButtons.Left))
             {
-                var trace = editor.Map.TraceTiles(start, pos);
                 direction = Vector2.Normalize(pos - start);
-                end = trace;
+                var trace = editor.Map.TraceTiles(start, direction);
+                end = start + trace * direction;
 
                 tangent = editor.Map.GetTilesCollisionTangent(end, direction);
             }

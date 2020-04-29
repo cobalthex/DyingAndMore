@@ -23,7 +23,6 @@ namespace DyingAndMore.Game.Entities
         Enemy = (1 << 20), //enemy to player and allies
 
         Boss = (1 << 30),
-
     }
 
     public class ActorTriggerFilter : ITriggerFilter
@@ -248,6 +247,18 @@ namespace DyingAndMore.Game.Entities
             base.Think(deltaTime);
         }
 
+        public override void OnSpawn(MapBaseInstance map)
+        {
+            base.OnSpawn(map);
+            ((MapInstance)map).Broadcast(new ActorBroadcast(this, ActorBroadcastType.Spawn));
+        }
+
+        public override void Kill()
+        {
+            base.Kill();
+            ((MapInstance)Map)?.Broadcast(new ActorBroadcast(this, ActorBroadcastType.Death));
+        }
+
         public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
         {
             Controller?.OnEntityCollision(collider, collision, deltaTime);
@@ -268,8 +279,9 @@ namespace DyingAndMore.Game.Entities
 
         public virtual void TurnTowards(Vector2 direction, TimeSpan deltaTime)
         {
+            //inversely proportional to speed
             //slerp?
-            Forward = Vector2.Normalize(Vector2.Lerp(Forward, direction, MathHelper.PiOver2 * (float)deltaTime.TotalSeconds));
+            Forward = Vector2.Normalize(Vector2.Lerp(Forward, direction, MathHelper.Pi * (float)deltaTime.TotalSeconds));
         }
 
         public virtual void Accelerate(Vector2 direction)
@@ -295,10 +307,6 @@ namespace DyingAndMore.Game.Entities
                 return;
 
             CurrentHealth -= damage;
-
-            //todo: propertify (damage effect?)
-            TintColor = Color.Tomato;
-            TintColorDuration = TimeSpan.FromMilliseconds(50);
         }
 
         public override string GetDebugInfo()

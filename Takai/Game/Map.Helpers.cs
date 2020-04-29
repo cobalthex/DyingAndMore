@@ -18,6 +18,8 @@ namespace Takai.Game
                 tilesEffect.Parameters["TilesImage"]?.SetValue(TilesImage);
                 tilesEffect.Parameters["TilesLayout"]?.SetValue(tilesLayoutTexture);
             }
+
+            GenerateCollisionMask();
         }
 
         /// <summary>
@@ -48,16 +50,14 @@ namespace Takai.Game
             if (!Bounds.Contains(point))
                 return false;
 
-            var pp = (point / TileSize).ToPoint();
-            var cr = new Point((int)point.X % TileSize, (int)point.Y % TileSize);
-            var tile = Tiles[pp.Y, pp.X];
-            if (tile == -1)
-                return false;
+            return CollisionMask[(int)point.Y >> CollisionMaskScale, (int)point.X >> CollisionMaskScale] > 0;
+        }
+        public byte DistanceToEdge(Vector2 point)
+        {
+            if (!Bounds.Contains(point))
+                return 0;
 
-            var mask = cr.X + (cr.Y * TilesImage.Width);
-            mask += (tile % TilesPerRow) * TileSize;
-            mask += (tile / TilesPerRow) * TileSize * TilesImage.Width;
-            return CollisionMask[mask];
+            return CollisionMask[(int)point.Y >> CollisionMaskScale, (int)point.X >> CollisionMaskScale];
         }
     }
 
@@ -392,44 +392,22 @@ namespace Takai.Game
         /// Trace a line in the tilemap
         /// </summary>
         /// <param name="start">Where to search from</param>
-        /// <param name="end">Where to search to</param>
-        /// <param name="stepSize">how far to skip between steps (larger numbers = faster/less accurate)</param>
-        /// <returns>The location of the collision, or end if none found</returns>
-        public Vector2 TraceTiles(Vector2 start, Vector2 end, float stepSize = 5)
+        /// <param name="direction">In which direction to search. Should be normalized</param>
+        /// <returns>The distance from start before colliding with a map edge"/></returns>
+        public int TraceTiles(Vector2 start, Vector2 direction)
         {
-            //todo: switch to points?
+            //max distance?
 
             var pos = start;
-            var diff = (end - start);
-            var ndiff = Vector2.Normalize(diff);
-            var n = Math.Max(Math.Abs(diff.X), Math.Abs(diff.Y)) / stepSize;
-            var delta = ndiff * stepSize;
-
-            for (int i = 0; i < n; ++i)
+            int total = 0;
+            byte dist;
+            do
             {
-                //todo: move to pre-calc (clip start/end at map bounds)
-                if (!Class.Bounds.Contains(pos))
-                    return pos;
+                total += (dist = Class.DistanceToEdge(pos));
+                pos += direction * dist;
+            } while (dist != 0);
 
-                bool inMap = Class.IsInsideMap(Util.Round(pos));
-                if (!inMap)
-                {
-                    //walk back
-                    for (int j = 0; j < (int)stepSize; ++j)
-                    {
-                        //var npos = Util.Round(pos - ndiff);
-                        //if (Class.GetCollisionValueAt(npos))
-                        //    return pos;
-                        //pos = npos;
-                    }
-
-                    return pos;
-                }
-
-                pos += delta;
-            }
-
-            return end;
+            return total;
         }
 
         /// <summary>
@@ -540,9 +518,8 @@ namespace Takai.Game
 
                 if (shortest != null && shortestDist <= maxDistance)
                 {
-                    var target = start + direction * shortestDist;
-                    var trace = TraceTiles(start, target);
-                    if (trace == target)
+                    var trace = TraceTiles(start, direction);
+                    if (trace >= shortestDist)
                     {
                         return new TraceHit()
                         {
@@ -554,7 +531,7 @@ namespace Takai.Game
 
                     return new TraceHit()
                     {
-                        distance = Vector2.Distance(start, trace),
+                        distance = trace,
                         entity = null,
                         didHit = true
                     };
@@ -562,14 +539,15 @@ namespace Takai.Game
 
                 sectorPos += sectorDelta;
             }
-
-            var dist = TraceTiles(start, end);
-            return new TraceHit()
             {
-                distance = Vector2.Distance(start, dist),
-                entity = null,
-                didHit = dist != end
-            };
+                var trace = TraceTiles(start, direction);
+                return new TraceHit()
+                {
+                    distance = trace,
+                    entity = null,
+                    didHit = trace < maxDistance
+                };
+            }
         }
 
         public Trigger FindTriggerByName(string name)

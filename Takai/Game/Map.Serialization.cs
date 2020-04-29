@@ -9,32 +9,148 @@ namespace Takai.Game
     public partial class MapBaseClass : Data.IDerivedSerialize, Data.IDerivedDeserialize
     {
         /// <summary>
-        /// Build the tiles mask
+        /// Generate the SDF based collision mask from the tile map/tileset.
+        /// 
         /// </summary>
-        /// <param name="texture">The source texture to use</param>
-        /// <param name="UseAlpha">Use alpha instead of color value</param>
-        /// <remarks>Values with luma/alpha < 0.5 are off and all others are on</remarks>
-        public void BuildTileMask(Texture2D texture, bool UseAlpha = true)
+        /// 
+        public void GenerateCollisionMask(int scale = CollisionMaskScale)
         {
-            Color[] pixels = new Color[texture.Width * texture.Height];
-            texture.GetData(pixels);
+            var timer = new System.Diagnostics.Stopwatch();
+            timer.Start();
 
-            CollisionMask = new System.Collections.BitArray(texture.Width * texture.Height);
-            for (var y = 0; y < texture.Height; ++y)
+            var w = (Width * TileSize) >> scale;
+            var h = (Height * TileSize) >> scale;
+
+            if (w <= 0 || h <= 0)
             {
-                for (var x = 0; x < texture.Width; ++x)
+                CollisionMask = new byte[0, 0];
+                return;
+            }
+
+            //do each individually for better cache perf
+            CollisionMask = new byte[h, w];
+            for (int y = 0; y < h; ++y)
+                for (int x = 0; x < w; ++x)
+                    CollisionMask[y, x] = 255;
+
+            var p = new Point[h, w];
+            for (int y = 0; y < h; ++y)
+                for (int x = 0; x < w; ++x)
+                    p[y, x] = new Point(-1);
+
+            Color[] tilesImageData = new Color[TilesImage.Width * TilesImage.Height];
+            TilesImage.GetData(tilesImageData);
+
+            //test if inside the map
+            bool I(int x, int y) //x and y here scaled down
+            {
+                x <<= scale;
+                y <<= scale;
+
+                var tile = Tiles[y / TileSize, x / TileSize];
+                if (tile < 0)
+                    return false;
+
+                const byte threshold = 127;
+                return tilesImageData[
+                    ((tile / TilesPerRow) * TileSize + (y % TileSize)) * TilesImage.Width +
+                    ((tile % TilesPerRow) * TileSize + (x % TileSize))
+                ].A > threshold;
+            }
+
+            //can skip bounds checking by using padded array, but requires copying array at end
+            
+            //find edges
+            for (int y = 0; y < h; ++y)
+            {
+                bool yBound = (y == 0 || y == h - 1);
+                for (int x = 0; x < w; ++x)
                 {
-                    var i = x + (y) * texture.Width; //flip Y
-                    if (UseAlpha)
-                        CollisionMask[x + y * texture.Width] = pixels[i].A > 127;
-                    else
-                        CollisionMask[x + y * texture.Width] = (pixels[i].R + pixels[i].G + pixels[i].B) / 3 > 127;
+                    bool onEdge = (
+                        x == 0 || x == w - 1 || yBound ||
+                        I(x - 1, y) != I(x, y) || I(x + 1, y) != I(x, y) ||
+                        I(x, y - 1) != I(x, y) || I(x, y + 1) != I(x, y)
+                    );
+                    if (I(x, y) && onEdge)
+                    {
+                        CollisionMask[y, x] = 0;
+                        p[y, x] = new Point(x, y);
+                    }
+
                 }
             }
 
-            /*
-            //save as tga
-            using (var fs = new FileStream("collision.tga", FileMode.Create))
+            byte length(int x, int y) => (byte)Math.Sqrt(x * x + y * y);
+
+            const float dx = 1f, dy = 1f, dh = 1.4142135623730950488f /* sqrt(2) */;
+
+            //first pass
+            for (int y = 0; y < h; ++y)
+            {
+                bool yBound = (y == 0 || y == h - 1);
+                for (int x = 0; x < w; ++x)
+                {
+                    bool xBound = (x == 0 || x == w - 1);
+
+                    if (!xBound && !yBound && CollisionMask[y - 1, x - 1] + dh < CollisionMask[y, x])
+                    {
+                        p[y, x] = p[y - 1, x - 1];
+                        CollisionMask[y, x] = length(x - p[y, x].X, y - p[y, x].Y);
+                    }
+                    if (!yBound && CollisionMask[y - 1, x] + dy < CollisionMask[y, x])
+                    {
+                        p[y, x] = p[y - 1, x];
+                        CollisionMask[y, x] = length(x - p[y, x].X, y - p[y, x].Y);
+                    }
+                    if (!xBound && !yBound && CollisionMask[y - 1, x + 1] + dh < CollisionMask[y, x])
+                    {
+                        p[y, x] = p[y - 1, x + 1];
+                        CollisionMask[y, x] = length(x - p[y, x].X, y - p[y, x].Y);
+                    }
+                    if (!xBound && CollisionMask[y, x - 1] + dx < CollisionMask[y, x])
+                    {
+                        p[y, x] = p[y, x - 1];
+                        CollisionMask[y, x] = length(x - p[y, x].X, y - p[y, x].Y);
+                    }
+                }
+            }
+
+            //second, and final pass
+            for (int y = h - 1; y >= 0; --y)
+            {
+                bool yBound = (y == 0 || y == h - 1);
+                for (int x = w - 1; x >= 0; --x)
+                {
+                    bool xBound = (x == 0 || x == w - 1);
+
+                    if (!xBound && CollisionMask[y, x + 1] + dx < CollisionMask[y, x])
+                    {
+                        p[y, x] = p[y, x + 1];
+                        CollisionMask[y, x] = length(x - p[y, x].X, y - p[y, x].Y);
+                    }
+                    if (!xBound && !yBound && CollisionMask[y + 1, x - 1] + dh < CollisionMask[y, x])
+                    {
+                        p[y, x] = p[y + 1, x - 1];
+                        CollisionMask[y, x] = length(x - p[y, x].X, y - p[y, x].Y);
+                    }
+                    if (!yBound && CollisionMask[y + 1, x] + dy < CollisionMask[y, x])
+                    {
+                        p[y, x] = p[y + 1, x];
+                        CollisionMask[y, x] = length(x - p[y, x].X, y - p[y, x].Y);
+                    }
+                    if (!xBound && !yBound && CollisionMask[y + 1, x + 1] + dx < CollisionMask[y, x])
+                    {
+                        p[y, x] = p[y + 1, x + 1];
+                        CollisionMask[y, x] = length(x - p[y, x].X, y - p[y, x].Y);
+                    }
+                }
+            }
+
+            timer.Stop();
+            System.Diagnostics.Debug.WriteLine("Generated collision map in " + timer.Elapsed);
+
+            //save as TGA image for testing
+            using (var fs = new System.IO.FileStream("collision.tga", System.IO.FileMode.Create))
             {
                 fs.WriteByte(0);
                 fs.WriteByte(0);
@@ -42,27 +158,18 @@ namespace Takai.Game
                 var bytes = new byte[5 + 4];
                 fs.Write(bytes, 0, bytes.Length);
 
-                bytes = BitConverter.GetBytes((short)texture.Width);
+                bytes = BitConverter.GetBytes((short)w);
                 fs.Write(bytes, 0, bytes.Length);
-                bytes = BitConverter.GetBytes((short)texture.Height);
+                bytes = BitConverter.GetBytes((short)h);
                 fs.Write(bytes, 0, bytes.Length);
 
                 fs.WriteByte(8); //bpp
                 fs.WriteByte(0);
 
-                //bytes = new byte[CollisionMask.Length / 8 + (CollisionMask.Length % 8 == 0 ? 0 : 1)];
-                //CollisionMask.CopyTo(bytes, 0);
-                //fs.Write(bytes, 0, bytes.Length);
-
-                for (var y = 0; y < texture.Height; ++y)
-                {
-                    for (var x = 0; x < texture.Width; ++x)
-                    {
-                        fs.WriteByte(CollisionMask[x + y * texture.Width] ? (byte)255 : (byte)0);
-                    }
-                }
+                for (var y = h - 1; y >= 0; --y) //y is flipped
+                    for (var x = 0; x < w; ++x)
+                        fs.WriteByte(CollisionMask[y, x]); //maybe a hacky way to get a single dimensional array but ¯\_(ツ)_/¯
             }
-            */
         }
 
         public virtual Dictionary<string, object> DerivedSerialize()
@@ -97,8 +204,7 @@ namespace Takai.Game
             Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, width * height * sizeof(short));
             TilesPerRow = (TilesImage != null ? (TilesImage.Width / TileSize) : 0);
             SectorPixelSize = SectorSize * TileSize;
-
-            BuildTileMask(TilesImage, true);
+            GenerateCollisionMask(); //todo: necessary here?
         }
     }
 

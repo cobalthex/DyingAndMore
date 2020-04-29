@@ -13,6 +13,28 @@ namespace DyingAndMore
         }
     }
 
+    public enum ActorBroadcastType
+    {
+        Unknown,
+        Spawn,
+        Death,
+        AIBehaviorChange,
+    }
+
+    public struct ActorBroadcast
+    {
+        public Game.Entities.ActorInstance actor;
+        public ActorBroadcastType type;
+        public object message;
+
+        public ActorBroadcast(Game.Entities.ActorInstance actor, ActorBroadcastType type, object message = null)
+        {
+            this.actor = actor;
+            this.type = type;
+            this.message = message;
+        }
+    }
+
     public class MapInstance : MapBaseInstance
     {
         [Takai.Data.Serializer.AsReference]
@@ -30,12 +52,27 @@ namespace DyingAndMore
         }
         HashSet<Game.Entities.Squad> _squads; //List?
 
+        /// <summary>
+        /// Current broadcasts. Reset every frame.
+        /// 
+        /// </summary>
+        public System.Collections.ObjectModel.ReadOnlyCollection<ActorBroadcast> Broadcasts { get; private set; }
+        private List<ActorBroadcast> broadcasts = new List<ActorBroadcast>(16);
+        private List<ActorBroadcast> nextBroadcasts = new List<ActorBroadcast>(16);
+
+        public void Broadcast(ActorBroadcast broadcast)
+        {
+            nextBroadcasts.Add(broadcast);
+        }
+
         public MapInstance() : this(null) { }
         public MapInstance(MapClass @class)
             : base(@class)
         {
             if (@class == null)
                 return;
+
+            Broadcasts = broadcasts.AsReadOnly();
         }
 
         /// <summary>
@@ -53,6 +90,7 @@ namespace DyingAndMore
                     squad.Name = Takai.Util.RandomString(prefix: "squad_");
                 Squads.Add(squad);
                 squad.SpawnUnits(this);
+
             }
         }
 
@@ -60,6 +98,14 @@ namespace DyingAndMore
 
         protected override void UpdateEntities(TimeSpan deltaTime)
         {
+            {
+                var tmp = broadcasts;
+                broadcasts = nextBroadcasts;
+                nextBroadcasts = tmp;
+                nextBroadcasts.Clear();
+                Broadcasts = broadcasts.AsReadOnly();
+            }
+
             if (updateSettings.isEntityLogicEnabled)
             {
                 //todo: only squads in sector

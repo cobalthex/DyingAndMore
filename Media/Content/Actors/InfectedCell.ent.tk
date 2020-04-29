@@ -11,12 +11,24 @@ ActorClass {
 
     DefaultController: [AIController {
         Behaviors: [
-            Behavior {
+            #*Behavior {
                 Name: "Kamikazi";
                 Tasks: [
                     NavigateGradient { }
                     Suicide { };
                 ];
+            };*#
+            Behavior {
+                Name: "Follow";
+                Tasks: [
+                    FindClosestEnemy {
+                        sightDistance: 1000;
+                    };
+                    NavigateToTarget {
+                        distance: 100;
+                        permanent: true;
+                    }
+                ]
             }
         ]
     }];

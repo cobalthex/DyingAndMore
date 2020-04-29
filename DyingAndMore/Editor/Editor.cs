@@ -240,7 +240,7 @@ namespace DyingAndMore.Editor
             modes.AddMode(new SquadsEditorMode(this));
             modes.AddMode(new PathsEditorMode(this));
             modes.AddMode(new TriggersEditorMode(this));
-            //modes.AddMode(new TestEditorMode(this));
+            modes.AddMode(new TestEditorMode(this));
         }
 
         protected override void OnParentChanged(Static oldParent)

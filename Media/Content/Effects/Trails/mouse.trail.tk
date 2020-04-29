@@ -1,6 +1,7 @@
 TrailClass {
-    MaxPoints: 10;
-    CaptureDelay: 120Hz;
+    MaxPoints: 100;
+    CaptureDelay: 60Hz;
+    MergeCollinear: true;
 
     Color: {
     	Values: [
