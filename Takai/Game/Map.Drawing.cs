@@ -122,7 +122,7 @@ namespace Takai.Game
         public void InitializeGraphics()
         {
             if (TilesImage != null && CollisionMask == null)
-                BuildTileMask(TilesImage);
+                GenerateCollisionMask();
 
             if (Runtime.GraphicsDevice == null)
                 return;
@@ -274,6 +274,7 @@ namespace Takai.Game
         public class RenderSettings //class so that it can be reflected
         {
             public bool drawTiles;
+            public bool drawTileCollisionMask;
             public bool drawEntities;
             public bool drawFluids;
             public bool drawReflections;
@@ -302,6 +303,7 @@ namespace Takai.Game
 
             public void SetDefault()
             {
+                drawTileCollisionMask = false;
                 drawFluidReflectionMask = false;
                 drawTrailMesh = false;
                 drawTriggers = false;
@@ -502,7 +504,12 @@ namespace Takai.Game
             //main render
             Runtime.GraphicsDevice.SetRenderTargets(Class.preRenderTarget);
 
-            if (renderSettings.drawTiles && Class.TilesImage != null)
+            if (renderSettings.drawTileCollisionMask && Class.CollisionMask != null)
+            {
+                //todo
+                //need to upload collision mask as texture
+            }    
+            else if (renderSettings.drawTiles && Class.TilesImage != null)
                 DrawTiles(ref context, Color.White);
             else
                 Runtime.GraphicsDevice.Clear(ClearOptions.Stencil, Color.Transparent, 0, 1);

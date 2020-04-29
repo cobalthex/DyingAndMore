@@ -17,12 +17,14 @@ namespace DyingAndMore.Game.Entities.Tasks
         TaskResult Think(TimeSpan deltaTime, AIController ai);
     }
 
-    public struct FindClosestTarget : ITask
+    public struct FindClosestEnemy : ITask
     {
         public float sightDistance;
 
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
+            //auto-success if already have target?
+
             var ents = ai.Actor.Map.FindEntitiesInRegion(ai.Actor.WorldPosition, sightDistance);
 
             var possibles = new List<ActorInstance>();
@@ -63,6 +65,11 @@ namespace DyingAndMore.Game.Entities.Tasks
         /// </summary>
         public float distance;
 
+        /// <summary>
+        /// Continue to follow target
+        /// </summary>
+        public bool permanent;
+
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
             if (ai.Target == null)
@@ -71,7 +78,7 @@ namespace DyingAndMore.Game.Entities.Tasks
             var interDist = ai.Target.RadiusSq + ai.Actor.RadiusSq;
             if (Vector2.DistanceSquared(ai.Target.Position, ai.Actor.Position) 
                 <= (distance * distance) + interDist)
-                return TaskResult.Success;
+                return permanent ? TaskResult.Continue : TaskResult.Success;
 
             var dir = Vector2.Normalize(ai.Target.Position - ai.Actor.Position);
             ai.Actor.TurnTowards(dir, deltaTime);
@@ -152,6 +159,8 @@ namespace DyingAndMore.Game.Entities.Tasks
     /// </summary>
     public struct NavigateToTarget : ITask
     {
+        public bool permanent;
+
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
             if (ai.Target == null) //fail on target death?
@@ -162,7 +171,7 @@ namespace DyingAndMore.Game.Entities.Tasks
             var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
             var target = ai.Actor.Map.PathInfoAt(ai.Target.WorldPosition).heuristic;
             if (Math.Abs(cur - target) < 1)
-                return TaskResult.Success;
+                return permanent ? TaskResult.Continue : TaskResult.Success;
 
             NavigateGradient.NavigateToPoint(target, deltaTime, ai.Actor);
             return TaskResult.Continue;

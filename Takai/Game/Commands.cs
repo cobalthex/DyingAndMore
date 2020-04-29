@@ -10,10 +10,6 @@
 
     public delegate void CommandAction(object parameter);
 
-    //todo: data model command, map command
-
-    //todo: command delays?
-    
     public class EntityCommand : ICommand
     {
         public string ActionName { get; set; }

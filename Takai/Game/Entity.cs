@@ -70,11 +70,6 @@ namespace Takai.Game
         /// </summary>
         public TrailClass Trail { get; set; }
 
-        /// <summary>
-        /// Code defined events that this entity can trigger
-        /// </summary>
-        public virtual HashSet<string> Events { get; }
-
         public EntityClass()
         {
             EditorPreviewSprite = new Lazy<Graphics.Sprite>(delegate
@@ -278,8 +273,8 @@ namespace Takai.Game
             if (Trail != null)
                 Trail.AddPoint(WorldPosition, Trail.CurrentDirection, true);
 
-            PlayAnimation("Dead", () => { if (Class.DestroyOnDeath) Map?.Destroy(this); });
             IsAlive = false;
+            PlayAnimation("Dead", () => { if (Class.DestroyOnDeath) Map?.Destroy(this); });
         }
 
         public virtual void Resurrect()

@@ -110,13 +110,6 @@ namespace Takai.Game
         /// </summary>
         public IEnumerable<EntityInstance> ActiveEntities => activeEntities;
 
-        //public event EventHandler<List<EntityInstance>> EntitiesRemoved;
-        //public event EventHandler<List<EntityInstance>> EntitiesAdded;
-        /// <summary>
-        /// Entities added within the last update cycle 
-        /// </summary>
-        //protected List<EntityInstance> entsAdded = new List<EntityInstance>(8);
-
         public void BeginUpdate()
         {
             activeEntities.Clear();
