@@ -394,7 +394,7 @@ namespace Takai.Game
         /// <param name="start">Where to search from</param>
         /// <param name="direction">In which direction to search. Should be normalized</param>
         /// <returns>The distance from start before colliding with a map edge"/></returns>
-        public int TraceTiles(Vector2 start, Vector2 direction)
+        public int TraceTiles(Vector2 start, Vector2 direction, int maxDistance = 1000)
         {
             //max distance?
 
@@ -405,9 +405,9 @@ namespace Takai.Game
             {
                 total += (dist = Class.DistanceToEdge(pos));
                 pos += direction * dist;
-            } while (dist != 0);
+            } while (dist != 0 && total < maxDistance);
 
-            return total;
+            return Math.Min(total, maxDistance);
         }
 
         /// <summary>
@@ -518,8 +518,8 @@ namespace Takai.Game
 
                 if (shortest != null && shortestDist <= maxDistance)
                 {
-                    var trace = TraceTiles(start, direction);
-                    if (trace >= shortestDist)
+                    var trace = TraceTiles(start, direction, (int)shortestDist);
+                    if (trace >= (int)shortestDist)
                     {
                         return new TraceHit()
                         {
@@ -540,12 +540,12 @@ namespace Takai.Game
                 sectorPos += sectorDelta;
             }
             {
-                var trace = TraceTiles(start, direction);
+                var trace = TraceTiles(start, direction, (int)maxDistance);
                 return new TraceHit()
                 {
                     distance = trace,
                     entity = null,
-                    didHit = trace < maxDistance
+                    didHit = trace < (int)maxDistance
                 };
             }
         }
