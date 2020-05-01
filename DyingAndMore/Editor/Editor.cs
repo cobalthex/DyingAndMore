@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -305,7 +305,7 @@ namespace DyingAndMore.Editor
 
             modes.Mode?.End();
 
-            var tmpFile = System.IO.Path.GetTempFileName();
+            var tmpFile = Path.GetTempFileName();
             Map.Save(tmpFile);
 
             if (Game.GameInstance.Current == null)
@@ -493,14 +493,14 @@ namespace DyingAndMore.Editor
                     using (var sfd = new System.Windows.Forms.SaveFileDialog()
                     {
                         Filter = "Dying and More! Maps (*.map.tk)|*.map.tk",
-                        InitialDirectory = System.IO.Path.GetDirectoryName(Map.Class.File),
+                        InitialDirectory = Path.GetDirectoryName(Map.Class.File),
                         RestoreDirectory = true,
                         SupportMultiDottedExtensions = true,
-                        FileName = System.IO.Path.GetFileName(Map.Class.File),
+                        FileName = Path.GetFileName(Map.Class.File),
                     })
                     {
-                        sfd.CustomPlaces.Add(System.IO.Path.GetFullPath("Content/Mapsrc"));
-                        sfd.CustomPlaces.Add(System.IO.Path.GetFullPath("Maps"));
+                        sfd.CustomPlaces.Add(Path.GetFullPath("Content/Mapsrc"));
+                        sfd.CustomPlaces.Add(Path.GetFullPath("Maps"));
                         if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         {
                             try
@@ -522,13 +522,13 @@ namespace DyingAndMore.Editor
                     using (var ofd = new System.Windows.Forms.OpenFileDialog()
                     {
                         Filter = "Dying and More! Maps (*.map.tk)|*.map.tk|Dying and More! Saves (*.d2sav)|*.d2sav",
-                        InitialDirectory = System.IO.Path.Combine(Cache.Root, "Mapsrc"),
+                        InitialDirectory = Path.GetFullPath(Path.Combine(Cache.Root, "Mapsrc")),
                         RestoreDirectory = true,
                         SupportMultiDottedExtensions = true,
                     })
                     {
-                        ofd.CustomPlaces.Add(System.IO.Path.GetFullPath("Content/Mapsrc")); //test if exists in release mode?
-                        ofd.CustomPlaces.Add(System.IO.Path.GetFullPath("Maps"));
+                        ofd.CustomPlaces.Add(Path.GetFullPath("Content/Mapsrc")); //test if exists in release mode?
+                        ofd.CustomPlaces.Add(Path.GetFullPath("Maps"));
                         if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         {
                             //try

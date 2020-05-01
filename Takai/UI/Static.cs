@@ -425,7 +425,7 @@ namespace Takai.UI
         public Vector2 MeasuredSize { get; private set; }
 
         /// <summary>
-        /// The bounds of the content area, as determined by <see cref="Reflow"/>
+        /// The bounds of the content area, as determined by <see cref="ReflowQueued"/>
         /// </summary>
         [Data.DebugSerialize]
         public Rectangle ContentArea { get; private set; }
@@ -1738,7 +1738,7 @@ namespace Takai.UI
         /// <summary>
         /// Complete any pending reflows/arranges
         /// </summary>
-        public static void Reflow()
+        public static void ReflowQueued()
         {
             for (int i = 0; i < measureQueue.Count; ++i)
             {
@@ -1765,8 +1765,10 @@ namespace Takai.UI
         /// <param name="time">Game time</param>
         public virtual void Update(GameTime time)
         {
+#if DEBUG
             boop.Restart();
-            Reflow();
+#endif
+            ReflowQueued();
 
             if (!IsEnabled)
                 return;
@@ -1829,7 +1831,9 @@ namespace Takai.UI
                 if (i < 0) //todo: does this skip the first child?
                     toUpdate = toUpdate.Parent;
             }
+#if DEBUG
             lastUpdateDuration = boop.Elapsed;
+#endif
         }
 
         /// <summary>
@@ -2026,7 +2030,9 @@ namespace Takai.UI
         /// <param name="spriteBatch">The spritebatch to use</param>
         public virtual void Draw(SpriteBatch spriteBatch)
         {
+#if DEBUG
             boop.Restart();
+#endif
             if (!IsEnabled)
                 return;
 
@@ -2092,9 +2098,8 @@ namespace Takai.UI
                         Data.Serializer.TextSerialize(stream, debugDraw, 0, false, false, true);
                 }
             }
-#endif
-
             lastDrawDuration = boop.Elapsed;
+#endif
         }
 
         private void BreakOnThis()
@@ -2241,7 +2246,7 @@ namespace Takai.UI
             //Graphics.Primitives2D.DrawRect(spriteBatch, Color.LightSteelBlue, finalRect);
         }
 
-        #endregion
+#endregion
 
         public override string ToString()
         {
@@ -2312,7 +2317,7 @@ namespace Takai.UI
             //base on rules
         }
 
-        #region Helpers
+#region Helpers
 
         //todo: better name
 
@@ -2328,6 +2333,6 @@ namespace Takai.UI
             BubbleEvent(ClickEvent, ce);
         }
 
-        #endregion
+#endregion
     }
 }

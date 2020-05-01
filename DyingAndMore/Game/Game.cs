@@ -323,6 +323,8 @@ namespace DyingAndMore.Game
             updateSettingsPane?.BindTo(Map.updateSettings);
             renderSettingsPane?.BindTo(Map.renderSettings);
             SelectPlayers();
+
+            IsPaused = false;
         }
 
         string GetClockText(TimeSpan time)
@@ -468,6 +470,23 @@ namespace DyingAndMore.Game
                     }
                 }
                 return false;
+            }
+#endif
+
+#if DEBUG
+            if (IsPaused)
+            {
+                //per viewport?
+                if (players.Count > 0)
+                {
+                    if (InputState.IsButtonDown(MouseButtons.Middle))
+                        players[0].camera.MoveTo(players[0].camera.ActualPosition - 
+                            InputState.MouseDelta() / players[0].camera.ActualScale);
+
+                    var delta = InputState.ScrollDelta();
+                    if (delta != 0)
+                        players[0].camera.ActualScale += Math.Sign(InputState.ScrollDelta()) * 0.2f;
+                }
             }
 #endif
 

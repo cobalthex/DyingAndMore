@@ -48,14 +48,13 @@ namespace Takai
             Values.RemoveAt(find);
             return outv.value;
         }
-
-        int GetClosestIndex(float t)
+        int GetClosestIndex(float t, int indexHint = 1)
         {
             //binary search?
-            for (int i = 1; i < Values.Count; ++i)
+            for (; indexHint < Values.Count; ++indexHint)
             {
-                if (t < Values[i].position)
-                    return i - 1;
+                if (t < Values[indexHint].position)
+                    return indexHint - 1;
             }
             return Values.Count - 1;
         }
@@ -64,18 +63,24 @@ namespace Takai
 
         public TValue Evaluate(float t)
         {
+            int hint = 1;
+            return Evaluate(t, ref hint);
+        }
+
+        public TValue Evaluate(float t, ref int indexHint)
+        {
             if (Values.Count == 0)
                 return default;
             if (Values.Count == 1)
                 return Values[0].value;
 
-            var i1 = GetClosestIndex(t);
-            var i0 = Util.Clamp(i1 - 1, 0, Values.Count - 1);
-            var i2 = Util.Clamp(i1 + 1, 0, Values.Count - 1);
-            var i3 = Util.Clamp(i1 + 2, 0, Values.Count - 1);
+            indexHint = GetClosestIndex(t, indexHint);
+            var i0 = Util.Clamp(indexHint - 1, 0, Values.Count - 1);
+            var i2 = Util.Clamp(indexHint + 1, 0, Values.Count - 1);
+            var i3 = Util.Clamp(indexHint + 2, 0, Values.Count - 1);
 
-            t = (t - Values[i1].position) / (Values[i2].position - Values[i1].position);
-            return Function(Values[i0].value, Values[i1].value, Values[i2].value, Values[i3].value, t);
+            t = (t - Values[indexHint].position) / (Values[i2].position - Values[indexHint].position);
+            return Function(Values[i0].value, Values[indexHint].value, Values[i2].value, Values[i3].value, t);
         }
 
         public void DerivedDeserialize(Dictionary<string, object> props)
@@ -216,20 +221,32 @@ namespace Takai
 
         public Color Evaluate(float t)
         {
+            int indexHint = 1;
+            return Evaluate(t, ref indexHint);
+        }
+
+        public Color Evaluate(float t, ref int indexHint)
+        {
             switch (Mode)
             {
                 case ChromaMode.HSL:
-                    return Graphics.ColorUtil.ColorFromHSL(curve.Evaluate(t));
+                    return Graphics.ColorUtil.ColorFromHSL(curve.Evaluate(t, ref indexHint));
                 case ChromaMode.HSV:
-                    return Graphics.ColorUtil.ColorFromHSV(curve.Evaluate(t));
+                    return Graphics.ColorUtil.ColorFromHSV(curve.Evaluate(t, ref indexHint));
                 default:
-                    return Color.FromNonPremultiplied(curve.Evaluate(t));
+                    return Color.FromNonPremultiplied(curve.Evaluate(t, ref indexHint));
             }
         }
 
         public Vector4 EvaluateChroma(float t)
         {
-            return curve.Evaluate(t);
+            int indexHint = 1;
+            return curve.Evaluate(t, ref indexHint);
+        }
+
+        public Vector4 EvaluateChroma(float t, ref int indexHint)
+        {
+            return curve.Evaluate(t, ref indexHint);
         }
 
         public static implicit operator ColorCurve(Color color)
