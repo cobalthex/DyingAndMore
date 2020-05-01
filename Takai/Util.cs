@@ -24,6 +24,17 @@ namespace Takai
             ++n;
             return n;
         }
+        public static int NextPowerOf2(int n)
+        {
+            --n;
+            n |= (n >> 1);
+            n |= (n >> 2);
+            n |= (n >> 4);
+            n |= (n >> 8);
+            n |= (n >> 16);
+            ++n;
+            return n;
+        }
 
         public static bool IsPowerOf2(int n)
         {

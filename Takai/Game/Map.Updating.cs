@@ -126,6 +126,7 @@ namespace Takai.Game
             );
             var activeSectors = GetOverlappingSectors(_activeRegion);
 
+            //todo: this is slow
             for (int y = activeSectors.Top; y < activeSectors.Bottom; ++y)
                 for (int x = activeSectors.Left; x < activeSectors.Right; ++x)
                     activeEntities.UnionWith(Sectors[y, x].entities);

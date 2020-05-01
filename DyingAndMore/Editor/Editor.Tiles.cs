@@ -11,12 +11,26 @@ namespace DyingAndMore.Editor
         bool isPosSaved = false;
         Vector2 savedWorldPos, lastWorldPos, currentWorldPos;
 
+        bool tilesChanged = false;
+
         //short[,] clipboard;
 
         public TilesEditorMode(Editor editor)
             : base("Tiles", editor, new Selectors.TileSelector(editor.Map.Class.Tileset))
         {
         }
+
+        public override void End()
+        {
+            if (tilesChanged) //if can, PatchTileLayoutTexture should handle this
+            {
+                editor.Map.Class.GenerateCollisionMask();
+                tilesChanged = false;
+            }
+            base.End();
+        }
+
+        //todo: regenerate SDF if tiles changed
 
         protected override void UpdatePreview(int selectedItem)
         {
@@ -179,6 +193,7 @@ namespace DyingAndMore.Editor
             //todo: first row/col dont render
 
             editor.Map.Class.PatchTileLayoutTexture(new Rectangle(start, end - start));
+            tilesChanged = true;
         }
 
         void TileLine(Point start, Point end, short value)
@@ -229,6 +244,7 @@ namespace DyingAndMore.Editor
 
             //todo:broken
             editor.Map.Class.PatchTileLayoutTexture(Takai.Util.AbsRectangle(start, end + new Point(1)));
+            tilesChanged = true;
         }
 
         void TileFlood(Point tile, short value)
@@ -273,6 +289,7 @@ namespace DyingAndMore.Editor
             var bnd = new Rectangle(min, max - min);
             bnd.Inflate(1, 1);
             editor.Map.Class.PatchTileLayoutTexture(bnd);
+            tilesChanged = true;
         }
     }
 }

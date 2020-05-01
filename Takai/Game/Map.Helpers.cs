@@ -50,14 +50,19 @@ namespace Takai.Game
             if (!Bounds.Contains(point))
                 return false;
 
-            return CollisionMask[(int)point.Y >> CollisionMaskScale, (int)point.X >> CollisionMaskScale] > 0;
+            return CollisionMask[
+                ((int)point.Y >> CollisionMaskScale) * CollisionMaskSize.X +
+                ((int)point.X >> CollisionMaskScale)]
+                > 0;
         }
         public byte DistanceToEdge(Vector2 point)
         {
             if (!Bounds.Contains(point))
                 return 0;
 
-            return CollisionMask[(int)point.Y >> CollisionMaskScale, (int)point.X >> CollisionMaskScale];
+            return CollisionMask[
+                ((int)point.Y >> CollisionMaskScale) * CollisionMaskSize.X +
+                ((int)point.X >> CollisionMaskScale)];
         }
     }
 
@@ -540,12 +545,13 @@ namespace Takai.Game
                 sectorPos += sectorDelta;
             }
             {
-                var trace = TraceTiles(start, direction, (int)maxDistance);
+                var md = (int)Math.Ceiling(maxDistance);
+                var trace = TraceTiles(start, direction, md);
                 return new TraceHit()
                 {
                     distance = trace,
                     entity = null,
-                    didHit = trace < (int)maxDistance
+                    didHit = trace < md //todo: maxDistance here likely very tiny
                 };
             }
         }

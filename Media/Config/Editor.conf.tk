@@ -3,7 +3,8 @@
     SnapAngle: 45deg;
 
     RenderSettings: {
-		drawTiles: true;
+        drawTiles: true;
+		drawTileCollisionMask: true;
         drawEntities: true;
         drawFluids: true;
         drawReflections: true;

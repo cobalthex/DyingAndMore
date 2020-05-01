@@ -1,13 +1,29 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+
+using SDF = Takai.Graphics.SignedDistanceField;
 
 namespace Takai.Game
 {
     public partial class MapBaseClass : Data.IDerivedSerialize, Data.IDerivedDeserialize
     {
+        //test if inside the map
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        byte TileValueAt(int x, int y, Color[] tilemap) //x and y here scaled down
+        {
+            var tile = Tiles[y / TileSize, x / TileSize];
+            if (tile < 0)
+                return 0;
+
+            return tilemap[
+                ((tile / TilesPerRow) * TileSize + (y % TileSize)) * TilesImage.Width +
+                ((tile % TilesPerRow) * TileSize + (x % TileSize))
+            ].A;
+        }
+
         /// <summary>
         /// Generate the SDF based collision mask from the tile map/tileset.
         /// Calculates 
@@ -22,99 +38,86 @@ namespace Takai.Game
             var w = (Width * TileSize) >> scale;
             var h = (Height * TileSize) >> scale;
 
+            CollisionMaskSize = new Point(w, h);
             if (w <= 0 || h <= 0)
             {
-                CollisionMask = new byte[0, 0];
+                CollisionMask = new byte[0];
                 return;
             }
             
-            //use floats?
-
             //1px border around map is considered unpathable
 
             //do each individually for better cache perf
 
-            CollisionMask = new byte[h, w];
+            CollisionMask = new byte[h * w];
             for (int y = 1; y < h - 1; ++y)
                 for (int x = 1; x < w - 1; ++x)
-                    CollisionMask[y, x] = 255;
+                    CollisionMask[y * w + x] = byte.MaxValue;
 
-            var p = new Point[h, w];
+            var p = new Point[h * w];
             for (int y = 1; y < h - 1; ++y)
                 for (int x = 1; x < w - 1; ++x)
-                    p[y, x] = new Point(-1);
+                    p[y * w + x] = new Point(-1);
 
-            Color[] tilesImageData = new Color[TilesImage.Width * TilesImage.Height];
-            TilesImage.GetData(tilesImageData);
-
-            //test if inside the map
-            bool I(int x, int y) //x and y here scaled down
-            {
-                x <<= scale;
-                y <<= scale;
-
-                var tile = Tiles[y / TileSize, x / TileSize];
-                if (tile < 0)
-                    return false;
-
-                const byte threshold = 127;
-                return tilesImageData[
-                    ((tile / TilesPerRow) * TileSize + (y % TileSize)) * TilesImage.Width +
-                    ((tile % TilesPerRow) * TileSize + (x % TileSize))
-                ].A > threshold;
-            }
+            Color[] tilemap = new Color[TilesImage.Width * TilesImage.Height];
+            TilesImage.GetData(tilemap);
 
             //can skip bounds checking by using padded array, but requires copying array at end
-            
+
             //find edges
+            //can be parallelized
+            const byte threshold = 127;
             for (int y = 1; y < h - 1; ++y)
             {
+                var ys = y << scale;
                 for (int x = 1; x < w - 1; ++x)
                 {
-                    bool onEdge = (
-                        I(x - 1, y) != I(x, y) || I(x + 1, y) != I(x, y) ||
-                        I(x, y - 1) != I(x, y) || I(x, y + 1) != I(x, y)
-                    );
-                    if (!I(x, y) || onEdge)
+                    var xs = x << scale;
+                    byte cur = TileValueAt(xs, ys, tilemap);
+                    //from 'Fast Edge Detection Algorithm for Embedded Systems'
+                    bool isEdge = 
+                        (cur - TileValueAt((x + 1) << scale, ys, tilemap) > threshold) || 
+                        (cur - TileValueAt(xs, (y + 1) << scale, tilemap) > threshold);
+                    if (cur < threshold || isEdge)
                     {
-                        CollisionMask[y, x] = 0;
-                        p[y, x] = new Point(x, y);
+                        CollisionMask[y * w + x] = 0;
+                        p[y * w + x] = new Point(x, y);
                     }
 
                 }
             }
-
-            //distance functions - these assume X - x, Y - y
-            byte euclidean(int x, int y) => (byte)Math.Sqrt(x * x + y * y);
-            //byte manhattan(int x, int y) => (byte)(Math.Abs(x) + Math.Abs(y));
-            //byte chebyshev(int x, int y) => (byte)Math.Max(Math.Abs(x), Math.Abs(y));
-
-            const float dx = 1f, dy = 1f, dh = 1.4142135623730950488f /* sqrt(2) */;
-
+            System.Diagnostics.Debug.WriteLine("Edge pass SDF in " + timer.Elapsed);
+            
             //first pass
             for (int y = 1; y < h - 1; ++y)
             {
                 for (int x = 1; x < w - 1; ++x)
                 {
-                    if (CollisionMask[y - 1, x - 1] + dh < CollisionMask[y, x])
+                    var cc = y * w + x;
+
+                    var cp = (y - 1) * w + (x - 1);
+                    if (CollisionMask[cp] + SDF.DHyp < CollisionMask[cc])
                     {
-                        p[y, x] = p[y - 1, x - 1];
-                        CollisionMask[y, x] = euclidean(x - p[y, x].X, y - p[y, x].Y);
+                        p[cc] = p[cp];
+                        CollisionMask[cc] = SDF.Euclidean(x - p[cc].X, y - p[cc].Y);
                     }
-                    if (CollisionMask[y - 1, x] + dy < CollisionMask[y, x])
+                    cp = (y - 1) * w + x;
+                    if (CollisionMask[cp] + SDF.DY < CollisionMask[cc])
                     {
-                        p[y, x] = p[y - 1, x];
-                        CollisionMask[y, x] = euclidean(x - p[y, x].X, y - p[y, x].Y);
+                        p[cc] = p[cp];
+                        CollisionMask[cc] = SDF.Euclidean(x - p[cc].X, y - p[cc].Y);
                     }
-                    if (CollisionMask[y - 1, x + 1] + dh < CollisionMask[y, x])
+                    cp = (y - 1) * w + (x + 1);
+                    if (CollisionMask[cp] + SDF.DHyp < CollisionMask[cc])
                     {
-                        p[y, x] = p[y - 1, x + 1];
-                        CollisionMask[y, x] = euclidean(x - p[y, x].X, y - p[y, x].Y);
+                        p[cc] = p[cp];
+                        CollisionMask[cc] = SDF.Euclidean(x - p[cc].X, y - p[cc].Y);
                     }
-                    if (CollisionMask[y, x - 1] + dx < CollisionMask[y, x])
+                    cp = y * w + (x - 1);
+                    if (CollisionMask[cp] + SDF.DX < CollisionMask[cc])
                     {
-                        p[y, x] = p[y, x - 1];
-                        CollisionMask[y, x] = euclidean(x - p[y, x].X, y - p[y, x].Y);
+                        p[cc] = p[cp];
+                        CollisionMask[cc] = SDF.Euclidean(x - p[cc].X, y - p[cc].Y);
                     }
                 }
             }
@@ -124,25 +127,31 @@ namespace Takai.Game
             {
                 for (int x = w - 2; x > 0; --x)
                 {
-                    if (CollisionMask[y, x + 1] + dx < CollisionMask[y, x])
+                    var cc = y * w + x;
+
+                    var cp = y * w + (x + 1);
+                    if (CollisionMask[cp] + SDF.DX < CollisionMask[cc])
                     {
-                        p[y, x] = p[y, x + 1];
-                        CollisionMask[y, x] = euclidean(x - p[y, x].X, y - p[y, x].Y);
+                        p[cc] = p[cp];
+                        CollisionMask[cc] = SDF.Euclidean(x - p[cc].X, y - p[cc].Y);
                     }
-                    if (CollisionMask[y + 1, x - 1] + dh < CollisionMask[y, x])
+                    cp = (y + 1) * w + (x - 1);
+                    if (CollisionMask[cp] + SDF.DHyp < CollisionMask[cc])
                     {
-                        p[y, x] = p[y + 1, x - 1];
-                        CollisionMask[y, x] = euclidean(x - p[y, x].X, y - p[y, x].Y);
+                        p[cc] = p[cp];
+                        CollisionMask[cc] = SDF.Euclidean(x - p[cc].X, y - p[cc].Y);
                     }
-                    if (CollisionMask[y + 1, x] + dy < CollisionMask[y, x])
+                    cp = (y + 1) * w + x;
+                    if (CollisionMask[cp] + SDF.DY < CollisionMask[cc])
                     {
-                        p[y, x] = p[y + 1, x];
-                        CollisionMask[y, x] = euclidean(x - p[y, x].X, y - p[y, x].Y);
+                        p[cc] = p[cp];
+                        CollisionMask[cc] = SDF.Euclidean(x - p[cc].X, y - p[cc].Y);
                     }
-                    if (CollisionMask[y + 1, x + 1] + dx < CollisionMask[y, x])
+                    cp = (y + 1) * w + (x + 1);
+                    if (CollisionMask[cp] + SDF.DX < CollisionMask[cc])
                     {
-                        p[y, x] = p[y + 1, x + 1];
-                        CollisionMask[y, x] = euclidean(x - p[y, x].X, y - p[y, x].Y);
+                        p[cc] = p[cp];
+                        CollisionMask[cc] = SDF.Euclidean(x - p[cc].X, y - p[cc].Y);
                     }
                 }
             }
@@ -150,9 +159,20 @@ namespace Takai.Game
             timer.Stop();
             System.Diagnostics.Debug.WriteLine("Generated collision SDF in " + timer.Elapsed);
 
-            //todo: this is being called several times
+            if (collisionMaskSDF == null || collisionMaskSDF.Width < w || collisionMaskSDF.Height < h)
+            {
+                collisionMaskSDF?.Dispose();
+                collisionMaskSDF = new Microsoft.Xna.Framework.Graphics.Texture2D(
+                    Runtime.GraphicsDevice,
+                    Util.NextPowerOf2(w),
+                    Util.NextPowerOf2(h),
+                    false,
+                    Microsoft.Xna.Framework.Graphics.SurfaceFormat.Alpha8
+                );
+            }
+            collisionMaskSDF.SetData(0, new Rectangle(0, 0, w, h), CollisionMask, 0, CollisionMask.Length);
 
-            
+#if DEBUG
             //save as TGA image for testing
             using (var fs = new System.IO.FileStream("collision.tga", System.IO.FileMode.Create))
             {
@@ -171,10 +191,9 @@ namespace Takai.Game
                 fs.WriteByte(0);
 
                 for (var y = h - 1; y >= 0; --y) //y is flipped
-                    for (var x = 0; x < w; ++x)
-                        fs.WriteByte(CollisionMask[y, x]); //maybe a hacky way to get a single dimensional array but ¯\_(ツ)_/¯
+                    fs.Write(CollisionMask, y * w, w);
             }
-            
+#endif
         }
 
         public virtual Dictionary<string, object> DerivedSerialize()
@@ -210,6 +229,7 @@ namespace Takai.Game
             TilesPerRow = (TilesImage != null ? (TilesImage.Width / TileSize) : 0);
             SectorPixelSize = SectorSize * TileSize;
             GenerateCollisionMask(); //todo: necessary here?
+            //todo: this is being called several times
         }
     }
 

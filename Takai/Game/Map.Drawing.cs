@@ -61,6 +61,10 @@ namespace Takai.Game
         internal DynamicVertexBuffer trailVBuffer;
 
         internal Texture2D tilesLayoutTexture;
+        /// <summary>
+        /// GPU stored version of <see cref="CollisionMask"/>
+        /// </summary>
+        internal Texture2D collisionMaskSDF;
 
         internal VertexPositionColor[] fullScreenVerts = new[]
         {
@@ -504,12 +508,7 @@ namespace Takai.Game
             //main render
             Runtime.GraphicsDevice.SetRenderTargets(Class.preRenderTarget);
 
-            if (renderSettings.drawTileCollisionMask && Class.CollisionMask != null)
-            {
-                //todo
-                //need to upload collision mask as texture
-            }    
-            else if (renderSettings.drawTiles && Class.TilesImage != null)
+            if (renderSettings.drawTiles && Class.TilesImage != null)
                 DrawTiles(ref context, Color.White);
             else
                 Runtime.GraphicsDevice.Clear(ClearOptions.Stencil, Color.Transparent, 0, 1);
@@ -620,7 +619,7 @@ namespace Takai.Game
                  new VertexPositionColorTexture(new Vector3(width, 0, 0), renderColor, new Vector2(1, 0)),
                  new VertexPositionColorTexture(new Vector3(0, height, 0), renderColor, new Vector2(0, 1)),
                  new VertexPositionColorTexture(new Vector3(width, height, 0), renderColor, new Vector2(1, 1)),
-             };
+            };
 
             Runtime.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             Runtime.GraphicsDevice.DepthStencilState = Class.stencilWrite;
@@ -632,6 +631,26 @@ namespace Takai.Game
                 pass.Apply();
                 Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, verts, 0, 2);
             }
+
+            if (renderSettings.drawTileCollisionMask && Class.CollisionMask != null)
+            {
+                var frx = (float)Class.CollisionMaskSize.X / Class.collisionMaskSDF.Width;
+                var fry = (float)Class.CollisionMaskSize.Y / Class.collisionMaskSDF.Height;
+                verts[0].TextureCoordinate = new Vector2(0, 0);
+                verts[1].TextureCoordinate = new Vector2(frx, 0);
+                verts[2].TextureCoordinate = new Vector2(0, fry);
+                verts[3].TextureCoordinate = new Vector2(frx, fry);
+                Class.basicEffect.Parameters["Tex"].SetValue(Class.collisionMaskSDF);
+                Class.basicEffect.Parameters["Transform"].SetValue(c.viewTransform);
+
+                Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                foreach (EffectPass pass in Class.basicEffect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, verts, 0, 2);
+                }
+            }
+
             Runtime.GraphicsDevice.ScissorRectangle = Runtime.GraphicsDevice.Viewport.Bounds;
         }
 
@@ -909,7 +928,7 @@ namespace Takai.Game
                     spriteFrame = trail.Class.Sprite.GetFrameUV(trail.Class.Sprite.GetFrameIndex(ElapsedTime));
                 }
 
-                //(next < trailVerts.Length) a bit hacky, trails can be updated more often than the map is
+                int widIndex = 1, colIndex = 1;
                 for (int n = 0; n < trail.Count && next < Class.trailVerts.Length; ++n, next += 2)
                 {
                     var i1 = (n + trail.TailIndex) % trail.AllPoints.Count;
@@ -917,8 +936,8 @@ namespace Takai.Game
 
                     var t = n / (float)trail.Count;
 
-                    var wid = trail.Class.Width.Evaluate(t);
-                    var col = trail.Class.Color.Evaluate(t);
+                    var wid = trail.Class.Width.Evaluate(t, ref widIndex);
+                    var col = trail.Class.Color.Evaluate(t, ref colIndex);
 
                     var p = trail.AllPoints[i1];
                     var norm = p.direction.Ortho();
