@@ -240,8 +240,6 @@ namespace DyingAndMore.Game
 
                 if (possiblePlayers[i].Hud != null)
                     hudContainer.AddChild(possiblePlayers[i].Hud);
-                if (possiblePlayers[i].Weapon?.Hud != null)
-                    hudContainer.AddChild(possiblePlayers[i].Hud);
             }
             if (players.Count > 0)
             {
@@ -564,6 +562,7 @@ namespace DyingAndMore.Game
                     {
                         var pos = player.camera.WorldToScreen(ent.WorldPosition - new Vector2(0, ent.Radius + 16));
                         DrawHealthBar(spriteBatch, pos, actor.CurrentHealth, actor._Class.MaxHealth);
+                        DrawEntInfo(spriteBatch, pos, actor);
                     }
                 }
 #endif
@@ -610,12 +609,12 @@ namespace DyingAndMore.Game
                 }
             }
 
-            DebugPropertyDisplay.AddRow("Total entities", Map.AllEntities.Count());
-            DebugPropertyDisplay.AddRow("Active entities", Map.UpdateStats.updatedEntities);
-            DebugPropertyDisplay.AddRow("Total particles", particleCount);
-            DebugPropertyDisplay.AddRow("Trail points", Map.RenderStats.trailPointCount);
-            DebugPropertyDisplay.AddRow("Visible fluids (active)", Map.RenderStats.visibleActiveFluids);
-            DebugPropertyDisplay.AddRow("Visible fluids (inactive)", Map.RenderStats.visibleInactiveFluids);
+            DyingAndMoreGame.DebugDisplay("Total entities", Map.AllEntities.Count());
+            DyingAndMoreGame.DebugDisplay("Active entities", Map.UpdateStats.updatedEntities);
+            DyingAndMoreGame.DebugDisplay("Total particles", particleCount);
+            DyingAndMoreGame.DebugDisplay("Trail points", Map.RenderStats.trailPointCount);
+            DyingAndMoreGame.DebugDisplay("Visible fluids (active)", Map.RenderStats.visibleActiveFluids);
+            DyingAndMoreGame.DebugDisplay("Visible fluids (inactive)", Map.RenderStats.visibleInactiveFluids);
         }
 
         protected void DrawHealthBar(SpriteBatch spriteBatch, Vector2 screenPosition, float health, float maxHealth)
@@ -628,6 +627,26 @@ namespace DyingAndMore.Game
             rect.Width = (int)(rect.Width * pc);
             Takai.Graphics.Primitives2D.DrawFill(spriteBatch, health > maxHealth ? Color.LightSteelBlue : Color.LawnGreen, rect);
             Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Teal, rect);
+        }
+
+        protected void DrawEntInfo(SpriteBatch spriteBatch, Vector2 screenPosition, EntityInstance entity)
+        {
+            var text = $"{entity.Name} ({entity.Class.Name})\n";
+            //weapon
+            if (entity is Entities.ActorInstance actor)
+            {
+                if (actor.Controller != null)
+                    text += $"Controller: {(actor.Controller.GetType().Name)}\n";
+                if (actor.Controller is Entities.AIController ai)
+                    text += $" AI: {ai}\n";
+
+                var fov = Matrix.CreateRotationZ(((Entities.ActorClass)actor.Class).FieldOfView / 2);
+                var d = Vector2.TransformNormal(entity.WorldForward, fov);
+                Map.DrawLine(entity.WorldPosition, entity.WorldPosition + d * 100, new Color(Color.White, 0.5f));
+                d = Vector2.TransformNormal(entity.WorldForward, Matrix.Invert(fov));
+                Map.DrawLine(entity.WorldPosition, entity.WorldPosition + d * 100, new Color(Color.White, 0.5f));
+            }
+            DebugFont.Draw(spriteBatch, text, screenPosition, Color.White);
         }
     }
 }

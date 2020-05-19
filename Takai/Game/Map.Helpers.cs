@@ -12,11 +12,11 @@ namespace Takai.Game
 
             if (tilesEffect != null)
             {
-                tilesEffect.Parameters["TilesPerRow"].SetValue(TilesPerRow);
+                tilesEffect.Parameters["TilesPerRow"].SetValue(Tileset.TilesPerRow);
                 tilesEffect.Parameters["TileSize"].SetValue(new Vector2(TileSize));
+                tilesEffect.Parameters["TilesImage"].SetValue(Tileset.texture);
+                tilesEffect.Parameters["TilesLayout"].SetValue(tilesLayoutTexture);
                 tilesEffect.Parameters["MapSize"].SetValue(new Vector2(Width, Height));
-                tilesEffect.Parameters["TilesImage"]?.SetValue(TilesImage);
-                tilesEffect.Parameters["TilesLayout"]?.SetValue(tilesLayoutTexture);
             }
 
             GenerateCollisionMask();
@@ -32,7 +32,7 @@ namespace Takai.Game
         {
             var map = new MapBaseClass
             {
-                TileSize = size,
+                Tileset = new Tileset(null, size)
             };
             if (initializeGraphics)
                 map.InitializeGraphics();
@@ -75,7 +75,7 @@ namespace Takai.Game
         ///<summary>
         ///Resize the map (in tiles)
         ///</summary>
-        public void Resize(int newWidth, int newHeight)
+        public void Resize(int newWidth, int newHeight, bool regenerateSectors = false)
         {
             System.Diagnostics.Contracts.Contract.Requires(newWidth > 0);
             System.Diagnostics.Contracts.Contract.Requires(newHeight > 0);
@@ -94,9 +94,16 @@ namespace Takai.Game
             {
                 for (int x = 0; x < Sectors.GetLength(1); ++x)
                 {
-                    if (Sectors[y, x] == null)
+                    if (regenerateSectors || Sectors[y, x] == null)
                         Sectors[y, x] = new MapSector();
                 }
+            }
+
+            //remove all entities outside the map
+            foreach (var entity in AllEntities)
+            {
+                if (!Class.Bounds.Intersects(entity.AxisAlignedBounds))
+                    Destroy(entity);
             }
 
             PathInfo = PathInfo.Resize(newHeight, newWidth);

@@ -1,4 +1,5 @@
 Tileset {
 	texture: @"./Tiles.png";
+	material: "Tiles";
 	size: 48;
 }

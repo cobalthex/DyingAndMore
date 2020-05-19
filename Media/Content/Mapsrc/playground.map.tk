@@ -21,14 +21,8 @@ MapInstance {
     };
     Class: MapClass {
         Name: "playground";
-        TileSize: 48;
-        Tileset: Tileset {
-            texture: "Tilesets/Tiles2.png";
-            size: 48;
-        };
+        Tileset: @"Tilesets/gray.tiles.tk";
         MaterialInteractions: @"Materials/Test.mtl.tk";
-        TilesMaterial: "Tiles";
-        TilesImage: "Tilesets/Tiles2.png";
         Width: 20;
         Height: 20;
         Tiles: [0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 22 0 0 0 23 0 0 0 22 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 24 25 0 0 50 0 0 0 -1 0 0 0 0 15 14 0 0 0 0 0 26 27 0 0 -1 14 0 0 13 -1 -1 -1 -1 -1 12 0 0 0 0 0 0 0 0 0 -1 -1 14 0 0 13 -1 -1 -1 -1 0 0 0 -1 -1 -1 0 -1 -1 -1 -1 -1 -1 14 0 0 -1 -1 -1 -1 0 0 0 -1 28 29 0 -1 -1 -1 -1 -1 -1 -1 14 0 13 -1 -1 -1 0 0 0 -1 30 31 0 -1 -1 -1 -1 8 0 9 -1 14 0 -1 -1 -1 0 0 0 -1 -1 -1 0 -1 -1 -1 -1 0 0 0 -1 -1 14 13 -1 -1 0 0 0 -1 -1 -1 0 95 -1 -1 -1 0 0 0 13 -1 -1 14 13 -1 0 0 0 0 0 -1 0 0 -1 0 0 0 0 0 0 13 -1 -1 14 13 0 0 0 0 0 -1 20 0 -1 0 0 0 0 0 0 0 -1 -1 -1 14 0 0 0 0 21 -1 0 0 -1 0 0 0 0 0 0 0 13 4 4 12 0 0 0 0 0 -1 0 21 79 0 0 0 0 0 0 0 0 0 0 0 0 0 55 0 0 -1 14 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 47 16 0 73 -1 -1 20 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 26 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
@@ -70,10 +64,9 @@ MapInstance {
             Trail: Null;
             SpawnTime: 151195;
             EventHandlers: Null;
-        }
+        };
         WeaponPickupInstance {
             Weapon: GunInstance {
-                Class: @"Weapons/bfg.wpn.tk";
                 Class: @"Weapons/bfg.wpn.tk";
                 CurrentAmmo: 5000;
                 StateTime: 0;
@@ -82,7 +75,6 @@ MapInstance {
             Class: @"Pickups/Bfg.ent.tk";
             NextRespawnTime: 0;
             Id: 2;
-            Class: @"Pickups/Bfg.ent.tk";
             Name: Null;
             Position: [33.56412 101.8654];
             Forward: [1 0];
@@ -97,15 +89,12 @@ MapInstance {
         WeaponPickupInstance {
             Weapon: GunInstance {
                 Class: @"Weapons/mg.wpn.tk";
-                Class: @"Weapons/mg.wpn.tk";
-                CurrentAmmo: 1000;
                 StateTime: 0;
                 Charge: 0;
             };
             Class: @"Pickups/MG.ent.tk";
             NextRespawnTime: 0;
             Id: 3;
-            Class: @"Pickups/MG.ent.tk";
             Name: Null;
             Position: [32.566 36.16143];
             Forward: [1 0];
@@ -120,7 +109,6 @@ MapInstance {
         WeaponPickupInstance {
             Weapon: GunInstance {
                 Class: @"Weapons/shotgun.wpn.tk";
-                Class: @"Weapons/shotgun.wpn.tk";
                 CurrentAmmo: 1200;
                 StateTime: 0;
                 Charge: 0;
@@ -128,7 +116,6 @@ MapInstance {
             Class: @"Pickups/Shotgun.ent.tk";
             NextRespawnTime: 0;
             Id: 4;
-            Class: @"Pickups/Shotgun.ent.tk";
             Name: Null;
             Position: [301.5458 34.76918];
             Forward: [1 0];
@@ -143,7 +130,6 @@ MapInstance {
         WeaponPickupInstance {
             Weapon: GunInstance {
                 Class: @"Weapons/Laser.wpn.tk";
-                Class: @"Weapons/Laser.wpn.tk";
                 CurrentAmmo: 4000;
                 StateTime: 0;
                 Charge: 0;
@@ -151,7 +137,6 @@ MapInstance {
             Class: @"Pickups/Laser.ent.tk";
             NextRespawnTime: 0;
             Id: 5;
-            Class: @"Pickups/Laser.ent.tk";
             Name: Null;
             Position: [232.9503 35.93439];
             Forward: [1 0];
@@ -166,7 +151,6 @@ MapInstance {
         WeaponPickupInstance {
             Weapon: GunInstance {
                 Class: @"Weapons/GrenadeLauncher.wpn.tk";
-                Class: @"Weapons/GrenadeLauncher.wpn.tk";
                 CurrentAmmo: 200;
                 StateTime: 0;
                 Charge: 0;
@@ -174,7 +158,6 @@ MapInstance {
             Class: @"Pickups/GrenadeLauncher.ent.tk";
             NextRespawnTime: 0;
             Id: 6;
-            Class: @"Pickups/GrenadeLauncher.ent.tk";
             Name: Null;
             Position: [165.6504 35.94365];
             Forward: [1 0];
@@ -189,7 +172,6 @@ MapInstance {
         WeaponPickupInstance {
             Weapon: GunInstance {
                 Class: @"Weapons/Flamethrower.wpn.tk";
-                Class: @"Weapons/Flamethrower.wpn.tk";
                 CurrentAmmo: 20000;
                 StateTime: 0;
                 Charge: 0;
@@ -197,7 +179,6 @@ MapInstance {
             Class: @"Pickups/TestPfx.ent.tk";
             NextRespawnTime: 0;
             Id: 7;
-            Class: @"Pickups/TestPfx.ent.tk";
             Name: Null;
             Position: [98.06796 35.94364];
             Forward: [1 0];
@@ -212,7 +193,6 @@ MapInstance {
         WeaponPickupInstance {
             Weapon: GunInstance {
                 Class: @"Weapons/Test.wpn.tk";
-                Class: @"Weapons/Test.wpn.tk";
                 CurrentAmmo: 400;
                 StateTime: 0;
                 Charge: 0;
@@ -220,7 +200,6 @@ MapInstance {
             Class: @"Pickups/Tuber.ent.tk";
             NextRespawnTime: 0;
             Id: 8;
-            Class: @"Pickups/Tuber.ent.tk";
             Name: Null;
             Position: [35.14649 164.117];
             Forward: [1 0];
@@ -233,7 +212,6 @@ MapInstance {
             EventHandlers: Null;
         }
         ActorInstance {
-            Class: @"Actors/Target.ent.tk";
             Class: @"Actors/Target.ent.tk";
             CurrentHealth: 50000;
             Factions: Factions [Enemy];
@@ -265,7 +243,6 @@ MapInstance {
         }
         ActorInstance {
             Class: @"Actors/Target.ent.tk";
-            Class: @"Actors/Target.ent.tk";
             CurrentHealth: 50000;
             Factions: Factions [Enemy];
             Controller: AIController {
@@ -296,7 +273,6 @@ MapInstance {
         }
         ActorInstance {
             Class: @"Actors/Target.ent.tk";
-            Class: @"Actors/Target.ent.tk";
             CurrentHealth: 50000;
             Factions: Factions [Enemy];
             Controller: AIController {
@@ -326,7 +302,6 @@ MapInstance {
             EventHandlers: Null;
         }
         ActorInstance {
-            Class: @"Actors/Target.ent.tk";
             Class: @"Actors/Target.ent.tk";
             CurrentHealth: 50000;
             Factions: Factions [Enemy];

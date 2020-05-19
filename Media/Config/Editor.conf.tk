@@ -4,7 +4,7 @@
 
     RenderSettings: {
         drawTiles: true;
-		drawTileCollisionMask: true;
+		drawTileCollisionMask: false;
         drawEntities: true;
         drawFluids: true;
         drawReflections: true;

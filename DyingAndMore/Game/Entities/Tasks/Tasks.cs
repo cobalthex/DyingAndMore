@@ -79,6 +79,7 @@ namespace DyingAndMore.Game.Entities.Tasks
             if (Vector2.DistanceSquared(ai.Target.Position, ai.Actor.Position) 
                 <= (distance * distance) + interDist)
                 return permanent ? TaskResult.Continue : TaskResult.Success;
+            //must be able to see target?
 
             var dir = Vector2.Normalize(ai.Target.Position - ai.Actor.Position);
             ai.Actor.TurnTowards(dir, deltaTime);
@@ -193,9 +194,38 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    public struct FleeFromTarget : ITask
+    {
+        //success condition (sight range?)
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null)
+                return TaskResult.Success; //no ghosts allowed
+
+            //todo: sight range
+
+            // turn and run away
+
+            return TaskResult.Continue;
+
+        }
+    }
+
+    //Face target and shoot  (maybe leading)
+    //provide cover
+    //clone
+    //spawn entities
+    //group with allies
+    //attach
+    //shield/provide cover
+    //get in cover
+    //follow path
+    //assasinate (attack from behind)
+
     //tasks are individual actions
     //run, face direction, pick target, etc
 
     //behaviors are task state machines
-    //tasks run until interrupted
+    //tasks run until completion or interrupted
 }

@@ -4,7 +4,7 @@ ActorClass {
     DefaultFactions: Factions.Enemy;
     DefaultController: [ArtilleryController {
         CanRotate: false;
-        MaxRange: 400;
+        MaxRange: 800;
     }];
     FieldOfView: 60deg;
 

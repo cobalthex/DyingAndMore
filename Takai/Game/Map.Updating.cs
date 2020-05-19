@@ -202,7 +202,7 @@ namespace Takai.Game
                             {
                                 entity.SetPositionTransformed(target);
 
-                                var interaction = Class.MaterialInteractions.Find(entity.Material, Class.TilesMaterial);
+                                var interaction = Class.MaterialInteractions.Find(entity.Material, Class.Tileset.material);
 
                                 //f = m * v² / (2 * d)
                                 //d = radius of object?

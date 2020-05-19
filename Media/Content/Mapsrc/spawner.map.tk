@@ -9,7 +9,7 @@ MapInstance {
                 @"Actors/Ebola.ent.tk"
             ];
             SpawnPosition: [644.9997 154.9995];
-            SpawnRadius: 73.40981;
+            SpawnRadius: 200;
             DontSpawnAutomatically: True;
             MinLiveCount: 0;
             MaxLiveCount: 1;
@@ -20,22 +20,13 @@ MapInstance {
             Leader: Null;
             Units: [];
             TotalSpawnCount: 0;
-            LastSpawnTime: 37690;
+            LastSpawnTime: 0;
         };
     };
     Class: MapClass {
         Name: Null;
-        TileSize: 48;
-        Tileset: Tileset {
-            texture: "Tilesets/Tiles2.png";
-            size: 48;
-        };
-        MaterialInteractions: MaterialInteractions {
-            File: Null;
-            Interactions: [];
-        };
-        TilesMaterial: "Tiles";
-        TilesImage: "Tilesets/Tiles2.png";
+        Tileset: @"Tilesets/gray.tiles.tk";
+        MaterialInteractions: @"Materials/Test.mtl.tk";
         Width: 16;
         Height: 6;
         Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
@@ -64,12 +55,10 @@ MapInstance {
                 CurrentAmmo: 1000;
                 LastAmmoRefillTime: 78705;
                 OnlyRefillIfIdle: True;
-                Class: @"Weapons/mg.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
             Id: 1;
-            Class: @"Actors/Player.ent.tk";
             Name: Null;
             Position: [190.9995 139.9995];
             Forward: [1 0];
@@ -84,37 +73,17 @@ MapInstance {
         ActorInstance {
             Name: Null;
             Class: @"Actors/Cyst.ent.tk";
-            Class: @"Actors/Cyst.ent.tk";
-            CurrentHealth: 1000;
+            CurrentHealth: 10000;
             Id: 2;
             Factions: Factions [Enemy];
             Controller: ArtilleryController {
-                MaxRange: 400;
+                MaxRange: 800;
                 CanRotate: False;
                 ShowSweepLines: True;
                 trackedActor: Null;
             };
             Weapon: SpawnerInstance {
-                Squad: Squad {
-                    Name: "spawner";
-                    DontSpawnAutomatically: True;
-                    DisableSpawningIfLeaderIsDead: False;
-                    MinLiveCount: 0;
-                    MaxLiveCount: 1;
-                    MaxSpawnCount: 0;
-                    SpawnDelay: 0;
-                    TotalSpawnCount: 0;
-                    Units: [];
-                    LeaderTemplate: [];
-                    UnitsTemplate: [];
-                    SpawnPosition: [644.9997 154.9995];
-                    SpawnRadius: 73.40981;
-                    ResetDelay: 0;
-                    Leader: Null;
-                    LastSpawnTime: 37690;
-                };
-                Class: @"Weapons/Cyst.wpn.tk";
-                SpawnQueue: Null;
+                Squad: *Squad.spawner;
                 Class: @"Weapons/Cyst.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
