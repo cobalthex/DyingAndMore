@@ -248,6 +248,7 @@ namespace Takai.UI
         /// If null, debug info is not drawn
         /// </summary>
         public static Graphics.BitmapFont DebugFont = null;
+        public static bool DisplayDebugInfo = false;
 
         /// <summary>
         /// The color to use when drawing the focus rectangle around the focused element
@@ -2051,10 +2052,10 @@ namespace Takai.UI
                 toDraw.DrawSelf(spriteBatch);
 
                 var borderColor = /*(toDraw.HasFocus && toDraw.CanFocus) ? FocusedBorderColor : */toDraw.BorderColor;
-                if (DebugFont != null && borderColor == Color.Transparent)
+                if (DisplayDebugInfo && borderColor == Color.Transparent)
                     borderColor = isMeasureValid && isArrangeValid ? Color.SteelBlue : Color.Tomato;
 
-                if (DebugFont != null && toDraw.VisibleBounds.Contains(InputState.MousePoint))
+                if (DisplayDebugInfo && toDraw.VisibleBounds.Contains(InputState.MousePoint))
                     debugDraw = toDraw;
 
                 if (borderColor.A > 0)

@@ -11,17 +11,31 @@ namespace Takai.Game
     /// <summary>
     /// An intermediate struct encapsulating tileset properties
     /// </summary>
-    public struct Tileset
+    public struct Tileset : Data.ISerializeExternally
     {
+        [Data.Serializer.Ignored]
+        public string File { get; set; }
+
         public Texture2D texture; //sprite?
         public int size;
+        public string material;
 
-        public int TilesPerRow => texture != null ? texture.Width / size : 1;
+        [Data.Serializer.Ignored]
+        public int TilesPerRow { get; internal set; }
 
-        public Tileset(Texture2D texture, int size)
+        internal void CalculateTilesPerRow()
         {
+            TilesPerRow = texture != null ? texture.Width / size : 1;
+        }
+
+        public Tileset(Texture2D texture, int size, string material = "Tiles")
+        {
+            this.File = null;
             this.texture = texture;
             this.size = size;
+            this.material = material;
+            this.TilesPerRow = 1;
+            CalculateTilesPerRow();
         }
     }
 
@@ -47,7 +61,7 @@ namespace Takai.Game
         /// </summary>
         const int CollisionMaskScale = 2;
         /// <summary>
-        /// Number of columns in the collision mask
+        /// Size of the collision mask (rows, columns)
         /// </summary>
         public Point CollisionMaskSize { get; private set; }
 
@@ -60,33 +74,22 @@ namespace Takai.Game
         /// <summary>
         /// The Width and height of each tile in the map
         /// </summary>
-        public int TileSize
-        {
-            get { return _tileSize; }
-            set
-            {
-                _tileSize = value;
-                TilesPerRow = (TilesImage != null ? (TilesImage.Width / value) : 1);
-                SectorPixelSize = SectorSize * value;
-            }
-        }
-        private int _tileSize = 1;
         [Data.Serializer.Ignored]
-        public int TilesPerRow { get; private set; } = 1;
+        public int TileSize => Tileset.size;
 
         /// <summary>
-        /// Encapsulated tileset, calculated on demand
+        /// Encapsulated tileset
         /// </summary>
-        [Data.Serializer.ReadOnly]
         public Tileset Tileset
         {
-            get => new Tileset(TilesImage, TileSize);
+            get => _tileset;
             set
             {
-                _tileSize = value.size;
-                TilesImage = value.texture;
+                _tileset = value;
+                _tileset.CalculateTilesPerRow();
             }
         }
+        private Tileset _tileset;
 
         /// <summary>
         /// The horizontal size of the map in tiles
@@ -117,7 +120,6 @@ namespace Takai.Game
 
         public MaterialInteractions MaterialInteractions { get; set; } = new MaterialInteractions();
 
-        public string TilesMaterial { get; set; } = "Tiles";
         
         public virtual MapBaseInstance Instantiate()
         {
@@ -162,10 +164,8 @@ namespace Takai.Game
                 if (value != null && value != _class)
                 {
                     _class = value;
-                    _allEntities.Clear();
-                    Sectors = null;
-                    Resize(Class.Width, Class.Height);
-                    
+                    Resize(Class.Width, Class.Height, false); //ApplyObject needs this false, Class = needs this true
+                                                              //if setting class manuall,y should RemoveAllEntities() first
                 }
             }
         }
@@ -176,7 +176,7 @@ namespace Takai.Game
         /// </summary>
         /// <remarks>Size is Height,Width</remarks>
         [Data.Serializer.Ignored]
-        public MapSector[,] Sectors { get; protected set; } = new MapSector[0, 0];
+        public MapSector[,] Sectors { get; protected set; } = null;
 
         /// <summary>
         /// An enumerable list of all entities, entities must be added through Spawn()

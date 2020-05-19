@@ -277,11 +277,15 @@ namespace DyingAndMore.Game.Entities
             Controller?.OnFluidCollision(fluid, deltaTime);
         }
 
+        public const float TurnSpeed = MathHelper.Pi; //dynamic/settable?
+
+        //Turn in direction of...
+
         public virtual void TurnTowards(Vector2 direction, TimeSpan deltaTime)
         {
             //inversely proportional to speed
             //slerp?
-            Forward = Vector2.Normalize(Vector2.Lerp(Forward, direction, MathHelper.Pi * (float)deltaTime.TotalSeconds));
+            Forward = Vector2.Normalize(Vector2.Lerp(Forward, direction, TurnSpeed * (float)deltaTime.TotalSeconds));
         }
 
         public virtual void Accelerate(Vector2 direction)

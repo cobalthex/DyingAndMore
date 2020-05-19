@@ -1,5 +1,8 @@
 %YAML 1.2
 ---
+
+# use CTRL+SHIFT+ALT+P to debug
+
 name: Takai Definition
 
 file_extensions:
@@ -52,6 +55,9 @@ contexts:
           scope: string
           pop: true
 
+    - match: '\*[A-Za-z_0-9.]+'
+      scope: entity.name.class
+      comment: internal reference
 
     - match: '{{ident_begin}}'
       scope: entity.name.class
@@ -72,6 +78,7 @@ contexts:
 
         - match: '(?=\{)'
           set: dictionary
+          pop: true # this is a hack, shouldnt be necessary
 
         - match: '\['
           scope: punctuation.section.brackets.begin
@@ -248,6 +255,7 @@ contexts:
 
   dictionary:
     - meta_scope: meta.dictionary
+
     - match: '\{'
       scope: punctuation.section.block.begin
       push:
@@ -257,13 +265,16 @@ contexts:
 
         - include: comments
 
-        - match: '\s*'
-
+        # stray/extra ;
         - match: ';'
           scope: invalid.illegal
 
+        # todo: this doesnt work (key value without value)
+        - match: '(?=[\n;])'
+          scope: invalid.illegal
+
+        # property key
         - match: '[^:]'
-          # meta_scope: meta.property
           scope: variable
 
         - match: ':\s*{{block_comment}}?\s*(;)'
@@ -279,13 +290,15 @@ contexts:
 
             - include: atoms
 
+            # terminator in middle of key: value
             - match: '(?=\})'
-              #scope: invalid
+              #scope: invalid.illegal #?
               pop: true
 
             - match: '[;\n]'
+              scope: punctuation.definition.key.terminator
               pop: true
-          
+
             - match: '[^\s]'
               comment: more than one value
               scope: invalid.illegal.double-property-value

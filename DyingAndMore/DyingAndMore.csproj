@@ -64,7 +64,7 @@
     </Shaders>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game\Entities\Behaviors\Behaviors.cs" />
+    <Compile Include="Game\Entities\Behaviors\Tasks.cs" />
     <Compile Include="Game\Entities\Behaviors\Orbit.cs" />
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />

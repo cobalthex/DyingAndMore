@@ -10,14 +10,21 @@ ActorClass {
     IgnoreTrace: false;
 
     DefaultController: [AIController {
-        Behaviors: [
-            #*Behavior {
+        DefaultBehaviors: [
+            Behavior {
+                Name: "Orbit";
+                Tasks: [
+                    FindClosestEnemy { sightDistance: 1000; };
+                    OrbitTarget { radius: 100; };
+                ];
+            };
+            Behavior {
                 Name: "Kamikazi";
                 Tasks: [
-                    NavigateGradient { }
+                    NavigateGradient { };
                     Suicide { };
                 ];
-            };*#
+            };
             Behavior {
                 Name: "Follow";
                 Tasks: [

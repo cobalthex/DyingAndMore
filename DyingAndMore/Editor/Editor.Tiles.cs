@@ -38,8 +38,8 @@ namespace DyingAndMore.Editor
                 return;
 
             preview.Sprite.ClipRect = new Rectangle(
-                (selector.SelectedIndex % editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
-                (selector.SelectedIndex / editor.Map.Class.TilesPerRow) * editor.Map.Class.TileSize,
+                (selector.SelectedIndex % editor.Map.Class.Tileset.TilesPerRow) * editor.Map.Class.TileSize,
+                (selector.SelectedIndex / editor.Map.Class.Tileset.TilesPerRow) * editor.Map.Class.TileSize,
                 editor.Map.Class.TileSize,
                 editor.Map.Class.TileSize
             );

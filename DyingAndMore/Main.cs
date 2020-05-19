@@ -44,8 +44,17 @@ namespace DyingAndMore
 
         SpriteBatch sbatch;
         Static ui;
-        Takai.Graphics.BitmapFont debugFont;
+        Static debugUI;
         Takai.FpsGraph fpsGraph;
+        public static Table DebugPropertyDisplay { get; private set; }
+
+        public static void DebugDisplay(string key, object value)
+        {
+            DebugPropertyDisplay.AddChildren(
+                new Static(key) { Color = Color.Cyan },
+                new Static(value.ToString()) { Color = Color.Aquamarine }
+            );
+        }
 
         /// <summary>
         /// Create the game
@@ -93,7 +102,7 @@ namespace DyingAndMore
             GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
             gdm.ApplyChanges();
 
-            debugFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/mono.fnt.tk");
+            Static.DebugFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/mono.fnt.tk");
 
             #region Mouse Cursor
 #if WINDOWS
@@ -203,13 +212,6 @@ namespace DyingAndMore
                     var cmd = Serializer.Cast<EventCommandBinding>(il[1]);
                     namedUI.BubbleCommand(cmd.command, cmd.argument);
                 }
-            };
-
-            fpsGraph = new Takai.FpsGraph
-            {
-                Position = new Vector2(0, 20),
-                Size = new Vector2(600, 100),
-                HorizontalAlignment = Alignment.Center,
             };
 
             /*
@@ -337,12 +339,33 @@ namespace DyingAndMore
             //    VerticalAlignment = Alignment.Middle
             //};
 
+            debugUI = new Static
+            {
+                HorizontalAlignment = Alignment.Stretch,
+                VerticalAlignment = Alignment.Stretch,
+            };
+            debugUI.AddChild(DebugPropertyDisplay = new Table(2)
+            {
+                HorizontalAlignment = Alignment.Right,
+                VerticalAlignment = Alignment.Top,
+                Position = new Vector2(30),
+                Margin = new Vector2(5),
+            });
+
+            debugUI.AddChild(fpsGraph = new Takai.FpsGraph
+            {
+                IsEnabled = false,
+                Position = new Vector2(0, 20),
+                Size = new Vector2(600, 100),
+                HorizontalAlignment = Alignment.Center,
+            });
+
             ui.HasFocus = true;
             base.Initialize();
         }
         protected override void Update(GameTime gameTime)
         {
-            Takai.DebugPropertyDisplay.Reset();
+            DebugPropertyDisplay.RemoveAllChildren();
 
             InputState.Update(GraphicsDevice.Viewport.Bounds);
 
@@ -357,20 +380,16 @@ namespace DyingAndMore
             }
 
             else if (InputState.IsPress(Keys.F8))
-            {
-                if (fpsGraph.Parent == null)
-                    ui.AddChild(fpsGraph);
-                else
-                    fpsGraph.RemoveFromParent();
-            }
+                fpsGraph.IsEnabled ^= true;
 
             //F9 used in UI code
             else if (InputState.IsPress(Keys.F10))
-                Static.DebugFont = (Static.DebugFont == null ? ui.Font : null);
+                Static.DisplayDebugInfo ^= true;
             else if (InputState.IsPress(Keys.F11))
                 ui.DebugInvalidateTree();
 
             ui.Update(gameTime);
+            debugUI.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -379,35 +398,18 @@ namespace DyingAndMore
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
             ui.Draw(sbatch);
+            debugUI.Draw(sbatch);
 
             int y = GraphicsDevice.Viewport.Height - 70;
-            foreach (var row in Takai.LogBuffer.Entries)
+            foreach (var row in Takai.LogBuffer.Entries) //convert to UI?
             {
                 if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
                 {
                     var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
-                    var sz = debugFont.MeasureString(text);
-                    debugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
+                    var sz = Static.DebugFont.MeasureString(text);
+                    Static.DebugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
                 }
-                y -= debugFont.MaxCharHeight;
-            }
-
-            y = 70;
-            foreach (var row in Takai.DebugPropertyDisplay.Entries)
-            {
-                var text = row.Key.PadLeft(Takai.DebugPropertyDisplay.KeyWidth) + $" = {row.Value}";
-                var sz = debugFont.MeasureString(text, true);
-                debugFont.Draw(
-                    sbatch, 
-                    text, 
-                    new Vector2(
-                        GraphicsDevice.Viewport.Width - 20 - ((Takai.DebugPropertyDisplay.KeyWidth + Takai.DebugPropertyDisplay.ValueWidth + 3) * debugFont.MaxCharWidth), 
-                        y
-                    ),
-                    Color.Cyan, 
-                    true
-                );
-                y += debugFont.MaxCharHeight;
+                y -= Static.DebugFont.MaxCharHeight;
             }
 
             sbatch.End();

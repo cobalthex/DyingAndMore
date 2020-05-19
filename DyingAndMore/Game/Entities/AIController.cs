@@ -13,11 +13,17 @@ namespace DyingAndMore.Game.Entities
         LowHealth       = 0b0000000000000010,
         DamageTaken     = 0b0000000000000100,
         LowAmmo         = 0b0000000000001000,
-        Supremecy       = 0b0000000000010000, //more allies than enemies
-        Outnumbered     = 0b0000000000100000, //more enemies than allies
-        HasTarget       = 0b0000000001000000,
-        TargetVisible   = 0b0000000010000000 + HasTarget,
-        //has parent?
+        HasTarget       = 0b0000000000010000,
+        TargetVisible   = 0b0000000000100000, //+ HasTarget ?,
+        TargetCanSeeMe  = 0b0000000001000000, //+ HasTarget ?, //rename?
+        Supremecy       = 0b0000000010000000, //more allies than enemies
+        Outnumbered     = 0b0000000100000000, //more enemies than allies
+        AllyDied        = 0b0000001000000000,
+        EnemyDied       = 0b0000010000000000,
+        AllyNearby      = 0b0000100000000000, // >= 1
+        EnemyNearby     = 0b0001000000000000, // >= 1
+        //target close/far
+        //target fleeing?
     }
 
     public class AIController : Controller
@@ -35,10 +41,10 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public List<Behavior> DefaultBehaviors { get; set; }
 
-        public Dictionary<ActorBroadcast, Behavior> AllyBroadcasts { get; set; } //list of behaviors>?
+        public Dictionary<ActorBroadcast, Behavior> AllyBroadcasts { get; set; } //list of behaviors?
         //conditions? (has line of sight, etc)
 
-        public Dictionary<ActorBroadcast, Behavior> EnemyBroadcasts { get; set; } //list of behaviors>?
+        public Dictionary<ActorBroadcast, Behavior> EnemyBroadcasts { get; set; } //list of behaviors?
 
         /// <summary>
         /// The current 
@@ -59,33 +65,63 @@ namespace DyingAndMore.Game.Entities
         public int CurrentTask { get; set; }
         //task start time
 
+        public Senses KnownSenses { get; private set; }
+
+        public override string ToString()
+        {
+            if (CurrentBehavior == null)
+                return "(No active behavior)";
+
+            var sb = new System.Text.StringBuilder();
+            sb.Append(CurrentBehavior.Name);
+            if (CurrentTask < CurrentBehavior.Tasks.Count)
+            {
+                sb.Append(": ");
+                sb.Append(CurrentBehavior.Tasks[CurrentTask].GetType().Name);
+                //sb.Append("\n(");
+                //sb.Append(KnownSenses);
+                //sb.Append(")");
+            }
+            return sb.ToString();
+        }
 
         public override void Think(TimeSpan deltaTime)
         {
-            //remove target on its death?
-
             // run every X frames?
-            // events?
-            var senses = BuildSenses();
+            //remove target on its death?
+            //reactions to events
+
+            KnownSenses = 0;
+
+            //minimal runtime per behavior?
 
             if (CurrentBehavior != null && CurrentTask < CurrentBehavior.Tasks.Count)
             {
-                DebugPropertyDisplay.AddRow(Actor.ToString(), CurrentBehavior);
-
                 var result = CurrentBehavior.Tasks[CurrentTask].Think(deltaTime, this);
                 if (result == Tasks.TaskResult.Failure)
                     CurrentTask = 0;
                 else if (result == Tasks.TaskResult.Success)
                     ++CurrentTask;
-
+            }
+            else if (DefaultBehaviors != null)
+            {
+                foreach (var behavior in DefaultBehaviors) //these should always be checking?
+                {
+                    KnownSenses |= BuildSenses(behavior.RequisiteSenses & ~KnownSenses);
+                    if ((behavior.RequisiteSenses & KnownSenses) == behavior.RequisiteSenses &&
+                        (float)Util.RandomGenerator.NextDouble() < behavior.QueueChance)
+                    {
+                        CurrentBehavior = behavior;
+                        CurrentTask = 0;
+                    }
+                }
             }
             //else return to default behavior after behavior completed?
         }
-        public Senses BuildSenses()
+
+        public Senses BuildSenses(Senses testSenses)
         {
             var senses = Senses.None;
-
-            //calculate senses on demand
 
             var maxHealth = ((ActorClass)Actor.Class).MaxHealth;
             if (Actor.CurrentHealth >= maxHealth)
@@ -93,31 +129,101 @@ namespace DyingAndMore.Game.Entities
             else if (Actor.CurrentHealth <= maxHealth * 0.2f)
                 senses |= Senses.LowHealth;
 
-            if (Actor.Weapon != null)
+            if ((testSenses & Senses.LowAmmo) > 0 && Actor.Weapon != null)
             {
                 if (Actor.Weapon is Weapons.GunInstance gi && gi.CurrentAmmo < gi.MaxAmmo * 0.2f)
                     senses |= Senses.LowAmmo;
             }
 
-            //outnumbered, supremecy
+            if ((testSenses & (Senses.Supremecy | Senses.Outnumbered | Senses.AllyNearby | Senses.EnemyNearby)) > 0)
+            {
+                int allyCount = 0, enemyCount = 0;
+                //this is probably expensive
+                foreach (var sector in Actor.Map.TraceSectors(Actor.WorldPosition, Actor.WorldForward, 300))
+                {
+                    foreach (var ent in sector.entities)
+                    {
+                        if (ent == Actor || !(ent is ActorInstance actor))
+                            continue;
+                        if (Actor.IsAlliedWith(actor.Factions))
+                            ++allyCount;
+                        else
+                            ++enemyCount;
+                    }
+                }
 
-            if (Target != null)
+                if (enemyCount > 0)
+                    senses |= Senses.EnemyNearby;
+                if (allyCount > 0)
+                    senses |= Senses.AllyNearby;
+
+                if (enemyCount > allyCount + 3)
+                    senses |= Senses.Outnumbered;
+                else if (allyCount > enemyCount + 3)
+                    senses |= Senses.Supremecy;
+            }
+
+            var testedSenses = testSenses & (Senses.HasTarget | Senses.TargetVisible | Senses.TargetCanSeeMe);
+            if (testedSenses > 0 && Target != null)
+            {
+                // itemize?
                 senses |= Senses.HasTarget;
 
-            //target visible
+                var diff = Actor.WorldPosition - Target.WorldPosition;
+                var dl = diff.Length();
+                var dist = (int)Math.Ceiling(dl);
+                if ((testSenses & Senses.TargetVisible) > 0 && dl < 500 && Actor.Map.TraceTiles(Actor.WorldPosition, Actor.WorldForward, dist) == dist) //store sight dist?
+                    senses |= Senses.TargetVisible;
 
-            return senses;
+                var dot = -Vector2.Dot(diff / dl, Target.WorldForward);
+                if (dot <= (((ActorClass)Target.Class).FieldOfView / 2 / MathHelper.Pi) - 1)
+                    senses |= Senses.TargetCanSeeMe; //trace tiles?
+            }
+
+            return senses & testSenses;
         }
     }
 
+    /// <summary>
+    /// A behavior is a list of tasks to run in sequence, and rules on when to queue the tasks
+    /// </summary>
     public class Behavior : Takai.Data.INamedObject
     {
         public string Name { get; set; }
         public string File { get; set; }
 
         /// <summary>
-        /// The tasks in this behavior to run, in order.
+        /// Senses required for this behavior to be picked. (Tasks are not affected by this)
+        /// Leave blank to always pick.
+        /// Ignored once this behavior is queued
+        /// </summary>
+        public Senses RequisiteSenses { get; set; }
+
+        //failure senses?
+
+        /// <summary>
+        /// If this behavior is chosen, how likely is it to actually queue
+        /// </summary>
+        public float QueueChance { get; set; } = 0.5f;
+
+        /// <summary>
+        /// The tasks that comprise this behavior
         /// </summary>
         public List<Tasks.ITask> Tasks { get; set; }
+
+        public override string ToString()
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append(Name);
+            sb.Append(":");
+            foreach (var task in Tasks)
+            {
+                sb.Append(' ');
+                sb.Append(task.GetType().Name);
+            }
+            return sb.ToString();
+        }
     }
 }
+
+//generic counters for behaviors to use for limiting repeats (e.g. clone behavior can only run 4x)

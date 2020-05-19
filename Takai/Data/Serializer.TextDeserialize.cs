@@ -92,9 +92,9 @@ namespace Takai.Data
             public string root;
 
             public Dictionary<string, object> resolverCache = new Dictionary<string, object>
-                (Serializer.CaseSensitiveIdentifiers ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+                (Serializer.CaseSensitiveIdentifiers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
             public Dictionary<string, List<PendingResolution>> pendingCache = new Dictionary<string, List<PendingResolution>>
-                (Serializer.CaseSensitiveIdentifiers ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+                (Serializer.CaseSensitiveIdentifiers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
 
             public void AddPending(PendingResolution pending)
             {

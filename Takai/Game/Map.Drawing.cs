@@ -101,16 +101,17 @@ namespace Takai.Game
             AlphaBlendFunction = BlendFunction.Add
         };
 
-        public Texture2D TilesImage
+        internal static readonly BlendState InvertBlendState = new BlendState
         {
-            get => _tilesImage;
-            set
-            {
-                _tilesImage = value;
-                TileSize = TileSize;
-            }
-        }
-        private Texture2D _tilesImage;
+            //source.RGB + (dest.RGB * (1 - source.A))
+
+            AlphaBlendFunction = BlendFunction.Add,
+            AlphaDestinationBlend = Blend.SourceAlpha,
+            AlphaSourceBlend = Blend.InverseSourceAlpha,
+            ColorBlendFunction = BlendFunction.Add,
+            ColorDestinationBlend = Blend.InverseSourceAlpha,
+            ColorSourceBlend = Blend.SourceAlpha
+        };
 
         /// <summary>
         /// The font used to draw debug information
@@ -125,7 +126,7 @@ namespace Takai.Game
         /// </summary>
         public void InitializeGraphics()
         {
-            if (TilesImage != null && CollisionMask == null)
+            if (Tileset.texture != null && CollisionMask == null)
                 GenerateCollisionMask();
 
             if (Runtime.GraphicsDevice == null)
@@ -508,7 +509,7 @@ namespace Takai.Game
             //main render
             Runtime.GraphicsDevice.SetRenderTargets(Class.preRenderTarget);
 
-            if (renderSettings.drawTiles && Class.TilesImage != null)
+            if (renderSettings.drawTiles && Class.Tileset.texture != null)
                 DrawTiles(ref context, Color.White);
             else
                 Runtime.GraphicsDevice.Clear(ClearOptions.Stencil, Color.Transparent, 0, 1);
@@ -643,6 +644,7 @@ namespace Takai.Game
                 Class.basicEffect.Parameters["Tex"].SetValue(Class.collisionMaskSDF);
                 Class.basicEffect.Parameters["Transform"].SetValue(c.viewTransform);
 
+                Runtime.GraphicsDevice.BlendState = MapBaseClass.InvertBlendState;
                 Runtime.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                 foreach (EffectPass pass in Class.basicEffect.CurrentTechnique.Passes)
                 {

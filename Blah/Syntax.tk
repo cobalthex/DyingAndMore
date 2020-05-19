@@ -2,17 +2,18 @@
 #* Block Comment *#
 
 ClassName {
-    
+
     BoolTrue: True;
     BoolFalse: False;
     Null: Null;
-    
+
     SQString: 'single-quoted\nstring';
     DQString: "string";
 
     RecursiveRef: @.;
     SQExternalRef: @'test';
     DQExternalRef: @"test";
+    InternalRef: *test;
 
     Int: 10;
     NegInt: -10;
@@ -32,12 +33,17 @@ ClassName {
         1;
         2;
         "test";
+        3
+        4
 
-        #A { };
-        #B { };
+        A { };
+        B { }
+        { };
+        { }
     ];
 
     Struct: [1 Color.White 3];
+    TypedStruct: Type [1 2 3];
 
     Dictionary: { asdf: 123; };
 };

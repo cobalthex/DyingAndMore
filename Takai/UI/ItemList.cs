@@ -123,7 +123,8 @@ namespace Takai.UI
             get => _selectedIndex;
             set
             {
-                if (value < 0 || value >= Items.Count)
+                if (value < 0 || value >= Items.Count || 
+                    value >= Container.Children.Count) //shouldnt be necessary
                     value = -1;
 
                 if (value != _selectedIndex)

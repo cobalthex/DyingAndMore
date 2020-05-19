@@ -49,7 +49,7 @@ namespace DyingAndMore.Editor
                 {
                     Width = editor.Map.Class.TileSize,
                     Height = editor.Map.Class.TileSize,
-                    Texture = editor.Map.Class.TilesImage
+                    Texture = editor.Map.Class.Tileset.texture
                 },
                 Position = new Vector2(20),
                 Size = new Vector2(64),
@@ -588,8 +588,7 @@ namespace DyingAndMore.Editor
                         {
                             Name = name,
                             Tiles = new short[height, width],
-                            TileSize = tileset.size,
-                            TilesImage = tileset.texture,
+                            Tileset = tileset
                         };
                         map.InitializeGraphics();
                         Map = (MapInstance)map.Instantiate();

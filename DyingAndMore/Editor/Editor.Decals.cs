@@ -212,7 +212,7 @@ namespace DyingAndMore.Editor
                 }
             }
 
-            Takai.DebugPropertyDisplay.AddRow("Visible Decals", visibleDecals);
+            DyingAndMoreGame.DebugDisplay("Visible Decals", visibleDecals);
         }
 
         bool SelectDecal(Vector2 worldPosition)

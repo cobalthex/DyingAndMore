@@ -19,8 +19,8 @@ namespace Takai.Game
                 return 0;
 
             return tilemap[
-                ((tile / TilesPerRow) * TileSize + (y % TileSize)) * TilesImage.Width +
-                ((tile % TilesPerRow) * TileSize + (x % TileSize))
+                ((tile / Tileset.TilesPerRow) * TileSize + (y % TileSize)) * Tileset.texture.Width +
+                ((tile % Tileset.TilesPerRow) * TileSize + (x % TileSize))
             ].A;
         }
 
@@ -50,8 +50,8 @@ namespace Takai.Game
             //do each individually for better cache perf
 
             CollisionMask = new byte[h * w];
-            for (int y = 1; y < h - 1; ++y)
-                for (int x = 1; x < w - 1; ++x)
+            for (int y = 0; y < h - 1; ++y)
+                for (int x = 0; x < w - 1; ++x)
                     CollisionMask[y * w + x] = byte.MaxValue;
 
             var p = new Point[h * w];
@@ -59,18 +59,18 @@ namespace Takai.Game
                 for (int x = 1; x < w - 1; ++x)
                     p[y * w + x] = new Point(-1);
 
-            Color[] tilemap = new Color[TilesImage.Width * TilesImage.Height];
-            TilesImage.GetData(tilemap);
+            Color[] tilemap = new Color[Tileset.texture.Width * Tileset.texture.Height];
+            Tileset.texture.GetData(tilemap);
 
             //can skip bounds checking by using padded array, but requires copying array at end
 
             //find edges
             //can be parallelized
             const byte threshold = 127;
-            for (int y = 1; y < h - 1; ++y)
+            for (int y = 0; y < h - 1; ++y)
             {
                 var ys = y << scale;
-                for (int x = 1; x < w - 1; ++x)
+                for (int x = 0; x < w - 1; ++x)
                 {
                     var xs = x << scale;
                     byte cur = TileValueAt(xs, ys, tilemap);
@@ -175,24 +175,7 @@ namespace Takai.Game
 #if DEBUG
             //save as TGA image for testing
             using (var fs = new System.IO.FileStream("collision.tga", System.IO.FileMode.Create))
-            {
-                fs.WriteByte(0);
-                fs.WriteByte(0);
-                fs.WriteByte(3);
-                var bytes = new byte[5 + 4];
-                fs.Write(bytes, 0, bytes.Length);
-
-                bytes = BitConverter.GetBytes((short)w);
-                fs.Write(bytes, 0, bytes.Length);
-                bytes = BitConverter.GetBytes((short)h);
-                fs.Write(bytes, 0, bytes.Length);
-
-                fs.WriteByte(8); //bpp
-                fs.WriteByte(0);
-
-                for (var y = h - 1; y >= 0; --y) //y is flipped
-                    fs.Write(CollisionMask, y * w, w);
-            }
+                SDF.SaveToTGA(CollisionMask, (short)w, (short)h, fs);
 #endif
         }
 
@@ -226,7 +209,6 @@ namespace Takai.Game
 
             Tiles = new short[height, width];
             Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, width * height * sizeof(short));
-            TilesPerRow = (TilesImage != null ? (TilesImage.Width / TileSize) : 0);
             SectorPixelSize = SectorSize * TileSize;
             GenerateCollisionMask(); //todo: necessary here?
             //todo: this is being called several times
@@ -314,6 +296,9 @@ namespace Takai.Game
 
         public virtual void DerivedDeserialize(Dictionary<string, object> props)
         {
+            Class?.InitializeGraphics();
+            Resize(Class.Width, Class.Height, true); //builds spacial info, etc
+
             if (props.TryGetValue("Entities", out var ents))
             {
                 foreach (var ent in Data.Serializer.Cast<List<EntityInstance>>(ents))
@@ -344,9 +329,6 @@ namespace Takai.Game
                 foreach (var trigger in Data.Serializer.Cast<List<Trigger>>(triggers))
                     AddTrigger(trigger);
             }
-            
-            Class?.InitializeGraphics(); //todo: this is a hack fix
-            Resize(Class.Width, Class.Height); //builds spacial info, etc
         }
     }
 }
