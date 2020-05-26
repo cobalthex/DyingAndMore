@@ -24,6 +24,7 @@ namespace DyingAndMore.Game.Entities
         EnemyNearby     = 0b0001000000000000, // >= 1
         //target close/far
         //target fleeing?
+        //target out of range
     }
 
     public class AIController : Controller
@@ -63,7 +64,8 @@ namespace DyingAndMore.Game.Entities
         /// The current task running in the <see cref="CurrentBehavior"/>
         /// </summary>
         public int CurrentTask { get; set; }
-        //task start time
+
+        public TimeSpan CurrentTaskStartTime { get; private set; }
 
         public Senses KnownSenses { get; private set; }
 
@@ -99,9 +101,16 @@ namespace DyingAndMore.Game.Entities
             {
                 var result = CurrentBehavior.Tasks[CurrentTask].Think(deltaTime, this);
                 if (result == Tasks.TaskResult.Failure)
+                {
                     CurrentTask = 0;
+                    CurrentTaskStartTime = Actor.Map.ElapsedTime;
+                }
                 else if (result == Tasks.TaskResult.Success)
+                {
                     ++CurrentTask;
+                    CurrentTaskStartTime = Actor.Map.ElapsedTime;
+                }
+
             }
             else if (DefaultBehaviors != null)
             {
@@ -113,6 +122,7 @@ namespace DyingAndMore.Game.Entities
                     {
                         CurrentBehavior = behavior;
                         CurrentTask = 0;
+                        CurrentTaskStartTime = Actor.Map.ElapsedTime;
                     }
                 }
             }
@@ -227,3 +237,6 @@ namespace DyingAndMore.Game.Entities
 }
 
 //generic counters for behaviors to use for limiting repeats (e.g. clone behavior can only run 4x)
+
+
+//behavior influencers/sources/whatever (entering a region adds possible behaviors)

@@ -3,17 +3,33 @@ ActorClass {
     MaxHealth: 3000;
 
     FieldOfView: 2.356194;
-    MaxSpeed: [100 200];
+    MaxSpeed: [300 500];
     MoveForce: 600;
     IsPhysical: True;
     IgnoreTrace: False;
+    #Drag: 0.5;
 
     DefaultFactions: Factions [Enemy];
 
     DefaultController: [AIController {
+        DefaultBehaviors: [
+            Behavior {
+                Name: "ShootAtTarget";
+                Tasks: [
+                    FindClosestEnemy { sightDistance: 1000; };
+                    NavigateGradient { targetValue: 15; }
+                    ShootAtTarget {
+
+                    }
+                ];
+            };
+        ];
     }];
 
-    DefaultWeapon: [@"Weapons/Plasma.wpn.tk"];
+    DefaultWeapon: [
+        @"Weapons/plasma.wpn.tk"
+        @"Weapons/laser.wpn.tk"
+    ];
 
     Trail: {
         LifeSpan: 0.4sec;

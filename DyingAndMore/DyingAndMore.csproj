@@ -64,8 +64,10 @@
     </Shaders>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game\Entities\Behaviors\Tasks.cs" />
-    <Compile Include="Game\Entities\Behaviors\Orbit.cs" />
+    <Compile Include="Game\Entities\Tasks\Navigation.cs" />
+    <Compile Include="Game\Entities\Tasks\Shooting.cs" />
+    <Compile Include="Game\Entities\Tasks\Tasks.cs" />
+    <Compile Include="Game\Entities\Tasks\Orbit.cs" />
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
@@ -85,8 +87,8 @@
     <Compile Include="Game\Effects.cs" />
     <Compile Include="Game\Entities\AIController.cs" />
     <Compile Include="Game\Entities\ArtilleryController.cs" />
-    <Compile Include="Game\Entities\Behaviors\Magnet.cs" />
-    <Compile Include="Game\Entities\Behaviors\Test.cs" />
+    <Compile Include="Game\Entities\Tasks\Magnet.cs" />
+    <Compile Include="Game\Entities\Tasks\Test.cs" />
     <Compile Include="Game\Entities\Conditions.cs" />
     <Compile Include="Game\Entities\Controller.cs" />
     <Compile Include="Game\Entities\Pickups.cs" />

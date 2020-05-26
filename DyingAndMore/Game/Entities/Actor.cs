@@ -277,7 +277,7 @@ namespace DyingAndMore.Game.Entities
             Controller?.OnFluidCollision(fluid, deltaTime);
         }
 
-        public const float TurnSpeed = MathHelper.Pi; //dynamic/settable?
+        public const float TurnSpeed = MathHelper.TwoPi; //dynamic/settable?
 
         //Turn in direction of...
 
