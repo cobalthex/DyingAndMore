@@ -43,12 +43,24 @@ namespace DyingAndMore.Game.Entities.Tasks
     }
 
     /// <summary>
+    /// Determine when a gradient navigation task is successful
+    /// Compares current nav value to target value
+    /// </summary>
+    public enum NavGradientSuccessCondition
+    {
+        LessOrEqual,
+        Equal,
+        GreaterOreEqual
+    }
+
+    /// <summary>
     /// Navigate towards a particular value in the flow field gradient
     /// </summary>
     public struct NavigateGradient : ITask
     {
-
         public uint targetValue;
+        public NavGradientSuccessCondition successCondition;
+
         int lastDirection;
 
         public static readonly Point[] NavigationDirections =
@@ -75,6 +87,7 @@ namespace DyingAndMore.Game.Entities.Tasks
 
             var pos = (testPos / actor.Map.Class.TileSize).ToPoint();
             //calculate best direction to move
+            //start at last direction moved towards
             for (int i = 0, n = lastDirection; 
                 i < NavigationDirections.Length; 
                 ++i, n = (n + 1) % NavigationDirections.Length)
@@ -85,9 +98,10 @@ namespace DyingAndMore.Game.Entities.Tasks
                     continue;
 
                 //note: doesn't really work with cur < target due to how heuristic is generated
+                //maybe use sdf edge detection to work around this?
                 var h = actor.Map.PathInfo[next.Y, next.X].heuristic;
-                if ((cur > target && h < best) ||
-                    (cur < target && h > best))
+                if ((cur > target && h <= best) ||
+                    (cur < target && h >= best))
                 {
                     possible = dir;
                     best = h;
@@ -97,7 +111,6 @@ namespace DyingAndMore.Game.Entities.Tasks
                 //    possible = dir; //can store this in a list and pick randomly among possible directions
             }
 
-            //prefer to move in same direction
             if (possible != Point.Zero)
             {
                 actor.TurnTowards(Vector2.Normalize(possible.ToVector2()), deltaTime);
@@ -110,8 +123,23 @@ namespace DyingAndMore.Game.Entities.Tasks
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
             var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
-            if (Math.Abs(cur - targetValue) <= 1)
-                return TaskResult.Success;
+            switch (successCondition)
+            {
+                case NavGradientSuccessCondition.Equal:
+                    if (Math.Abs(cur - targetValue) <= 1)
+                        return TaskResult.Success;
+                    break;
+
+                case NavGradientSuccessCondition.LessOrEqual:
+                    if (cur <= targetValue + 1)
+                        return TaskResult.Success;
+                    break;
+
+                case NavGradientSuccessCondition.GreaterOreEqual:
+                    if (cur >= targetValue - 1)
+                        return TaskResult.Success;
+                    break;
+            }
 
             if (!NavigateToPoint(targetValue, deltaTime, ai.Actor, ref lastDirection))
                 return TaskResult.Success; //hack
@@ -138,6 +166,29 @@ namespace DyingAndMore.Game.Entities.Tasks
             var target = ai.Actor.Map.PathInfoAt(ai.Target.WorldPosition).heuristic;
             if (Math.Abs(cur - target) < 1)
                 return permanent ? TaskResult.Continue : TaskResult.Success;
+
+            NavigateGradient.NavigateToPoint(target, deltaTime, ai.Actor, ref lastDirection);
+            return TaskResult.Continue;
+        }
+    }
+
+    public struct FleeFromTarget : ITask
+    {
+        int lastDirection;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null)
+                return TaskResult.Success; //no ghosts allowed
+
+            //determine if cornered
+
+            var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
+            uint target = 50;
+            DyingAndMoreGame.DebugDisplay("cur", cur);
+            DyingAndMoreGame.DebugDisplay("tgt", target);
+            if (cur >= target)
+                return TaskResult.Success;
 
             NavigateGradient.NavigateToPoint(target, deltaTime, ai.Actor, ref lastDirection);
             return TaskResult.Continue;
