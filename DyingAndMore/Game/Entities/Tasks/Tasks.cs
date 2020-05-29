@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Microsoft.Xna.Framework;
 using Takai.Game;
 
@@ -31,14 +32,16 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
-    public struct FindClosestEnemy : ITask
+    public struct FindClosestActor : ITask
     {
+        public bool isAlly;
+        public bool isSameClass;
+
         public float sightDistance;
 
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
-            //auto-success if already have target?
-            if (ai.Target != null)
+            if (ai.Target != null) //specify as option to change target?
                 return TaskResult.Success;
 
             var ents = ai.Actor.Map.FindEntitiesInRegion(ai.Actor.WorldPosition, sightDistance);
@@ -46,12 +49,20 @@ namespace DyingAndMore.Game.Entities.Tasks
             var possibles = new List<ActorInstance>();
             foreach (var ent in ents)
             {
-                if (ent != ai.Actor &&
-                    ent is ActorInstance actor &&
-                    !actor.IsAlliedWith(ai.Actor.Factions) &&
-                    ai.Actor.IsFacing(actor.WorldPosition))
-                    possibles.Add(actor);
+                if (ent == ai.Actor || !(ent is ActorInstance actor))
+                    continue;
+
+                if (isAlly ^ actor.IsAlliedWith(ai.Actor.Factions))
+                    continue;
+
+                if (isSameClass ^ (actor.Class == ai.Actor.Class)) //compare class names?
+                    continue;
+
+                //    ai.Actor.IsFacing(actor.WorldPosition)) ?
+                    
+                possibles.Add(actor);
             }
+
             possibles.Sort(delegate (ActorInstance a, ActorInstance b)
             {
                 var afw = Vector2.Dot(a.WorldForward, ai.Actor.WorldForward);
@@ -70,16 +81,12 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
-    public struct Suicide : ITask
+    public struct ForgetTarget : ITask
     {
-        public EffectsClass effect;
-
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
-            ai.Actor.Kill();
-            if (effect != null)
-                ai.Actor.Map.Spawn(effect.Instantiate(ai.Actor));
-
+            //conditions?
+            ai.Target = null;
             return TaskResult.Success;
         }
     }
@@ -95,6 +102,35 @@ namespace DyingAndMore.Game.Entities.Tasks
             ai.Actor.TurnTowards(dir, deltaTime);
 
             return (Vector2.Dot(ai.Actor.WorldForward, dir) < 0.99f) ? TaskResult.Continue : TaskResult.Success;
+        }
+    }
+
+    /// <summary>
+    /// Attach to the target.
+    /// Fails if not next to target
+    /// </summary>
+    public struct AttachToTarget : ITask
+    {
+        //attach angle (may require this task moving into position)
+        // e.g. form geometric patterns
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null || ai.Target.WorldParent == ai.Actor)
+                return TaskResult.Failure;
+
+            if (ai.Actor.WorldParent == ai.Target)
+                return TaskResult.Success;
+
+            var distSq = Vector2.DistanceSquared(ai.Actor.WorldPosition, ai.Target.WorldPosition);
+            var desired = ai.Actor.Radius + ai.Target.Radius + 10;
+            if (distSq <= desired * desired)
+            {
+                //move actor to touch?
+                ai.Actor.Map.Attach(ai.Target, ai.Actor);
+                return TaskResult.Success;
+            }
+            return TaskResult.Failure;
         }
     }
 
