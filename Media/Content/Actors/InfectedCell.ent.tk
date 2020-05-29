@@ -14,7 +14,7 @@ ActorClass {
             Behavior {
                 Name: "Orbit";
                 Tasks: [
-                    FindClosestEnemy { sightDistance: 1000; };
+                    FindClosestActor { sightDistance: 1000; };
                     OrbitTarget { radius: 100; };
                 ];
             };
@@ -28,7 +28,7 @@ ActorClass {
             Behavior {
                 Name: "Follow";
                 Tasks: [
-                    FindClosestEnemy {
+                    FindClosestActor {
                         sightDistance: 1000;
                     };
                     NavigateToTarget {

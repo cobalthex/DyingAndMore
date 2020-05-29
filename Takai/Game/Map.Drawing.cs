@@ -1025,7 +1025,7 @@ namespace Takai.Game
                 foreach (EffectPass pass in Class.circleEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, renderedCircles.ToArray(), 0, renderedCircles.Count / 3);
+                    Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, renderedCircles.ToArray(), 0, renderedCircles.Count / 3); //todo: ToArray copies
                 }
             }
 

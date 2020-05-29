@@ -16,7 +16,7 @@ ActorClass {
             Behavior {
                 Name: "ShootAtTarget";
                 Tasks: [
-                    FindClosestEnemy { sightDistance: 1000; };
+                    FindClosestActor { sightDistance: 1000; };
                     NavigateGradient { targetValue: 10; }
                     ShootAtTarget {
 

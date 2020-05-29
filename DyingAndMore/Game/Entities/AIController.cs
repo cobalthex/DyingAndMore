@@ -22,6 +22,7 @@ namespace DyingAndMore.Game.Entities
         EnemyDied       = 0b0000010000000000,
         AllyNearby      = 0b0000100000000000, // >= 1
         EnemyNearby     = 0b0001000000000000, // >= 1
+        Attached        = 0b0010000000000000,
         //target close/far
         //target fleeing?
         //target out of range
@@ -118,8 +119,9 @@ namespace DyingAndMore.Game.Entities
             {
                 foreach (var behavior in DefaultBehaviors) //these should always be checking?
                 {
-                    KnownSenses |= BuildSenses(behavior.RequisiteSenses & ~KnownSenses);
+                    KnownSenses |= BuildSenses((behavior.RequisiteSenses | behavior.RequisiteNotSenses) & ~KnownSenses);
                     if ((behavior.RequisiteSenses & KnownSenses) == behavior.RequisiteSenses &&
+                        (behavior.RequisiteNotSenses & KnownSenses) == 0 &&
                         (float)Util.RandomGenerator.NextDouble() < behavior.QueueChance)
                     {
                         CurrentBehavior = behavior;
@@ -140,6 +142,9 @@ namespace DyingAndMore.Game.Entities
                 senses |= Senses.FullHealth;
             else if (Actor.CurrentHealth <= maxHealth * 0.2f)
                 senses |= Senses.LowHealth;
+
+            if (Actor.WorldParent != null)
+                senses |= Senses.Attached;
 
             if ((testSenses & Senses.LowAmmo) > 0 && Actor.Weapon != null)
             {
@@ -210,6 +215,11 @@ namespace DyingAndMore.Game.Entities
         /// Ignored once this behavior is queued
         /// </summary>
         public Senses RequisiteSenses { get; set; }
+
+        /// <summary>
+        /// Senses that cannot be set for this behavior to be picked.
+        /// </summary>
+        public Senses RequisiteNotSenses { get; set; } //rename
 
         //inverted senses?
         //failure senses?

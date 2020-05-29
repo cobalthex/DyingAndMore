@@ -10,6 +10,33 @@ ActorClass {
     IgnoreTrace: false;
 
     DefaultController: [AIController {
+        DefaultBehaviors: [
+            Behavior {
+                Name: "Attach";
+                RequisiteNotSenses: Senses [Attached];
+                Tasks: [
+                    FindClosestActor {
+                        sightDistance: 1000;
+                        isAlly: true;
+                        isSameClass: true;
+                    };
+                    MoveToTarget { };
+                    AttachToTarget { };
+                ];
+            };
+            Behavior {
+                Name: "Explode";
+                RequisiteSenses: Senses [Attached];
+                Tasks: [
+                    Wait { duration: 2sec; }
+                    Suicide {
+                     # todo: effect
+                    }
+
+                    #set condition to heat up and then explode after x seconds?
+                ];
+            };
+        ];
     }];
 
 	Animations: {

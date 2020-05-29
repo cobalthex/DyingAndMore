@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
-using DyingAndMore.Game.Weapons;
 using Microsoft.Xna.Framework;
+using Takai.Game;
+using DyingAndMore.Game.Weapons;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
@@ -251,6 +251,7 @@ namespace DyingAndMore.Game.Entities.Tasks
                 if (Vector2.Dot(ai.Actor.WorldForward, dir) < 0.99f)
                     return TaskResult.Continue;
 
+                //determine if needs to reload?
                 ai.Actor.Weapon.TryUse();
                 return TaskResult.Success;
             }
@@ -258,6 +259,23 @@ namespace DyingAndMore.Game.Entities.Tasks
             return TaskResult.Failure;
         }
     }
+
+    public struct Suicide : ITask
+    {
+        public EffectsClass effect;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            ai.Actor.Kill();
+            if (effect != null)
+                ai.Actor.Map.Spawn(effect.Instantiate(ai.Actor));
+
+            return TaskResult.Success;
+        }
+    }
+
+    //set condition on self
+    //set condition on target
 }
 
 
