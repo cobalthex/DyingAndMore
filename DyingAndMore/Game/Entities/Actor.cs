@@ -277,7 +277,7 @@ namespace DyingAndMore.Game.Entities
             Controller?.OnFluidCollision(fluid, deltaTime);
         }
 
-        public const float TurnSpeed = MathHelper.TwoPi; //dynamic/settable?
+        public const float TurnSpeed = 2 * MathHelper.Pi; //dynamic/settable?
 
         //Turn in direction of...
 
@@ -327,11 +327,11 @@ namespace DyingAndMore.Game.Entities
         /// Can this actor see a point given its field of view?
         /// (in world space)
         /// </summary>
-        /// <param name="Point">The point to check</param>
+        /// <param name="point">The point to check</param>
         /// <returns>True if this entity is facing Point</returns>
-        public bool IsFacing(Vector2 Point)
+        public bool IsFacing(Vector2 point)
         {
-            var diff = Point - WorldPosition;
+            var diff = point - WorldPosition;
             diff.Normalize();
 
             var dot = Vector2.Dot(WorldForward, diff);
@@ -352,6 +352,17 @@ namespace DyingAndMore.Game.Entities
 
             var dot = Vector2.Dot(diff, Ent.WorldForward);
             return (dot > (_Class.FieldOfView / 2 / MathHelper.Pi) - 1);
+        }
+
+        public bool CanSee(Vector2 point, int sightRange = 1000)
+        {
+            System.Diagnostics.Contracts.Contract.Assume(Map != null);
+
+            if (!IsFacing(point))
+                return false;
+
+            var dist = Map.TraceTiles(WorldPosition, Vector2.Normalize(point - WorldPosition), sightRange);
+            return dist >= sightRange;
         }
 
         public bool IsAlliedWith(Factions factions)

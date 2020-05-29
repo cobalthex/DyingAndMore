@@ -29,6 +29,8 @@ namespace DyingAndMore.Game.Entities
 
     public class AIController : Controller
     {
+        // sight range
+
         /// <summary>
         /// The current target actor for behaviors (e.g. enemy to shoot at or ally to follow)
         /// </summary>
@@ -179,14 +181,14 @@ namespace DyingAndMore.Game.Entities
                 // itemize?
                 senses |= Senses.HasTarget;
 
-                var diff = Actor.WorldPosition - Target.WorldPosition;
-                var dl = diff.Length();
-                var dist = (int)Math.Ceiling(dl);
-                if ((testSenses & Senses.TargetVisible) > 0 && dl < 500 && Actor.Map.TraceTiles(Actor.WorldPosition, Actor.WorldForward, dist) == dist) //store sight dist?
+                if ((testSenses & Senses.TargetVisible) > 0 &&
+                    Actor.CanSee(Target.WorldPosition, 500)) //store sight range?
                     senses |= Senses.TargetVisible;
 
-                var dot = -Vector2.Dot(diff / dl, Target.WorldForward);
-                if (dot <= (((ActorClass)Target.Class).FieldOfView / 2 / MathHelper.Pi) - 1)
+                //todo: Actor.CanSee
+
+                if ((testSenses & Senses.TargetCanSeeMe) > 0 &&
+                    Target.CanSee(Actor.WorldPosition, 500))
                     senses |= Senses.TargetCanSeeMe; //trace tiles?
             }
 
@@ -209,6 +211,7 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public Senses RequisiteSenses { get; set; }
 
+        //inverted senses?
         //failure senses?
 
         /// <summary>

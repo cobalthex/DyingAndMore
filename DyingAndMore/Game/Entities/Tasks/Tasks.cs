@@ -98,27 +98,6 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
-
-
-    public struct FleeFromTarget : ITask
-    {
-        //success condition (sight range?)
-
-        public TaskResult Think(TimeSpan deltaTime, AIController ai)
-        {
-            if (ai.Target == null)
-                return TaskResult.Success; //no ghosts allowed
-
-            //todo: sight range
-
-            // turn and run away
-
-            return TaskResult.Continue;
-
-        }
-    }
-
-    //Face target and shoot  (maybe leading)
     //provide cover
     //clone
     //spawn entities

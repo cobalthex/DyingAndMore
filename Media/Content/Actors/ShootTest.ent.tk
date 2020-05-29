@@ -17,10 +17,18 @@ ActorClass {
                 Name: "ShootAtTarget";
                 Tasks: [
                     FindClosestEnemy { sightDistance: 1000; };
-                    NavigateGradient { targetValue: 15; }
+                    NavigateGradient { targetValue: 10; }
                     ShootAtTarget {
 
                     }
+                ];
+            };
+
+            Behavior {
+                Name: "Flee";
+                RequisiteSenses: Senses [LowHealth HasTarget];
+                Tasks: [
+                    FleeFromTarget { };
                 ];
             };
         ];

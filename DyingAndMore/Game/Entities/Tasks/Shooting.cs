@@ -226,7 +226,7 @@ namespace DyingAndMore.Game.Entities.Tasks
 
             //shoot N times?
 
-            // turn towards actor then shoot
+            //todo: aiming styles
 
             var projectileSpeed = 10f; //pick another number? (maybe infinite?)
             if (ai.Actor.Weapon.Class is GunClass gun)
@@ -246,7 +246,7 @@ namespace DyingAndMore.Game.Entities.Tasks
             if (intercepted)
             {
                 var dir = Vector2.Normalize(positionToTarget - ai.Actor.WorldPosition);
-                ai.Actor.TurnTowards(dir, deltaTime);
+                ai.Actor.TurnTowards(dir, deltaTime); //todo: this is too slow
 
                 if (Vector2.Dot(ai.Actor.WorldForward, dir) < 0.99f)
                     return TaskResult.Continue;
@@ -258,12 +258,6 @@ namespace DyingAndMore.Game.Entities.Tasks
             return TaskResult.Failure;
         }
     }
-
-    // trajectory calculation styles:
-    // lead target
-    // shoot at target current position
-    // shoot around target
-    // 
 }
 
 
