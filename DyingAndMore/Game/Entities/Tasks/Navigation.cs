@@ -164,7 +164,7 @@ namespace DyingAndMore.Game.Entities.Tasks
 
             var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
             var target = ai.Actor.Map.PathInfoAt(ai.Target.WorldPosition).heuristic;
-            if (Math.Abs(cur - target) < 1)
+            if (Math.Abs(cur - target) <= 1)
                 return permanent ? TaskResult.Continue : TaskResult.Success;
 
             NavigateGradient.NavigateToPoint(target, deltaTime, ai.Actor, ref lastDirection);

@@ -182,6 +182,7 @@ namespace DyingAndMore.Game
             AddChild(settingsConsole = new TabPanel
             {
                 Name = "Settings Console",
+                Style = "Frame",
                 IsEnabled = false,
                 Position = new Vector2(100, 200),
                 Padding = new Vector2(10, 5),
@@ -190,19 +191,29 @@ namespace DyingAndMore.Game
             });
 
             renderSettingsPane = GeneratePropSheet(Map.renderSettings);
+            renderSettingsPane.BackgroundSprite = null;
+            renderSettingsPane.BackgroundColor = Color.Transparent; //hacky, should fix .Style = null
             renderSettingsPane.Name = "Render Settings";
+            renderSettingsPane.HorizontalAlignment = Alignment.Stretch;
             settingsConsole.AddChild(renderSettingsPane);
 
             updateSettingsPane = GeneratePropSheet(Map.updateSettings);
+            updateSettingsPane.BackgroundSprite = null;
+            updateSettingsPane.BackgroundColor = Color.Transparent;
             updateSettingsPane.Name = "Update Settings";
+            updateSettingsPane.HorizontalAlignment = Alignment.Stretch;
             settingsConsole.AddChild(updateSettingsPane);
 
             gameplaySettingsPane = GeneratePropSheet(GameplaySettings);
+            gameplaySettingsPane.BackgroundSprite= null;
+            gameplaySettingsPane.BackgroundColor = Color.Transparent;
             gameplaySettingsPane.Name = "Gameplay Settings";
+            gameplaySettingsPane.HorizontalAlignment = Alignment.Stretch;
             settingsConsole.AddChild(gameplaySettingsPane);
 
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
-            Map.Class.DebugFont = Font; //todo: revisit
+            Map.renderSettings.drawDebugInfo = true;
+            Map.Class.DebugFont = DebugFont;
 
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
@@ -562,7 +573,6 @@ namespace DyingAndMore.Game
                     {
                         var pos = player.camera.WorldToScreen(ent.WorldPosition - new Vector2(0, ent.Radius + 16));
                         DrawHealthBar(spriteBatch, pos, actor.CurrentHealth, actor._Class.MaxHealth);
-                        DrawEntInfo(spriteBatch, pos, actor);
                     }
                 }
 #endif
@@ -627,26 +637,6 @@ namespace DyingAndMore.Game
             rect.Width = (int)(rect.Width * pc);
             Takai.Graphics.Primitives2D.DrawFill(spriteBatch, health > maxHealth ? Color.LightSteelBlue : Color.LawnGreen, rect);
             Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Teal, rect);
-        }
-
-        protected void DrawEntInfo(SpriteBatch spriteBatch, Vector2 screenPosition, EntityInstance entity)
-        {
-            var text = $"{entity.Name} ({entity.Class.Name})\n";
-            //weapon
-            if (entity is Entities.ActorInstance actor)
-            {
-                if (actor.Controller != null)
-                    text += $"Controller: {(actor.Controller.GetType().Name)}\n";
-                if (actor.Controller is Entities.AIController ai)
-                    text += $" AI: {ai}\n";
-
-                var fov = Matrix.CreateRotationZ(((Entities.ActorClass)actor.Class).FieldOfView / 2);
-                var d = Vector2.TransformNormal(entity.WorldForward, fov);
-                Map.DrawLine(entity.WorldPosition, entity.WorldPosition + d * 100, new Color(Color.White, 0.5f));
-                d = Vector2.TransformNormal(entity.WorldForward, Matrix.Invert(fov));
-                Map.DrawLine(entity.WorldPosition, entity.WorldPosition + d * 100, new Color(Color.White, 0.5f));
-            }
-            DebugFont.Draw(spriteBatch, text, screenPosition, Color.White);
         }
     }
 }

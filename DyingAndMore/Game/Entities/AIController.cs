@@ -92,6 +92,9 @@ namespace DyingAndMore.Game.Entities
 
         public override void Think(TimeSpan deltaTime)
         {
+            if (GameInstance.Current != null && !GameInstance.Current.GameplaySettings.isAiEnabled)
+                return;
+
             // run every X frames?
             //remove target on its death?
             //reactions to events

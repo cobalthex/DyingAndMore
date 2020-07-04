@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Text;
+using System.Windows.Forms.VisualStyles;
 
 namespace Takai.Data
 {
@@ -159,6 +161,30 @@ namespace Takai.Data
                 {
                     getset.type = typeof(string);
                     getset.get = () => oget()?.ToString() ?? "[null]";
+                    getset.set = null;
+                    return getset;
+                }
+                else if (modifier[1].Equals("slist", StringComparison.OrdinalIgnoreCase))
+                {
+                    getset.type = typeof(string);
+                    getset.get = () =>
+                    {
+                        var sb = new StringBuilder();
+                        var v = oget();
+                        if (v != null && v is System.Collections.IEnumerable e)
+                        {
+                            bool first = true;
+                            foreach (var i in e)
+                            {
+                                if (!first)
+                                    sb.Append(",");
+
+                                first = false;
+                                sb.Append(i);
+                            }
+                        }
+                        return sb.ToString();
+                    };
                     getset.set = null;
                     return getset;
                 }

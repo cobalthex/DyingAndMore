@@ -72,7 +72,6 @@ List {
 			        ];
 
 			    	ItemUI: List {
-			    		Name: "zunk";
     					HorizontalAlignment: Alignment.Stretch;
     					Direction: Direction.Horizontal;
     					Children: [

@@ -347,7 +347,13 @@ namespace Takai.Game
 
         public virtual string GetDebugInfo()
         {
-            return $"Name: {(Name ?? "(none)")}\nAlive: {IsAlive}";
+            return $"Class: {(Class?.Name ?? "(none)")}\nName: {(Name ?? "(none)")}\nAlive: {IsAlive}";
+        }
+
+        public bool InRange(EntityInstance ent, float distanceBetween)
+        {
+            var d = Radius + ent.Radius + distanceBetween;
+            return (Vector2.DistanceSquared(WorldPosition, ent.WorldPosition) <= (d * d));
         }
     }
 }

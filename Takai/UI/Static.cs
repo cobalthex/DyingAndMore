@@ -239,6 +239,7 @@ namespace Takai.UI
 
                 _style = value;
                 ApplyStyles(GetStyles(_style));
+                //todo: this needs to clear styles when switching
             }
         }
         private string _style;

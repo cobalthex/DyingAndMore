@@ -64,7 +64,6 @@ List {
                                     ];
                                 }
 
-
                                 Static { Text: "`_Controller"; };
                                 @"./Controller.ui.tk";
 

@@ -799,7 +799,7 @@ namespace Takai.Game
                 {
                     //todo: defer this drawing and draw outside of stencil
                     var textPos = entPos + new Vector2(ent.Radius + 10);
-                    Class.DebugFont.Draw(c.spriteBatch, ent.GetDebugInfo(), textPos, Color.Gold);
+                    Class.DebugFont.Draw(c.spriteBatch, ent.GetDebugInfo(), textPos, Color.White);
                 }
             }
 

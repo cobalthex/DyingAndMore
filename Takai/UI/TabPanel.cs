@@ -49,19 +49,20 @@
         {
             Direction = Direction.Vertical;
             base.InternalInsertChild(TabBar);
+
+            On("_SelectTab", delegate (Static sender, UIEventArgs e)
+            {
+                var sce = (SelectionChangedEventArgs)e;
+                TabIndex = sce.newIndex;
+                InvalidateArrange();
+                return UIEventResult.Handled;
+            });
         }
 
         public TabPanel(params Static[] children)
             : this()
         {
             AddChildren(TabBar);
-
-            On("_SelectTab", delegate (Static sender, UIEventArgs e)
-            {
-                var sce = (SelectionChangedEventArgs)e;
-                TabIndex = sce.newIndex;
-                return UIEventResult.Handled;
-            });
         }
 
         protected override void FinalizeClone()
@@ -81,7 +82,7 @@
 
             if (Children.Count > 1)
                 child.IsEnabled = false;
-            return base.InternalInsertChild(child, index, reflow, ignoreFocus);
+            return base.InternalInsertChild(child, index < 0 ? -1 : index + 1, reflow, ignoreFocus);
         }
 
         public override bool InternalRemoveChildIndex(int index, bool reflow = true)

@@ -1,10 +1,11 @@
 ﻿using Takai.UI;
 using DyingAndMore.Game.Weapons;
+using DyingAndMore.Game.Entities;
 using Takai.Game;
 
 namespace DyingAndMore.UI
 {
-    public class FactionSelect : EnumSelect<Game.Entities.Factions> { }
+    public class FactionSelect : EnumSelect<Factions> { }
 
     class TriggerFilterSelect : TypeSelect
     {
@@ -18,7 +19,7 @@ namespace DyingAndMore.UI
     {
         public ControllerSelect()
         {
-            AddTypeTree<Game.Entities.Controller>();
+            AddTypeTree<Controller>();
         }
     }
 
@@ -43,6 +44,24 @@ namespace DyingAndMore.UI
                 try
                 {
                     var weapon = Takai.Data.Cache.Load<WeaponClass>(entry);
+                    Items.Add(weapon);
+                }
+                catch { }
+            }
+        }
+    }
+
+    public class ConditionSelect : ObjectSelect<ConditionClass, ConditionInstance>
+    {
+        public ConditionSelect()
+            : base()
+        {
+            //todo: object cache
+            foreach (var entry in System.IO.Directory.EnumerateFiles("Content/Actors/Conditions", "*.cond.tk", System.IO.SearchOption.AllDirectories))
+            {
+                try
+                {
+                    var weapon = Takai.Data.Cache.Load<ConditionClass>(entry);
                     Items.Add(weapon);
                 }
                 catch { }
@@ -76,13 +95,13 @@ namespace DyingAndMore.UI
         }
     }
 
-    class SquadSelect : DropdownSelect<Game.Entities.Squad>
+    class SquadSelect : DropdownSelect<Squad>
     {
         public override void OpenDropdown() //hacky
         {
             Items.Clear();
             if (Takai.Data.Binding.Globals.TryGetValue("Map.Squads", out var squads) &&
-                squads is System.Collections.Generic.HashSet<Game.Entities.Squad> sqSet)
+                squads is System.Collections.Generic.HashSet<Squad> sqSet)
             {
                 foreach (var squad in sqSet)
                     Items.Add(squad);
@@ -91,15 +110,15 @@ namespace DyingAndMore.UI
         }
     }
 
-    class ActorList : ItemList<Game.Entities.ActorClass> { } //object select?
+    class ActorList : ItemList<ActorClass> { } //object select?
 
-    class BehaviorList : ItemList<Game.Entities.Behavior> { }
+    class BehaviorList : ItemList<Behavior> { }
 
     class BehaviorSelect : TypeSelect
     {
         public BehaviorSelect()
         {
-            AddTypeTree<Game.Entities.Behavior>();
+            AddTypeTree<Behavior>();
         }
     }
 }
