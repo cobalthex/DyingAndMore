@@ -315,10 +315,16 @@ namespace DyingAndMore.Game.Entities
 
         public override string GetDebugInfo()
         {
-            return $"{base.GetDebugInfo()}\n" +
-                   $"Health: {CurrentHealth}/{_Class?.MaxHealth}\n" +
-                   $"Weapon: {Weapon}\n" +
-                   $"Controller: {Controller}";
+            var text =
+                $"{base.GetDebugInfo()}\n" +
+                $"Health: {CurrentHealth}/{_Class?.MaxHealth}\n" +
+                $"Weapon: {Weapon}\n" +
+                $"Controller: {Controller}\n";
+
+            if (Controller is Entities.AIController ai)
+                text += $"AI: {ai}\n";
+
+            return text;
         }
 
         #region Helpers

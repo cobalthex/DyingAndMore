@@ -1,5 +1,26 @@
 MapInstance {
-    Squads: Null;
+    Squads: [
+        Squad {
+            Name: "spawn";
+            LeaderTemplate: [];
+            UnitsTemplate: [
+                @"Actors/Astrovirus.ent.tk"
+            ];
+            SpawnPosition: [807.9365 -44.81023];
+            SpawnRadius: 41.25773;
+            DontSpawnAutomatically: False;
+            MinLiveCount: 3;
+            MaxLiveCount: 5;
+            MaxSpawnCount: 0;
+            SpawnDelay: 2000;
+            ResetDelay: 0;
+            DisableSpawningIfLeaderIsDead: False;
+            Leader: Null;
+            Units: [];
+            TotalSpawnCount: 0;
+            LastSpawnTime: 0;
+        }
+    ];
     Class: MapClass {
         Name: Null;
         Tileset: @"Tilesets/pink.tiles.tk";
@@ -9,69 +30,241 @@ MapInstance {
         Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
     };
     Sounds: [];
-    ElapsedTime: 118248.194;
+    ElapsedTime: 172753.7039;
     TimeScale: 1;
     currentScreenFade: ScreenFade {
         Duration: 0;
         Colors: Null;
         Blend: Null;
     };
-    currentScreenFadeElapsedTime: 118248.194;
+    currentScreenFadeElapsedTime: 172753.7039;
     Entities: [
         ActorInstance {
             Class: @"Actors/Player.ent.tk";
             Factions: Factions [Player Ally];
-            Controller: InputController { };
+            Controller: InputController {
+                Inputs: Null;
+            };
             CurrentHealth: 5000;
             Conditions: {
             };
             MaxSpeed: 300;
             Weapon: GunInstance {
-                Class: @"Weapons/mg.wpn.tk";
                 CurrentAmmo: 1000;
+                LastAmmoRefillTime: 0;
+                OnlyRefillIfIdle: True;
+                Class: @"Weapons/mg.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
             Id: 100;
             Name: Null;
-            Position: [100 100];
-            Forward: [1 0];
-            Velocity: [0 0];
             OutlineColor: [0 0 0 0];
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 116296;
+            SpawnTime: 118248;
             EventHandlers: Null;
+            Position: [100 100];
+            Forward: [1 0];
+            Velocity: [0 0];
         }
         ActorInstance {
             Class: @"Actors/InfectedCell.ent.tk";
             CurrentHealth: 500;
             Factions: Factions [Enemy];
+            Controller: AIController {
+                Target: Null;
+                DefaultBehaviors: [
+                    Behavior {
+                        Name: "Orbit";
+                        File: Null;
+                        RequisiteSenses: Senses.None;
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            FindClosestActor {
+                                isAlly: False;
+                                isSameClass: False;
+                                sightDistance: 1000;
+                            }
+                            OrbitTarget {
+                                radius: 100;
+                            }
+                        ];
+                    }
+                    Behavior {
+                        Name: "Kamikazi";
+                        File: Null;
+                        RequisiteSenses: Senses.None;
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            NavigateGradient {
+                                targetValue: 0;
+                                successCondition: NavGradientSuccessCondition.LessOrEqual;
+                            }
+                            Suicide {
+                                effect: Null;
+                            }
+                        ];
+                    }
+                    Behavior {
+                        Name: "Clone";
+                        File: Null;
+                        RequisiteSenses: Senses.None;
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            Wait {
+                                duration: 3000;
+                            }
+                            CloneSelf {
+                                relativeDirection: [-1 0];
+                            }
+                        ];
+                    }
+                    Behavior {
+                        Name: "Follow";
+                        File: Null;
+                        RequisiteSenses: Senses.None;
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            FindClosestActor {
+                                isAlly: False;
+                                isSameClass: False;
+                                sightDistance: 1000;
+                            }
+                            NavigateToTarget {
+                                permanent: True;
+                            }
+                        ];
+                    }
+                ];
+                AllyBroadcasts: Null;
+                EnemyBroadcasts: Null;
+                CurrentBehavior: Null;
+                CurrentTask: 0;
+            };
+            Conditions: {
+            };
             MaxSpeed: 200;
             Weapon: Null;
             Id: 101;
             Name: Null;
             Position: [400 400];
             Forward: [-1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 118248;
+            EventHandlers: Null;
         }
         ActorInstance {
             Class: @"Actors/ShootTest.ent.tk";
             CurrentHealth: 5000;
             Factions: Factions [Enemy];
+            Controller: AIController {
+                Target: Null;
+                DefaultBehaviors: [
+                    Behavior {
+                        Name: "ShootAtTarget";
+                        File: Null;
+                        RequisiteSenses: Senses.None;
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            FindClosestActor {
+                                isAlly: False;
+                                isSameClass: False;
+                                sightDistance: 1000;
+                            }
+                            NavigateGradient {
+                                targetValue: 10;
+                                successCondition: NavGradientSuccessCondition.LessOrEqual;
+                            }
+                            ShootAtTarget {
+                                aimingMethod: AimingMethod.None;
+                            }
+                        ];
+                    }
+                    Behavior {
+                        Name: "Flee";
+                        File: Null;
+                        RequisiteSenses: Senses [LowHealth HasTarget];
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            FleeFromTarget {
+                            }
+                        ];
+                    }
+                ];
+                AllyBroadcasts: Null;
+                EnemyBroadcasts: Null;
+                CurrentBehavior: Null;
+                CurrentTask: 0;
+            };
+            Conditions: {
+            };
             MaxSpeed: 400;
             Weapon: GunInstance {
                 Class: @"Weapons/laser.wpn.tk";
                 CurrentAmmo: 100;
                 StateTime: 0;
                 Charge: 0;
+                LastAmmoRefillTime: 0;
+                OnlyRefillIfIdle: True;
             };
             Id: 102;
             Name: Null;
             Position: [2000 100];
             Forward: [-1 0];
+            Velocity: [0 0];
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 118248;
+            EventHandlers: Null;
+        }
+        ActorInstance {
+            Class: @"Actors/Cyst.ent.tk";
+            CurrentHealth: 10000;
+            Factions: Factions [Enemy];
+            Controller: ArtilleryController {
+                MaxRange: 800;
+                CanRotate: False;
+                ShowSweepLines: True;
+                trackedActor: Null;
+            };
+            Conditions: {
+            };
+            MaxSpeed: 0;
+            Weapon: SpawnerInstance {
+                Squad: *Squad.spawn;
+                SpawnQueue: Null;
+                Class: @"Weapons/Cyst.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
+            };
+            Id: 103;
+            Name: Null;
+            Position: [811.2648 23.98842];
+            Forward: [0 1];
+            Velocity: [0 0];
+            OutlineColor: [255 215 0 255];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 164833.7755;
+            EventHandlers: Null;
         }
     ];
+    EntityAttachments: [];
     Triggers: [];
     Fluids: [];
 }

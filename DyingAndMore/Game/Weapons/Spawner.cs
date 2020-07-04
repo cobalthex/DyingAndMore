@@ -67,7 +67,7 @@ namespace DyingAndMore.Game.Weapons
             if (Squad.LeaderTemplate != null && Squad.LeaderTemplate.Count > 0)
                 SpawnQueue.Enqueue(Takai.Util.Random(Squad.LeaderTemplate));
 
-            if (Squad.UnitsTemplate.Count > 0)
+            if (Squad.UnitsTemplate != null && Squad.UnitsTemplate.Count > 0)
             {
                 for (int i = 0; i < (Squad.MaxSpawnCount == 0 ? 50 : Squad.MaxSpawnCount); ++i) //todo: dont limit
                     SpawnQueue.Enqueue(Takai.Util.Random(Squad.UnitsTemplate));

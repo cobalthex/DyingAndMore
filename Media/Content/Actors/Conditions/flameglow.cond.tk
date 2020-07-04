@@ -1,9 +1,9 @@
 ConditionClass {
-    Name: "Fire";
+    Name: "Flameglow";
 	HealthPerSecond: -4;
 	ActiveEffect: {
 		Effects: [
-			ParticleEffect {
+			#*ParticleEffect {
                 Count: 1;
                 Spread: [80deg 100deg];
                 Radius: 16;
@@ -28,23 +28,11 @@ ConditionClass {
                         #AlphaDestinationBlend: Blend.One;
 
                         # ghost fire
-                        #ColorSourceBlend: Blend.SourceColor;
-                        #ColorDestinationBlend: Blend.BlendFactor;
-                        #ColorBlendFunction: BlendFunction.Add;
-                        #AlphaSourceBlend: Blend.Zero;
-                        #AlphaDestinationBlend: Blend.One;
-
-                        # explosion
-                        #ColorSourceBlend: Blend.SourceColor;
-                        #AlphaSourceBlend: Blend.Zero;
-                        #ColorDestinationBlend: Blend.InverseSourceAlpha;
-                        #AlphaDestinationBlend: Blend.InverseSourceAlpha;
-
-
-                        ColorSourceBlend: Blend.One;
+                        ColorSourceBlend: Blend.SourceColor;
+                        ColorDestinationBlend: Blend.BlendFactor;
+                        ColorBlendFunction: BlendFunction.Add;
                         AlphaSourceBlend: Blend.Zero;
-                        ColorDestinationBlend: Blend.InverseSourceAlpha;
-                        AlphaDestinationBlend: Blend.InverseSourceAlpha;
+                        AlphaDestinationBlend: Blend.One;
                     };
                     InitialSpeed: [5 50];
                     LifeSpan: [1000msec 1500msec];
@@ -56,7 +44,7 @@ ConditionClass {
                             [0.3 Color.Yellow];
                             [0.5 Color.Orange];
                             [0.6 [100 0 0 255]];
-                            [1 [00 00 00 10]];
+                            [1 [0 0 0 10]];
                         ];
                     };
 
@@ -69,7 +57,7 @@ ConditionClass {
                         ];
                     };
 	            };
-	        };
+	        };*#
         ];
 	}
 }

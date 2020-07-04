@@ -42,6 +42,11 @@ ClassName {
         { }
     ];
 
+    Struct: {
+        a: 1;
+        b: Color.White;
+        c: 3;
+    };
     Struct: [1 Color.White 3];
     TypedStruct: Type [1 2 3];
 

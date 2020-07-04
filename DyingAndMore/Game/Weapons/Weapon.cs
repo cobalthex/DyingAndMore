@@ -218,7 +218,8 @@ namespace DyingAndMore.Game.Weapons
         /// <summary>
         /// Begin charging the weapon
         /// </summary>
-        public virtual void TryUse()
+        /// <returns>True if the weapon can begin charging (returns true if can use but already firing)</returns>
+        public virtual bool TryUse()
         {
             isUsing = true;
             if (Class.CanAlwaysCharge || CanUse(Actor.Map.ElapsedTime))
@@ -228,7 +229,9 @@ namespace DyingAndMore.Game.Weapons
                     State = WeaponState.Charging;
                     Actor.PlayAnimation($"{Class.AnimationClass}ChargeWeapon");
                 }
+                return true;
             }
+            return false;
         }
 
         protected virtual void OnEndUse()

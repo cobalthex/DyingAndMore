@@ -1,4 +1,5 @@
 ConditionClass {
+    Name: "Poison";
 	HealthPerSecond: -80;
 	ActiveEffect: {
 		Effects: [

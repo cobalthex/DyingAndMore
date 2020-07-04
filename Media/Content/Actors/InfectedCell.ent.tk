@@ -26,6 +26,15 @@ ActorClass {
                 ];
             };
             Behavior {
+                Name: "Clone";
+                Tasks: [
+                    Wait { duration: 3sec; }
+                    CloneSelf {
+                        relativeDirection: [-1 0];
+                    };
+                ];
+            };
+            Behavior {
                 Name: "Follow";
                 Tasks: [
                     FindClosestActor {

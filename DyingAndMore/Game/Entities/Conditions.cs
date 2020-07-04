@@ -42,8 +42,20 @@ namespace DyingAndMore.Game.Entities
         {
             return new ConditionInstance
             {
-                Class = this
+                Class = this,
             };
+        }
+        public ConditionInstance Instantiate(TimeSpan duration)
+        {
+            return new ConditionInstance
+            {
+                Class = this,
+                TimeRemaining = duration
+            };
+        }
+        public override string ToString()
+        {
+            return $"{Name}";
         }
     }
 
@@ -68,6 +80,11 @@ namespace DyingAndMore.Game.Entities
 
                 //effect radius scaled by entity size?
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{TimeRemaining.Seconds}.{TimeRemaining.Milliseconds}sec";
         }
     }
 

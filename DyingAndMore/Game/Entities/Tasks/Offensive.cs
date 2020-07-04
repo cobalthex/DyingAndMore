@@ -237,7 +237,7 @@ namespace DyingAndMore.Game.Entities.Tasks
                 ai.Actor.Velocity,
                 projectileSpeed,
                 ai.Target.WorldPosition, 
-                ai.Target.Velocity, 
+                ai.Target.Velocity,
                 Vector2.Zero, // current - last velocity ?
                 ai.Target.MaxSpeed, 
                 out var positionToTarget
@@ -246,14 +246,17 @@ namespace DyingAndMore.Game.Entities.Tasks
             if (intercepted)
             {
                 var dir = Vector2.Normalize(positionToTarget - ai.Actor.WorldPosition);
+                //ai.Actor.Forward = dir;
                 ai.Actor.TurnTowards(dir, deltaTime); //todo: this is too slow
 
                 if (Vector2.Dot(ai.Actor.WorldForward, dir) < 0.99f)
                     return TaskResult.Continue;
 
                 //determine if needs to reload?
-                ai.Actor.Weapon.TryUse();
-                return TaskResult.Success;
+                if (!ai.Actor.Weapon.TryUse()) //limit to amount of time?
+                    return TaskResult.Success;
+
+                return TaskResult.Continue;
             }
 
             return TaskResult.Failure;
@@ -274,18 +277,36 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
-    //set condition on self
-    //set condition on target
+    public struct SetConditionOnSelf : ITask
+    {
+        public ConditionClass condition;
+        public TimeSpan duration;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (condition == null)
+                return TaskResult.Failure;
+
+            ai.Actor.Conditions[condition] = condition.Instantiate(duration);
+            return TaskResult.Success;
+        }
+    }
+
+    //must be 'touching'
+    public struct SetConditionOnTarget : ITask
+    {
+        public ConditionClass condition;
+        public TimeSpan duration;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null || !ai.Actor.InRange(ai.Target, 20) || condition == null)
+                return TaskResult.Failure; //facing target?
+
+            ai.Actor.Conditions[condition] = condition.Instantiate(duration);
+            return TaskResult.Success;
+        }
+    }
+
+    //create condition to light up and then blow up
 }
-
-
-/*
-a = (V0.x * V0.x) + (V0.y * V0.y) - (s1 * s1)
-b = 2 * ((P0.x * V0.x) + (P0.y * V0.y) - (P1.x * V0.x) - (P1.y * V0.y))
-c = (P0.x * P0.x) + (P0.y * P0.y) + (P1.x * P1.x) + (P1.y * P1.y) - (2 * P1.x * P0.x) - (2 * P1.y * P0.y)
-
-t1 = (-b + sqrt((b * b) - (4 * a * c))) / (2 * a)
-t2 = (-b - sqrt((b * b) - (4 * a * c))) / (2 * a)
-
-discard if t < 0 or NaN. take smaller of two values
-*/

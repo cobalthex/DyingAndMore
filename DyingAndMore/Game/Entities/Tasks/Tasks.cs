@@ -122,15 +122,36 @@ namespace DyingAndMore.Game.Entities.Tasks
             if (ai.Actor.WorldParent == ai.Target)
                 return TaskResult.Success;
 
-            var distSq = Vector2.DistanceSquared(ai.Actor.WorldPosition, ai.Target.WorldPosition);
-            var desired = ai.Actor.Radius + ai.Target.Radius + 10;
-            if (distSq <= desired * desired)
+            if (ai.Actor.InRange(ai.Target, 20))
             {
                 //move actor to touch?
                 ai.Actor.Map.Attach(ai.Target, ai.Actor);
                 return TaskResult.Success;
             }
             return TaskResult.Failure;
+        }
+    }
+
+    public struct CloneSelf : ITask
+    {
+        /// <summary>
+        /// Where to spawn the clone, relative to this actor's forward direction
+        /// Should be normalized
+        /// </summary>
+        public Vector2 relativeDirection;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            //ensure space
+            Vector2 targetPos = ai.Actor.WorldPosition;
+            targetPos += (ai.Actor.Radius * 2 + 10) * (relativeDirection * ai.Actor.WorldForward);
+            if (!ai.Actor.Map.Class.IsInsideMap(targetPos))
+                return TaskResult.Failure;
+
+            var clone = ai.Actor.Clone();
+            clone.SetPositionTransformed(targetPos);
+            ai.Actor.Map.Spawn(clone);
+            return TaskResult.Success;
         }
     }
 

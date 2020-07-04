@@ -1,10 +1,10 @@
 ActorClass {
     Name: "Astrovirus";
-    MaxHealth: 40;
+    MaxHealth: 400;
     DefaultFactions: Factions.Enemy;
 
     FieldOfView: 2.356194;
-    MaxSpeed: [50 200];
+    MaxSpeed: [300 800];
     MoveForce: 200;
     IsPhysical: true;
     IgnoreTrace: false;
@@ -17,10 +17,12 @@ ActorClass {
                 Tasks: [
                     FindClosestActor {
                         sightDistance: 1000;
-                        isAlly: true;
-                        isSameClass: true;
+                        isAlly: false;
+                        isSameClass: false;
                     };
-                    MoveToTarget { };
+                    MoveToTarget {
+                        distance: 20;
+                    };
                     AttachToTarget { };
                 ];
             };
@@ -28,9 +30,14 @@ ActorClass {
                 Name: "Explode";
                 RequisiteSenses: Senses [Attached];
                 Tasks: [
+                    SetConditionOnTarget {
+                        condition: @"Actors/Conditions/flameglow.cond.tk";
+                        duration: 2sec;
+                    }
                     Wait { duration: 2sec; }
                     Suicide {
                      # todo: effect
+                     effect: @"Effects/greensplosion.fx.tk";
                     }
 
                     #set condition to heat up and then explode after x seconds?

@@ -1,0 +1,50 @@
+EffectsClass {
+    Effects: [
+        ParticleEffect {
+            Count: 30;
+            Spread: [80deg 100deg];
+            Radius: 16;
+            Class: {
+                Sprite: {
+                    Texture: @"Effects/fire.png";
+                    width: 64;
+                    height: 48;
+                    Origin: [48 24];
+                };
+                Blend: {
+                    # explosion
+                    ColorSourceBlend: Blend.SourceColor;
+                    AlphaSourceBlend: Blend.Zero;
+                    ColorDestinationBlend: Blend.InverseSourceAlpha;
+                    AlphaDestinationBlend: Blend.InverseSourceAlpha;
+                };
+                InitialSpeed: [15 50];
+                LifeSpan: [500msec 1000msec];
+                Drag: 1.0;
+                ColorOverTime: {
+                    Reverse: false;
+                    Values: [
+                        [0 [0 220 64 255]];
+                        [0.5 [127 127 127 255]];
+                        [1 [255 255 255 10]];
+                    ];
+                };
+
+                ScaleOverTime: {
+                    IsLinear: true;
+                    Values: [
+                        [0 0.5]
+                        [0.7 1]
+                        [1 2]
+                    ];
+                };
+            };
+        };
+
+        HealthEffect {
+            MaxDamage: 200;
+            Radius: 100;
+            CanAffectSource: true;
+        }
+    ];
+};

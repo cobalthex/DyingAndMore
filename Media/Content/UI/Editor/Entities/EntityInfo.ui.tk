@@ -164,5 +164,15 @@ Table {
                 }
             ];
         };
+
+        Static { Text: "Condition(s)"; };
+        Static {
+            Bindings: [
+                {
+                    Source: "Conditions:slist";
+                    Target: "Text";
+                }
+            ];
+        };
     ];
 }
