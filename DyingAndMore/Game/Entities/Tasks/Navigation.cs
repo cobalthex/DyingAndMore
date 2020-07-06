@@ -172,27 +172,9 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
-    public struct FleeFromTarget : ITask
-    {
-        int lastDirection;
-
-        public TaskResult Think(TimeSpan deltaTime, AIController ai)
-        {
-            if (ai.Target == null)
-                return TaskResult.Success; //no ghosts allowed
-
-            //determine if cornered
-
-            var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
-            uint target = 50;
-            DyingAndMoreGame.DebugDisplay("cur", cur);
-            DyingAndMoreGame.DebugDisplay("tgt", target);
-            if (cur >= target)
-                return TaskResult.Success;
-
-            NavigateGradient.NavigateToPoint(target, deltaTime, ai.Actor, ref lastDirection);
-            return TaskResult.Continue;
-
-        }
-    }
+    //navigate behind entity (for assassination)
+    //navigate to entity (powerup/weapon/etc)
+    //teleport
+    //wander
+    //follow path
 }

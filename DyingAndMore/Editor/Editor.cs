@@ -371,12 +371,14 @@ namespace DyingAndMore.Editor
                 var dist = Vector2.Distance(savedWorldPos, currentWorldPos);
                 var whRatio = new Vector2(Camera.Viewport.Width, Camera.Viewport.Height);
                 whRatio.Normalize();
+                if (!float.IsNaN(whRatio.X))
+                {
+                    whRatio *= Takai.Util.Sign(currentWorldPos - savedWorldPos);
 
-                whRatio *= Takai.Util.Sign(currentWorldPos - savedWorldPos);
+                    //todo: allow breaking into quadrants
 
-                //todo: allow breaking into quadrants
-
-                Map.DrawRect(Takai.Util.AbsRectangle(savedWorldPos, savedWorldPos + dist * whRatio), Color.Aquamarine);
+                    Map.DrawRect(Takai.Util.AbsRectangle(savedWorldPos, savedWorldPos + dist * whRatio), Color.Aquamarine);
+                }
             }
 
             Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 10f); //todo: make ranges global and move to some game settings

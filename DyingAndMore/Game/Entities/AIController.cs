@@ -60,6 +60,7 @@ namespace DyingAndMore.Game.Entities
             {
                 _currentBehavior = value;
                 CurrentTask = 0;
+                CurrentTaskStartTime = Actor?.Map?.ElapsedTime ?? TimeSpan.Zero;
             }
         }
         private Behavior _currentBehavior;
@@ -71,6 +72,14 @@ namespace DyingAndMore.Game.Entities
         public TimeSpan CurrentTaskStartTime { get; private set; }
 
         public Senses KnownSenses { get; private set; }
+
+        public void Reset()
+        {
+            CurrentBehavior = null;
+            KnownSenses = 0;
+            Target = null;
+            //part of ICloneable?
+        }
 
         public override string ToString()
         {
@@ -108,7 +117,20 @@ namespace DyingAndMore.Game.Entities
                 var result = CurrentBehavior.Tasks[CurrentTask].Think(deltaTime, this);
                 if (result == Tasks.TaskResult.Failure)
                 {
-                    CurrentTask = 0;
+                    switch (CurrentBehavior.OnTaskFailure)
+                    {
+                        case TaskFailureAction.RestartBehavior:
+                            CurrentTask = 0;
+                            break;
+                        case TaskFailureAction.CancelBehavior:
+                            CurrentBehavior = null;
+                            break;
+                        case TaskFailureAction.RetryTask:
+                            break;
+                        case TaskFailureAction.Ignore:
+                            ++CurrentTask;
+                            break;
+                    }
                     CurrentTaskStartTime = Actor.Map.ElapsedTime;
                 }
                 else if (result == Tasks.TaskResult.Success)
@@ -126,11 +148,7 @@ namespace DyingAndMore.Game.Entities
                     if ((behavior.RequisiteSenses & KnownSenses) == behavior.RequisiteSenses &&
                         (behavior.RequisiteNotSenses & KnownSenses) == 0 &&
                         (float)Util.RandomGenerator.NextDouble() < behavior.QueueChance)
-                    {
                         CurrentBehavior = behavior;
-                        CurrentTask = 0;
-                        CurrentTaskStartTime = Actor.Map.ElapsedTime;
-                    }
                 }
             }
             //else return to default behavior after behavior completed?
@@ -205,6 +223,17 @@ namespace DyingAndMore.Game.Entities
     }
 
     /// <summary>
+    /// What to do if a behavior's task fails
+    /// </summary>
+    public enum TaskFailureAction
+    {
+        RestartBehavior, //restart from the beginning
+        CancelBehavior, //pick another behavior
+        RetryTask, //retry the task
+        Ignore, //continue to next task
+    }
+
+    /// <summary>
     /// A behavior is a list of tasks to run in sequence, and rules on when to queue the tasks
     /// </summary>
     public class Behavior : Takai.Data.INamedObject
@@ -224,7 +253,6 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public Senses RequisiteNotSenses { get; set; } //rename
 
-        //inverted senses?
         //failure senses?
 
         /// <summary>
@@ -236,6 +264,8 @@ namespace DyingAndMore.Game.Entities
         /// The tasks that comprise this behavior
         /// </summary>
         public List<Tasks.ITask> Tasks { get; set; }
+
+        public TaskFailureAction OnTaskFailure { get; set; }
 
         public override string ToString()
         {

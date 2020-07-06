@@ -406,9 +406,13 @@ namespace Takai.Data
                             return @float * 1000;
                         else if (unit.Equals("min", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
                             return @float * 1000 * 60;
-                        else if (unit.Equals("pi", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
+                        else if (unit.Equals("hr", StringComparison.OrdinalIgnoreCase)) //convert from hours to milliseconds
+                            return @float * 1000 * 60 * 60;
+                        else if (unit.Equals("days", StringComparison.OrdinalIgnoreCase)) //convert from days to milliseconds
+                            return @float * 1000 * 60 * 60 * 24;
+                        else if (unit.Equals("pi", StringComparison.OrdinalIgnoreCase)) //multiply value by pi
                             return @float * Math.PI;
-                        else if (unit.Equals("%", StringComparison.OrdinalIgnoreCase)) //convert from minutes to milliseconds
+                        else if (unit.Equals("%", StringComparison.OrdinalIgnoreCase)) //convert from percentage to decimal
                             return @float / 100;
                         else if (unit.Equals("rpm", StringComparison.OrdinalIgnoreCase)) //convert from rounds per minute (rpm) to milliseconds
                             return (60 * 1000) / @float;

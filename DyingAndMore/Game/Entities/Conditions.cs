@@ -25,7 +25,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// Affect actor speed
         /// </summary>
-        public float SpeedScale { get; set; } = 1;
+        public float SpeedScale { get; set; } = 1; //todo
 
         /// <summary>
         /// How likely is this condition to pass between actors on collision (as percent)
@@ -123,7 +123,6 @@ namespace DyingAndMore.Game.Entities
             else
             {
                 var ents = instance.Map.FindEntitiesInRegion(instance.Position, Radius);
-                var rSq = Radius * Radius;
                 foreach (var ent in ents)
                     ApplyCondition(ent);
             }

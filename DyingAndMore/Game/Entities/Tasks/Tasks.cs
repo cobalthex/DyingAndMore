@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using Takai.Game;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
@@ -28,65 +27,6 @@ namespace DyingAndMore.Game.Entities.Tasks
         {
             if (ai.Actor.Map.ElapsedTime < ai.CurrentTaskStartTime + duration)
                 return TaskResult.Continue;
-            return TaskResult.Success;
-        }
-    }
-
-    public struct FindClosestActor : ITask
-    {
-        public bool isAlly;
-        public bool isSameClass;
-
-        public float sightDistance;
-
-        public TaskResult Think(TimeSpan deltaTime, AIController ai)
-        {
-            if (ai.Target != null) //specify as option to change target?
-                return TaskResult.Success;
-
-            var ents = ai.Actor.Map.FindEntitiesInRegion(ai.Actor.WorldPosition, sightDistance);
-
-            var possibles = new List<ActorInstance>();
-            foreach (var ent in ents)
-            {
-                if (ent == ai.Actor || !(ent is ActorInstance actor))
-                    continue;
-
-                if (isAlly ^ actor.IsAlliedWith(ai.Actor.Factions))
-                    continue;
-
-                if (isSameClass ^ (actor.Class == ai.Actor.Class)) //compare class names?
-                    continue;
-
-                //    ai.Actor.IsFacing(actor.WorldPosition)) ?
-                    
-                possibles.Add(actor);
-            }
-
-            possibles.Sort(delegate (ActorInstance a, ActorInstance b)
-            {
-                var afw = Vector2.Dot(a.WorldForward, ai.Actor.WorldForward);
-                var bfw = Vector2.Dot(b.WorldForward, ai.Actor.WorldForward);
-                return (afw == bfw ? 0 : (int)Math.Ceiling(bfw - afw));
-            });
-
-            if (possibles.Count > 0)
-            {
-                ai.Target = possibles[0];
-                return TaskResult.Success;
-            }
-
-            ai.Target = null;
-            return TaskResult.Continue;
-        }
-    }
-
-    public struct ForgetTarget : ITask
-    {
-        public TaskResult Think(TimeSpan deltaTime, AIController ai)
-        {
-            //conditions?
-            ai.Target = null;
             return TaskResult.Success;
         }
     }
@@ -148,22 +88,145 @@ namespace DyingAndMore.Game.Entities.Tasks
             if (!ai.Actor.Map.Class.IsInsideMap(targetPos))
                 return TaskResult.Failure;
 
-            var clone = ai.Actor.Clone();
+            var clone = (ActorInstance)ai.Actor.Clone();
+            ((AIController)clone.Controller).Reset();
             clone.SetPositionTransformed(targetPos);
             ai.Actor.Map.Spawn(clone);
             return TaskResult.Success;
         }
     }
 
-    //provide cover
-    //clone
-    //spawn entities
+    public struct HealSelf : ITask
+    {
+        public float healthPerSecond;
+        public TimeSpan duration;
+        public bool canRevive;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Actor.Map.ElapsedTime > ai.CurrentTaskStartTime + duration)
+                return TaskResult.Success;
+
+            if (!ai.Actor.IsAlive)
+            {
+                if (canRevive)
+                    ai.Actor.Resurrect();
+                else
+                    return TaskResult.Failure;
+            }
+
+            ai.Actor.CurrentHealth += (float)deltaTime.TotalSeconds * healthPerSecond;
+            return TaskResult.Continue;
+        }
+    }
+
+    public struct HealTarget : ITask
+    {
+        public float healthPerSecond;
+        public TimeSpan duration;
+        public bool canRevive;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null)
+                return TaskResult.Failure; //must be within certain distance?
+
+            if (ai.Actor.Map.ElapsedTime > ai.CurrentTaskStartTime + duration)
+                return TaskResult.Success;
+
+            if (!ai.Target.IsAlive)
+            {
+                if (canRevive)
+                    ai.Actor.Resurrect();
+                else
+                    return TaskResult.Failure;
+            }
+
+            ai.Target.CurrentHealth += (float)deltaTime.TotalSeconds * healthPerSecond;
+            return TaskResult.Continue;
+        }
+    }
+
+    public enum SetOperation
+    {
+        Replace,
+        Union,
+        Intersection,
+        Outersection, //symmetric difference/xor
+        Difference,
+    }
+
+    public struct SetTargetFactions : ITask
+    {
+        public Factions factions;
+        public SetOperation method;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null)
+                return TaskResult.Failure;
+
+            switch (method)
+            {
+                case SetOperation.Replace:
+                    ai.Target.Factions = factions;
+                    break;
+                case SetOperation.Union:
+                    ai.Target.Factions |= factions;
+                    break;
+                case SetOperation.Intersection:
+                    ai.Target.Factions &= factions;
+                    break;
+                case SetOperation.Outersection:
+                    ai.Target.Factions ^= factions;
+                    break;
+                case SetOperation.Difference:
+                    ai.Target.Factions &= ~factions;
+                    break;
+            }
+            return TaskResult.Success;
+        }
+    }
+
+    public struct SetOwnFactions : ITask
+    {
+        public Factions factions;
+        public SetOperation method;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            switch (method)
+            {
+                case SetOperation.Replace:
+                    ai.Actor.Factions = factions;
+                    break;
+                case SetOperation.Union:
+                    ai.Actor.Factions |= factions;
+                    break;
+                case SetOperation.Intersection:
+                    ai.Actor.Factions &= factions;
+                    break;
+                case SetOperation.Outersection:
+                    ai.Actor.Factions ^= factions;
+                    break;
+                case SetOperation.Difference:
+                    ai.Actor.Factions &= ~factions;
+                    break;
+            }
+            return TaskResult.Success;
+        }
+    }
+
+
+    //todo: play animations
+
+
     //group with allies
-    //attach
-    //shield/provide cover
-    //get in cover
     //follow path
     //assasinate (attack from behind)
+
+
+
 
     //tasks are individual actions
     //run, face direction, pick target, etc
