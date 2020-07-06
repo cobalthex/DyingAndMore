@@ -10,6 +10,40 @@ ActorClass {
     IgnoreTrace: False;
 
     DefaultController: [AIController {
+        DefaultBehaviors: [
+            Behavior {
+                Name: "Infect";
+                OnTaskFailure: TaskFailureAction.Ignore;
+                Tasks: [
+                    FindClosestActor { sightDistance: 500; isAlly: true; };
+                    NavigateGradient { targetValue: 10; }
+                    InfectTarget {
+                        applyBehavior: {
+                            Name: "Zombie";
+                            Tasks: [
+                                SetOwnFactions {
+                                    factions: Factions.Zombie;
+                                }
+                                SetConditionOnSelf {
+                                    condition: @"./Conditions/zombie.cond.tk";
+                                    duration: 999999days;
+                                }
+                                NavigateGradient { };
+                                Suicide { };
+                            ];
+                        };
+                    };
+                    ForgetTarget { };
+                    Wait { duration: 2sec; }
+                ];
+            };
+            #*Behavior {
+                Name: "Wait3s";
+                Tasks: [
+                    Wait { duration: 3sec; };
+                ];
+            };*#
+        ];
     }];
 
     Animations: {

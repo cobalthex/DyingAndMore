@@ -217,7 +217,11 @@ namespace Takai.Data
             Serializers[typeof(TimeSpan)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((TimeSpan)value).TotalMilliseconds; },
-                Deserialize = (object value, DeserializationContext cxt) => { return TimeSpan.FromMilliseconds((double)Convert.ChangeType(value, typeof(double))); } //return suffix object?
+                Deserialize = (object value, DeserializationContext cxt) => {
+                    var dv = (double)Convert.ChangeType(value, typeof(double));
+                    //negative/positive infinity -> Min/MaxValue?
+                    return TimeSpan.FromMilliseconds(dv); 
+                } //return suffix object?
             };
 
             Serializers[typeof(BlendState)] = new CustomTypeSerializer

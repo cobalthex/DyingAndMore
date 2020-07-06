@@ -22,6 +22,8 @@ namespace DyingAndMore.Game.Entities
 
         Enemy = (1 << 20), //enemy to player and allies
 
+        Zombie = (1 << 25),
+
         Boss = (1 << 30),
     }
 
@@ -207,8 +209,12 @@ namespace DyingAndMore.Game.Entities
             clone._controller = null;
             clone.Controller = Controller?.Clone();
 
+            clone.Conditions = new Dictionary<ConditionClass, ConditionInstance>(Conditions);
+            clone.Squad = null; //add to squad?
+
             clone._weapon = null;
             clone.Weapon = Weapon?.Clone();
+
             if (Hud != null)
             {
                 clone.Hud = Hud.CloneHierarchy();

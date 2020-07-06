@@ -307,6 +307,29 @@ namespace DyingAndMore.Game.Entities.Tasks
             return TaskResult.Success;
         }
     }
-
     //create condition to light up and then blow up
+
+    public struct InfectTarget : ITask
+    {
+        public Behavior applyBehavior; //setting to null will render target 'dead'
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null || !(ai.Target.Controller is AIController tai))
+                return TaskResult.Failure;
+
+            //store old behavior?
+            tai.CurrentBehavior = applyBehavior;
+
+            return TaskResult.Success;
+        }
+    }
+
+    //possess/takeover?
+
+    //Unpossess task (auto queued)?
+
+    //possess target
+    //alt weapons/grenades
+    //berserk
 }

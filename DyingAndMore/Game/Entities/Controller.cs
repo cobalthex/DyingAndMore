@@ -10,8 +10,7 @@ namespace DyingAndMore.Game.Entities
     public abstract class Controller : ICollisionResolver
     {
         [Takai.Data.Serializer.Ignored]
-        public virtual ActorInstance Actor { get;
-            set; }
+        public virtual ActorInstance Actor { get; set; }
 
         public virtual Controller Clone()
         {
