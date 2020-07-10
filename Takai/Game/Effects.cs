@@ -36,24 +36,34 @@ namespace Takai.Game
         }
 
         /// <summary>
-        /// Spawn a set of effects at an entity's position in their map
-        /// with the entity as the source
+        /// spawn a set of effects at the source, created by the source
         /// </summary>
-        /// <param name="source">The entity to spawn at</param>
+        /// <param name="source">The entity responsible for the effects</param>
         /// <returns>The effect instance created</returns>
-        public EffectsInstance Instantiate(EntityInstance source, EntityInstance target = null)
+        public EffectsInstance Instantiate(EntityInstance source)
         {
             var instance = Instantiate();
             instance.Source = source;
-            var spawn = target == null ? source : target;
-            if (spawn != null)
-            {
-                instance.Position = spawn.WorldPosition;
-                instance.Direction = spawn.WorldForward;
-                instance.Velocity = spawn.Velocity;
-            }
-            instance.Target = spawn;
+            instance.Position = source.WorldPosition;
+            instance.Direction = source.WorldForward;
+            instance.Velocity = source.Velocity;
+            return instance;
+        }
 
+        /// <summary>
+        /// Spawn a set of effects at the target, created by the source
+        /// </summary>
+        /// <param name="source">The entity responsible for the effects</param>
+        /// <param name="target">The target of the effects (and where to place them)</param>
+        /// <returns>The effect instance created</returns>
+        public EffectsInstance Instantiate(EntityInstance source, EntityInstance target)
+        {
+            var instance = Instantiate();
+            instance.Source = source;
+            instance.Target = target;
+            instance.Position = target.WorldPosition;
+            instance.Direction = target.WorldForward;
+            instance.Velocity = target.Velocity;
             return instance;
         }
     }

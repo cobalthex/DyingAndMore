@@ -42,7 +42,7 @@ EffectsClass {
         };
 
         HealthEffect {
-            MaxDamage: 200;
+            MaxDamage:400;
             Radius: 100;
             CanAffectSource: true;
         }
