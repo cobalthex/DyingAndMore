@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Takai.Data;
 
 namespace Takai
 {
+    [Data.CustomSerialize("serialize")]
     public struct CurveValue<TValue> : IComparable
     {
         public float position;
@@ -18,6 +20,11 @@ namespace Takai
         public int CompareTo(object obj)
         {
             return position.CompareTo(((CurveValue<TValue>)obj).position);
+        }
+
+        object serialize()
+        {
+            return Serializer.LinearStruct;
         }
     }
 
@@ -147,9 +154,10 @@ namespace Takai
         HSL,
         HSV,
         RGB
+        //CIELAB
     }
 
-    public class ColorCurve : Data.IDerivedDeserialize
+    public class ColorCurve : Data.IDerivedDeserialize, Data.IDerivedSerialize
     {
         protected ChromaCurve curve = new ChromaCurve();
         /// <summary>
@@ -278,6 +286,14 @@ namespace Takai
                     }
                 }
             }
+        }
+
+        public Dictionary<string, object> DerivedSerialize()
+        {
+            return new Dictionary<string, object>
+            {
+                ["Values"] = Values
+            };
         }
     }
 }

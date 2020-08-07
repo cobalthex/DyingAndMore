@@ -427,7 +427,7 @@ namespace Takai.UI
         public Vector2 MeasuredSize { get; private set; }
 
         /// <summary>
-        /// The bounds of the content area, as determined by <see cref="ReflowQueued"/>
+        /// The bounds of the content area, as determined by <see cref="PerformReflows"/>
         /// </summary>
         [Data.DebugSerialize]
         public Rectangle ContentArea { get; private set; }
@@ -1740,12 +1740,12 @@ namespace Takai.UI
         /// <summary>
         /// Complete any pending reflows/arranges
         /// </summary>
-        public static void ReflowQueued()
+        public static void PerformReflows()
         {
             for (int i = 0; i < measureQueue.Count; ++i)
             {
                 measureQueue[i].Measure(measureQueue[i].lastMeasureAvailableSize);
-                if (!measureQueue[i].isMeasureValid) //todo: que?
+                if (!measureQueue[i].isMeasureValid) //todo: queue?
                     measureQueue[i].Measure(new Vector2(InfiniteSize));
             }
             measureQueue.Clear();
@@ -1770,7 +1770,7 @@ namespace Takai.UI
 #if DEBUG
             boop.Restart();
 #endif
-            ReflowQueued();
+            PerformReflows();
 
             if (!IsEnabled)
                 return;

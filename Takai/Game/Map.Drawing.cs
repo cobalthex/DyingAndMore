@@ -355,7 +355,8 @@ namespace Takai.Game
         /// <param name="end">The end position of the line (in map space)</param>
         /// <param name="color">The color of the line</param>
         /// <param name="wingTipsSize">if >0 draw arrow wing tips with this length</param>
-        public void DrawLine(Vector2 start, Vector2 end, Color color, float wingTipsSize = 0)
+        /// <param name="wingTipAngle">The angle of the wing tips, if 0, uses default</param>
+        public void DrawLine(Vector2 start, Vector2 end, Color color, float wingTipsSize = 0, float wingTipAngle = 0)
         {
             renderedLines.Add(new VertexPositionColor(new Vector3(start, 0), color));
             renderedLines.Add(new VertexPositionColor(new Vector3(end, 0), color));
@@ -364,12 +365,14 @@ namespace Takai.Game
             {
                 var direction = Vector2.Normalize(end - start);
 
+                var transform = wingTipAngle == 0 ? arrowWingTransform : Matrix.CreateRotationZ(wingTipAngle);
+
                 renderedLines.Add(new VertexPositionColor(new Vector3(end, 0), color));
-                var z = end - (wingTipsSize * Vector2.TransformNormal(direction, arrowWingTransform));
+                var z = end - (wingTipsSize * Vector2.TransformNormal(direction, transform));
                 renderedLines.Add(new VertexPositionColor(new Vector3(z, 0), color));
 
                 renderedLines.Add(new VertexPositionColor(new Vector3(end, 0), color));
-                z = end - (wingTipsSize * Vector2.TransformNormal(direction, Matrix.Invert(arrowWingTransform)));
+                z = end - (wingTipsSize * Vector2.TransformNormal(direction, Matrix.Invert(transform)));
                 renderedLines.Add(new VertexPositionColor(new Vector3(z, 0), color));
             }
         }

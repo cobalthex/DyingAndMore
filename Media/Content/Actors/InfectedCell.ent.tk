@@ -14,7 +14,7 @@ ActorClass {
             Behavior {
                 Name: "Orbit";
                 Tasks: [
-                    FindClosestActor { sightDistance: 1000; };
+                    FindClosestActor { };
                     OrbitTarget { radius: 100; };
                 ];
             };
@@ -37,9 +37,7 @@ ActorClass {
             Behavior {
                 Name: "Follow";
                 Tasks: [
-                    FindClosestActor {
-                        sightDistance: 1000;
-                    };
+                    FindClosestActor { };
                     NavigateToTarget {
                         distance: 100;
                         permanent: true;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Takai;
 
@@ -30,11 +31,12 @@ namespace DyingAndMore.Game.Entities
 
     public class AIController : Controller
     {
-        // sight range
+        public float SightRange { get; set; } = 400;
 
         /// <summary>
         /// The current target actor for behaviors (e.g. enemy to shoot at or ally to follow)
         /// </summary>
+        [Takai.Data.Serializer.AsReference]
         public ActorInstance Target { get; set; }
 
         public TimeSpan TargetLastSeenTime { get; protected set; }
@@ -44,9 +46,15 @@ namespace DyingAndMore.Game.Entities
         /// Possible behaviors to start this AI with
         /// </summary>
         public List<Behavior> DefaultBehaviors { get; set; }
+        /// <summary>
+        /// Behaviors that can pre-empt the current behavior if they have matching senses
+        /// (one is picked randomly and tested)
+        /// <seealso cref="nextSenseCheck"/>
+        /// </summary>
+        public List<Behavior> PreemptiveBehaviors { get; set; } //merge with default?
 
+        //todo
         public Dictionary<ActorBroadcast, Behavior> AllyBroadcasts { get; set; } //list of behaviors?
-        //conditions? (has line of sight, etc)
 
         public Dictionary<ActorBroadcast, Behavior> EnemyBroadcasts { get; set; } //list of behaviors?
 
@@ -73,11 +81,17 @@ namespace DyingAndMore.Game.Entities
 
         public Senses KnownSenses { get; private set; }
 
+        /// <summary>
+        /// when to next check preemptive behaviors
+        /// </summary>
+        TimeSpan nextSenseCheck;
+
         public void Reset()
         {
             CurrentBehavior = null;
             KnownSenses = 0;
             Target = null;
+            nextSenseCheck = TimeSpan.Zero;
             //part of ICloneable?
         }
 
@@ -111,6 +125,18 @@ namespace DyingAndMore.Game.Entities
             KnownSenses = 0;
 
             //minimal runtime per behavior?
+            if (Actor.Map.ElapsedTime >= nextSenseCheck && (PreemptiveBehaviors != null && PreemptiveBehaviors.Count > 0))
+            {
+                var behavior = PreemptiveBehaviors[Util.RandomGenerator.Next(0, PreemptiveBehaviors.Count)];
+                KnownSenses |= BuildSenses((behavior.RequisiteSenses | behavior.RequisiteNotSenses) & ~KnownSenses);
+                if ((behavior.RequisiteSenses & KnownSenses) == behavior.RequisiteSenses &&
+                    (behavior.RequisiteNotSenses & KnownSenses) == 0 &&
+                    (float)Util.RandomGenerator.NextDouble() < behavior.QueueChance)
+                    CurrentBehavior = behavior;
+
+                //programmable delay?
+                nextSenseCheck = Actor.Map.ElapsedTime + TimeSpan.FromMilliseconds(200);
+            }
 
             if (CurrentBehavior != null && CurrentTask < CurrentBehavior.Tasks.Count)
             {
@@ -142,7 +168,8 @@ namespace DyingAndMore.Game.Entities
             }
             else if (DefaultBehaviors != null)
             {
-                foreach (var behavior in DefaultBehaviors) //these should always be checking?
+                //pick random one and test?
+                foreach (var behavior in DefaultBehaviors)
                 {
                     KnownSenses |= BuildSenses((behavior.RequisiteSenses | behavior.RequisiteNotSenses) & ~KnownSenses);
                     if ((behavior.RequisiteSenses & KnownSenses) == behavior.RequisiteSenses &&
@@ -177,7 +204,7 @@ namespace DyingAndMore.Game.Entities
             {
                 int allyCount = 0, enemyCount = 0;
                 //this is probably expensive
-                foreach (var sector in Actor.Map.TraceSectors(Actor.WorldPosition, Actor.WorldForward, 300))
+                foreach (var sector in Actor.Map.TraceSectors(Actor.WorldPosition, Actor.WorldForward, SightRange))
                 {
                     foreach (var ent in sector.entities)
                     {
@@ -208,13 +235,13 @@ namespace DyingAndMore.Game.Entities
                 senses |= Senses.HasTarget;
 
                 if ((testSenses & Senses.TargetVisible) > 0 &&
-                    Actor.CanSee(Target.WorldPosition, 500)) //store sight range?
+                    Actor.CanSee(Target.WorldPosition, (int)SightRange))
                     senses |= Senses.TargetVisible;
 
                 //todo: Actor.CanSee
 
                 if ((testSenses & Senses.TargetCanSeeMe) > 0 &&
-                    Target.CanSee(Actor.WorldPosition, 500))
+                    Target.CanSee(Actor.WorldPosition, (int)SightRange))
                     senses |= Senses.TargetCanSeeMe; //trace tiles?
             }
 
@@ -263,7 +290,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The tasks that comprise this behavior
         /// </summary>
-        public List<Tasks.ITask> Tasks { get; set; }
+        public List<Tasks.ITask> Tasks { get; set; }    
 
         public TaskFailureAction OnTaskFailure { get; set; }
 

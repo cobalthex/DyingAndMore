@@ -346,6 +346,7 @@ namespace DyingAndMore
             };
             debugUI.AddChild(DebugPropertyDisplay = new Table(2)
             {
+                Name = "Debug Display",
                 HorizontalAlignment = Alignment.Right,
                 VerticalAlignment = Alignment.Top,
                 Position = new Vector2(30),
@@ -354,6 +355,7 @@ namespace DyingAndMore
 
             debugUI.AddChild(fpsGraph = new Takai.FpsGraph
             {
+                Name = "FPS Graph",
                 IsEnabled = false,
                 Position = new Vector2(0, 20),
                 Size = new Vector2(600, 100),
