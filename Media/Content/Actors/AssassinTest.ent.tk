@@ -1,0 +1,71 @@
+ActorClass {
+    Name: "Assassin Test";
+    MaxHealth: 3000;
+
+    FieldOfView: 0.75pi;
+    MaxSpeed: [400 500];
+    MoveForce: 600;
+    IsPhysical: True;
+    IgnoreTrace: False;
+    #Drag: 0.5;
+
+    DefaultFactions: Factions [Enemy];
+
+    DefaultController: [AIController {
+        DefaultBehaviors: [
+            Behavior {
+                Name: "Find target";
+                Tasks: [
+                    FindClosestActor { };
+                    NavigateGradient { targetValue: 6; }
+                    OrbitTarget {
+                        radius: 100;
+                        faceTarget: true;
+                    }
+                ];
+            };
+        ];
+        PreemptiveBehaviors: [
+            Behavior {
+                Name: "Assassinate"
+                RequisiteSenses: Senses [ TargetVisible ];
+                RequisiteNotSenses: Senses [ TargetCanSeeMe ];
+
+                Tasks: [
+                    ShootAtTarget { }
+                ]
+            }
+        ]
+    }];
+
+    DefaultWeapon: [
+        @"Weapons/laser.wpn.tk"
+    ];
+
+    Trail: {
+        LifeSpan: 0.5sec;
+        CaptureDelay: 30Hz;
+        Color: {
+            Values: [
+                [0 [0 64 127 127]];
+                [1 [127 64 192 255]];
+            ]
+        }
+
+        width: {
+            values: [
+                [0 0]
+                [0.95 8]
+                [1 0]
+            ]
+        }
+    }
+
+    Animations: {
+        Idle: {
+            Sprite: {
+                texture: @"./zorbit.png";
+            };
+        };
+    };
+}

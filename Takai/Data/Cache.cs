@@ -140,6 +140,12 @@ namespace Takai.Data
 
             //var swatch = System.Diagnostics.Stopwatch.StartNew();
 
+            if (file[0] == '$') // chroot
+            {
+                root = "";
+                file = file.Substring(1);
+            }
+
             if (root == null)
                 root = Root;
             else if (root == "")
@@ -357,13 +363,23 @@ namespace Takai.Data
             var tti = typeof(T).GetTypeInfo();
 
             var loaded = Load(file, root, forceLoad || tti.IsDefined(typeof(AlwaysReloadAttribute), true));
-            return Serializer.Cast<T>(loaded);
+            var casted = Serializer.Cast<T>(loaded);
+            if (casted is ISerializeExternally sxt && sxt.File == null)
+                sxt.File = GetFullPath(file, root);
+            return casted;
         }
 
         public static void SaveAllToFile(string file)
         {
             using (var writer = new StreamWriter(new FileStream(file, FileMode.Create)))
                 Serializer.TextSerialize(writer, objects, 0, true);
+        }
+
+        public static string GetFullPath(string file, string root = null)
+        {
+            if (root == null)
+                return Normalize(file);
+            return $"${root}/{Normalize(file)}";
         }
 
         public static string Normalize(string path)

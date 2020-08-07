@@ -16,7 +16,6 @@ ActorClass {
                 RequisiteNotSenses: Senses [Attached];
                 Tasks: [
                     FindClosestActor {
-                        sightDistance: 1000;
                         isAlly: false;
                         isSameClass: false;
                     };

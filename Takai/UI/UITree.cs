@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
     /// <summary>
-    /// Displays the full tree of <see cref="Display"/>'s hierarchy
+    /// Displays the full tree of <see cref="Root"/>'s hierarchy
     /// </summary>
     public class UITree : Static
     {
@@ -12,54 +14,80 @@ namespace Takai.UI
         /// <summary>
         /// Allows for customization on how each element is displayed
         /// </summary>
-        public System.Func<Static, string> DisplayString { get; set; } = (Static s) =>
+        public Func<Static, string> DisplayString { get; set; } = (Static s) =>
         {
-            var text = string.IsNullOrEmpty(s.Name) ? "(No name)" : s.Name;
-            text += $" w:{s.Size.X} h:{s.Size.Y}";
-            return text;
+            var name = string.IsNullOrEmpty(s.Name) ? "(None)" : s.Name;
+#if DEBUG
+            return $"{(s.GetType().Name)} id:{s.DebugId} name:{name} w:{s.Size.X} h:{s.Size.Y}";
+#else
+            return $"{(s.GetType().Name)} name:{name} w:{s.Size.X} h:{s.Size.Y}";
+#endif
         };
+
+        /// <summary>
+        /// The size of each indent level for nested elements
+        /// </summary>
+        public int Indent { get; set; } = 10;
 
         /// <summary>
         /// The UI element to display the hierarchy of
         /// </summary>
-        public Static Display
+        public Static Root
         {
-            get => _display;
+            get => _root;
             set
             {
-                if (value == _display)
+                if (value == _root)
                     return;
-                _display = value;
+                _root = value;
+                rows.Clear();
+                maxWidth = 0;
 
-                RemoveAllChildren();
+                var stack = new Stack<(int depth, Static element)>();
+                stack.Push((0, value));
 
-                var stack = new Stack<KeyValuePair<int, Static>>();
-                stack.Push(new KeyValuePair<int, Static>(0, value));
-
-                int y = 0;
                 while (stack.Count > 0)
                 {
-                    var top = stack.Pop();
-                    var elem = top.Value;
+                    var (depth, element) = stack.Pop();
+                    var elem = element;
                     if (elem == this)
                         continue;
 
                     foreach (var child in elem.Children)
-                        stack.Push(new KeyValuePair<int, Static>(top.Key + 1, child));
+                        stack.Push((depth + 1, child));
 
-                    var disp = new Static
-                    {
-                        Name = elem.Name,
-                        Text = DisplayString(elem),
-                        Color = new Color(Color, elem.IsEnabled ? 1 : 0.5f),
-                        Font = Font,
-                        Position = new Vector2(20 * top.Key, y)
-                    };
-                    y += (int)disp.Size.Y;
-                    AddChild(disp);
+                    var str = DisplayString(elem);
+                    rows.Add((str, depth));
+                    if (Font != null)
+                        maxWidth = Math.Max(maxWidth, Font.MeasureString(str).X + (Indent * depth));
                 }
             }
         }
-        private Static _display;
+        private Static _root;
+
+        private readonly List<(string text, int indent)> rows = new List<(string text, int indent)>();
+        private float maxWidth;
+
+        protected override void OnParentChanged(Static oldParent)
+        {
+            Root = GetRoot();
+            base.OnParentChanged(oldParent);
+        }
+
+        protected override Vector2 MeasureOverride(Vector2 availableSize)
+        {
+            return new Vector2(maxWidth, rows.Count * Font.MaxCharHeight);
+        }
+
+        protected override void DrawSelf(SpriteBatch spriteBatch)
+        {
+            var offset = (OffsetContentArea.Location - VisibleContentArea.Location);
+            for (int y = 0; y < rows.Count; ++y)
+            {
+                var row = rows[y];
+                Font.Draw(spriteBatch, row.text, 0, -1, VisibleContentArea,
+                    offset + new Point(row.indent * Indent, y * Font.MaxCharHeight), Color);
+            }
+        }
     }
 }

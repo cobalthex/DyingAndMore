@@ -106,7 +106,7 @@ namespace DyingAndMore.Game.Weapons
         [Takai.Data.Serializer.Ignored]
         public Entities.ActorInstance Actor { get; set; }
 
-        public virtual WeaponClass Class
+        public WeaponClass Class
         {
             get => _class;
             set

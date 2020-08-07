@@ -89,6 +89,7 @@ namespace DyingAndMore.Game
         private MapInstance _map;
 
         public bool IsPaused { get; set; }
+        float lastGameSpeed;
 
         public TimeSpan ElapsedRealTime { get; set; }
 
@@ -409,6 +410,19 @@ namespace DyingAndMore.Game
 
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
 
+            bool isCornered = players[0].actor.IsMaybeCornered();
+
+            var particleCount = 0;
+            foreach (var ptype in Map.Particles)
+                particleCount += ptype.Value.Count;
+
+            DyingAndMoreGame.DebugDisplay("Total entities", Map.AllEntities.Count());
+            DyingAndMoreGame.DebugDisplay("Active entities", Map.UpdateStats.updatedEntities);
+            DyingAndMoreGame.DebugDisplay("Total particles", particleCount);
+            DyingAndMoreGame.DebugDisplay("Trail points", Map.RenderStats.trailPointCount);
+            DyingAndMoreGame.DebugDisplay("Visible fluids (active)", Map.RenderStats.visibleActiveFluids);
+            DyingAndMoreGame.DebugDisplay("Visible fluids (inactive)", Map.RenderStats.visibleInactiveFluids);
+
             base.UpdateSelf(time);
         }
 
@@ -500,7 +514,20 @@ namespace DyingAndMore.Game
 #endif
 
             if (InputState.IsPress(Keys.Escape))
-                IsPaused = !IsPaused;
+            {
+                if (InputState.IsMod(KeyMod.Shift))
+                {
+                    if (Map.TimeScale == 0)
+                        Map.TimeScale = lastGameSpeed;
+                    else
+                    {
+                        lastGameSpeed = Map.TimeScale;
+                        Map.TimeScale = 0;
+                    }
+                }    
+                else
+                    IsPaused = !IsPaused;
+            }
 
             //todo
             var scrollDelta = InputState.ScrollDelta();
@@ -573,6 +600,8 @@ namespace DyingAndMore.Game
                     {
                         var pos = player.camera.WorldToScreen(ent.WorldPosition - new Vector2(0, ent.Radius + 16));
                         DrawHealthBar(spriteBatch, pos, actor.CurrentHealth, actor._Class.MaxHealth);
+
+                        Map.DrawLine(actor.WorldPosition + actor.WorldForward * 50, actor.WorldPosition, Color.Black, 50, actor._Class.FieldOfView / 2);
                     }
                 }
 #endif
@@ -591,6 +620,7 @@ namespace DyingAndMore.Game
                     new Vector2(player.camera.Viewport.Left + 10, player.camera.Viewport.Top + 10),
                     Color.Cyan
                 );
+
 #endif
 
                 //var v = new Vector2(player.camera.Viewport.Width, player.camera.Viewport.Height);
@@ -606,10 +636,6 @@ namespace DyingAndMore.Game
                 //}
             }
 
-            var particleCount = 0;
-            foreach (var ptype in Map.Particles)
-                particleCount += ptype.Value.Count;
-
             if (Map.Squads != null)
             {
                 foreach (var squad in Map.Squads)
@@ -618,13 +644,6 @@ namespace DyingAndMore.Game
                     Font.Draw(spriteBatch, squad.Name, players[0].camera.WorldToScreen(squad.SpawnPosition), Color.White);
                 }
             }
-
-            DyingAndMoreGame.DebugDisplay("Total entities", Map.AllEntities.Count());
-            DyingAndMoreGame.DebugDisplay("Active entities", Map.UpdateStats.updatedEntities);
-            DyingAndMoreGame.DebugDisplay("Total particles", particleCount);
-            DyingAndMoreGame.DebugDisplay("Trail points", Map.RenderStats.trailPointCount);
-            DyingAndMoreGame.DebugDisplay("Visible fluids (active)", Map.RenderStats.visibleActiveFluids);
-            DyingAndMoreGame.DebugDisplay("Visible fluids (inactive)", Map.RenderStats.visibleInactiveFluids);
         }
 
         protected void DrawHealthBar(SpriteBatch spriteBatch, Vector2 screenPosition, float health, float maxHealth)

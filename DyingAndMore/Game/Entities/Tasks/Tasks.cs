@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using DyingAndMore.Game.Weapons;
 using Microsoft.Xna.Framework;
+using Takai.UI;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
@@ -217,16 +219,68 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    public struct SetOwnClass : ITask
+    {
+        public ActorClass @class;
+        public bool inheritController;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            var actor = ai.Actor;
+            actor.Class = @class;
+            if (inheritController)
+                actor.Controller = ai;
+            return TaskResult.Success;
+        }
+    }
+
+    public struct SetTargetClass : ITask
+    {
+        public ActorClass @class;
+        public bool inheritController;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null)
+                return TaskResult.Failure;
+
+            var actor = ai.Target;
+            actor.Class = @class;
+            if (inheritController)
+                actor.Controller = ai;
+            return TaskResult.Success;
+        }
+    }
+
+    public struct SetOwnWeapon : ITask
+    {
+        public WeaponClass weapon;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            ai.Actor.Weapon = weapon.Instantiate();
+            return TaskResult.Success;
+        }
+    }
+
+    public struct FollowPath : ITask
+    {
+        public Takai.Game.VectorCurve path;
+
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (path == null)
+                return TaskResult.Failure;
+
+            return TaskResult.Continue;
+        }
+    }
 
     //todo: play animations
 
-
-    //group with allies
-    //follow path
-    //assasinate (attack from behind)
-
-
-
+    //teleport (possibly with delay, e.g. burrowing)
+    //  still follows path/trajectory
 
     //tasks are individual actions
     //run, face direction, pick target, etc
@@ -234,3 +288,11 @@ namespace DyingAndMore.Game.Entities.Tasks
     //behaviors are task state machines
     //tasks run until completion or interrupted
 }
+
+
+//vent/tunnels?
+//can enter one, choose one near player to exit out of after some delay (based on distance/move speed?)
+
+
+
+//actor shoots part of self, losing health, must recollect to regain health (non-recoverable energy used to fire)

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Takai.Game;
 using DyingAndMore.Game.Weapons;
+using System.Windows.Forms;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
@@ -217,6 +218,8 @@ namespace DyingAndMore.Game.Entities.Tasks
 
         //leading accuracy
 
+        //option to continue moving in direction?
+
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
             if (ai.Target == null || ai.Actor.Weapon == null)
@@ -253,10 +256,9 @@ namespace DyingAndMore.Game.Entities.Tasks
                     return TaskResult.Continue;
 
                 //determine if needs to reload?
-                if (!ai.Actor.Weapon.TryUse()) //limit to amount of time?
-                    return TaskResult.Success;
-
-                return TaskResult.Continue;
+                //shoot n times?
+                ai.Actor.Weapon.TryUse();
+                return TaskResult.Success;
             }
 
             return TaskResult.Failure;

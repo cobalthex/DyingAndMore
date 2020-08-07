@@ -46,6 +46,7 @@ namespace Takai.Game
             }
             
             //1px border around map is considered unpathable
+            //todo: not generating gradient around map edges
 
             //do each individually for better cache perf
 

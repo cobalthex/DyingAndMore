@@ -36,5 +36,18 @@ ActorClass {
 
             Material: "Player";
         };
+        Dead: {
+            Sprite: {
+                texture: @"./Player.png";
+                width: 48;
+                height: 48;
+                origin: [24 24];
+                ClipRect: [0 96 96 48];
+                FrameCount: 2;
+                FrameLength: 100;
+                IsLooping: False;
+                Tween: TweenStyle [Overlap];
+            };
+        };
     };
 }

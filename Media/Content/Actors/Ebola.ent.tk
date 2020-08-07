@@ -15,13 +15,13 @@ ActorClass {
                 Name: "Infect";
                 OnTaskFailure: TaskFailureAction.Ignore;
                 Tasks: [
-                    FindClosestActor { sightDistance: 500; isAlly: true; };
+                    FindClosestActor { isAlly: true; };
                     NavigateGradient { targetValue: 10; }
                     InfectTarget {
                         applyBehavior: {
                             Name: "Zombie";
                             Tasks: [
-                                SetOwnFactions {
+                                #*SetOwnFactions {
                                     factions: Factions.Zombie;
                                 }
                                 SetConditionOnSelf {
@@ -29,7 +29,16 @@ ActorClass {
                                     duration: 999999days;
                                 }
                                 NavigateGradient { };
-                                Suicide { };
+                                Suicide { };*#
+
+                                SetOwnClass {
+                                    class: @.;
+                                    inheritController: true;
+                                }
+                                SetConditionOnSelf {
+                                    condition: @"./Conditions/zombie.cond.tk";
+                                    duration: 999999days;
+                                }
                             ];
                         };
                     };

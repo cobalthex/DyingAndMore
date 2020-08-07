@@ -453,11 +453,10 @@ namespace DyingAndMore.Editor
             if (InputState.IsPress(Keys.Z))
             {
                 isZoomSizing = true;
-                savedWorldPos = currentWorldPos = Camera.ScreenToWorld(InputState.MouseVector);
+
                 if (float.IsNaN(currentWorldPos.X) || float.IsNaN(currentWorldPos.Y))
-                {
-                    savedWorldPos = currentWorldPos = new Vector2();
-                }
+                    ZoomWholeMap();
+                savedWorldPos = currentWorldPos = Camera.ScreenToWorld(InputState.MouseVector);
                 return false;
             }
             if (InputState.IsClick(Keys.Z))
@@ -531,6 +530,7 @@ namespace DyingAndMore.Editor
                     {
                         ofd.CustomPlaces.Add(Path.GetFullPath("Content/Mapsrc")); //test if exists in release mode?
                         ofd.CustomPlaces.Add(Path.GetFullPath("Maps"));
+                        ofd.CustomPlaces.Add(Path.GetFullPath("Saves"));
                         if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         {
                             //try

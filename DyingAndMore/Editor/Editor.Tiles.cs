@@ -44,6 +44,17 @@ namespace DyingAndMore.Editor
                 editor.Map.Class.TileSize
             );
         }
+
+#if DEBUG
+        protected override void UpdateSelf(GameTime time)
+        {
+            DyingAndMoreGame.DebugDisplay("X", (int)(lastWorldPos.X / editor.Map.Class.TileSize));
+            DyingAndMoreGame.DebugDisplay("Y", (int)(lastWorldPos.Y / editor.Map.Class.TileSize));
+
+            base.UpdateSelf(time);
+        }
+#endif
+
         protected override bool HandleInput(GameTime time)
         {
             lastWorldPos = currentWorldPos;

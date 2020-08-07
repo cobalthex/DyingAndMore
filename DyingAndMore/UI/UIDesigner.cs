@@ -16,7 +16,10 @@ namespace DyingAndMore.UI
         Static propsEditor;
         Static newItemPopup;
 
+        Static parent;
         Static newItem;
+
+        Static hoverElement;
 
         bool sizing;
         Rectangle sizingRect;
@@ -59,9 +62,14 @@ namespace DyingAndMore.UI
                 var newElement = (Static)System.Activator.CreateInstance((System.Type)arg); //list of Statics?
                 if (sizingRect.Width > sizingEpsilon || sizingRect.Height > sizingEpsilon)
                     newElement.Size = new Vector2(self.sizingRect.Width, self.sizingRect.Height);
+
+                //transform coords
                 newElement.Position = new Vector2(self.sizingRect.X, self.sizingRect.Y);
 
-                self.AddChild(newElement);
+                //test props
+                newElement.BorderColor = Color.White;
+
+                self.parent.AddChild(newElement);
                 self.RemoveChild(newItemPopup);
             };
 
@@ -90,9 +98,11 @@ namespace DyingAndMore.UI
         {
             var self = (UIDesigner)sender;
             var pea = (PointerEventArgs)args;
-            if (pea.device == Takai.Input.DeviceType.Mouse && pea.deviceIndex == 0)
+
+            if (pea.device == Takai.Input.DeviceType.Mouse && pea.button == 0)
             {
                 var pos = self.showTargeter ? self.targetPoint : pea.position;
+                self.parent = args.Source;
                 self.sizing = true;
                 self.sizingRect = new Rectangle((int)pos.X, (int)pos.Y, 0, 0);
                 return UIEventResult.Handled;
@@ -103,24 +113,41 @@ namespace DyingAndMore.UI
         {
             var self = (UIDesigner)sender;
             var dea = (DragEventArgs)args;
-            if (self.sizing && dea.device == Takai.Input.DeviceType.Mouse && dea.deviceIndex == 0)
+            if (self.sizing && dea.device == Takai.Input.DeviceType.Mouse && dea.button == 0)
             {
                 self.sizingRect = Util.AbsRectangle(self.sizingRect.Location, (self.showTargeter ? self.targetPoint : dea.position).ToPoint());
                 return UIEventResult.Handled;
             }
+
+            if (self != args.Source) //don't hover on the designer
+                self.hoverElement = args.Source;
+            else
+                self.hoverElement = null;
+
             return UIEventResult.Continue;
         }
         static UIEventResult OnClick(Static sender, UIEventArgs args)
         {
             var self = (UIDesigner)sender;
             var pea = (PointerEventArgs)args;
-            if (self.sizing && pea.device == Takai.Input.DeviceType.Mouse && pea.deviceIndex == 0)
+            if (self.sizing && pea.device == Takai.Input.DeviceType.Mouse && pea.button == 0)
             {
-                self.newItemPopup.Position = pea.position;
+                self.newItemPopup.Position = Vector2.Clamp(
+                    pea.position,
+                    Vector2.Zero,
+                    new Vector2(self.VisibleContentArea.Right - self.newItemPopup.VisibleBounds.Width,
+                        self.VisibleContentArea.Bottom - self.newItemPopup.VisibleBounds.Height)
+                );
                 self.AddChild(self.newItemPopup);
                 return UIEventResult.Handled;
             }
             return UIEventResult.Continue;
+        }
+
+        protected override void OnChildRemeasure(Static child)
+        {
+            InvalidateMeasure();
+            InvalidateArrange();
         }
 
         protected override bool HandleInput(GameTime time)
@@ -148,8 +175,15 @@ namespace DyingAndMore.UI
                 }
             }
 
+            if (hoverElement != null)
+                DrawRect(spriteBatch, Color.Cyan, hoverElement.OffsetContentArea);
+
             if (sizing)
+            {
+                if (sizingRect.Width < sizingEpsilon || sizingRect.Height < sizingEpsilon)
+                    Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Gold, new Rectangle(sizingRect.X - 4, sizingRect.Y - 4, 8, 8));
                 DrawRect(spriteBatch, Color.Gold, sizingRect);
+            }
 
             const int targeterRadius = 10;
             if (showTargeter)

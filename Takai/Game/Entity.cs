@@ -133,7 +133,21 @@ namespace Takai.Game
         /// <summary>
         /// The class that this instance inherits from
         /// </summary>
-        public virtual EntityClass Class { get; set; }
+        public virtual EntityClass Class
+        {
+            get => _Class;
+            set
+            {
+                if (_Class == value)
+                    return;
+
+                _Class = value;
+                PlayAnimation(Class.DefaultBaseAnimation);
+                if (Class.Trail != null)
+                    Trail = Class.Trail.Instantiate();
+            }
+        }
+        private EntityClass _Class;
 
         /// <summary>
         /// A name for this instance, should be unique
@@ -217,10 +231,6 @@ namespace Takai.Game
             Class = @class;
             if (Class == null)
                 return;
-
-            PlayAnimation(Class.DefaultBaseAnimation);
-            if (Class.Trail != null)
-                Trail = Class.Trail.Instantiate();
         }
 
         /// <summary>

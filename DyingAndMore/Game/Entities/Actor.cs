@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Takai.Game;
 using Takai;
 using System.Collections.Generic;
+using System.Security.AccessControl;
 
 namespace DyingAndMore.Game.Entities
 {
@@ -366,17 +367,6 @@ namespace DyingAndMore.Game.Entities
             return (dot > (_Class.FieldOfView / 2 / MathHelper.Pi) - 1);
         }
 
-        public bool CanSee(Vector2 point, int sightRange = 1000)
-        {
-            System.Diagnostics.Contracts.Contract.Assume(Map != null);
-
-            if (!IsFacing(point))
-                return false;
-
-            var dist = Map.TraceTiles(WorldPosition, Vector2.Normalize(point - WorldPosition), sightRange);
-            return dist >= sightRange;
-        }
-
         public bool IsAlliedWith(Factions factions)
         {
             return (Factions & factions) != Factions.None;
@@ -390,6 +380,47 @@ namespace DyingAndMore.Game.Entities
         public float DistanceBetween(EntityInstance entity)
         {
             return Vector2.Distance(WorldPosition, entity.WorldPosition) - Radius - entity.Radius;
+        }
+
+        // ↓ requires map
+
+        public bool CanSee(Vector2 point, int sightRange = 1000)
+        {
+            System.Diagnostics.Contracts.Contract.Assert(Map != null);
+
+            if (!IsFacing(point))
+                return false;
+
+            var dist = Map.TraceTiles(WorldPosition, Vector2.Normalize(point - WorldPosition), sightRange);
+            return dist >= sightRange;
+        }
+
+        /// <summary>
+        /// Guess if the actor is cornered
+        /// </summary>
+        /// <param name="bias">how close to be considered against an edge (in pixels), combined from all edges</param>
+        /// <returns>True if the actor might be cornered</returns>
+        public bool IsMaybeCornered(byte bias = 80)
+        {
+            System.Diagnostics.Contracts.Contract.Assert(Map != null);
+            bias >>= MapClass.CollisionMaskScale;
+
+            var dist = 0;
+            dist += Map.Class.DistanceToEdge(WorldPosition + Forward * Radius);
+            dist += Map.Class.DistanceToEdge(WorldPosition - Forward * Radius);
+            dist += Map.Class.DistanceToEdge(WorldPosition + Forward.Ortho() * Radius);
+            dist += Map.Class.DistanceToEdge(WorldPosition - Forward.Ortho() * Radius);
+
+            Map.DrawLine(WorldPosition, WorldPosition + Forward * Radius, Color.Magenta);
+            Map.DrawLine(WorldPosition, WorldPosition - Forward * Radius, Color.Cyan);
+            Map.DrawLine(WorldPosition, WorldPosition + Forward.Ortho() * Radius, Color.White);
+            Map.DrawLine(WorldPosition, WorldPosition - Forward.Ortho() * Radius, Color.Yellow);
+            if (dist < bias)
+                Map.DrawCircle(WorldPosition, Radius, Color.Orange, 3, 4);
+
+            //returns false positives along long edges
+
+            return dist < bias;
         }
 
         #endregion

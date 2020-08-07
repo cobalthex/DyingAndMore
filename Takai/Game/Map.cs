@@ -59,7 +59,7 @@ namespace Takai.Game
         /// The rshift multiple for the collision mask of the map size
         /// e.g. MapWidth >> <see cref="CollisionMaskScale"/>
         /// </summary>
-        const int CollisionMaskScale = 2;
+        public const int CollisionMaskScale = 2;
         /// <summary>
         /// Size of the collision mask (rows, columns)
         /// </summary>

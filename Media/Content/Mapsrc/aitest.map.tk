@@ -86,7 +86,6 @@ MapInstance {
                             FindClosestActor {
                                 isAlly: False;
                                 isSameClass: False;
-                                sightDistance: 1000;
                             }
                             OrbitTarget {
                                 radius: 100;
@@ -134,7 +133,6 @@ MapInstance {
                             FindClosestActor {
                                 isAlly: False;
                                 isSameClass: False;
-                                sightDistance: 1000;
                             }
                             NavigateToTarget {
                                 permanent: True;
@@ -180,7 +178,6 @@ MapInstance {
                             FindClosestActor {
                                 isAlly: False;
                                 isSameClass: False;
-                                sightDistance: 1000;
                             }
                             NavigateGradient {
                                 targetValue: 10;

@@ -11,14 +11,12 @@ namespace DyingAndMore.Game.Entities.Tasks
 
         //class filter?
 
-        public float sightDistance;
-
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
             if (ai.Target != null) //specify as option to change target?
                 return TaskResult.Success;
 
-            var ents = ai.Actor.Map.FindEntitiesInRegion(ai.Actor.WorldPosition, sightDistance);
+            var ents = ai.Actor.Map.FindEntitiesInRegion(ai.Actor.WorldPosition, ai.SightRange);
 
             var possibles = new List<ActorInstance>();
             foreach (var ent in ents)

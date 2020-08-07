@@ -207,7 +207,7 @@ namespace Takai.Game
                                 //f = m * v² / (2 * d)
                                 //d = radius of object?
                                 var impactForce = entity.Class.Mass * entity.Velocity.LengthSquared();
-                                LogBuffer.Append(impactForce.ToString());
+                                //LogBuffer.Append(impactForce.ToString());
 
                                 //overpenetrate?
 

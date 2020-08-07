@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Entities.Tasks
@@ -13,6 +14,9 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    /// <summary>
+    /// Move in opposite direction
+    /// </summary>
     public struct FleeFromTarget : ITask
     {
         int lastDirection;
@@ -22,7 +26,7 @@ namespace DyingAndMore.Game.Entities.Tasks
             if (ai.Target == null)
                 return TaskResult.Success; //no ghosts allowed
 
-            //determine if cornered
+            //determine if cornered (check sdf to sides & behind), move into senses?
 
             var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
             uint target = 50;
@@ -37,7 +41,26 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
-    //Flee
+    /// <summary>
+    /// Find a point out of sight of the target
+    /// </summary>
+    public struct HideFromTarget : ITask
+    {
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null)
+                return TaskResult.Success; //no ghosts allowed
 
-    //Move to cover
+            //find closest point on sdf blocking view from target to self
+            //limited range (slightly past self?)
+
+
+            //run perpendicular to enemy then turn away if obstacle
+            // quit if target cannot see
+
+            return TaskResult.Continue;
+        }
+    }
+
+    //move in specific/random direction (less than 90deg off forward?)
 }

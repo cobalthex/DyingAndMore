@@ -1,135 +1,455 @@
 MapInstance {
-    Class: @"Maps/shootingrange.map.tk";
-    Trails: [];
+    Squads: [
+        Squad {
+            Name: "spawn";
+            LeaderTemplate: [];
+            UnitsTemplate: [
+                @"Actors/Astrovirus.ent.tk"
+            ];
+            SpawnPosition: [807.9365 -44.81023];
+            SpawnRadius: 41.25773;
+            DontSpawnAutomatically: False;
+            MinLiveCount: 3;
+            MaxLiveCount: 5;
+            MaxSpawnCount: 0;
+            SpawnDelay: 2000;
+            ResetDelay: 0;
+            DisableSpawningIfLeaderIsDead: False;
+            Leader: Null;
+            Units: [];
+            TotalSpawnCount: 0;
+            LastSpawnTime: 0;
+        }
+    ];
+    Class: MapClass {
+        Name: Null;
+        Tileset: @"Tilesets/pink.tiles.tk";
+        MaterialInteractions: @"Materials/Test.mtl.tk";
+        Width: 46;
+        Height: 46;
+        Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    };
     Sounds: [];
-    ElapsedTime: 1811.3573;
+    ElapsedTime: 191350.1128;
     TimeScale: 1;
     currentScreenFade: ScreenFade {
         Duration: 0;
         Colors: Null;
         Blend: Null;
     };
-    currentScreenFadeElapsedTime: 1811.3573;
+    currentScreenFadeElapsedTime: 191350.1128;
     Entities: [
         ActorInstance {
             Class: @"Actors/Player.ent.tk";
-            Factions: Factions [Player];
+            CurrentHealth: 3800;
+            Factions: Factions [Player Ally];
             Controller: InputController {
-                ActionInputs: {
-                    Fire: [
-                        ActionInput {
-                            type: ActionInputType.MouseButton;
-                            which: 0;
-                        }
-                    ];
-                };
-                player: PlayerIndex.One;
+                Inputs: @"$Config/Player1.input.tk";
             };
+            Conditions: {
+            };
+            MaxSpeed: 300;
+            Weapon: GunInstance {
+                CurrentAmmo: 969;
+                LastAmmoRefillTime: 181119.4581;
+                OnlyRefillIfIdle: True;
+                Class: @"Weapons/mg.wpn.tk";
+                StateTime: 187693.4005;
+                Charge: 0;
+            };
+            Id: 100;
+            Name: Null;
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 172754;
+            EventHandlers: Null;
+            Position: [355.6741 300.6028];
+            Forward: [0.4740998 -0.8804711];
+            Velocity: [158.4661 0.2285206];
+        }
+        ActorInstance {
+            Class: @"Actors/ShootTest.ent.tk";
             CurrentHealth: 5000;
+            Factions: Factions [Enemy];
+            Controller: AIController {
+                SightRange: 400;
+                Target: Null;
+                DefaultBehaviors: [
+                    Behavior {
+                        Name: "ShootAtTarget";
+                        File: Null;
+                        RequisiteSenses: Senses.None;
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            FindClosestActor {
+                                isAlly: False;
+                                isSameClass: False;
+                            }
+                            NavigateGradient {
+                                targetValue: 10;
+                                successCondition: NavGradientSuccessCondition.LessOrEqual;
+                            }
+                            ShootAtTarget {
+                                aimingMethod: AimingMethod.None;
+                            }
+                        ];
+                        OnTaskFailure: TaskFailureAction.RestartBehavior;
+                    }
+                    Behavior {
+                        Name: "Flee";
+                        File: Null;
+                        RequisiteSenses: Senses [LowHealth HasTarget];
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            FleeFromTarget {
+                            }
+                        ];
+                        OnTaskFailure: TaskFailureAction.RestartBehavior;
+                    }
+                ];
+                PreemptiveBehaviors: Null;
+                AllyBroadcasts: Null;
+                EnemyBroadcasts: Null;
+                CurrentBehavior: Null;
+                CurrentTask: 0;
+            };
             Conditions: {
             };
             MaxSpeed: 400;
-            Weapon: Null;
-            Id: 1;
-            Class: @"Actors/Player.ent.tk";
-            Name: Null;
-            Position: [190.6349 192.8318];
-            Forward: [1 0];
-            Velocity: [0 0];
-            OutlineColor: [0 0 0 0];
-            Trail: Null;
-            SpawnTime: 0;
-            EventHandlers: Null;
-        }
-        WeaponPickupInstance {
             Weapon: GunInstance {
-                Class: @"Weapons/mg.wpn.tk";
-                AmmoCount: 1000;
-                Class: @"Weapons/mg.wpn.tk";
+                CurrentAmmo: 100;
+                LastAmmoRefillTime: 0;
+                OnlyRefillIfIdle: True;
+                Class: @"Weapons/laser.wpn.tk";
                 StateTime: 0;
-                State: WeaponState.Idle;
                 Charge: 0;
             };
-            Class: @"Pickups/MG.ent.tk";
-            Id: 2;
-            Class: @"Pickups/MG.ent.tk";
+            Id: 102;
             Name: Null;
-            Position: [48.01904 144.759];
-            Forward: [1 0];
-            Velocity: [0 0];
             OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 0;
+            SpawnTime: 172754;
             EventHandlers: Null;
+            Position: [2000 100];
+            Forward: [-1 0];
+            Velocity: [0 0];
         }
-        WeaponPickupInstance {
-            Weapon: GunInstance {
-                Class: @"Weapons/Flamethrower.wpn.tk";
-                AmmoCount: 20000;
-                Class: @"Weapons/Flamethrower.wpn.tk";
+        ActorInstance {
+            Class: @"Actors/Cyst.ent.tk";
+            CurrentHealth: 10000;
+            Factions: Factions [Enemy];
+            Controller: ArtilleryController {
+                MaxRange: 800;
+                CanRotate: False;
+                ShowSweepLines: True;
+                trackedActor: Null;
+            };
+            Conditions: {
+            };
+            MaxSpeed: 0;
+            Weapon: SpawnerInstance {
+                Squad: *Squad.spawn;
+                SpawnQueue: Null;
+                Class: @"Weapons/Cyst.wpn.tk";
                 StateTime: 0;
-                State: WeaponState.Idle;
                 Charge: 0;
             };
-            Class: @"Pickups/TestPfx.ent.tk";
-            Id: 3;
-            Class: @"Pickups/TestPfx.ent.tk";
+            Id: 103;
             Name: Null;
-            Position: [46.41661 237.6997];
-            Forward: [1 0];
-            Velocity: [0 0];
-            OutlineColor: [0 0 0 0];
+            OutlineColor: [255 215 0 255];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 0;
+            SpawnTime: 172754;
             EventHandlers: Null;
+            Position: [811.2648 23.98842];
+            Forward: [0 1];
+            Velocity: [0 0];
         }
-        WeaponPickupInstance {
-            Weapon: GunInstance {
-                Class: @"Weapons/Test.wpn.tk";
-                AmmoCount: 2000;
-                Class: @"Weapons/Test.wpn.tk";
-                StateTime: 0;
-                State: WeaponState.Idle;
-                Charge: 0;
+        ActorInstance {
+            Class: @"Actors/AssassinTest.ent.tk";
+            CurrentHealth: 3000;
+            Factions: Factions [Enemy];
+            Controller: AIController {
+                SightRange: 400;
+                Target: *ActorInstance.;
+                DefaultBehaviors: [
+                    Behavior {
+                        Name: "Find target";
+                        File: Null;
+                        RequisiteSenses: Senses.None;
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            FindClosestActor {
+                                isAlly: False;
+                                isSameClass: False;
+                            }
+                            NavigateGradient {
+                                targetValue: 6;
+                                successCondition: NavGradientSuccessCondition.LessOrEqual;
+                            }
+                            OrbitTarget {
+                                radius: 100;
+                                faceTarget: True;
+                            }
+                        ];
+                        OnTaskFailure: TaskFailureAction.RestartBehavior;
+                    }
+                ];
+                PreemptiveBehaviors: [
+                    Behavior {
+                        Name: "Assassinate";
+                        File: Null;
+                        RequisiteSenses: Senses [TargetVisible];
+                        RequisiteNotSenses: Senses [TargetCanSeeMe];
+                        QueueChance: 0.5;
+                        Tasks: [
+                            ShootAtTarget {
+                                aimingMethod: AimingMethod.None;
+                            }
+                        ];
+                        OnTaskFailure: TaskFailureAction.RestartBehavior;
+                    }
+                ];
+                AllyBroadcasts: Null;
+                EnemyBroadcasts: Null;
+                CurrentBehavior: Behavior {
+                    Name: "Find target";
+                    File: Null;
+                    RequisiteSenses: Senses.None;
+                    RequisiteNotSenses: Senses.None;
+                    QueueChance: 0.5;
+                    Tasks: [
+                        FindClosestActor {
+                            isAlly: False;
+                            isSameClass: False;
+                        }
+                        NavigateGradient {
+                            targetValue: 6;
+                            successCondition: NavGradientSuccessCondition.LessOrEqual;
+                        }
+                        OrbitTarget {
+                            radius: 100;
+                            faceTarget: True;
+                        }
+                    ];
+                    OnTaskFailure: TaskFailureAction.RestartBehavior;
+                };
+                CurrentTask: 2;
             };
-            Class: @"Pickups/Tuber.ent.tk";
-            Id: 4;
-            Class: @"Pickups/Tuber.ent.tk";
+            Conditions: {
+            };
+            MaxSpeed: 493.4513;
+            Weapon: GunInstance {
+                CurrentAmmo: 3994;
+                LastAmmoRefillTime: 181119.4581;
+                OnlyRefillIfIdle: True;
+                Class: @"Weapons/laser.wpn.tk";
+                StateTime: 190759.2677;
+                Charge: 0.6294036;
+            };
+            Id: 104;
             Name: Null;
-            Position: [49.62146 48.61347];
-            Forward: [1 0];
-            Velocity: [0 0];
             OutlineColor: [0 0 0 0];
-            Trail: Null;
-            SpawnTime: 0;
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: TrailInstance {
+                Class: TrailClass {
+                    File: Null;
+                    Name: Null;
+                    MaxPoints: 0;
+                    Sprite: Null;
+                    SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
+                    SpriteScale: 1;
+                    Color: ColorCurve {
+                        Mode: ChromaMode.HSL;
+                        Reverse: False;
+                        Values: [
+                            [0 [0 63 127 127]]
+                            [1 [127 64 192 255]]
+                        ];
+                    };
+                    Width: ScalarCurve {
+                        IsLinear: False;
+                        Values: [
+                            [0 0]
+                            [0.95 8]
+                            [1 0]
+                        ];
+                    };
+                    Jitter: [0 0];
+                    SkipChance: 0;
+                    LifeSpan: 500;
+                    CaptureDelay: 33;
+                    MergeCollinear: False;
+                };
+            };
+            SpawnTime: 176313.7796;
             EventHandlers: Null;
+            Position: [255.8916 256.9811];
+            Forward: [0.9183386 0.3957956];
+            Velocity: [360.0324 -337.4475];
         }
-        WeaponPickupInstance {
-            Weapon: GunInstance {
-                Class: @"Weapons/bfg.wpn.tk";
-                AmmoCount: 1000;
-                Class: @"Weapons/bfg.wpn.tk";
-                StateTime: 0;
-                State: WeaponState.Idle;
-                Charge: 0;
+        ActorInstance {
+            Class: @"Actors/AssassinTest.ent.tk";
+            CurrentHealth: 2700;
+            Factions: Factions [Enemy];
+            Controller: AIController {
+                SightRange: 400;
+                Target: *ActorInstance.;
+                DefaultBehaviors: [
+                    Behavior {
+                        Name: "Find target";
+                        File: Null;
+                        RequisiteSenses: Senses.None;
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            FindClosestActor {
+                                isAlly: False;
+                                isSameClass: False;
+                            }
+                            NavigateGradient {
+                                targetValue: 6;
+                                successCondition: NavGradientSuccessCondition.LessOrEqual;
+                            }
+                            OrbitTarget {
+                                radius: 100;
+                                faceTarget: True;
+                            }
+                        ];
+                        OnTaskFailure: TaskFailureAction.RestartBehavior;
+                    }
+                ];
+                PreemptiveBehaviors: [
+                    Behavior {
+                        Name: "Assassinate";
+                        File: Null;
+                        RequisiteSenses: Senses [TargetVisible];
+                        RequisiteNotSenses: Senses [TargetCanSeeMe];
+                        QueueChance: 0.5;
+                        Tasks: [
+                            ShootAtTarget {
+                                aimingMethod: AimingMethod.None;
+                            }
+                        ];
+                        OnTaskFailure: TaskFailureAction.RestartBehavior;
+                    }
+                ];
+                AllyBroadcasts: Null;
+                EnemyBroadcasts: Null;
+                CurrentBehavior: Behavior {
+                    Name: "Find target";
+                    File: Null;
+                    RequisiteSenses: Senses.None;
+                    RequisiteNotSenses: Senses.None;
+                    QueueChance: 0.5;
+                    Tasks: [
+                        FindClosestActor {
+                            isAlly: False;
+                            isSameClass: False;
+                        }
+                        NavigateGradient {
+                            targetValue: 6;
+                            successCondition: NavGradientSuccessCondition.LessOrEqual;
+                        }
+                        OrbitTarget {
+                            radius: 100;
+                            faceTarget: True;
+                        }
+                    ];
+                    OnTaskFailure: TaskFailureAction.RestartBehavior;
+                };
+                CurrentTask: 2;
             };
-            Class: @"Pickups/Bfg.ent.tk";
-            Id: 5;
-            Class: @"Pickups/Bfg.ent.tk";
+            Conditions: {
+            };
+            MaxSpeed: 418.617;
+            Weapon: GunInstance {
+                CurrentAmmo: 3994;
+                LastAmmoRefillTime: 181119.4581;
+                OnlyRefillIfIdle: True;
+                Class: @"Weapons/laser.wpn.tk";
+                StateTime: 191219.4204;
+                Charge: 0.8957481;
+            };
+            Id: 105;
             Name: Null;
-            Position: [49.62146 333.8452];
-            Forward: [1 0];
-            Velocity: [0 0];
             OutlineColor: [0 0 0 0];
-            Trail: Null;
-            SpawnTime: 0;
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: TrailInstance {
+                Class: TrailClass {
+                    File: Null;
+                    Name: Null;
+                    MaxPoints: 0;
+                    Sprite: Null;
+                    SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
+                    SpriteScale: 1;
+                    Color: ColorCurve {
+                        Mode: ChromaMode.HSL;
+                        Reverse: False;
+                        Values: [
+                            [0 [0 63 127 127]]
+                            [1 [127 64 192 255]]
+                        ];
+                    };
+                    Width: ScalarCurve {
+                        IsLinear: False;
+                        Values: [
+                            [0 0]
+                            [0.95 8]
+                            [1 0]
+                        ];
+                    };
+                    Jitter: [0 0];
+                    SkipChance: 0;
+                    LifeSpan: 500;
+                    CaptureDelay: 33;
+                    MergeCollinear: False;
+                };
+            };
+            SpawnTime: 178250.4109;
             EventHandlers: Null;
+            Position: [221.0542 262.7166];
+            Forward: [0.96185 0.2735773];
+            Velocity: [200.3483 367.5605];
         }
     ];
-    Triggers: [
-        TriggerInstance {
-            Class: *TriggerClass.1;
-            UseCount: 0;
+    EntityAttachments: [];
+    Triggers: [];
+    Fluids: [
+        FluidInstance {
+            Class: @"Fluids/Blood.fluid.tk";
+            position: [378.4637 394.3336];
+            velocity: [-1.016427 -0.284009];
+        }
+        FluidInstance {
+            Class: @"Fluids/Blood.fluid.tk";
+            position: [383.2853 375.8971];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: @"Fluids/Blood.fluid.tk";
+            position: [392.5406 366.1903];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: @"Fluids/Blood.fluid.tk";
+            position: [406.4435 407.9125];
+            velocity: [0 0];
+        }
+        FluidInstance {
+            Class: @"Fluids/Blood.fluid.tk";
+            position: [402.7294 428.7972];
+            velocity: [0 0];
         }
     ];
 }
