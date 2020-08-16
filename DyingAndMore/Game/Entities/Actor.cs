@@ -254,18 +254,6 @@ namespace DyingAndMore.Game.Entities
             base.Think(deltaTime);
         }
 
-        public override void OnSpawn(MapBaseInstance map)
-        {
-            base.OnSpawn(map);
-            ((MapInstance)map).Broadcast(new ActorBroadcast(this, ActorBroadcastType.Spawn));
-        }
-
-        public override void Kill()
-        {
-            base.Kill();
-            ((MapInstance)Map)?.Broadcast(new ActorBroadcast(this, ActorBroadcastType.Death));
-        }
-
         public override void OnEntityCollision(EntityInstance collider, CollisionManifold collision, TimeSpan deltaTime)
         {
             Controller?.OnEntityCollision(collider, collision, deltaTime);
@@ -295,6 +283,10 @@ namespace DyingAndMore.Game.Entities
             Forward = Vector2.Normalize(Vector2.Lerp(Forward, direction, TurnSpeed * (float)deltaTime.TotalSeconds));
         }
 
+        /// <summary>
+        /// Accelerate in a direction (local to parent)
+        /// </summary>
+        /// <param name="direction">The direction to accelerate in. Can be non-normalized for speed scaling</param>
         public virtual void Accelerate(Vector2 direction)
         {
             var vel = Velocity + (direction * _Class.MoveForce.Random());
@@ -326,10 +318,8 @@ namespace DyingAndMore.Game.Entities
                 $"{base.GetDebugInfo()}\n" +
                 $"Health: {CurrentHealth}/{_Class?.MaxHealth}\n" +
                 $"Weapon: {Weapon}\n" +
+                $"Factions: {Factions}\n" +
                 $"Controller: {Controller}\n";
-
-            if (Controller is Entities.AIController ai)
-                text += $"AI: {ai}\n";
 
             return text;
         }

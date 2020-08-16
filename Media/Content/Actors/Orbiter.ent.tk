@@ -8,6 +8,25 @@ ActorClass {
         };
     };
 
+    Trail: {
+        LifeSpan: 0.5sec;
+        CaptureDelay: 30Hz;
+        Color: {
+            Values: [
+                [0 [64 127 0 0]];
+                [1 [64 192 127 255]];
+            ]
+        }
+
+        width: {
+            values: [
+                [0 32]
+                [0.9 8]
+                [1 0]
+            ]
+        }
+    }
+
     MaxSpeed: 100;
     MoveForce: 30;
 }

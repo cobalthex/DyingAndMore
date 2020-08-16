@@ -263,20 +263,6 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
-    public struct FollowPath : ITask
-    {
-        public Takai.Game.VectorCurve path;
-
-
-        public TaskResult Think(TimeSpan deltaTime, AIController ai)
-        {
-            if (path == null)
-                return TaskResult.Failure;
-
-            return TaskResult.Continue;
-        }
-    }
-
     //todo: play animations
 
     //teleport (possibly with delay, e.g. burrowing)

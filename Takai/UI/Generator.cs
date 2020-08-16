@@ -6,13 +6,49 @@ using Takai.Data;
 
 namespace Takai.UI
 {
+    /// <summary>
+    /// Ignore this field when generating a prop sheet
+    /// </summary>
+    public class UIHiddenAttribute : Attribute { }
+
+    /// <summary>
+    /// Generate A UI whenever the binding to 'this' is updated
+    /// </summary>
+    public class AutoUI : Static
+    {
+        public string BindSource { get; set; }
+
+        public AutoUI()
+        {
+
+        }
+
+        public override void BindTo(object source, Dictionary<string, object> customBindProps = null)
+        {
+            base.BindTo(source, customBindProps);
+
+            if (string.IsNullOrEmpty(BindSource))
+                return;
+
+            var src = Binding.GetAccessors(BindSource, source, customBindProps);
+            ReplaceAllChildren(GeneratePropSheet(src.type, src.get()));
+        }
+    }
+
     public partial class Static
     {
         public static Static GeneratePropSheet<T>(T obj = default)
         {
             return GeneratePropSheet(typeof(T), obj);
         }
-        private static Static GeneratePropSheet(Type type, object obj)
+        public static Static GeneratePropSheet(object obj)
+        {
+            if (obj == null)
+                return null;
+            return GeneratePropSheet(obj.GetType(), obj);
+        }
+
+        internal static Static GeneratePropSheet(Type type, object obj)
         {
             if (type == typeof(Type))
                 return null;
@@ -75,8 +111,9 @@ namespace Takai.UI
             //todo: move these into type handlers
             foreach (var member in members)
             {
-                //helps avoid cyclical issues
-                if (member.IsDefined(typeof(Serializer.IgnoredAttribute)))
+                //helps avoid cyclical issues + unwanted UI elements
+                if (member.IsDefined(typeof(Serializer.IgnoredAttribute)) ||
+                    member.IsDefined(typeof(UIHiddenAttribute)))
                     continue;
 
                 Type memberType;
@@ -85,14 +122,14 @@ namespace Takai.UI
                 object memberVal;
                 if (fi != null)
                 {
-                    if (fi.IsInitOnly)
+                    if (fi.IsInitOnly || !fi.IsPublic)
                         continue;
                     memberType = fi.FieldType;
                     memberVal = fi.GetValue(obj);
                 }
                 else if (pi != null)
                 {
-                    if (!pi.CanWrite)
+                    if (!pi.CanWrite || !pi.GetMethod.IsPublic)
                         continue;
                     memberType = pi.PropertyType;
                     memberVal = pi.GetValue(obj);

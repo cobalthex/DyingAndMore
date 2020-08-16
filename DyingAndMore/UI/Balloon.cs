@@ -30,6 +30,7 @@ namespace DyingAndMore.UI
             : this()
         {
             Text = text;
+            Padding = new Vector2(10, 5);
         }
 
         protected override void OnParentChanged(Static oldParent)

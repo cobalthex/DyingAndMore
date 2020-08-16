@@ -1032,7 +1032,7 @@ namespace Takai.UI
 
             //todo: set parent normally?
             foreach (var child in children)
-                child.SetParentNoReflow(null);
+                child?.SetParentNoReflow(null);
 
             Static lastFocus = null;
             foreach (var child in children)

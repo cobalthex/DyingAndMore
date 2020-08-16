@@ -68,7 +68,7 @@ namespace Takai.Game
         /// <summary>
         /// A trail that is applied on spawn
         /// </summary>
-        public TrailClass Trail { get; set; }
+        public TrailClass Trail { get; set; } // move to animations?
 
         public EntityClass()
         {

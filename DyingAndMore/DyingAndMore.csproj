@@ -69,7 +69,6 @@
     <Compile Include="Game\Entities\Tasks\Offensive.cs" />
     <Compile Include="Game\Entities\Tasks\Targeting.cs" />
     <Compile Include="Game\Entities\Tasks\Tasks.cs" />
-    <Compile Include="Game\Entities\Tasks\Orbit.cs" />
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />

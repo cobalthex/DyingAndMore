@@ -120,7 +120,6 @@ namespace Takai.Game
 
         public MaterialInteractions MaterialInteractions { get; set; } = new MaterialInteractions();
 
-        
         public virtual MapBaseInstance Instantiate()
         {
             var instance = new MapBaseInstance(this);

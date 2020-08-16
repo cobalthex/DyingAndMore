@@ -60,65 +60,29 @@ List {
 					];
 			    };
 
-			    AIController: BehaviorList {
+			    AIController: List {
 			    	Margin: 10;
 					HorizontalAlignment: Alignment.Stretch;
-			        Bindings: [
-			            Binding {
-			                Source: "Behaviors";
-			                Target: "Items";
-			                Direction: BindingDirection.TwoWay;
-			            }
-			        ];
+					Children: [
+						Static { Text: "`_Sight Range"; };
+						NumericInput {
+    						HorizontalAlignment: Alignment.Stretch;
+							Minimum: 0;
+							Maximum: 10000;
+							Bindings: [
+							    Binding {
+							        Source: "SightRange";
+							        Target: "Value";
+							    }
+							]
+						}
 
-			    	ItemUI: List {
-    					HorizontalAlignment: Alignment.Stretch;
-    					Direction: Direction.Horizontal;
-    					Children: [
-    						Static {
-				    			VerticalAlignment: ALignment.Center;
-					    		Bindings: [
-					    			Binding {
-						    			Converter: StringFormatConverter {
-						    				Format: "{0}) ";
-						    				PreConverter : BasicMathConverter {
-							    				Factor: 1;
-							    			};
-							    		};
-					    				Source: ":index";
-					    				Target: "Text";
-					    			};
-				    			];
-				    		};
-
-				    		Static {
-				    			VerticalAlignment: Alignment.Center;
-					    		#todo: switch on type (fill in details)?
-					    		Bindings: [
-					    			Binding {
-					    				Source: ":typename";
-					    				Target: "Text";
-					    			};
-				    			];
-				    		};
-
-				    		@"UI/RemoveItem.ui.tk";
-			    		];
-			    	};
-
-			    	AddItemUI: BehaviorSelect {
-    					HorizontalAlignment: Alignment.Stretch;
-			            Bindings: [
-			                Binding {
-			                    Source: "item";
-			                    Target: "Instance";
-			                    Direction: BindingDirection.TwoWay;
-			                }
-			            ];
-			    		EventCommands: {
-			    			SelectionChanged: "AddItem";
-			    		};
-			    	};
+						Static { Text: "`_Default Behaviors"; };
+						#@"./Behaviors.ui.tk";
+						AutoUI {
+							BindSource: "DefaultBehaviors";
+						}
+				    ];
 			    };
 			};
 		};
