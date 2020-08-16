@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Takai;
 
@@ -26,7 +25,6 @@ namespace DyingAndMore.Game.Entities
         Attached        = 0b0010000000000000,
         //target close/far
         //target fleeing?
-        //target out of range
     }
 
     public class AIController : Controller
@@ -36,11 +34,8 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The current target actor for behaviors (e.g. enemy to shoot at or ally to follow)
         /// </summary>
-        [Takai.Data.Serializer.AsReference]
+        [Takai.Data.Serializer.AsReference, Takai.UI.UIHidden]
         public ActorInstance Target { get; set; }
-
-        public TimeSpan TargetLastSeenTime { get; protected set; }
-        public Vector2 TargetLastSeenPosition { get; protected set; }
 
         /// <summary>
         /// Possible behaviors to start this AI with
@@ -53,11 +48,6 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public List<Behavior> PreemptiveBehaviors { get; set; } //merge with default?
 
-        //todo
-        public Dictionary<ActorBroadcast, Behavior> AllyBroadcasts { get; set; } //list of behaviors?
-
-        public Dictionary<ActorBroadcast, Behavior> EnemyBroadcasts { get; set; } //list of behaviors?
-
         /// <summary>
         /// The current 
         /// </summary>
@@ -68,6 +58,7 @@ namespace DyingAndMore.Game.Entities
             {
                 _currentBehavior = value;
                 CurrentTask = 0;
+                CurrentTaskState = 0;
                 CurrentTaskStartTime = Actor?.Map?.ElapsedTime ?? TimeSpan.Zero;
             }
         }
@@ -78,6 +69,13 @@ namespace DyingAndMore.Game.Entities
         public int CurrentTask { get; set; }
 
         public TimeSpan CurrentTaskStartTime { get; private set; }
+
+        /// <summary>
+        /// A simple state marker that can be used by tasks to mark internal state
+        /// Reset to 0 when tasks change/fail
+        /// </summary>
+        /// <remarks>Manually editing this value may cause unintended results</remarks>
+        public int CurrentTaskState { get; set; } = 0;
 
         public Senses KnownSenses { get; private set; }
 
@@ -132,7 +130,7 @@ namespace DyingAndMore.Game.Entities
                 if ((behavior.RequisiteSenses & KnownSenses) == behavior.RequisiteSenses &&
                     (behavior.RequisiteNotSenses & KnownSenses) == 0 &&
                     (float)Util.RandomGenerator.NextDouble() < behavior.QueueChance)
-                    CurrentBehavior = behavior;
+                    CurrentBehavior = behavior; //increase next check if one is chosen? && verify not current task
 
                 //programmable delay?
                 nextSenseCheck = Actor.Map.ElapsedTime + TimeSpan.FromMilliseconds(200);
@@ -158,10 +156,12 @@ namespace DyingAndMore.Game.Entities
                             break;
                     }
                     CurrentTaskStartTime = Actor.Map.ElapsedTime;
+                    CurrentTaskState = 0;
                 }
                 else if (result == Tasks.TaskResult.Success)
                 {
                     ++CurrentTask;
+                    CurrentTaskState = 0;
                     CurrentTaskStartTime = Actor.Map.ElapsedTime;
                 }
 

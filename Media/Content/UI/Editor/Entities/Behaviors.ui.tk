@@ -1,0 +1,46 @@
+BehaviorList {
+    Bindings: [
+        Binding {
+            Source: "DefaultBehaviors"; # todo: make this parametric somehow
+            Target: "Items";
+            Direction: BindingDirection.TwoWay;
+        }
+    ];
+
+	ItemUI: List {
+		HorizontalAlignment: Alignment.Stretch;
+		Direction: Direction.Vertical;
+		Children: [
+			Static { Text: "`_Name"; };
+			Static {
+	    		Bindings: [
+	    			Binding {
+	    				Source: "Name";
+	    				Target: "Text";
+	    			};
+    			];
+    		};
+
+    		#senses
+
+    		TaskList { }
+
+    		#on taks failure
+
+    		@"UI/RemoveItem.ui.tk";
+		];
+	};
+
+	AddItemUI: List {
+		HorizontalAlignment: Alignment.Stretch;
+		Style: "Frame";
+
+		#*EventCommands: {
+			SelectionChanged: "AddItem";
+		};*#
+
+		Children: [
+
+		];
+	};
+};

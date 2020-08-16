@@ -248,7 +248,7 @@ namespace DyingAndMore
 #endif
             */
             Static childUI;
-            /*
+            
             childUI = new FileList
             {
                 //Size = new Vector2(400, 600),
@@ -284,7 +284,7 @@ namespace DyingAndMore
                 }
                 return UIEventResult.Handled;
             });
-            */
+
 
             //sp = new Takai.Graphics.Sprite();
             //childUI = Static.GeneratePropSheet(sp);
@@ -295,10 +295,12 @@ namespace DyingAndMore
             //    Size = new Vector2(3000, 2000)
             //};
 
-            var map = Cache.Load<MapInstance>("mapsrc/aitest.map.tk");
-            childUI = new Editor.Editor(map);
-            map.renderSettings.drawEntityForwardVectors = true;
-            map.renderSettings.drawEntityHierarchies = true;
+            //{
+                //var map = Cache.Load<MapInstance>("mapsrc/aitest.map.tk");
+                //childUI = new Editor.Editor(map);
+                //map.renderSettings.drawEntityForwardVectors = true;
+                //map.renderSettings.drawEntityHierarchies = true;
+            //}
 
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)

@@ -42,8 +42,8 @@ EffectsClass {
         };
 
         HealthEffect {
-            MaxDamage:400;
-            Radius: 100;
+            MaxDamage: 1000;
+            Radius: 300;
             CanAffectSource: true;
         }
     ];

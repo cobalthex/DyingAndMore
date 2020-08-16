@@ -2,6 +2,8 @@
 using DyingAndMore.Game.Weapons;
 using DyingAndMore.Game.Entities;
 using Takai.Game;
+using DyingAndMore.Editor;
+using System.Collections.Generic;
 
 namespace DyingAndMore.UI
 {
@@ -114,11 +116,25 @@ namespace DyingAndMore.UI
 
     class BehaviorList : ItemList<Behavior> { }
 
-    class BehaviorSelect : TypeSelect
+    class TaskList : ItemList<Game.Entities.Tasks.ITask>
     {
-        public BehaviorSelect()
+        public TaskList()
         {
-            AddTypeTree<Behavior>();
+            ItemUI = new Static //todo: for testing
+            {
+                Bindings = new List<Takai.Data.Binding>
+                {
+                    new Takai.Data.Binding(":typename", "Text")
+                }
+            };
+        }
+    }
+
+    class TaskSelect : TypeSelect
+    {
+        public TaskSelect()
+        {
+            AddTypeTree<Game.Entities.Tasks.ITask>();
         }
     }
 }

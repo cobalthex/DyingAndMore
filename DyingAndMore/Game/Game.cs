@@ -9,6 +9,7 @@ using Takai.Game;
 using Takai.Input;
 using Takai;
 using System.Collections.Generic;
+using SharpDX.MediaFoundation;
 
 namespace DyingAndMore.Game
 {
@@ -281,7 +282,7 @@ namespace DyingAndMore.Game
             },
             new []
             {
-                new Rectangle( 0,  0, 100, 40),
+                new Rectangle( 0,  0, 100,  00),
                 new Rectangle( 0, 40,  50, 60),
                 new Rectangle(50, 40,  50, 60),
             },

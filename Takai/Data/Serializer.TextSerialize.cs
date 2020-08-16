@@ -278,7 +278,11 @@ namespace Takai.Data
             if (value == null)
                 writer.Write("Null");
             else if (member.IsDefined(typeof(AsReferenceAttribute)) && value is IReferenceable ir)
+            {
+                if (ir.Name == null)
+                    ir.Name = Takai.Util.RandomString(8, 8, "ref_");
                 writer.Write($"*{(Serializer.WriteFullTypeNames ? valueType.FullName : valueType.Name)}.{ir.Name}"); //todo: serialize externals?
+            }
             else
             {
                 //custom-defined serializer

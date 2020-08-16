@@ -3,6 +3,7 @@
 using System.Windows.Forms;
 #endif
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
@@ -171,19 +172,5 @@ namespace Takai.UI
                 BorderColor = InvalidFileOutlineColor;
             }
         }
-
-        protected override Vector2 MeasureOverride(Vector2 availableSize)
-        {
-            var sz = textInput.Measure(availableSize);
-            return sz + new Vector2(sz.Y, 0);
-        }
-
-        //protected override void ArrangeOverride(Vector2 availableSize)
-        //{
-        //    var sz = availableSize.ToPoint();
-        //    //todo: pickerButton bounds?
-        //    textInput.Arrange(new Rectangle(0, 0, sz.X - (int)pickerButton.MeasuredSize.X, sz.Y));
-        //    pickerButton.Arrange(new Rectangle(sz.X - (int)pickerButton.MeasuredSize.X, 0, (int)pickerButton.MeasuredSize.X, sz.Y));
-        //}
     }
 }

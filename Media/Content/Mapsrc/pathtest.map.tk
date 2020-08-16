@@ -1,0 +1,110 @@
+MapInstance {
+    Squads: Null;
+    Class: MapClass {
+        Name: "path test";
+        Tileset: @"B:/Code/DyingAndMore/Media/Content/Tilesets/Gray.tiles.tk";
+        MaterialInteractions: MaterialInteractions {
+            File: Null;
+            Interactions: [];
+        };
+        Width: 24;
+        Height: 12;
+        Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    };
+    Sounds: [];
+    ElapsedTime: 60769.9916;
+    TimeScale: 1;
+    currentScreenFade: ScreenFade {
+        Duration: 0;
+        Colors: Null;
+        Blend: Null;
+    };
+    currentScreenFadeElapsedTime: 60769.9916;
+    Entities: [
+        ActorInstance {
+            Class: @"Actors/Player.ent.tk";
+            Factions: Factions [Player Ally];
+            Controller: InputController {
+                Inputs: Null;
+            };
+            CurrentHealth: 5000;
+            Conditions: {
+            };
+            MaxSpeed: 400;
+            Weapon: Null;
+            Id: 1;
+            Name: Null;
+            OutlineColor: [255 215 0 255];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 31260;
+            EventHandlers: Null;
+            Position: [145 288];
+            Forward: [0.9988681 0.04756514];
+            Velocity: [0 0];
+        }
+        ActorInstance {
+            Class: @"Actors/Orbiter.ent.tk";
+            CurrentHealth: 100;
+            Factions: Factions.None;
+            Controller: AIController {
+                DefaultBehaviors: [
+                    Behavior {
+                        Name: "Follow path";
+                        Tasks: [
+                            FollowPath {
+                                path: VectorCurve {
+                                    Values: [
+                                        [0 [900 100]];
+                                        [1 [700 200]];
+                                        [1 [500 100]];
+                                        [1 [300 200]];
+                                        [1 [100 100]];
+                                    ]
+                                }
+                            }
+                        ];
+                    }
+                ];
+            }
+            Conditions: {
+            };
+            MaxSpeed: 300;
+            Weapon: Null;
+            Id: 2;
+            Name: Null;
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: {
+                Class: {
+                    LifeSpan: 0.5sec;
+                    CaptureDelay: 30Hz;
+                    Color: {
+                        Values: [
+                            [0 [64 127 0 0]];
+                            [1 [64 127 192 255]];
+                        ]
+                    }
+
+                    width: {
+                        values: [
+                            [0 32]
+                            [0.9 8]
+                            [1 0]
+                        ]
+                    }
+                }
+            };
+            SpawnTime: 42391.2279;
+            EventHandlers: Null;
+            Position: [961.0002 285.0005];
+            Forward: [-0.9980526 0.06237818];
+            Velocity: [0 0];
+        }
+    ];
+    EntityAttachments: [];
+    Triggers: [];
+    Fluids: [];
+}

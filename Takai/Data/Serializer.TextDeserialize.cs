@@ -315,7 +315,7 @@ namespace Takai.Data
                 {
                     sb.Append((char)context.reader.Read());
                     sb.Append(ReadWord(context.reader));
-                } while (context.reader.Peek() == '.');
+                } while (context.reader.Peek() == '.' || context.reader.Peek() == '_');
 
                 var refname = sb.ToString();
 

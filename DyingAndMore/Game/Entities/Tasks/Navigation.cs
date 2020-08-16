@@ -1,12 +1,10 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Takai;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
-
-
     /// <summary>
     /// Move in a straight line (or there abouts) towards the target
     /// </summary>
@@ -162,6 +160,8 @@ namespace DyingAndMore.Game.Entities.Tasks
 
             //todo: sight range
 
+            //todo: A*?
+
             var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
             var target = ai.Actor.Map.PathInfoAt(ai.Target.WorldPosition).heuristic;
             if (Math.Abs(cur - target) <= 1)
@@ -171,6 +171,153 @@ namespace DyingAndMore.Game.Entities.Tasks
             return TaskResult.Continue;
         }
     }
+
+    /// <summary>
+    /// Orbit around the target at a specified radius (from the center point).
+    /// Automatically moves to face the target 
+    /// Optionally face the target as orbiting
+    /// </summary>
+    public struct OrbitTarget : ITask
+    {
+        public float radius;
+        public bool faceTarget; //as opposed to facing in the direction of travel
+
+        //success condition? (time?)
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null)
+                return TaskResult.Failure; //no ghosts allowed
+
+            var origin = ai.Target.WorldPosition;
+
+            var diff = origin - ai.Actor.WorldPosition;
+            var diffLen = diff.Length();
+
+            Vector2 accelAngle;
+
+            //ai.Actor.Map.DrawCircle(ai.Target.WorldPosition, radius, Color.CornflowerBlue, 2, 4);
+
+            //var diffSpacing = difflen - ai.actor.radius - ai.target.radius :: use below and in a
+            if (diffLen > radius)
+            {
+                var angleToTangent = (float)Math.Asin(radius / diffLen); //angle between position relative to circle and intersecting tangent
+                // θ = asin (opp / hyp)
+                //if at edge of circle, opp (radius) = hyp (diffLen) so actor should travel along tangent, (triangle has zero area)
+                //if farther away, hyp > opp so angle grows meaning the actor must turn farther in to approach the tangent
+                //if closer than radius, asin returns imaginary result (NaN in C#)
+                //at opp = hyp, will be fwd - 90deg
+
+                var relAngle = Util.Angle(diff); //angle between actor and target (to orient angleToTangent)
+
+                //if fwd is pointing left of diff, move leftwards (clockwise), otherwise ccw
+                //det > 0 == cw
+                var det = Util.Determinant(ai.Actor.WorldForward, diff);
+
+                var desiredAngle = relAngle - (angleToTangent * Math.Sign(det));
+                var desiredDir = new Vector2((float)Math.Cos(desiredAngle), (float)Math.Sin(desiredAngle));
+
+                if (faceTarget)
+                {
+                    ai.Actor.TurnTowards(diff, deltaTime);
+                    accelAngle = Vector2.Lerp(ai.Actor.Forward.Ortho(), desiredDir, 0.2f);
+                }
+                else
+                {
+                    //todo: might be able to exploit (radius / diffLen) to skip angle calculations
+
+                    var sign = Util.Determinant(ai.Actor.WorldForward, desiredDir);
+
+                    //crude
+                    float angle = ActorInstance.TurnSpeed * sign * (float)deltaTime.TotalSeconds;
+                    accelAngle = ai.Actor.Forward = Vector2.TransformNormal(ai.Actor.Forward, Matrix.CreateRotationZ(angle));
+                }
+            }
+            else
+            {
+                if (faceTarget && ai.Actor.Velocity != Vector2.Zero)
+                    accelAngle = Vector2.Normalize(ai.Actor.Velocity);
+                else
+                    accelAngle = ai.Actor.Forward;
+            }
+
+            ai.Actor.Accelerate(accelAngle);
+
+            return TaskResult.Continue;
+        }
+    }
+
+    public struct FollowPath : ITask
+    {
+        public Takai.Game.VectorCurve path;
+
+        int currentPathIndex;
+        List<Point> aStarPath;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (path == null || path.Values.Count < 1)
+                return TaskResult.Failure;
+
+            switch (ai.CurrentTaskState)
+            {
+                case 0:
+                    {
+                        aStarPath = ai.Actor.Map.AStarBuildPath(ai.Actor.WorldPosition, path.Evaluate(0));
+                        ++ai.CurrentTaskState;
+                        currentPathIndex = 0;
+                        goto case 1;
+                    }
+                case 1:
+                    {
+                        if (currentPathIndex >= aStarPath.Count)
+                        {
+                            ++ai.CurrentTaskState;
+                            currentPathIndex = 0;
+                            goto case 2;
+                        }
+
+                        var ap = (ai.Actor.WorldPosition / ai.Actor.Map.Class.TileSize).ToPoint();
+                        if (ap == aStarPath[currentPathIndex])
+                            ++currentPathIndex;
+                        else
+                        {
+                            var ts = ai.Actor.Map.Class.TileSize;
+                            var target = aStarPath[currentPathIndex].ToVector2() * ts + new Vector2(ts / 2);
+                            var diff = Vector2.Normalize(target - ai.Actor.WorldPosition);
+
+                            ai.Actor.Map.DrawX(target, 10, Color.Gold);
+
+                            ai.Actor.TurnTowards(diff, deltaTime);
+                            ai.Actor.Accelerate(ai.Actor.Forward * Math.Max(0, Vector2.Dot(ai.Actor.Forward, diff)));
+                        }
+                    }
+                    break;
+                case 2:
+                    {
+                        if (currentPathIndex >= path.Count)
+                            return TaskResult.Success;
+
+                        var target = path.Values[currentPathIndex].value; //todo: actually follow path
+                        var diff = target - ai.Actor.WorldPosition;
+                        if (diff.LengthSquared() <= ai.Actor.RadiusSq * 2)
+                            ++currentPathIndex;
+
+                        //check direction and approximate location
+
+                        ai.Actor.Map.DrawX(target, 10, Color.Gold);
+
+                        diff.Normalize();
+                        ai.Actor.TurnTowards(diff, deltaTime);
+                        ai.Actor.Accelerate(ai.Actor.Forward * Math.Max(0, Vector2.Dot(ai.Actor.WorldForward, diff)));
+                    }
+                    break;
+            }
+
+            return TaskResult.Continue;
+        }
+    }
+
 
     //navigate behind entity (for assassination)
     //navigate to entity (powerup/weapon/etc)
