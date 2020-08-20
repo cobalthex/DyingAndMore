@@ -21,12 +21,14 @@ Output vmain(float4 position : POSITION, float4 color : COLOR0, float2 texcoord 
 
 Texture2D TilesImage : register(t0);
 Texture2D<uint> TilesLayout : register(t1);
+Texture2D TileSDF : register(t2);
 
 SamplerState Sampler;
 
-int TilesPerRow;
-float2 TileSize;
-float2 MapSize;
+int TilesPerRow; //in tiles
+float2 TileSize; //in pixels
+float2 MapSize; //in tiles
+float2 SDFScale; //fraction
 
 SamplerState LayoutSampler
 {
@@ -53,7 +55,14 @@ float4 pmain(float4 position : SV_Position, float4 color : COLOR0, float2 rpos :
     float2 local = (rpos % (1 / MapSize)) * MapSize;
 
     float4 ti = TilesImage.Sample(Sampler, (cell + local) / tdiv);
-	return color * ti;
+    
+    //draw border around map
+    //float sdf = TileSDF.Sample(LayoutSampler, rpos * SDFScale).a;
+    //float cutoff = 1 / 255.0;
+    //if (sdf < cutoff)
+    //float alpha = smoothstep(sdf - cutoff, sdf + cutoff, sdf * 2);
+    
+    return color * ti;
 }
 
 technique Technique1

@@ -19,7 +19,7 @@ namespace Takai.Game
                 tilesEffect.Parameters["MapSize"].SetValue(new Vector2(Width, Height));
             }
 
-            GenerateCollisionMask();
+            GenerateCollisionMaskCPU();
         }
 
         /// <summary>

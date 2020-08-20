@@ -49,7 +49,6 @@ namespace Takai.Game
         internal XnaEffect outlineEffect;
         internal XnaEffect fluidEffect;
         internal XnaEffect reflectionEffect; //writes color and reflection information to two render targets
-
         internal XnaEffect colorEffect;
         internal XnaEffect tilesEffect;
         internal XnaEffect circleEffect;
@@ -127,7 +126,7 @@ namespace Takai.Game
         public void InitializeGraphics()
         {
             if (Tileset.texture != null && CollisionMask == null)
-                GenerateCollisionMask();
+                GenerateCollisionMaskCPU();
 
             if (Runtime.GraphicsDevice == null)
                 return;
@@ -617,6 +616,9 @@ namespace Takai.Game
             float width = Class.TileSize * Class.Width;
             float height = Class.TileSize * Class.Height;
 
+            var sdfScale = new Vector2((float)Class.CollisionMaskSize.X / Class.collisionMaskSDF.Width,
+                                       (float)Class.CollisionMaskSize.Y / Class.collisionMaskSDF.Height);
+
             var verts = new[]
             { // possibly clip  to size and transform uv coords
                  new VertexPositionColorTexture(new Vector3(0, 0, 0), renderColor, new Vector2(0, 0)),
@@ -629,6 +631,8 @@ namespace Takai.Game
             Runtime.GraphicsDevice.DepthStencilState = Class.stencilWrite;
             Runtime.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             Runtime.GraphicsDevice.ScissorRectangle = c.camera.Viewport;
+            //Class.tilesEffect.Parameters["TileSDF"].SetValue(Class.collisionMaskSDF);
+            //Class.tilesEffect.Parameters["SDFScale"].SetValue(sdfScale);
             Class.tilesEffect.Parameters["Transform"].SetValue(c.viewTransform);
             foreach (EffectPass pass in Class.tilesEffect.CurrentTechnique.Passes)
             {
@@ -638,12 +642,10 @@ namespace Takai.Game
 
             if (renderSettings.drawTileCollisionMask && Class.CollisionMask != null)
             {
-                var frx = (float)Class.CollisionMaskSize.X / Class.collisionMaskSDF.Width;
-                var fry = (float)Class.CollisionMaskSize.Y / Class.collisionMaskSDF.Height;
                 verts[0].TextureCoordinate = new Vector2(0, 0);
-                verts[1].TextureCoordinate = new Vector2(frx, 0);
-                verts[2].TextureCoordinate = new Vector2(0, fry);
-                verts[3].TextureCoordinate = new Vector2(frx, fry);
+                verts[1].TextureCoordinate = new Vector2(sdfScale.X, 0);
+                verts[2].TextureCoordinate = new Vector2(0, sdfScale.Y);
+                verts[3].TextureCoordinate = sdfScale;
                 Class.basicEffect.Parameters["Tex"].SetValue(Class.collisionMaskSDF);
                 Class.basicEffect.Parameters["Transform"].SetValue(c.viewTransform);
 

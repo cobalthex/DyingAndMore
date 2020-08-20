@@ -24,7 +24,7 @@ namespace DyingAndMore.Editor
         {
             if (tilesChanged) //if can, PatchTileLayoutTexture should handle this
             {
-                editor.Map.Class.GenerateCollisionMask();
+                editor.Map.Class.GenerateCollisionMaskCPU();
                 tilesChanged = false;
             }
             base.End();

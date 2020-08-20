@@ -78,10 +78,7 @@ List {
 						}
 
 						Static { Text: "`_Default Behaviors"; };
-						#@"./Behaviors.ui.tk";
-						AutoUI {
-							BindSource: "DefaultBehaviors";
-						}
+						@"./Behaviors.ui.tk";
 				    ];
 			    };
 			};

@@ -29,8 +29,8 @@ namespace Takai.Game
         /// Calculates 
         /// </summary>
         /// <param name="scale">Fractional scale of the map to generate (in format of Size >> scale)</param>
-        /// <remarks> Based on https://github.com/arkanis/single-header-file-c-libs/blob/master/sdt_dead_reckoning.h </remarks>
-        public void GenerateCollisionMask(int scale = CollisionMaskScale)
+        /// <remarks>Uses dead-reckoning algorithm</remarks>
+        public void GenerateCollisionMaskCPU(int scale = CollisionMaskScale)
         {
             var timer = new System.Diagnostics.Stopwatch();
             timer.Start();
@@ -173,11 +173,11 @@ namespace Takai.Game
             }
             collisionMaskSDF.SetData(0, new Rectangle(0, 0, w, h), CollisionMask, 0, CollisionMask.Length);
 
-#if DEBUG
-            //save as TGA image for testing
-            using (var fs = new System.IO.FileStream("collision.tga", System.IO.FileMode.Create))
-                SDF.SaveToTGA(CollisionMask, (short)w, (short)h, fs);
-#endif
+//#if DEBUG
+//            //save as TGA image for testing
+//            using (var fs = new System.IO.FileStream("collision.tga", System.IO.FileMode.Create))
+//                SDF.SaveToTGA(CollisionMask, (short)w, (short)h, fs);
+//#endif
         }
 
         public virtual Dictionary<string, object> DerivedSerialize()
@@ -211,7 +211,7 @@ namespace Takai.Game
             Tiles = new short[height, width];
             Buffer.BlockCopy(tiles.ToArray(), 0, Tiles, 0, width * height * sizeof(short));
             SectorPixelSize = SectorSize * TileSize;
-            GenerateCollisionMask(); //todo: necessary here?
+            GenerateCollisionMaskCPU(); //todo: necessary here?
             //todo: this is being called several times
         }
     }

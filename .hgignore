@@ -1,5 +1,6 @@
 syntax: glob
 
+desktop.ini
 *.orig
 *.suo
 *.user

@@ -401,10 +401,10 @@ namespace DyingAndMore.Game.Entities
             dist += Map.Class.DistanceToEdge(WorldPosition + Forward.Ortho() * Radius);
             dist += Map.Class.DistanceToEdge(WorldPosition - Forward.Ortho() * Radius);
 
-            Map.DrawLine(WorldPosition, WorldPosition + Forward * Radius, Color.Magenta);
-            Map.DrawLine(WorldPosition, WorldPosition - Forward * Radius, Color.Cyan);
-            Map.DrawLine(WorldPosition, WorldPosition + Forward.Ortho() * Radius, Color.White);
-            Map.DrawLine(WorldPosition, WorldPosition - Forward.Ortho() * Radius, Color.Yellow);
+            //Map.DrawLine(WorldPosition, WorldPosition + Forward * Radius, Color.Magenta);
+            //Map.DrawLine(WorldPosition, WorldPosition - Forward * Radius, Color.Cyan);
+            //Map.DrawLine(WorldPosition, WorldPosition + Forward.Ortho() * Radius, Color.White);
+            //Map.DrawLine(WorldPosition, WorldPosition - Forward.Ortho() * Radius, Color.Yellow);
             if (dist < bias)
                 Map.DrawCircle(WorldPosition, Radius, Color.Orange, 3, 4);
 

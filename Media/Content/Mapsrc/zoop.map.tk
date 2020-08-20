@@ -1,0 +1,132 @@
+MapInstance {
+    Squads: Null;
+    Class: MapClass {
+        Name: "path test";
+        Tileset: @"B:/Code/DyingAndMore/Media/Content/Tilesets/Gray.tiles.tk";
+        MaterialInteractions: MaterialInteractions {
+            File: Null;
+            Interactions: [];
+        };
+        Width: 24;
+        Height: 12;
+        Tiles: [0 0 0 0 0 0 0 13 -1 -1 -1 -1 -1 -1 -1 -1 -1 28 104 0 0 0 0 0 0 0 0 0 0 0 0 0 13 -1 -1 -1 -1 -1 -1 -1 -1 71 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 -1 -1 80 104 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 26 27 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 0 0 0 0 -1 -1 -1 -1 -1];
+    };
+    Sounds: [];
+    ElapsedTime: 174896.1624;
+    TimeScale: 1;
+    currentScreenFade: ScreenFade {
+        Duration: 0;
+        Colors: Null;
+        Blend: Null;
+    };
+    currentScreenFadeElapsedTime: 174896.1624;
+    Entities: [
+        ActorInstance {
+            Class: @"Actors/Player.ent.tk";
+            Factions: Factions [Player Ally];
+            Controller: InputController {
+                Inputs: Null;
+            };
+            CurrentHealth: 5000;
+            Conditions: {
+            };
+            MaxSpeed: 400;
+            Weapon: Null;
+            Id: 1;
+            Name: Null;
+            OutlineColor: [255 215 0 255];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: Null;
+            SpawnTime: 60770;
+            EventHandlers: Null;
+            Position: [145 288];
+            Forward: [0.9988681 0.04756514];
+            Velocity: [0 0];
+        }
+        ActorInstance {
+            Class: @"Actors/Orbiter.ent.tk";
+            CurrentHealth: 100;
+            Factions: Factions.None;
+            Controller: AIController {
+                SightRange: 400;
+                Target: Null;
+                DefaultBehaviors: [
+                    Behavior {
+                        Name: "Follow path";
+                        File: Null;
+                        RequisiteSenses: Senses.None;
+                        RequisiteNotSenses: Senses.None;
+                        QueueChance: 0.5;
+                        Tasks: [
+                            FollowPath {
+                                path: VectorCurve {
+                                    Values: [
+                                        [0 [900 100]]
+                                        [1 [700 200]]
+                                        [1 [500 100]]
+                                        [1 [300 200]]
+                                        [1 [100 100]]
+                                    ];
+                                };
+                            }
+                        ];
+                        OnTaskFailure: TaskFailureAction.RestartBehavior;
+                    }
+                ];
+                PreemptiveBehaviors: Null;
+                CurrentBehavior: Null;
+                CurrentTask: 0;
+                CurrentTaskState: 0;
+            };
+            Conditions: {
+            };
+            MaxSpeed: 300;
+            Weapon: Null;
+            Id: 2;
+            Name: Null;
+            OutlineColor: [0 0 0 0];
+            TintColor: [255 255 255 255];
+            TintColorDuration: 0;
+            Trail: TrailInstance {
+                Class: TrailClass {
+                    File: Null;
+                    Name: Null;
+                    MaxPoints: 0;
+                    Sprite: Null;
+                    SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
+                    SpriteScale: 1;
+                    Color: ColorCurve {
+                        Mode: ChromaMode.HSL;
+                        Reverse: False;
+                        Values: [
+                            [0 [63 127 0 0]]
+                            [1 [64 127 192 255]]
+                        ];
+                    };
+                    Width: ScalarCurve {
+                        IsLinear: False;
+                        Values: [
+                            [0 32]
+                            [0.9 8]
+                            [1 0]
+                        ];
+                    };
+                    Jitter: [0 0];
+                    SkipChance: 0;
+                    LifeSpan: 500;
+                    CaptureDelay: 33;
+                    MergeCollinear: False;
+                };
+            };
+            SpawnTime: 60770;
+            EventHandlers: Null;
+            Position: [961.0002 285.0005];
+            Forward: [-0.9980526 0.06237818];
+            Velocity: [0 0];
+        }
+    ];
+    EntityAttachments: [];
+    Triggers: [];
+    Fluids: [];
+}
