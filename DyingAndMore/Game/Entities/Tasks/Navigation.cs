@@ -215,7 +215,7 @@ namespace DyingAndMore.Game.Entities.Tasks
                 var det = Util.Determinant(ai.Actor.WorldForward, diff);
 
                 var desiredAngle = relAngle - (angleToTangent * Math.Sign(det));
-                var desiredDir = new Vector2((float)Math.Cos(desiredAngle), (float)Math.Sin(desiredAngle));
+                var desiredDir = Util.Direction(desiredAngle);
 
                 if (faceTarget)
                 {
