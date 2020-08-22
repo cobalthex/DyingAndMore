@@ -965,29 +965,40 @@ namespace Takai.Data
                     return implCast.Invoke(null, new[] { source });
             }
 
-            bool canConvert = false;
-
-            bool isSourceInt = IsInt(sourceType);
-            bool isSourceFloat = IsFloat(sourceType);
-
-            bool isDestInt = IsInt(sourceType);
-            bool isDestFloat = IsFloat(sourceType);
-
-            canConvert |= (isDestInt && isSourceInt);
-            canConvert |= (isDestFloat || isDestInt) && (isSourceFloat || isSourceInt);
-
-            if (canConvert)
             {
-                if (destTypeInfo.IsEnum)
-                    return Enum.ToObject(destType, source);
-
-                return Convert.ChangeType(source, destType);
+                if (TryNumericCast(source, out var destNumber, sourceTypeInfo, destTypeInfo))
+                    return destNumber;
             }
 
             if (destType == typeof(string))
                 return source.ToString();
 
             throw new InvalidCastException($"Error converting '{source}' from type:{sourceType.Name} to type:{destType.Name}");
+        }
+
+        public static bool TryNumericCast(object source, out object dest, TypeInfo sourceType, TypeInfo destType)
+        {
+            bool canConvert = false;
+
+            bool isSourceInt = IsInt(sourceType);
+            bool isSourceFloat = IsFloat(sourceType);
+
+            bool isDestInt = IsInt(destType);
+            bool isDestFloat = IsFloat(destType);
+
+            canConvert |= (isDestInt && isSourceInt);
+            canConvert |= (isDestFloat || isDestInt) && (isSourceFloat || isSourceInt);
+
+            if (canConvert)
+            {
+                if (destType.IsEnum)
+                    dest = Enum.ToObject(destType, source);
+
+                dest = Convert.ChangeType(source, destType);
+                return true;
+            }
+            dest = null;
+            return false;
         }
 
         public static char FromLiteral(char escape)

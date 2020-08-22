@@ -109,6 +109,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\Binding.cs" />
     <Compile Include="UI\Animation.cs" />
+    <Compile Include="UI\Catalog.cs" />
     <Compile Include="UI\CheckBox.cs" />
     <Compile Include="UI\Drawer.cs" />
     <Compile Include="UI\DropdownSelect.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="UI\Graphic.cs" />
     <Compile Include="UI\ItemList.cs" />
     <Compile Include="UI\ObjectSelect.cs" />
+    <Compile Include="UI\DirectionInput.cs" />
     <Compile Include="UI\ProgressBar.cs" />
     <Compile Include="UI\Switch.cs" />
     <Compile Include="UI\Table.cs" />
@@ -140,7 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <Compile Include="UI\TimeInput.cs" />
+    <Compile Include="UI\DurationInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Concentus.OggFile">

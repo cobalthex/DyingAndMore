@@ -10,12 +10,12 @@ List {
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
     IsModal: true;
+    margin: 10;
     Children: [
         Static {
             Text: "Create a New Map";
             Font: @"Fonts/UILarge.bfnt";
             Color: Color.White;
-            HorizontalAlignment: Alignment.Middle;
         }
 
         Static {
@@ -72,7 +72,7 @@ List {
         List {
             Direction: Direction.Horizontal;
             Margin: 10;
-            HorizontalAlignment: Alignment.Stretch;
+            HorizontalAlignment: Alignment.Center;
             Children: [
                 Static {
                     Style: "Button";

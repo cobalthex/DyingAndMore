@@ -35,6 +35,7 @@ namespace Takai.UI
         {
             ItemUI = new Static
             {
+                HorizontalAlignment = Alignment.Stretch,
                 Bindings = new List<Data.Binding>
                 {
                     new Data.Binding("Name", "Text", Data.BindingDirection.OneWay, "(None)")
@@ -69,6 +70,27 @@ namespace Takai.UI
             {
                 var rti = rtype.Value.GetTypeInfo();
                 if (!rti.IsAbstract && typeInfo.IsAssignableFrom(rtype.Value))
+                    Items.Add(rtype.Value);
+            }
+        }
+
+
+        public void AddTypeTreeByAttribute<T>() where T : Attribute
+        {
+            AddTypeTreeByAttribute(typeof(T));
+        }
+
+        /// <summary>
+        /// Add a type and all of its subclasses to the list
+        /// Ignores any abstract classes
+        /// </summary>
+        /// <param name="type">The type to add. Can be abstract</param>
+        public void AddTypeTreeByAttribute(Type attributeType)
+        {
+            foreach (var rtype in Data.Serializer.RegisteredTypes)
+            {
+                var rti = rtype.Value.GetTypeInfo();
+                if (!rti.IsAbstract && rtype.Value.IsDefined(attributeType, true))
                     Items.Add(rtype.Value);
             }
         }

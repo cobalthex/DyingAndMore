@@ -48,6 +48,8 @@ UI:
     ☐ tab focus should not be able to escape modal
     ☐ when adding a modal to UI, should switch focus
     ☐ cache previous focus in modal?
+    ☐ clipping in dropdown containers is not working at top (try dropdown with rows of colored boxes)
+    ☐ Angle snapping for direction input
 
   ✔  Think only when alive? @done (20-04-10 22:48)
 

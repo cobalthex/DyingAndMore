@@ -47,9 +47,9 @@ namespace DyingAndMore.Editor
             {
                 Sprite = new Takai.Graphics.Sprite()
                 {
+                    Texture = editor.Map.Class.Tileset.texture,
                     Width = editor.Map.Class.TileSize,
                     Height = editor.Map.Class.TileSize,
-                    Texture = editor.Map.Class.Tileset.texture
                 },
                 Position = new Vector2(20),
                 Size = new Vector2(64),
@@ -76,13 +76,14 @@ namespace DyingAndMore.Editor
 
             selectorDrawer = new Drawer
             {
-                Size = new Vector2(400, float.NaN),
+                Size = new Vector2(6, float.NaN) * (this.selector.ItemSize + this.selector.ItemMargin) 
+                     + this.selector.ItemMargin + new Vector2(8), //measure selector given this width and see if requires scrolling?
                 BackgroundColor = new Color(48, 48, 48, 192),
                 HorizontalAlignment = Alignment.Right,
                 VerticalAlignment = Alignment.Stretch,
                 IsEnabled = false
             };
-            selectorDrawer.AddChild(new ScrollBox(this.selector)
+            selectorDrawer.AddChild(new ScrollBox(this.selector) //do first and measure?
             {
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
@@ -198,7 +199,6 @@ namespace DyingAndMore.Editor
 
             AddChild(playButton = new Static
             {
-                Name = "Play button",
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.Middle,
                 Font = smallFont,
@@ -229,6 +229,9 @@ namespace DyingAndMore.Editor
             //todo: map zoom/something fucked if window not focused when loading
 
             On(ClickEvent, OnClick);
+            On(DragEvent, OnDrag);
+
+            Takai.Data.Binding.Globals["Editor.Paths"] = Paths;
         }
 
         void AddModes()
@@ -255,9 +258,21 @@ namespace DyingAndMore.Editor
 
         protected UIEventResult OnClick(Static sender, UIEventArgs e)
         {
-            if (e.Source.Name == "Play button")
+            if (e.Source == playButton)
             {
                 ((Editor)sender).SwitchToGame();
+                return UIEventResult.Handled;
+            }
+
+            return UIEventResult.Continue;
+        }
+
+        protected UIEventResult OnDrag(Static sender, UIEventArgs e)
+        {
+            var dea = (DragEventArgs)e;
+            if (dea.device == DeviceType.Mouse && dea.button == (int)MouseButtons.Middle)
+            {
+                Camera.MoveTo(Camera.Position - Camera.LocalToWorld(dea.delta));
                 return UIEventResult.Handled;
             }
 
@@ -320,29 +335,24 @@ namespace DyingAndMore.Editor
         {
             var worldMousePos = Camera.ScreenToWorld(InputState.MouseVector);
 
-            if (InputState.IsButtonDown(MouseButtons.Middle))
-                Camera.MoveTo(Camera.Position - Camera.LocalToWorld(InputState.MouseDelta()));
-            else
-            {
-                var d = Vector2.Zero;
-                if (InputState.IsButtonDown(Keys.A) || InputState.IsButtonDown(Keys.Left))
-                    d -= Vector2.UnitX;
-                if (InputState.IsButtonDown(Keys.W) || InputState.IsButtonDown(Keys.Up))
-                    d -= Vector2.UnitY;
-                if (InputState.IsButtonDown(Keys.D) || InputState.IsButtonDown(Keys.Right))
-                    d += Vector2.UnitX;
-                if (InputState.IsButtonDown(Keys.S) || InputState.IsButtonDown(Keys.Down))
-                    d += Vector2.UnitY;
+            var d = Vector2.Zero;
+            if (InputState.IsButtonDown(Keys.A) || InputState.IsButtonDown(Keys.Left))
+                d -= Vector2.UnitX;
+            if (InputState.IsButtonDown(Keys.W) || InputState.IsButtonDown(Keys.Up))
+                d -= Vector2.UnitY;
+            if (InputState.IsButtonDown(Keys.D) || InputState.IsButtonDown(Keys.Right))
+                d += Vector2.UnitX;
+            if (InputState.IsButtonDown(Keys.S) || InputState.IsButtonDown(Keys.Down))
+                d += Vector2.UnitY;
 
-                if (d != Vector2.Zero)
-                {
-                    d.Normalize();
-                    d = d * Camera.MoveSpeed * (float)time.ElapsedGameTime.TotalSeconds; //(camera velocity)
-                    Camera.Position += Camera.LocalToWorld(d);
-                }
+            if (d != Vector2.Zero)
+            {
+                d.Normalize();
+                d = d * Camera.MoveSpeed * (float)time.ElapsedGameTime.TotalSeconds; //(camera velocity)
+                Camera.Position += Camera.LocalToWorld(d);
             }
 
-            if (InputState.HasScrolled())
+            if (InputState.HasScrolled()) //special event?
             {
                 var delta = (Camera.Scale * InputState.ScrollDelta()) / 1024f;
                 if (InputState.IsButtonDown(Keys.LeftShift))

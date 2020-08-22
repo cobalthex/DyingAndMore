@@ -1,4 +1,11 @@
 BehaviorList {
+	HorizontalAlignment: Alignment.Stretch;
+	Container: List {
+		HorizontalAlignment: Alignment.Stretch;
+		Direction: Direction.Vertical;
+		Margin: 10;
+	}
+
     Bindings: [
         Binding {
             Source: "DefaultBehaviors"; # todo: make this parametric somehow
@@ -8,39 +15,151 @@ BehaviorList {
     ];
 
 	ItemUI: List {
+		Style: "Box";
 		HorizontalAlignment: Alignment.Stretch;
 		Direction: Direction.Vertical;
 		Children: [
 			Static { Text: "`_Name"; };
-			Static {
+			TextInput {
+				HorizontalAlignment: Alignment.Stretch;
 	    		Bindings: [
 	    			Binding {
 	    				Source: "Name";
 	    				Target: "Text";
+	    				Direction: BindingDirection.TwoWay;
 	    			};
     			];
     		};
+			@"UI/RemoveItem.ui.tk";
 
     		#senses
+    		Static { Text: "`_Tasks"; };
+    		TaskList {
+				HorizontalAlignment: Alignment.Stretch;
+    			Bindings: [
+    				Binding {
+    					Source: "Tasks";
+    					Target: "Items";
+	    				Direction: BindingDirection.TwoWay;
+    				}
+				];
 
-    		TaskList { }
+				ItemUI: List {
+					Style: "Box";
+					HorizontalAlignment: Alignment.Stretch;
+					Children: [
+						Static {
+							Bindings: [
+								Binding {
+									Source: ":typename";
+									Target: "Text";
+									Converter: StringFormatConverter { Format: "`_{0}"; }
+								};
+							];
+						};
+
+						@"./Tasks.ui.tk";
+						@"UI/RemoveItem.ui.tk";
+					];
+				};
+
+				AddItemUI: List {
+					Style: "Box";
+					Margin: 10;
+					HorizontalAlignment: Alignment.Stretch;
+					Children: [
+    					Static { Text: "`_New Task"; };
+    					TabPanel {
+    						HorizontalAlignment: Alignment.Stretch;
+    						Children: [
+    							TargetingTaskSelect {
+    								Name: "Targeting";
+									HorizontalAlignment: Alignment.Stretch;
+									Bindings: [
+										Binding {
+											Direction: BindingDirection.TwoWay;
+											Source: "item";
+											Target: "Instance";
+										};
+									];
+    							};
+
+								NavigationTaskSelect {
+									Name: "Navigation";
+									HorizontalAlignment: Alignment.Stretch;
+									Bindings: [
+										Binding {
+											Direction: BindingDirection.TwoWay;
+											Source: "item";
+											Target: "Instance";
+										};
+									];
+								};
+
+								OffensiveTaskSelect {
+									Name: "Offensive";
+									HorizontalAlignment: Alignment.Stretch;
+									Bindings: [
+										Binding {
+											Direction: BindingDirection.TwoWay;
+											Source: "item";
+											Target: "Instance";
+										};
+									];
+								};
+
+								DefensiveTaskSelect {
+									Name: "Defensive";
+									HorizontalAlignment: Alignment.Stretch;
+									Bindings: [
+										Binding {
+											Direction: BindingDirection.TwoWay;
+											Source: "item";
+											Target: "Instance";
+										};
+									];
+								};
+
+								MiscellaneousTaskSelect {
+									Name: "Miscellaneous";
+									HorizontalAlignment: Alignment.Stretch;
+									Bindings: [
+										Binding {
+											Direction: BindingDirection.TwoWay;
+											Source: "item";
+											Target: "Instance";
+										};
+									];
+								};
+    						];
+    					}
+
+						Static {
+							HorizontalAlignment: Alignment.Center;
+							Style: "Button";
+							Text: "Add Task";
+
+							EventCommands: {
+								Click: "AddItem";
+							};
+						};
+					];
+				}
+    		}
 
     		#on taks failure
 
-    		@"UI/RemoveItem.ui.tk";
 		];
 	};
 
-	AddItemUI: List {
-		HorizontalAlignment: Alignment.Stretch;
-		Style: "Frame";
+	AddItemTemplate: { };
+	AddItemUI: Static {
+		HorizontalAlignment: Alignment.Center;
+		Style: "Button";
+		Text: "New Behavior";
 
-		#*EventCommands: {
-			SelectionChanged: "AddItem";
-		};*#
-
-		Children: [
-
-		];
+		EventCommands: {
+			Click: "AddItem";
+		};
 	};
 };

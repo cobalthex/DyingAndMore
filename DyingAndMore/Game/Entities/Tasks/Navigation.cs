@@ -5,9 +5,12 @@ using Takai;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
+    public class NavigationTaskAttribute : Attribute { }
+
     /// <summary>
     /// Move in a straight line (or there abouts) towards the target
     /// </summary>
+    [NavigationTask]
     public struct MoveToTarget : ITask
     {
         /// <summary>
@@ -54,6 +57,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     /// <summary>
     /// Navigate towards a particular value in the flow field gradient
     /// </summary>
+    [NavigationTask]
     public struct NavigateGradient : ITask
     {
         public uint targetValue;
@@ -148,6 +152,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     /// <summary>
     /// Navigate to a target using the map's heuristic
     /// </summary>
+    [NavigationTask]
     public struct NavigateToTarget : ITask
     {
         public bool permanent;
@@ -177,6 +182,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     /// Automatically moves to face the target 
     /// Optionally face the target as orbiting
     /// </summary>
+    [NavigationTask]
     public struct OrbitTarget : ITask
     {
         public float radius;
@@ -247,6 +253,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [NavigationTask]
     public struct FollowPath : ITask
     {
         public Takai.Game.VectorCurve path;

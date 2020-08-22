@@ -53,6 +53,8 @@ namespace Takai.UI
                 var rect = VisibleContentArea;
                 rect.Inflate(-4, -4);
                 Graphics.Primitives2D.DrawX(spriteBatch, MissingSpriteXColor, rect);
+
+                //todo: clip
             }
 
             base.DrawSelf(spriteBatch);

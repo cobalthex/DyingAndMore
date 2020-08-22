@@ -5,6 +5,9 @@ using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
+    public class DefensiveTaskAttribute : Attribute { }
+
+    [DefensiveTask]
     public struct ProvideCover : ITask
     {
 
@@ -17,6 +20,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     /// <summary>
     /// Move in opposite direction
     /// </summary>
+    [DefensiveTask]
     public struct FleeFromTarget : ITask
     {
         int lastDirection;
@@ -44,6 +48,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     /// <summary>
     /// Find a point out of sight of the target
     /// </summary>
+    [DefensiveTask]
     public struct HideFromTarget : ITask
     {
         public TaskResult Think(TimeSpan deltaTime, AIController ai)

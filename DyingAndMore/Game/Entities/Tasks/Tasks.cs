@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using DyingAndMore.Game.Weapons;
 using Microsoft.Xna.Framework;
 using Takai.UI;
@@ -21,6 +19,9 @@ namespace DyingAndMore.Game.Entities.Tasks
 
     //pre/suffix tasks with 'Task' ?
 
+    public class MiscellaneousTaskAttribute : Attribute { }
+
+    [MiscellaneousTask]
     public struct Wait : ITask
     {
         public TimeSpan duration;
@@ -33,6 +34,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [MiscellaneousTask]
     public struct FaceTarget : ITask
     {
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
@@ -51,6 +53,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     /// Attach to the target.
     /// Fails if not next to target
     /// </summary>
+    [MiscellaneousTask]
     public struct AttachToTarget : ITask
     {
         //attach angle (may require this task moving into position)
@@ -74,6 +77,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [MiscellaneousTask]
     public struct CloneSelf : ITask
     {
         /// <summary>
@@ -98,6 +102,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [MiscellaneousTask]
     public struct HealSelf : ITask
     {
         public float healthPerSecond;
@@ -122,6 +127,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [MiscellaneousTask]
     public struct HealTarget : ITask
     {
         public float healthPerSecond;
@@ -157,7 +163,9 @@ namespace DyingAndMore.Game.Entities.Tasks
         Outersection, //symmetric difference/xor
         Difference,
     }
+    public class SetOperationsSelect : EnumSelect<SetOperation> { }
 
+    [MiscellaneousTask]
     public struct SetTargetFactions : ITask
     {
         public Factions factions;
@@ -190,6 +198,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [MiscellaneousTask]
     public struct SetOwnFactions : ITask
     {
         public Factions factions;
@@ -219,6 +228,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [MiscellaneousTask]
     public struct SetOwnClass : ITask
     {
         public ActorClass @class;
@@ -234,6 +244,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [MiscellaneousTask]
     public struct SetTargetClass : ITask
     {
         public ActorClass @class;
@@ -252,6 +263,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [MiscellaneousTask]
     public struct SetOwnWeapon : ITask
     {
         public WeaponClass weapon;
@@ -263,7 +275,23 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [MiscellaneousTask]
+    public struct SetTargetWeapon : ITask
+    {
+        public WeaponClass weapon;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            if (ai.Target == null)
+                return TaskResult.Failure;
+
+            ai.Target.Weapon = weapon.Instantiate();
+            return TaskResult.Success;
+        }
+    }
+
     //todo: play animations
+    //todo: recategorize some of these
 
     //teleport (possibly with delay, e.g. burrowing)
     //  still follows path/trajectory

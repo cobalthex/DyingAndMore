@@ -4,13 +4,14 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Takai.Input
 {
-    public enum MouseButtons
+    public enum MouseButtons : int
     {
         Left,
         Right,
         Middle,
         X4,
         X5,
+        _Count
     }
 
     public enum KeyMod

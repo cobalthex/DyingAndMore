@@ -29,7 +29,7 @@ namespace DyingAndMore.Game.Entities
 
     public class AIController : Controller
     {
-        public float SightRange { get; set; } = 400;
+        public float SightRange { get; set; } = 1000;
 
         /// <summary>
         /// The current target actor for behaviors (e.g. enemy to shoot at or ally to follow)
@@ -136,7 +136,7 @@ namespace DyingAndMore.Game.Entities
                 nextSenseCheck = Actor.Map.ElapsedTime + TimeSpan.FromMilliseconds(200);
             }
 
-            if (CurrentBehavior != null && CurrentTask < CurrentBehavior.Tasks.Count)
+            if (CurrentBehavior?.Tasks != null && CurrentTask < CurrentBehavior.Tasks.Count)
             {
                 var result = CurrentBehavior.Tasks[CurrentTask].Think(deltaTime, this);
                 if (result == Tasks.TaskResult.Failure)
@@ -299,11 +299,16 @@ namespace DyingAndMore.Game.Entities
             var sb = new System.Text.StringBuilder();
             sb.Append(Name);
             sb.Append(":");
-            foreach (var task in Tasks)
+            if (Tasks != null && Tasks.Count > 0)
             {
-                sb.Append(' ');
-                sb.Append(task.GetType().Name);
+                foreach (var task in Tasks)
+                {
+                    sb.Append(' ');
+                    sb.Append(task.GetType().Name);
+                }
             }
+            else
+                sb.Append("[none]");
             return sb.ToString();
         }
     }

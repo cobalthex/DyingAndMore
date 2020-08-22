@@ -328,19 +328,6 @@ namespace DyingAndMore
 
             //Static.DebugFont = Static.DefaultFont;
 
-            //fpsGraph = new Takai.FpsGraph()
-            //{
-            //    Position = new Vector2(0, 100),
-            //    Size = new Vector2(800, 100),
-            //    HorizontalAlignment = Alignment.Middle
-            //};
-
-            //devtoolsMenu = new UI.DevtoolsMenu
-            //{
-            //    HorizontalAlignment = Alignment.Middle,
-            //    VerticalAlignment = Alignment.Middle
-            //};
-
             debugUI = new Static
             {
                 HorizontalAlignment = Alignment.Stretch,
@@ -386,7 +373,23 @@ namespace DyingAndMore
             else if (InputState.IsPress(Keys.F8))
                 fpsGraph.IsEnabled ^= true;
 
-            //F9 used in UI code
+            else if (InputState.IsPress(Keys.F9))
+            {
+                var uiTree = new UITree(ui.FindChildAtPoint(InputState.MousePoint));
+                var container = new ScrollBox(uiTree)
+                {
+                    Size = new Vector2(600),
+                    Style = "Frame",
+                    HorizontalAlignment = Alignment.Center,
+                    VerticalAlignment = Alignment.Center,
+                    IsModal = true,
+                    EventCommands =
+                    {
+                        [Static.ClickEvent] = "CloseModal",
+                    }
+                };
+                ui.AddChild(container);
+            }
             else if (InputState.IsPress(Keys.F10))
                 Static.DisplayDebugInfo ^= true;
             else if (InputState.IsPress(Keys.F11))

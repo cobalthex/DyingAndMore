@@ -41,6 +41,7 @@ namespace Takai.UI
                 _items = value;
                 _items.CollectionChanged += Items_CollectionChanged;
                 Container.RemoveAllChildren();
+                Items_CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _items));
             }
         }
         private ObservableCollection<T> _items;
@@ -275,12 +276,14 @@ namespace Takai.UI
         {
             Items = new ObservableCollection<T>(Items);
             _container = Children[Container.ChildIndex];
+
             if (_addItemUI != null)
             {
                 newItem = new NewItemContainer(newItem);
                 _addItemUI = Children[_addItemUI.ChildIndex];
                 _addItemUI.BindTo(newItem);
             }
+
             base.FinalizeClone();
         }
 
@@ -321,8 +324,12 @@ namespace Takai.UI
             }
             else if (e.Action == NotifyCollectionChangedAction.Add)
             {
+                var start = e.NewStartingIndex;
+                if (e.NewItems.Count > 0 && start < 0)
+                    start = Items.Count;
+
                 for (int i = 0; i < e.NewItems.Count; ++i)
-                    Container.InsertChild(CreateItemEntry((T)e.NewItems[i], e.NewStartingIndex + i), e.NewStartingIndex + i);
+                    Container.InsertChild(CreateItemEntry((T)e.NewItems[i], start + i), start + i);
             }
 
             var sb = new System.Text.StringBuilder();

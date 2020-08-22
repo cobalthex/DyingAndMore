@@ -4,13 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
-    public enum Direction
-    {
-        Horizontal,
-        Vertical
-    }
-
-    public class List : Static
+    public class Catalog : Static
     {
         /// <summary>
         /// Spacing between items
@@ -18,17 +12,18 @@ namespace Takai.UI
         public float Margin { get; set; } = 0;
 
         /// <summary>
-        /// Which direction should list items flow
+        /// Which direction should items flow
+        /// (horizontal = rows vs vertical = columns)
         /// </summary>
-        public Direction Direction { get; set; } = Direction.Vertical;
+        public Direction Direction { get; set; } = Direction.Horizontal;
 
         //todo: shared size? (only measure using MeasuredSize)
         //must manually calculate size?
-        
-        int stretches = 0;
 
-        public List() { }
-        public List(params Static[] children)
+        //justify option?
+
+        public Catalog() { }
+        public Catalog(params Static[] children)
             : base(children) { }
 
         public override void ApplyStyles(Dictionary<string, object> styleRules)
@@ -38,9 +33,11 @@ namespace Takai.UI
             Direction = GetStyleRule(styleRules, "Direction", Direction);
         }
 
+        int stretches = 0;
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            stretches = 0;
+            //todo
+
             var usedSize = new Vector2();
             for (int i = 0; i < Children.Count; ++i)
             {
@@ -77,12 +74,6 @@ namespace Takai.UI
 
             //todo: bounds may be affected by Stretch which would prove wrong here
         }
-
-        //protected override void OnChildRemeasure(Static child)
-        //{
-        //    InvalidateMeasure();
-        //    InvalidateArrange();
-        //}
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {

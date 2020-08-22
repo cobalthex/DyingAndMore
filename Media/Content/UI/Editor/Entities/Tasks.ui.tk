@@ -1,0 +1,442 @@
+Switch {
+	HorizontalAlignment: Alignment.Stretch;
+	Bindings: [
+	    Binding {
+	        Source: ":typename";
+	        Target: "Value";
+	    };
+	];
+
+	Items: {
+		# In alphabetical order
+
+		AttachToTarget: Static { Text: "(no options)"; };
+
+		CloneSelf: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Relative Direction"; };
+		    	DirectionInput {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "relativeDirection";
+		    				Target: "Direction";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+    			Static {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "relativeDirection";
+		    				Target: "Text";
+		    			};
+		    		];
+    			};
+	    	];
+		};
+
+		FaceTarget:  Static { Text: "(no options)"; };
+
+		FindClosestActor: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	CheckBox {
+		    		Text: "Find Allies";
+
+		    		Bindings: [
+		    			Binding {
+		    				Source: "isAlly";
+		    				Target: "IsChecked";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+
+		    	CheckBox {
+		    		Text: "Matching Class";
+
+		    		Bindings: [
+		    			Binding {
+		    				Source: "isSameClass";
+		    				Target: "IsChecked";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+			];
+		};
+
+		FleeFromTarget: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`cfa0Todo"; }; #todo
+    		];
+		};
+
+		FollowPath: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Path"; };
+		    	PathSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "path";
+		    				Target: "SelectedPath";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	}
+	    	];
+		};
+
+		ForgetTarget: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "(No options)"; };
+	    	];
+		};
+
+		HealSelf: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Health Per Second"; };
+		    	NumericInput {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "healthPerSecond";
+		    				Target: "Value";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+
+		    	Static { Text: "`_Duration"; };
+		    	DurationInput {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "duration";
+		    				Target: "Duration";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+
+		    	CheckBox {
+		    		Text: "Can Revive";
+
+		    		Bindings: [
+		    			Binding {
+		    				Source: "canRevive";
+		    				Target: "IsChecked";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+		HealTarget: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Health Per Second"; };
+		    	NumericInput {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "healthPerSecond";
+		    				Target: "Value";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+
+		    	Static { Text: "`_Duration"; };
+		    	DurationInput {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "duration";
+		    				Target: "Duration";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+
+		    	CheckBox {
+		    		Text: "Can Revive";
+
+		    		Bindings: [
+		    			Binding {
+		    				Source: "canRevive";
+		    				Target: "IsChecked";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+		HideFromTarget: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`cfa0 todo"; }; #todo
+	    	];
+		};
+
+		InfectTarget: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`cfa0Todo"; }; #todo
+
+	    	];
+		};
+
+		MoveToTarget: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`cfa0Todo"; }; #todo
+
+	    	];
+		};
+
+		NavigateGradient: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`cfa0Todo"; }; #todo
+
+	    	];
+		};
+
+		NavigateToTarget: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`cfa0Todo"; }; #todo
+
+	    	];
+		};
+
+		OrbitTarget: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Radius"; };
+		    	NumericInput {
+		    		Minimum: 1;
+		    		Maximum: 10000;
+		    		Bindings: [
+		    			Binding {
+		    				Source: "radius";
+		    				Target: "Value";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+
+		    	CheckBox {
+		    		Text: "Face Target";
+		    		Bindings: [
+		    			Binding {
+		    				Source: "faceTarget";
+		    				Target: "IsChecked";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+		SetConditionOnSelf: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`cfa0Todo"; }; #todo
+
+	    	];
+		};
+
+		SetConditionOnTarget: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`cfa0Todo"; }; #todo
+
+	    	];
+		};
+
+		SetOwnClass: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Class"; };
+		    	Static { Text: "`cfa0Todo"; } #todo
+
+		    	CheckBox {
+		    		Text: "Inherit Controller";
+		    		Bindings: [
+		    			Binding {
+		    				Source: "inheritController";
+		    				Target: "IsChecked";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+		SetOwnFactions: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Factions"; };
+		    	FactionSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "factions";
+		    				Target: "Value";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+
+		    	Static { Text: "`_Method"; };
+		    	SetOperationsSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "method";
+		    				Target: "Value";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+		SetOwnWeapon: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Weapon"; };
+		    	WeaponSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "weapon";
+		    				Target: "SelectedItem";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+		SetTargetClass: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Class"; };
+		    	Static { Text: "`cfa0Todo"; } #todo
+
+		    	CheckBox {
+		    		Text: "Inherit Controller";
+		    		Bindings: [
+		    			Binding {
+		    				Source: "inheritController";
+		    				Target: "IsChecked";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+		SetTargetFactions: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Factions"; };
+		    	FactionSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "factions";
+		    				Target: "Value";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+
+		    	Static { Text: "`_Method"; };
+		    	SetOperationsSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "method";
+		    				Target: "Value";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+		SetTargetWeapon: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Weapon"; };
+		    	WeaponSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "weapon";
+		    				Target: "SelectedItem";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+		ShootAtTarget: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Aiming Method"; }; #todo
+		    	AimingMethodSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "aimingMethod";
+		    				Target: "SelectedItem";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+		Suicide: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Effect"; }; #todo
+		    	EffectsSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "effect";
+		    				Target: "SelectedItem";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
+	    Wait: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Duration"; };
+		    	DurationInput {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "duration";
+		    				Target: "Duration";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+	    };
+
+	    ProvideCover: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`cfa0Todo"; }; #todo
+
+	    	];
+	    };
+	};
+};

@@ -217,10 +217,11 @@ namespace Takai.Data
             Serializers[typeof(TimeSpan)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => { return ((TimeSpan)value).TotalMilliseconds; },
-                Deserialize = (object value, DeserializationContext cxt) => {
+                Deserialize = (object value, DeserializationContext cxt) =>
+                {
                     var dv = (double)Convert.ChangeType(value, typeof(double));
                     //negative/positive infinity -> Min/MaxValue?
-                    return TimeSpan.FromMilliseconds(dv); 
+                    return TimeSpan.FromMilliseconds(dv);
                 } //return suffix object?
             };
 
@@ -271,6 +272,22 @@ namespace Takai.Data
         {
             RegisteredTypes[WriteFullTypeNames ? type.FullName : type.Name] = type;
         }
+
+        public static IEnumerable<Type> GetTypeTree<T>()
+        {
+            return GetTypeTree(typeof(T));
+        }
+        public static IEnumerable<Type> GetTypeTree(Type baseType)
+        {
+            var typeInfo = baseType.GetTypeInfo();
+            foreach (var rtype in RegisteredTypes)
+            {
+                var rti = rtype.Value.GetTypeInfo();
+                if (!rti.IsAbstract && typeInfo.IsAssignableFrom(rtype.Value))
+                    yield return rtype.Value;
+            }
+        }
+
 
         static string DescribeMemberType(Type mtype)
         {

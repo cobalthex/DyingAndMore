@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 
@@ -8,7 +10,7 @@ namespace Takai
     {
         static Util()
         {
-            var clone = typeof(object).GetMethod("MemberwiseClone", 
+            var clone = typeof(object).GetMethod("MemberwiseClone",
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
             _ShallowClone_Slow = (CloneFn)clone.CreateDelegate(typeof(CloneFn));
         }
@@ -94,9 +96,9 @@ namespace Takai
             {
                 Array.Copy(
                     original,
-                    (i + area.X) * original.GetLength(1), 
-                    newArray, 
-                    i * newArray.GetLength(1), 
+                    (i + area.X) * original.GetLength(1),
+                    newArray,
+                    i * newArray.GetLength(1),
                     newArray.GetLength(1)
                 );
             }
@@ -230,7 +232,6 @@ namespace Takai
         {
             return new Vector2(Math.Abs(v.X), Math.Abs(v.Y));
         }
-
 
         /// <summary>
         /// Calculate a rectangle that is always of positive size
@@ -446,8 +447,101 @@ namespace Takai
             return a.X + ((yLine - a.Y) / ((b.Y - a.Y) / (b.X - a.X)));
         }
 
+        [Flags]
+        enum LineClipRegion
+        {
+            Inside = 0b0000,
+            Left   = 0b0001,
+            Right  = 0b0010,
+            Bottom = 0b0100,
+            Top    = 0b1000
+        }
+        static LineClipRegion GetLineClipRegion(Vector2 v, Rectangle r)
+        {
+            var region = LineClipRegion.Inside;
+
+            if (v.X < r.Left)
+                region |= LineClipRegion.Left;
+            else if (v.X > r.Right)
+                region |= LineClipRegion.Right;
+
+            if (v.Y < r.Top)
+                region |= LineClipRegion.Top;
+            else if (v.Y > r.Bottom)
+                region |= LineClipRegion.Bottom;
+
+            return region;
+        }
+
+        public static bool ClipLine(ref Vector2 a, ref Vector2 b, Rectangle box) //floating point rect?
+        {
+            //cohen-sutherland
+
+            var aRegion = GetLineClipRegion(a, box);
+            var bRegion = GetLineClipRegion(b, box);
+            var diff = b - a;
+            
+            while (true)
+            {
+                if ((aRegion | bRegion) == LineClipRegion.Inside)
+                    return true;
+                else if ((aRegion & bRegion) > LineClipRegion.Inside)
+                    return false;
+                else
+                {
+                    var regionOut = (aRegion != LineClipRegion.Inside ? aRegion : bRegion);
+                    Vector2 p = Vector2.Zero;
+
+                    if ((regionOut & LineClipRegion.Top) > 0)
+                    {
+                        // point is above the clip rectangle 
+                        p.X = a.X + diff.X * (box.Top - a.Y) / diff.Y;
+                        p.Y = box.Top;
+                    }
+                    else if ((regionOut & LineClipRegion.Bottom) > 0)
+                    {
+                        // point is below the rectangle 
+                        p.X = a.X + diff.X * (box.Bottom - a.Y) / diff.Y;
+                        p.Y = box.Bottom;
+                    }
+                    else if ((regionOut & LineClipRegion.Right) > 0)
+                    {
+                        // point is to the right of rectangle 
+                        p.Y = a.Y + diff.Y * (box.Right - a.X) / diff.X;
+                        p.X = box.Right;
+                    }
+                    else if ((regionOut & LineClipRegion.Left) > 0)
+                    {
+                        // point is to the left of rectangle 
+                        p.Y = a.Y + diff.Y * (box.Left - a.X) / diff.X;
+                        p.X = box.Left;
+                    }
+
+                    // intersection point found, replace repsective location with clipped
+                    if (regionOut == aRegion)
+                    {
+                        a = p;
+                        aRegion = GetLineClipRegion(a, box);
+                    }
+                    else
+                    {
+                        b = p;
+                        bRegion = GetLineClipRegion(b, box);
+                    }
+                }
+            }
+        }
+
         public delegate object CloneFn(object source);
         public static CloneFn _ShallowClone_Slow { get; }
+
+        public static string ToString(this BitArray bitArray)
+        {
+            var sb = new System.Text.StringBuilder(bitArray.Length);
+            foreach (var bit in bitArray)
+                sb.Append((bool)bit ? 1 : 0);
+            return sb.ToString();
+        }
     }
 
     public struct Extent

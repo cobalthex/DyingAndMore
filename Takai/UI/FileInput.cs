@@ -85,12 +85,14 @@ namespace Takai.UI
 
         protected TextInput textInput = new TextInput
         {
+            Style = "FileInput.TextInput",
             HorizontalAlignment = Alignment.Stretch,
             VerticalAlignment = Alignment.Stretch,
             BorderColor = Color.Transparent
         };
         protected Static pickerButton = new Static
         {
+            Style = "FileInput.PickerButton",
             VerticalAlignment = Alignment.Stretch,
             Text = "...",
             Padding = new Vector2(5, 0)
@@ -147,6 +149,7 @@ namespace Takai.UI
             dialog.Filter = Filter;
             dialog.ValidateNames = true;
             dialog.CheckFileExists = VerifyFileExists;
+            dialog.CustomPlaces.Add(Path.GetFullPath("Content"));
 
             using (dialog)
             {

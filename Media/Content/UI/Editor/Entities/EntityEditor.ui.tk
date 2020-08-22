@@ -29,47 +29,72 @@ List {
                                 };
                             ];
                         };
-
-                        List {
+                        Switch {
                             HorizontalAlignment: Alignment.Stretch;
-                            margin: 10;
-                            Children: [
-        						Static { Text: "Actor Properties"; };
-
-        						Static { Text: "`_Current Health"; };
-        						NumericInput {
-                                    HorizontalAlignment: Alignment.Stretch;
-        							Bindings: [
-        								Binding {
-        									Direction: BindingDirection.TwoWay;
-        									Source: "CurrentHealth";
-        									Target: "Value";
-        								};
-        							];
-        							Minimum: 0;
-        							Maximum: 2E9;
-        						};
-        						#conditions
-        						#actions
-
-
-                                Static { Text: "`_Factions"; };
-                                FactionSelect {
-                                    Bindings: [
-                                        {
-                                            Direction: BindingDirection.TwoWay;
-                                            Source: "Factions";
-                                            Target: "Value";
-                                        };
-                                    ];
+                            Bindings: [
+                                Binding {
+                                    Source: ":typename";
+                                    Target: "Value";
                                 }
-
-                                Static { Text: "`_Controller"; };
-                                @"./Controller.ui.tk";
-
-                                Static { Text: "`_Weapon"; };
-                                @"./Weapon.ui.tk";
                             ];
+                            Items: {
+                                ActorInstance: List {
+                                    HorizontalAlignment: Alignment.Stretch;
+                                    Children: [
+                						Static { Text: "`_Health"; };
+                                        List {
+                                            HorizontalAlignment: Alignment.Stretch;
+                                            Direction: Direction.Horizontal;
+                                            Children: [
+                                                NumericInput {
+                                                    HorizontalAlignment: Alignment.Stretch;
+                                                    Bindings: [
+                                                        Binding {
+                                                            Direction: BindingDirection.TwoWay;
+                                                            Source: "CurrentHealth";
+                                                            Target: "Value";
+                                                        };
+                                                    ];
+                                                    Minimum: 0;
+                                                    Maximum: 2E9;
+                                                };
+
+                                                Static { Text: "/"; }
+
+                                                Static {
+                                                    HorizontalAlignment: Alignment.Stretch;
+                                                    Bindings: [
+                                                        Binding {
+                                                            Source: "Class.MaxHealth";
+                                                            Target: "Text";
+                                                        };
+                                                    ];
+                                                }
+                                            ];
+                                        };
+
+                						#conditions
+                						#actions
+
+                                        Static { Text: "`_Factions"; };
+                                        FactionSelect {
+                                            Bindings: [
+                                                {
+                                                    Direction: BindingDirection.TwoWay;
+                                                    Source: "Factions";
+                                                    Target: "Value";
+                                                };
+                                            ];
+                                        }
+
+                                        Static { Text: "`_Controller"; };
+                                        @"./Controller.ui.tk";
+
+                                        Static { Text: "`_Weapon"; };
+                                        @"./Weapon.ui.tk";
+                                    ];
+                                };
+                            };
                         };
                     ];
                 };
@@ -78,7 +103,6 @@ List {
 
         Static {
             Style: "Button";
-            Padding: [10 5];
             HorizontalAlignment: Alignment.Middle;
             Text: "Close";
             EventCommands: {

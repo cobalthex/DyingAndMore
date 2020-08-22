@@ -3,9 +3,12 @@ using Microsoft.Xna.Framework;
 using Takai.Game;
 using DyingAndMore.Game.Weapons;
 using System.Windows.Forms;
+using Takai.UI;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
+    public class OffensiveTaskAttribute : Attribute { }
+
     public static class TrajectoryUtils
     {
         /// <summary>
@@ -211,7 +214,9 @@ namespace DyingAndMore.Game.Entities.Tasks
         LeadTarget, //shoot where the target is likely to be
         Spray // rotate in a direction and shoot - ?
     }
+    public class AimingMethodSelect : EnumSelect<AimingMethod> { }
 
+    [OffensiveTask]
     public struct ShootAtTarget : ITask
     {
         public AimingMethod aimingMethod;
@@ -265,6 +270,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [OffensiveTask]
     public struct Suicide : ITask
     {
         public EffectsClass effect;
@@ -279,6 +285,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [OffensiveTask]
     public struct SetConditionOnSelf : ITask
     {
         public ConditionClass condition;
@@ -295,6 +302,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     }
 
     //must be 'touching'
+    [OffensiveTask]
     public struct SetConditionOnTarget : ITask
     {
         public ConditionClass condition;
@@ -311,6 +319,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     }
     //create condition to light up and then blow up
 
+    [OffensiveTask]
     public struct InfectTarget : ITask
     {
         public Behavior applyBehavior; //setting to null will render target 'dead'

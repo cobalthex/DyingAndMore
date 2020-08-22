@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using DyingAndMore.Game.Entities;
+using Microsoft.Xna.Framework;
+using SharpDX.Direct3D11;
 using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
@@ -17,8 +19,13 @@ namespace DyingAndMore.Game.Entities
         public List<ActorClass> LeaderTemplate { get; set; } //a list of possible leaders. Only one is spawned
         public List<ActorClass> UnitsTemplate { get; set; } //a list of all possible members of this squad (not including leaders)
 
-        public Microsoft.Xna.Framework.Vector2 SpawnPosition { get; set; }
+        public Vector2 SpawnPosition { get; set; }
         public float SpawnRadius { get; set; }
+
+        /// <summary>
+        /// Direction to have entities facing when spawned
+        /// </summary>
+        public Vector2 SpawnForward { get; set; } = -Vector2.UnitX;
 
         public bool DontSpawnAutomatically { get; set; }
         public int MinLiveCount { get; set; } = 0;
@@ -77,6 +84,7 @@ namespace DyingAndMore.Game.Entities
             for (int i = 0; i < 10; ++i) //# of retries to find spawn point - todo: don't hard code (maybe based off radius)
             {
                 unit.SetPositionTransformed(Takai.Util.RandomCircle(SpawnPosition, SpawnRadius));
+                unit.SetForwardTransformed(SpawnForward);
 
                 if (map.TestRegionForEntities(unit.WorldPosition, unit.Radius / 2))
                     continue;

@@ -2,12 +2,15 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using System;
+using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using Takai.Input;
 
 using Stylesheet = System.Collections.Generic.Dictionary<string, object>;
+using Takai.Graphics;
 
 namespace Takai.UI
 {
@@ -30,7 +33,7 @@ namespace Takai.UI
         Center = Middle,
     }
 
-    public class UIEventArgs : System.EventArgs
+    public class UIEventArgs : EventArgs
     {
         public Static Source { get; set; }
 
@@ -162,6 +165,7 @@ namespace Takai.UI
     /// <summary>
     /// The basic UI element
     /// </summary>
+    //[Data.Cache.AlwaysReload] //required for multiple imports of same file, otherwise not required
     public partial class Static : Data.IDerivedDeserialize
     {
         #region Events + Command Definitions
@@ -184,12 +188,12 @@ namespace Takai.UI
         /// <summary>
         /// Global commands that are invoked if routed commands arent triggered
         /// </summary>
-        public static Dictionary<string, System.Action<Static, object>> GlobalCommands
+        public static Dictionary<string, Action<Static, object>> GlobalCommands
         {
-            get => (_globalCommands ?? (_globalCommands = new Dictionary<string, System.Action<Static, object>>
-                (System.StringComparer.OrdinalIgnoreCase)));
+            get => (_globalCommands ?? (_globalCommands = new Dictionary<string, Action<Static, object>>
+                (StringComparer.OrdinalIgnoreCase)));
         }
-        private static Dictionary<string, System.Action<Static, object>> _globalCommands;
+        private static Dictionary<string, Action<Static, object>> _globalCommands;
 
         #endregion
 
@@ -391,7 +395,7 @@ namespace Takai.UI
                 if (_size != value)
                 {
                     //if (float.IsInfinity(value.X) || float.IsInfinity(value.Y))
-                    //  System.Diagnostics.Debug.WriteLine($"{this}: Size=Infinity will always render as collapse");
+                    //  Diagnostics.Debug.WriteLine($"{this}: Size=Infinity will always render as collapse");
 
                     _size = value;
                     InvalidateMeasure();
@@ -531,16 +535,16 @@ namespace Takai.UI
         protected bool ignoreEnterKey = false;
 
         /// <summary>
-        /// Was the current (left) mouse press inside this element
+        /// Was the current mouse press inside this element
         /// </summary>
-        private bool didPress = false;
+        private BitVector32 didPress = new BitVector32(0);
 
         /// <summary>
         /// Was the mouse pressed inside this static (and is the mouse still down)
         /// </summary>
         /// <returns>True if the mouse is currently down and was pressed inside this static</returns>
         protected bool DidPressInside(MouseButtons button) =>
-            didPress && InputState.IsButtonDown(button);
+            didPress[1 << (int)button] && InputState.IsButtonDown(button);
 
         /// <summary>
         /// Who owns/contains this element
@@ -584,7 +588,7 @@ namespace Takai.UI
 
         public Static()
         {
-            //System.Diagnostics.Debug.WriteLine($"New ID:{DebugId}");
+            //Diagnostics.Debug.WriteLine($"New ID:{DebugId}");
             Children = _children.AsReadOnly();
 #if DEBUG
             DebugTreePath = $"/{(GetType().Name)}({DebugId})";
@@ -618,7 +622,7 @@ namespace Takai.UI
         private void DeserializeChildren(object objects)
         {
             if (!(objects is List<object> elements))
-                throw new System.ArgumentException("Children must be a list of UI elements");
+                throw new ArgumentException("Children must be a list of UI elements");
 
             foreach (var element in elements)
             {
@@ -636,10 +640,10 @@ namespace Takai.UI
         /// Action&lt;Static, object&gt; Static is the sender (not source), object is an optional argument
         /// </summary>
         [Data.Serializer.Ignored]
-        public Dictionary<string, System.Action<Static, object>> CommandActions =>
-            (_commandActions ?? (_commandActions = new Dictionary<string, System.Action<Static, object>>
-                (System.StringComparer.OrdinalIgnoreCase)));
-        private Dictionary<string, System.Action<Static, object>> _commandActions;
+        public Dictionary<string, Action<Static, object>> CommandActions =>
+            (_commandActions ?? (_commandActions = new Dictionary<string, Action<Static, object>>
+                (StringComparer.OrdinalIgnoreCase)));
+        private Dictionary<string, Action<Static, object>> _commandActions;
 
         /// <summary>
         /// A map from events to commands
@@ -649,8 +653,8 @@ namespace Takai.UI
         /// </summary>
         public Dictionary<string, EventCommandBinding> EventCommands
         {
-            get => _eventCommands ?? (_eventCommands = new Dictionary<string, EventCommandBinding>(System.StringComparer.OrdinalIgnoreCase));
-            set => _eventCommands = new Dictionary<string, EventCommandBinding>(value, System.StringComparer.OrdinalIgnoreCase); //mod passed in value?
+            get => _eventCommands ?? (_eventCommands = new Dictionary<string, EventCommandBinding>(StringComparer.OrdinalIgnoreCase));
+            set => _eventCommands = new Dictionary<string, EventCommandBinding>(value, StringComparer.OrdinalIgnoreCase); //mod passed in value?
         }
         private Dictionary<string, EventCommandBinding> _eventCommands;
 
@@ -659,7 +663,7 @@ namespace Takai.UI
         public void On(string @event, UIEventHandler handler)
         {
             if (events == null)
-                events = new Dictionary<string, UIEvent>(System.StringComparer.OrdinalIgnoreCase);
+                events = new Dictionary<string, UIEvent>(StringComparer.OrdinalIgnoreCase);
 
             if (!events.TryGetValue(@event, out var handlers))
                 events[@event] = handlers = new UIEvent(true);
@@ -669,7 +673,7 @@ namespace Takai.UI
         public void On(IEnumerable<string> events, UIEventHandler handler)
         {
             if (this.events == null)
-                this.events = new Dictionary<string, UIEvent>(System.StringComparer.OrdinalIgnoreCase);
+                this.events = new Dictionary<string, UIEvent>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var @event in events)
             {
@@ -789,7 +793,7 @@ namespace Takai.UI
             if (source == null || @event == null)
                 return;
 
-            //System.Diagnostics.Debug.WriteLine($"Bubbling event {@event} from {GetType().Name}({DebugId})");
+            //Diagnostics.Debug.WriteLine($"Bubbling event {@event} from {GetType().Name}({DebugId})");
 
             var target = source;
             while (target != null)
@@ -819,7 +823,7 @@ namespace Takai.UI
             if (command == null)
                 return false;
 
-            //System.Diagnostics.Debug.WriteLine($"Bubbling command {command} from {GetType().Name}({DebugId})");
+            //Diagnostics.Debug.WriteLine($"Bubbling command {command} from {GetType().Name}({DebugId})");
 
             var target = this;
             while (target != null)
@@ -884,18 +888,19 @@ namespace Takai.UI
         /// Does not add to parent
         /// </summary>
         /// <returns>The cloned static</returns>
-        public virtual Static CloneHierarchy()
+        public Static CloneHierarchy()
         {
             var clone = (Static)MemberwiseClone();
 #if DEBUG
             clone.DebugId = GenerateId();
 #endif
+            clone.didPress = new BitVector32(0);
             clone.SetParentNoReflow(null);
             clone._children = new List<Static>(_children);
             clone.Children = clone._children.AsReadOnly();
             for (int i = 0; i < clone._children.Count; ++i)
             {
-                var child = clone._children[i].CloneHierarchy();
+                var child = clone._children[i].CloneHierarchy(); //make iterative?
                 child.SetParentNoReflow(clone);
                 clone._children[i] = child;
 
@@ -953,7 +958,7 @@ namespace Takai.UI
         /// <returns>True if the child as added, false otherwise</returns>
         public virtual bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
-            //System.Diagnostics.Debug.WriteLine($"Inserting child ID:{child.DebugId} @ {index} into ID:{DebugId}");
+            //Diagnostics.Debug.WriteLine($"Inserting child ID:{child.DebugId} @ {index} into ID:{DebugId}");
             //todo: maybe have a forward setting (forward all additions to specified child)
 
             if (child == null || child.Parent == this)
@@ -984,7 +989,7 @@ namespace Takai.UI
                 return false;
 
             var child = Children[index];
-            //System.Diagnostics.Debug.WriteLine($"Removing child ID:{child.DebugId} @ {index} from ID:{DebugId}");
+            //Diagnostics.Debug.WriteLine($"Removing child ID:{child.DebugId} @ {index} from ID:{DebugId}");
             _children.RemoveAt(index);
             if (child.Parent == this)
                 child.SetParentNoReflow(null);
@@ -1134,6 +1139,11 @@ namespace Takai.UI
                 }
             }
             return null;
+        }
+
+        private void BreakOnThis()
+        {
+            System.Diagnostics.Debugger.Break();
         }
 #endif
 
@@ -1381,7 +1391,7 @@ namespace Takai.UI
         /// </summary>
         /// <param name="name">The name of the UI to search for</param>
         /// <returns>The first child found or null if none found with the specified name</returns>
-        public Static FindChildByName(string name, bool caseSensitive = false, System.Type elementType = null)
+        public Static FindChildByName(string name, bool caseSensitive = false, Type elementType = null)
         {
             var parent = this;
             while (parent.Parent != null)
@@ -1395,7 +1405,7 @@ namespace Takai.UI
                 var elem = next.Pop();
                 if (elem.Name != null &&
                     (elementType == null || elementType.IsInstanceOfType(elem)) &&
-                    elem.Name.Equals(name, caseSensitive ? System.StringComparison.Ordinal : System.StringComparison.OrdinalIgnoreCase))
+                    elem.Name.Equals(name, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase))
                     return elem;
 
                 foreach (var child in elem.Children)
@@ -1403,6 +1413,24 @@ namespace Takai.UI
             }
 
             return null;
+        }
+
+        public Static FindChildAtPoint(Point point)
+        {
+            var process = new Stack<Static>(Children);
+            var result = VisibleBounds.Contains(point) ? this : null; ;
+            while (process.Count > 0)
+            {
+                var top = process.Pop();
+                if (top.VisibleBounds.Contains(point))
+                {
+                    process.Clear();
+                    result = top;
+                    foreach (var child in top.Children)
+                        process.Push(child);
+                }
+            }
+            return result;
         }
 
         public T FindChildByName<T>(string name, bool caseSensitive = false) where T : Static
@@ -1420,7 +1448,7 @@ namespace Takai.UI
         public IEnumerable<Static> FindChildrenWithBinding(string bindingSource, string bindingTarget)
         {
             if (bindingSource == null && bindingTarget == null)
-                throw new System.ArgumentException("bindingSource and bindingTarget cannot both be null");
+                throw new ArgumentException("bindingSource and bindingTarget cannot both be null");
 
             var stack = new Stack<Static>(Children);
             while (stack.Count > 0)
@@ -1508,7 +1536,7 @@ namespace Takai.UI
 #endif
             lastMeasureAvailableSize = availableSize;
 
-            //System.Diagnostics.Debug.WriteLine($"Measuring ID:{DebugId} (available size:{availableSize})");
+            //Diagnostics.Debug.WriteLine($"Measuring ID:{DebugId} (available size:{availableSize})");
 
             var size = Size;
             bool isWidthAutoSize = float.IsNaN(size.X);
@@ -1539,7 +1567,7 @@ namespace Takai.UI
             {
                 if (float.IsInfinity(measuredSize.X) || float.IsNaN(measuredSize.X)
                  || float.IsInfinity(measuredSize.Y) || float.IsNaN(measuredSize.Y))
-                    throw new System./*NotFiniteNumberException*/InvalidOperationException("Measured size cannot be NaN or infinity");
+                    throw new /*NotFiniteNumberException*/InvalidOperationException("Measured size cannot be NaN or infinity");
 
                 if (isWidthAutoSize)
                     size.X = measuredSize.X; //stretched items do have intrinsic size
@@ -1615,7 +1643,7 @@ namespace Takai.UI
         protected Rectangle DefaultMeasureSomeChildren(Vector2 availableSize, int startIndex, int count)
         {
             var bounds = new Rectangle();
-            for (int i = startIndex; i < System.Math.Min(Children.Count, startIndex + count); ++i)
+            for (int i = startIndex; i < Math.Min(Children.Count, startIndex + count); ++i)
             {
                 if (!Children[i].IsEnabled)
                     continue;
@@ -1634,8 +1662,8 @@ namespace Takai.UI
 #if DEBUG
         private static uint totalMeasureCount = 0; //set breakpoint for speicifc reflow
         private static uint totalArrangeCount = 0; //set breakpoint for speicifc reflow
-        private static System.TimeSpan lastUpdateDuration;
-        private static System.TimeSpan lastDrawDuration;
+        private static TimeSpan lastUpdateDuration;
+        private static TimeSpan lastDrawDuration;
         private static System.Diagnostics.Stopwatch boop = new System.Diagnostics.Stopwatch();//todo: should be one for update and one for draw
 #endif
 
@@ -1651,7 +1679,7 @@ namespace Takai.UI
 #endif
             //todo: this needs to be called less
 
-            //System.Diagnostics.Debug.WriteLine($"Arranging ID:{DebugId} ({this}) [container:{container}]");
+            //Diagnostics.Debug.WriteLine($"Arranging ID:{DebugId} ({this}) [container:{container}]");
             AdjustToContainer(container);
             ArrangeOverride(ContentArea.Size.ToVector2()); //todo: this needs to be visibleDimensions (?)
         }
@@ -1716,6 +1744,14 @@ namespace Takai.UI
 
             tmp.Inflate(Padding.X, Padding.Y);
             VisibleBounds = Rectangle.Intersect(tmp, parentBounds);
+            //VisibleBounds = new Rectangle(
+            //    tmp.X,
+            //    tmp.Y,
+            //    Math.Min(tmp.Right, parentBounds.Right) - Math.Max(tmp.Left, parentBounds.Left),
+            //    Math.Min(tmp.Bottom, parentBounds.Bottom) - Math.Max(tmp.Top, parentBounds.Top)
+            //); //maintains offset, but size goes to zero
+
+            //todo: ^ get working
 
             lastMeasureContainerBounds = container;
         }
@@ -1734,8 +1770,8 @@ namespace Takai.UI
             }
         }
 
-        static List<Static> measureQueue = new List<Static>();
-        static List<Static> arrangeQueue = new List<Static>();
+        static readonly List<Static> measureQueue = new List<Static>();
+        static readonly List<Static> arrangeQueue = new List<Static>();
 
         /// <summary>
         /// Complete any pending reflows/arranges
@@ -1977,7 +2013,7 @@ namespace Takai.UI
                 };
                 BubbleEvent(PressEvent, pea);
 
-                didPress = true; //todo: should be per button
+                didPress[1 << (int)button] = true;
                 if (CanFocus)
                 {
                     HasFocus = true;
@@ -2008,17 +2044,19 @@ namespace Takai.UI
             else if (InputState.IsButtonUp(button))
             //else if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
-                if (didPress && VisibleBounds.Contains(mousePosition)) //gesture pos
+                if (didPress[1 << (int)button])
                 {
-                    TriggerClick(
-                        (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
-                        (int)button,
-                        DeviceType.Mouse
-                    );
-                    didPress = false;
-                    return false;
+                    didPress[1 << (int)button] = false;
+                    if (VisibleBounds.Contains(mousePosition)) //gesture pos
+                    {
+                        TriggerClick(
+                            (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
+                            (int)button,
+                            DeviceType.Mouse
+                        );
+                        return false;
+                    }
                 }
-                didPress = false;
             }
 
             return true;
@@ -2093,31 +2131,20 @@ namespace Takai.UI
                 debugDraw.DrawDebugInfo(spriteBatch);
                 if (InputState.IsPress(Keys.Pause))
                     debugDraw.BreakOnThis();
-
-                if (InputState.IsPress(Keys.F9))
-                {
-                    using (var stream = new System.IO.StreamWriter(System.IO.File.OpenWrite("ui.tk")))
-                        Data.Serializer.TextSerialize(stream, debugDraw, 0, false, false, true);
-                }
             }
             lastDrawDuration = boop.Elapsed;
 #endif
         }
 
-        private void BreakOnThis()
-        {
-            System.Diagnostics.Debugger.Break();
-        }
-
         public void DrawDebugInfo(SpriteBatch spriteBatch)
         {
-            Graphics.Primitives2D.DrawRect(spriteBatch, Color.Cyan, VisibleBounds);
+            Primitives2D.DrawRect(spriteBatch, Color.Cyan, VisibleBounds);
 
             var rect = OffsetContentArea;
-            Graphics.Primitives2D.DrawRect(spriteBatch, new Color(Color.Orange, 0.5f), rect);
+            Primitives2D.DrawRect(spriteBatch, new Color(Color.Orange, 0.5f), rect);
 
             rect.Inflate(Padding.X, Padding.Y);
-            Graphics.Primitives2D.DrawRect(spriteBatch, Color.OrangeRed, rect);
+            Primitives2D.DrawRect(spriteBatch, Color.OrangeRed, rect);
 
             string info = $"`_{GetType().Name}`_\n"
 #if DEBUG
@@ -2131,7 +2158,9 @@ namespace Takai.UI
                          + $"Bounds: {OffsetContentArea}\n" //visible bounds?
                          + $"Position: {Position}, Size: {Size}, Padding: {Padding}\n"
                          + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}\n"
-                         + $"Bindings: {(Bindings == null ? "(None)" : string.Join(",", Bindings))}";
+                         + $"Style: {Style}\n"
+                         + $"Bindings: {(Bindings == null ? "(None)" : string.Join(",", Bindings))}\n"
+                         + $"Events: {events?.Count}, Commands: {CommandActions?.Count}\n";
 
             var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);
             var size = DebugFont.MeasureString(info);
@@ -2163,6 +2192,26 @@ namespace Takai.UI
             Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleContentArea, position, Color);
         }
 
+        /// <summary>
+        /// Draw an arbitrary line, clipped to the visible content area.
+        /// Note: more computationally expensive than DrawVLine or DrawHLine
+        /// </summary>
+        /// <param name="spriteBatch">spriteBatch to use</param>
+        /// <param name="color">Color to draw the line</param>
+        /// <param name="a">The start of the line</param>
+        /// <param name="b">The end of the line</param>
+        protected void DrawLine(SpriteBatch spriteBatch, Color color, Vector2 a, Vector2 b)
+        {
+            var offset = OffsetContentArea.Location.ToVector2();
+            a += offset;
+            b += offset;
+
+            if (!Util.ClipLine(ref a, ref b, VisibleContentArea))
+                return;
+
+            Primitives2D.DrawLine(spriteBatch, color, a, b);
+        }
+
         protected void DrawVLine(SpriteBatch spriteBatch, Color color, float x, float y1, float y2)
         {
             DrawVLine(spriteBatch, color, x, y1, y2, OffsetContentArea.Location.ToVector2(), VisibleContentArea);
@@ -2179,7 +2228,7 @@ namespace Takai.UI
             if (y1 == y2)
                 return;
 
-            Graphics.Primitives2D.DrawLine(spriteBatch, color, new Vector2(x, y1), new Vector2(x, y2));
+            Primitives2D.DrawLine(spriteBatch, color, new Vector2(x, y1), new Vector2(x, y2));
         }
 
         protected void DrawHLine(SpriteBatch spriteBatch, Color color, float y, float x1, float x2)
@@ -2198,7 +2247,7 @@ namespace Takai.UI
             if (x1 == x2)
                 return;
 
-            Graphics.Primitives2D.DrawLine(spriteBatch, color, new Vector2(x1, y), new Vector2(x2, y));
+            Primitives2D.DrawLine(spriteBatch, color, new Vector2(x1, y), new Vector2(x2, y));
         }
 
         protected void DrawRect(SpriteBatch spriteBatch, Color color, Rectangle localRect)
@@ -2210,7 +2259,13 @@ namespace Takai.UI
             DrawVLine(spriteBatch, color, localRect.Left, localRect.Top, localRect.Bottom, offset, VisibleContentArea);
         }
 
-        protected void DrawSprite(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle localRect)
+        protected void DrawFill(SpriteBatch spriteBatch, Color color, Rectangle localRect)
+        {
+            localRect.Offset(OffsetContentArea.Location);
+            Primitives2D.DrawFill(spriteBatch, color, Rectangle.Intersect(VisibleContentArea, localRect));
+        }
+
+        protected void DrawSprite(SpriteBatch spriteBatch, Sprite sprite, Rectangle localRect)
         {
             DrawSpriteCustomRegion(spriteBatch, sprite, localRect, VisibleContentArea);
         }
@@ -2248,7 +2303,7 @@ namespace Takai.UI
             //Graphics.Primitives2D.DrawRect(spriteBatch, Color.LightSteelBlue, finalRect);
         }
 
-#endregion
+        #endregion
 
         public override string ToString()
         {
@@ -2256,7 +2311,7 @@ namespace Takai.UI
 #if DEBUG
             extraInfo = $" ID:{DebugId}";
 #endif
-            return $"{base.ToString()} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\" {(IsEnabled ? "👁" : "❌")}{extraInfo}";
+            return $"{GetType().Name} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\" {(IsEnabled ? "👁" : "❌")}{extraInfo}";
         }
 
         public virtual void DerivedDeserialize(Dictionary<string, object> props)
@@ -2272,9 +2327,20 @@ namespace Takai.UI
         protected T GetStyleRule<T>(Stylesheet styleRules, string propName, T fallback)
         {
             //Cast?
-            if (styleRules == null || !styleRules.TryGetValue(propName, out var sProp) || !(sProp is T prop))
-                prop = fallback;
-            return prop;
+            if (styleRules == null ||
+                !styleRules.TryGetValue(propName, out var sProp))
+                return fallback;
+
+            if (sProp is T prop)
+                return prop;
+
+            if (sProp == null)
+                return default;
+
+            if (Data.Serializer.TryNumericCast(sProp, out var destNumber, sProp.GetType().GetTypeInfo(), typeof(T).GetTypeInfo()))
+                return (T)destNumber;
+
+            return fallback;
         }
 
         public static Stylesheet GetStyles(string styleName, string styleState = "")
@@ -2283,6 +2349,11 @@ namespace Takai.UI
             if (styleName != null)
                 Styles.TryGetValue(styleName + (styleState != "" ? "." + styleState : ""), out styles);
             return styles;
+        }
+
+        protected virtual void UnapplyStyles(Stylesheet styleRules)
+        {
+            //todo
         }
 
         public virtual void ApplyStyles(Stylesheet styleRules)

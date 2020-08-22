@@ -58,7 +58,7 @@ namespace DyingAndMore.Editor.Selectors
             else
                 cols = Math.Max(1, (int)(availableSize.X / iz.X));
 
-            return new Vector2(cols, (float)Math.Ceiling((float)ItemCount / cols)) * iz + ItemMargin;
+            return ItemMargin + new Vector2(cols, (float)Math.Ceiling((float)ItemCount / cols)) * iz;
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
@@ -120,13 +120,10 @@ namespace DyingAndMore.Editor.Selectors
 
                 if (i == SelectedIndex)
                 {
-                    rect.Offset(OffsetContentArea.Location);
-                    rect = Rectangle.Intersect(VisibleContentArea, rect);
-                    //todo: intersect after inflate
                     rect.Inflate(1, 1);
-                    Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.White, rect);
+                    DrawRect(spriteBatch, Color.White, rect);
                     rect.Inflate(1, 1);
-                    Takai.Graphics.Primitives2D.DrawRect(spriteBatch, Color.Black, rect);
+                    DrawRect(spriteBatch, Color.Black, rect);
                 }
             }
         }

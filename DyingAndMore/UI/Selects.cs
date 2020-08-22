@@ -2,8 +2,10 @@
 using DyingAndMore.Game.Weapons;
 using DyingAndMore.Game.Entities;
 using Takai.Game;
-using DyingAndMore.Editor;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Takai.Data;
 
 namespace DyingAndMore.UI
 {
@@ -45,7 +47,7 @@ namespace DyingAndMore.UI
             {
                 try
                 {
-                    var weapon = Takai.Data.Cache.Load<WeaponClass>(entry);
+                    var weapon = Cache.Load<WeaponClass>(entry);
                     Items.Add(weapon);
                 }
                 catch { }
@@ -63,7 +65,7 @@ namespace DyingAndMore.UI
             {
                 try
                 {
-                    var weapon = Takai.Data.Cache.Load<ConditionClass>(entry);
+                    var weapon = Cache.Load<ConditionClass>(entry);
                     Items.Add(weapon);
                 }
                 catch { }
@@ -78,9 +80,9 @@ namespace DyingAndMore.UI
         {
             ItemUI = new Static
             {
-                Bindings = new System.Collections.Generic.List<Takai.Data.Binding>
+                Bindings = new List<Binding>
                 {
-                    new Takai.Data.Binding("File", "Text")
+                    new Binding("File", "Text")
                 }
             };
 
@@ -89,7 +91,7 @@ namespace DyingAndMore.UI
             {
                 try
                 {
-                    var fx = Takai.Data.Cache.Load<EffectsClass>(entry);
+                    var fx = Cache.Load<EffectsClass>(entry);
                     Items.Add(fx);
                 }
                 catch { }
@@ -102,8 +104,8 @@ namespace DyingAndMore.UI
         public override void OpenDropdown() //hacky
         {
             Items.Clear();
-            if (Takai.Data.Binding.Globals.TryGetValue("Map.Squads", out var squads) &&
-                squads is System.Collections.Generic.HashSet<Squad> sqSet)
+            if (Binding.Globals.TryGetValue("Map.Squads", out var squads) &&
+                squads is HashSet<Squad> sqSet)
             {
                 foreach (var squad in sqSet)
                     Items.Add(squad);
@@ -112,29 +114,97 @@ namespace DyingAndMore.UI
         }
     }
 
+    class PathSelect : DropdownSelect<Editor.NamedPath>
+    {
+        public VectorCurve SelectedPath
+        {
+            get => SelectedIndex >= 0 ? SelectedItem.path : default;
+            set => SelectedItem = new Editor.NamedPath { path = value };
+        }
+
+        public PathSelect()
+        {
+            ItemUI = new List { Direction = Direction.Horizontal };
+            ItemUI.AddChild(new Static
+            {
+                Bindings = new List<Binding>
+                {
+                    new Binding("name", "Text")
+                }
+            });
+            ItemUI.AddChild(new Static
+            {
+                Bindings = new List<Binding>
+                {
+                    new Binding("path.Count", "Text")
+                    {
+                        Converter = new StringFormatConverter("({0} nodes)")
+                    }
+                }
+            });
+        }
+
+        public override void OpenDropdown() //hacky
+        {
+            Items.Clear();
+            if (Binding.Globals.TryGetValue("Editor.Paths", out var paths) &&
+                paths is List<Editor.NamedPath> pathsList)
+            {
+                foreach (var path in pathsList)
+                    Items.Add(path);
+            }
+            InvalidateMeasure();
+            base.OpenDropdown();
+        }
+    }
+
     class ActorList : ItemList<ActorClass> { } //object select?
 
     class BehaviorList : ItemList<Behavior> { }
 
-    class TaskList : ItemList<Game.Entities.Tasks.ITask>
-    {
-        public TaskList()
-        {
-            ItemUI = new Static //todo: for testing
-            {
-                Bindings = new List<Takai.Data.Binding>
-                {
-                    new Takai.Data.Binding(":typename", "Text")
-                }
-            };
-        }
-    }
+    class TaskList : ItemList<Game.Entities.Tasks.ITask> { }
 
     class TaskSelect : TypeSelect
     {
         public TaskSelect()
         {
             AddTypeTree<Game.Entities.Tasks.ITask>();
+        }
+    }
+    class OffensiveTaskSelect : TypeSelect
+    {
+        public OffensiveTaskSelect()
+        {
+            AddTypeTreeByAttribute<Game.Entities.Tasks.OffensiveTaskAttribute>();
+        }
+    }
+
+    class DefensiveTaskSelect : TypeSelect
+    {
+        public DefensiveTaskSelect()
+        {
+            AddTypeTreeByAttribute<Game.Entities.Tasks.DefensiveTaskAttribute>();
+        }
+    }
+    class NavigationTaskSelect : TypeSelect
+    {
+        public NavigationTaskSelect()
+        {
+            AddTypeTreeByAttribute<Game.Entities.Tasks.NavigationTaskAttribute>();
+        }
+    }
+    class TargetingTaskSelect : TypeSelect
+    {
+        public TargetingTaskSelect()
+        {
+            AddTypeTreeByAttribute<Game.Entities.Tasks.TargetingTaskAttribute>();
+        }
+    }
+    class MiscellaneousTaskSelect : TypeSelect
+    {
+        public MiscellaneousTaskSelect()
+        {
+            AddTypeTreeByAttribute<Game.Entities.Tasks.MiscellaneousTaskAttribute>();
         }
     }
 }

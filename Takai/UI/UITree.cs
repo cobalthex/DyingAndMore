@@ -16,12 +16,7 @@ namespace Takai.UI
         /// </summary>
         public Func<Static, string> DisplayString { get; set; } = (Static s) =>
         {
-            var name = string.IsNullOrEmpty(s.Name) ? "(None)" : s.Name;
-#if DEBUG
-            return $"{(s.GetType().Name)} id:{s.DebugId} name:{name} w:{s.Size.X} h:{s.Size.Y}";
-#else
-            return $"{(s.GetType().Name)} name:{name} w:{s.Size.X} h:{s.Size.Y}";
-#endif
+            return s.ToString();
         };
 
         /// <summary>
@@ -65,12 +60,28 @@ namespace Takai.UI
         }
         private Static _root;
 
+        /// <summary>
+        /// Automatically update this tree with the current root (useful for inspection of live tree)
+        /// </summary>
+        public bool AutoRoot { get; set; } = false;
+
         private readonly List<(string text, int indent)> rows = new List<(string text, int indent)>();
         private float maxWidth;
 
+        public UITree()
+        {
+
+        }
+
+        public UITree(Static root)
+        {
+            Root = root;
+        }
+
         protected override void OnParentChanged(Static oldParent)
         {
-            Root = GetRoot();
+            if (AutoRoot)
+                Root = GetRoot();
             base.OnParentChanged(oldParent);
         }
 

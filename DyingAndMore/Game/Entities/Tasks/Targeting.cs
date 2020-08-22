@@ -4,6 +4,9 @@ using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
+    public class TargetingTaskAttribute : Attribute { }
+ 
+    [TargetingTask]
     public struct FindClosestActor : ITask
     {
         public bool isAlly;
@@ -53,6 +56,7 @@ namespace DyingAndMore.Game.Entities.Tasks
         }
     }
 
+    [TargetingTask]
     public struct ForgetTarget : ITask
     {
         public TaskResult Think(TimeSpan deltaTime, AIController ai)

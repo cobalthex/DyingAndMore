@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 
 namespace Takai.UI
 {
@@ -57,8 +58,9 @@ namespace Takai.UI
 
             list = new ItemList<T>()
             {
-                HorizontalAlignment = Alignment.Stretch
+                HorizontalAlignment = Alignment.Stretch,
             };
+            list.Container.Style = "Dropdown.List";
 
             dropdown = new ScrollBox(list)
             {
@@ -92,7 +94,7 @@ namespace Takai.UI
 
             On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
             {
-                CloseDropDown();
+                ((DropdownSelect<T>)sender).CloseDropDown();
                 return UIEventResult.Continue;
             });
         }
@@ -109,15 +111,16 @@ namespace Takai.UI
 
             //todo: arrow keying through dropdown entries sometimes leaves preview blank
             // (fills in once dropdown is closed)
+            var sea = (SelectionChangedEventArgs)e;
 
             var childIndex = preview?.ChildIndex ?? -1;
-            if (SelectedIndex >= 0)
+            if (sea.newIndex >= 0)
             {
-                ReplaceChild(preview = list.Container.Children[SelectedIndex].CloneHierarchy(), childIndex);
-                preview.Arrange(OffsetContentArea); //todo: still needs work
-                preview.BindTo(list.Items[SelectedIndex]);
+                ReplaceChild(preview = list.Container.Children[sea.newIndex].CloneHierarchy(), childIndex);
+                preview.Arrange(new Rectangle(0, 0, ContentArea.Width, ContentArea.Height)); //todo: still needs work
+                preview.BindTo(list.Items[sea.newIndex]);
             }
-            else
+            else if (preview != null)
                 preview.BindTo(null);
 
             BubbleEvent(this, SelectionChangedEvent, e);
@@ -129,7 +132,7 @@ namespace Takai.UI
             dropdownContainer = dropdownContainer.CloneHierarchy();
             dropdown = (ScrollBox)dropdownContainer.Children[0];
             list = (ItemList<T>)System.Linq.Enumerable.First(dropdown.EnumerableChildren);
-
+            
             var previewChildIndex = preview?.ChildIndex ?? -1;
             if (previewChildIndex >= 0)
             {
@@ -147,28 +150,23 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            if (dropdownContainer.Parent != null)
-                dropdown.Measure(new Vector2(InfiniteSize));
-            return new Vector2(200, 20);
+            dropdownContainer.Measure(new Vector2(InfiniteSize));
+            return new Vector2(list.MeasuredSize.X, 20); //todo
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
             if (dropdownContainer.Parent != null)
             {
-                dropdownContainer.Arrange(GetRoot().OffsetContentArea);
+                var dsz = new Point((int)availableSize.X, (int)Math.Min(DropdownMaxHeight, dropdownContainer.MeasuredSize.Y));
+                var dpos = new Point(OffsetContentArea.Left - (int)Padding.X, OffsetContentArea.Bottom);
+                //keep on-screen
+                var root = GetRoot();
+                dpos.X = MathHelper.Clamp(dpos.X, 0, root.OffsetContentArea.Width - dsz.X);
+                dpos.Y = MathHelper.Clamp(dpos.Y, 0, root.OffsetContentArea.Height - dsz.Y);
 
-                var dpos = new Vector2(VisibleContentArea.X, VisibleContentArea.Y + MeasuredSize.Y);
-                var dsz = new Vector2(
-                    System.Math.Max(list.MeasuredSize.X, MeasuredSize.X),
-                    System.Math.Min(list.MeasuredSize.Y, DropdownMaxHeight)
-                );
-
-                dpos.X = MathHelper.Clamp(dpos.X, 0, dropdownContainer.OffsetContentArea.Width - dsz.X);
-                dpos.Y = MathHelper.Clamp(dpos.Y, 0, dropdownContainer.OffsetContentArea.Height - dsz.Y);
-
-                dropdown.Position = dpos;
-                dropdown.Size = dsz;
+                dropdownContainer.Arrange(root.OffsetContentArea);
+                dropdown.Arrange(new Rectangle(dpos.X, dpos.Y, dsz.X, dsz.Y)); //dropdown scrollbox is not remeasuring correctly
             }
             base.ArrangeOverride(availableSize);
         }
@@ -181,7 +179,7 @@ namespace Takai.UI
             var root = GetRoot();
             root.AddChild(dropdownContainer);
             InvalidateArrange();
-            // arrange now
+            // arrange now?
         }
 
         public virtual void CloseDropDown()

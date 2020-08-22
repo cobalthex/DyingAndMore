@@ -166,16 +166,12 @@ namespace Takai.UI
                             offset.X += Margin.X;
                     }
 
-                    var rect = new Rectangle(
-                        OffsetContentArea.X + (int)offset.X,
-                        OffsetContentArea.Y + (int)offset.Y,
+                    DrawFill(spriteBatch, CellColor, new Rectangle(
+                        (int)offset.X,
+                        (int)offset.Y,
                         (int)columnWidths[i % ColumnCount],
                         (int)rowHeights[i / ColumnCount]
-                    );
-                    rect = Rectangle.Intersect(rect, VisibleContentArea);
-                    Graphics.Primitives2D.DrawFill(spriteBatch, CellColor, rect);
-
-                    DebugFont?.Draw(spriteBatch, $"{columnWidths[i % ColumnCount]}x{rowHeights[i / ColumnCount]}", rect, Color.LightGreen);
+                    ));
 
                     offset.X += columnWidths[i % ColumnCount];
                 }

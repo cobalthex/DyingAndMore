@@ -610,6 +610,7 @@ namespace DyingAndMore.Game
                 Map.Draw(player.camera);
 
 #if DEBUG
+                //use DrawV/HLine?
                 Takai.Graphics.Primitives2D.DrawLine(spriteBatch, Color.Gray,
                     new Vector2(player.camera.Viewport.Right, player.camera.Viewport.Top),
                     new Vector2(player.camera.Viewport.Right, player.camera.Viewport.Bottom),

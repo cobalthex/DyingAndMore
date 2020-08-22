@@ -104,6 +104,7 @@ namespace Takai.UI
         {
             BorderColor = Color;
             On(PressEvent, OnPress);
+            On(ClickEvent, (Static Sender, UIEventArgs e) => UIEventResult.Handled);
         }
 
         public override void ApplyStyles(Dictionary<string, object> styleRules)

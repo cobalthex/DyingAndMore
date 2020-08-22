@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Takai.Data;
 
 namespace Takai.UI
 {
@@ -14,10 +15,12 @@ namespace Takai.UI
                 if (isFlags)
                     RefreshCbValues();
                 else
-                    throw new NotImplementedException();
+                    dropdown.SelectedItem = Enum.GetName(typeof(T), value);
             }
         }
         private T _value;
+
+        protected DropdownSelect<string> dropdown; //dropdown for single value enums
 
         protected static readonly bool isFlags = typeof(T).IsDefined(typeof(FlagsAttribute));
 
@@ -61,7 +64,18 @@ namespace Takai.UI
             }
             else
             {
-                var dropdown = new DropdownSelect<string>();
+                dropdown = new DropdownSelect<string>()
+                {
+                    HorizontalAlignment = Alignment.Stretch,
+                    ItemUI = new Static
+                    {
+                        HorizontalAlignment = Alignment.Stretch,
+                        Bindings = new System.Collections.Generic.List<Binding>
+                        {
+                            new Binding("this", "Text")
+                        }
+                    }
+                };
                 foreach (var e in ev)
                     dropdown.Items.Add(Enum.GetName(t, e));
 
@@ -73,7 +87,7 @@ namespace Takai.UI
                         Value = default;
                     else
                     {
-                        var val = ((DropdownSelect<string>)sea.Source).Items[sea.newIndex];
+                        var val = ((ItemList<string>)sea.Source).Items[sea.newIndex];
                         self.Value = (T)Enum.Parse(typeof(T), val);
                         //todo: verify works
                     }
@@ -81,6 +95,7 @@ namespace Takai.UI
                     return UIEventResult.Handled;
                 });
                 AddChild(dropdown);
+                InvalidateArrange();
             }
         }
 

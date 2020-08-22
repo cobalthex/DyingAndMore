@@ -83,18 +83,13 @@ namespace Takai.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            //todo
-            var gripBnd = new Rectangle(OffsetContentArea.X, OffsetContentArea.Y, (int)GripperWidth, OffsetContentArea.Height);
-            switch (HorizontalAlignment)
-            {
-                case Alignment.Left:
-                    gripBnd.X = OffsetContentArea.Right - (int)GripperWidth;
-                    Graphics.Primitives2D.DrawFill(spriteBatch, GripperColor, Rectangle.Intersect(VisibleBounds, gripBnd));
-                    break;
-                case Alignment.Right:
-                    Graphics.Primitives2D.DrawFill(spriteBatch, GripperColor, Rectangle.Intersect(VisibleBounds, gripBnd));
-                    break;
-            }
+            //todo: gripper sprite
+
+            var gripBnd = new Rectangle(0, 0, (int)GripperWidth, ContentArea.Height);
+            if (HorizontalAlignment == Alignment.Left)
+                gripBnd.X = ContentArea.Right - (int)GripperWidth;
+
+            DrawFill(spriteBatch, GripperColor, gripBnd);
 
             base.DrawSelf(spriteBatch);
         }

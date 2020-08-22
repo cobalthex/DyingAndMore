@@ -229,7 +229,6 @@ List {
 
         Static {
             Style: "Button";
-            Padding: [10 5];
             HorizontalAlignment: Alignment.Middle;
             Text: "Close";
             EventCommands: {

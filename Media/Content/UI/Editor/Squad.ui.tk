@@ -298,7 +298,6 @@ List {
             Style: "Button";
 			Text: "Close";
 			HorizontalAlignment: Alignment.Center;
-			Padding: [10 5];
 			EventCommands: {
 				Click: ["CloseModal"];
 			};

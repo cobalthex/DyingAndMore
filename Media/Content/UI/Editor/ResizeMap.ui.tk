@@ -3,12 +3,14 @@ List {
 	Direction: Direction.Vertical;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
+    Margin: 10;
 
 	IsModal: True;
 
     Children: [
     	Static {
     		Text: "Resize Map"
+            Font: @"Fonts/UILarge.bfnt";
     	}
 
     	List {
@@ -18,6 +20,7 @@ List {
 			Children: [
 				List {
 					Direction: Direction.Vertical;
+					Margin: 10;
 
 					Children: [
 						Static {
@@ -41,6 +44,7 @@ List {
 
 				List {
 					Direction: Direction.Vertical;
+					Margin: 10;
 
 					Children: [
 						Static {
@@ -66,7 +70,7 @@ List {
 
     	List {
 			Direction: Direction.Horizontal;
-			HorizontalAlignment: Alignment.Stretch;
+			HorizontalAlignment: Alignment.Center;
 			Margin: 10;
 
 			Children: [
@@ -76,7 +80,6 @@ List {
 						Click: "ResizeMap";
 					};
 					Text: "Resize";
-					HorizontalAlignment: Alignment.Stretch;
 				}
 				Static {
                     Style: "Button";
@@ -84,7 +87,6 @@ List {
 						Click: "CloseModal";
 					};
 					Text: "Cancel";
-					HorizontalAlignment: Alignment.Stretch;
 				}
 			]
 		}
