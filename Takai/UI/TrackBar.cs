@@ -33,7 +33,7 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            return new Vector2(100, 20);
+            return new Vector2(200, 20);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -41,7 +41,6 @@ namespace Takai.UI
             var y = (OffsetContentArea.Height - 1) / 2;
             DrawHLine(spriteBatch, Color, y, 0, ContentArea.Width);
             DrawHLine(spriteBatch, Color, y + 1, 0, ContentArea.Width);
-
 
             var sliderPos = (Value - Minimum) / (float)(Maximum - Minimum);
             var x = sliderPos * ContentArea.Width;

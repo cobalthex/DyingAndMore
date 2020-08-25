@@ -12,10 +12,11 @@ float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoo
 	return Tex.Sample(Sampler, (texcoord * a) + 0.5);
 }
 
+#include "shadermodel.hlsli"
 technique Technique1
 {
     pass Pass1
     {
-        PixelShader = compile ps_4_0 pmain();
+        PixelShader = compile PS_SHADERMODEL pmain();
     }
 }

@@ -108,6 +108,7 @@
     <Compile Include="Input\InputState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\Binding.cs" />
+    <Compile Include="UI\Accordian.cs" />
     <Compile Include="UI\Animation.cs" />
     <Compile Include="UI\Catalog.cs" />
     <Compile Include="UI\CheckBox.cs" />
@@ -148,8 +149,14 @@
     <PackageReference Include="Concentus.OggFile">
       <Version>1.0.4</Version>
     </PackageReference>
+    <PackageReference Include="MonoGame.Framework.Android">
+      <Version>3.8.0.1641</Version>
+    </PackageReference>
     <PackageReference Include="MonoGame.Framework.Portable">
       <Version>3.7.1.189</Version>
+    </PackageReference>
+    <PackageReference Include="MonoGame.Framework.WindowsDX">
+      <Version>3.8.0.1641</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

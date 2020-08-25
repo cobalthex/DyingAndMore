@@ -6,6 +6,10 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
+#if ANDROID
+using Android.Content.Res;
+#endif
+
 namespace Takai.Data
 {
     /// <summary>
@@ -32,6 +36,10 @@ namespace Takai.Data
         /// Where all content lives
         /// </summary>
         public static string Root = "Content";
+
+#if ANDROID
+        public static AssetManager Assets;
+#endif
 
         public struct CustomLoad
         {
@@ -124,6 +132,10 @@ namespace Takai.Data
         }
 
         //todo: somehow provide ability to load files from zip without loading in as zip/...
+
+        static void LoadAndroid()
+        {
+        }
 
         /// <summary>
         /// Load a single file into the cache
@@ -235,10 +247,14 @@ namespace Takai.Data
                 }
                 else
                 {
+#if ANDROID
+                    load.stream = Assets.Open(realFile);
+#else
                     var fi = new FileInfo(realFile);
                     obj.fileTime = fi.LastWriteTimeUtc;
                     load.length = fi.Length;
                     load.stream = fi.OpenRead();
+#endif
                 }
 
                 //System.Diagnostics.Debug.WriteLine($"Cache: Loading {load.name} (Size: {(load.length / 1024f):N1} KiB)");
@@ -445,7 +461,7 @@ namespace Takai.Data
                 objects.Remove(key);
         }
 
-#if WINDOWS
+#if WINDOWS && DEBUG
         internal static Dictionary<string, FileSystemWatcher> fsWatchers = new Dictionary<string, FileSystemWatcher>(StringComparer.OrdinalIgnoreCase);
         public static void WatchDirectory(string directory, string filter = "*.*")
         {
@@ -487,7 +503,7 @@ namespace Takai.Data
         }
 #endif
 
-        #region Custom Loaders
+#region Custom Loaders
 
         class UnsupportedLoader : CustomLoader
         {
@@ -674,7 +690,6 @@ namespace Takai.Data
                 };
             }
         }
-
 #endregion
     }
 }

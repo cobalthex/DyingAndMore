@@ -27,7 +27,7 @@ namespace Takai.UI
             }
         }
 
-        public float DropdownMaxHeight { get; set; } = 300;
+        public static Range<int> DropdownHeight { get; set; } = new Range<int>(120, 300);
 
         public Static ItemUI { get => list.ItemUI; set => list.ItemUI = value; }
 
@@ -158,15 +158,27 @@ namespace Takai.UI
         {
             if (dropdownContainer.Parent != null)
             {
-                var dsz = new Point((int)availableSize.X, (int)Math.Min(DropdownMaxHeight, dropdownContainer.MeasuredSize.Y));
-                var dpos = new Point(OffsetContentArea.Left - (int)Padding.X, OffsetContentArea.Bottom);
-                //keep on-screen
                 var root = GetRoot();
+             
+                var dsz = new Point(
+                    (int)availableSize.X,
+                    (int)dropdownContainer.MeasuredSize.Y
+                );
+                dsz.Y = MathHelper.Clamp(
+                    Math.Min(dsz.Y, DropdownHeight.max), 
+                    DropdownHeight.min, 
+                    root.OffsetContentArea.Height - OffsetContentArea.Bottom
+                );
+
+                var dpos = new Point(OffsetContentArea.Left - (int)Padding.X, OffsetContentArea.Bottom);
+                
+                //keep on-screen
                 dpos.X = MathHelper.Clamp(dpos.X, 0, root.OffsetContentArea.Width - dsz.X);
                 dpos.Y = MathHelper.Clamp(dpos.Y, 0, root.OffsetContentArea.Height - dsz.Y);
 
                 dropdownContainer.Arrange(root.OffsetContentArea);
-                dropdown.Arrange(new Rectangle(dpos.X, dpos.Y, dsz.X, dsz.Y)); //dropdown scrollbox is not remeasuring correctly
+                dropdown.Measure(dsz.ToVector2()); //todo: this is not working
+                dropdown.Arrange(new Rectangle(dpos.X, dpos.Y, dsz.X, dsz.Y));
             }
             base.ArrangeOverride(availableSize);
         }

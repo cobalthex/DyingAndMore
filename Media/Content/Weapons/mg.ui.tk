@@ -17,13 +17,13 @@ Static {
             ];
 
             Sprite: {
-                Texture: @"./mg-hud.png";
+                Texture: @"./mg_hud.png";
                 ClipRect: [0 0 172 228];
                 Width: 84;
                 Height: 228;
             }
             Mask: {
-                Texture: @"./mg-hud.mask.png";
+                Texture: @"./mg_hud.mask.png";
                 ClipRect: [0 0 172 228];
                 Width: 84;
                 Height: 228;

@@ -36,7 +36,7 @@ ActorClass {
                     Wait { duration: 2sec; }
                     Suicide {
                      # todo: effect
-                     effect: @"Effects/greensplosion.fx.tk";
+                     effect: @"Effects/Greensplosion.fx.tk";
                     }
 
                     #set condition to heat up and then explode after x seconds?

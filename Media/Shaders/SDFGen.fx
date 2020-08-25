@@ -18,6 +18,7 @@ Output vmain(float4 position : POSITION, float2 texcoord : TEXCOORD0)
 Texture2D TilesImage : register(t0);
 Texture2D<uint> TilesLayout : register(t1);
 Texture2D<float> TileSDF : register(t2);
+float2 TilesImageSize;
 
 SamplerState Sampler;
 
@@ -41,31 +42,32 @@ float TileValueAt(uint tile, uint2 offset, float2 texcoord, float2 pixelFraction
     return TilesImage.Sample(Sampler, (cell + local) / pixelFraction).a;
 }
 
-uint pmain(float4 position : SV_Position, float2 texcoord : TEXCOORD0) : SV_Target
+int4 pmain(float4 position : SV_Position, float2 texcoord : TEXCOORD0) : SV_Target
 {
     //surface format color (unorm)
     //float4 tilec = TilesLayout.Load(uint3(texcoord * MapSize, 0));
     //uint tile = ((uint)(tilec.a * 255) << 24) + ((uint)(tilec.b * 255) << 16) + ((uint)(tilec.g * 255) << 8) + ((uint)(tilec.r * 255) << 0);
 
-    uint tile = TilesLayout.Load(uint3(texcoord * MapSize, 0));
+    return 0;
 
-	if (tile == 0xffffffff)
-		return 0;
+ //    uint tile = TilesLayout.Load(uint3(texcoord * MapSize, 0));
 
-	uint2 tsize;
-    TilesImage.GetDimensions(tsize.x, tsize.y);
-    float2 pixelFraction = tsize / TileSize;
+	// if (tile == 0xffffffff)
+	// 	return 0;
 
-    float color = TileValueAt(tile, 0, texcoord, pixelFraction);
+ //    float2 pixelFraction = TilesImageSize / TileSize;
 
-    return color;
+ //    float color = TileValueAt(tile, 0, texcoord, pixelFraction);
+
+ //    return color;
 }
 
+#include "shadermodel.hlsli"
 technique Technique1
 {
     pass Pass1
     {
-        VertexShader = compile vs_4_0 vmain();
-        PixelShader = compile ps_4_0 pmain();
+        VertexShader = compile VS_SHADERMODEL vmain();
+        PixelShader = compile PS_SHADERMODEL pmain();
     }
 }

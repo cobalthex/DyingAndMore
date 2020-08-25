@@ -8,7 +8,6 @@ using Takai.Data;
 using Takai.Input;
 using Takai.UI;
 
-
 namespace DyingAndMore
 {
 #if WINDOWS //win32 startup
@@ -37,10 +36,6 @@ namespace DyingAndMore
     public class DyingAndMoreGame : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager gdm;
-
-#if WINDOWS
-        bool useCustomCursor = false;
-#endif
 
         SpriteBatch sbatch;
         Static ui;
@@ -94,7 +89,8 @@ namespace DyingAndMore
             Takai.Runtime.Game = this;
 
             Serializer.LoadTypesFrom(typeof(DyingAndMoreGame).GetTypeInfo().Assembly);
-#if DEBUG
+
+#if DEBUG && WINDOWS
             Cache.WatchDirectory(Cache.Root);
 #endif
 
@@ -104,19 +100,8 @@ namespace DyingAndMore
 
             Static.DebugFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/mono.fnt.tk");
 
-            #region Mouse Cursor
-#if WINDOWS
-            if (useCustomCursor)
-            {
-                System.Drawing.Bitmap cur = new System.Drawing.Bitmap("Content/UI/Pointer.png", true);
-                System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(cur);
-                System.IntPtr ptr = cur.GetHicon();
-                System.Windows.Forms.Cursor c = new System.Windows.Forms.Cursor(ptr);
-                System.Windows.Forms.Form.FromHandle(Window.Handle).Cursor = c;
-                this.IsMouseVisible = true;
-            }
-#endif
-            #endregion
+            //custom cursor
+            //Mouse.SetCursor(MouseCursor.FromTexture2D(Cache.Load<Texture2D>("UI/Pointer.png"), 0, 0));
 
             InputState.EnabledGestures
                 = GestureType.Tap
@@ -214,6 +199,22 @@ namespace DyingAndMore
                 }
             };
 
+            Static.GlobalCommands["MoveElement"] = delegate (Static ui, object arg)
+            {
+                if (arg == null)
+                    ui.Position += InputState.MouseDelta(); //cross platform support?
+
+                else if (!(arg is Vector2 v))
+                {
+                    if (!(arg is Point p))
+                        return;
+
+                    ui.Position += p.ToVector2();
+                }
+                else
+                    ui.Position += v;
+            };
+
             /*
 #if WINDOWS //UWP launch activation parameters?
             //parse command line args
@@ -248,7 +249,15 @@ namespace DyingAndMore
 #endif
             */
             Static childUI;
-            
+
+#if ANDROID
+            {
+                var map = Cache.Load<MapInstance>("Mapsrc/aitest.map.tk");
+                childUI = new Editor.Editor(map);
+                map.renderSettings.drawEntityForwardVectors = true;
+                map.renderSettings.drawEntityHierarchies = true;
+            }
+#else
             childUI = new FileList
             {
                 //Size = new Vector2(400, 600),
@@ -284,7 +293,7 @@ namespace DyingAndMore
                 }
                 return UIEventResult.Handled;
             });
-
+#endif
 
             //sp = new Takai.Graphics.Sprite();
             //childUI = Static.GeneratePropSheet(sp);
@@ -296,10 +305,10 @@ namespace DyingAndMore
             //};
 
             //{
-                //var map = Cache.Load<MapInstance>("mapsrc/aitest.map.tk");
-                //childUI = new Editor.Editor(map);
-                //map.renderSettings.drawEntityForwardVectors = true;
-                //map.renderSettings.drawEntityHierarchies = true;
+            //var map = Cache.Load<MapInstance>("mapsrc/aitest.map.tk");
+            //childUI = new Editor.Editor(map);
+            //map.renderSettings.drawEntityForwardVectors = true;
+            //map.renderSettings.drawEntityHierarchies = true;
             //}
 
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
@@ -316,7 +325,6 @@ namespace DyingAndMore
             //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
             //    };
             //}
-
 
             ui = new Static
             //ui = new ScrollBox

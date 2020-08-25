@@ -131,4 +131,8 @@
 	TabPanel.TabHeader.Active: {
 		BackgroundColor: Color.CornflowerBlue;
 	};
+
+	Shade: {
+		Proto: "Box";
+	}
 }

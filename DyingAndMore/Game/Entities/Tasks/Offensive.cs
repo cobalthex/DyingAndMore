@@ -2,8 +2,6 @@
 using Microsoft.Xna.Framework;
 using Takai.Game;
 using DyingAndMore.Game.Weapons;
-using System.Windows.Forms;
-using Takai.UI;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
@@ -214,7 +212,6 @@ namespace DyingAndMore.Game.Entities.Tasks
         LeadTarget, //shoot where the target is likely to be
         Spray // rotate in a direction and shoot - ?
     }
-    public class AimingMethodSelect : EnumSelect<AimingMethod> { }
 
     [OffensiveTask]
     public struct ShootAtTarget : ITask

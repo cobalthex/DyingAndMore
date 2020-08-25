@@ -4,6 +4,8 @@ SamplerState Sampler;
 float2 TexNormSize; // 1 / size
 float2 FrameSize;
 
+//switch to convolution filter?
+
 float Adjacent(float2 texcoord, float2 distance)
 {
 	float4 nw = Tex.Sample(Sampler, texcoord + float2(-distance.x, -distance.y));
@@ -13,7 +15,6 @@ float Adjacent(float2 texcoord, float2 distance)
 
 	return ne.a * se.a * nw.a * sw.a;
 }
-
 
 float offset[] = { 0.0, 1.3846153846, 3.2307692308 };
 float weight[] = { 0.2270270270, 0.3162162162, 0.0702702703 };
@@ -43,10 +44,11 @@ float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoo
     return px;
 }
 
+#include "shadermodel.hlsli"
 technique Technique1
 {
     pass Pass1
     {
-        PixelShader = compile ps_4_0 pmain();
+        PixelShader = compile PS_SHADERMODEL pmain();
     }
 }

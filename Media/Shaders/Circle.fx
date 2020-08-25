@@ -18,7 +18,7 @@ PSInput vmain(
 	float radius	  : POSITION1,
 	float thickness  : POSITION2,
 	float dashLength : POSITION3,
-	float dashOffset : POSITION4, 
+	float dashOffset : POSITION4,
 	float4 color     : COLOR0,
 	float2 texcoord  : TEXCOORD0
 )
@@ -56,11 +56,12 @@ float4 pmain(PSInput input) : SV_Target
     return float4(input.color.rgb, input.color.a * alpha);
 }
 
+#include "shadermodel.hlsli"
 technique Technique1
 {
-	pass Pass1
-	{
-		VertexShader = compile vs_4_0 vmain();
-		PixelShader = compile ps_4_0 pmain();
-	}
+    pass Pass1
+    {
+        VertexShader = compile VS_SHADERMODEL vmain();
+        PixelShader = compile PS_SHADERMODEL pmain();
+    }
 }

@@ -2,7 +2,7 @@ param
 (
     [switch]$FNA,
     [switch]$DX11,
-    [switch]$OGL,
+    [switch]$OpenGL,
     [io.FileInfo[]]$Files = (Get-ChildItem -File -Recurse -Filter "*.fx"),
     [Switch]$FlattenHierarchy,
     [ValidateSet("Debug", "Release")][string]$Configuration = "Release"
@@ -20,7 +20,7 @@ if ($FNA)
         if ($FlattenHierarchy -or (Test-Path -PathType Leaf -Path $_.Name)) {
             $subDir = $outDir
         }
-        else { 
+        else {
             # support nested folders
             $subDir = New-Item -Force -ItemType directory -Path (Join-Path $outDir (Resolve-Path -Relative -Path $_.DirectoryName))
         }
@@ -37,18 +37,18 @@ if ($FNA)
     }
 }
 
-$mgfxExe = 'C:\Program Files (x86)\MSBuild\MonoGame\v3.0\Tools\2MGFX.exe'
+$mgfxExe = '../../Tools/mgfxc/mgfxc.exe'
 
 if ($DX11)
 {
     Write-Verbose "Compiling for DirectX 11 ($Configuration)"
-    
+
     $outDir = New-Item -Force -ItemType directory -Path 'DX11'
     $Files | Get-Item | % {
         if ($FlattenHierarchy -or (Test-Path -PathType Leaf -Path $_.Name)) {
             $subDir = $outDir
         }
-        else { 
+        else {
             # support nested folders
             $subDir = New-Item -Force -ItemType directory -Path (Join-Path $outDir (Resolve-Path -Relative -Path $_.DirectoryName))
         }
@@ -59,21 +59,21 @@ if ($DX11)
             '/Profile:DirectX_11' `
             $(If ($Configuration -eq 'Debug') { '/Debug' })
         if (!$?) {
-            throw "Error compiling DirectX 11 shader '$_'"  
+            throw "Error compiling DirectX 11 shader '$_'"
         }
     }
 }
 
-if ($OGL)
+if ($OpenGL)
 {
     Write-Verbose "Compiling for OpenGL ($Configuration)"
-    
-    $outDir = New-Item -Force -ItemType directory -Path 'OGL'
+
+    $outDir = New-Item -Force -ItemType directory -Path 'OpenGL'
     $Files | Get-Item | % {
         if ($FlattenHierarchy -or (Test-Path -PathType Leaf -Path $_.Name)) {
             $subDir = $outDir
         }
-        else { 
+        else {
             # support nested folders
             $subDir = New-Item -Force -ItemType directory -Path (Join-Path $outDir (Resolve-Path -Relative -Path $_.DirectoryName))
         }
@@ -89,7 +89,7 @@ if ($OGL)
     }
 }
 
-if (!$DX11 -and !$OGL -and !$FNA)
+if (!$DX11 -and !$OpenGL -and !$FNA)
 {
     throw "No build system specified."
 }

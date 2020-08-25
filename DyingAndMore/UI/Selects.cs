@@ -4,8 +4,8 @@ using DyingAndMore.Game.Entities;
 using Takai.Game;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Takai.Data;
+using DyingAndMore.Game.Entities.Tasks;
 
 namespace DyingAndMore.UI
 {
@@ -162,20 +162,20 @@ namespace DyingAndMore.UI
 
     class BehaviorList : ItemList<Behavior> { }
 
-    class TaskList : ItemList<Game.Entities.Tasks.ITask> { }
+    class TaskList : ItemList<ITask> { }
 
     class TaskSelect : TypeSelect
     {
         public TaskSelect()
         {
-            AddTypeTree<Game.Entities.Tasks.ITask>();
+            AddTypeTree<ITask>();
         }
     }
     class OffensiveTaskSelect : TypeSelect
     {
         public OffensiveTaskSelect()
         {
-            AddTypeTreeByAttribute<Game.Entities.Tasks.OffensiveTaskAttribute>();
+            AddTypeTreeByAttribute<OffensiveTaskAttribute>();
         }
     }
 
@@ -183,28 +183,36 @@ namespace DyingAndMore.UI
     {
         public DefensiveTaskSelect()
         {
-            AddTypeTreeByAttribute<Game.Entities.Tasks.DefensiveTaskAttribute>();
+            AddTypeTreeByAttribute<DefensiveTaskAttribute>();
         }
     }
     class NavigationTaskSelect : TypeSelect
     {
         public NavigationTaskSelect()
         {
-            AddTypeTreeByAttribute<Game.Entities.Tasks.NavigationTaskAttribute>();
+            AddTypeTreeByAttribute<NavigationTaskAttribute>();
         }
     }
     class TargetingTaskSelect : TypeSelect
     {
         public TargetingTaskSelect()
         {
-            AddTypeTreeByAttribute<Game.Entities.Tasks.TargetingTaskAttribute>();
+            AddTypeTreeByAttribute<TargetingTaskAttribute>();
         }
     }
     class MiscellaneousTaskSelect : TypeSelect
     {
         public MiscellaneousTaskSelect()
         {
-            AddTypeTreeByAttribute<Game.Entities.Tasks.MiscellaneousTaskAttribute>();
+            AddTypeTreeByAttribute<MiscellaneousTaskAttribute>();
         }
     }
+
+    public class SetOperationsSelect : EnumSelect<SetOperation> { }
+
+    public class TaskFailureActionSelect : EnumSelect<TaskFailureAction> { }
+    
+    public class AimingMethodSelect : EnumSelect<AimingMethod> { }
+
+    public class SensesSelect : EnumSelect<Senses> { }
 }

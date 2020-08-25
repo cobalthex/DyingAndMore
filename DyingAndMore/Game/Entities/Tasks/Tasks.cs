@@ -163,7 +163,6 @@ namespace DyingAndMore.Game.Entities.Tasks
         Outersection, //symmetric difference/xor
         Difference,
     }
-    public class SetOperationsSelect : EnumSelect<SetOperation> { }
 
     [MiscellaneousTask]
     public struct SetTargetFactions : ITask

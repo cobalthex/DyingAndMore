@@ -1,20 +1,27 @@
 BehaviorList {
 	HorizontalAlignment: Alignment.Stretch;
-	Container: List {
+	Container: Accordian {
 		HorizontalAlignment: Alignment.Stretch;
 		Direction: Direction.Vertical;
 		Margin: 10;
-	}
+	};
 
     Bindings: [
         Binding {
             Source: "DefaultBehaviors"; # todo: make this parametric somehow
             Target: "Items";
             Direction: BindingDirection.TwoWay;
-        }
+        };
     ];
 
 	ItemUI: List {
+	    Bindings: [
+	        Binding {
+	            Source: "Name";
+	            Target: "Name";
+	        };
+        ];
+
 		Style: "Box";
 		HorizontalAlignment: Alignment.Stretch;
 		Direction: Direction.Vertical;
@@ -30,9 +37,87 @@ BehaviorList {
 	    			};
     			];
     		};
-			@"UI/RemoveItem.ui.tk";
+			@"UI/RemoveItem.ui.tk"; # todo: broken
 
-    		#senses
+			List {
+				Direction: Direction.Horizontal;
+				Children: [
+					List {
+						Direction: Direction.Vertical;
+						Children: [
+				    		Static { Text: "`_Requisite Senses"; };
+							SensesSelect {
+				    			Bindings: [
+				    				Binding {
+				    					Source: "RequisiteSenses";
+				    					Target: "Value";
+					    				Direction: BindingDirection.TwoWay;
+				    				};
+								];
+							};
+						];
+					};
+
+					List {
+						Direction: Direction.Vertical;
+						Children: [
+				    		Static { Text: "`_Requisite (Not) Senses"; };
+							SensesSelect {
+				    			Bindings: [
+				    				Binding {
+				    					Source: "RequisiteNotSenses";
+				    					Target: "Value";
+					    				Direction: BindingDirection.TwoWay;
+				    				};
+								];
+							};
+						];
+					};
+				];
+			};
+
+    		Static { Text: "`_Queue Chance"; };
+    		List {
+				Direction: Direction.Horizontal;
+				Children: [
+					TrackBar {
+						Minimum: 0;
+						Maximum: 100;
+						Increment: 1;
+
+						Bindings: [
+							Binding {
+								Source: "QueueChance";
+								Target: "NormalizedValue";
+								Direction: BindingDirection.TwoWay;
+							};
+						];
+					};
+					Static {
+						Bindings: [
+							Binding {
+								Source: "QueueChance";
+								Target: "Text";
+								Converter: StringFormatConverter {
+									Format: "{0:0%}";
+								}
+							};
+						];
+					};
+				];
+			};
+
+    		Static { Text: "`_On Task Failure"; };
+    		TaskFailureActionSelect {
+				Bindings: [
+					Binding { # todo: not working
+						Source: "OnTaskFailure";
+						Target: "Value";
+						Direction: BindingDirection.TwoWay;
+					};
+				];
+			};
+
     		Static { Text: "`_Tasks"; };
     		TaskList {
 				HorizontalAlignment: Alignment.Stretch;
@@ -41,7 +126,7 @@ BehaviorList {
     					Source: "Tasks";
     					Target: "Items";
 	    				Direction: BindingDirection.TwoWay;
-    				}
+    				};
 				];
 
 				ItemUI: List {
@@ -53,7 +138,7 @@ BehaviorList {
 								Binding {
 									Source: ":typename";
 									Target: "Text";
-									Converter: StringFormatConverter { Format: "`_{0}"; }
+									Converter: StringFormatConverter { Format: "`_{0}"; };
 								};
 							];
 						};
@@ -62,6 +147,8 @@ BehaviorList {
 						@"UI/RemoveItem.ui.tk";
 					];
 				};
+
+				# option to load behavior from file
 
 				AddItemUI: List {
 					Style: "Box";
@@ -132,7 +219,7 @@ BehaviorList {
 									];
 								};
     						];
-    					}
+    					};
 
 						Static {
 							HorizontalAlignment: Alignment.Center;
@@ -144,8 +231,8 @@ BehaviorList {
 							};
 						};
 					];
-				}
-    		}
+				};
+    		};
 
     		#on taks failure
 

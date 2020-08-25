@@ -1,13 +1,12 @@
 Texture2D Tex : register(t0);
 SamplerState Sampler;
+float2 TextureSize;
 
 float3x3 Filter;
 
 float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoord : TEXCOORD0) : SV_Target
 {
-    uint2 tsize;
-    Tex.GetDimensions(tsize.x, tsize.y);
-    float2 inc = 1.0 / tsize;
+    float2 inc = 1.0 / TextureSize;
     float2 off = texcoord - inc;
 
     float4 sum = 0;
@@ -18,10 +17,11 @@ float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoo
 	return color * (sum / 9);
 }
 
+#include "shadermodel.hlsli"
 technique Technique1
 {
     pass Pass1
     {
-        PixelShader = compile ps_4_0 pmain();
+        PixelShader = compile PS_SHADERMODEL pmain();
     }
 }

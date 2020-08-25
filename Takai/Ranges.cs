@@ -128,5 +128,10 @@ namespace Takai
         {
             return range.max - range.min;
         }
+
+        public static T Clamp<T>(this Range<T> range, T value) where T : IComparable
+        {
+            return (value.CompareTo(range.min) < 0 ? range.min : (value.CompareTo(range.max) > 0 ? range.max : value));
+        }
     }
 }

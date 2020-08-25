@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using DyingAndMore.Game.Entities;
 using Microsoft.Xna.Framework;
-using SharpDX.Direct3D11;
 using Takai.Game;
 
 namespace DyingAndMore.Game.Entities

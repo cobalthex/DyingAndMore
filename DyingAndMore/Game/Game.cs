@@ -9,7 +9,6 @@ using Takai.Game;
 using Takai.Input;
 using Takai;
 using System.Collections.Generic;
-using SharpDX.MediaFoundation;
 
 namespace DyingAndMore.Game
 {

@@ -25,11 +25,12 @@ float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float3 texcoo
 	return color * Tex.Sample(Sampler, texcoord.xy / (1 - texcoord.z));
 }
 
+#include "shadermodel.hlsli"
 technique Technique1
 {
     pass Pass1
     {
-        VertexShader = compile vs_4_0 vmain();
-        PixelShader = compile ps_4_0 pmain();
+        VertexShader = compile VS_SHADERMODEL vmain();
+        PixelShader = compile PS_SHADERMODEL pmain();
     }
 }

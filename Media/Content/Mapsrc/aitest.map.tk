@@ -23,7 +23,7 @@ MapInstance {
     ];
     Class: MapClass {
         Name: Null;
-        Tileset: @"Tilesets/pink.tiles.tk";
+        Tileset: @"Tilesets/Pink.tiles.tk";
         MaterialInteractions: @"Materials/Test.mtl.tk";
         Width: 46;
         Height: 46;
@@ -53,7 +53,7 @@ MapInstance {
                 CurrentAmmo: 1000;
                 LastAmmoRefillTime: 0;
                 OnlyRefillIfIdle: True;
-                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/MG.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };

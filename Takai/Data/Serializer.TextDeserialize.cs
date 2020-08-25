@@ -123,7 +123,7 @@ namespace Takai.Data
                             null, stream, null);
 
             return stream.BaseStream.Position - charLen + charPos;
-#elif WINDOWS_UAP
+#else
             return 0; //todo
 #endif
         }
@@ -1036,11 +1036,11 @@ namespace Takai.Data
                     builder.Append((char)ch);
             }
             reader.Read();
-#if WINDOWS
+//#if WINDOWS
             return string.Intern(builder.ToString());
-#elif WINDOWS_UAP
-            return builder.ToString(); //todo: .net 2+ intern
-#endif
+//#else
+            //return builder.ToString(); //todo: .net 2+ intern
+//#endif
         }
 
         public static string ReadWord(TextReader reader)

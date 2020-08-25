@@ -6,6 +6,10 @@ List {
 	Style: "Frame";
 	Margin: 10;
 
+    #EventCommands: {
+    #    Drag: "MoveElement";
+    #}
+
     Children: [
         Scrollbox {
             Size: [600 500];

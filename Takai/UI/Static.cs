@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using Takai.Input;
+using Takai.Graphics;
 
 using Stylesheet = System.Collections.Generic.Dictionary<string, object>;
-using Takai.Graphics;
 
 namespace Takai.UI
 {
@@ -1703,16 +1703,23 @@ namespace Takai.UI
         /// <param name="container">The container to fit this to, in relative coordinates</param>
         private void AdjustToContainer(Rectangle container)
         {
-            Rectangle parentContentArea;
-            Rectangle parentBounds;
+            Rectangle parentContainer = container;
+
+            //Rectangle parentContentArea;
+            //Rectangle parentBounds;
             var offsetParent = Point.Zero;
             if (Parent == null)
-                parentBounds = parentContentArea = Runtime.GraphicsDevice.Viewport.Bounds;
+                parentContainer = Rectangle.Intersect(parentContainer, Runtime.GraphicsDevice.Viewport.Bounds);
+                //parentBounds = parentContentArea = Runtime.GraphicsDevice.Viewport.Bounds;
             else
             {
                 offsetParent = Parent.OffsetContentArea.Location;
-                parentContentArea = Parent.VisibleContentArea;
-                parentBounds = Parent.VisibleBounds;
+                parentContainer.Offset(offsetParent);
+                parentContainer = Rectangle.Intersect(parentContainer, Parent.OffsetContentArea);
+
+                //offsetParent = Parent.OffsetContentArea.Location;
+                //parentContentArea = Parent.VisibleContentArea;
+                //parentBounds = Parent.VisibleBounds;
             }
 
             var finalSize = MeasuredSize;
@@ -1740,15 +1747,17 @@ namespace Takai.UI
 
             tmp = Rectangle.Intersect(bounds, container);
             tmp.Offset(offsetParent);
-            VisibleContentArea = Rectangle.Intersect(tmp, parentContentArea);
+            VisibleContentArea = Rectangle.Intersect(tmp, parentContainer);
+
+            //todo: this needs to shrink to clipped container
 
             tmp.Inflate(Padding.X, Padding.Y);
-            VisibleBounds = Rectangle.Intersect(tmp, parentBounds);
+            VisibleBounds = Rectangle.Intersect(tmp, parentContainer);
             //VisibleBounds = new Rectangle(
             //    tmp.X,
             //    tmp.Y,
-            //    Math.Min(tmp.Right, parentBounds.Right) - Math.Max(tmp.Left, parentBounds.Left),
-            //    Math.Min(tmp.Bottom, parentBounds.Bottom) - Math.Max(tmp.Top, parentBounds.Top)
+            //    Math.Min(tmp.Right, parentContainer.Right) - Math.Max(tmp.Left, parentContainer.Left),
+            //    Math.Min(tmp.Bottom, parentContainer.Bottom) - Math.Max(tmp.Top, parentContainer.Top)
             //); //maintains offset, but size goes to zero
 
             //todo: ^ get working
@@ -2049,6 +2058,8 @@ namespace Takai.UI
                     didPress[1 << (int)button] = false;
                     if (VisibleBounds.Contains(mousePosition)) //gesture pos
                     {
+                        //todo: only trigger click if did not drag (?) (only if drag event)
+
                         TriggerClick(
                             (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
                             (int)button,
@@ -2406,6 +2417,6 @@ namespace Takai.UI
             BubbleEvent(ClickEvent, ce);
         }
 
-#endregion
+        #endregion
     }
 }
