@@ -25,7 +25,7 @@ MapInstance {
     };
     Class: MapClass {
         Name: Null;
-        Tileset: @"Tilesets/gray.tiles.tk";
+        Tileset: @"Tilesets/Gray.tiles.tk";
         MaterialInteractions: @"Materials/Test.mtl.tk";
         Width: 16;
         Height: 6;
@@ -51,7 +51,7 @@ MapInstance {
             };
             MaxSpeed: 300;
             Weapon: GunInstance {
-                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/MG.wpn.tk";
                 CurrentAmmo: 1000;
                 LastAmmoRefillTime: 78705;
                 OnlyRefillIfIdle: True;

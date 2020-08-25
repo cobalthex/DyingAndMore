@@ -1,7 +1,7 @@
 WeaponPickupClass {
     Name: "Some boss gun";
 
-	Weapon: @"Weapons/boss.wpn.tk";
+	Weapon: @"Weapons/Boss.wpn.tk";
 
     Animations: {
         Idle: {

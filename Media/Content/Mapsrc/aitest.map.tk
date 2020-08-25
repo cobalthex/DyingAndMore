@@ -209,7 +209,7 @@ MapInstance {
             };
             MaxSpeed: 400;
             Weapon: GunInstance {
-                Class: @"Weapons/laser.wpn.tk";
+                Class: @"Weapons/Laser.wpn.tk";
                 CurrentAmmo: 100;
                 StateTime: 0;
                 Charge: 0;

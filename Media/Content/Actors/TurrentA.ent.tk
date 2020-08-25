@@ -8,7 +8,7 @@ ActorClass {
     DefaultWeapon: [GunClass {
         MaxAmmo: 0;
         Projectile: {
-            Trail: @"Effects/Trails/laser.trail.tk";
+            Trail: @"Effects/Trails/Laser.trail.tk";
             MuzzleVelocity: 1E10;
             Damage: 100;
             Drag: 0;
@@ -18,7 +18,7 @@ ActorClass {
 
     Animations: {
     	Idle: {
-    		Sprite: @"./TurretA.png";
+    		Sprite: @"./turretA.png";
     	};
     };
 };

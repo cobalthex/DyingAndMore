@@ -9,7 +9,7 @@ EntityClass {
                     ParticleEffect {
                         Class: {
                             Sprite: {
-                                Texture: @"Effects/Smoke3.png"
+                                Texture: @"Effects/smoke3.png"
                                 Tween: TweenStyle.Overlap;
                                 Width: 48;
                                 Height: 48;
@@ -40,7 +40,7 @@ EntityClass {
         }
         EditorPreview: {
             Sprite: {
-                texture: @"Effects/Smoke3.png";
+                texture: @"Effects/smoke3.png";
                 width: 48;
                 height: 48;
             };

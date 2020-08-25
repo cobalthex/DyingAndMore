@@ -2,7 +2,7 @@ EffectsClass {
 	Effects: [
 		ParticleEffect {
             Class: {
-            Sprite: @"./spark.png";
+            Sprite: @"./Spark.png";
                 Blend: BlendState.Additive;
                 ScaleOverTime: {
                     values: [

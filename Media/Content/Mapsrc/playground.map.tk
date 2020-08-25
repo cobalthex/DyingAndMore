@@ -21,7 +21,7 @@ MapInstance {
     };
     Class: MapClass {
         Name: "playground";
-        Tileset: @"Tilesets/gray.tiles.tk";
+        Tileset: @"Tilesets/Gray.tiles.tk";
         MaterialInteractions: @"Materials/Test.mtl.tk";
         Width: 20;
         Height: 20;
@@ -46,9 +46,9 @@ MapInstance {
             };
             MaxSpeed: 300;
             Weapon: GunInstance {
-                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/MG.wpn.tk";
                 CurrentAmmo: 1000;
-                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/MG.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };
@@ -88,7 +88,7 @@ MapInstance {
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
-                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/MG.wpn.tk";
                 StateTime: 0;
                 Charge: 0;
             };

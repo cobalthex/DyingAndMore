@@ -16,7 +16,7 @@ ActorClass {
             ParticleEffect {
                 Class: {
                     Sprite: {
-                        Texture: @"Effects/Smoke2.png";
+                        Texture: @"Effects/smoke2.png";
                         Width: 16;
                         Height: 16;
                         FrameCount: 4;
@@ -52,7 +52,7 @@ ActorClass {
 
     Animations: {
         Idle: {
-            Sprite: @"./Explosive.png";
+            Sprite: @"./explosive.png";
         };
     };
 }

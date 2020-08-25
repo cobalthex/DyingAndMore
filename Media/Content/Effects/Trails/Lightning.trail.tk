@@ -2,7 +2,7 @@ TrailClass {
     MaxPoints: 400;
     Color: Color.White;
     Sprite: {
-        texture: @"Effects/Trails/lightning.png";
+        texture: @"Effects/Trails/Lightning.png";
     }
 
     Width: {

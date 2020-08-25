@@ -42,7 +42,7 @@ ProjectileClass {
             ParticleEffect {
                 Class: {
                     Sprite: {
-                        Texture: @"Effects/spark.png";
+                        Texture: @"Effects/Spark.png";
                     };
                     Blend: BlendState.Additive;
                     ColorOverTime: {
@@ -94,7 +94,7 @@ ProjectileClass {
             Sprite: {
                 Texture: @"./grenade.png";
             };
-            #Effect: @"Effects/trail.fx.tk";
+            #Effect: @"Effects/Trail.fx.tk";
         }
     }
 }

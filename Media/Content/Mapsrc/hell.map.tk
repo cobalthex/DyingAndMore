@@ -60,7 +60,7 @@ MapInstance {
     ];
     Class: MapClass {
         Name: "Hell";
-        Tileset: @"Tilesets/gray.tiles.tk";
+        Tileset: @"Tilesets/Gray.tiles.tk";
         MaterialInteractions: @"Materials/Test.mtl.tk";
         Width: 200;
         Height: 200;
@@ -126,7 +126,7 @@ MapInstance {
             Class: @"Pickups/MG.ent.tk";
             Id: 3;
             Weapon: GunInstance {
-                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/MG.wpn.tk";
                 CurrentAmmo: 1000;
                 LastAmmoRefillTime: 0;
                 OnlyRefillIfIdle: True;

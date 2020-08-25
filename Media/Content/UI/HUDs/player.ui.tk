@@ -19,7 +19,7 @@ Static {
 			];
 
 			Sprite: {
-				Texture: @"./player.png";
+				Texture: @"./Player.png";
 				ClipRect: [0 88 84 88];
 				Width: 84;
 				Height: 88;

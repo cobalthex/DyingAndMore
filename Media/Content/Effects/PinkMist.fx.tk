@@ -2,7 +2,7 @@ EffectsClass {
 	Effects: [
 		ParticleEffect {
             Class: {
-                Sprite: @"./spark.png";
+                Sprite: @"./Spark.png";
                 Blend: BlendState.Additive;
                 ColorOverTime: Color.HotPink;
                 InitialSpeed: [-300 -400];
@@ -15,7 +15,7 @@ EffectsClass {
         };
         ParticleEffect {
             Class: {
-                Sprite: @"./spark.png";
+                Sprite: @"./Spark.png";
                 Blend: BlendState.Additive;
                 ColorOverTime: Color.HotPink;
                 InitialSpeed: [-100 -200];

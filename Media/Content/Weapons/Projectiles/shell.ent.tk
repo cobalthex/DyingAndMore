@@ -10,7 +10,7 @@ ProjectileClass {
     Animations: {
         Idle: {
             Sprite: {
-                Texture: @"./Tracer.png";
+                Texture: @"./tracer.png";
                 Height: 1;
                 IsLooping: true;
                 Origin: [0 0];

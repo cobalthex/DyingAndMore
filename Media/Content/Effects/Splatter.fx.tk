@@ -3,7 +3,7 @@ EffectsClass {
 		ParticleEffect {
             Class: {
                 Sprite: {
-                    Texture: @"./blood.png";
+                    Texture: @"./Blood.png";
                     Width: 10;
                     Height: 10;
                     FrameCount: 6;

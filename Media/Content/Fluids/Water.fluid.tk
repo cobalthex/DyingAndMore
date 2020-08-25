@@ -1,7 +1,7 @@
 FluidClass {
     Name: "Water";
-    Texture: @"Fluids/water.png";
-    Reflection: @"Fluids/water.r.png";
+    Texture: @"Fluids/Water.png";
+    Reflection: @"Fluids/Water.r.png";
     Alpha: 0.5;
     Radius: 42;
     Drag: 0.55;

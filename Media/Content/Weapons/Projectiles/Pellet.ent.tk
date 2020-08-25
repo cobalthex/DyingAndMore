@@ -11,7 +11,7 @@ ProjectileClass {
         Idle: {
             Material: "Brass";
             Sprite: {
-                Texture: @"./Tracer.png";
+                Texture: @"./tracer.png";
                 Height: 1;
                 #FrameCount: 4;
                 #FrameLength: 50msec;

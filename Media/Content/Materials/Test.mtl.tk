@@ -1,7 +1,7 @@
 MaterialInteractions {
     Interactions: [
         ["Player" "Tiles" MaterialInteraction {
-            Effect: @"Effects/trail.fx.tk";
+            Effect: @"Effects/Trail.fx.tk";
         }]
 
         ["Brass" "*" MaterialInteraction {

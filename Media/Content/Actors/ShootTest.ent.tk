@@ -35,8 +35,8 @@ ActorClass {
     }];
 
     DefaultWeapon: [
-        @"Weapons/plasma.wpn.tk"
-        @"Weapons/laser.wpn.tk"
+        @"Weapons/Plasma.wpn.tk"
+        @"Weapons/Laser.wpn.tk"
     ];
 
     Trail: {

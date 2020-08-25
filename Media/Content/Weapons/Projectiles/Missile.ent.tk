@@ -35,7 +35,7 @@ ProjectileClass {
     Trail: {
         MaxPoints: 200;
         Color: Color.Aquamarine;
-        Sprite: @"Effects/Trails/Missile.png";
+        Sprite: @"Effects/Trails/missile.png";
         LifeSpan: 0.5sec;
         CaptureDelay: 300hz;
         Width: {
@@ -53,7 +53,7 @@ ProjectileClass {
             Sprite: {
                 Texture: @"./Antibody.png";
             };
-            #Effect: @"Effects/trail.fx.tk";
+            #Effect: @"Effects/Trail.fx.tk";
         }
     }
 }

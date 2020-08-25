@@ -8,7 +8,7 @@ Static {
 
             Children: [
                 Graphic {
-                    Sprite: @"promo/dejitaru.png";
+                    Sprite: @"Promo/Dejitaru.png";
                     Height: 200px;
                     HorizontalAlignment: Alignment.Middle;
                 };

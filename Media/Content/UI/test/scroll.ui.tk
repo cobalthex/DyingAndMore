@@ -47,11 +47,11 @@ Static {
 					}
 					ItemUI: Static { Text: "AAA"; Size: [100 100]; };
 					Items: [
-						@"Actors/player.ent.tk";
-						@"Actors/player.ent.tk";
-						@"Actors/player.ent.tk";
-						@"Actors/player.ent.tk";
-						@"Actors/player.ent.tk";
+						@"Actors/Player.ent.tk";
+						@"Actors/Player.ent.tk";
+						@"Actors/Player.ent.tk";
+						@"Actors/Player.ent.tk";
+						@"Actors/Player.ent.tk";
 					];
 				};
 			];

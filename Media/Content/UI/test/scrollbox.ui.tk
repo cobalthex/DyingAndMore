@@ -20,7 +20,7 @@ ScrollBox {
 					Position: 200;
 
 					Sprite: {
-						texture: @"other/animation.png";
+						texture: @"Other/Animation.png";
 						width: 34;
 						height: 49;
 						cliprect: [0 49 340 49];

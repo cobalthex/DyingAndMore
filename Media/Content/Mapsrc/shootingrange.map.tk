@@ -52,7 +52,7 @@ MapInstance {
             };
             MaxSpeed: 300;
             Weapon: GunInstance {
-                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/MG.wpn.tk";
                 CurrentAmmo: 1000;
                 StateTime: 0;
                 Charge: 0;
@@ -181,8 +181,8 @@ MapInstance {
         }
         WeaponPickupInstance {
             Weapon: GunInstance {
-                Class: @"Weapons/mg.wpn.tk";
-                Class: @"Weapons/mg.wpn.tk";
+                Class: @"Weapons/MG.wpn.tk";
+                Class: @"Weapons/MG.wpn.tk";
                 CurrentAmmo: 1000;
                 StateTime: 0;
                 Charge: 0;
