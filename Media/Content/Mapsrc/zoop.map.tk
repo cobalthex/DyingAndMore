@@ -2,7 +2,7 @@ MapInstance {
     Squads: Null;
     Class: MapClass {
         Name: "path test";
-        Tileset: @"B:/Code/DyingAndMore/Media/Content/Tilesets/Gray.tiles.tk";
+        Tileset: @"Tilesets/Gray.tiles.tk";
         MaterialInteractions: MaterialInteractions {
             File: Null;
             Interactions: [];

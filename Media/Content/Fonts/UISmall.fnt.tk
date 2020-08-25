@@ -224,6 +224,6 @@ BitmapFont {
         253: [157 309 13 24];
         254: [170 309 11 25];
     };
-    Texture: "Fonts/UISmall.png";
+    Texture: @"Fonts/UISmall.png";
     Tracking: [0 0];
 }

@@ -16,9 +16,9 @@ Get-ChildItem -Recurse -Path * -File | % {
 
 Pop-Location
 
-# not efficient
 $queue | ForEach-Object -Parallel {
-    foreach ($kv in $allFiles.GetEnumerator()) {
+    $dict = $using:allFiles
+    foreach ($kv in $dict.GetEnumerator()) {
         $p = $kv.Value
         $lp = './' + $kv.Key.Name
         # -raw is not ideal, but out-file -NoNewLine will remove all newlines if done per-line

@@ -12,7 +12,7 @@ ActorClass {
     Animations: {
         Idle: {
             Sprite: {
-                texture: "Actors/Spawner.png";
+                texture: @"Actors/spawner.png";
                 Width: 64;
                 Height: 64;
                 origin: [32 32];
@@ -21,7 +21,7 @@ ActorClass {
         };
         Dead: {
             Sprite: {
-                texture: "Actors/Spawner.png";
+                texture: @"Actors/spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];
@@ -34,7 +34,7 @@ ActorClass {
         };
         Inactive: {
             Sprite: {
-                texture: "Actors/Spawner.png";
+                texture: @"Actors/spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];
@@ -47,7 +47,7 @@ ActorClass {
         };
         SpawnerChargeWeapon: {
             Sprite: {
-                texture: "Actors/Spawner.png";
+                texture: @"Actors/spawner.png";
                 width: 64;
                 height: 64;
                 origin: [32 32];

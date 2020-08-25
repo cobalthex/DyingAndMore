@@ -133,10 +133,6 @@ namespace Takai.Data
 
         //todo: somehow provide ability to load files from zip without loading in as zip/...
 
-        static void LoadAndroid()
-        {
-        }
-
         /// <summary>
         /// Load a single file into the cache
         /// </summary>
@@ -248,6 +244,14 @@ namespace Takai.Data
                 else
                 {
 #if ANDROID
+                    try
+                    {
+                        var fd = Assets.OpenFd(realFile);
+                        load.length = fd.Length;
+                        fd.Close();
+                    } 
+                    catch (Java.IO.FileNotFoundException) { }
+
                     load.stream = Assets.Open(realFile);
 #else
                     var fi = new FileInfo(realFile);
@@ -415,6 +419,44 @@ namespace Takai.Data
             //var dir = path.LastIndexOfAny(new[] { '\\', '/' }) + 1;
             //var ext = path.IndexOf('.', dir) + 1;
             //return path.Substring(ext == 0 ? dir : ext);
+        }
+
+        /// <summary>
+        /// Read the entire contents of a stream to a byte array.
+        /// Here for android support
+        /// </summary>
+        /// <param name="stream">The stream to read from</param>
+        /// <returns>The bytes read</returns>
+        public static byte[] ReadStream(Stream stream)
+        {
+            var readBuffer = new byte[1 << 16]; //64k
+            int offset = 0;
+            int bytesRead;
+            while ((bytesRead = stream.Read(readBuffer, offset, readBuffer.Length - offset)) > 0)
+            {
+                offset += bytesRead;
+                if (offset == readBuffer.Length)
+                {
+                    int nextByte = stream.ReadByte();
+                    if (nextByte != -1)
+                    {
+                        byte[] temp = new byte[readBuffer.Length * 2];
+                        Buffer.BlockCopy(readBuffer, 0, temp, 0, readBuffer.Length);
+                        Buffer.SetByte(temp, offset, (byte)nextByte);
+                        readBuffer = temp;
+                        ++offset;
+                    }
+                }
+            }
+
+            byte[] buffer = readBuffer;
+            if (readBuffer.Length != offset)
+            {
+                buffer = new byte[offset];
+                Buffer.BlockCopy(readBuffer, 0, buffer, 0, offset);
+            }
+
+            return buffer;
         }
 
         public static void ReloadAll(bool discardNotFound = false)
@@ -680,8 +722,12 @@ namespace Takai.Data
         {
             public override object Load(CustomLoad load)
             {
+#if ANDROID
+                var bytes = Cache.ReadStream(load.stream);
+#else
                 var bytes = new byte[load.length];
                 load.stream.Read(bytes, 0, bytes.Length);
+#endif
 
                 //load = TransformPath(file, DataFolder, "Shaders", "DX11");
                 return new Effect(Runtime.GraphicsDevice, bytes)

@@ -12,7 +12,7 @@ ActorClass {
     Animations: {
         Idle: {
             Sprite: {
-                texture: "Actors/Cannon.png";
+                texture: @"Actors/Cannon.png";
                 Width: 48;
                 Height: 48;
                 origin: [24 24];
@@ -22,7 +22,7 @@ ActorClass {
         };
         Active: {
             Sprite: {
-                texture: "Actors/Cannon.png";
+                texture: @"Actors/Cannon.png";
                 width: 48;
                 height: 48;
                 origin: [16 24];
@@ -33,7 +33,7 @@ ActorClass {
         };
         SpawnerDischargeWeapon: {
             Sprite: {
-                texture: "Actors/Cannon.png";
+                texture: @"Actors/Cannon.png";
                 width: 48;
                 height: 48;
                 origin: [16 24];

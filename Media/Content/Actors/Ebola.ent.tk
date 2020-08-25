@@ -58,7 +58,7 @@ ActorClass {
     Animations: {
         Idle: {
             Sprite: {
-                texture: "Actors/Ebola.png";
+                texture: @"Actors/Ebola.png";
                 width: 54;
                 height: 16;
                 origin: [27 8];
