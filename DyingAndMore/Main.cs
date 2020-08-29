@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using Takai.Data;
 using Takai.Input;
 using Takai.UI;
+using Takai.Game;
+using Takai.Graphics;
 
 namespace DyingAndMore
 {
@@ -58,30 +60,35 @@ namespace DyingAndMore
         {
             gdm = new GraphicsDeviceManager(this)
             {
-                PreferredBackBufferWidth = 1600,
-                PreferredBackBufferHeight = 900,
                 PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
                 GraphicsProfile = GraphicsProfile.HiDef,
                 PreferredBackBufferFormat = SurfaceFormat.Color,
+                SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight,
 #if WINDOWS_UAP
                 SynchronizeWithVerticalRetrace = true,
                 //IsFullScreen = true,
+#elif ANDROID
+                IsFullScreen = true,
+                PreferMultiSampling = true,
 #else
                 PreferMultiSampling = true,
                 SynchronizeWithVerticalRetrace = false,
+                PreferredBackBufferWidth = 1600,
+                PreferredBackBufferHeight = 900,
 #endif
             };
 
             gdm.DeviceCreated += GdmDeviceCreated;
             gdm.PreparingDeviceSettings += delegate (object sender, PreparingDeviceSettingsEventArgs e)
             {
-                //required for splitscreen (currently)
+                //required for splitscreen (currentsly)
                 //e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
             };
 
             IsMouseVisible = true;
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 144f);
             IsFixedTimeStep = false;
+
         }
 
         void GdmDeviceCreated(object sender, System.EventArgs e)
@@ -91,12 +98,14 @@ namespace DyingAndMore
             Serializer.LoadTypesFrom(typeof(DyingAndMoreGame).GetTypeInfo().Assembly);
 
 #if DEBUG && WINDOWS
-            Cache.WatchDirectory(Cache.Root);
+            Cache.WatchDirectory(Cache.ContentRoot);
 #endif
 
             GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
             gdm.ApplyChanges();
+
+            TextRenderer.Default = new TextRenderer(Cache.Load<Effect>("Shaders/SDFTex.mgfx"));
 
             Static.DebugFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/mono.fnt.tk");
 
@@ -252,47 +261,49 @@ namespace DyingAndMore
 
 #if ANDROID
             {
-                var map = Cache.Load<MapInstance>("Mapsrc/aitest.map.tk");
-                childUI = new Editor.Editor(map);
+                var map = Cache.Load<MapInstance>("Mapsrc/zoop.map.tk");
+                //childUI = new Editor.Editor(map);
                 map.renderSettings.drawEntityForwardVectors = true;
                 map.renderSettings.drawEntityHierarchies = true;
+                map.renderSettings.drawTileCollisionMask = true;
+                childUI = Game.GameInstance.Current = new Game.GameInstance(new Game.Game { Map = map });
             }
 #else
-            childUI = new FileList
-            {
-                //Size = new Vector2(400, 600),
-                HorizontalAlignment = Alignment.Middle,
-                VerticalAlignment = Alignment.Middle,
-                BasePath = System.IO.Path.Combine(Cache.Root, "Mapsrc"),
-                FilterRegex = "\\.(map\\.tk|d2map\\.zip)$",
-            };
-            childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)
-            {
-                var fl = (FileList)s;
-                if (System.IO.File.Exists(fl.SelectedFile))
-                {
-                    if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
-                    {
-                        var packmap = (MapInstance)Takai.Game.MapBaseInstance.FromPackage(fl.SelectedFile);
-                        packmap.Class.InitializeGraphics();
-                        ui.ReplaceAllChildren(new Editor.Editor(packmap));
-                        return UIEventResult.Handled;
-                    }
+            //childUI = new FileList
+            //{
+            //    //Size = new Vector2(400, 600),
+            //    HorizontalAlignment = Alignment.Middle,
+            //    VerticalAlignment = Alignment.Middle,
+            //    BasePath = System.IO.Path.Combine(Cache.ContentRoot, "Mapsrc"),
+            //    FilterRegex = "\\.(map\\.tk|d2map\\.zip)$",
+            //};
+            //childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)
+            //{
+            //    var fl = (FileList)s;
+            //    if (System.IO.File.Exists(fl.SelectedFile))
+            //    {
+            //        if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
+            //        {
+            //            var packmap = (MapInstance)MapBaseInstance.FromPackage(fl.SelectedFile);
+            //            packmap.Class.InitializeGraphics();
+            //            ui.ReplaceAllChildren(new Editor.Editor(packmap));
+            //            return UIEventResult.Handled;
+            //        }
 
-                    var map = Cache.Load(fl.SelectedFile);
-                    if (map is MapClass mc)
-                    {
-                        mc.InitializeGraphics();
-                        ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
-                    }
-                    else if (map is MapInstance mi)
-                    {
-                        mi.Class.InitializeGraphics();
-                        ui.ReplaceAllChildren(new Editor.Editor(mi));
-                    }
-                }
-                return UIEventResult.Handled;
-            });
+            //        var map = Cache.Load(fl.SelectedFile);
+            //        if (map is MapClass mc)
+            //        {
+            //            mc.InitializeGraphics();
+            //            ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
+            //        }
+            //        else if (map is MapInstance mi)
+            //        {
+            //            mi.Class.InitializeGraphics();
+            //            ui.ReplaceAllChildren(new Editor.Editor(mi));
+            //        }
+            //    }
+            //    return UIEventResult.Handled;
+            //});
 #endif
 
             //sp = new Takai.Graphics.Sprite();
@@ -332,7 +343,7 @@ namespace DyingAndMore
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch,
             };
-            ui.AddChild(childUI);
+            //ui.AddChild(childUI);
 
             //Static.DebugFont = Static.DefaultFont;
 
@@ -359,9 +370,22 @@ namespace DyingAndMore
                 HorizontalAlignment = Alignment.Center,
             });
 
+            font = Cache.Load<Font>("Fonts/sgi_sdf.fnt.tk");
+            textTransform = Matrix.CreateOrthographicOffCenter(GraphicsDevice.Viewport.Bounds, 0, 1);
+            style = new TextStyle
+            {
+                size = 200,
+                outlineColor = Color.Black,
+                outlineThickness = 0.1f
+            };
+
             ui.HasFocus = true;
             base.Initialize();
         }
+        Font font;
+        TextStyle style;
+        Matrix textTransform;
+
         protected override void Update(GameTime gameTime)
         {
             DebugPropertyDisplay.RemoveAllChildren();
@@ -405,11 +429,22 @@ namespace DyingAndMore
 
             ui.Update(gameTime);
             debugUI.Update(gameTime);
+
+            //while (GraphicsDevice.GraphicsDebug.TryDequeueMessage(out var gdbMsg))
+            //    System.Diagnostics.Debug.WriteLine(gdbMsg.ToString());
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
+
+            var offset = new Vector2(100);
+            for (int i = 0; i < 10; ++i)
+            {
+                style.size = 10 + i * 10;
+                var x = TextRenderer.Default.Draw(new DrawTextOptions("test `c0aftex`xt", font, style, Color.White, offset));
+                offset.Y += x.Size.Y;
+            }
 
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
             ui.Draw(sbatch);
@@ -428,6 +463,8 @@ namespace DyingAndMore
             }
 
             sbatch.End();
+
+            TextRenderer.Default.Present(GraphicsDevice, textTransform);
         }
     }
 }

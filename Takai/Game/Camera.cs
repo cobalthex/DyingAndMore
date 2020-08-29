@@ -113,7 +113,7 @@ namespace Takai.Game
         {
             get
             {
-                //todo: cache this
+                //todo: cache?
                 return Matrix.CreateTranslation(-ActualPosition.X, -ActualPosition.Y, 0) *
                        Matrix.CreateRotationZ(actualRotation) *
                        Matrix.CreateScale(ActualScale) *

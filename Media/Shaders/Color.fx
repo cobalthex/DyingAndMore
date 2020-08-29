@@ -1,4 +1,5 @@
 float4x4 Transform;
+float4 ColorMultiplier;
 
 struct Output
 {
@@ -17,10 +18,10 @@ Output vmain(float4 position : POSITION, float4 color : COLOR0)
 
 float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0) : SV_Target
 {
-	return color;
+    return color * ColorMultiplier;
 }
 
-#include "shadermodel.hlsli"
+#include "shadermodel.fxh"
 technique Technique1
 {
     pass Pass1

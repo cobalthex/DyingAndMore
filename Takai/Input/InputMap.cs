@@ -234,23 +234,23 @@ namespace Takai.Input
             SetInput(GamepadRightTrigger, DeviceType.Gamepad, triggers.Right);
 
             //todo: convert to circle (allow for magnitude)
-            foreach (var touch in InputState.touches)
-            {
-                foreach (var touchAction in Touches)
-                {
-                    var v = new Vector2(viewport.Width, viewport.Height);
-                    var absMin = (touchAction.boundsPercent.min * v).ToPoint();
-                    var absMax = (touchAction.boundsPercent.max * v).ToPoint();
-                    var rv = absMax - absMin;
-                    if (!new Rectangle(absMin.X, absMin.Y, rv.X, rv.Y).Contains(touch.Position))
-                        continue;
+            //foreach (var touch in InputState.touches)
+            //{
+            //    foreach (var touchAction in Touches)
+            //    {
+            //        var v = new Vector2(viewport.Width, viewport.Height);
+            //        var absMin = (touchAction.boundsPercent.min * v).ToPoint();
+            //        var absMax = (touchAction.boundsPercent.max * v).ToPoint();
+            //        var rv = absMax - absMin;
+            //        if (!new Rectangle(absMin.X, absMin.Y, rv.X, rv.Y).Contains(touch.Position))
+            //            continue;
 
-                    var polar = (touch.Position - ((absMin + absMax).ToVector2() / 2)) / rv.ToVector2();
-                    polar.Normalize();
-                    SetInput(touchAction.horizontal, DeviceType.Touch, polar.X);
-                    SetInput(touchAction.vertical, DeviceType.Touch, polar.Y);
-                }
-            }
+            //        var polar = (touch.Position - ((absMin + absMax).ToVector2() / 2)) / rv.ToVector2();
+            //        polar.Normalize();
+            //        SetInput(touchAction.horizontal, DeviceType.Touch, polar.X);
+            //        SetInput(touchAction.vertical, DeviceType.Touch, polar.Y);
+            //    }
+            //}
         }
     }
 }

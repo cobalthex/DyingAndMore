@@ -16,11 +16,11 @@ Switch {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
 		    	Static { Text: "`_Relative Direction"; };
-		    	DirectionInput {
+		    	PolarInput {
 		    		Bindings: [
 		    			Binding {
 		    				Source: "relativeDirection";
-		    				Target: "Direction";
+		    				Target: "NormalizedValue";
 		    				Direction: BindingDirection.TwoWay;
 		    			};
 		    		];

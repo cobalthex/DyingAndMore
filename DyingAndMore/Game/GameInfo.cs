@@ -155,7 +155,7 @@ namespace DyingAndMore.Game
 
                 AddChild(new Static("Select a story"));
 
-                _directory = System.IO.Path.Combine(Cache.Root, value);
+                _directory = System.IO.Path.Combine(Cache.ContentRoot, value);
                 foreach (var file in System.IO.Directory.EnumerateFiles(_directory, "*.story.tk", System.IO.SearchOption.AllDirectories))
                 {
                     try

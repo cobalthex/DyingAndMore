@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Takai.Input;
 
 namespace DyingAndMore.Editor.Selectors
 {
-    class TileSelector : Selector
+    class TileSelector : UI.Selector
     {
         readonly Takai.Game.Tileset tileset;
         readonly int tilesPerRow;

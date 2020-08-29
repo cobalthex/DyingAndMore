@@ -17,7 +17,7 @@ PSOutput pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texc
     return output;
 }
 
-#include "shadermodel.hlsli"
+#include "shadermodel.fxh"
 technique Technique1
 {
     pass Pass1

@@ -1,5 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="Dejitaru.DyingAndMore" android:versionCode="1" android:versionName="1.0" android:installLocation="auto">
+<manifest 
+  xmlns:android="http://schemas.android.com/apk/res/android" 
+  package="Dejitaru.DyingAndMore"
+  android:versionCode="1"
+  android:versionName="1.0"
+  android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="28" />
 	<application android:label="DyingAndMore" android:icon="@drawable/Icon"></application>
 </manifest>

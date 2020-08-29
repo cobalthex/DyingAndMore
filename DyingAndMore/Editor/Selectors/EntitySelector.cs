@@ -1,11 +1,10 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DyingAndMore.Editor.Selectors
 {
-    class EntitySelector : Selector
+    class EntitySelector : UI.Selector
     {
         public string[] SearchPaths
         {
@@ -22,7 +21,6 @@ namespace DyingAndMore.Editor.Selectors
         string[] _searchPaths = new[] { "Actors", "Scenery", "Pickups" };
 
         public List<Takai.Game.EntityClass> ents = new List<Takai.Game.EntityClass>();
-        System.TimeSpan elapsedTime;
 
         public Takai.Game.EntityClass SelectedEntity
         {
@@ -36,15 +34,13 @@ namespace DyingAndMore.Editor.Selectors
         void RescanDirectories()
         {
             ents.Clear();
-            elapsedTime = System.TimeSpan.Zero;
             if (SearchPaths == null)
                 return;
 
             foreach (var path in SearchPaths)
             {
-                var searchPath = Path.Combine(Takai.Data.Cache.Root, path);
                 int i = 0;
-                foreach (var file in Directory.EnumerateFiles(searchPath, "*.ent.tk", SearchOption.AllDirectories))
+                foreach (var file in EnumerateFiles(path, "*.ent.tk"))
                 {
                     try
                     {
@@ -76,7 +72,6 @@ namespace DyingAndMore.Editor.Selectors
 
         protected override void UpdateSelf(GameTime time)
         {
-            elapsedTime = time.TotalGameTime;
             base.UpdateSelf(time);
         }
 

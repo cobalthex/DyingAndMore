@@ -2,7 +2,6 @@ Texture2D Tex : register(S0);
 SamplerState Sampler;
 
 float2 TexNormSize; // 1 / size
-float2 FrameSize;
 
 //switch to convolution filter?
 
@@ -44,7 +43,7 @@ float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoo
     return px;
 }
 
-#include "shadermodel.hlsli"
+#include "shadermodel.fxh"
 technique Technique1
 {
     pass Pass1

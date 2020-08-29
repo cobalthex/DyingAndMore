@@ -15,16 +15,41 @@ namespace Takai.UI
         /// <summary>
         /// Spacing between items
         /// </summary>
-        public float Margin { get; set; } = 0;
+        public float Margin
+        {
+            get => _margin;
+            set
+            {
+                if (_margin == value)
+                    return;
+
+                _margin = value;
+                InvalidateMeasure();
+            }
+        }
+        private float _margin = 0;
 
         /// <summary>
-        /// Which direction should list items flow
+        /// Which direction should items flow
+        /// (horizontal = rows vs vertical = columns)
         /// </summary>
-        public Direction Direction { get; set; } = Direction.Vertical;
+        public Direction Direction
+        {
+            get => _direction;
+            set
+            {
+                if (_direction == value)
+                    return;
+
+                _direction = value;
+                InvalidateMeasure();
+            }
+        }
+        private Direction _direction = Direction.Vertical;
 
         //todo: shared size? (only measure using MeasuredSize)
         //must manually calculate size?
-        
+
         int stretches = 0;
 
         public List() { }

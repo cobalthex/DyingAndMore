@@ -35,7 +35,7 @@ namespace Takai.Data
         /// <summary>
         /// Where all content lives
         /// </summary>
-        public static string Root = "Content";
+        public static string ContentRoot = "Content";
 
 #if ANDROID
         public static AssetManager Assets;
@@ -155,7 +155,7 @@ namespace Takai.Data
             }
 
             if (root == null)
-                root = Root;
+                root = ContentRoot;
             else if (root == "")
                 root = Directory.GetCurrentDirectory();
 
@@ -163,10 +163,10 @@ namespace Takai.Data
             file = Normalize(file);
 
             string realFile;
-            if (PathStartsWith(file, Root) && root == Root)
+            if (PathStartsWith(file, ContentRoot) && root == ContentRoot)
             {
                 realFile = file;
-                file = file.Substring(Root.Length + 1);
+                file = file.Substring(ContentRoot.Length + 1);
             }
             else if (Path.IsPathRooted(file) || PathStartsWith(file, root))
             {

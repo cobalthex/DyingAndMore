@@ -805,7 +805,15 @@ namespace Takai.Data
                 //chars can be represented as numbers (or as strings if object key)
                 if (destType == typeof(char))
                 {
-                    if (TInt.TryParse(sourceString, out var @int))
+                    TInt @int;
+                    if (sourceString.StartsWith("0x"))
+                    {
+                        //ugly garbage
+                        if (TInt.TryParse(sourceString.Substring(2), NumberStyles.HexNumber, 
+                            CultureInfo.InvariantCulture, out @int))
+                            return (char)@int;
+                    }
+                    else if (TInt.TryParse(sourceString, out @int))
                         return (char)@int;
                 }
 

@@ -30,7 +30,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\$(MonoGamePlatform)\$(Platform)\$(Configuration)\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;ANDROID</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ANDROID;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>True</AndroidUseSharedRuntime>
@@ -39,6 +39,7 @@
     <EnableLLVM>false</EnableLLVM>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <BundleAssemblies>false</BundleAssemblies>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -69,14 +70,14 @@
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\DyingAndMore\**\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" Exclude="..\DyingAndMore\obj\**\*.cs" />
-    <Compile Include="..\Takai\**\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" Exclude="..\Takai\obj\**\*.cs;" />
+    <Compile Include="..\DyingAndMore\**\*.cs" Link="DyingAndMore\%(RecursiveDir)%(Filename)%(Extension)" Exclude="..\DyingAndMore\obj\**\*.cs" />
+    <Compile Include="..\Takai\**\*.cs" Link="Takai\%(RecursiveDir)%(Filename)%(Extension)" Exclude="..\Takai\obj\**\*.cs;" />
   </ItemGroup>
   <PropertyGroup>
     <MediaDir>$(SolutionDir)Media\</MediaDir>
   </PropertyGroup>
   <ItemGroup>
-    <AndroidAsset Link="Assets\Content\%(RecursiveDir)%(Filename)%(Extension)" Include="$(MediaDir)Content\**\*.*" />
+    <AndroidAsset Link="Assets\Content\%(RecursiveDir)%(Filename)%(Extension)" Include="$(MediaDir)Content\**\*.*" Exclude="$(MediaDir)Content\Shaders" />
     <AndroidAsset Link="Assets\Maps\%(RecursiveDir)%(Filename)%(Extension)" Include="$(MediaDir)Maps\**\*.*" />
     <AndroidAsset Link="Assets\Config\%(RecursiveDir)%(Filename)%(Extension)" Include="$(MediaDir)Config\**\*.*" />
   </ItemGroup>
@@ -104,10 +105,18 @@
     <Shaders Include="$(MediaDir)Shaders\**\*.fx">
       <Link>Shaders\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Shaders>
+    <AndroidAsset Link="Assets\Content\Shaders\%(RecursiveDir)%(Filename)%(Extension)" Include="$(MediaDir)Shaders\$(ShaderProfile)\**\*.*" />
   </ItemGroup>
-  <Target Name="CompileShaders" Label="Compile shaders" AfterTargets="Build" Inputs="@(Shaders)" Outputs="@(Shaders -> '$(MediaDir)Shaders\$(ShaderProfile)\%(RecursiveDir)%(Filename).mgfx')">
+  <Target Name="CompileShaders" Label="Compile shaders" BeforeTargets="Build" Inputs="@(Shaders)" Outputs="@(Shaders -> '$(MediaDir)Shaders\$(ShaderProfile)\%(RecursiveDir)%(Filename).mgfx')">
     <Exec Command="&#xD;&#xA;powershell.exe @(PowershellArgs, ' ') -File &quot;$(MediaDir)Shaders\compile.ps1&quot; -Verbose -Files %(Shaders.Identity) -$(ShaderProfile) -Configuration $(Configuration)" WorkingDirectory="$(MediaDir)Shaders\" />
   </Target>
+  <Target Name="CopyShaders" Label="Symlink media files" BeforeTargets="CompileShaders" Condition="'$(Configuration)' == 'Debug'">
+    <Exec Command="&#xD;&#xA;powershell.exe @(PowershellArgs, ' ') -Command &quot; Copy-Item -Force -Container -Recurse -Path '$(MediaDir)Shaders\$(ShaderProfile)\*' -Destination (New-Item -Force -ItemType directory -Path '$(MediaDir)Content\Shaders');&quot;&#xD;&#xA;" />
+  </Target>
+  <!-- <Target Name="CleanShaders" AfterTargets="AfterClean">
+    <Delete Files="@(Shaders -> '$(MediaDir)Shaders\$(ShaderProfile)\%(RecursiveDir)%(Filename).mgfx')" ContinueOnError="false" />
+    <Delete Files="@(Shaders -> '$(MediaDir)Content\Shaders\%(Filename).mgfx')" ContinueOnError="false" />
+  </Target> -->
   <ItemGroup>
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Framework.Android" Version="3.8.0.1641" />

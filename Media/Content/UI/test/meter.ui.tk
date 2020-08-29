@@ -1,0 +1,10 @@
+Meter {
+	name: "meter";
+	Sprite: @"./metertest.png";
+	Mask: @"./metertest.mask.png";
+
+	Minimum: 0;
+	Maximum: 100;
+
+	Value: 50;
+}

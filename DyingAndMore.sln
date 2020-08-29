@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Takai", "Takai\Takai.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Android", "Android\Android.csproj", "{1F3308BD-5D79-446A-9B4D-E53BC5B25E58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DyingGL", "DyingGL\DyingGL.csproj", "{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,26 @@ Global
 		{1F3308BD-5D79-446A-9B4D-E53BC5B25E58}.Release|x86.ActiveCfg = Release|Any CPU
 		{1F3308BD-5D79-446A-9B4D-E53BC5B25E58}.Release|x86.Build.0 = Release|Any CPU
 		{1F3308BD-5D79-446A-9B4D-E53BC5B25E58}.Release|x86.Deploy.0 = Release|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Debug|UWP.ActiveCfg = Debug|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Debug|UWP.Build.0 = Debug|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Debug|x64.Build.0 = Debug|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Debug|x86.Build.0 = Debug|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Release|ARM.Build.0 = Release|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Release|UWP.ActiveCfg = Release|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Release|UWP.Build.0 = Release|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Release|x64.ActiveCfg = Release|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Release|x64.Build.0 = Release|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Release|x86.ActiveCfg = Release|Any CPU
+		{E2E35C93-9E08-4C85-B95D-46E2BDFFC75A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

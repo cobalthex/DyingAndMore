@@ -2,7 +2,6 @@
 
 namespace Takai
 {
-
     /// <summary>
     /// Specifies a simple min/max range
     /// </summary>

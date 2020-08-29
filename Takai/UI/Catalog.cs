@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.CodeDom;
+using System.Collections.Generic;
+using System.Xml.Schema;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -9,13 +11,37 @@ namespace Takai.UI
         /// <summary>
         /// Spacing between items
         /// </summary>
-        public float Margin { get; set; } = 0;
+        public Vector2 Margin
+        {
+            get => _margin;
+            set
+            {
+                if (_margin == value)
+                    return;
+
+                _margin = value;
+                InvalidateMeasure();
+            }
+        }
+        private Vector2 _margin;
 
         /// <summary>
         /// Which direction should items flow
         /// (horizontal = rows vs vertical = columns)
         /// </summary>
-        public Direction Direction { get; set; } = Direction.Horizontal;
+        public Direction Direction
+        {
+            get => _direction;
+            set
+            {
+                if (_direction == value)
+                    return;
+
+                _direction = value;
+                InvalidateMeasure();
+            }
+        }
+        private Direction _direction = Direction.Horizontal;
 
         //todo: shared size? (only measure using MeasuredSize)
         //must manually calculate size?
@@ -33,42 +59,43 @@ namespace Takai.UI
             Direction = GetStyleRule(styleRules, "Direction", Direction);
         }
 
-        int stretches = 0;
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            //todo
+            //todo: item alignments
 
             var usedSize = new Vector2();
-            for (int i = 0; i < Children.Count; ++i)
+            var lateralMax = 0f;
+            foreach (var child in Children)
             {
-                var child = Children[i];
                 if (!child.IsEnabled)
                     continue;
 
-                //stretched items in primary axis are rendered at 
-
-                var childSize = child.Measure(new Vector2(InfiniteSize));
+                var itemSize = child.Measure(new Vector2(InfiniteSize));
                 if (Direction == Direction.Horizontal)
                 {
-                    if (child.HorizontalAlignment == Alignment.Stretch)
-                        ++stretches;
-                    else //(only else here if stretch size != 0, see Static::Measure)
-                        usedSize.X += childSize.X;
-                    usedSize.Y = System.Math.Max(usedSize.Y, childSize.Y);
+                    if (usedSize.X > 0 && usedSize.X + itemSize.X > availableSize.X)
+                        usedSize = new Vector2(0, usedSize.Y + lateralMax + Margin.Y);
+
+                    child.Arrange(new Rectangle(usedSize.ToPoint(), itemSize.ToPoint()));
+                    usedSize.X += itemSize.X + Margin.X;
+                    lateralMax = System.Math.Max(lateralMax, itemSize.Y);
                 }
                 else
                 {
-                    if (child.VerticalAlignment == Alignment.Stretch)
-                        ++stretches;
-                    else //ditto above
-                        usedSize.Y += childSize.Y;
-                    usedSize.X = System.Math.Max(usedSize.X, childSize.X);
+                    if (usedSize.Y > 0 && usedSize.Y + itemSize.Y > availableSize.Y)
+                        usedSize = new Vector2(usedSize.X + lateralMax + Margin.X, 0);
+
+                    child.Arrange(new Rectangle(usedSize.ToPoint(), itemSize.ToPoint()));
+                    usedSize.Y += itemSize.Y + Margin.Y;
+                    lateralMax = System.Math.Max(lateralMax, itemSize.X);
                 }
+            
             }
+            
             if (Direction == Direction.Horizontal)
-                usedSize.X += Margin * (Children.Count - 1);
+                usedSize += new Vector2(-Margin.X, lateralMax);
             else
-                usedSize.Y += Margin * (Children.Count - 1);
+                usedSize += new Vector2(lateralMax, -Margin.Y);
 
             return usedSize;
 
@@ -77,80 +104,33 @@ namespace Takai.UI
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            float stretchSize;
-            if (Direction == Direction.Horizontal)
-                stretchSize = System.Math.Max(0, (availableSize.X - MeasuredSize.X) / stretches); //todo: availableSize?
-            else
-                stretchSize = System.Math.Max(0, (availableSize.Y - MeasuredSize.Y) / stretches);
+            //todo: item alignments
 
-            float front = 0;
-            float back = 0;
-            for (int i = 0, n = 0; i < Children.Count; ++i)
+            var offset = new Vector2();
+            var lateralMax = 0f;
+            foreach (var child in Children)
             {
-                if (!Children[i].IsEnabled)
+                if (!child.IsEnabled)
                     continue;
 
-                if (n++ > 0)
-                    front += Margin; //todo: this doesnt apply on right aligned correctly
-
-                float itemSize;
+                var itemSize = child.MeasuredSize; 
                 if (Direction == Direction.Horizontal)
                 {
-                    if (Children[i].HorizontalAlignment == Alignment.Stretch)
-                        itemSize = stretchSize;
-                    else
-                        itemSize = Children[i].MeasuredSize.X;
+                    if (offset.X > 0 && offset.X + itemSize.X > availableSize.X)
+                        offset = new Vector2(0, offset.Y + lateralMax + Margin.Y);
 
-                    if (Children[i].HorizontalAlignment == Alignment.End)
-                    {
-                        back += itemSize;
-                        Children[i].Arrange(new Rectangle(
-                            (int)(availableSize.X - back),
-                            (int)0,
-                            (int)itemSize,
-                            (int)availableSize.Y
-                        ));
-                    }
-                    else
-                    {
-                        Children[i].Arrange(new Rectangle(
-                            (int)front,
-                            (int)0,
-                            (int)itemSize,
-                            (int)availableSize.Y
-                        ));
-                        front += itemSize;
-                    }
-                    //center?
+                    child.Arrange(new Rectangle(offset.ToPoint(), itemSize.ToPoint()));
+                    offset.X += itemSize.X + Margin.X;
+                    lateralMax = System.Math.Max(lateralMax, itemSize.Y);
                 }
                 else
                 {
-                    if (Children[i].VerticalAlignment == Alignment.Stretch)
-                        itemSize = stretchSize;
-                    else
-                        itemSize = Children[i].MeasuredSize.Y;
+                    if (offset.Y > 0 && offset.Y + itemSize.Y > availableSize.Y)
+                        offset = new Vector2(offset.X + lateralMax + Margin.X, 0);
 
-                    if (Children[i].VerticalAlignment == Alignment.End)
-                    {
-                        back += itemSize;
-                        Children[i].Arrange(new Rectangle(
-                            (int)0,
-                            (int)(availableSize.Y - back),
-                            (int)availableSize.X,
-                            (int)itemSize
-                        ));
-                    }
-                    else
-                    {
-                        Children[i].Arrange(new Rectangle(
-                            (int)0,
-                            (int)front,
-                            (int)availableSize.X,
-                            (int)itemSize
-                        ));
-                        front += itemSize;
-                    }
-                    //center?
+                    child.Arrange(new Rectangle(offset.ToPoint(), itemSize.ToPoint()));
+                    offset.Y += itemSize.Y + Margin.Y;
+                    lateralMax = System.Math.Max(lateralMax, itemSize.X);
                 }
             }
         }

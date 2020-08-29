@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System;
+using System.IO;
 using Takai.Input;
 using Takai.UI;
-using System;
 
-namespace DyingAndMore.Editor.Selectors
+namespace DyingAndMore.UI
 {
     public abstract class Selector : Static
     {
@@ -129,5 +130,26 @@ namespace DyingAndMore.Editor.Selectors
         }
 
         public abstract void DrawItem(SpriteBatch spriteBatch, int itemIndex, Rectangle bounds);
+
+        public static System.Collections.Generic.IEnumerable<string> EnumerateFiles(string searchPath, string mask)
+        {
+            searchPath = Path.Combine(Takai.Data.Cache.ContentRoot, searchPath);
+#if ANDROID
+            mask = mask.Replace(".", "\\.").Replace("*", ".*");
+            var regex = new System.Text.RegularExpressions.Regex(mask);
+            var allFiles = Takai.Data.Cache.Assets.List(searchPath);
+            foreach (var file in allFiles)
+            {
+                if (file.IndexOf('.') == -1) //likely directory
+                {
+                    //todo
+                }
+                if (regex.IsMatch(file))
+                    yield return file;
+            }
+#else
+            return System.IO.Directory.EnumerateFiles(searchPath, mask, System.IO.SearchOption.AllDirectories);
+#endif
+        }
     }
 }

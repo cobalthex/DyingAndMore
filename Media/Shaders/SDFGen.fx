@@ -62,7 +62,7 @@ int4 pmain(float4 position : SV_Position, float2 texcoord : TEXCOORD0) : SV_Targ
  //    return color;
 }
 
-#include "shadermodel.hlsli"
+#include "shadermodel.fxh"
 technique Technique1
 {
     pass Pass1

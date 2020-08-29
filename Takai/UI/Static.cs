@@ -1518,7 +1518,11 @@ namespace Takai.UI
         public void DebugInvalidateTree()
         {
             foreach (var element in EnumerateRecursive())
+            {
+                element.lastMeasureContainerBounds = Rectangle.Empty;
+                element.lastMeasureAvailableSize = new Vector2(InfiniteSize);
                 element.InvalidateMeasure();
+            }
         }
 
         /// <summary>
@@ -1703,23 +1707,16 @@ namespace Takai.UI
         /// <param name="container">The container to fit this to, in relative coordinates</param>
         private void AdjustToContainer(Rectangle container)
         {
-            Rectangle parentContainer = container;
+            lastMeasureContainerBounds = container;
 
-            //Rectangle parentContentArea;
-            //Rectangle parentBounds;
+            Rectangle parentContentArea;
             var offsetParent = Point.Zero;
             if (Parent == null)
-                parentContainer = Rectangle.Intersect(parentContainer, Runtime.GraphicsDevice.Viewport.Bounds);
-                //parentBounds = parentContentArea = Runtime.GraphicsDevice.Viewport.Bounds;
+                container = parentContentArea = Rectangle.Intersect(container, Runtime.GraphicsDevice.Viewport.Bounds);
             else
             {
                 offsetParent = Parent.OffsetContentArea.Location;
-                parentContainer.Offset(offsetParent);
-                parentContainer = Rectangle.Intersect(parentContainer, Parent.OffsetContentArea);
-
-                //offsetParent = Parent.OffsetContentArea.Location;
-                //parentContentArea = Parent.VisibleContentArea;
-                //parentBounds = Parent.VisibleBounds;
+                parentContentArea = Parent.VisibleContentArea;
             }
 
             var finalSize = MeasuredSize;
@@ -1747,22 +1744,12 @@ namespace Takai.UI
 
             tmp = Rectangle.Intersect(bounds, container);
             tmp.Offset(offsetParent);
-            VisibleContentArea = Rectangle.Intersect(tmp, parentContainer);
-
-            //todo: this needs to shrink to clipped container
+            container.Offset(offsetParent);
+            container = Rectangle.Intersect(container, parentContentArea);
+            VisibleContentArea = Rectangle.Intersect(tmp, container);
 
             tmp.Inflate(Padding.X, Padding.Y);
-            VisibleBounds = Rectangle.Intersect(tmp, parentContainer);
-            //VisibleBounds = new Rectangle(
-            //    tmp.X,
-            //    tmp.Y,
-            //    Math.Min(tmp.Right, parentContainer.Right) - Math.Max(tmp.Left, parentContainer.Left),
-            //    Math.Min(tmp.Bottom, parentContainer.Bottom) - Math.Max(tmp.Top, parentContainer.Top)
-            //); //maintains offset, but size goes to zero
-
-            //todo: ^ get working
-
-            lastMeasureContainerBounds = container;
+            VisibleBounds = Rectangle.Intersect(tmp, container);
         }
 
         public float GetAlignedPosition(Alignment alignment, float position, float size, float padding, float containerSize)
@@ -1987,7 +1974,8 @@ namespace Takai.UI
 
         bool HandleTouchInput()
         {
-            if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture) && VisibleBounds.Contains(gesture.Position))
+            if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture) &&
+                VisibleBounds.Contains(gesture.Position))
             {
                 var pea = new PointerEventArgs(this)
                 {
@@ -2004,7 +1992,26 @@ namespace Takai.UI
                     return false;
                 }
             }
+            else if (InputState.Gestures.TryGetValue(GestureType.FreeDrag, out gesture) && 
+                VisibleBounds.Contains(gesture.Position))
+            {
+                //todo: this needs to support didPress style of moving finger outside of control
 
+                var pea = new DragEventArgs(this)
+                {
+                    position = (gesture.Position - OffsetContentArea.Location.ToVector2()) + Padding,
+                    button = 0,
+                    device = DeviceType.Touch,
+                    delta = gesture.Delta
+                };
+                BubbleEvent(DragEvent, pea);
+
+                if (CanFocus)
+                {
+                    HasFocus = true;
+                    return false;
+                }
+            }
             return true;
         }
 

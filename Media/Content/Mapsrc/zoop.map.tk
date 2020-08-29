@@ -31,7 +31,10 @@ MapInstance {
             Conditions: {
             };
             MaxSpeed: 400;
-            Weapon: Null;
+            Weapon: GunInstance {
+                Class: @"Weapons/MG.wpn.tk";
+                CurrentAmmo: 1000;
+            };
             Id: 1;
             Name: Null;
             OutlineColor: [255 215 0 255];

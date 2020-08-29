@@ -214,6 +214,7 @@ namespace Takai.UI
 
         public ItemList()
         {
+            Margin = 10; //division between Items and AddItemUI
             Items = new ObservableCollection<T>();
             AddChild(Container);
             

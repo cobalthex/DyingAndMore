@@ -43,7 +43,7 @@ namespace DyingAndMore.UI
             : base()
         {
             //todo: object cache
-            foreach (var entry in System.IO.Directory.EnumerateFiles("Content/Weapons", "*.wpn.tk", System.IO.SearchOption.AllDirectories))
+            foreach (var entry in Selector.EnumerateFiles("Weapons", "*.wpn.tk"))
             {
                 try
                 {
@@ -61,7 +61,7 @@ namespace DyingAndMore.UI
             : base()
         {
             //todo: object cache
-            foreach (var entry in System.IO.Directory.EnumerateFiles("Content/Actors/Conditions", "*.cond.tk", System.IO.SearchOption.AllDirectories))
+            foreach (var entry in Selector.EnumerateFiles("Actors/Conditions", "*.cond.tk"))
             {
                 try
                 {
@@ -87,7 +87,7 @@ namespace DyingAndMore.UI
             };
 
             //todo: object cache
-            foreach (var entry in System.IO.Directory.EnumerateFiles("Content/Effects", "*.fx.tk", System.IO.SearchOption.AllDirectories))
+            foreach (var entry in Selector.EnumerateFiles("Effects", "*.fx.tk"))
             {
                 try
                 {

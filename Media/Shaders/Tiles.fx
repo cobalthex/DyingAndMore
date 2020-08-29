@@ -21,7 +21,7 @@ Output vmain(float4 position : POSITION, float4 color : COLOR0, float2 texcoord 
 
 Texture2D TilesImage : register(t0);
 #if OPENGL
-Texture2D<float> TilesLayout : register(t1);
+Texture2D TilesLayout : register(t1);
 #else
 Texture2D<uint> TilesLayout : register(t1);
 #endif
@@ -37,7 +37,7 @@ float2 SDFScale; //fraction
 
 SamplerState LayoutSampler
 {
-    Filter = Anisotropic;
+    Filter = Point;
     AddressU = Clamp;
     AddressV = Clamp;
 };
@@ -47,15 +47,15 @@ float4 pmain(float4 position : SV_Position, float4 color : COLOR0, float2 rpos :
 #if OPENGL
     //sm3.0 is shit
     float4 tilec = TilesLayout.Sample(LayoutSampler, rpos);
-    int tile = ((int)(tilec.b * 255) * 65536) + ((int)(tilec.g * 255) * 255) + ((int)(tilec.r * 255));
-    // tile += (int)(tilec.a * 255) * 16777216);
 
-    if (tile >= (int)0xffffff) //hack
-        discard;
+    int tile = ((int)(tilec.b * 255) * 65536) + ((int)(tilec.g * 255) * 255) + ((int)(tilec.r * 255));
+    //tile += (int) (tilec.a * 255);// * 16777216;
+    if (tile < 0)
+        return float4(1, 0, 0, 1);
 #else
     uint tile = TilesLayout.Load(uint3(rpos * MapSize, 0));
-    if (tile == 0xffffffff)
-        discard; //not sure why htis returns this value
+    if (tile == 0xffffffff) //-1
+        discard;
 #endif
 
     float2 tdiv = TilesImageSize / TileSize;
@@ -73,7 +73,7 @@ float4 pmain(float4 position : SV_Position, float4 color : COLOR0, float2 rpos :
     return color * ti;
 }
 
-#include "shadermodel.hlsli"
+#include "shadermodel.fxh"
 technique Technique1
 {
     pass Pass1

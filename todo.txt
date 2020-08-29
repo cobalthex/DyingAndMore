@@ -39,8 +39,9 @@ Gases:
 
 
 Serializer:
-    ☐ Implicit children
+    ☐ Implicit children (especially for UI elements (e.g. List { a: b; ... ; Child { }; Child { } } ))
     ☐ Parametric imports ($0 $1 $2 for arguments as templates)
+    ☐ Hex inputs might not work (int.tryparse does not like 0x)
 
 UI:
     ☐ default buttons (click enter in text box to submit)
@@ -86,7 +87,6 @@ UI:
   Music:
     ☐ background music (one track), play via FadeMusic game action
 
- ☐ make polarinput actually polar (via radius, cap at 1)
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
  ✔ material interaction physics @done (20-04-10 21:55) @project(Bugs)

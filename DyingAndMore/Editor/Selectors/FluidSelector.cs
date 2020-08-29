@@ -1,20 +1,17 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Takai.Input;
 
 namespace DyingAndMore.Editor.Selectors
 {
-    class FluidSelector : Selector
+    class FluidSelector : UI.Selector
     {
         public List<Takai.Game.FluidClass> fluids;
 
         public FluidSelector()
         {
             fluids = new List<Takai.Game.FluidClass>();
-            var searchPath = Path.Combine(Takai.Data.Cache.Root, "Fluids");
-            foreach (var file in Directory.EnumerateFiles(searchPath, "*.fluid.tk", SearchOption.AllDirectories))
+            foreach (var file in EnumerateFiles("Fluids", "*.fluid.tk"))
             {
                 try
                 {

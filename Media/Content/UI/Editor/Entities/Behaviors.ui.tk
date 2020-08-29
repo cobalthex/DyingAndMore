@@ -4,6 +4,7 @@ BehaviorList {
 		HorizontalAlignment: Alignment.Stretch;
 		Direction: Direction.Vertical;
 		Margin: 10;
+		InitiallyCollapsed: true;
 	};
 
     Bindings: [
@@ -19,6 +20,7 @@ BehaviorList {
 	        Binding {
 	            Source: "Name";
 	            Target: "Name";
+				DefaultValue: "(Unnamed Behavior)";
 	        };
         ];
 

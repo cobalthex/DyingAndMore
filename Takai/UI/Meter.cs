@@ -44,7 +44,11 @@ namespace Takai.UI
 
             maskEffect.Parameters["Cutoff"].SetValue(NormalizedValue);
             maskEffect.Parameters["Range"].SetValue(BandPass);
+#if OPENGL
+            maskEffect.Parameters["Sampler+Mask"].SetValue(Mask.Texture);
+#else
             maskEffect.Parameters["Mask"].SetValue(Mask.Texture);
+#endif
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, maskEffect);
             DrawSprite(sbatch, Sprite, new Rectangle(0, 0, ContentArea.Width - 1, ContentArea.Height - 1));
             sbatch.End();

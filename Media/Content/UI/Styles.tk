@@ -80,7 +80,7 @@
 		BackgroundSprite: null;
 	};
 
-	DirectionInput: {
+	PolarInput: {
 		BackgroundSprite: @"UI/input.9p.tk";
 		BorderColor: Color.Transparent;
 	};

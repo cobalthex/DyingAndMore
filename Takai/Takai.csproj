@@ -94,6 +94,7 @@
     <Compile Include="Diagnostics.cs" />
     <Compile Include="Game\Trails.cs" />
     <Compile Include="Graphics\ColorUtil.cs" />
+    <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\NinePatch.cs" />
     <Compile Include="Graphics\SignedDistanceField.cs" />
     <Compile Include="Input\InputMap.cs" />
@@ -121,7 +122,7 @@
     <Compile Include="UI\Graphic.cs" />
     <Compile Include="UI\ItemList.cs" />
     <Compile Include="UI\ObjectSelect.cs" />
-    <Compile Include="UI\DirectionInput.cs" />
+    <Compile Include="UI\PolarInput.cs" />
     <Compile Include="UI\ProgressBar.cs" />
     <Compile Include="UI\Switch.cs" />
     <Compile Include="UI\Table.cs" />

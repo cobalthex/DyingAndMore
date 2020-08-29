@@ -150,6 +150,9 @@ namespace DyingAndMore.Game
             if (game?.Map == null)
                 throw new ArgumentNullException("There must be a map to play");
 
+            HorizontalAlignment = Alignment.Stretch;
+            VerticalAlignment = Alignment.Stretch;
+
             //game.Map.PackageMap("Maps/test.d2map");
 
             Game = game;
@@ -185,7 +188,7 @@ namespace DyingAndMore.Game
                 Name = "Settings Console",
                 Style = "Frame",
                 IsEnabled = false,
-                Position = new Vector2(100, 200),
+                Position = new Vector2(50),
                 Padding = new Vector2(10, 5),
                 Margin = 10,
                 BackgroundColor = new Color(40, 40, 40)
@@ -215,9 +218,6 @@ namespace DyingAndMore.Game
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
             Map.renderSettings.drawDebugInfo = true;
             Map.Class.DebugFont = DebugFont;
-
-            HorizontalAlignment = Alignment.Stretch;
-            VerticalAlignment = Alignment.Stretch;
         }
 
         private void GameMapChanged(object sender, MapChangedEventArgs e)
@@ -250,8 +250,38 @@ namespace DyingAndMore.Game
             {
                 players.Add(new PlayerInstance(possiblePlayers[i], new Rectangle()));
 
+                //todo: hud container per player
+
                 if (possiblePlayers[i].Hud != null)
                     hudContainer.AddChild(possiblePlayers[i].Hud);
+
+                var movementInput = new PolarInput
+                {
+                    DisplayNormalizedValue = true,
+                    HorizontalAlignment = Alignment.Start,
+                    VerticalAlignment = Alignment.End,
+                    Position = new Vector2(20),
+                    Size = new Vector2(200),
+                    Bindings = new List<Binding>
+                    {
+                        new Binding("Velocity", "NormalizedValue", BindingDirection.TwoWay)
+                    }
+                };
+                var forwardInput = new PolarInput
+                {
+                    DisplayNormalizedValue = true,
+                    HorizontalAlignment = Alignment.End,
+                    VerticalAlignment = Alignment.End,
+                    Position = new Vector2(20),
+                    Size = new Vector2(200),
+                    Bindings = new List<Binding>
+                    {
+                        new Binding("Forward", "NormalizedValue", BindingDirection.TwoWay)
+                    }
+                };
+                movementInput.BindTo(possiblePlayers[i]);
+                forwardInput.BindTo(possiblePlayers[i]);
+                hudContainer.AddChildren(movementInput, forwardInput);
             }
             if (players.Count > 0)
             {

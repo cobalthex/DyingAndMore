@@ -14,9 +14,14 @@ namespace Takai.Game
             {
                 tilesEffect.Parameters["TilesPerRow"].SetValue(Tileset.TilesPerRow);
                 tilesEffect.Parameters["TileSize"].SetValue(new Vector2(TileSize));
+#if OPENGL
+                tilesEffect.Parameters["Sampler+TilesImage"].SetValue(Tileset.texture);
+                tilesEffect.Parameters["LayoutSampler+TilesLayout"].SetValue(tilesLayoutTexture);
+#else
                 tilesEffect.Parameters["TilesImage"].SetValue(Tileset.texture);
-                tilesEffect.Parameters["TilesImageSize"].SetValue(new Vector2(Tileset.texture.Width, Tileset.texture.Height));
                 tilesEffect.Parameters["TilesLayout"].SetValue(tilesLayoutTexture);
+#endif
+                tilesEffect.Parameters["TilesImageSize"].SetValue(new Vector2(Tileset.texture.Width, Tileset.texture.Height));
                 tilesEffect.Parameters["MapSize"].SetValue(new Vector2(Width, Height));
             }
 

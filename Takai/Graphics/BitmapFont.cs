@@ -276,6 +276,7 @@ namespace Takai.Graphics
                 if (clip.Width > 0 && clip.Height > 0)
                 {
                     loc = bounds.Location + curPos + (clip.Location - rgn.Location);
+
                     spriteBatch.Draw(
                         Texture,
                         new Rectangle(loc.X, loc.Y, clip.Width, clip.Height),

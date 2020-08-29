@@ -12,7 +12,7 @@ float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoo
 	return Tex.Sample(Sampler, (texcoord * a) + 0.5);
 }
 
-#include "shadermodel.hlsli"
+#include "shadermodel.fxh"
 technique Technique1
 {
     pass Pass1

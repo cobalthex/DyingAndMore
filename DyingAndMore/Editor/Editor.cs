@@ -33,7 +33,7 @@ namespace DyingAndMore.Editor
     }
 
     public abstract class SelectorEditorMode<TSelector> : EditorMode
-        where TSelector : Selectors.Selector, new()
+        where TSelector : UI.Selector, new()
     {
         public TSelector selector;
         public Graphic preview;
@@ -533,7 +533,7 @@ namespace DyingAndMore.Editor
                     using (var ofd = new System.Windows.Forms.OpenFileDialog()
                     {
                         Filter = "Dying and More! Maps (*.map.tk)|*.map.tk|Dying and More! Saves (*.d2sav)|*.d2sav",
-                        InitialDirectory = Path.GetFullPath(Path.Combine(Cache.Root, "Mapsrc")),
+                        InitialDirectory = Path.GetFullPath(Path.Combine(Cache.ContentRoot, "Mapsrc")),
                         RestoreDirectory = true,
                         SupportMultiDottedExtensions = true,
                     })
