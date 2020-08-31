@@ -1,6 +1,7 @@
 Texture2D Tex;
 Texture2D Mask; //the reflection mask that dictates how the reflection is to be drawn (distortion and reflectivity)
 Texture2D Reflection; //the texture to reflect
+
 SamplerState Sampler;
 
 float Reflectivity = 0.25;

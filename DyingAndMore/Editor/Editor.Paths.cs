@@ -16,15 +16,16 @@ namespace DyingAndMore.Editor
 
         UIEventResult OnPress(Static sender, UIEventArgs e)
         {
-            if (((PointerEventArgs)e).button == (int)Takai.Input.MouseButtons.Left)
+            var pea = (PointerEventArgs)e;
+            if (pea.button == 0)
             {
                 if (currentPath != null)
-                    AddPathPoint(editor.Camera.ScreenToWorld(Takai.Input.InputState.MouseVector));
+                    AddPathPoint(editor.Camera.ScreenToWorld(pea.position));
                 else
                 {
                     currentPath = new Takai.Game.VectorCurve();
                     editor.Paths.Add(new NamedPath { name = Takai.Util.RandomString(prefix: "p_"), path = currentPath });
-                    AddPathPoint(editor.Camera.ScreenToWorld(Takai.Input.InputState.MouseVector));
+                    AddPathPoint(editor.Camera.ScreenToWorld(pea.position));
                 }
             }
             return UIEventResult.Handled;

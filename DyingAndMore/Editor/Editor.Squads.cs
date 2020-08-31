@@ -10,8 +10,6 @@ namespace DyingAndMore.Editor
     {
         public Game.Entities.Squad SelectedSquad { get; set; }
 
-        public Takai.Graphics.Sprite SquadIcon { get; set; }
-
         protected Static nameUI;
         protected Static editUI;
 
@@ -24,8 +22,18 @@ namespace DyingAndMore.Editor
             nameUI = Takai.Data.Cache.Load<Static>("UI/Editor/Name.ui.tk");
             editUI = Takai.Data.Cache.Load<Static>("UI/Editor/Squad.ui.tk");
 
-            SquadIcon = new Takai.Graphics.Sprite(Takai.Data.Cache.Load<Texture2D>("UI/Editor/squad.png"));
-            SquadIcon.CenterOrigin();
+            //todo: these should be context-free
+            nameUI.CommandActions["Accept"] = delegate (Static sender, object argument)
+            {
+                sender.RemoveFromParent();
+                editor.Map.Spawn(SelectedSquad);
+                creatingSquad = false;
+            };
+            nameUI.CommandActions["Cancel"] = delegate (Static sender, object argument)
+            {
+                sender.RemoveFromParent();
+                creatingSquad = false;
+            };
 
             On(PressEvent, OnPress);
             On(ClickEvent, OnClick);
@@ -35,7 +43,6 @@ namespace DyingAndMore.Editor
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
         {
             var pea = (PointerEventArgs)e;
-
             var worldPos = editor.Camera.ScreenToWorld(pea.position);
 
             if (pea.button == 0)
@@ -85,17 +92,6 @@ namespace DyingAndMore.Editor
                 {
                     var ui = nameUI.CloneHierarchy();
                     ui.BindTo(SelectedSquad);
-                    ui.CommandActions["Accept"] = delegate (Static _sender, object argument)
-                    {
-                        ui.RemoveFromParent();
-                        editor.Map.Spawn(SelectedSquad);
-                        creatingSquad = false;
-                    };
-                    ui.CommandActions["Cancel"] = delegate (Static _sender, object argument)
-                    {
-                        ui.RemoveFromParent();
-                        creatingSquad = false;
-                    };
                     AddChild(ui);
                 }
             }

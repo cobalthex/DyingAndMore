@@ -22,6 +22,59 @@ namespace DyingAndMore.Editor
         public DecalsEditorMode(Editor editor)
             : base("Decals", editor)
         {
+            On(PressEvent, OnPress);
+            //On(ClickEvent, OnClick);
+            On(DragEvent, OnDrag);
+        }
+
+        protected UIEventResult OnPress(Static sender, UIEventArgs e)
+        {
+            var pea = (PointerEventArgs)e;
+            var worldPos = editor.Camera.ScreenToWorld(pea.position);
+
+            if (!SelectDecal(worldPos) && editor.Map.Class.Bounds.Contains(worldPos))
+            {
+                //add new decal under cursor
+                selectedDecal = editor.Map.AddDecal(selector.textures[selector.SelectedIndex], worldPos);
+                return UIEventResult.Handled;
+            }
+
+            return UIEventResult.Continue;
+        }
+
+        protected UIEventResult OnClick(Static sender, UIEventArgs e)
+        {
+            var pea = (PointerEventArgs)e;
+            var worldPos = editor.Camera.ScreenToWorld(pea.position);
+
+            //var lastSelected = selectedDecal;
+            //SelectDecal(worldPos);
+
+            //if (selectedDecal != null && selectedDecal.Equals(lastSelected))
+            //{
+            //    GetDecalSector(selectedDecal).decals.Remove(selectedDecal);
+            //    selectedDecal = null;
+            //}
+
+            return UIEventResult.Handled;
+        }
+
+        protected UIEventResult OnDrag(Static sender, UIEventArgs e)
+        {
+            if (selectedDecal != null)
+            {
+                var oldSector = GetDecalSector(selectedDecal);
+                selectedDecal.position += ((DragEventArgs)e).delta;
+                var newSector = GetDecalSector(selectedDecal);
+                if (oldSector != newSector)
+                {
+                    oldSector.decals.Remove(selectedDecal);
+                    newSector.decals.Add(selectedDecal);
+                }
+                return UIEventResult.Handled;
+            }
+
+            return UIEventResult.Continue;
         }
 
         protected override void UpdatePreview(int selectedItem)
@@ -55,50 +108,9 @@ namespace DyingAndMore.Editor
             lastWorldPos = currentWorldPos;
             currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 
-            if (InputState.IsPress(MouseButtons.Left))
+            //todo
+            if (selectedDecal != null)
             {
-                if (!SelectDecal(currentWorldPos) && editor.Map.Class.Bounds.Contains(currentWorldPos))
-                {
-                    //add new decal under cursor
-                    selectedDecal = editor.Map.AddDecal(selector.textures[selector.SelectedIndex], currentWorldPos);
-                    var pos = (currentWorldPos / editor.Map.Class.SectorPixelSize).ToPoint();
-                    return false;
-                }
-            }
-            else if (InputState.IsPress(MouseButtons.Right))
-            {
-                SelectDecal(currentWorldPos);
-                return false;
-            }
-            else if (InputState.IsClick(MouseButtons.Right))
-            {
-                var lastSelected = selectedDecal;
-                SelectDecal(currentWorldPos);
-
-                if (selectedDecal != null && selectedDecal.Equals(lastSelected))
-                {
-                    GetDecalSector(selectedDecal).decals.Remove(selectedDecal);
-                    selectedDecal = null;
-                }
-                return false;
-            }
-
-            else if (selectedDecal != null)
-            {
-                if (InputState.IsButtonDown(MouseButtons.Left))
-                {
-                    var delta = currentWorldPos - lastWorldPos;
-                    var oldSector = GetDecalSector(selectedDecal);
-                    selectedDecal.position += delta;
-                    var newSector = GetDecalSector(selectedDecal);
-                    if (oldSector != newSector)
-                    {
-                        oldSector.decals.Remove(selectedDecal);
-                        newSector.decals.Add(selectedDecal);
-                    }
-                    return false;
-                }
-
                 bool didAct = false;
                 if (InputState.IsButtonDown(Keys.R))
                 {
@@ -143,6 +155,7 @@ namespace DyingAndMore.Editor
                 //todo: clone
             }
 
+            //todo: move to events
             if (InputState.IsPress(Keys.X))
             {
                 isBatchDeleting = true;
@@ -233,7 +246,6 @@ namespace DyingAndMore.Editor
                         var transform = Matrix.CreateScale(decal.scale)
                                       * Matrix.CreateRotationZ(decal.angle)
                                       * Matrix.CreateTranslation(new Vector3(decal.position, 0));
-
 
                         //todo: use correct box checking (invert transform rectangle check)
                         if (Vector2.DistanceSquared(Vector2.Transform(Vector2.Zero, transform), worldPosition) < decal.texture.Width * decal.texture.Height * decal.scale)

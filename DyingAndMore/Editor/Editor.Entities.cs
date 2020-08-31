@@ -79,6 +79,7 @@ namespace DyingAndMore.Editor
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
         {
             var pea = (PointerEventArgs)e;
+            var worldPos = editor.Camera.ScreenToWorld(pea.position);
 
             var inputSearchRadius = pea.device == DeviceType.Touch ? 30 : 20;
 
@@ -104,7 +105,7 @@ namespace DyingAndMore.Editor
                 }
 #endif
                 */
-                var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, inputSearchRadius);
+                var selected = editor.Map.FindEntitiesInRegion(worldPos, inputSearchRadius);
 
                 if (InputState.IsMod(KeyMod.Alt) && SelectedEntity != null && selected.Count > 0)
                 {
@@ -114,8 +115,8 @@ namespace DyingAndMore.Editor
 
                 if (selected.Count < 1)
                 {
-                    if (editor.Map.Class.Bounds.Contains(currentWorldPos) && selector.ents.Count > 0)
-                        SelectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedIndex], currentWorldPos, Vector2.UnitX, Vector2.Zero);
+                    if (editor.Map.Class.Bounds.Contains(worldPos) && selector.ents.Count > 0)
+                        SelectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedIndex], worldPos, Vector2.UnitX, Vector2.Zero);
                     else
                         SelectedEntity = null;
                 }
@@ -135,7 +136,7 @@ namespace DyingAndMore.Editor
 
             else if (pea.button == (int)MouseButtons.Right) //mouse only?
             {
-                var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, inputSearchRadius);
+                var selected = editor.Map.FindEntitiesInRegion(worldPos, inputSearchRadius);
                 SelectedEntity = selected.Count > 0 ? selected[0] : null;
             }
 
@@ -244,7 +245,7 @@ namespace DyingAndMore.Editor
                 }
             }
 
-
+            //todo: move to events
             if (InputState.IsPress(Keys.X))
             {
                 isBatchDeleting = true;

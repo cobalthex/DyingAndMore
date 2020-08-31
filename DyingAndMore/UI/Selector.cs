@@ -145,7 +145,7 @@ namespace DyingAndMore.UI
                     //todo
                 }
                 if (regex.IsMatch(file))
-                    yield return file;
+                    yield return Path.Combine(searchPath, file);
             }
 #else
             return System.IO.Directory.EnumerateFiles(searchPath, mask, System.IO.SearchOption.AllDirectories);

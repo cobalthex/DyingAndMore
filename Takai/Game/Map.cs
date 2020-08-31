@@ -141,6 +141,11 @@ namespace Takai.Game
         public List<FluidInstance> fluids = new List<FluidInstance>();
         public List<Decal> decals = new List<Decal>();
         public List<Trigger> triggers = new List<Trigger>(); //triggers may be in one or more sectors, list as it shouldn't be modified during runtime
+
+        public override string ToString()
+        {
+            return $"ents:{entities.Count} sounds:{sounds.Count} fluids:{fluids.Count} decals:{decals.Count} triggers:{triggers.Count}";
+        }
     }
 
     [Data.Cache.AlwaysReload] //todo: necessary?
@@ -340,13 +345,13 @@ namespace Takai.Game
 
         public void Spawn(FluidInstance instance)
         {
-            if (!Class.Bounds.Intersects(
-                new Rectangle(
-                    (int)(instance.position.X - instance.Class.Radius),
-                    (int)(instance.position.X - instance.Class.Radius),
-                    (int)(instance.Class.Radius * 2),
-                    (int)(instance.Class.Radius * 2)
-                )))
+            var aabb = new Rectangle(
+                (int)(instance.position.X - instance.Class.Radius),
+                (int)(instance.position.Y - instance.Class.Radius),
+                (int)(instance.Class.Radius * 2),
+                (int)(instance.Class.Radius * 2)
+            );
+            if (!Class.Bounds.Intersects(aabb))
                 return;
 
             if (instance.velocity == Vector2.Zero)

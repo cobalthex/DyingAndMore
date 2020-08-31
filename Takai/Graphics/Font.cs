@@ -5,16 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.Graphics
 {
-
-    /// <summary>
-    /// How to align characters of a font
-    /// </summary>
-    public enum VerticalAlignment
-    {
-        Top,
-        Bottom
-    }
-
     /// <summary>
     /// Text styling options to apply to a text render
     /// </summary>
@@ -81,8 +71,6 @@ namespace Takai.Graphics
         [Data.Serializer.Ignored]
         public int MaxCharHeight { get; protected set; }
 
-        public VerticalAlignment VerticalAlignment { get; set; }
-
         /// <summary>
         /// The amount of lateral slant to apply when drawing this font as oblique
         /// Value is a fraction of <see cref="MaxCharWidth"/>
@@ -139,6 +127,7 @@ namespace Takai.Graphics
     public class TextRenderer
     {
         public static TextRenderer Default;
+        public static int MaxBatchVertexCount = 1 << 20; //round-robins past this number
 
         protected struct TextVertex : IVertexType
         {
@@ -148,7 +137,7 @@ namespace Takai.Graphics
                 new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 0),
                 new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
                 new VertexElement(20, VertexElementFormat.Color, VertexElementUsage.Color, 1),
-                new VertexElement(24, VertexElementFormat.Single, VertexElementUsage.Position, 1),
+                new VertexElement(24, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 1),
             });
 
             public Vector2 position;
@@ -192,11 +181,27 @@ namespace Takai.Graphics
             shader = textShader;
         }
 
+        /// <summary>
+        /// Resets batches without drawing
+        /// </summary>
+        public void ResetBatches()
+        {
+            foreach (var batch in batches)
+                batch.Value.nextVertexIndex = 0;
+        }
+
         protected void EnsureCapacity(int additionalCapacity, RenderBatch batch)
         {
-            if (batch.vertices.Length < batch.nextVertexIndex + additionalCapacity)
+            var newCount = batch.nextVertexIndex + additionalCapacity;
+            if (newCount > MaxBatchVertexCount)
             {
-                additionalCapacity = Math.Max(batch.vertices.Length * 3 / 2, batch.nextVertexIndex + additionalCapacity);
+                batch.nextVertexIndex = 0;
+                newCount = additionalCapacity;
+            }
+
+            if (batch.vertices.Length < newCount)
+            {
+                additionalCapacity = Math.Max(batch.vertices.Length * 3 / 2, newCount);
                 var newVertices = new TextVertex[additionalCapacity];
                 batch.vertices.CopyTo(newVertices, 0);
                 batch.vertices = newVertices;
@@ -232,6 +237,9 @@ namespace Takai.Graphics
                 };
             }
 
+            var length = Math.Min(options.text.Length, options.textOffset + options.textLength);
+            EnsureCapacity(length * 6, batch);
+
             Color color = options.color;
             TextStyle style = options.style;
 
@@ -240,9 +248,6 @@ namespace Takai.Graphics
 
             var slantFrac = options.font.ObliqueSlant * options.font.MaxCharWidth;
             float currentSlant = style.oblique ? slantFrac : 0;
-
-            var length = Math.Min(options.text.Length, options.textOffset + options.textLength);
-            EnsureCapacity(length, batch);
 
             //todo: underline may need extra verts
 
@@ -352,7 +357,7 @@ namespace Takai.Graphics
                             if (clip.Size != Vector2.Zero)
                             {
                                 Vector2 vloc = options.position + (offset + (clip.min - rgnExtent.min)) * options.sizeFraction;
-                                //vloc.Y += (options.font.MaxCharHeight - rgn.Height) * options.sizeFraction; //crude -- should use alignment code
+                                //todo: vertical alignment
                                 Vector2 vsz = clip.Size * options.sizeFraction;
 
                                 var tl = new TextVertex(
@@ -409,13 +414,13 @@ namespace Takai.Graphics
             return drawnSize;
         }
 
-        SpriteEffect testFx;
+        DynamicVertexBuffer dvb;
 
         //necessary?
         public void Present(GraphicsDevice graphicsDevice, Matrix transform)
         {
-            if (testFx == null)
-                testFx = new SpriteEffect(graphicsDevice);
+            if (dvb == null)
+                dvb = new DynamicVertexBuffer(graphicsDevice, typeof(TextVertex), MaxBatchVertexCount, BufferUsage.WriteOnly);
 
             foreach (var batch in batches)
             {
@@ -423,12 +428,14 @@ namespace Takai.Graphics
                     continue;
 
                 shader.Parameters["Transform"].SetValue(transform * batch.Value.transform);
+                dvb.SetData(batch.Value.vertices, 0, batch.Value.nextVertexIndex);
                 foreach (var pass in shader.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    graphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
                     graphicsDevice.Textures[0] = batch.Key;
-                    //use (dynamic) vertex buffers?
+                    graphicsDevice.SetVertexBuffer(dvb);
+                    graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, batch.Value.nextVertexIndex / 3);
+
                     graphicsDevice.DrawUserPrimitives(
                         PrimitiveType.TriangleList,
                         batch.Value.vertices,
@@ -438,17 +445,5 @@ namespace Takai.Graphics
                 batch.Value.nextVertexIndex = 0;
             }
         }
-
-        //public static (Vector2 pos, Vector2 size) Intersect((Vector2 pos, Vector2 size) a, (Vector2 pos, Vector2 size) b)
-        //{
-        //    var xMax = Math.Max(a.pos.X, b.pos.X);
-        //    var xMin = Math.Min(a.pos.X + a.size.X, b.pos.X + b.size.X);
-        //    var yMax = Math.Max(a.pos.Y, b.pos.Y);
-        //    var yMin = Math.Min(a.pos.Y + a.size.Y, b.pos.Y + b.size.Y);
-        //    if (xMin >= xMax && yMin >= yMax)
-        //        return (new Vector2(xMax, yMax), new Vector2(xMin - xMax, yMin - yMax));
-        //    else
-        //        return (Vector2.Zero, Vector2.Zero);
-        //}
     }
 }

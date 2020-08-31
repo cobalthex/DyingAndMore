@@ -547,6 +547,13 @@ namespace Takai.UI
             didPress[1 << (int)button] && InputState.IsButtonDown(button);
 
         /// <summary>
+        /// Was the touch pressed inside this static (and is the mouse still down)
+        /// </summary>
+        /// <returns>True if the mouse is currently down and was pressed inside this static</returns>
+        protected bool DidPressInside(int touchIndex) =>
+            didPress[1 << (touchIndex + (int)MouseButtons._TouchIndex)] && InputState.IsButtonDown(touchIndex);
+
+        /// <summary>
         /// Who owns/contains this element
         /// </summary>
         [Data.Serializer.Ignored]
@@ -1974,7 +1981,9 @@ namespace Takai.UI
 
         bool HandleTouchInput()
         {
-            if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture) &&
+            //todo: don't use gestures
+
+            /*if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture) &&
                 VisibleBounds.Contains(gesture.Position))
             {
                 var pea = new PointerEventArgs(this)
@@ -2011,7 +2020,76 @@ namespace Takai.UI
                     HasFocus = true;
                     return false;
                 }
+            }*/
+
+            for (int touchIndex = 0; touchIndex < InputState.touches.Count; ++touchIndex)
+            {
+                var touch = InputState.touches[touchIndex];
+
+                if (InputState.IsPress(touchIndex) && VisibleBounds.Contains(touch.Position))
+                {
+                    var pea = new PointerEventArgs(this)
+                    {
+                        position = touch.Position - OffsetContentArea.Location.ToVector2() + Padding,
+                        button = touchIndex,
+                        device = DeviceType.Mouse
+                    };
+                    BubbleEvent(PressEvent, pea);
+
+                    didPress[1 << (touchIndex + (int)MouseButtons._TouchIndex)] = true;
+                    if (CanFocus)
+                    {
+                        HasFocus = true;
+                        return false; //todo: always return false?
+                    }
+                }
+
+                //input capture
+                //todo: maybe add capture setting
+                else if (DidPressInside(touchIndex))
+                {
+                    //touch count should be >= touchIndex
+
+                    var lastTouch = InputState.lastTouches[touchIndex];
+                    if (lastTouch.Position != touch.Position)
+                    {
+                        var pea = new DragEventArgs(this)
+                        {
+                            delta = touch.Position - lastTouch.Position,
+                            position = touch.Position - OffsetContentArea.Location.ToVector2() + Padding,
+                            button = touchIndex,
+                            device = DeviceType.Mouse
+                        };
+                        BubbleEvent(DragEvent, pea);
+                    }
+                    return false;
+                }
             }
+
+            for (int touchIndex = 0; touchIndex < InputState.lastTouches.Count; ++touchIndex)
+            {
+                var touch = InputState.lastTouches[touchIndex];
+             
+                if (InputState.IsButtonUp(touchIndex)) //may need to be alted for touch
+                {
+                    if (didPress[1 << (touchIndex + (int)MouseButtons._TouchIndex)])
+                    {
+                        didPress[1 << (touchIndex + (int)MouseButtons._TouchIndex)] = false;
+                        if (VisibleBounds.Contains(touch.Position)) //gesture pos
+                        {
+                            //todo: only trigger click if did not drag (?) (only if drag event)
+
+                            TriggerClick(
+                                touch.Position - OffsetContentArea.Location.ToVector2() + Padding,
+                                touchIndex,
+                                DeviceType.Mouse
+                            );
+                            return false;
+                        }
+                    }
+                }
+            }
+
             return true;
         }
 
@@ -2058,7 +2136,6 @@ namespace Takai.UI
             }
 
             else if (InputState.IsButtonUp(button))
-            //else if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture))
             {
                 if (didPress[1 << (int)button])
                 {

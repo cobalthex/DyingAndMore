@@ -244,13 +244,13 @@ namespace Takai.Data
                 else
                 {
 #if ANDROID
-                    try
-                    {
-                        var fd = Assets.OpenFd(realFile);
-                        load.length = fd.Length;
-                        fd.Close();
-                    } 
-                    catch (Java.IO.FileNotFoundException) { }
+                    //try
+                    //{
+                    //    var fd = Assets.OpenFd(realFile);
+                    //    load.length = fd.Length;
+                    //    fd.Close();
+                    //} 
+                    //catch (Java.IO.FileNotFoundException) { }
 
                     load.stream = Assets.Open(realFile);
 #else
@@ -723,7 +723,7 @@ namespace Takai.Data
             public override object Load(CustomLoad load)
             {
 #if ANDROID
-                var bytes = Cache.ReadStream(load.stream);
+                var bytes = ReadStream(load.stream);
 #else
                 var bytes = new byte[load.length];
                 load.stream.Read(bytes, 0, bytes.Length);

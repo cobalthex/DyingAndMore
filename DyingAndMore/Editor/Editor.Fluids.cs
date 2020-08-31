@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using Takai.Input;
 using Takai;
+using Takai.UI;
 
 namespace DyingAndMore.Editor
 {
@@ -16,6 +17,27 @@ namespace DyingAndMore.Editor
         public FluidsEditorMode(Editor editor)
             : base("Fluids", editor)
         {
+            On(PressEvent, OnPress);
+            On(ClickEvent, OnClick);
+            On(DragEvent, OnDrag);
+        }
+
+        protected UIEventResult OnPress(Static sender, UIEventArgs e)
+        {
+
+            return UIEventResult.Handled;
+        }
+
+        protected UIEventResult OnClick(Static sender, UIEventArgs e)
+        {
+
+            return UIEventResult.Handled;
+        }
+
+        protected UIEventResult OnDrag(Static sender, UIEventArgs e)
+        {
+
+            return UIEventResult.Handled;
         }
 
         protected override void UpdatePreview(int selectedItem)

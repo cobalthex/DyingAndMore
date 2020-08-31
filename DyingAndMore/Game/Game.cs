@@ -50,6 +50,8 @@ namespace DyingAndMore.Game
     {
         public static GameInstance Current { get; set; }
 
+        public static string SwitchToEditorCommand = "SwitchToEditor";
+
         /// <summary>
         /// The current game that this game instance is playing
         /// </summary>
@@ -100,7 +102,7 @@ namespace DyingAndMore.Game
         Static fpsDisplay;
         Static clockDisplay;
 
-        TabPanel settingsConsole;
+        Static settingsConsole;
         Static renderSettingsPane;
         Static updateSettingsPane;
         Static gameplaySettingsPane;
@@ -181,39 +183,49 @@ namespace DyingAndMore.Game
                 Color = new Color(1, 1, 1, 0.5f),
             });
 
+            CommandActions[SwitchToEditorCommand] = delegate (Static sender, object arg)
+            {
+                ((GameInstance)sender).SwitchToEditor();
+            };
+
             Map = game.Map;
 
-            AddChild(settingsConsole = new TabPanel
-            {
-                Name = "Settings Console",
-                Style = "Frame",
-                IsEnabled = false,
-                Position = new Vector2(50),
-                Padding = new Vector2(10, 5),
-                Margin = 10,
-                BackgroundColor = new Color(40, 40, 40)
-            });
+            var tabs = new TabPanel();
 
             renderSettingsPane = GeneratePropSheet(Map.renderSettings);
             renderSettingsPane.BackgroundSprite = null;
             renderSettingsPane.BackgroundColor = Color.Transparent; //hacky, should fix .Style = null
             renderSettingsPane.Name = "Render Settings";
             renderSettingsPane.HorizontalAlignment = Alignment.Stretch;
-            settingsConsole.AddChild(renderSettingsPane);
+            tabs.AddChild(renderSettingsPane);
 
             updateSettingsPane = GeneratePropSheet(Map.updateSettings);
             updateSettingsPane.BackgroundSprite = null;
             updateSettingsPane.BackgroundColor = Color.Transparent;
             updateSettingsPane.Name = "Update Settings";
             updateSettingsPane.HorizontalAlignment = Alignment.Stretch;
-            settingsConsole.AddChild(updateSettingsPane);
+            tabs.AddChild(updateSettingsPane);
 
             gameplaySettingsPane = GeneratePropSheet(GameplaySettings);
             gameplaySettingsPane.BackgroundSprite= null;
             gameplaySettingsPane.BackgroundColor = Color.Transparent;
             gameplaySettingsPane.Name = "Gameplay Settings";
             gameplaySettingsPane.HorizontalAlignment = Alignment.Stretch;
-            settingsConsole.AddChild(gameplaySettingsPane);
+            tabs.AddChild(gameplaySettingsPane);
+
+            var returnToEditor = new Static("Return to editor")
+            {
+                Style = "Button"
+            };
+            returnToEditor.EventCommands[ClickEvent] = SwitchToEditorCommand;
+
+            AddChild(settingsConsole = new ScrollBox(new List(returnToEditor, tabs))
+            {
+                Name = "Settings Console",
+                VerticalAlignment = Alignment.Stretch,
+                Style = "Frame",
+                IsEnabled = false,
+            });
 
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
             Map.renderSettings.drawDebugInfo = true;
@@ -490,6 +502,7 @@ namespace DyingAndMore.Game
             if (InputState.IsPress(Keys.F1) ||
                 InputState.IsAnyPress(Buttons.Start))
             {
+                //call SwitchToEditor command?
                 SwitchToEditor();
                 return false;
             }

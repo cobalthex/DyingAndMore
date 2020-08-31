@@ -11,7 +11,8 @@ namespace Takai.Input
         Middle,
         X4,
         X5,
-        _Count
+        
+        _TouchIndex = 8, //for indexing in bitset
     }
 
     public enum KeyMod
@@ -260,6 +261,15 @@ namespace Takai.Input
         public static bool IsClick(int touchIndex)
         {
             return (touches.Count > touchIndex && touches[touchIndex].State == TouchLocationState.Released);
+        }
+
+        public static bool IsButtonDown(int touchIndex)
+        {
+            return (touches.Count > touchIndex);
+        }
+        public static bool IsButtonUp(int touchIndex)
+        {
+            return (touches.Count <= touchIndex);
         }
 
         /// <summary>

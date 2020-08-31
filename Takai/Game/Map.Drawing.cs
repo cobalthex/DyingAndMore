@@ -232,8 +232,8 @@ namespace Takai.Game
         {
             public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(new[] {
                 new VertexElement( 0, VertexElementFormat.HalfVector2, VertexElementUsage.Position, 0),
-                new VertexElement( 4, VertexElementFormat.HalfVector2, VertexElementUsage.Position, 1),
-                new VertexElement( 8, VertexElementFormat.HalfVector2, VertexElementUsage.Position, 2),
+                new VertexElement( 4, VertexElementFormat.HalfVector2, VertexElementUsage.TextureCoordinate, 1),
+                new VertexElement( 8, VertexElementFormat.HalfVector2, VertexElementUsage.TextureCoordinate, 2),
                 new VertexElement(12, VertexElementFormat.Color,       VertexElementUsage.Color   , 0),
                 new VertexElement(16, VertexElementFormat.HalfVector2, VertexElementUsage.TextureCoordinate, 0)
             });
@@ -508,7 +508,7 @@ namespace Takai.Game
             var originalRt = Runtime.GraphicsDevice.GetRenderTargets(); //necessary?
             var context = GenerateRenderContext(camera);
 
-            //Runtime.GraphicsDevice.Viewport = new Viewport(camera.Viewport);
+            Runtime.GraphicsDevice.Viewport = new Viewport(camera.Viewport);
             Runtime.GraphicsDevice.ScissorRectangle = camera.Viewport;
             Runtime.GraphicsDevice.SetRenderTarget(Class.reflectedRenderTarget);
             Runtime.GraphicsDevice.Clear(Color.Transparent);
@@ -556,22 +556,29 @@ namespace Takai.Game
             {
                 //todo: reflections aren't scaled correctly
 
+#if OPENGL
+                //topdo: reflections dont work
+                Class.fluidEffect.Parameters["Sampler+Mask"].SetValue(Class.reflectionRenderTarget);
+                Class.fluidEffect.Parameters["Sampler+Reflection"].SetValue(renderSettings.drawReflections ? Class.reflectedRenderTarget : null);
+#else
+                Class.fluidEffect.Parameters["Mask"].SetValue(Class.reflectionRenderTarget);
+                Class.fluidEffect.Parameters["Reflection"].SetValue(renderSettings.drawReflections ? Class.reflectedRenderTarget : null);
+#endif
+
                 context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, MapBaseClass.StencilRead, null, Class.fluidEffect);
-                Runtime.GraphicsDevice.Textures[1] = Class.reflectionRenderTarget; //mask
-                Runtime.GraphicsDevice.Textures[2] = renderSettings.drawReflections ? Class.reflectedRenderTarget : null; //Reflection
                 context.spriteBatch.Draw(Class.fluidsRenderTarget, Vector2.Zero, Color.White);
                 context.spriteBatch.End();
             }
 
-            #endregion
+#endregion
 
-            #region present entities (and any other reflected objects)
+#region present entities (and any other reflected objects)
 
             context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, MapBaseClass.StencilRead, null);
             context.spriteBatch.Draw(Class.reflectedRenderTarget, Vector2.Zero, Color.White);
             context.spriteBatch.End();
 
-            #endregion
+#endregion
 
             if (renderSettings.drawLights)
                 DrawLights(ref context);
@@ -589,7 +596,7 @@ namespace Takai.Game
             nextRenderedCircleIndex = 0;
             renderedLights.Clear();
 
-            #region present
+#region present
 
             Runtime.GraphicsDevice.SetRenderTargets(originalRt);
 
@@ -597,7 +604,7 @@ namespace Takai.Game
             context.spriteBatch.Draw(Class.preRenderTarget, new Vector2(camera.Viewport.X, camera.Viewport.Y), Color.White);
             context.spriteBatch.End();
 
-            #endregion
+#endregion
 
             if (renderSettings.drawScreenEffects)
                 DrawScreenEffects(ref context);
@@ -695,7 +702,11 @@ namespace Takai.Game
                     foreach (var fluid in Sectors[y, x].fluids)
                     {
                         ++_renderStats.visibleInactiveFluids;
-                        Runtime.GraphicsDevice.Textures[1] = fluid.Class.Reflection; //Reflection
+#if OPENGL
+                        Class.reflectionEffect.Parameters["Sampler+Reflection"].SetValue(fluid.Class.Reflection);
+#else
+                        Class.reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
+#endif
 
                         var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
                         c.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, Color.White, 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
@@ -706,7 +717,11 @@ namespace Takai.Game
             foreach (var fluid in LiveFluids)
             {
                 ++_renderStats.visibleActiveFluids;
-                Runtime.GraphicsDevice.Textures[1] = fluid.Class.Reflection; //Reflection
+#if OPENGL
+                        Class.reflectionEffect.Parameters["Sampler+Reflection"].SetValue(fluid.Class.Reflection);
+#else
+                        Class.reflectionEffect.Parameters["Reflection"].SetValue(fluid.Class.Reflection);
+#endif
 
                 var sz = new Vector2(fluid.Class.Texture.Width / 2, fluid.Class.Texture.Height / 2);
                 c.spriteBatch.Draw(fluid.Class.Texture, fluid.position, null, Color.White, 0, sz, fluid.Class.Scale, SpriteEffects.None, 0);
@@ -1039,7 +1054,6 @@ namespace Takai.Game
 
         public void DrawLines(ref RenderContext c)
         {
-#if !OPENGL //broken for some reason
             if (nextRenderedCircleIndex > 0)
             {
                 Class.circleEffect.Parameters["Transform"].SetValue(c.viewTransform);
@@ -1054,7 +1068,6 @@ namespace Takai.Game
                     Runtime.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, renderedCircles, 0, nextRenderedCircleIndex / 3);
                 }
             }
-#endif
 
             if (nextRenderedLineIndex > 0)
             {

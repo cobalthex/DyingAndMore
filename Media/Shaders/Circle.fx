@@ -4,17 +4,17 @@ const static float TWO_PI = 6.28318530718;
 
 struct PSInput
 {
-	float4 position						   : POSITION0;
-	nointerpolation float2 radiusThickness  : POSITION1;
-	nointerpolation float2 dashLengthOffset : POSITION2;
-	float4 color						       : COLOR0;
-	float2 texcoord					       : TEXCOORD0;
+	float4 position						    : POSITION0;
+	nointerpolation float2 radiusThickness  : TEXCOORD1;
+	nointerpolation float2 dashLengthOffset : TEXCOORD2;
+	float4 color						    : COLOR0;
+	float2 texcoord					        : TEXCOORD0;
 };
 
 PSInput vmain(
-	float2 position		   : POSITION0,
-	float2 radiusThickness  : POSITION1,
-	float2 dashLengthOffset : POSITION2,
+	float2 position		    : POSITION0,
+	float2 radiusThickness  : TEXCOORD1,
+	float2 dashLengthOffset : TEXCOORD2,
 	float4 color            : COLOR0,
 	float2 texcoord         : TEXCOORD0
 )
