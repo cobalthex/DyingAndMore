@@ -64,12 +64,21 @@ namespace Takai.UI
             }
         }
 
-        public override Graphics.BitmapFont Font
+        public override Graphics.Font Font
         {
             get => textInput.Font;
             set
             {
                 textInput.Font = pickerButton.Font = value;
+            }
+        }
+        public override Graphics.TextStyle TextStyle
+        {
+            get => textInput.TextStyle;
+            set
+            {
+                if (textInput != null)
+                    textInput.TextStyle = pickerButton.TextStyle = value;
             }
         }
 

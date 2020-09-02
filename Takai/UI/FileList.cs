@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
-using Takai.Data;
 using P = System.IO.Path;
 
 namespace Takai.UI
@@ -20,7 +19,11 @@ namespace Takai.UI
             get => _path;
             set
             {
+#if ANDROID
+                _path = value;
+#else
                 _path = P.GetFullPath(value);
+#endif
                 if (!_path.StartsWith(_basePath))
                     _path = _basePath;
                 RefreshList(_path);
@@ -37,7 +40,11 @@ namespace Takai.UI
             get => _basePath;
             set
             {
+#if ANDROID
+                _basePath = value;
+#else
                 _basePath = P.GetFullPath(value);
+#endif
                 if (Path == null || !Path.StartsWith(_basePath))
                     Path = _basePath;
             }
@@ -70,6 +77,8 @@ namespace Takai.UI
                     }
                 }
             });
+
+#if !ANDROID
             template.AddChild(new Static { Size = new Microsoft.Xna.Framework.Vector2(10, 1) });
             template.AddChild(new Static
             {
@@ -79,6 +88,7 @@ namespace Takai.UI
                     new Data.Binding("LastWriteTime", "Text")
                 }
             });
+#endif
             ItemUI = template;
 
             On(SelectionChangedEvent, OnSelectionChanged);
@@ -86,18 +96,33 @@ namespace Takai.UI
 
         protected void RefreshList(string path)
         {
+            var regex = new Regex(FilterRegex ?? "", RegexOptions.IgnoreCase | RegexOptions.Singleline);
             Items.Clear();
 
+#if ANDROID
+            var assets = Takai.Data.Cache.Assets;
+            var allFiles = Takai.Data.Cache.Assets.List(path + "/");
+            foreach (var file in allFiles)
+            {
+                var fullPath = P.Combine(path, file);
+                if (file.IndexOf('.') == -1) //likely directory
+                {
+                    Items.Add(new DirectoryInfo(fullPath));
+                }
+                if (regex.IsMatch(file))
+                    Items.Add(new FileInfo(fullPath));
+            }
+#else
             //display folders first
             foreach (var entry in Directory.EnumerateDirectories(path))
                 Items.Add(new DirectoryInfo(entry));
 
-            var regex = new Regex(FilterRegex ?? "", RegexOptions.IgnoreCase | RegexOptions.Singleline);
             foreach (var entry in Directory.EnumerateFiles(path))
             {
                 if (regex.IsMatch(entry))
                     Items.Add(new FileInfo(entry));
             }
+#endif
 
             if (Path != BasePath)
             {

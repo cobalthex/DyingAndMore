@@ -18,7 +18,9 @@ Static {
 
                 Static {
                     Text: "No map loaded";
-                    Font: @"Fonts/UILarge.bfnt";
+                    TextStyle: {
+                        Size: 40;
+                    }
                     Color: Color.White;
                     HorizontalAlignment: Alignment.Middle;
                 }

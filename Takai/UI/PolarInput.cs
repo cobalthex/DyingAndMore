@@ -99,13 +99,13 @@ namespace Takai.UI
             return base.HandleInput(time);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(context);
 
             var dot = tip;
-            DrawLine(spriteBatch, Color, center, tip);
-            DrawFill(spriteBatch, Color, new Rectangle((int)dot.X - 2, (int)dot.Y - 2, 4, 4));
+            DrawLine(context.spriteBatch, Color, center, tip);
+            DrawFill(context.spriteBatch, Color, new Rectangle((int)dot.X - 2, (int)dot.Y - 2, 4, 4));
 
             //todo: draw circle
         }

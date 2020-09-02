@@ -41,23 +41,23 @@ namespace Takai.UI
             base.UpdateSelf(time);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             //todo: modernize
 
             //todo: custom positioning/sizing
             if (Sprite?.Texture != null)
-                DrawSprite(spriteBatch, Sprite, new Rectangle(0, 0, ContentArea.Width - 1, ContentArea.Height - 1));
+                DrawSprite(context.spriteBatch, Sprite, new Rectangle(0, 0, ContentArea.Width - 1, ContentArea.Height - 1));
             else if (MissingSpriteXColor.A > 0)
             {
                 var rect = VisibleContentArea;
                 rect.Inflate(-4, -4);
-                Graphics.Primitives2D.DrawX(spriteBatch, MissingSpriteXColor, rect);
+                Graphics.Primitives2D.DrawX(context.spriteBatch, MissingSpriteXColor, rect);
 
                 //todo: clip
             }
 
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(context);
         }
 
         public override void DerivedDeserialize(Dictionary<string, object> props)

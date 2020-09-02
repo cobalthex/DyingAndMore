@@ -1,7 +1,10 @@
 # types must be explicit here
 {
 	Static: {
-		Font: @"Fonts/UILarge.bfnt";
+		Font: @"Fonts/Bahnschrift.fnt.tk";
+		TextStyle: {
+			size: 50;
+		}
 
 		#Padding: Vector2 [0 0];
 		#Color: Color.White;
@@ -16,7 +19,7 @@
 	};
 
 	List: {
-    	Margin: 20;
+    	Margin: 10;
 	};
 
 	ScrollBar: {
@@ -28,23 +31,23 @@
 
 	Frame: {
 		BackgroundSprite: @"UI/frame.9p.tk";
-		Padding: Vector2 [20 20];
+		Padding: Vector2 [10 10];
 	};
 
 	Box: {
 		BackgroundSprite: @"UI/box.9p.tk";
-		Padding: Vector2 [20 20];
-		Margin: 20;
+		Padding: Vector2 [10 10];
+		Margin: 10;
 	};
 
 	DropdownSelect: {
 		BackgroundSprite: @"UI/input.9p.tk";
 		BorderColor: Color.Transparent;
-		Padding: Vector2 [8 4];
+		Padding: Vector2 [4 2];
 	};
 	Dropdown: {
 		BackgroundSprite: @"UI/frame.9p.tk";
-		Padding: Vector2 [20 10];
+		Padding: Vector2 [10 5];
 	};
 	Dropdown.List: {
 		Margin: 1;
@@ -60,13 +63,13 @@
 		BorderColor: Color.Transparent;
 	};
 	NumericInput.Button: {
-		Padding: Vector2 [10 2];
+		Padding: Vector2 [5 2];
 	};
 
 	TextInput: {
 		BackgroundSprite: @"UI/input.9p.tk";
 		BorderColor: Color.Transparent;
-		Padding: Vector2 [8 4];
+		Padding: Vector2 [4 2];
 	};
 
 	FileInput: {
@@ -88,8 +91,8 @@
 	CheckBox: {
 		CheckColor: Color.Transparent;
 		BoxSprite: @"UI/input.9p.tk";
-		Margin: 20;
-		Padding: Vector2 [8 4];
+		Margin: 10;
+		Padding: Vector2 [4 2];
 		CheckSprite: Sprite {
 			Texture: @"UI/checkbox.png";
 			Center: false;
@@ -100,7 +103,7 @@
 
 	Button: {
 		BackgroundSprite: @"UI/input.9p.tk";
-		Padding: Vector2 [20 10];
+		Padding: Vector2 [10 5];
 	};
 
 	Divider: {
@@ -109,7 +112,7 @@
 
 	Balloon: {
 		BackgroundSprite: @"UI/input.9p.tk";
-		Padding: Vector2 [20 20];
+		Padding: Vector2 [10 10];
 		HorizontalAlignment: Alignment.Center;
 		VerticalAlignment: Alignment.Center;
 	};
@@ -123,10 +126,11 @@
 	};
 
 	TabPanel.TabBar: {
-		Margin: 20;
+		HorizontalAlignment: Alignment.Center;
+		Margin: 10;
 	}
 	TabPanel.TabHeader: {
-		Padding: Vector2 [10 10];
+		Padding: Vector2 [5 5];
 	};
 	TabPanel.TabHeader.Active: {
 		BackgroundColor: Color.CornflowerBlue;
@@ -134,5 +138,7 @@
 
 	Shade: {
 		Proto: "Box";
-	}
+	};
+
+	#todo: support hierarchical styling: ParentElement ChildElement { }
 }

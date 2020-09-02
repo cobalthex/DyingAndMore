@@ -12,7 +12,7 @@ namespace Takai.UI
 
         //indeterminate state (nax==min)?
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             var rect = OffsetContentArea;
             if (Direction == Direction.Vertical)
@@ -21,9 +21,9 @@ namespace Takai.UI
                 rect.Width = (int)(rect.Width * NormalizedValue);
 
             var vrect = Rectangle.Intersect(rect, VisibleContentArea);
-            Graphics.Primitives2D.DrawFill(spriteBatch, ForegroundColor, vrect);
-            ForegroundSprite.Draw(spriteBatch, vrect); //todo: clip
-            base.DrawSelf(spriteBatch);
+            Graphics.Primitives2D.DrawFill(context.spriteBatch, ForegroundColor, vrect);
+            ForegroundSprite.Draw(context.spriteBatch, vrect); //todo: clip
+            base.DrawSelf(context);
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Takai;
 using Takai.UI;
+using Takai.Graphics;
 
 using System.Reflection;
 
@@ -162,7 +163,7 @@ namespace DyingAndMore.UI
             return base.HandleInput(time);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             var offset = GridSize - new Vector2(VisibleOffset.X % GridSize.X, VisibleOffset.Y % GridSize.Y);
             for (int y = 0; y < VisibleBounds.Height / GridSize.Y; ++y)
@@ -170,26 +171,26 @@ namespace DyingAndMore.UI
                 for (int x = 0; x < VisibleBounds.Width / GridSize.X; ++x)
                 {
                     //use shader?
-                    Takai.Graphics.Primitives2D.DrawDot(spriteBatch, GridColor,
+                    Primitives2D.DrawDot(context.spriteBatch, GridColor,
                         new Vector2(VisibleBounds.Left + x * GridSize.X, VisibleBounds.Top + y * GridSize.Y) + offset);
                 }
             }
 
             if (hoverElement != null)
-                DrawRect(spriteBatch, Color.Cyan, hoverElement.OffsetContentArea);
+                DrawRect(context.spriteBatch, Color.Cyan, hoverElement.OffsetContentArea);
 
             if (sizing)
             {
                 if (sizingRect.Width < sizingEpsilon || sizingRect.Height < sizingEpsilon)
-                    Takai.Graphics.Primitives2D.DrawX(spriteBatch, Color.Gold, new Rectangle(sizingRect.X - 4, sizingRect.Y - 4, 8, 8));
-                DrawRect(spriteBatch, Color.Gold, sizingRect);
+                    Primitives2D.DrawX(context.spriteBatch, Color.Gold, new Rectangle(sizingRect.X - 4, sizingRect.Y - 4, 8, 8));
+                DrawRect(context.spriteBatch, Color.Gold, sizingRect);
             }
 
             const int targeterRadius = 10;
             if (showTargeter)
             {
-                DrawVLine(spriteBatch, Color.LawnGreen, targetPoint.X, targetPoint.Y - targeterRadius, targetPoint.Y + targeterRadius);
-                DrawHLine(spriteBatch, Color.Tomato, targetPoint.Y, targetPoint.X - targeterRadius, targetPoint.X + targeterRadius);
+                DrawVLine(context.spriteBatch, Color.LawnGreen, targetPoint.X, targetPoint.Y - targeterRadius, targetPoint.Y + targeterRadius);
+                DrawHLine(context.spriteBatch, Color.Tomato, targetPoint.Y, targetPoint.X - targeterRadius, targetPoint.X + targeterRadius);
             }
         }
     }

@@ -14,7 +14,9 @@ List {
     Children: [
         Static {
             Text: "Create a New Map";
-            Font: @"Fonts/UILarge.bfnt";
+            TextStyle: {
+                Size: 40;
+            }
             Color: Color.White;
         }
 

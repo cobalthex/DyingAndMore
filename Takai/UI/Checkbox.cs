@@ -51,7 +51,9 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            var size = Vector2.Max(new Vector2(Font.MaxCharWidth, Font.MaxCharHeight), Font.MeasureString(Text));
+            var size = Vector2.Max(
+                new Vector2(30), Font.MeasureString(Text, TextStyle)
+            );
             return size + new Vector2(size.Y + Margin, 0);
         }
 
@@ -64,20 +66,20 @@ namespace Takai.UI
             CheckSprite = GetStyleRule(styleRules, "CheckSprite", CheckSprite);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             var checkSize = System.Math.Min(ContentArea.Width, ContentArea.Height);
 
             var boxBounds = new Rectangle(0, 0, checkSize, checkSize);
-            DrawRect(spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, boxBounds);
+            DrawRect(context.spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, boxBounds);
             //todo: DrawNinePatch that is localized
             boxBounds.Offset(OffsetContentArea.Location);
-            BoxSprite.Draw(spriteBatch, Rectangle.Intersect(boxBounds, VisibleContentArea));
+            BoxSprite.Draw(context.spriteBatch, Rectangle.Intersect(boxBounds, VisibleContentArea));
 
             if (IsChecked)
-                DrawSprite(spriteBatch, CheckSprite, new Rectangle(2, 2, checkSize - 4, checkSize - 4));
+                DrawSprite(context.spriteBatch, CheckSprite, new Rectangle(2, 2, checkSize - 4, checkSize - 4));
 
-            DrawElementText(spriteBatch, new Point(checkSize + Margin, 0));
+            DrawElementText(context.textRenderer, new Vector2(checkSize + Margin, 0));
         }
     }
 }

@@ -161,6 +161,11 @@ namespace Takai.UI
             return new EventCommandBinding(command);
         }
     }
+    public struct DrawContext
+    {
+        public SpriteBatch spriteBatch;
+        public TextRenderer textRenderer;
+    }
 
     /// <summary>
     /// The basic UI element
@@ -252,7 +257,11 @@ namespace Takai.UI
         /// A font to use for drawing debug info.
         /// If null, debug info is not drawn
         /// </summary>
-        public static Graphics.BitmapFont DebugFont = null;
+        public static Font DebugFont = null;
+        public static TextStyle DebugTextStyle = new TextStyle
+        {
+            size = 15
+        };
         public static bool DisplayDebugInfo = false;
 
         /// <summary>
@@ -286,7 +295,7 @@ namespace Takai.UI
         /// The font to draw the text of this element with.
         /// Optional if text is null
         /// </summary>
-        public virtual Graphics.BitmapFont Font
+        public virtual Font Font
         {
             get => _font;
             set
@@ -298,7 +307,21 @@ namespace Takai.UI
                 InvalidateMeasure();
             }
         }
-        private Graphics.BitmapFont _font;
+        private Font _font;
+
+        public virtual TextStyle TextStyle
+        {
+            get => _textStyle;
+            set
+            {
+                if (_textStyle == value)
+                    return;
+
+                _textStyle = value;
+                InvalidateMeasure();
+            }                
+        }
+        private TextStyle _textStyle;
 
         /// <summary>
         /// The color of this element. Usage varies between element types
@@ -309,17 +332,17 @@ namespace Takai.UI
         /// <summary>
         /// The color to draw the outline with, by default, transparent
         /// </summary>
-        public virtual Color BorderColor { get; set; } = Color.Transparent;
+        public Color BorderColor { get; set; } = Color.Transparent;
 
         /// <summary>
         /// An optional fill color for this element, by default, transparent
         /// </summary>
-        public virtual Color BackgroundColor { get; set; } = Color.Transparent;
+        public Color BackgroundColor { get; set; } = Color.Transparent;
 
         /// <summary>
         /// An optional background sprite to draw behind the element. Drawn over BackgroundColor
         /// </summary>
-        public Graphics.NinePatch BackgroundSprite { get; set; }
+        public NinePatch BackgroundSprite { get; set; }
 
         /// <summary>
         /// How this element is positioned in its container horizontally
@@ -1636,7 +1659,7 @@ namespace Takai.UI
         {
             var textSize = new Point();
             if (Font != null && Text != null)
-                textSize = Font.MeasureString(Text).ToPoint();
+                textSize = Vector2.Ceiling(Font.MeasureString(Text, TextStyle)).ToPoint();
 
             var bounds = Rectangle.Union(
                 new Rectangle(0, 0, textSize.X, textSize.Y),
@@ -1719,7 +1742,10 @@ namespace Takai.UI
             Rectangle parentContentArea;
             var offsetParent = Point.Zero;
             if (Parent == null)
-                container = parentContentArea = Rectangle.Intersect(container, Runtime.GraphicsDevice.Viewport.Bounds);
+            {
+                var viewport = Runtime.GraphicsDevice.Viewport.Bounds;
+                container = parentContentArea = Rectangle.Intersect(container, viewport);
+            }
             else
             {
                 offsetParent = Parent.OffsetContentArea.Location;
@@ -2046,9 +2072,9 @@ namespace Takai.UI
 
                 //input capture
                 //todo: maybe add capture setting
-                else if (DidPressInside(touchIndex))
+                else if (InputState.lastTouches.Count > touchIndex && DidPressInside(touchIndex))
                 {
-                    //touch count should be >= touchIndex
+                    //first if clause ^ shouldnt be necessary
 
                     var lastTouch = InputState.lastTouches[touchIndex];
                     if (lastTouch.Position != touch.Position)
@@ -2163,7 +2189,7 @@ namespace Takai.UI
         /// Draws depth-first, parent-most first
         /// </summary>
         /// <param name="spriteBatch">The spritebatch to use</param>
-        public virtual void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(DrawContext context)
         {
 #if DEBUG
             boop.Restart();
@@ -2180,10 +2206,10 @@ namespace Takai.UI
                 var toDraw = draws.Pop();
 
                 if (toDraw.BackgroundColor.A > 0)
-                    Graphics.Primitives2D.DrawFill(spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
-                toDraw.BackgroundSprite.Draw(spriteBatch, toDraw.VisibleBounds);
+                    Primitives2D.DrawFill(context.spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);
+                toDraw.BackgroundSprite.Draw(context.spriteBatch, toDraw.VisibleBounds);
 
-                toDraw.DrawSelf(spriteBatch);
+                toDraw.DrawSelf(context);
 
                 var borderColor = /*(toDraw.HasFocus && toDraw.CanFocus) ? FocusedBorderColor : */toDraw.BorderColor;
                 if (DisplayDebugInfo && borderColor == Color.Transparent)
@@ -2197,10 +2223,10 @@ namespace Takai.UI
                     var offsetRect = toDraw.OffsetContentArea;
                     offsetRect.Inflate(toDraw.Padding.X, toDraw.Padding.Y);
                     var offset = offsetRect.Location.ToVector2();
-                    DrawHLine(spriteBatch, borderColor, 0, 0, offsetRect.Width, offset, toDraw.VisibleBounds);
-                    DrawVLine(spriteBatch, borderColor, offsetRect.Width, 0, offsetRect.Height, offset, toDraw.VisibleBounds);
-                    DrawHLine(spriteBatch, borderColor, offsetRect.Height, 0, offsetRect.Width, offset, toDraw.VisibleBounds);
-                    DrawVLine(spriteBatch, borderColor, 0, 0, offsetRect.Height, offset, toDraw.VisibleBounds);
+                    DrawHLine(context.spriteBatch, borderColor, 0, 0, offsetRect.Width, offset, toDraw.VisibleBounds);
+                    DrawVLine(context.spriteBatch, borderColor, offsetRect.Width, 0, offsetRect.Height, offset, toDraw.VisibleBounds);
+                    DrawHLine(context.spriteBatch, borderColor, offsetRect.Height, 0, offsetRect.Width, offset, toDraw.VisibleBounds);
+                    DrawVLine(context.spriteBatch, borderColor, 0, 0, offsetRect.Height, offset, toDraw.VisibleBounds);
                 }
 
                 for (int i = toDraw.Children.Count - 1; i >= 0; --i)
@@ -2213,17 +2239,16 @@ namespace Takai.UI
 #if DEBUG //todo: re-evaluate
             if (debugDraw != null)
             {
-                DebugFont.Draw(
-                    spriteBatch,
+                DrawTextOptions drawText = new DrawTextOptions(
                     $"Measure Count: {totalMeasureCount}\n" +
                     $"Arrange Count: {totalArrangeCount}\n" +
                     $"Total Elements Created: {idCounter}\n" +
-                    $"Total binding Updates: {Takai.Data.Binding.TotalUpdateCount}",
-                    new Vector2(10),
-                    Color.CornflowerBlue
+                    $"Total binding Updates: {Data.Binding.TotalUpdateCount}",
+                    DebugFont, DebugTextStyle, Color.CornflowerBlue, new Vector2(10)
                 );
+                context.textRenderer.Draw(drawText);
 
-                debugDraw.DrawDebugInfo(spriteBatch);
+                debugDraw.DrawDebugInfo(context);
                 if (InputState.IsPress(Keys.Pause))
                     debugDraw.BreakOnThis();
             }
@@ -2231,60 +2256,77 @@ namespace Takai.UI
 #endif
         }
 
-        public void DrawDebugInfo(SpriteBatch spriteBatch)
+        public void DrawDebugInfo(DrawContext context)
         {
-            Primitives2D.DrawRect(spriteBatch, Color.Cyan, VisibleBounds);
+            Primitives2D.DrawRect(context.spriteBatch, Color.Cyan, VisibleBounds);
 
             var rect = OffsetContentArea;
-            Primitives2D.DrawRect(spriteBatch, new Color(Color.Orange, 0.5f), rect);
+            Primitives2D.DrawRect(context.spriteBatch, new Color(Color.Orange, 0.5f), rect);
 
             rect.Inflate(Padding.X, Padding.Y);
-            Primitives2D.DrawRect(spriteBatch, Color.OrangeRed, rect);
+            Primitives2D.DrawRect(context.spriteBatch, Color.OrangeRed, rect);
 
             string info = $"`_{GetType().Name}`_\n"
 #if DEBUG
-                         + $"ID: {DebugId}\n"
+                        + $"ID: {DebugId}\n"
 #endif
-                         + $"Name: {(Name ?? "(No name)")}\n"
+                        + $"Name: {(Name ?? "(No name)")}\n"
 #if DEBUG
-                         + $"Parent ID: {Parent?.DebugId}\n"
+                        + $"Parent ID: {Parent?.DebugId}\n"
 #endif
-                         + $"Children: {Children?.Count ?? 0}\n"
-                         + $"Bounds: {OffsetContentArea}\n" //visible bounds?
-                         + $"Position: {Position}, Size: {Size}, Padding: {Padding}\n"
-                         + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}\n"
-                         + $"Style: {Style}\n"
-                         + $"Bindings: {(Bindings == null ? "(None)" : string.Join(",", Bindings))}\n"
-                         + $"Events: {events?.Count}, Commands: {CommandActions?.Count}\n";
+                        + $"Children: {Children?.Count ?? 0}\n"
+                        + $"Bounds: {OffsetContentArea}\n" //visible bounds?
+                        + $"Position: {Position}, Size: {Size}, Padding: {Padding}\n"
+                        + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}\n"
+                        + $"Style: {Style}\n"
+                        + $"Bindings: {(Bindings == null ? "(None)" : string.Join(",", Bindings))}\n"
+                        + $"Events: {events?.Count}, Commands: {CommandActions?.Count}\n";
 
             var drawPos = rect.Location + new Point(rect.Width + 10, rect.Height + 10);
-            var size = DebugFont.MeasureString(info);
+            var size = DebugFont.MeasureString(info, DebugTextStyle);
             drawPos = Util.Clamp(new Rectangle(drawPos.X, drawPos.Y, (int)size.X, (int)size.Y), Runtime.GraphicsDevice.Viewport.Bounds);
             drawPos -= new Point(10);
-            DebugFont.Draw(spriteBatch, info, drawPos.ToVector2(), Color.Gold);
+
+            var drawText = new DrawTextOptions(info, DebugFont, DebugTextStyle, Color.Gold, drawPos.ToVector2());
+            context.textRenderer.Draw(drawText);
         }
 
         /// <summary>
         /// Draw only this item (no children)
         /// </summary>
         /// <param name="spriteBatch">The spritebatch to use</param>
-        protected virtual void DrawSelf(SpriteBatch spriteBatch)
+        protected virtual void DrawSelf(DrawContext context)
         {
-            DrawElementText(spriteBatch, Point.Zero);
+            DrawElementText(context.textRenderer, Vector2.Zero);
         }
+
+        //todo: pass in context to methods below
 
         /// <summary>
         /// Draw text clipped to the visible region of this element
         /// </summary>
         /// <param name="spriteBatch">The spritebatch to use</param>
         /// <param name="position">The relative position (to the element) to draw this text</param>
-        protected void DrawElementText(SpriteBatch spriteBatch, Point position)
+        protected void DrawElementText(TextRenderer textRenderer, Vector2 position)
         {
             if (Font == null || Text == null)
                 return;
 
-            position += (OffsetContentArea.Location - VisibleContentArea.Location);
-            Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleContentArea, position, Color);
+            position += (OffsetContentArea.Location - VisibleContentArea.Location).ToVector2();
+
+            var drawText = new DrawTextOptions(
+                Text,
+                Font,
+                TextStyle,
+                Color,
+                VisibleContentArea.Location.ToVector2()
+            )
+            {
+                clipSize = VisibleContentArea.Size.ToVector2(),
+                relativeOffset = position
+            };
+            textRenderer.Draw(drawText);
+            //Font.Draw(spriteBatch, Text, 0, Text.Length, VisibleContentArea, position, Color);
         }
 
         /// <summary>
@@ -2365,7 +2407,7 @@ namespace Takai.UI
             DrawSpriteCustomRegion(spriteBatch, sprite, localRect, VisibleContentArea);
         }
 
-        void DrawSpriteCustomRegion(SpriteBatch spriteBatch, Graphics.Sprite sprite, Rectangle localRect, Rectangle clipRegion)
+        void DrawSpriteCustomRegion(SpriteBatch spriteBatch, Sprite sprite, Rectangle localRect, Rectangle clipRegion)
         {
             if (sprite?.Texture == null || localRect.Width == 0 || localRect.Height == 0)
                 return;
@@ -2395,7 +2437,7 @@ namespace Takai.UI
                 clip.Y = 0;
 
             sprite.Draw(spriteBatch, finalRect, clip, 0, Color.White, sprite.ElapsedTime);
-            //Graphics.Primitives2D.DrawRect(spriteBatch, Color.LightSteelBlue, finalRect);
+            //Primitives2D.DrawRect(spriteBatch, Color.LightSteelBlue, finalRect);
         }
 
         #endregion

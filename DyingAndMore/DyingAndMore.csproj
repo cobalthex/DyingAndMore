@@ -67,7 +67,6 @@
     <Compile Include="Editor\Selectors\EntitySelector.cs" />
     <Compile Include="Editor\Selectors\FluidSelector.cs" />
     <Compile Include="Editor\Selectors\DecalSelector.cs" />
-    <Compile Include="Editor\ModeSelector.cs" />
     <Compile Include="UI\Selector.cs" />
     <Compile Include="Editor\Selectors\TileSelector.cs" />
     <Compile Include="Game\Commands.cs" />

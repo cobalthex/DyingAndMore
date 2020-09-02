@@ -38,9 +38,9 @@ namespace Takai.UI
             return Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2();
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(context);
 
             maskEffect.Parameters["Cutoff"].SetValue(NormalizedValue);
             maskEffect.Parameters["Range"].SetValue(BandPass);

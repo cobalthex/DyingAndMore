@@ -40,9 +40,9 @@ namespace DyingAndMore.UI
             return Vector2.One;
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
-            Takai.Graphics.Primitives2D.DrawFill(spriteBatch, Color, VisibleContentArea);
+            Takai.Graphics.Primitives2D.DrawFill(context.spriteBatch, Color, VisibleContentArea);
         }
     }
 }

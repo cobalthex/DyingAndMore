@@ -1,7 +1,10 @@
 # types must be explicit here
 {
 	Static: {
-		Font: @"Fonts/test.fnt.tk";
+		Font: @"Fonts/Bahnschrift.fnt.tk";
+		TextStyle: {
+			size: 20;
+		}
 
 		#Padding: Vector2 [0 0];
 		#Color: Color.White;
@@ -123,6 +126,7 @@
 	};
 
 	TabPanel.TabBar: {
+		HorizontalAlignment: Alignment.Center;
 		Margin: 10;
 	}
 	TabPanel.TabHeader: {
@@ -134,5 +138,7 @@
 
 	Shade: {
 		Proto: "Box";
-	}
+	};
+
+	#todo: support hierarchical styling: ParentElement ChildElement { }
 }

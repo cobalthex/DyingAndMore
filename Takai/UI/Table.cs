@@ -146,9 +146,9 @@ namespace Takai.UI
             }
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(context);
 
             if (CellColor.A > 0)
             {
@@ -166,7 +166,7 @@ namespace Takai.UI
                             offset.X += Margin.X;
                     }
 
-                    DrawFill(spriteBatch, CellColor, new Rectangle(
+                    DrawFill(context.spriteBatch, CellColor, new Rectangle(
                         (int)offset.X,
                         (int)offset.Y,
                         (int)columnWidths[i % ColumnCount],

@@ -39,10 +39,12 @@ namespace DyingAndMore
     {
         GraphicsDeviceManager gdm;
 
+        Matrix textTransform;
         SpriteBatch sbatch;
         Static ui;
         Static debugUI;
         Takai.FpsGraph fpsGraph;
+
         public static Table DebugPropertyDisplay { get; private set; }
 
         public static void DebugDisplay(string key, object value)
@@ -85,10 +87,35 @@ namespace DyingAndMore
                 //e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
             };
 
+            Window.ClientSizeChanged += Window_ClientSizeChanged;
+
             IsMouseVisible = true;
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 144f);
             IsFixedTimeStep = false;
+        }
 
+        Matrix CreateScreenTransform()
+        {
+            Matrix.CreateOrthographicOffCenter(
+                0,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height,
+                0,
+                0, -1,
+                out var transform
+            );
+            if (GraphicsDevice.UseHalfPixelOffset)
+            {
+                transform.M41 += -0.5f * transform.M11;
+                transform.M42 += -0.5f * transform.M22;
+            }
+            return transform;
+        }
+
+        private void Window_ClientSizeChanged(object sender, System.EventArgs e)
+        {
+            textTransform = CreateScreenTransform();
+            ui?.InvalidateMeasure();
         }
 
         void GdmDeviceCreated(object sender, System.EventArgs e)
@@ -106,8 +133,9 @@ namespace DyingAndMore
             gdm.ApplyChanges();
 
             TextRenderer.Default = new TextRenderer(Cache.Load<Effect>("Shaders/SDFTex.mgfx"));
+            textTransform = CreateScreenTransform();
 
-            Static.DebugFont = Cache.Load<BitmapFont>("Fonts/mono.fnt.tk");
+            Static.DebugFont = Cache.Load<Font>("Fonts/SGI.fnt.tk");
 
             //custom cursor
             //Mouse.SetCursor(MouseCursor.FromTexture2D(Cache.Load<Texture2D>("UI/Pointer.png"), 0, 0));
@@ -263,16 +291,6 @@ namespace DyingAndMore
             */
             Static childUI;
 
-#if ANDROID
-            {
-                var map = Cache.Load<MapInstance>("Mapsrc/zoop.map.tk");
-                //childUI = new Editor.Editor(map);
-                map.renderSettings.drawEntityForwardVectors = true;
-                map.renderSettings.drawEntityHierarchies = true;
-                map.renderSettings.drawTileCollisionMask = true;
-                childUI = Game.GameInstance.Current = new Game.GameInstance(new Game.Game { Map = map });
-            }
-#else
             childUI = new FileList
             {
                 //Size = new Vector2(400, 600),
@@ -284,7 +302,9 @@ namespace DyingAndMore
             childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)
             {
                 var fl = (FileList)s;
+#if !ANDROID
                 if (System.IO.File.Exists(fl.SelectedFile))
+#endif
                 {
                     if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
                     {
@@ -308,6 +328,9 @@ namespace DyingAndMore
                 }
                 return UIEventResult.Handled;
             });
+
+#if DEBUG && ANDROID
+            Static.DisplayDebugInfo = true;
 #endif
 
             //sp = new Takai.Graphics.Sprite();
@@ -374,27 +397,16 @@ namespace DyingAndMore
                 HorizontalAlignment = Alignment.Center,
             });
 
-            font = Cache.Load<Font>("Fonts/sgi_sdf.fnt.tk");
-            textTransform = Matrix.CreateOrthographicOffCenter(GraphicsDevice.Viewport.Bounds, 0, 1);
-            style = new TextStyle
-            {
-                size = GraphicsDevice.Viewport.Height / 20,
-                outlineColor = Color.Black,
-                outlineThickness = 0.0f
-            };
-
             ui.HasFocus = true;
             base.Initialize();
         }
-        Font font;
-        TextStyle style;
-        Matrix textTransform;
 
         protected override void Update(GameTime gameTime)
         {
             DebugPropertyDisplay.RemoveAllChildren();
 
             InputState.Update(GraphicsDevice.Viewport.Bounds);
+            DebugDisplay("Viewport", GraphicsDevice.Viewport.Bounds);
 
             if (InputState.IsPress(Keys.Q)
             && InputState.IsMod(KeyMod.Control))
@@ -434,36 +446,50 @@ namespace DyingAndMore
             ui.Update(gameTime);
             debugUI.Update(gameTime);
 
-            //while (GraphicsDevice.GraphicsDebug.TryDequeueMessage(out var gdbMsg))
-            //    System.Diagnostics.Debug.WriteLine(gdbMsg.ToString());
+            if (InputState.touches.Count > 0)
+                lastTouchPos = InputState.touches[0].Position;
         }
+        Vector2 lastTouchPos;
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
 
-            var offset = new Vector2(100);
-            var x = TextRenderer.Default.Draw(new DrawTextOptions("test `c0aftex`xt", font, style, Color.White, offset));
-
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-            ui.Draw(sbatch);
-            debugUI.Draw(sbatch);
+            var drawContext = new DrawContext
+            {
+                spriteBatch = sbatch,
+                textRenderer = TextRenderer.Default
+            };
+            ui.Draw(drawContext);
+            debugUI.Draw(drawContext);
 
-            int y = GraphicsDevice.Viewport.Height - 70;
+            float y = GraphicsDevice.Viewport.Height - 70;
             foreach (var row in Takai.LogBuffer.Entries) //convert to UI?
             {
                 if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
                 {
                     var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
-                    var sz = Static.DebugFont.MeasureString(text);
-                    Static.DebugFont.Draw(sbatch, text, new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y), Color.LightSeaGreen);
+
+                    //todo: debug font style
+                    var sz = Static.DebugFont.MeasureString(text, Static.DebugTextStyle);
+                    var drawText = new DrawTextOptions(
+                        text,
+                        Static.DebugFont,
+                        Static.DebugTextStyle,
+                        Color.LightSeaGreen,
+                        new Vector2(GraphicsDevice.Viewport.Width - sz.X - 20, y)
+                    );
+                    TextRenderer.Default.Draw(drawText);
+                    y -= sz.Y;
                 }
-                y -= Static.DebugFont.MaxCharHeight;
             }
+
+            Primitives2D.DrawCross(sbatch, Color.Tomato,
+                new Rectangle((int)lastTouchPos.X - 20, (int)lastTouchPos.Y - 20, 40, 40));
 
             sbatch.End();
 
-            //TextRenderer.Default.ResetBatches();
             TextRenderer.Default.Present(GraphicsDevice, textTransform);
         }
     }

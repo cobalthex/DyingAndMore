@@ -44,6 +44,13 @@ namespace Takai.UI
         }
         private int _tabIndex = -1;
 
+        /// <summary>
+        /// The active tab, or null if none
+        /// </summary>
+        public Static ActiveTab => TabIndex < 0 ? null : Children[TabIndex + 1];
+
+        public bool NavigateWithNumKeys { get; set; } = false; 
+
         public TabPanel()
         {
             Direction = Direction.Vertical;
@@ -118,6 +125,34 @@ namespace Takai.UI
         {
             tabBar.RemoveChildAt(index);
             return base.InternalRemoveChildIndex(index + 1, reflow);
+        }
+
+        protected override bool HandleInput(GameTime time)
+        {
+            //ctrl+(shift+)tab?
+
+            if (NavigateWithNumKeys)
+            {
+                var pk = Input.InputState.GetPressedKeys();
+                var tab = -1;
+                foreach (var k in pk)
+                {
+                    if (k >= Microsoft.Xna.Framework.Input.Keys.D1 &&
+                        k <= Microsoft.Xna.Framework.Input.Keys.D9)
+                        tab = (k - Microsoft.Xna.Framework.Input.Keys.D1);
+
+                    else if (k >= Microsoft.Xna.Framework.Input.Keys.NumPad1 &&
+                        k <= Microsoft.Xna.Framework.Input.Keys.NumPad9)
+                        tab = (k - Microsoft.Xna.Framework.Input.Keys.NumPad1);
+                }
+                if (tab >= 0 && tab < Children.Count - 1)
+                {
+                    TabIndex = tab;
+                    return false;
+                }
+            }
+
+            return base.HandleInput(time);
         }
     }
 }

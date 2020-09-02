@@ -18,6 +18,7 @@ namespace DyingAndMore.Editor
         public TilesEditorMode(Editor editor)
             : base("Tiles", editor, new Selectors.TileSelector(editor.Map.Class.Tileset))
         {
+            //todo: use events
         }
 
         public override void End()
@@ -50,6 +51,14 @@ namespace DyingAndMore.Editor
         {
             DyingAndMoreGame.DebugDisplay("X", (int)(lastWorldPos.X / editor.Map.Class.TileSize));
             DyingAndMoreGame.DebugDisplay("Y", (int)(lastWorldPos.Y / editor.Map.Class.TileSize));
+
+            if (isPosSaved && !InputState.IsMod(KeyMod.Shift))
+            {
+                var angle = (int)MathHelper.ToDegrees(Takai.Util.Angle(currentWorldPos - lastWorldPos));
+                if (angle < 0)
+                    angle += 360;
+                DyingAndMoreGame.DebugDisplay("Angle", angle);
+            }
 
             base.UpdateSelf(time);
         }
@@ -115,7 +124,7 @@ namespace DyingAndMore.Editor
         }
 
         //Takai.Game.Camera clipCam = new Takai.Game.Camera();
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             //draw rect around tile under cursor
             if (editor.Map.Class.Bounds.Contains(lastWorldPos))
@@ -140,22 +149,9 @@ namespace DyingAndMore.Editor
                 {
                     //todo: snap to tiles
                     editor.Map.DrawRect(new Rectangle((int)savedWorldPos.X, (int)savedWorldPos.Y, (int)diff.X, (int)diff.Y), Color.GreenYellow);
-
-                    var w = (System.Math.Abs((int)diff.X) - 1) / editor.Map.Class.TileSize + 1;
-                    var h = (System.Math.Abs((int)diff.Y) - 1) / editor.Map.Class.TileSize + 1;
-                    Font.Draw(spriteBatch, $"w:{w}, h:{h}", editor.Camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
                 }
                 else
-                {
-                    var angle = (int)MathHelper.ToDegrees((float)System.Math.Atan2(-diff.Y, diff.X));
-                    if (angle < 0)
-                        angle += 360;
                     editor.Map.DrawLine(savedWorldPos, lastWorldPos, Color.GreenYellow);
-
-                    diff /= editor.Map.Class.TileSize;
-                    Font.Draw(spriteBatch, $"x:{System.Math.Ceiling(diff.X)} y:{System.Math.Ceiling(diff.Y)} deg:{angle}",
-                        editor.Camera.WorldToScreen(lastWorldPos) + new Vector2(10, -10), Color.White);
-                }
             }
 
             //else if (clipboard != null && clipboard.Length > 0)

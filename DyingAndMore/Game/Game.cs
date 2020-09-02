@@ -229,7 +229,6 @@ namespace DyingAndMore.Game
 
             Map.renderSettings.drawBordersAroundNonDrawingEntities = true;
             Map.renderSettings.drawDebugInfo = true;
-            Map.Class.DebugFont = DebugFont;
         }
 
         private void GameMapChanged(object sender, MapChangedEventArgs e)
@@ -630,9 +629,9 @@ namespace DyingAndMore.Game
             return base.HandleInput(time);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(context);
 
             foreach (var player in players)
             {
@@ -642,7 +641,7 @@ namespace DyingAndMore.Game
                     if (ent is Entities.ActorInstance actor && actor._Class.MaxHealth > 0 && ent.IsAlive)
                     {
                         var pos = player.camera.WorldToScreen(ent.WorldPosition - new Vector2(0, ent.Radius + 16));
-                        DrawHealthBar(spriteBatch, pos, actor.CurrentHealth, actor._Class.MaxHealth);
+                        DrawHealthBar(context.spriteBatch, pos, actor.CurrentHealth, actor._Class.MaxHealth);
 
                         Map.DrawLine(actor.WorldPosition + actor.WorldForward * 50, actor.WorldPosition, Color.Black, 50, actor._Class.FieldOfView / 2);
                     }
@@ -652,18 +651,15 @@ namespace DyingAndMore.Game
                 Map.Draw(player.camera);
 
 #if DEBUG
-                //use DrawV/HLine?
-                Takai.Graphics.Primitives2D.DrawLine(spriteBatch, Color.Gray,
-                    new Vector2(player.camera.Viewport.Right, player.camera.Viewport.Top),
-                    new Vector2(player.camera.Viewport.Right, player.camera.Viewport.Bottom),
-                    new Vector2(player.camera.Viewport.Left, player.camera.Viewport.Bottom)
-                );
-                Font.Draw(spriteBatch,
-                    $"Health:{player.actor.CurrentHealth}/{player.actor._Class.MaxHealth}\n" +
-                    $"Weapon:{player.actor.Weapon}",
-                    new Vector2(player.camera.Viewport.Left + 10, player.camera.Viewport.Top + 10),
-                    Color.Cyan
-                );
+                //todo: viewport should be localized
+                DrawRect(context.spriteBatch, Color.Gray, player.camera.Viewport);
+                
+                //Font.Draw(spriteBatch,
+                //    $"Health:{player.actor.CurrentHealth}/{player.actor._Class.MaxHealth}\n" +
+                //    $"Weapon:{player.actor.Weapon}",
+                //    new Vector2(player.camera.Viewport.Left + 10, player.camera.Viewport.Top + 10),
+                //    Color.Cyan
+                //);
 
 #endif
 
@@ -679,19 +675,12 @@ namespace DyingAndMore.Game
                 //    );
                 //}
             }
-
-            if (Map.Squads != null)
-            {
-                foreach (var squad in Map.Squads)
-                {
-                    Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, Color.Cyan, 2);
-                    Font.Draw(spriteBatch, squad.Name, players[0].camera.WorldToScreen(squad.SpawnPosition), Color.White);
-                }
-            }
         }
 
         protected void DrawHealthBar(SpriteBatch spriteBatch, Vector2 screenPosition, float health, float maxHealth)
         {
+            //todo: use DrawFill/Rect
+
             var pc = (maxHealth == 0 ? 0 : MathHelper.Clamp(health, 0, maxHealth) / maxHealth);
 
             var rect = new Rectangle((int)screenPosition.X - 30, (int)screenPosition.Y - 3, 60, 6);

@@ -191,7 +191,7 @@ namespace DyingAndMore.Editor
             return base.HandleInput(time);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             var visibleRegion = editor.Camera.VisibleRegion;
             var visibleSectors = editor.Map.GetOverlappingSectors(visibleRegion);

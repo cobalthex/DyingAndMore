@@ -151,9 +151,8 @@ namespace DyingAndMore.Editor
 
         public Camera Camera { get; set; } = new Camera();
 
-        ModeSelector modes;
+        TabPanel modes;
         Static renderSettingsConsole;
-        Static fpsDisplay;
         Static resizeDialog;
         Static playButton;
 
@@ -177,31 +176,20 @@ namespace DyingAndMore.Editor
             HorizontalAlignment = Alignment.Stretch;
             VerticalAlignment = Alignment.Stretch;
 
-            var smallFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UISmall.bfnt");
-            var largeFont = Cache.Load<Takai.Graphics.BitmapFont>("Fonts/UILarge.bfnt");
-
-            AddChild(modes = new ModeSelector(largeFont, smallFont)
+            AddChild(modes = new TabPanel()
             {
                 HorizontalAlignment = Alignment.Stretch,
-                VerticalAlignment = Alignment.Stretch
+                VerticalAlignment = Alignment.Stretch,
+                Style = "ModeSelector",
+                NavigateWithNumKeys = true
             });
             AddModes();
-            modes.ModeIndex = 0;
-
-            AddChild(fpsDisplay = new Static
-            {
-                Name = "FPS",
-                Position = new Vector2(20),
-                VerticalAlignment = Alignment.End,
-                HorizontalAlignment = Alignment.End,
-                Font = smallFont
-            });
+            modes.TabIndex = 0;
 
             AddChild(playButton = new Static
             {
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.Middle,
-                Font = smallFont,
                 Text = "> PLAY >",
                 Padding = new Vector2(20)
             });
@@ -231,19 +219,19 @@ namespace DyingAndMore.Editor
             On(ClickEvent, OnClick);
             On(DragEvent, OnDrag);
 
-            Takai.Data.Binding.Globals["Editor.Paths"] = Paths;
+            Binding.Globals["Editor.Paths"] = Paths;
         }
 
         void AddModes()
         {
-            modes.AddMode(new TilesEditorMode(this));
-            modes.AddMode(new DecalsEditorMode(this));
-            modes.AddMode(new FluidsEditorMode(this));
-            modes.AddMode(new EntitiesEditorMode(this));
-            modes.AddMode(new SquadsEditorMode(this));
-            modes.AddMode(new PathsEditorMode(this));
-            modes.AddMode(new TriggersEditorMode(this));
-            modes.AddMode(new TestEditorMode(this));
+            modes.AddChild(new TilesEditorMode(this));
+            modes.AddChild(new DecalsEditorMode(this));
+            modes.AddChild(new FluidsEditorMode(this));
+            modes.AddChild(new EntitiesEditorMode(this));
+            modes.AddChild(new SquadsEditorMode(this));
+            modes.AddChild(new PathsEditorMode(this));
+            modes.AddChild(new TriggersEditorMode(this));
+            modes.AddChild(new TestEditorMode(this));
         }
 
         protected override void OnParentChanged(Static oldParent)
@@ -318,7 +306,7 @@ namespace DyingAndMore.Editor
                 return;
             }
 
-            modes.Mode?.End();
+            ((EditorMode)(modes.ActiveTab))?.End();
 
             var tmpFile = Path.GetTempFileName();
             Map.Save(tmpFile);
@@ -624,9 +612,9 @@ namespace DyingAndMore.Editor
             return base.HandleInput(time);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(context);
             Map.Draw(Camera);
         }
     }

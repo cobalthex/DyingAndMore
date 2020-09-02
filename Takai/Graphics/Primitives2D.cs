@@ -87,5 +87,16 @@ namespace Takai.Graphics
             b.X = x;
             DrawLine(spriteBatch, color, a, b);
         }
+
+        public static void DrawCross(SpriteBatch spriteBatch, Color color, Rectangle bounds)
+        {
+            var a = new Vector2(bounds.Left, bounds.Y + (bounds.Height / 2));
+            var b = new Vector2(bounds.Right, a.Y);
+            DrawLine(spriteBatch, color, a, b);
+
+            a = new Vector2(bounds.X + (bounds.Width / 2), bounds.Top);
+            b = new Vector2(a.X, bounds.Bottom);
+            DrawLine(spriteBatch, color, a, b);
+        }
     }
 }

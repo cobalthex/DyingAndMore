@@ -135,15 +135,21 @@ namespace DyingAndMore.Editor
             activeTrigger = null;
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             if (activeTrigger != null)
             {
                 editor.Map.DrawRect(activeTrigger.Region, Color.GreenYellow);
-                var textPos = new Vector2(activeTrigger.Region.X + 10, activeTrigger.Region.Y + 5);
-                Font?.Draw(spriteBatch, activeTrigger.Name, editor.Camera.WorldToScreen(textPos), Color.White);
+                var drawText = new Takai.Graphics.DrawTextOptions(
+                    activeTrigger.Name,
+                    Font,
+                    TextStyle,
+                    Color.White,
+                    editor.Camera.WorldToScreen(new Vector2(activeTrigger.Region.X + 10, activeTrigger.Region.Y + 5))
+                );
+                context.textRenderer.Draw(drawText);
             }
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(context);
         }
     }
 }

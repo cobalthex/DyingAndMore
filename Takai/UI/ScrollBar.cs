@@ -116,9 +116,9 @@ namespace Takai.UI
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             if (Direction == Direction.Horizontal)
-                return new Vector2(float.IsInfinity(availableSize.X) ? 20 : availableSize.X, 20);
+                return new Vector2(float.IsInfinity(availableSize.X) ? 30 : availableSize.X, 30);
             else
-                return new Vector2(20, float.IsInfinity(availableSize.Y) ? 20 : availableSize.Y);
+                return new Vector2(30, float.IsInfinity(availableSize.Y) ? 30 : availableSize.Y);
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
@@ -131,7 +131,7 @@ namespace Takai.UI
 
         public void Scroll(int direction)
         {
-            ContentPosition -= Math.Sign(direction) * (Font != null ? Font.MaxCharHeight : 20);
+            ContentPosition -= Math.Sign(direction) * (Font?.GetLineHeight(TextStyle) ?? 30);
         }
 
         static UIEventResult OnPress(Static sender, UIEventArgs e)
@@ -273,7 +273,7 @@ namespace Takai.UI
             return base.HandleInput(time);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             if (!IsThumbVisible)
                 return;
@@ -281,8 +281,8 @@ namespace Takai.UI
             var thumb = GetThumbBounds();
             thumb.Offset(OffsetContentArea.Location);
             thumb = Rectangle.Intersect(VisibleContentArea, thumb);
-            Graphics.Primitives2D.DrawFill(spriteBatch, Color, thumb);
-            ThumbSprite.Draw(spriteBatch, thumb);
+            Graphics.Primitives2D.DrawFill(context.spriteBatch, Color, thumb);
+            ThumbSprite.Draw(context.spriteBatch, thumb);
         }
     }
 

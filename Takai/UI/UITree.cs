@@ -54,7 +54,7 @@ namespace Takai.UI
                     var str = DisplayString(elem);
                     rows.Add((str, depth));
                     if (Font != null)
-                        maxWidth = Math.Max(maxWidth, Font.MeasureString(str).X + (Indent * depth));
+                        maxWidth = Math.Max(maxWidth, Font.MeasureString(str, TextStyle).X + (Indent * depth));
                 }
             }
         }
@@ -87,17 +87,28 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            return new Vector2(maxWidth, rows.Count * Font.MaxCharHeight);
+            return new Vector2(maxWidth, rows.Count * Font.GetLineHeight(TextStyle));
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
-            var offset = (OffsetContentArea.Location - VisibleContentArea.Location);
+            if (Font == null)
+                return;
+
+            var drawText = new Graphics.DrawTextOptions(
+                "",
+                Font,
+                TextStyle, 
+                Color, 
+                (OffsetContentArea.Location - VisibleContentArea.Location).ToVector2()
+            );
+
             for (int y = 0; y < rows.Count; ++y)
             {
                 var row = rows[y];
-                Font.Draw(spriteBatch, row.text, 0, -1, VisibleContentArea,
-                    offset + new Point(row.indent * Indent, y * Font.MaxCharHeight), Color);
+                drawText.text = row.text;
+                drawText.position = new Vector2(row.indent * Indent, y * Font.GetLineHeight(TextStyle));
+                context.textRenderer.Draw(drawText);
             }
         }
     }

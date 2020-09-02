@@ -67,7 +67,7 @@ namespace Takai.UI
             if (IsMinimized)
                 measured.Y = 0;
 
-            var header = Font.MeasureString(Text);
+            var header = Font.MeasureString(Text, TextStyle);
             headerSize = (int)(header.Y + Padding.Y);
             measured = new Vector2(MathHelper.Max(header.X, measured.X), header.Y + measured.Y);
 

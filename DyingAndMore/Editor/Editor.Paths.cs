@@ -103,13 +103,22 @@ namespace DyingAndMore.Editor
             editor.Map.DrawLine(last + new Vector2(-3, 3), last + new Vector2(3, -3), color);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             foreach (var path in editor.Paths)
             {
                 DrawPath(path.path, path.path == currentPath ? Color.Gold : Color.Cyan);
                 if (path.path.Count > 0)
-                    Font.Draw(spriteBatch, path.name, editor.Camera.WorldToScreen(path.path.Values[0].value), Color.Cyan);
+                {
+                    var drawText = new Takai.Graphics.DrawTextOptions(
+                        path.name,
+                        Font,
+                        TextStyle,
+                        Color.Cyan,
+                        editor.Camera.WorldToScreen(path.path.Values[0].value)
+                    );
+                    context.textRenderer.Draw(drawText);
+                }
                 editor.Map.DrawRect(path.path.Bounds, new Color(Color.Aquamarine, 255));
             }
 
@@ -119,7 +128,7 @@ namespace DyingAndMore.Editor
                 editor.Map.DrawLine(currentPath.Values[currentPath.Count - 1].value, mp, Color.LightYellow);
             }
 
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(context);
         }
     }
 }

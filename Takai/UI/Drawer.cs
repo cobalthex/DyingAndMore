@@ -81,7 +81,7 @@ namespace Takai.UI
                 child.Arrange(container);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             //todo: gripper sprite
 
@@ -89,9 +89,9 @@ namespace Takai.UI
             if (HorizontalAlignment == Alignment.Left)
                 gripBnd.X = ContentArea.Right - (int)GripperWidth;
 
-            DrawFill(spriteBatch, GripperColor, gripBnd);
+            DrawFill(context.spriteBatch, GripperColor, gripBnd);
 
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(context);
         }
     }
 }

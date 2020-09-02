@@ -133,13 +133,13 @@ namespace Takai.UI
             var width = 0;
             for (int i = 0; i < Text.Length; ++i)
             {
-                var cw = (int)Font.MeasureString(Text, i, 1).X;
+                var cw = (int)Font.MeasureString(Text, TextStyle, i, 1).X;
                 if (width + (cw / 2) > x)
                 {
                     Caret = i;
                     return UIEventResult.Continue;
                 }
-                width += cw + Font.Tracking.X;
+                width += cw;
             }
             Caret = Text.Length;
 
@@ -148,7 +148,7 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            return new Vector2(200, (Font?.MaxCharHeight ?? 20)); //todo: these values should be better esablished elsewhere
+            return new Vector2(200, (Font?.GetLineHeight(TextStyle) ?? 30)); //todo: these values should be better esablished elsewhere
         }
 
         protected int FindNextWordStart()
@@ -350,7 +350,7 @@ namespace Takai.UI
         protected void UpdateVisibleText()
         {
             visibleText = IsPassword ? new string(PasswordChar, base.Text.Length) : base.Text;
-            textSize = Font?.MeasureString(visibleText) ?? Vector2.Zero;
+            textSize = Font?.MeasureString(visibleText, TextStyle) ?? Vector2.Zero;
 
             BubbleEvent(TextChangedEvent, new UIEventArgs(this));
         }
@@ -363,7 +363,7 @@ namespace Takai.UI
                 return;
             }
 
-            var textWidth = Font.MeasureString(Text, 0, Caret).X;
+            var textWidth = Font.MeasureString(Text, TextStyle, 0, Caret).X;
 
             if (textWidth < ScrollPosition)
                 ScrollPosition -= (int)ContentArea.Width;
@@ -383,18 +383,18 @@ namespace Takai.UI
             ++Caret;
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             if (Font == null)
                 return;
 
-            DrawElementText(spriteBatch, new Point(-ScrollPosition + 2, (int)(ContentArea.Height - textSize.Y) / 2));
+            DrawElementText(context.textRenderer, new Vector2(-ScrollPosition + 2, (ContentArea.Height - textSize.Y) / 2));
 
             var tickCount = System.Environment.TickCount;
             if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))
             {
-                var x = Font.MeasureString(visibleText, 0, Caret).X - ScrollPosition;
-                DrawVLine(spriteBatch, Color, x + 3, 2, ContentArea.Height - 2);
+                var x = Font.MeasureString(visibleText, TextStyle, 0, Caret).X - ScrollPosition;
+                DrawVLine(context.spriteBatch, Color, x + 3, 2, ContentArea.Height - 2);
             }
         }
     }

@@ -133,12 +133,6 @@ namespace Takai.Game
             ColorSourceBlend = Blend.SourceAlpha
         };
 
-        /// <summary>
-        /// The font used to draw debug information
-        /// </summary>
-        [Data.Serializer.Ignored]
-        public Graphics.BitmapFont DebugFont { get; set; }
-
         //todo: curves (and volumetric curves) (things like rivers/flows)
 
         /// <summary>
@@ -366,7 +360,7 @@ namespace Takai.Game
                 renderedLines.CopyTo(newRenderedLines, 0);
                 renderedLines = newRenderedLines;
             }
-            
+
             renderedLines[nextRenderedLineIndex++] = new VertexPositionColor(new Vector3(start, 0), color);
             renderedLines[nextRenderedLineIndex++] = new VertexPositionColor(new Vector3(end, 0), color);
 
@@ -468,7 +462,7 @@ namespace Takai.Game
         {
             var visibleRegion = Rectangle.Intersect(camera.VisibleRegion, Class.Bounds);
             var cameraTransform = camera.Transform;
-            var projection = Matrix.CreateOrthographicOffCenter(camera.Viewport, 0, 1);
+            var projection = Matrix.CreateOrthographicOffCenter(camera.Viewport, 0, -1);
             return new RenderContext
             {
                 spriteBatch = Class.spriteBatch,
@@ -508,7 +502,7 @@ namespace Takai.Game
             var originalRt = Runtime.GraphicsDevice.GetRenderTargets(); //necessary?
             var context = GenerateRenderContext(camera);
 
-            Runtime.GraphicsDevice.Viewport = new Viewport(camera.Viewport);
+            //Runtime.GraphicsDevice.Viewport = new Viewport(camera.Viewport);
             Runtime.GraphicsDevice.ScissorRectangle = camera.Viewport;
             Runtime.GraphicsDevice.SetRenderTarget(Class.reflectedRenderTarget);
             Runtime.GraphicsDevice.Clear(Color.Transparent);
@@ -776,7 +770,7 @@ namespace Takai.Game
                     foreach (var state in ent.ActiveAnimations)
                     {
                         var stateAngle = state.Class.AlwaysDrawUpright ? 0 : angle;
-                        
+
                         state.Class?.Sprite?.Draw(
                             c.spriteBatch,
                             entPos,
@@ -835,11 +829,12 @@ namespace Takai.Game
                 if (renderSettings.drawEntityHierarchies && ent.WorldParent != null)
                     DrawLine(entPos, ent.WorldParent.WorldPosition, Color.LightGreen, 10);
 
-                if (renderSettings.drawDebugInfo && Class.DebugFont != null)
+                if (renderSettings.drawDebugInfo)
                 {
                     //todo: defer this drawing and draw outside of stencil
                     var textPos = entPos + new Vector2(ent.Radius + 10);
-                    Class.DebugFont.Draw(c.spriteBatch, ent.GetDebugInfo(), textPos, Color.White);
+                    //Class.DebugFont.Draw(c.spriteBatch, ent.GetDebugInfo(), textPos, Color.White);
+                    //todo
                 }
             }
 

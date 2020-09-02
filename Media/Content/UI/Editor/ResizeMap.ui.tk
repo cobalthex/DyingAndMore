@@ -10,7 +10,9 @@ List {
     Children: [
     	Static {
     		Text: "Resize Map"
-            Font: @"Fonts/UILarge.bfnt";
+            TextStyle: {
+                Size: 40;
+            }
     	}
 
     	List {

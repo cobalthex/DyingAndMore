@@ -165,11 +165,9 @@ namespace DyingAndMore.Editor
             return base.HandleInput(time);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
-            base.DrawSelf(spriteBatch);
-
-            var clampScale = Takai.Util.Clamp(editor.Camera.ActualScale, 0.4f, 1);
+            base.DrawSelf(context);
 
             if (editor.Map.Squads != null)
             {
@@ -177,13 +175,15 @@ namespace DyingAndMore.Editor
                 {
                     editor.Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, SelectedSquad == squad ? Color.Gold : Color.Cyan, 3);
                     
-                    var squadNameSize = Font.MeasureString(squad.Name);
-                    Font.Draw(
-                        spriteBatch,
+                    var squadNameSize = Font.MeasureString(squad.Name, TextStyle);
+                    var drawText = new Takai.Graphics.DrawTextOptions(
                         squad.Name,
-                        editor.Camera.WorldToScreen(squad.SpawnPosition) - (squadNameSize / 2),
-                        Color.White
+                        Font,
+                        TextStyle,
+                        Color.White,
+                        editor.Camera.WorldToScreen(squad.SpawnPosition) - (squadNameSize / 2)
                     );
+                    context.textRenderer.Draw(drawText);
                 }
             }
 

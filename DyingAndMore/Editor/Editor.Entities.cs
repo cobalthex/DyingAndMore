@@ -199,8 +199,8 @@ namespace DyingAndMore.Editor
                         newForward = diff;
 
                     editor.Map.MoveEnt(
-                        SelectedEntity, 
-                        SelectedEntity.Position, 
+                        SelectedEntity,
+                        SelectedEntity.Position,
                         newForward
                     );
                     return false;
@@ -276,9 +276,9 @@ namespace DyingAndMore.Editor
             return base.HandleInput(time);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(context);
 
             if (editor.Map.Squads != null)
             {
@@ -286,51 +286,17 @@ namespace DyingAndMore.Editor
                 {
                     editor.Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, new Color(Color.Cyan, 0.6f), 3, 4 * MathHelper.Pi);
 
-                    var squadNameSize = Font.MeasureString(squad.Name);
-                    Font.Draw(
-                        spriteBatch,
+                    var squadNameSize = Font.MeasureString(squad.Name, TextStyle);
+                    var drawText = new Takai.Graphics.DrawTextOptions(
                         squad.Name,
-                        editor.Camera.WorldToScreen(squad.SpawnPosition) - (squadNameSize / 2),
-                        new Color(Color.White, 0.4f)
+                        Font,
+                        TextStyle,
+                        new Color(Color.White, 0.4f),
+                        editor.Camera.WorldToScreen(squad.SpawnPosition) - (squadNameSize / 2)
                     );
+                    context.textRenderer.Draw(drawText);
                 }
             }
-            DrawEntityInfo(spriteBatch);
-        }
-
-        //todo: make work in both editor and game
-        void DrawEntityInfo(SpriteBatch spriteBatch)
-        {
-            //todo: only draw around cursor?
-
-            //foreach (var ent in editor.Map.ActiveEntities)
-            //{
-            //    var pos = editor.Camera.WorldToScreen(ent.Position) + new Vector2(ent.Radius / 2 * editor.Camera.Scale);
-
-            //    var sb = new System.Text.StringBuilder();
-            //    sb.Append($"{ent.Id}: {ent.Name} {{{string.Join(",", ent.ActiveAnimations)}}}\n");
-
-            //    if (ent is Game.Entities.ActorInstance actor)
-            //    {
-            //        sb.Append($"`f76{actor.CurrentHealth} {string.Join(",", actor.ActiveAnimations)}`x\n");
-            //        if (actor.Weapon is Game.Weapons.GunInstance gun)
-            //            sb.Append($"`bcf{gun.CurrentAmmo} {gun.State} {gun.Charge:N2}`x\n");
-            //        if (actor.Controller is Game.Entities.AIController ai)
-            //        {
-            //            sb.Append($"`ad4{ai.Target}");
-            //            for (int i = 0; i < ai.ChosenBehaviors.Length; ++i)
-            //            {
-            //                if (ai.ChosenBehaviors[i] != null)
-            //                {
-            //                    sb.Append("\n");
-            //                    sb.Append(ai.ChosenBehaviors[i].ToString());
-            //                }
-            //            }
-            //            sb.Append("`x\n");
-            //        }
-            //    }
-            //    DefaultFont.Draw(spriteBatch, sb.ToString(), pos, Color.White);
-            //}
         }
     }
 }

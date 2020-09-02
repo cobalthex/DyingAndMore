@@ -10,6 +10,8 @@ namespace Takai.Graphics
     /// </summary>
     public struct TextStyle
     {
+        public static float DefaultTextSize = 20f;
+
         public bool monospace;
         public bool underline;
         public bool oblique;
@@ -19,12 +21,26 @@ namespace Takai.Graphics
         public float outlineThickness; //0-1
         public Color outlineColor;
 
-        //outlined
         //bold
         //strikethrough
+
+        public static bool operator ==(TextStyle a, TextStyle b) => a.Equals(b);
+        public static bool operator !=(TextStyle a, TextStyle b) => !a.Equals(b);
+        public override int GetHashCode() => base.GetHashCode();
+        public override bool Equals(object obj) => base.Equals(obj);
     }
 
-    [Data.CustomDeserialize(typeof(BitmapFont), "DeserializeFont")]
+    public struct CharacterRegion
+    {
+        public int x;
+        public int y;
+        public int width;
+        public int height;
+        public int xOffset; //probably not necessary
+        public int yOffset;
+        public int xAdvance;
+    }
+
     public class Font : Data.INamedObject
     {
         public string Name { get; set; }
@@ -33,54 +49,145 @@ namespace Takai.Graphics
         /// <summary>
         /// All of the available characters in the font
         /// </summary>
-        public Dictionary<char, Rectangle> Characters
+        public Dictionary<char, CharacterRegion> Characters
         {
-            get => _characters;
+            get
+            {
+                return this._characters;
+            }
             protected set
             {
-                _characters = value;
-                MaxCharWidth = 0;
-                MaxCharHeight = 0;
-                foreach (var @char in _characters)
+                this._characters = value;
+                this.maxAdvance = 0;
+                this.maxCharHeight = 0;
+                foreach (KeyValuePair<char, CharacterRegion> @char in this._characters)
                 {
-                    MaxCharWidth = Math.Max(MaxCharWidth, @char.Value.Width);
-                    MaxCharHeight = Math.Max(MaxCharHeight, @char.Value.Height);
+                    this.maxAdvance = Math.Max(this.maxAdvance, @char.Value.xAdvance);
+                    this.maxCharHeight = Math.Max(this.maxCharHeight, @char.Value.height);
                 }
             }
         }
-        private Dictionary<char, Rectangle> _characters;
+        private Dictionary<char, CharacterRegion> _characters;
 
         /// <summary>
         /// The source texture holding all of the character images
         /// </summary>
         public Texture2D Texture { get; protected set; }
-        /// <summary>
-        /// Spacing between each character when drawn
-        /// </summary>
-        public Point Tracking { get; set; }
 
         /// <summary>
-        /// The maximum width of all characters
+        /// The maximum x-advance of all characters
         /// </summary>
-        [Data.Serializer.Ignored]
-        public int MaxCharWidth { get; protected set; }
+        [Data.Serializer.IgnoredAttribute]
+        protected internal int maxAdvance;
 
         /// <summary>
-        /// The maximum height of all characters
+        /// The maximum char height of each character
         /// </summary>
-        [Data.Serializer.Ignored]
-        public int MaxCharHeight { get; protected set; }
+        [Data.Serializer.IgnoredAttribute]
+        protected internal int maxCharHeight;
 
         /// <summary>
         /// The amount of lateral slant to apply when drawing this font as oblique
         /// Value is a fraction of <see cref="MaxCharWidth"/>
         /// </summary>
         public float ObliqueSlant { get; set; } = 0.1f;
+
+        public float GetLineHeight(TextStyle style) => GetLineHeight(style.size);
+
+        public float GetLineHeight(float size) => maxCharHeight * GetScale(size);
+
+        internal float GetScale(float size) => ((size == 0f) ? TextStyle.DefaultTextSize : size) / maxAdvance;
+
+        public Vector2 MeasureString(string text, TextStyle style, int textOffset = 0, int textLength = -1) =>
+            MeasureString(text, style.size == 0 ? TextStyle.DefaultTextSize : style.size, style, textOffset, textLength);
+        
+        public Vector2 MeasureString(string text, float size, TextStyle style, int textOffset = 0, int textLength = -1)
+        {
+            if (text == null)
+                return Vector2.Zero;
+
+            if (textLength < 0)
+                textLength = text.Length;
+
+            Vector2 total = Vector2.Zero;
+            Vector2 row = Vector2.Zero;
+            TextStyle curStyle = style;
+            for (int i = textOffset; i < Math.Min(textLength, text.Length); ++i)
+            {
+                switch (text[i])
+                {
+                    case '\n':
+                        //handle underlines
+                        total.X = Math.Max(total.X, row.X);
+                        total.Y += row.Y;
+                        row = Vector2.Zero;
+                        break;
+
+                    case '`':
+                        if (i + 1 >= text.Length)
+                            goto default;
+
+                        switch (text[i + 1])
+                        {
+                            //`x - reset style + color
+                            case 'x':
+                                //handle underline
+                                curStyle = style;
+                                textLength += 2;
+                                ++i;
+                                continue;
+
+                            //`_ - toggle underline
+                            case '_':
+                                curStyle.underline ^= true;
+                                textLength += 2;
+                                ++i;
+                                continue;
+
+                            //`/ - toggle italics
+                            case '/':
+                                curStyle.oblique ^= true;
+                                textLength += 2;
+                                ++i;
+                                continue;
+
+                            //`c[rgb] - change color
+                            case 'c':
+                                if (i + 4 >= text.Length)
+                                    break;
+
+                                textLength += 5;
+                                i += 4;
+                                continue;
+
+                            //`k - reset color
+                            case 'k':
+                                textLength += 2;
+                                ++i;
+                                continue;
+
+                        }
+                        goto default;
+
+                    default:
+                        if (Characters.TryGetValue(text[i], out var rgn))
+                        {
+                            row.X += (style.monospace ? maxAdvance : rgn.xAdvance);
+                            row.Y = Math.Max(row.Y, rgn.height + rgn.yOffset);
+                        }
+                        break;
+                }
+            }
+
+            //todo: handle obliques
+            total.X = Math.Max(total.X, row.X);
+            total.Y += row.Y;
+            return total * GetScale(size) + Vector2.One;
+        }
     }
+
     public struct DrawTextOptions
     {
-        public static float DefaultTextSize = 20f;
-
         public Font font;
 
         public string text;
@@ -111,16 +218,18 @@ namespace Takai.Graphics
         { 
             this.font = font;
             this.text = text;
-            textOffset = 0;
-            textLength = text.Length; //formatting characters not included in length calculation
+            this.textOffset = 0;
+            this.textLength = text.Length; //formatting characters not included in length calculation
             this.style = style;
-            sizeFraction = (style.size == 0 ? DefaultTextSize : style.size) / font.MaxCharWidth;
+            if (this.style.size == 0)
+                this.style.size = TextStyle.DefaultTextSize;
+            sizeFraction = font?.GetScale(this.style.size) ?? 1;
             this.color = color;
 
             this.position = position;
-            clipSize = new Vector2(100000); //todo: use max value
-            relativeOffset = Vector2.Zero;
-            transform = null;
+            this.clipSize = new Vector2(100000); //todo: use max value
+            this.relativeOffset = Vector2.Zero;
+            this.transform = null;
         }
     }
 
@@ -246,7 +355,7 @@ namespace Takai.Graphics
             var texFrac = new Vector2(1f / options.font.Texture.Width, 1f / options.font.Texture.Height);
             var clipFrac = options.clipSize / options.sizeFraction;
 
-            var slantFrac = options.font.ObliqueSlant * options.font.MaxCharWidth;
+            var slantFrac = options.font.ObliqueSlant * options.font.maxAdvance;
             float currentSlant = style.oblique ? slantFrac : 0;
 
             //todo: underline may need extra verts
@@ -271,7 +380,7 @@ namespace Takai.Graphics
                         {
                             //handle underlines
                             offset.X = options.relativeOffset.X;
-                            offset.Y += (lineHeight + options.font.Tracking.Y);
+                            offset.Y += lineHeight * options.sizeFraction;
                             lineHeight = 0;
                             underlineX = 0;
                             break;
@@ -344,20 +453,20 @@ namespace Takai.Graphics
                                 return drawnSize;
                             }
                             if (offset.X >= clipFrac.X)
-                                continue; //might be newline
+                                continue; //might be newline later in string
 
                             if (!options.font.Characters.TryGetValue(options.text[i], out var rgn))
                                 continue;
 
                             //restrict source region to visible area of clip region
-                            var rgnExtent = new Extent(rgn);
+                            var rgnExtent = new Extent(rgn.x, rgn.y, rgn.x + rgn.width, rgn.y + rgn.height);
                             var loc = rgnExtent.min - offset;
                             var clip = Extent.Intersect(rgnExtent, new Extent(loc, loc + clipFrac));
 
                             if (clip.Size != Vector2.Zero)
                             {
-                                Vector2 vloc = options.position + (offset + (clip.min - rgnExtent.min)) * options.sizeFraction;
-                                //todo: vertical alignment
+                                var adjust = new Vector2(rgn.xOffset, rgn.yOffset);
+                                Vector2 vloc = options.position + (offset + (clip.min - rgnExtent.min) + adjust) * options.sizeFraction;
                                 Vector2 vsz = clip.Size * options.sizeFraction;
 
                                 var tl = new TextVertex(
@@ -398,8 +507,8 @@ namespace Takai.Graphics
                                 batch.vertices[batch.nextVertexIndex++] = br;
                             }
 
-                            offset.X += ((style.monospace ? options.font.MaxCharWidth : rgn.Width) + options.font.Tracking.X);
-                            lineHeight = Math.Max(lineHeight, rgn.Height); //include underline height
+                            offset.X += (style.monospace ? options.font.maxAdvance : rgn.xAdvance);
+                            lineHeight = Math.Max(lineHeight, rgn.height); //include underline height
 
                             break;
                         }
@@ -410,7 +519,7 @@ namespace Takai.Graphics
 
             offset.Y += lineHeight;
             drawnSize.max += offset * options.sizeFraction;
-            drawnSize.max.X += -options.font.Tracking.X + currentSlant;
+            drawnSize.max.X += currentSlant;
             return drawnSize;
         }
 

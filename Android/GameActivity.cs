@@ -10,6 +10,8 @@ namespace DyingAndMore
         Label = "@string/app_name",
         MainLauncher = true,
         Icon = "@drawable/icon",
+        Logo = "@drawable/logo",
+        Theme = "@android:style/Theme.Black.NoTitleBar.Fullscreen",
         AlwaysRetainTaskState = true,
         LaunchMode = LaunchMode.SingleInstance,
         ScreenOrientation = ScreenOrientation.Landscape,
@@ -22,6 +24,8 @@ namespace DyingAndMore
 
         protected override void OnCreate(Bundle bundle)
         {
+            Window.DecorView.SystemUiVisibility = StatusBarVisibility.Hidden;
+         
             base.OnCreate(bundle);
             Takai.Data.Cache.Assets = Assets;
             game = new DyingAndMoreGame();

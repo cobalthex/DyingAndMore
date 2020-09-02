@@ -36,16 +36,16 @@ namespace Takai.UI
             return new Vector2(200, 20);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
-            var y = (OffsetContentArea.Height - 1) / 2;
-            DrawHLine(spriteBatch, Color, y, 0, ContentArea.Width);
-            DrawHLine(spriteBatch, Color, y + 1, 0, ContentArea.Width);
+            var y = (ContentArea.Height - 1) / 2;
+            DrawHLine(context.spriteBatch, Color, y, 0, ContentArea.Width);
+            DrawHLine(context.spriteBatch, Color, y + 1, 0, ContentArea.Width);
 
             var sliderPos = (Value - Minimum) / (float)(Maximum - Minimum);
             var x = sliderPos * ContentArea.Width;
-            DrawVLine(spriteBatch, Color, x, 0, ContentArea.Height);
-            DrawVLine(spriteBatch, Color, x + 1, 0, ContentArea.Height);
+            DrawVLine(context.spriteBatch, Color, x, 0, ContentArea.Height);
+            DrawVLine(context.spriteBatch, Color, x + 1, 0, ContentArea.Height);
         }
     }
 }

@@ -138,7 +138,7 @@ namespace Takai
             lastSampleTime = time.TotalGameTime;
         }
 
-        protected override void DrawSelf(SpriteBatch sbatch)
+        protected override void DrawSelf(UI.DrawContext context)
         {
             var bounds = VisibleContentArea;
             var average = Average;
@@ -148,24 +148,36 @@ namespace Takai
 
             //todo: rewrite
 
-            var smax = Font.MeasureString(max.ToString("N2"));
-            Font.Draw(sbatch, max.ToString("N2"), bounds.Location.ToVector2(), Color.RoyalBlue);
-            var smin = Font.MeasureString(min.ToString("N2"));
-            Font.Draw(sbatch, min.ToString("N2"), new Vector2(bounds.Left + smax.X - smin.X, bounds.Bottom - smin.Y), Color.RoyalBlue);
+            var smax = Font.MeasureString(max.ToString("N2"), TextStyle);
+            var drawText = new Graphics.DrawTextOptions(
+                max.ToString("N2"),
+                Font,
+                TextStyle,
+                Color.RoyalBlue,
+                bounds.Location.ToVector2()
+            );
+            context.textRenderer.Draw(drawText);
+
+            drawText.text = min.ToString("N2");
+            var smin = Font.MeasureString(drawText.text, TextStyle);
+            drawText.position = new Vector2(bounds.Left + smax.X - smin.X, bounds.Bottom - smin.Y);
+            context.textRenderer.Draw(drawText);
 
             float dy = (max - min);
 
+            drawText.text = average.ToString("N2");
+            var savg = Font.MeasureString(drawText.text, TextStyle);
             float y = bounds.Bottom - ((dy / buffer.Count) - min) / dy * bounds.Height;
-            var savg = Font.MeasureString(average.ToString("N2"));
-            Font.Draw(sbatch, average.ToString("N2"), new Vector2(bounds.Left + smax.X - savg.X, bounds.Top + (bounds.Height - savg.Y) / 2), Color.Azure);
+            drawText.position = new Vector2(bounds.Left + smax.X - savg.X, bounds.Top + (bounds.Height - savg.Y) / 2);
+            context.textRenderer.Draw(drawText);
 
             var advance = ((int)(smax.X - 1) / 5 + 1) * 5;
             bounds.X += advance + 5;
             bounds.Width -= advance + 5;
-            P2D.DrawRect(sbatch, Color.White, bounds);
+            P2D.DrawRect(context.spriteBatch, Color.White, bounds);
             bounds.Inflate(-5, -5);
 
-            P2D.DrawLine(sbatch, Color.Azure, new Vector2(bounds.Left, bounds.Center.Y), new Vector2(bounds.Right, bounds.Center.Y));
+            P2D.DrawLine(context.spriteBatch, Color.Azure, new Vector2(bounds.Left, bounds.Center.Y), new Vector2(bounds.Right, bounds.Center.Y));
 
             float step = (float)bounds.Width / buffer.Count;
 
@@ -178,10 +190,10 @@ namespace Takai
                     continue;
 
                 y = bounds.Bottom - (entry.fps - min) / dy * bounds.Height;
-                P2D.DrawLine(sbatch, Color.Black, last, new Vector2(x, y + 1));
-                P2D.DrawLine(sbatch, Color.Black, new Vector2(x, y + 1), new Vector2(x + step, y + 1));
-                P2D.DrawLine(sbatch, Color.Yellow, last, new Vector2(x, y));
-                P2D.DrawLine(sbatch, Color.Yellow, new Vector2(x, y), new Vector2(x + step, y));
+                P2D.DrawLine(context.spriteBatch, Color.Black, last, new Vector2(x, y + 1));
+                P2D.DrawLine(context.spriteBatch, Color.Black, new Vector2(x, y + 1), new Vector2(x + step, y + 1));
+                P2D.DrawLine(context.spriteBatch, Color.Yellow, last, new Vector2(x, y));
+                P2D.DrawLine(context.spriteBatch, Color.Yellow, new Vector2(x, y), new Vector2(x + step, y));
                 last = new Vector2(x + step, y);
 
                 x += step;

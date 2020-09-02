@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using Takai.Input;
 using Takai.UI;
 
@@ -94,7 +95,7 @@ namespace DyingAndMore.UI
             return false;
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(DrawContext context)
         {
             var iz = ItemSize + ItemMargin;
             int start = (int)(ContentArea.Y / iz.Y) * ItemsPerRow;
@@ -117,14 +118,14 @@ namespace DyingAndMore.UI
                 //    new Color((i * 24) % 255, (i * 32) % 255, (i * 16) % 255),
                 //    rect
                 //);
-                DrawItem(spriteBatch, i, rect);
+                DrawItem(context.spriteBatch, i, rect);
 
                 if (i == SelectedIndex)
                 {
                     rect.Inflate(1, 1);
-                    DrawRect(spriteBatch, Color.White, rect);
+                    DrawRect(context.spriteBatch, Color.White, rect);
                     rect.Inflate(1, 1);
-                    DrawRect(spriteBatch, Color.Black, rect);
+                    DrawRect(context.spriteBatch, Color.Black, rect);
                 }
             }
         }
@@ -136,7 +137,7 @@ namespace DyingAndMore.UI
             searchPath = Path.Combine(Takai.Data.Cache.ContentRoot, searchPath);
 #if ANDROID
             mask = mask.Replace(".", "\\.").Replace("*", ".*");
-            var regex = new System.Text.RegularExpressions.Regex(mask);
+            var regex = new Regex(mask, RegexOptions.IgnoreCase | RegexOptions.Singleline);
             var allFiles = Takai.Data.Cache.Assets.List(searchPath);
             foreach (var file in allFiles)
             {
@@ -148,7 +149,7 @@ namespace DyingAndMore.UI
                     yield return Path.Combine(searchPath, file);
             }
 #else
-            return System.IO.Directory.EnumerateFiles(searchPath, mask, System.IO.SearchOption.AllDirectories);
+            return Directory.EnumerateFiles(searchPath, mask, SearchOption.AllDirectories);
 #endif
         }
     }
