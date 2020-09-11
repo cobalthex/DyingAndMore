@@ -388,7 +388,7 @@ namespace Takai.UI
             if (Font == null)
                 return;
 
-            DrawElementText(context.textRenderer, new Vector2(-ScrollPosition + 2, (ContentArea.Height - textSize.Y) / 2));
+            DrawText(context.textRenderer, Text, new Vector2(-ScrollPosition + 2, (ContentArea.Height - textSize.Y) / 2));
 
             var tickCount = System.Environment.TickCount;
             if (HasFocus && (System.Math.Abs(lastInputTick - tickCount) < 500 || tickCount % 650 < 325))

@@ -17,16 +17,18 @@ namespace DyingAndMore.Editor
             : base("Test", editor)
         {
             trail = Takai.Data.Cache.Load<TrailClass>("Effects/Trails/mouse.trail.tk").Instantiate();
+
+            On(DragEvent, OnDrag);
         }
 
-
-        protected override bool HandleInput(GameTime time)
+        UIEventResult OnDrag(Static sender, UIEventArgs e)
         {
-            var pos = editor.Camera.ScreenToWorld(InputState.MouseVector);
-            trail.Advance(pos, Vector2.Normalize(InputState.MouseDelta()));
+            var dea = (DragEventArgs)e;
+            var pos = editor.Camera.ScreenToWorld(LocalToScreen(dea.position));
+            trail.Advance(pos, Vector2.Normalize(dea.delta));
             editor.Map.Spawn(trail);
 
-            return base.HandleInput(time);
+            return UIEventResult.Handled;
         }
     }
 }

@@ -2,8 +2,10 @@
 {
 	Static: {
 		Font: @"Fonts/Bahnschrift.fnt.tk";
-		TextStyle: {
+		TextStyle: TextStyle {
 			size: 20;
+			outlineThickness: 0.5;
+			outlineColor: [0 0 0 255];
 		}
 
 		#Padding: Vector2 [0 0];
@@ -43,11 +45,11 @@
 	DropdownSelect: {
 		BackgroundSprite: @"UI/input.9p.tk";
 		BorderColor: Color.Transparent;
-		Padding: Vector2 [4 2];
+		Padding: Vector2 [5 5];
 	};
 	Dropdown: {
 		BackgroundSprite: @"UI/frame.9p.tk";
-		Padding: Vector2 [10 5];
+		Padding: Vector2 [5 5];
 	};
 	Dropdown.List: {
 		Margin: 1;
@@ -59,17 +61,17 @@
 	};
 	NumericInput.TextInput: {
 		BackgroundSprite: NinePatch { };
-		Padding: Vector2 [2 2];
+		Padding: Vector2 [5 5];
 		BorderColor: Color.Transparent;
 	};
 	NumericInput.Button: {
-		Padding: Vector2 [5 2];
+		Padding: Vector2 [5 5];
 	};
 
 	TextInput: {
 		BackgroundSprite: @"UI/input.9p.tk";
 		BorderColor: Color.Transparent;
-		Padding: Vector2 [4 2];
+		Padding: Vector2 [5 5];
 	};
 
 	FileInput: {
@@ -92,12 +94,8 @@
 		CheckColor: Color.Transparent;
 		BoxSprite: @"UI/input.9p.tk";
 		Margin: 10;
-		Padding: Vector2 [4 2];
 		CheckSprite: Sprite {
-			Texture: @"UI/checkbox.png";
-			Center: false;
-			ClipRect: [8 0 13 12];
-			ShrinkToFit: True;
+			Texture: @"UI/Check.png";
 		};
 	};
 
@@ -117,16 +115,7 @@
 		VerticalAlignment: Alignment.Center;
 	};
 
-	ModeSelector: {
-		InactiveColor: Color [150 150 255];
-	};
-
-	GameInstance: {
-		#Font: @"Fonts/UISmall.fnt.tk";
-	};
-
 	TabPanel.TabBar: {
-		HorizontalAlignment: Alignment.Center;
 		Margin: 10;
 	}
 	TabPanel.TabHeader: {
@@ -139,6 +128,35 @@
 	Shade: {
 		Proto: "Box";
 	};
+
+	GameInstance: {
+		#Font: @"Fonts/UISmall.fnt.tk";
+	};
+
+	Editor.ModeSelector: {
+		InactiveColor: Color [150 150 255];
+	};
+	Editor.ModeSelector TabBar: {
+		HorizontalAlignment: Alignment.Stretch;
+	};
+
+	Editor.Selector.Preview: {
+		BackgroundSprite: @"UI/box.9p.tk";
+		Size: Vector2 [64 64];
+		Padding: Vector2 [4 4];
+		MissingSpriteXColor: Color.Tomato;
+	};
+
+	Editor.Selector.Eraser: {
+        Padding: Vector2 [5 5];
+	}
+
+	Editor.Play: {
+		Padding: Vector2 [10 10];
+	}
+	Editor.ResetZoom: {
+        Padding: Vector2 [5 5];
+	}
 
 	#todo: support hierarchical styling: ParentElement ChildElement { }
 }

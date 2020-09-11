@@ -167,6 +167,7 @@ namespace DyingAndMore.Game
                 HorizontalAlignment = Alignment.Stretch,
             });
 
+#if DEBUG
             AddChild(fpsDisplay = new Static
             {
                 Name = "FPS",
@@ -182,6 +183,7 @@ namespace DyingAndMore.Game
                 HorizontalAlignment = Alignment.Middle,
                 Color = new Color(1, 1, 1, 0.5f),
             });
+#endif
 
             CommandActions[SwitchToEditorCommand] = delegate (Static sender, object arg)
             {
@@ -193,21 +195,18 @@ namespace DyingAndMore.Game
             var tabs = new TabPanel();
 
             renderSettingsPane = GeneratePropSheet(Map.renderSettings);
-            renderSettingsPane.BackgroundSprite = null;
             renderSettingsPane.BackgroundColor = Color.Transparent; //hacky, should fix .Style = null
             renderSettingsPane.Name = "Render Settings";
             renderSettingsPane.HorizontalAlignment = Alignment.Stretch;
             tabs.AddChild(renderSettingsPane);
 
             updateSettingsPane = GeneratePropSheet(Map.updateSettings);
-            updateSettingsPane.BackgroundSprite = null;
             updateSettingsPane.BackgroundColor = Color.Transparent;
             updateSettingsPane.Name = "Update Settings";
             updateSettingsPane.HorizontalAlignment = Alignment.Stretch;
             tabs.AddChild(updateSettingsPane);
 
             gameplaySettingsPane = GeneratePropSheet(GameplaySettings);
-            gameplaySettingsPane.BackgroundSprite= null;
             gameplaySettingsPane.BackgroundColor = Color.Transparent;
             gameplaySettingsPane.Name = "Gameplay Settings";
             gameplaySettingsPane.HorizontalAlignment = Alignment.Stretch;
@@ -257,15 +256,16 @@ namespace DyingAndMore.Game
             }
 
             players = new List<PlayerInstance>(possiblePlayers.Count);
-            for (int i = 0; i < possiblePlayers.Count; ++i)
+            foreach (var player in possiblePlayers)
             {
-                players.Add(new PlayerInstance(possiblePlayers[i], new Rectangle()));
+                players.Add(new PlayerInstance(player, new Rectangle()));
 
                 //todo: hud container per player
 
-                if (possiblePlayers[i].Hud != null)
-                    hudContainer.AddChild(possiblePlayers[i].Hud);
+                if (player.Hud != null)
+                    hudContainer.AddChild(player.Hud);
 
+#if ANDROID
                 var movementInput = new PolarInput
                 {
                     DisplayNormalizedValue = true,
@@ -290,9 +290,16 @@ namespace DyingAndMore.Game
                         new Binding("Forward", "NormalizedValue", BindingDirection.TwoWay)
                     }
                 };
-                movementInput.BindTo(possiblePlayers[i]);
-                forwardInput.BindTo(possiblePlayers[i]);
+                forwardInput.On(ValueChangedEvent, delegate (Static sender, UIEventArgs e)
+                {
+                    //todo: this only works when cursor moves, not just held down
+                    player.Weapon?.TryUse();
+                    return UIEventResult.Handled;
+                });
+                movementInput.BindTo(player);
+                forwardInput.BindTo(player);
                 hudContainer.AddChildren(movementInput, forwardInput);
+#endif
             }
             if (players.Count > 0)
             {
@@ -402,7 +409,10 @@ namespace DyingAndMore.Game
         protected override void UpdateSelf(GameTime time)
         {
             ElapsedRealTime += time.ElapsedGameTime;
+#if DEBUG
             clockDisplay.Text = $"{GetClockText(ElapsedRealTime)}\n{GetClockText(Map.ElapsedTime)}x{Map.TimeScale:N1}{(IsPaused ? "\n -- PAUSED --" : "")}";
+            fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
+#endif
 
             if (isDead && time.TotalGameTime > restartTimer)
             {
@@ -448,8 +458,6 @@ namespace DyingAndMore.Game
 
                 Map.Update(time);
             }
-
-            fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
 
             bool isCornered = players[0].actor.IsMaybeCornered();
 
@@ -498,6 +506,7 @@ namespace DyingAndMore.Game
                 //Takai.LogBuffer.Append(swatch.ElapsedMilliseconds.ToString());
             }*/
 
+            //todo: should be a flag if can go to editor
             if (InputState.IsPress(Keys.F1) ||
                 InputState.IsAnyPress(Buttons.Start))
             {
@@ -506,12 +515,14 @@ namespace DyingAndMore.Game
                 return false;
             }
 
+#if DEBUG
             if (InputState.IsPress(Keys.F2) ||
                 InputState.IsAnyPress(Buttons.Back))
             {
                 settingsConsole.IsEnabled ^= true;
                 return false;
             }
+#endif
 
 #if WINDOWS
             if (InputState.IsPress(Keys.F5))

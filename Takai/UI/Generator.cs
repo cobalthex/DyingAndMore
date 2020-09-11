@@ -58,7 +58,6 @@ namespace Takai.UI
                 Margin = new Vector2(5),
                 Padding = new Vector2(5),
                 BackgroundColor = new Color(1, 1, 1, 0.1f),
-                Style = "Frame"
             };
 
             if (obj == default)

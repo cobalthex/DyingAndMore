@@ -49,10 +49,12 @@ namespace DyingAndMore
 
         public static void DebugDisplay(string key, object value)
         {
+#if DEBUG
             DebugPropertyDisplay.AddChildren(
                 new Static(key) { Color = Color.Cyan },
                 new Static(value.ToString()) { Color = Color.Aquamarine }
             );
+#endif
         }
 
         /// <summary>
@@ -70,20 +72,21 @@ namespace DyingAndMore
                 SynchronizeWithVerticalRetrace = true,
                 //IsFullScreen = true,
 #elif ANDROID
-                IsFullScreen = true,
+                IsFullScreen = false,
                 PreferMultiSampling = true,
 #else
                 PreferMultiSampling = true,
                 SynchronizeWithVerticalRetrace = false,
                 PreferredBackBufferWidth = 1600,
                 PreferredBackBufferHeight = 900,
+                PreferHalfPixelOffset = false,
 #endif
             };
 
             gdm.DeviceCreated += GdmDeviceCreated;
             gdm.PreparingDeviceSettings += delegate (object sender, PreparingDeviceSettingsEventArgs e)
             {
-                //required for splitscreen (currentsly)
+                //required for splitscreen (currentsly
                 //e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
             };
 
@@ -129,13 +132,17 @@ namespace DyingAndMore
 #endif
 
             GraphicsDevice.BlendState = BlendState.NonPremultiplied;
-            GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
-            gdm.ApplyChanges();
 
             TextRenderer.Default = new TextRenderer(Cache.Load<Effect>("Shaders/SDFTex.mgfx"));
             textTransform = CreateScreenTransform();
 
-            Static.DebugFont = Cache.Load<Font>("Fonts/SGI.fnt.tk");
+            Static.DebugFont = Cache.Load<Font>("Fonts/Debug.fnt.tk");
+            Static.DebugTextStyle = new TextStyle
+            {
+                size = 15,
+                outlineColor = Color.Black,
+                outlineThickness = 0.2f,
+            };
 
             //custom cursor
             //Mouse.SetCursor(MouseCursor.FromTexture2D(Cache.Load<Texture2D>("UI/Pointer.png"), 0, 0));
@@ -148,10 +155,9 @@ namespace DyingAndMore
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
+            Static.MergeStyles(Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.tk"));
 #if ANDROID
-            Static.Styles = Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.Mobile.tk");
-#else
-            Static.Styles = Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.tk");
+            Static.MergeStyles(Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.Mobile.tk"));
 #endif
 
             //var state = new Editor.Editor();
@@ -182,8 +188,7 @@ namespace DyingAndMore
                 while (ui != null && !ui.IsModal)
                     ui = ui.Parent;
 
-                if (ui != null)
-                    ui.RemoveFromParent();
+                ui?.RemoveFromParent();
             };
             Static.GlobalCommands["RemoveUI"] = delegate (Static ui, object arg)
             {
@@ -293,7 +298,6 @@ namespace DyingAndMore
 
             childUI = new FileList
             {
-                //Size = new Vector2(400, 600),
                 HorizontalAlignment = Alignment.Middle,
                 VerticalAlignment = Alignment.Middle,
                 BasePath = System.IO.Path.Combine(Cache.ContentRoot, "Mapsrc"),
@@ -370,7 +374,11 @@ namespace DyingAndMore
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch,
             };
-            ui.AddChild(childUI);
+            ui.AddChild(new ScrollBox(childUI)
+            {
+                HorizontalAlignment = Alignment.Middle,
+                VerticalAlignment = Alignment.Stretch
+            });
 
             //Static.DebugFont = Static.DefaultFont;
 
@@ -379,6 +387,7 @@ namespace DyingAndMore
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch,
             };
+#if DEBUG
             debugUI.AddChild(DebugPropertyDisplay = new Table(2)
             {
                 Name = "Debug Display",
@@ -387,7 +396,7 @@ namespace DyingAndMore
                 Position = new Vector2(30),
                 Margin = new Vector2(5),
             });
-
+#endif
             debugUI.AddChild(fpsGraph = new Takai.FpsGraph
             {
                 Name = "FPS Graph",
@@ -399,14 +408,23 @@ namespace DyingAndMore
 
             ui.HasFocus = true;
             base.Initialize();
+
+            GraphicsDevice.SetRenderTarget(null);
         }
 
         protected override void Update(GameTime gameTime)
         {
+#if DEBUG
             DebugPropertyDisplay.RemoveAllChildren();
+#endif
 
             InputState.Update(GraphicsDevice.Viewport.Bounds);
-            DebugDisplay("Viewport", GraphicsDevice.Viewport.Bounds);
+
+            if (InputState.touches.Count > 0)
+                lastTouchPos = InputState.touches[0].Position;
+
+            //DebugDisplay("Viewport", GraphicsDevice.Viewport.Bounds);
+            //DebugDisplay("Touch", lastTouchPos);
 
             if (InputState.IsPress(Keys.Q)
             && InputState.IsMod(KeyMod.Control))
@@ -445,9 +463,6 @@ namespace DyingAndMore
 
             ui.Update(gameTime);
             debugUI.Update(gameTime);
-
-            if (InputState.touches.Count > 0)
-                lastTouchPos = InputState.touches[0].Position;
         }
         Vector2 lastTouchPos;
 
@@ -464,6 +479,7 @@ namespace DyingAndMore
             ui.Draw(drawContext);
             debugUI.Draw(drawContext);
 
+#if DEBUG
             float y = GraphicsDevice.Viewport.Height - 70;
             foreach (var row in Takai.LogBuffer.Entries) //convert to UI?
             {
@@ -485,8 +501,10 @@ namespace DyingAndMore
                 }
             }
 
+
             Primitives2D.DrawCross(sbatch, Color.Tomato,
                 new Rectangle((int)lastTouchPos.X - 20, (int)lastTouchPos.Y - 20, 40, 40));
+#endif
 
             sbatch.End();
 

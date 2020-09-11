@@ -95,7 +95,7 @@ MapInstance {
                 Class: TrailClass {
                     File: Null;
                     Name: Null;
-                    MaxPoints: 0;
+                    MaxPoints: 1024;
                     Sprite: Null;
                     SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
                     SpriteScale: 1;

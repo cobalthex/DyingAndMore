@@ -24,7 +24,6 @@ List {
                         Static { Text: "`_Name"; }
                         TextInput {
                             HorizontalAlignment: Alignment.Stretch;
-                            Padding: [4 2];
                             Bindings: [
                                 {
                                     Direction: BindingDirection.TwoWay;

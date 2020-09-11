@@ -22,24 +22,23 @@ namespace DyingAndMore.Editor
                 _selectedEntity = value;
                 if (_selectedEntity != null)
                     _selectedEntity.OutlineColor = Color.Gold;
-                entInfo.BindTo(value);
             }
         }
         Takai.Game.EntityInstance _selectedEntity;
 
         Vector2 currentWorldPos;
 
-        Static entInfo;
         Static entEditor;
 
         bool isBatchDeleting = false;
         Vector2 savedWorldPos;
         Rectangle deleteRect;
 
+        public Vector2 DefaultForward = -Vector2.UnitX; //load from config?
+
         public EntitiesEditorMode(Editor editor)
             : base("Entities", editor)
         {
-            AddChild(entInfo = Takai.Data.Cache.Load<Static>("UI/Editor/Entities/EntityInfo.ui.tk").CloneHierarchy());
             entEditor = Takai.Data.Cache.Load<Static>("UI/Editor/Entities/EntityEditor.ui.tk").CloneHierarchy();
 
             On(PressEvent, OnPress);
@@ -54,12 +53,12 @@ namespace DyingAndMore.Editor
                  selector.ents[selectedItem].Animations.TryGetValue(selector.ents[selectedItem].DefaultBaseAnimation, out animation)))
             {
                 preview.Sprite = animation.Sprite;
-                preview.Size = Vector2.Max(new Vector2(32), preview.Sprite?.Size.ToVector2() ?? new Vector2(32));
+                //preview.Size = Vector2.Max(new Vector2(32), preview.Sprite?.Size.ToVector2() ?? new Vector2(32));
             }
             else
             {
                 preview.Sprite = null;
-                preview.Size = new Vector2(32);
+                //preview.Size = new Vector2(32);
             }
         }
 
@@ -79,65 +78,61 @@ namespace DyingAndMore.Editor
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
         {
             var pea = (PointerEventArgs)e;
-            var worldPos = editor.Camera.ScreenToWorld(pea.position);
+            var worldPos = editor.Camera.ScreenToWorld(LocalToScreen(pea.position));
 
             var inputSearchRadius = pea.device == DeviceType.Touch ? 30 : 20;
 
             if (pea.button == 0)
             {
-                /*
-#if WINDOWS
-                //load entity from file
-                if (InputState.IsMod(KeyMod.Alt))
-                {
-                    var ofd = new System.Windows.Forms.OpenFileDialog()
-                    {
-                        Filter = "Entity Definitions (*.ent.tk)|*.ent.tk"
-                    };
-                    if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    {
-                        var ent = Takai.Data.Cache.Load<Takai.Game.EntityClass>(ofd.FileName);
-                        if (ent != null)
-                            SelectedEntity = editor.Map.Spawn(ent, currentWorldPos, Vector2.UnitX, Vector2.Zero);
-                    }
-
-                    return UIEventResult.Handled;
-                }
-#endif
-                */
                 var selected = editor.Map.FindEntitiesInRegion(worldPos, inputSearchRadius);
-
-                if (InputState.IsMod(KeyMod.Alt) && SelectedEntity != null && selected.Count > 0)
+                if (selected.Count > 0)
                 {
-                    editor.Map.Attach(selected[0], SelectedEntity);
-                    return UIEventResult.Handled;
+                    if (InputState.IsMod(KeyMod.Alt) && SelectedEntity != null)
+                        editor.Map.Attach(selected[selected.Count - 1], SelectedEntity);
+
+                    else
+                    {
+                        SelectedEntity = selected[selected.Count - 1];
+                        SelectedEntity.Velocity = Vector2.Zero;
+
+                        if (InputState.IsMod(KeyMod.Control))
+                        {
+                            SelectedEntity = SelectedEntity.Clone();
+                            //maintain hierarchy?
+                            editor.Map.Spawn(SelectedEntity);
+                        }
+                    }
                 }
 
-                if (selected.Count < 1)
+                if (SelectedEntity != null && selector.SelectedIndex < 0)
                 {
-                    if (editor.Map.Class.Bounds.Contains(worldPos) && selector.ents.Count > 0)
-                        SelectedEntity = editor.Map.Spawn(selector.ents[selector.SelectedIndex], worldPos, Vector2.UnitX, Vector2.Zero);
+                    editor.Map.Destroy(selected[selected.Count - 1]);
+                    SelectedEntity = null;
+                }
+                else if (selected.Count == 0)
+                {
+                    if (selector.SelectedIndex < 0)
+                    {
+                        if (SelectedEntity != null)
+                        {
+                            editor.Map.Destroy(SelectedEntity);
+                            SelectedEntity = null;
+                        }
+                    }
+                    else if (editor.Map.Class.Bounds.Contains(worldPos) && selector.ents.Count > 0)
+                    {
+                        SelectedEntity = editor.Map.Spawn(
+                            selector.ents[selector.SelectedIndex], 
+                            worldPos, 
+                            DefaultForward, 
+                            Vector2.Zero
+                        );
+                    }
                     else
                         SelectedEntity = null;
                 }
-                else
-                {
-                    SelectedEntity = selected[0];
-                    SelectedEntity.Velocity = Vector2.Zero;
 
-                    if (InputState.IsMod(KeyMod.Control))
-                    {
-                        SelectedEntity = SelectedEntity.Clone();
-                        //maintain hierarchy?
-                        editor.Map.Spawn(SelectedEntity);
-                    }
-                }
-            }
-
-            else if (pea.button == (int)MouseButtons.Right) //mouse only?
-            {
-                var selected = editor.Map.FindEntitiesInRegion(worldPos, inputSearchRadius);
-                SelectedEntity = selected.Count > 0 ? selected[0] : null;
+                return UIEventResult.Handled;
             }
 
             return UIEventResult.Continue;
@@ -146,12 +141,12 @@ namespace DyingAndMore.Editor
         protected UIEventResult OnClick(Static sender, UIEventArgs e)
         {
             var pea = (PointerEventArgs)e;
+            var worldPos = editor.Camera.ScreenToWorld(LocalToScreen(pea.position));
 
-            if (pea.button == (int)MouseButtons.Right) //mouse only?
+            if (pea.device == DeviceType.Mouse && pea.button == (int)MouseButtons.Right)
             {
-                var searchRadius = /*isTapping*/ false ? 10 : 1;
-                var selected = editor.Map.FindEntitiesInRegion(currentWorldPos, searchRadius);
-                if (selected.Count > 0 && selected[0] == SelectedEntity)
+                var selected = editor.Map.FindEntitiesInRegion(worldPos, 1);
+                if (selected.Count > 0 && selected[selected.Count - 1] == SelectedEntity)
                 {
                     editor.Map.Destroy(SelectedEntity);
                     SelectedEntity = null;

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Takai.UI
 {
-    public class DurationInput : List
+    public class DurationInput : Catalog
     {
         public TimeSpan Duration { get; set; } = TimeSpan.Zero;
 
@@ -73,14 +73,13 @@ namespace Takai.UI
         public DurationInput()
         {
             Direction = Direction.Horizontal;
-            Margin = 10;
-
+            Margin = new Vector2(10);
 
             var minutes = new NumericInput
             {
                 Minimum = 0,
                 Maximum = int.MaxValue,
-				Size = new Vector2(80, 20), //todo: some default input size here
+                HorizontalAlignment = Alignment.Stretch,
 				Bindings = new System.Collections.Generic.List<Data.Binding>
                 {
 					new Data.Binding("Minutes", "Value", Data.BindingDirection.TwoWay)
@@ -91,7 +90,7 @@ namespace Takai.UI
             {
                 Minimum = 0,
                 Maximum = int.MaxValue,
-				Size = new Vector2(80, 20),
+                HorizontalAlignment = Alignment.Stretch,
                 Bindings = new System.Collections.Generic.List<Data.Binding>
                 {
                     new Data.Binding("Seconds", "Value", Data.BindingDirection.TwoWay)
@@ -102,7 +101,7 @@ namespace Takai.UI
             {
                 Minimum = 0,
                 Maximum = int.MaxValue,
-				Size = new Vector2(80, 20),
+                HorizontalAlignment = Alignment.Stretch,
                 Bindings = new System.Collections.Generic.List<Data.Binding>
                 {
                     new Data.Binding("Milliseconds", "Value", Data.BindingDirection.TwoWay)

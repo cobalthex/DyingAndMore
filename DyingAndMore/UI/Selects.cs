@@ -210,6 +210,8 @@ namespace DyingAndMore.UI
 
     public class SetOperationsSelect : EnumSelect<SetOperation> { }
 
+    public class ComparisonMethodSelect : EnumSelect<ComparisonMethod> { }
+
     public class TaskFailureActionSelect : EnumSelect<TaskFailureAction> { }
     
     public class AimingMethodSelect : EnumSelect<AimingMethod> { }

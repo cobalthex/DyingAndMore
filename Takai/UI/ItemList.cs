@@ -225,21 +225,21 @@ namespace Takai.UI
 
             CommandActions[AddItemCommand] = delegate (Static sender, object arg)
             {
-                var il = (ItemList<T>)sender;
+                var self = (ItemList<T>)sender;
 
-                if (il.newItem.item == null)
+                if (self.newItem.item == null)
                     return;
 
-                il.Items.Add(il.newItem.item);
-                il.newItem = new NewItemContainer(il.newItem);
-                il.AddItemUI.BindTo(il.newItem);
+                self.Items.Add(self.newItem.item);
+                self.newItem = new NewItemContainer(self.newItem);
+                self.AddItemUI.BindTo(self.newItem);
             };
 
             CommandActions[RemoveItemCommand] = delegate (Static sender, object arg)
             {
-                var il = (ItemList<T>)sender;
+                var self = (ItemList<T>)sender;
                 if (arg is int i)
-                    il.Items.RemoveAt(i);
+                    self.Items.RemoveAt(i);
             };
         }
 

@@ -924,7 +924,19 @@ namespace Takai.UI
 #if DEBUG
             clone.DebugId = GenerateId();
 #endif
+            
+            //move to copy constructor?
             clone.didPress = new BitVector32(0);
+            if (events != null)
+                clone.events = new Dictionary<string, UIEvent>(events);
+            if (_eventCommands != null)
+                clone._eventCommands = new Dictionary<string, EventCommandBinding>(_eventCommands);
+            if (_commandActions != null)
+                clone._commandActions = new Dictionary<string, Action<Static, object>>(_commandActions);
+            if (Bindings != null)
+                clone.Bindings = new List<Data.Binding>(Bindings);
+
+            //rebind?
             clone.SetParentNoReflow(null);
             clone._children = new List<Static>(_children);
             clone.Children = clone._children.AsReadOnly();
@@ -1582,7 +1594,7 @@ namespace Takai.UI
             {
                 availableSize.X -= Padding.X * 2;
                 if (isWidthAutoSize && isHStretch)
-                    availableSize.X -= (int)Position.X;
+                    availableSize.X -= Position.X;
             }
             else if (!float.IsNaN(size.X))
                 availableSize.X = size.X;
@@ -1591,7 +1603,7 @@ namespace Takai.UI
             {
                 availableSize.Y -= Padding.Y * 2;
                 if (isHeightAutoSize && isVStretch)
-                    availableSize.Y -= (int)Position.Y;
+                    availableSize.Y -= Position.Y;
             }
             else if (!float.IsNaN(size.Y))
                 availableSize.Y = size.Y;
@@ -1727,7 +1739,8 @@ namespace Takai.UI
             foreach (var child in Children)
             {
                 if (child.IsEnabled)
-                    child.Arrange(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
+                    // child.Arrange(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
+                    child.Arrange(new Rectangle(child.lastMeasureContainerBounds.Location, availableSize.ToPoint())); //?
             }
         }
 
@@ -1744,6 +1757,8 @@ namespace Takai.UI
             if (Parent == null)
             {
                 var viewport = Runtime.GraphicsDevice.Viewport.Bounds;
+                viewport.X = 0;
+                viewport.Y = 0;
                 container = parentContentArea = Rectangle.Intersect(container, viewport);
             }
             else
@@ -1810,7 +1825,7 @@ namespace Takai.UI
             for (int i = 0; i < measureQueue.Count; ++i)
             {
                 measureQueue[i].Measure(measureQueue[i].lastMeasureAvailableSize);
-                if (!measureQueue[i].isMeasureValid) //todo: queue?
+                if (!measureQueue[i].isMeasureValid)
                     measureQueue[i].Measure(new Vector2(InfiniteSize));
             }
             measureQueue.Clear();
@@ -1985,20 +2000,6 @@ namespace Takai.UI
             if (!HandleTouchInput())
                 return false;
 
-            //todo: improve
-            if (InputState.IsPress(0) && VisibleBounds.Contains(InputState.touches[0].Position))
-            {
-                TriggerClick(Vector2.Zero, 0, DeviceType.Touch);
-
-                if (CanFocus)
-                {
-                    HasFocus = true;
-                    return false;
-                }
-
-                //return false;
-            }
-
             var mouse = InputState.MousePoint;
             return HandleMouseInput(mouse, MouseButtons.Left) &&
                 HandleMouseInput(mouse, MouseButtons.Right) &&
@@ -2007,9 +2008,8 @@ namespace Takai.UI
 
         bool HandleTouchInput()
         {
-            //todo: don't use gestures
-
-            /*if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture) &&
+            /* gestures don't work very conveniently 
+            if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture) &&
                 VisibleBounds.Contains(gesture.Position))
             {
                 var pea = new PointerEventArgs(this)
@@ -2048,7 +2048,8 @@ namespace Takai.UI
                 }
             }*/
 
-            for (int touchIndex = 0; touchIndex < InputState.touches.Count; ++touchIndex)
+            bool touched = false;
+            for (int touchIndex = InputState.touches.Count - 1; touchIndex >= 0; --touchIndex)
             {
                 var touch = InputState.touches[touchIndex];
 
@@ -2058,7 +2059,7 @@ namespace Takai.UI
                     {
                         position = touch.Position - OffsetContentArea.Location.ToVector2() + Padding,
                         button = touchIndex,
-                        device = DeviceType.Mouse
+                        device = DeviceType.Touch
                     };
                     BubbleEvent(PressEvent, pea);
 
@@ -2066,7 +2067,7 @@ namespace Takai.UI
                     if (CanFocus)
                     {
                         HasFocus = true;
-                        return false; //todo: always return false?
+                        return false;
                     }
                 }
 
@@ -2084,7 +2085,7 @@ namespace Takai.UI
                             delta = touch.Position - lastTouch.Position,
                             position = touch.Position - OffsetContentArea.Location.ToVector2() + Padding,
                             button = touchIndex,
-                            device = DeviceType.Mouse
+                            device = DeviceType.Touch
                         };
                         BubbleEvent(DragEvent, pea);
                     }
@@ -2108,7 +2109,7 @@ namespace Takai.UI
                             TriggerClick(
                                 touch.Position - OffsetContentArea.Location.ToVector2() + Padding,
                                 touchIndex,
-                                DeviceType.Mouse
+                                DeviceType.Touch
                             );
                             return false;
                         }
@@ -2116,7 +2117,7 @@ namespace Takai.UI
                 }
             }
 
-            return true;
+            return !touched;
         }
 
         bool HandleMouseInput(Point mousePosition, MouseButtons button)
@@ -2297,7 +2298,7 @@ namespace Takai.UI
         /// <param name="spriteBatch">The spritebatch to use</param>
         protected virtual void DrawSelf(DrawContext context)
         {
-            DrawElementText(context.textRenderer, Vector2.Zero);
+            DrawText(context.textRenderer, Text, Vector2.Zero);
         }
 
         //todo: pass in context to methods below
@@ -2307,15 +2308,15 @@ namespace Takai.UI
         /// </summary>
         /// <param name="spriteBatch">The spritebatch to use</param>
         /// <param name="position">The relative position (to the element) to draw this text</param>
-        protected void DrawElementText(TextRenderer textRenderer, Vector2 position)
+        protected void DrawText(TextRenderer textRenderer, string text, Vector2 position)
         {
-            if (Font == null || Text == null)
+            if (Font == null || text == null)
                 return;
 
             position += (OffsetContentArea.Location - VisibleContentArea.Location).ToVector2();
 
             var drawText = new DrawTextOptions(
-                Text,
+                text,
                 Font,
                 TextStyle,
                 Color,
@@ -2488,11 +2489,6 @@ namespace Takai.UI
             return styles;
         }
 
-        protected virtual void UnapplyStyles(Stylesheet styleRules)
-        {
-            //todo
-        }
-
         public virtual void ApplyStyles(Stylesheet styleRules)
         {
             //todo: switch to enumeration based method? (enumerate dictionary vs try and fetch)
@@ -2513,6 +2509,7 @@ namespace Takai.UI
 
             Color = GetStyleRule(styleRules, "Color", Color);
             Font = GetStyleRule(styleRules, "Font", Font);
+            TextStyle = GetStyleRule(styleRules, "TextStyle", TextStyle);
 
             BorderColor = GetStyleRule(styleRules, "BorderColor", BorderColor);
             BackgroundColor = GetStyleRule(styleRules, "BackgroundColor", BackgroundColor);
@@ -2525,6 +2522,26 @@ namespace Takai.UI
             Size = GetStyleRule(styleRules, "Size", Size);
 
             //base on rules
+        }
+
+        public static void MergeStyles(Dictionary<string, Stylesheet> stylesheets)
+        {
+            if (Styles == null)
+            {
+                Styles = stylesheets;
+                return;
+            }
+
+            foreach (var rules in stylesheets)
+            {
+                if (Styles.TryGetValue(rules.Key, out var sheet))
+                {
+                    foreach (var rule in rules.Value)
+                        sheet[rule.Key] = rule.Value;
+                }
+                else
+                    Styles.Add(rules.Key, rules.Value);
+            }
         }
 
 #region Helpers
@@ -2542,6 +2559,27 @@ namespace Takai.UI
             };
             BubbleEvent(ClickEvent, ce);
         }
+        
+        public Vector2 LocalToScreen(Vector2 point)
+        {
+            return point + new Vector2(OffsetContentArea.X, OffsetContentArea.Y);
+        }
+
+        public Point LocalToScreen(Point point)
+        {
+            return point + OffsetContentArea.Location;
+        }
+
+        public Vector2 ScreenToLocal(Vector2 point)
+        {
+            return point - new Vector2(OffsetContentArea.X, OffsetContentArea.Y);
+        }
+
+        public Point ScreenToLocal(Point point)
+        {
+            return point - OffsetContentArea.Location;
+        }
+
 
         #endregion
     }

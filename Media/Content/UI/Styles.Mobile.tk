@@ -1,144 +1,77 @@
-# types must be explicit here
 {
 	Static: {
-		Font: @"Fonts/Bahnschrift.fnt.tk";
-		TextStyle: {
-			size: 50;
+		TextStyle: TextStyle {
+			size: 40;
+			outlineThickness: 0.5;
+			outlineColor: [0 0 0 255];
 		}
-
-		#Padding: Vector2 [0 0];
-		#Color: Color.White;
-		BackgroundColor: Color.Transparent;
-		#BackgroundSprite: null;
-		#BorderColor: Color.Transparent;
-
-		#HorizontalAlignment: Alignment.Start;
-		#VerticalAlignment: Alignment.Start;
-		#Position: Vector2 [0 0];
-		#Size: Vector2 [NaN NaN];
-	};
+	}
 
 	List: {
-    	Margin: 10;
-	};
-
-	ScrollBar: {
-		BackgroundSprite: @"UI/scrollback.9p.tk";
-		ThumbSprite: @"UI/scrollthumb.9p.tk";
-		Color: Color.Transparent;
-		BorderColor: Color [48 0 128 255];
+    	Margin: 20;
 	};
 
 	Frame: {
-		BackgroundSprite: @"UI/frame.9p.tk";
-		Padding: Vector2 [10 10];
+		Padding: Vector2 [20 20];
 	};
 
 	Box: {
-		BackgroundSprite: @"UI/box.9p.tk";
 		Padding: Vector2 [10 10];
 		Margin: 10;
 	};
 
 	DropdownSelect: {
-		BackgroundSprite: @"UI/input.9p.tk";
 		BorderColor: Color.Transparent;
-		Padding: Vector2 [4 2];
+		Padding: Vector2 [20 10];
 	};
 	Dropdown: {
-		BackgroundSprite: @"UI/frame.9p.tk";
-		Padding: Vector2 [10 5];
+		Padding: Vector2 [20 10];
 	};
 	Dropdown.List: {
-		Margin: 1;
+		Margin: 2;
 	};
 
-	NumericInput: {
-		BackgroundSprite: @"UI/input.9p.tk";
-		BorderColor: Color.Transparent;
-	};
 	NumericInput.TextInput: {
-		BackgroundSprite: NinePatch { };
-		Padding: Vector2 [2 2];
-		BorderColor: Color.Transparent;
+		Padding: Vector2 [10 10];
 	};
 	NumericInput.Button: {
-		Padding: Vector2 [5 2];
+		Padding: Vector2 [10 5];
 	};
 
 	TextInput: {
-		BackgroundSprite: @"UI/input.9p.tk";
-		BorderColor: Color.Transparent;
-		Padding: Vector2 [4 2];
-	};
-
-	FileInput: {
-		BackgroundSprite: @"UI/input.9p.tk";
-		BorderColor: Color.Transparent;
-	};
-	FileInput.TextInput: {
-		BackgroundSprite: null;
-	};
-	FileInput.PickerButton: {
-		BackgroundSprite: null;
-	};
-
-	PolarInput: {
-		BackgroundSprite: @"UI/input.9p.tk";
-		BorderColor: Color.Transparent;
+		Padding: Vector2 [20 10];
 	};
 
 	CheckBox: {
-		CheckColor: Color.Transparent;
-		BoxSprite: @"UI/input.9p.tk";
-		Margin: 10;
-		Padding: Vector2 [4 2];
-		CheckSprite: Sprite {
-			Texture: @"UI/checkbox.png";
-			Center: false;
-			ClipRect: [8 0 13 12];
-			ShrinkToFit: True;
-		};
+		Margin: 20;
 	};
 
 	Button: {
-		BackgroundSprite: @"UI/input.9p.tk";
-		Padding: Vector2 [10 5];
-	};
-
-	Divider: {
-		Color: Color [220 220 255 127];
+		Padding: Vector2 [20 10];
 	};
 
 	Balloon: {
-		BackgroundSprite: @"UI/input.9p.tk";
-		Padding: Vector2 [10 10];
-		HorizontalAlignment: Alignment.Center;
-		VerticalAlignment: Alignment.Center;
-	};
-
-	ModeSelector: {
-		InactiveColor: Color [150 150 255];
-	};
-
-	GameInstance: {
-		#Font: @"Fonts/UISmall.fnt.tk";
+		Padding: Vector2 [20 20];
 	};
 
 	TabPanel.TabBar: {
-		HorizontalAlignment: Alignment.Center;
-		Margin: 10;
+		Margin: 20;
 	}
 	TabPanel.TabHeader: {
-		Padding: Vector2 [5 5];
-	};
-	TabPanel.TabHeader.Active: {
-		BackgroundColor: Color.CornflowerBlue;
+		Padding: Vector2 [10 10];
 	};
 
-	Shade: {
-		Proto: "Box";
-	};
+	Editor.Selector.Preview: {
+		Size: Vector2 [128 128];
+	}
+	Editor.Selector.Eraser: {
+        Padding: Vector2 [10 10];
+	}
 
-	#todo: support hierarchical styling: ParentElement ChildElement { }
+	Editor.Play: {
+		Padding: Vector2 [20 20];
+	}
+	Editor.ResetZoom: {
+        Padding: Vector2 [10 10];
+	}
 }

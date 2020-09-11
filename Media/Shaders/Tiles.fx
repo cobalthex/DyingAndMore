@@ -21,7 +21,8 @@ Output vmain(float4 position : POSITION, float4 color : COLOR0, float2 texcoord 
 
 Texture2D TilesImage : register(t0);
 #if OPENGL
-Texture2D TilesLayout : register(t1);
+Texture2D<float> TilesLayout : register(t1);
+float2 TilesLayoutScale; //MapSize / TilesLayout.size
 #else
 Texture2D<uint> TilesLayout : register(t1);
 #endif
@@ -37,7 +38,7 @@ float2 SDFScale; //fraction
 
 SamplerState LayoutSampler
 {
-    Filter = Point;
+    Filter = Linear;
     AddressU = Clamp;
     AddressV = Clamp;
 };
@@ -45,19 +46,15 @@ SamplerState LayoutSampler
 float4 pmain(float4 position : SV_Position, float4 color : COLOR0, float2 rpos : TEXCOORD0) : SV_Target
 {
 #if OPENGL
-    //sm3.0 is shit
-    float4 tilec = TilesLayout.Sample(LayoutSampler, rpos);
-
-    int tile = ((int)(tilec.b * 255) * 65536) + ((int)(tilec.g * 255) * 255) + ((int)(tilec.r * 255));
-    //tile += (int) (tilec.a * 255);// * 16777216;
+    int tile = (int)TilesLayout.Sample(LayoutSampler, rpos * TilesLayoutScale);
     if (tile < 0)
-        return float4(1, 0, 0, 1);
+        return float4(1, 1, 0, 1);
 #else
     uint tile = TilesLayout.Load(uint3(rpos * MapSize, 0));
     if (tile == 0xffffffff) //-1
         discard;
 #endif
-
+    
     float2 tdiv = TilesImageSize / TileSize;
     float2 cell = float2(tile % TilesPerRow, tile / TilesPerRow);
     float2 local = (rpos % (1 / MapSize)) * MapSize;

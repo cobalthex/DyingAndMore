@@ -160,13 +160,13 @@ namespace Takai.Game
                 reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents, true);
                 //todo: some of the render targets may be able to be combined
 
-                //todo: this needs to work with resize
+//todo: this needs to work with resize
 #if OPENGL
-                var layoutFormat = SurfaceFormat.Color;
+                var surfaceFormat = SurfaceFormat.Color;
 #else
-                var layoutFormat = SurfaceFormat.Single;
+                var surfaceFormat = SurfaceFormat.Single;
 #endif
-                tilesLayoutTexture = new Texture2D(Runtime.GraphicsDevice, (int)Util.NextPowerOf2((uint)Width), (int)Util.NextPowerOf2((uint)Height), false, layoutFormat); //any 32 bit format should do (not unorm)
+                tilesLayoutTexture = new Texture2D(Runtime.GraphicsDevice, (int)Util.NextPowerOf2((uint)Width), (int)Util.NextPowerOf2((uint)Height), false, surfaceFormat); //any 32 bit format should do (not unorm)
                 PatchTileLayoutTexture(new Rectangle(0, 0, Width, Height));
             }
 
@@ -537,7 +537,7 @@ namespace Takai.Game
             if (renderSettings.drawDecals)
                 DrawDecals(ref context);
 
-            #region Present fluids + reflections
+#region Present fluids + reflections
 
             if (renderSettings.drawFluidReflectionMask)
             {
@@ -569,7 +569,7 @@ namespace Takai.Game
 #region present entities (and any other reflected objects)
 
             context.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, MapBaseClass.StencilRead, null);
-            context.spriteBatch.Draw(Class.reflectedRenderTarget, Vector2.Zero, Color.White);
+            context.spriteBatch.Draw(Class.reflectedRenderTarget, new Vector2(camera.Viewport.X, camera.Viewport.Y), Color.White);
             context.spriteBatch.End();
 
 #endregion

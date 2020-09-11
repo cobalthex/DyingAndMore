@@ -21,6 +21,7 @@ namespace Takai.UI
     {
         public const string HScrollEvent = "HScroll";
         public const string VScrollEvent = "VScroll";
+        public static float DefaultSize = 20;
 
         /// <summary>
         /// The size of the content. This determines how big the scroll thumb is
@@ -104,6 +105,7 @@ namespace Takai.UI
         {
             BorderColor = Color;
             On(PressEvent, OnPress);
+            On(DragEvent, OnDrag);
             On(ClickEvent, (Static Sender, UIEventArgs e) => UIEventResult.Handled);
         }
 
@@ -116,9 +118,9 @@ namespace Takai.UI
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             if (Direction == Direction.Horizontal)
-                return new Vector2(float.IsInfinity(availableSize.X) ? 30 : availableSize.X, 30);
+                return new Vector2(float.IsInfinity(availableSize.X) ? DefaultSize : availableSize.X, DefaultSize);
             else
-                return new Vector2(30, float.IsInfinity(availableSize.Y) ? 30 : availableSize.Y);
+                return new Vector2(DefaultSize, float.IsInfinity(availableSize.Y) ? DefaultSize : availableSize.Y);
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
@@ -129,44 +131,59 @@ namespace Takai.UI
             base.ArrangeOverride(availableSize);
         }
 
-        public void Scroll(int direction)
+        public bool Scroll(int direction)
         {
+            var cpos = ContentPosition;
             ContentPosition -= Math.Sign(direction) * (Font?.GetLineHeight(TextStyle) ?? 30);
+            return (cpos != ContentPosition);
         }
 
         static UIEventResult OnPress(Static sender, UIEventArgs e)
         {
             //todo: compare against absolute bounds not dimensions
 
-            var pe = (PointerEventArgs)e;
-            var sbar = (ScrollBar)sender;
+            var pea = (PointerEventArgs)e;
+            var self = (ScrollBar)sender;
 
-            if (pe.device == DeviceType.Keyboard) //todo
+            if (pea.device == DeviceType.Keyboard) //todo
             {
-                if (pe.button == (int)Microsoft.Xna.Framework.Input.Keys.Up)
+                if (pea.button == (int)Microsoft.Xna.Framework.Input.Keys.Up)
                 {
-                    sbar.Scroll(-1);
+                    self.Scroll(-1);
                     return UIEventResult.Handled;
                 }
-                if (pe.button == (int)Microsoft.Xna.Framework.Input.Keys.Down)
+                if (pea.button == (int)Microsoft.Xna.Framework.Input.Keys.Down)
                 {
-                    sbar.Scroll(1);
+                    self.Scroll(1);
                     return UIEventResult.Handled;
                 }
             }
 
-            var thumb = sbar.GetThumbBounds();
-            if (!thumb.Contains(pe.position))
+            var thumb = self.GetThumbBounds();
+            if (!thumb.Contains(pea.position))
             {
                 //todo: maybe scroll to mouse over time
 
                 //center thumb around mouse
-                if (sbar.Direction == Direction.Vertical)
-                    sbar.ContentPosition = (int)((pe.position.Y - sbar.ThumbSize / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
-                else if (sbar.Direction == Direction.Horizontal)
-                    sbar.ContentPosition = (int)((pe.position.X - sbar.ThumbSize / 2) * (sbar.ContentSize / sbar.GetContainerSize()));
+                if (self.Direction == Direction.Vertical)
+                    self.ContentPosition = (int)((pea.position.Y - self.ThumbSize / 2) * (self.ContentSize / self.GetContainerSize()));
+                else if (self.Direction == Direction.Horizontal)
+                    self.ContentPosition = (int)((pea.position.X - self.ThumbSize / 2) * (self.ContentSize / self.GetContainerSize()));
             }
-            sbar.didPressThumb = true;
+            self.didPressThumb = true;
+            return UIEventResult.Handled;
+        }
+
+        static UIEventResult OnDrag(Static sender, UIEventArgs e)
+        {
+            var dea = (DragEventArgs)e;
+            var self = (ScrollBar)sender;
+
+            if (self.Direction == Direction.Horizontal)
+                self.ContentPosition += dea.delta.X;
+            else
+                self.ContentPosition += dea.delta.Y;
+
             return UIEventResult.Handled;
         }
 
@@ -365,6 +382,18 @@ namespace Takai.UI
         /// </summary>
         public bool StayAtEnd { get; set; } = false;
 
+        /// <summary>
+        /// Show the scrollbars (does not affect whether or not can scroll)
+        /// </summary>
+        public bool ShowScrollbars { get; set; }
+#if ANDROID
+            = false;
+#else
+            = true;
+#endif
+
+        //velocity?
+
         public ScrollBox()
         {
             ScrollBarUI = new ScrollBar();
@@ -389,12 +418,17 @@ namespace Takai.UI
             On(DragEvent, delegate (Static sender, UIEventArgs e)
             {
                 var dea = (DragEventArgs)e;
-                if (dea.device == DeviceType.Mouse && dea.button == (int)MouseButtons.Middle)
+                if ((dea.device == DeviceType.Mouse && dea.button == (int)MouseButtons.Middle) ||
+                    dea.device == DeviceType.Touch)
                 {
                     //todo: not working in child
-                    horizontalScrollbar.Scroll(-(int)dea.delta.X);
-                    verticalScrollbar.Scroll(-(int)dea.delta.Y); //todo: scale by viewport size
-                    return UIEventResult.Handled;
+                    var hpos = horizontalScrollbar.ContentPosition;
+                    var vpos = verticalScrollbar.ContentPosition;
+                    horizontalScrollbar.ContentPosition -= dea.delta.X;
+                    verticalScrollbar.ContentPosition -= dea.delta.Y;
+                    if (hpos != horizontalScrollbar.ContentPosition ||
+                        vpos != verticalScrollbar.ContentPosition)
+                        return UIEventResult.Handled;
                 }
 
                 return UIEventResult.Continue;
@@ -413,6 +447,14 @@ namespace Takai.UI
         {
             verticalScrollbar = (ScrollBar)Children[0];
             horizontalScrollbar = (ScrollBar)Children[1];
+        }
+
+        public override void ApplyStyles(Dictionary<string, object> styleRules)
+        {
+            base.ApplyStyles(styleRules);
+            StayAtEnd = GetStyleRule(styleRules, "StayAtEnd", StayAtEnd);
+            InnerPadding = GetStyleRule(styleRules, "InnerPadding", InnerPadding);
+            ShowScrollbars = GetStyleRule(styleRules, "ShowScrollbars", ShowScrollbars);
         }
 
         public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
@@ -463,9 +505,11 @@ namespace Takai.UI
             verticalScrollbar.ContentSize = ContentSize.Y + InnerPadding.Y * 2;
 
             ScrollPosition = newPosition;
-            
-            horizontalScrollbar.IsEnabled = EnableHorizontalScrolling && ContentSize.X > availableSize.X - InnerPadding.X;
-            verticalScrollbar.IsEnabled = EnableVerticalScrolling && ContentSize.Y > availableSize.Y - InnerPadding.Y;
+
+            bool canHScroll = EnableHorizontalScrolling && ContentSize.X > availableSize.X - InnerPadding.X;
+            bool canVScroll = EnableVerticalScrolling && ContentSize.Y > availableSize.Y - InnerPadding.Y;
+            horizontalScrollbar.IsEnabled = ShowScrollbars && canHScroll;
+            verticalScrollbar.IsEnabled = ShowScrollbars && canVScroll;
 
             var hs = horizontalScrollbar.IsEnabled ? new Vector2(0, horizontalScrollbar.MeasuredSize.Y) : Vector2.Zero;
             var vs = verticalScrollbar.IsEnabled ? new Vector2(verticalScrollbar.MeasuredSize.X, 0) : Vector2.Zero;
@@ -491,16 +535,13 @@ namespace Takai.UI
             {
                 if (InputState.IsMod(KeyMod.Shift))
                 {
-                    if (horizontalScrollbar.IsEnabled)
-                    {
-                        horizontalScrollbar.Scroll(InputState.ScrollDelta());
+                    if (horizontalScrollbar.Scroll(InputState.ScrollDelta()))
                         return false;
-                    }
                 }
-                else if (verticalScrollbar.IsEnabled)
+                else
                 {
-                    verticalScrollbar.Scroll(InputState.ScrollDelta());
-                    return false;
+                    if (verticalScrollbar.Scroll(InputState.ScrollDelta()))
+                        return false;
                 }
             }
 

@@ -8,7 +8,24 @@ namespace Takai.UI
     {
         public string RestartCommand = "Restart";
 
-        public Graphics.Sprite Sprite { get; set; }
+        public Graphics.Sprite Sprite
+        {
+            get => _sprite;
+            set
+            {
+                if (_sprite == value)
+                    return;
+
+                _sprite = value;
+                InvalidateMeasure();
+            }
+        }
+        private Graphics.Sprite _sprite;
+
+        /// <summary>
+        /// Stretch the sprite to fit the container, or center
+        /// </summary>
+        public bool StretchToFit { get; set; }
 
         /// <summary>
         /// If not transparent, draws and X if the <see cref="Sprite"/> is missing
@@ -17,7 +34,7 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            return (Sprite == null ? Vector2.Zero : Sprite.Size.ToVector2());
+            return (Sprite?.Size.ToVector2() ?? Vector2.Zero);
         }
 
         public Graphic()
@@ -47,7 +64,20 @@ namespace Takai.UI
 
             //todo: custom positioning/sizing
             if (Sprite?.Texture != null)
-                DrawSprite(context.spriteBatch, Sprite, new Rectangle(0, 0, ContentArea.Width - 1, ContentArea.Height - 1));
+            {
+                Rectangle bounds;
+                if (StretchToFit)
+                    bounds = new Rectangle(0, 0, ContentArea.Width, ContentArea.Height);
+                else
+                {
+                    var size = new Point(
+                        System.Math.Min(Sprite.Width, ContentArea.Width),
+                        System.Math.Min(Sprite.Height, ContentArea.Height)
+                    );
+                    bounds = new Rectangle((ContentArea.Width - size.X) / 2, (ContentArea.Height - size.Y) / 2, size.X, size.Y);
+                }
+                DrawSprite(context.spriteBatch, Sprite, bounds);
+            }
             else if (MissingSpriteXColor.A > 0)
             {
                 var rect = VisibleContentArea;
@@ -58,6 +88,12 @@ namespace Takai.UI
             }
 
             base.DrawSelf(context);
+        }
+
+        public override void ApplyStyles(Dictionary<string, object> styleRules)
+        {
+            base.ApplyStyles(styleRules);
+            MissingSpriteXColor = GetStyleRule(styleRules, "MissingSpriteXColor", MissingSpriteXColor);
         }
 
         public override void DerivedDeserialize(Dictionary<string, object> props)

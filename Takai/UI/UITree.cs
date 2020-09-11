@@ -106,9 +106,7 @@ namespace Takai.UI
             for (int y = 0; y < rows.Count; ++y)
             {
                 var row = rows[y];
-                drawText.text = row.text;
-                drawText.position = new Vector2(row.indent * Indent, y * Font.GetLineHeight(TextStyle));
-                context.textRenderer.Draw(drawText);
+                DrawText(context.textRenderer, row.text, new Vector2(row.indent * Indent, y * Font.GetLineHeight(TextStyle)));
             }
         }
     }

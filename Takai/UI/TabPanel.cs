@@ -13,7 +13,7 @@ namespace Takai.UI
     {
         public static string SelectTabCommand = "SelectTab";
 
-        Static tabBar;
+        protected Static tabBar; //todo: make modifyable?
 
         //current tab, etc
         public int TabIndex
@@ -55,10 +55,10 @@ namespace Takai.UI
         {
             Direction = Direction.Vertical;
 
-            tabBar = new List
+            tabBar = new Catalog
             {
-                Name = "tabbar",
                 Direction = Direction.Horizontal,
+                HorizontalAlignment = Alignment.Stretch,
                 Style = "TabPanel.TabBar",
             };
             base.InternalInsertChild(tabBar);

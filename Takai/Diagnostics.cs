@@ -79,9 +79,13 @@ namespace Takai
         {
             buffer.Clear();
         }
+
+        public static void Append(object o) => Append(o.ToString());
         public static void Append(string text)
         {
+#if DEBUG
             buffer.Append(new LogRow(text, DateTime.UtcNow));
+#endif
         }
     }
 

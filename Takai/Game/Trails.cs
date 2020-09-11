@@ -34,10 +34,9 @@ namespace Takai.Game
         public string Name { get; set; }
 
         /// <summary>
-        /// The maximum number of points in this trail. 0 for infinite
-        /// Note, any number not zero will be pre-sized
+        /// The maximum number of points in this trail
         /// </summary>
-        public int MaxPoints { get; set; } = 0;
+        public int MaxPoints { get; set; } = 1024;
 
         public Graphics.Sprite Sprite { get; set; }
         public TrailSpriteRenderStyle SpriteRenderStyle { get; set; }
@@ -203,18 +202,12 @@ namespace Takai.Game
 
             nextCapture = elapsedTime + Class.CaptureDelay;
 
-            if (Count > 2)
+            if (Count > 2 && Class.MergeCollinear)
             {
                 var p2 = (TailIndex + Count - 2) % points.Count;
                 var p1 = (TailIndex + Count - 1) % points.Count;
-                if (Class.MergeCollinear &&
-                    IsCollinear(
-                        location,
-                        points[p1].location,
-                        points[p2].location
-                    ))
+                if (IsCollinear(location, points[p1].location, points[p2].location))
                 {
-
                     points[p2] = new TrailPoint(points[p2].location, points[p2].direction, points[p1].time);
                     points[p1] = new TrailPoint(location, direction, elapsedTime);
                     return;
@@ -232,27 +225,19 @@ namespace Takai.Game
         /// <param name="collapse">Only add this point if its not on top of the last point</param>
         public void AddPoint(Vector2 location, Vector2 direction, bool collapse = true)
         {
-            if (collapse && Count > 0 && points[HeadIndex == 0 ? points.Count - 1 : HeadIndex - 1].location == location)
+            if (collapse && Count > 0 && points[(HeadIndex == 0 ? points.Count : HeadIndex) - 1].location == location)
                 return;
 
-            if (Class.MaxPoints == 0)
+            points[HeadIndex] = new TrailPoint(location, direction, elapsedTime);
+            HeadIndex = (HeadIndex + 1) % points.Count;
+
+            if (Count >= points.Count)
             {
-                points.Add(new TrailPoint(location, direction, elapsedTime));
-                HeadIndex = ++Count;
+                TailIndex = HeadIndex;
+                Count = points.Count;
             }
             else
-            {
-                points[HeadIndex] = new TrailPoint(location, direction, elapsedTime);
-                HeadIndex = (HeadIndex + 1) % points.Count;
-
-                if (Count >= points.Count)
-                {
-                    TailIndex = HeadIndex;
-                    Count = points.Count;
-                }
-                else
-                    ++Count;
-            }
+                ++Count;
         }
     }
 }

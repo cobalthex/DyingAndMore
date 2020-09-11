@@ -14,7 +14,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     public struct MoveToTarget : ITask
     {
         /// <summary>
-        /// Maximum distance required for this task to complete.
+        /// minimum distance required for this task to complete.
         /// Offset from distance between two actors combined radii
         /// </summary>
         public float distance;
@@ -47,7 +47,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     /// Determine when a gradient navigation task is successful
     /// Compares current nav value to target value
     /// </summary>
-    public enum NavGradientSuccessCondition
+    public enum ComparisonMethod
     {
         LessOrEqual,
         Equal,
@@ -61,7 +61,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     public struct NavigateGradient : ITask
     {
         public uint targetValue;
-        public NavGradientSuccessCondition successCondition;
+        public ComparisonMethod successCondition;
 
         int lastDirection;
 
@@ -127,17 +127,17 @@ namespace DyingAndMore.Game.Entities.Tasks
             var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
             switch (successCondition)
             {
-                case NavGradientSuccessCondition.Equal:
+                case ComparisonMethod.Equal:
                     if (Math.Abs(cur - targetValue) <= 1)
                         return TaskResult.Success;
                     break;
 
-                case NavGradientSuccessCondition.LessOrEqual:
+                case ComparisonMethod.LessOrEqual:
                     if (cur <= targetValue + 1)
                         return TaskResult.Success;
                     break;
 
-                case NavGradientSuccessCondition.GreaterOreEqual:
+                case ComparisonMethod.GreaterOreEqual:
                     if (cur >= targetValue - 1)
                         return TaskResult.Success;
                     break;

@@ -3,6 +3,7 @@
 Bugs:
     ☐ Nine-patch relative clipping
     ☐ Evaluate [perf of] casting style args to correct type
+    ☐ Fluids not clipping to map for partial tiles
 
 Conditions:
     ☐  Invisibility
@@ -16,7 +17,7 @@ Game AI:
     ☐  Events
     ☐  doors/devices
     ☐  marquee
-    ☐  conditions/senses
+    ✔  conditions/senses @done (20-09-10 18:32)
     ☐  enemies that attach to walls and affect map (rumbling, destruction, etc)
 
 Gases:
@@ -50,11 +51,16 @@ UI:
     ☐ when adding a modal to UI, should switch focus
     ☐ cache previous focus in modal?
     ☐ clipping in dropdown containers is not working at top (try dropdown with rows of colored boxes)
-    ☐ SDF Fonts (can probably repurpose BitmapFont)
-    ☐ Accordian controls (particularly useful for AI)
-    ☐ Draggable window element
-    ☐ custom cursors, and font sizes (with or without support for SDF fonts)
+    ✔ SDF Fonts (can probably repurpose BitmapFont) @done (20-09-07 21:46)
+    ✔ Accordian controls (particularly useful for AI) @done (20-09-07 21:47)
+    ✔ Draggable window element @done (20-09-07 21:47)
+    ☐ custom cursors
     ☐ animations
+    ✔ BitmapFont text display element @done (20-09-08 10:45)
+    ☐ Text Line-height based on baseline?
+    ☐ Skip Press event and go directly to drag if mouse delta > some threshold?
+    ☐ Store styles in Trie (faster search for root styles), possibly suffix tree
+
 
   ✔  Think only when alive? @done (20-04-10 22:48)
 

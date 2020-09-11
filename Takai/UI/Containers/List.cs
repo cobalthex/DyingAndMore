@@ -75,7 +75,7 @@ namespace Takai.UI
 
                 //stretched items in primary axis are rendered at 
 
-                var childSize = child.Measure(new Vector2(InfiniteSize));
+                var childSize = child.Measure(availableSize);
                 if (Direction == Direction.Horizontal)
                 {
                     if (child.HorizontalAlignment == Alignment.Stretch)

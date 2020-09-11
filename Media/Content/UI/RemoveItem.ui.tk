@@ -1,5 +1,7 @@
 Graphic {
 	Name: "ex";
+	BackgroundColor: Color.Tomato;
+	Size: [40 40];
 	Sprite: @"./X.png";
 	Padding: 5;
 	HorizontalAlignment: Alignment.Right;

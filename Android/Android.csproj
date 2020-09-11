@@ -77,7 +77,11 @@
     <MediaDir>$(SolutionDir)Media\</MediaDir>
   </PropertyGroup>
   <ItemGroup>
-    <AndroidAsset Link="Assets\Content\%(RecursiveDir)%(Filename)%(Extension)" Include="$(MediaDir)Content\**\*.*" Exclude="$(MediaDir)Content\Shaders" />
+    <AndroidAsset
+      Link="Assets\Content\%(RecursiveDir)%(Filename)%(Extension)"
+      Include="$(MediaDir)Content\**\*.*"
+      Exclude="$(MediaDir)Content\Shaders;$(MediaDir)Content\**\.*"
+     />
     <AndroidAsset Link="Assets\Maps\%(RecursiveDir)%(Filename)%(Extension)" Include="$(MediaDir)Maps\**\*.*" />
     <AndroidAsset Link="Assets\Config\%(RecursiveDir)%(Filename)%(Extension)" Include="$(MediaDir)Config\**\*.*" />
   </ItemGroup>

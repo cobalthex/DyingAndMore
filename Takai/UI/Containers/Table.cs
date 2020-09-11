@@ -9,7 +9,19 @@ namespace Takai.UI
         /// <summary>
         /// Spacing between items
         /// </summary>
-        public Vector2 Margin { get; set; } = Vector2.Zero;
+        public Vector2 Margin
+        {
+            get => _margin;
+            set
+            {
+                if (_margin == value)
+                    return;
+
+                _margin = value;
+                InvalidateMeasure();
+            }
+        }
+        private Vector2 _margin = new Vector2(0);
 
         /// <summary>
         /// The number of columns, data is divided by the columns.
@@ -45,6 +57,13 @@ namespace Takai.UI
             InvalidateArrange();
         }
 
+        public override void ApplyStyles(Dictionary<string, object> styleRules)
+        {
+            base.ApplyStyles(styleRules);
+            Margin = GetStyleRule(styleRules, "Margin", Margin);
+            CellColor = GetStyleRule(styleRules, "CellColor", CellColor);
+        }
+
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             if (ColumnCount <= 0)
@@ -71,7 +90,7 @@ namespace Takai.UI
                 if (!Children[i].IsEnabled)
                     continue;
 
-                var csize = Children[i].Measure(new Vector2(InfiniteSize));
+                var csize = Children[i].Measure(availableSize);
                 if (Children[i].HorizontalAlignment == Alignment.Stretch)
                     hStretches.Add(i % ColumnCount);
                 if (Children[i].VerticalAlignment == Alignment.Stretch)

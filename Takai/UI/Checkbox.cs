@@ -26,7 +26,7 @@ namespace Takai.UI
         /// <summary>
         /// The margin between the checkbox and text
         /// </summary>
-        static int Margin { get; set; } = 10;
+        static float Margin { get; set; } = 10;
 
         /// <summary>
         /// Is this checkbox currently checked?
@@ -51,10 +51,10 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            var size = Vector2.Max(
-                new Vector2(30), Font.MeasureString(Text, TextStyle)
-            );
-            return size + new Vector2(size.Y + Margin, 0);
+            var size = Font.MeasureString(Text, TextStyle);
+            if (size.X > 0)
+                size.X += Margin;
+            return new Vector2(30 + size.X, System.Math.Max(size.Y, 30));
         }
 
         public override void ApplyStyles(Dictionary<string, object> styleRules)
@@ -79,7 +79,7 @@ namespace Takai.UI
             if (IsChecked)
                 DrawSprite(context.spriteBatch, CheckSprite, new Rectangle(2, 2, checkSize - 4, checkSize - 4));
 
-            DrawElementText(context.textRenderer, new Vector2(checkSize + Margin, 0));
+            DrawText(context.textRenderer, Text, new Vector2(checkSize + Margin, 0));
         }
     }
 }

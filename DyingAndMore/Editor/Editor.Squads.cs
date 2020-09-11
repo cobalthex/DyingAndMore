@@ -169,7 +169,7 @@ namespace DyingAndMore.Editor
         {
             base.DrawSelf(context);
 
-            if (editor.Map.Squads != null)
+            if (editor.Map.Squads != null && editUI.Parent == null)
             {
                 foreach (var squad in editor.Map.Squads)
                 {

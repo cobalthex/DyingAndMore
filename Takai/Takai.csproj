@@ -64,6 +64,7 @@
     <Compile Include="Data\Serializer.cs" />
     <Compile Include="Data\Serializer.TextDeserialize.cs" />
     <Compile Include="Data\Serializer.TextSerialize.cs" />
+    <Compile Include="Data\SuffixTree.cs" />
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Commands.cs" />
     <Compile Include="Game\Effects.cs" />
@@ -109,9 +110,9 @@
     <Compile Include="Input\InputState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\Binding.cs" />
-    <Compile Include="UI\Accordian.cs" />
-    <Compile Include="UI\Animation.cs" />
-    <Compile Include="UI\Catalog.cs" />
+    <Compile Include="UI\Containers\Accordian.cs" />
+    <Compile Include="UI\BitmapTextDisplay.cs" />
+    <Compile Include="UI\Containers\Catalog.cs" />
     <Compile Include="UI\CheckBox.cs" />
     <Compile Include="UI\Drawer.cs" />
     <Compile Include="UI\DropdownSelect.cs" />
@@ -125,12 +126,12 @@
     <Compile Include="UI\PolarInput.cs" />
     <Compile Include="UI\ProgressBar.cs" />
     <Compile Include="UI\Switch.cs" />
-    <Compile Include="UI\Table.cs" />
-    <Compile Include="UI\List.cs" />
+    <Compile Include="UI\Containers\Table.cs" />
+    <Compile Include="UI\Containers\List.cs" />
     <Compile Include="UI\Meter.cs" />
     <Compile Include="UI\NumericInput.cs" />
-    <Compile Include="UI\RadialList.cs" />
-    <Compile Include="UI\ScrollBar.cs" />
+    <Compile Include="UI\Containers\RadialList.cs" />
+    <Compile Include="UI\Containers\ScrollBar.cs" />
     <Compile Include="UI\Static.cs" />
     <Compile Include="UI\TabPanel.cs" />
     <Compile Include="UI\TextInput.cs" />

@@ -24,6 +24,18 @@ namespace Takai.Graphics
             };
         }
 
+        public static implicit operator NinePatch(Texture2D texture)
+        {
+            if (texture == null)
+                return new NinePatch(); //todo ?
+
+            return new NinePatch
+            {
+                Sprite = new Sprite(texture),
+                CenterRegion = new Rectangle(0, 0, texture.Width, texture.Height)
+            };
+        }
+
         //todo: clip rect
         public void Draw(SpriteBatch spriteBatch, Rectangle destination)
         {

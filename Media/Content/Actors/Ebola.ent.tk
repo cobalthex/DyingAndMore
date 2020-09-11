@@ -17,7 +17,7 @@ ActorClass {
                 Tasks: [
                     FindClosestActor { isAlly: true; };
                     NavigateGradient { targetValue: 10; }
-                    InfectTarget {
+                    SetTargetBehavior {
                         applyBehavior: {
                             Name: "Zombie";
                             Tasks: [

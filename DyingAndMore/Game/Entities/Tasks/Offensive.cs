@@ -317,7 +317,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     //create condition to light up and then blow up
 
     [OffensiveTask]
-    public struct InfectTarget : ITask
+    public struct SetTargetBehavior : ITask
     {
         public Behavior applyBehavior; //setting to null will render target 'dead'
 
@@ -332,6 +332,8 @@ namespace DyingAndMore.Game.Entities.Tasks
             return TaskResult.Success;
         }
     }
+
+    //set all behaviors
 
     //possess/takeover?
 

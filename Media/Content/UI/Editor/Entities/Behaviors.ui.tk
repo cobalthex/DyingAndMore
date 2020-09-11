@@ -135,6 +135,7 @@ BehaviorList {
 					Style: "Box";
 					HorizontalAlignment: Alignment.Stretch;
 					Children: [
+						@"UI/RemoveItem.ui.tk";
 						Static {
 							Bindings: [
 								Binding {
@@ -146,7 +147,6 @@ BehaviorList {
 						};
 
 						@"./Tasks.ui.tk";
-						@"UI/RemoveItem.ui.tk";
 					];
 				};
 

@@ -8,7 +8,11 @@ namespace DyingAndMore.Editor
 {
     class FluidsEditorMode : SelectorEditorMode<Selectors.FluidSelector>
     {
-        System.TimeSpan lastFluidTime = System.TimeSpan.Zero;
+        System.TimeSpan elapsedTime = System.TimeSpan.Zero;
+        System.TimeSpan nextFluidTime = System.TimeSpan.Zero;
+
+        static System.TimeSpan fluidDelay = System.TimeSpan.FromMilliseconds(50);
+        Takai.Graphics.Sprite previewSprite;
 
         bool isBatchDeleting = false;
         Vector2 savedWorldPos;
@@ -17,36 +21,75 @@ namespace DyingAndMore.Editor
         public FluidsEditorMode(Editor editor)
             : base("Fluids", editor)
         {
+            previewSprite = preview.Sprite;
+
             On(PressEvent, OnPress);
-            On(ClickEvent, OnClick);
             On(DragEvent, OnDrag);
         }
 
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
         {
+            var pea = (PointerEventArgs)e;
+            if (pea.button == 0)
+            {
+                var worldPos = editor.Camera.ScreenToWorld(LocalToScreen(pea.position));
 
-            return UIEventResult.Handled;
-        }
+                if (editor.Map.Class.Bounds.Contains(worldPos.ToPoint()))
+                {
+                    if (selector.SelectedIndex < 0 || 
+                        (pea.device == DeviceType.Mouse && pea.button == (int)MouseButtons.Right))
+                    {
+                        var rect = new Rectangle(worldPos.ToPoint(), new Point(1));
+                        if (pea.device == DeviceType.Touch)
+                            rect.Inflate(5, 5);
+                        DeleteFluids(rect);
+                    }
+                    else
+                    {
+                        editor.Map.Spawn(selector.fluids[selector.SelectedIndex], worldPos, Vector2.Zero);
+                        nextFluidTime = elapsedTime + fluidDelay;
+                    }
+                }
 
-        protected UIEventResult OnClick(Static sender, UIEventArgs e)
-        {
-
-            return UIEventResult.Handled;
+                return UIEventResult.Handled;
+            }
+            return UIEventResult.Continue;
         }
 
         protected UIEventResult OnDrag(Static sender, UIEventArgs e)
         {
+            var dea = (DragEventArgs)e;
+            if (dea.button == 0)
+            {
+                var worldPos = editor.Camera.ScreenToWorld(LocalToScreen(dea.position));
 
+                if ((elapsedTime >= nextFluidTime || dea.delta.LengthSquared() > 50) &&
+                    editor.Map.Class.Bounds.Contains(worldPos.ToPoint()))
+                {
+                    if (selector.SelectedIndex < 0 ||
+                        (dea.device == DeviceType.Mouse && dea.button == (int)MouseButtons.Right))
+                    {
+                        var rect = new Rectangle(worldPos.ToPoint(), new Point(1));
+                        if (dea.device == DeviceType.Touch)
+                            rect.Inflate(5, 5);
+                        DeleteFluids(rect);
+                    }
+                    else
+                    {
+                        editor.Map.Spawn(selector.fluids[selector.SelectedIndex], worldPos, Vector2.Zero);
+                        nextFluidTime = elapsedTime + fluidDelay;
+                    }
+                }
+
+                return UIEventResult.Handled;
+            }
             return UIEventResult.Handled;
         }
 
         protected override void UpdatePreview(int selectedItem)
         {
-            if (selectedItem < 0)
-            {
-                preview.Sprite.Texture = null;
-                return;
-            }
+            if (preview.Sprite == null)
+                preview.Sprite = previewSprite;
 
             var selectedFluid = selector.fluids[selector.SelectedIndex];
             preview.Sprite.Texture = selectedFluid.Texture;
@@ -54,55 +97,48 @@ namespace DyingAndMore.Editor
             preview.Sprite.Size = new Point(selectedFluid.Texture.Bounds.Width, selectedFluid.Texture.Bounds.Height);
         }
 
+        protected override void UpdateSelf(GameTime time)
+        {
+            elapsedTime = time.TotalGameTime;
+            base.UpdateSelf(time);
+        }
+
+        void DeleteFluids(Rectangle rect)
+        {
+            var sectors = editor.Map.GetOverlappingSectors(rect);
+            for (int y = sectors.Top; y < sectors.Bottom; ++y)
+            {
+                for (int x = sectors.Left; x < sectors.Right; ++x)
+                {
+                    var sect = editor.Map.Sectors[y, x];
+                    for (var i = 0; i < sect.fluids.Count; ++i)
+                    {
+                        var fluid = sect.fluids[i];
+                        var frect = new Rectangle(fluid.position.ToPoint(), new Point(1));
+                        frect.Inflate(fluid.Class.Radius / 4, fluid.Class.Radius / 4);
+                        if (rect.Intersects(frect))
+                        {
+                            sect.fluids[i] = sect.fluids[sect.fluids.Count - 1];
+                            sect.fluids.RemoveAt(sect.fluids.Count - 1);
+                            --i;
+                        }
+                    }
+                }
+            }
+        }
+
         protected override bool HandleInput(GameTime time)
         {
             var currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
 
-            if (selector.SelectedIndex >= 0 && time.TotalGameTime > lastFluidTime + System.TimeSpan.FromMilliseconds(50))
-            {
-                var selectedFluid = selector.fluids[selector.SelectedIndex];
-                lastFluidTime = time.TotalGameTime;
-
-                if (InputState.IsButtonDown(MouseButtons.Left) && editor.Map.Class.Bounds.Contains(currentWorldPos.ToPoint()))
-                {
-                    editor.Map.Spawn(selectedFluid, currentWorldPos, Vector2.Zero);
-                    return false;
-                }
-
-                if (InputState.IsButtonDown(MouseButtons.Right))
-                {
-                    var sectors = editor.Map.GetOverlappingSectors(new Rectangle((int)currentWorldPos.X - 1, (int)currentWorldPos.Y - 1, 2, 2));
-                    //get overlapping sectors
-                    for (int y = sectors.Top; y < sectors.Bottom; ++y)
-                    {
-                        for (int x = sectors.Left; x < sectors.Right; ++x)
-                        {
-                            var sect = editor.Map.Sectors[y, x];
-                            for (var i = 0; i < sect.fluids.Count; ++i)
-                            {
-                                var Fluid = sect.fluids[i];
-
-                                if (Vector2.DistanceSquared(Fluid.position, currentWorldPos) < Fluid.Class.Radius * Fluid.Class.Radius)
-                                {
-                                    sect.fluids[i] = sect.fluids[sect.fluids.Count - 1];
-                                    sect.fluids.RemoveAt(sect.fluids.Count - 1);
-                                    --i;
-                                }
-                            }
-                        }
-                    }
-
-                    return false;
-                }
-            }
-
+            //move to events
             if (InputState.IsPress(Keys.X))
             {
                 isBatchDeleting = true;
                 savedWorldPos = currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
                 if (float.IsNaN(currentWorldPos.X) || float.IsNaN(currentWorldPos.Y))
                 {
-                    savedWorldPos = currentWorldPos = new Vector2();
+                    savedWorldPos = new Vector2();
                 }
                 return false;
             }

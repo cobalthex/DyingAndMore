@@ -219,7 +219,7 @@ namespace Takai.Graphics
             this.font = font;
             this.text = text;
             this.textOffset = 0;
-            this.textLength = text.Length; //formatting characters not included in length calculation
+            this.textLength = -1; //formatting characters not included in length calculation
             this.style = style;
             if (this.style.size == 0)
                 this.style.size = TextStyle.DefaultTextSize;
@@ -333,9 +333,11 @@ namespace Takai.Graphics
         /// Draw some text
         /// </summary>
         /// <param name="options">The text and optiosn to draw the text with</param>
-        /// <returns>The dimensions of the virtual size of the rendered text (not clipped)</returns>
-        public Extent Draw(DrawTextOptions options)
+        public void Draw(DrawTextOptions options)
         {
+            if (options.text == null)
+                return;
+
             if (!batches.TryGetValue(options.font.Texture, out var batch))
             {
                 batch = batches[options.font.Texture] = new RenderBatch
@@ -345,6 +347,9 @@ namespace Takai.Graphics
                     transform = Matrix.Identity //todo
                 };
             }
+
+            if (options.textLength < 0)
+                options.textLength = options.text.Length;
 
             var length = Math.Min(options.text.Length, options.textOffset + options.textLength);
             EnsureCapacity(length * 6, batch);
@@ -360,16 +365,11 @@ namespace Takai.Graphics
 
             //todo: underline may need extra verts
 
-            Vector2 offset = options.relativeOffset;
+            Vector2 offset = options.relativeOffset / options.sizeFraction;
             float lineHeight = 0; //scaled by size on newline
             float underlineX = 0;
 
             //todo: italics can push text out of container
-
-            var drawnSize = new Extent(options.position, options.position);
-            drawnSize.min.X -= currentSlant;
-
-            //todo: text scale
 
             //length ignores formatting characters
             for (int i = options.textOffset; i < Math.Min(length, options.text.Length); ++i)
@@ -380,7 +380,7 @@ namespace Takai.Graphics
                         {
                             //handle underlines
                             offset.X = options.relativeOffset.X;
-                            offset.Y += lineHeight * options.sizeFraction;
+                            offset.Y += lineHeight;
                             lineHeight = 0;
                             underlineX = 0;
                             break;
@@ -448,10 +448,8 @@ namespace Takai.Graphics
                     default:
                         {
                             if (offset.Y > clipFrac.Y)
-                            {
-                                drawnSize.max.X += currentSlant;
-                                return drawnSize;
-                            }
+                                return;
+
                             if (offset.X >= clipFrac.X)
                                 continue; //might be newline later in string
 
@@ -462,6 +460,7 @@ namespace Takai.Graphics
                             var rgnExtent = new Extent(rgn.x, rgn.y, rgn.x + rgn.width, rgn.y + rgn.height);
                             var loc = rgnExtent.min - offset;
                             var clip = Extent.Intersect(rgnExtent, new Extent(loc, loc + clipFrac));
+                            //todo: clipping not working as expected
 
                             if (clip.Size != Vector2.Zero)
                             {
@@ -516,11 +515,6 @@ namespace Takai.Graphics
             }
 
             //draw trailing underline
-
-            offset.Y += lineHeight;
-            drawnSize.max += offset * options.sizeFraction;
-            drawnSize.max.X += currentSlant;
-            return drawnSize;
         }
 
         DynamicVertexBuffer dvb;

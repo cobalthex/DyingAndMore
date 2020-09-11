@@ -20,12 +20,12 @@ namespace DyingAndMore.Editor
             if (pea.button == 0)
             {
                 if (currentPath != null)
-                    AddPathPoint(editor.Camera.ScreenToWorld(pea.position));
+                    AddPathPoint(editor.Camera.ScreenToWorld(LocalToScreen(pea.position)));
                 else
                 {
                     currentPath = new Takai.Game.VectorCurve();
                     editor.Paths.Add(new NamedPath { name = Takai.Util.RandomString(prefix: "p_"), path = currentPath });
-                    AddPathPoint(editor.Camera.ScreenToWorld(pea.position));
+                    AddPathPoint(editor.Camera.ScreenToWorld(LocalToScreen(pea.position)));
                 }
             }
             return UIEventResult.Handled;

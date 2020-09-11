@@ -1,6 +1,6 @@
 TrailClass {
+    LifeSpan: 300msec;
     MaxPoints: 100;
-    CaptureDelay: 60Hz;
     MergeCollinear: true;
 
     Color: {
@@ -12,12 +12,7 @@ TrailClass {
     Width: {
         Values: [
             [0 0]
-            [0.01 30];
-            [0.94 30];
-            [0.95 20];
-            [0.97 15];
-            [0.99 5];
-            [1 0];
+            [1 30];
         ];
     };
 

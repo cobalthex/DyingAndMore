@@ -139,12 +139,27 @@ namespace Takai.Input
         }
 
         /// <summary>
-        /// Get the change in position of the cursor's (mouse or touch) position
+        /// Get the change in position of the mouse's position
         /// </summary>
         /// <returns>The change in position</returns>
         public static Vector2 MouseDelta()
         {
             return MouseVector - LastMouseVector;
+        }
+
+        /// <summary>
+        /// Calculate the amount pinch-zoomed between touch 0 and touch 1
+        /// </summary>
+        /// <returns>The delta, or zero if no touch</returns>
+        public static float TouchPinchDelta()
+        {
+            if (touches.Count < 2 || lastTouches.Count < 2)
+                return 0;
+
+            var lNow = Vector2.DistanceSquared(touches[0].Position, touches[1].Position);
+            var lOld = Vector2.DistanceSquared(lastTouches[0].Position, lastTouches[1].Position);
+            var diff = lNow - lOld;
+            return System.Math.Sign(diff) * (float)System.Math.Sqrt(System.Math.Abs(diff));
         }
 
         /// <summary>

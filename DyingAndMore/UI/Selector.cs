@@ -36,7 +36,7 @@ namespace DyingAndMore.UI
             get => _selectedIndex;
             set
             {
-                _selectedIndex = Takai.Util.Clamp(value, 0, ItemCount - 1);
+                _selectedIndex = Takai.Util.Clamp(value, -1, ItemCount - 1);
                 BubbleEvent(SelectionChangedEvent, new UIEventArgs(this));
             }
         }

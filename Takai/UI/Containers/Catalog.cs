@@ -70,7 +70,7 @@ namespace Takai.UI
                 if (!child.IsEnabled)
                     continue;
 
-                var itemSize = child.Measure(new Vector2(InfiniteSize));
+                var itemSize = child.Measure(availableSize);
                 if (Direction == Direction.Horizontal)
                 {
                     if (usedSize.X > 0 && usedSize.X + itemSize.X > availableSize.X)
@@ -98,9 +98,13 @@ namespace Takai.UI
                 usedSize += new Vector2(lateralMax, -Margin.Y);
 
             return usedSize;
-
-            //todo: bounds may be affected by Stretch which would prove wrong here
         }
+
+        //protected override void OnChildRemeasure(Static child)
+        //{
+        //    InvalidateMeasure();
+        //    InvalidateArrange();
+        //}
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {

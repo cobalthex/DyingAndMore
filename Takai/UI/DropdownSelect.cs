@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using System;
 
 namespace Takai.UI
@@ -117,7 +118,7 @@ namespace Takai.UI
             if (sea.newIndex >= 0)
             {
                 ReplaceChild(preview = list.Container.Children[sea.newIndex].CloneHierarchy(), childIndex);
-                preview.Arrange(new Rectangle(0, 0, ContentArea.Width, ContentArea.Height)); //todo: still needs work
+                InvalidateMeasure();
                 preview.BindTo(list.Items[sea.newIndex]);
             }
             else if (preview != null)
@@ -151,7 +152,7 @@ namespace Takai.UI
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             dropdownContainer.Measure(new Vector2(InfiniteSize));
-            return new Vector2(list.MeasuredSize.X, 20); //todo
+            return new Vector2(list.MeasuredSize.X, 30); //todo
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
@@ -177,9 +178,10 @@ namespace Takai.UI
                 dpos.Y = MathHelper.Clamp(dpos.Y, 0, root.OffsetContentArea.Height - dsz.Y);
 
                 dropdownContainer.Arrange(root.OffsetContentArea);
-                dropdown.Measure(dsz.ToVector2()); //todo: this is not working
+                //dropdown.Measure(dsz.ToVector2()); //todo: this is not working
                 dropdown.Arrange(new Rectangle(dpos.X, dpos.Y, dsz.X, dsz.Y));
             }
+            preview?.Arrange(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
             base.ArrangeOverride(availableSize);
         }
 
@@ -202,18 +204,18 @@ namespace Takai.UI
         protected override bool HandleInput(GameTime time)
         {
             if (dropdownContainer.Parent != null &&
-                (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Escape) ||
-                Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Space) ||
-                Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Enter)))
+                (Input.InputState.IsPress(Keys.Escape) ||
+                Input.InputState.IsPress(Keys.Space) ||
+                Input.InputState.IsPress(Keys.Enter)))
                 CloseDropDown();
 
-            else if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Up))
+            else if (Input.InputState.IsPress(Keys.Up))
                 --SelectedIndex;
-            else if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Down))
+            else if (Input.InputState.IsPress(Keys.Down))
                 ++SelectedIndex;
-            else if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.Home))
+            else if (Input.InputState.IsPress(Keys.Home))
                 SelectedIndex = -1;
-            else if (Input.InputState.IsPress(Microsoft.Xna.Framework.Input.Keys.End))
+            else if (Input.InputState.IsPress(Keys.End))
                 SelectedIndex = Items.Count - 1;
             else
                 return base.HandleInput(time);

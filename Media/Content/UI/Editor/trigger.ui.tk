@@ -20,7 +20,6 @@ List {
                         TextInput {
                         	HasFocus: true;
                             HorizontalAlignment: Alignment.Stretch;
-                            Padding: [4 2];
                             Bindings: [
                                 {
                                     Direction: BindingDirection.TwoWay;
@@ -197,7 +196,6 @@ List {
                         Static { Text: "`_Max Uses"; }
                         NumericInput {
                             HorizontalAlignment: Alignment.Stretch;
-                            Padding: [4 2];
                             Bindings: [
                                 {
                                     Direction: BindingDirection.TwoWay;

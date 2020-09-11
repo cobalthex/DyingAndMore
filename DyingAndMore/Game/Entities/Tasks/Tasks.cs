@@ -232,7 +232,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     {
         public ActorClass @class;
         public bool inheritController;
-
+        
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
             var actor = ai.Actor;

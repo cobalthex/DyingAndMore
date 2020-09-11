@@ -13,7 +13,7 @@ namespace DyingAndMore.Game.Entities.Tasks
 
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
-            return TaskResult.Success;
+            throw new NotImplementedException();
         }
     }
 
@@ -63,6 +63,7 @@ namespace DyingAndMore.Game.Entities.Tasks
             //run perpendicular to enemy then turn away if obstacle
             // quit if target cannot see
 
+            throw new NotImplementedException();
             return TaskResult.Continue;
         }
     }

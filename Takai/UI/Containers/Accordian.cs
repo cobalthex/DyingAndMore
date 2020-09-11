@@ -117,6 +117,8 @@ namespace Takai.UI
         /// </summary>
         public bool InitiallyCollapsed { get; set; } = true;
 
+        //preview UI?
+
         //collapse new vs first?
 
         public Accordian() 
@@ -147,7 +149,8 @@ namespace Takai.UI
         {
             var shade = new Shade(child)
             {
-                IsMinimized = InitiallyCollapsed
+                IsMinimized = InitiallyCollapsed,
+                HorizontalAlignment = Alignment.Stretch
             };
             var binding = new Data.Binding("Name", "Text");
             binding.BindTo(child, shade);

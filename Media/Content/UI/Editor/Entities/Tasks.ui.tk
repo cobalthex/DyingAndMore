@@ -15,7 +15,7 @@ Switch {
 		CloneSelf: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`_Relative Direction"; };
+		    	Static { Text: "`_Relative direction"; };
 		    	PolarInput {
 		    		Bindings: [
 		    			Binding {
@@ -42,7 +42,7 @@ Switch {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
 		    	CheckBox {
-		    		Text: "Find Allies";
+		    		Text: "Find allies";
 
 		    		Bindings: [
 		    			Binding {
@@ -54,7 +54,7 @@ Switch {
 		    	};
 
 		    	CheckBox {
-		    		Text: "Matching Class";
+		    		Text: "Matching class";
 
 		    		Bindings: [
 		    			Binding {
@@ -70,7 +70,7 @@ Switch {
 		FleeFromTarget: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`cfa0Todo"; }; #todo
+		    	Static { Text: "(No options)"; };
     		];
 		};
 
@@ -100,7 +100,7 @@ Switch {
 		HealSelf: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`_Health Per Second"; };
+		    	Static { Text: "`_Health per second"; };
 		    	NumericInput {
 		    		Bindings: [
 		    			Binding {
@@ -123,7 +123,7 @@ Switch {
 		    	};
 
 		    	CheckBox {
-		    		Text: "Can Revive";
+		    		Text: "Can revive";
 
 		    		Bindings: [
 		    			Binding {
@@ -139,7 +139,7 @@ Switch {
 		HealTarget: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`_Health Per Second"; };
+		    	Static { Text: "`_Health per second"; };
 		    	NumericInput {
 		    		Bindings: [
 		    			Binding {
@@ -182,35 +182,84 @@ Switch {
 	    	];
 		};
 
-		InfectTarget: List {
+		SetTargetBeahavior: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`cfa0Todo"; }; #todo
-
+		    	Static { Text: "`cfa0Todo"; } #todo
 	    	];
 		};
 
 		MoveToTarget: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`cfa0Todo"; }; #todo
+		    	Static { Text: "`_Completion distance"; };
+		    	NumericInput {
+		    		Minimum: 1;
+		    		Maximum: 10000;
+		    		Bindings: [
+		    			Binding {
+		    				Source: "radius";
+		    				Target: "Value";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
 
+		    	CheckBox {
+		    		Text: "Continue forever";
+		    		Bindings: [
+		    			Binding {
+		    				Source: "permanent";
+		    				Target: "IsChecked";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
 	    	];
 		};
 
 		NavigateGradient: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`cfa0Todo"; }; #todo
+		    	Static { Text: "`_Completion distance"; };
+		    	NumericInput {
+		    		Minimum: 1;
+		    		Maximum: 10000;
+		    		Bindings: [
+		    			Binding {
+		    				Source: "targetValue";
+		    				Target: "Value";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
 
+		    	Static { Text: "`_Success Condition"; };
+		    	ComparisonMethodSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "successCondition";
+		    				Target: "Value";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
 	    	];
 		};
 
 		NavigateToTarget: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`cfa0Todo"; }; #todo
-
+		    	CheckBox {
+		    		Text: "Continue forever";
+		    		Bindings: [
+		    			Binding {
+		    				Source: "permanent";
+		    				Target: "IsChecked";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
 	    	];
 		};
 
@@ -231,7 +280,7 @@ Switch {
 		    	};
 
 		    	CheckBox {
-		    		Text: "Face Target";
+		    		Text: "Face target";
 		    		Bindings: [
 		    			Binding {
 		    				Source: "faceTarget";
@@ -246,16 +295,54 @@ Switch {
 		SetConditionOnSelf: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`cfa0Todo"; }; #todo
+		    	Static { Text: "`_Condition to apply"; };
+		    	ConditionSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "condition";
+		    				Target: "selectedItem";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
 
+		    	Static { Text: "`_Duration"; };
+		    	DurationInput {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "duration";
+		    				Target: "Duration";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
 	    	];
 		};
 
 		SetConditionOnTarget: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`cfa0Todo"; }; #todo
+		    	Static { Text: "`_Condition to apply"; };
+		    	ConditionSelect {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "condition";
+		    				Target: "selectedItem";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
 
+		    	Static { Text: "`_Duration"; };
+		    	DurationInput {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "duration";
+		    				Target: "Duration";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
 	    	];
 		};
 
@@ -266,7 +353,7 @@ Switch {
 		    	Static { Text: "`cfa0Todo"; } #todo
 
 		    	CheckBox {
-		    		Text: "Inherit Controller";
+		    		Text: "Inherit controller";
 		    		Bindings: [
 		    			Binding {
 		    				Source: "inheritController";
@@ -386,7 +473,7 @@ Switch {
 		ShootAtTarget: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`_Aiming Method"; }; #todo
+		    	Static { Text: "`_Aiming method"; };
 		    	AimingMethodSelect {
 		    		Bindings: [
 		    			Binding {

@@ -43,7 +43,7 @@ namespace DyingAndMore.Editor
         public SelectorEditorMode(string name, Editor editor, TSelector selector = null)
             : base(name, editor)
         {
-            AddChild(preview = new Graphic()
+            preview = new Graphic()
             {
                 Sprite = new Takai.Graphics.Sprite()
                 {
@@ -51,12 +51,9 @@ namespace DyingAndMore.Editor
                     Width = editor.Map.Class.TileSize,
                     Height = editor.Map.Class.TileSize,
                 },
-                Position = new Vector2(20),
-                Size = new Vector2(64),
-                HorizontalAlignment = Alignment.End,
-                VerticalAlignment = Alignment.Start,
-                BorderColor = Color.White
-            });
+                HorizontalAlignment = Alignment.Right,
+                Style = "Editor.Selector.Preview",
+            };
             preview.EventCommands[ClickEvent] = "OpenSelector";
             CommandActions["OpenSelector"] = delegate (Static sender, object arg)
             {
@@ -66,11 +63,33 @@ namespace DyingAndMore.Editor
             this.selector = selector ?? new TSelector();
             this.selector.HorizontalAlignment = Alignment.Stretch;
 
+            //todo: store in list with preview
+            var eraserButton = new Graphic(Cache.Load<Texture2D>("UI/Editor/Eraser.png"))
+            {
+                HorizontalAlignment = Alignment.Right,
+                Style = "Editor.Selector.Eraser"
+            };
+            eraserButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
+            {
+                this.selector.SelectedIndex = -1;
+                return UIEventResult.Handled;
+            });
+
+            AddChild(new List(preview, eraserButton)
+            {
+                Position = new Vector2(20),
+                Margin = 20,
+                HorizontalAlignment = Alignment.Right
+            });
+
             On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
             {
-                var source = (SelectorEditorMode<TSelector>)sender;
-                source.selectorDrawer.IsEnabled = false;
-                source.UpdatePreview(this.selector.SelectedIndex);
+                var self = (SelectorEditorMode<TSelector>)sender;
+                self.selectorDrawer.IsEnabled = false;
+                if (self.selector.SelectedIndex < 0)
+                    self.preview.Sprite = null;
+                else
+                    self.UpdatePreview(self.selector.SelectedIndex);
                 return UIEventResult.Handled;
             });
 
@@ -149,12 +168,16 @@ namespace DyingAndMore.Editor
         }
         private MapInstance _map;
 
-        public Camera Camera { get; set; } = new Camera();
+        public Camera Camera { get; set; } = new Camera
+        {
+            MoveSpeed = 2000
+        };
 
         TabPanel modes;
         Static renderSettingsConsole;
         Static resizeDialog;
         Static playButton;
+        Static resetZoom;
 
         UI.Balloon errorBalloon;
 
@@ -180,7 +203,7 @@ namespace DyingAndMore.Editor
             {
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch,
-                Style = "ModeSelector",
+                Style = "Editor.ModeSelector",
                 NavigateWithNumKeys = true
             });
             AddModes();
@@ -191,7 +214,7 @@ namespace DyingAndMore.Editor
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.Middle,
                 Text = "> PLAY >",
-                Padding = new Vector2(20)
+                Style = "Editor.Play",
             });
 
             errorBalloon = new UI.Balloon
@@ -204,11 +227,23 @@ namespace DyingAndMore.Editor
             };
 
             AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings));
+            renderSettingsConsole.Style = "Frame";
             renderSettingsConsole.IsEnabled = false;
             renderSettingsConsole.Position = new Vector2(100, 0);
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;
 
             resizeDialog = Cache.Load<Static>("UI/Editor/ResizeMap.ui.tk");
+
+            resetZoom = new Graphic
+            {
+                Style = "Input",
+                Sprite = Cache.Load<Texture2D>("UI/Editor/ResetZoom.png"),
+                Position = new Vector2(20),
+                VerticalAlignment = Alignment.End,
+                IsEnabled = false
+            };
+            resetZoom.EventCommands[ClickEvent] = "ZoomWholeMap";
+            AddChild(resetZoom);
 
             swatch.Stop();
             Takai.LogBuffer.Append($"Loaded editor and map \"{Map.Class.Name}\" ({Map.Class.File}) in {swatch.ElapsedMilliseconds}msec");
@@ -218,6 +253,11 @@ namespace DyingAndMore.Editor
 
             On(ClickEvent, OnClick);
             On(DragEvent, OnDrag);
+            
+            CommandActions["ZoomWholeMap"] = delegate (Static sender, object arg)
+            {
+                ((Editor)sender).ZoomWholeMap();
+            };
 
             Binding.Globals["Editor.Paths"] = Paths;
         }
@@ -260,7 +300,26 @@ namespace DyingAndMore.Editor
             var dea = (DragEventArgs)e;
             if (dea.device == DeviceType.Mouse && dea.button == (int)MouseButtons.Middle)
             {
-                Camera.MoveTo(Camera.Position - Camera.LocalToWorld(dea.delta));
+                //Camera.MoveTo(Camera.Position - Camera.LocalToWorld(dea.delta));
+                Camera.Position -= Camera.LocalToWorld(dea.delta);
+
+                resetZoom.IsEnabled = true;
+                return UIEventResult.Handled;
+            }
+
+            if (dea.device == DeviceType.Touch)
+            {
+                if (dea.button == 2) //three finger pan
+                    Camera.Position -= Camera.LocalToWorld(dea.delta);
+                else if (dea.button == 1) //two finger pan+scale
+                {
+                    Camera.Position -= Camera.LocalToWorld(dea.delta * Camera.ActualScale);
+                    var zoomDelta = InputState.TouchPinchDelta();
+                    var diagonal = ContentArea.Size.ToVector2().Length() * 2;
+                    Camera.Scale += (Camera.Scale * zoomDelta) / diagonal;
+                }
+                
+                resetZoom.IsEnabled = true;
                 return UIEventResult.Handled;
             }
 
@@ -281,8 +340,16 @@ namespace DyingAndMore.Editor
             var xyScale = new Vector2(Takai.Runtime.GraphicsDevice.Viewport.Width - 20,
                                       Takai.Runtime.GraphicsDevice.Viewport.Height - 20) / mapSize;
 
+            if (float.IsNaN(Camera.ActualPosition.X) || float.IsNaN(Camera.ActualPosition.Y))
+                Camera.MoveTo(Vector2.Zero);
+            if (float.IsNaN(Camera.ActualScale))
+                Camera.ActualScale = 0;
+
             Camera.Scale = MathHelper.Clamp(System.Math.Min(xyScale.X, xyScale.Y), 0.1f, 1f);
             Camera.Position = mapSize / 2;
+
+            if (resetZoom != null)
+                resetZoom.IsEnabled = false;
         }
 
         void SwitchToGame()
@@ -338,6 +405,7 @@ namespace DyingAndMore.Editor
                 d.Normalize();
                 d = d * Camera.MoveSpeed * (float)time.ElapsedGameTime.TotalSeconds; //(camera velocity)
                 Camera.Position += Camera.LocalToWorld(d);
+                resetZoom.IsEnabled = true;
             }
 
             if (InputState.HasScrolled()) //special event?
@@ -348,11 +416,12 @@ namespace DyingAndMore.Editor
                 else
                 {
                     //todo: this is a little wobbly
-                    Camera.Position += (worldMousePos - Camera.Position) * (1 / Camera.Scale * delta);
+                    Camera.Position += (worldMousePos - Camera.Position) * (delta / Camera.ActualScale);
                     Camera.Scale += delta;
                     if (System.Math.Abs(Camera.Scale - 1) < 0.1f) //snap to 100% when near
                         Camera.Scale = 1;
                 }
+                resetZoom.IsEnabled = true;
             }
         }
 
@@ -380,6 +449,7 @@ namespace DyingAndMore.Editor
             }
 
             Camera.Scale = MathHelper.Clamp(Camera.Scale, 0.1f, 10f); //todo: make ranges global and move to some game settings
+            //check if scale changed and toggle reset button?
             Camera.Viewport = VisibleContentArea;
             Camera.Update(time);
 
@@ -395,31 +465,33 @@ namespace DyingAndMore.Editor
                 return false;
             }
 
+#if DEBUG
             if (InputState.IsPress(Keys.F2))
             {
                 renderSettingsConsole.IsEnabled ^= true;
                 return false;
             }
+#endif
 
-            if (InputState.Gestures.TryGetValue(GestureType.Pinch, out var gesture))
-            {
-                if (Vector2.Dot(gesture.Delta, gesture.Delta2) > 0)
-                {
-                    //todo: maybe add velocity
-                    Camera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(Camera.Transform)) / 2;
-                }
-                //scale
-                else
-                {
-                    var lp1 = gesture.Position - gesture.Delta;
-                    var lp2 = gesture.Position2 - gesture.Delta2;
-                    var dist = Vector2.Distance(gesture.Position, gesture.Position2);
-                    var ld = Vector2.Distance(lp1, lp2);
+            //if (InputState.Gestures.TryGetValue(GestureType.Pinch, out var gesture))
+            //{
+            //    if (Vector2.Dot(gesture.Delta, gesture.Delta2) > 0)
+            //    {
+            //        //todo: maybe add velocity
+            //        Camera.Position -= Vector2.TransformNormal(gesture.Delta2, Matrix.Invert(Camera.Transform)) / 2;
+            //    }
+            //    //scale
+            //    else
+            //    {
+            //        var lp1 = gesture.Position - gesture.Delta;
+            //        var lp2 = gesture.Position2 - gesture.Delta2;
+            //        var dist = Vector2.Distance(gesture.Position, gesture.Position2);
+            //        var ld = Vector2.Distance(lp1, lp2);
 
-                    var scale = (dist / ld) / 100;
-                    Camera.Scale += scale;
-                }
-            }
+            //        var scale = (dist / ld) / 100;
+            //        Camera.Scale += scale;
+            //    }
+            //}
 
 #if WINDOWS
             if (InputState.IsPress(Keys.F5))

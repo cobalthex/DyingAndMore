@@ -9,6 +9,7 @@ namespace Takai.Game
         internal void Resize(int newWidth, int newHeight)
         {
             Tiles = Tiles.Resize(newHeight, newWidth);
+            GenerateCollisionMaskCPU();
 
             if (tilesEffect != null)
             {
@@ -17,6 +18,9 @@ namespace Takai.Game
 #if OPENGL
                 tilesEffect.Parameters["Sampler+TilesImage"].SetValue(Tileset.texture);
                 tilesEffect.Parameters["LayoutSampler+TilesLayout"].SetValue(tilesLayoutTexture);
+                tilesEffect.Parameters["TilesLayoutScale"].SetValue(
+                    new Vector2((float)Width / tilesLayoutTexture.Width, (float)Height / tilesLayoutTexture.Height)
+                );
 #else
                 tilesEffect.Parameters["TilesImage"].SetValue(Tileset.texture);
                 tilesEffect.Parameters["TilesLayout"].SetValue(tilesLayoutTexture);
@@ -24,8 +28,6 @@ namespace Takai.Game
                 tilesEffect.Parameters["TilesImageSize"].SetValue(new Vector2(Tileset.texture.Width, Tileset.texture.Height));
                 tilesEffect.Parameters["MapSize"].SetValue(new Vector2(Width, Height));
             }
-
-            GenerateCollisionMaskCPU();
         }
 
         /// <summary>

@@ -39,15 +39,10 @@ float4 pmain(
 {
     float3 sample = SDF.Sample(Sampler, texcoord).rgb;
 
-    float3 sz;
-    SDF.GetDimensions(0, sz.x, sz.y, sz.z);
-
-    float dx = ddx(texcoord.x) * sz.x;
-    float dy = ddy(texcoord.y) * sz.y;
+    //float dx = ddx(texcoord.x) * sz.x;
+    //float dy = ddy(texcoord.y) * sz.y;
     
-    float toPixels = /*8 * */rsqrt(dx * dx + dy * dy); //smoothing factor doesnt seem to affect quality (need more testing)
     float sigDist = median(sample);
-
     float w = fwidth(sigDist);
     
     float cmin = 0.5, cmax = 0.5;
@@ -68,9 +63,8 @@ float4 pmain(
         return float4(color.rgb, centerToOutline * color.a);
         
     float centerEdge = cmin - outlineThickness / 2;
-    
     float outlineToEdge = smoothstep(centerEdge - w, centerEdge + w, sigDist);
-    
+
     float4 mix = lerp(outlineColor, color, centerToOutline);
     return float4(mix.rgb, outlineToEdge * mix.a);
 }
