@@ -155,9 +155,9 @@ namespace DyingAndMore
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
-            Static.MergeStyles(Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.tk"));
+            Static.MergeStyleRules(Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.tk"));
 #if ANDROID
-            Static.MergeStyles(Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.Mobile.tk"));
+            Static.MergeStyleRules(Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.Mobile.tk"));
 #endif
 
             //var state = new Editor.Editor();
@@ -487,7 +487,6 @@ namespace DyingAndMore
                 {
                     var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";
 
-                    //todo: debug font style
                     var sz = Static.DebugFont.MeasureString(text, Static.DebugTextStyle);
                     var drawText = new DrawTextOptions(
                         text,
@@ -507,7 +506,7 @@ namespace DyingAndMore
 #endif
 
             sbatch.End();
-
+            
             TextRenderer.Default.Present(GraphicsDevice, textTransform);
         }
     }

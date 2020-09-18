@@ -29,8 +29,6 @@ List {
                             ];
                         };
 
-                        Divider { };
-
                         Static { Text: "`_Filter"; }
                         TriggerFilterSelect {
                             HorizontalAlignment: Alignment.Stretch;
@@ -72,9 +70,7 @@ List {
 							};
 						};
 
-                        Divider { };
-
-                        Static { Text: "`_Commands (On Enter)"; }
+                        Static { Text: "`_Commands (On enter)"; }
                         GameCommandsList {
                             HorizontalAlignment: Alignment.Stretch;
                             Bindings: [
@@ -86,17 +82,114 @@ List {
                             ];
 
                             ItemUI: List {
-                                Direction: Direction.Horizontal;
+                                Style: "Box";
+                                HorizontalAlignment: Alignment.Stretch;
+                                Direction: Direction.Vertical;
                                 Margin: 10;
                                 Children: [
                                     Static {
-                                        name: "foo";
                                         Bindings: [
                                             Binding {
-                                                Source: ":string";
+                                                Source: ":typename";
                                                 Target: "Text";
                                             };
                                         ];
+                                    }
+
+                                    Switch {
+                                        HorizontalAlignment: Alignment.Stretch;
+                                        Bindings: [
+                                            Binding {
+                                                Source: ":typename";
+                                                Target: "Value";
+                                            };
+                                        ];
+                                        Items: {
+                                            EntityCommand: List {
+                                                HorizontalAlignment: Alignment.Stretch;
+                                                Children: [
+                                                    Static { Text: "`_Action"; };
+                                                    TextInput {
+                                                        HorizontalAlignment: Alignment.Stretch;
+                                                        Bindings: [
+                                                            Binding {
+                                                                Source: "ActionName";
+                                                                Target: "Text";
+                                                                Direction: BindingDirection.TwoWay;
+                                                            };
+                                                        ];
+                                                    };
+
+                                                    # action parameter (predefine actions and predetermine parameter type?)
+
+                                                    # target entity
+                                                ];
+                                            };
+
+                                            SpawnSquadCommand: List {
+                                                HorizontalAlignment: Alignment.Stretch;
+                                                Children: [
+                                                    Static { Text: "`_Squad"; };
+                                                    SquadSelect {
+                                                        HorizontalAlignment: Alignment.Stretch;
+                                                        Bindings: [
+                                                            Binding {
+                                                                Source: "Squad";
+                                                                Target: "SelectedItem";
+                                                                Direction: BindingDirection.TwoWay;
+                                                            };
+                                                        ];
+                                                    };
+                                                ];
+                                            };
+
+
+                                            AllSquadUnitsEntityCommand: List {
+                                                HorizontalAlignment: Alignment.Stretch;
+                                                Children: [
+                                                    Static { Text: "`_Action"; };
+                                                    TextInput {
+                                                        HorizontalAlignment: Alignment.Stretch;
+                                                        Bindings: [
+                                                            Binding {
+                                                                Source: "ActionName";
+                                                                Target: "Text";
+                                                                Direction: BindingDirection.TwoWay;
+                                                            };
+                                                        ];
+                                                    };
+
+                                                    Static { Text: "`_Squad"; };
+                                                    SquadSelect {
+                                                        HorizontalAlignment: Alignment.Stretch;
+                                                        Bindings: [
+                                                            Binding {
+                                                                Source: "Squad";
+                                                                Target: "SelectedItem";
+                                                                Direction: BindingDirection.TwoWay;
+                                                            };
+                                                        ];
+                                                    };
+                                                ];
+                                            };
+
+                                            DestroySquadUnitsCommand: List {
+                                                HorizontalAlignment: Alignment.Stretch;
+                                                Children: [
+                                                    Static { Text: "`_Squad"; };
+                                                    SquadSelect {
+                                                        HorizontalAlignment: Alignment.Stretch;
+                                                        Bindings: [
+                                                            Binding {
+                                                                Source: "Squad";
+                                                                Target: "SelectedItem";
+                                                                Direction: BindingDirection.TwoWay;
+                                                            };
+                                                        ];
+                                                    };
+                                                ];
+                                            };
+                                        };
                                     };
                                 ];
                             };
@@ -132,43 +225,10 @@ List {
                                     }
                                     *#
 
-                                    Switch {
-                                        ChildBindScope: "item";
-                                        Bindings: [
-                                            Binding {
-                                                Source: "item:typename";
-                                                Target: "Value";
-                                            }
-                                        ];
-                                        Items: { #todo: need to rethink design of this
-                                            SpawnSquadCommand: List {
-                                                Children: [
-                                                    Static { Text: "Squad"; };
-                                                    SquadSelect {
-                                                        Bindings: [
-                                                            Binding {
-                                                                Source: "SquadName";
-                                                                Target: "SelectedItem.name";
-                                                                Direction: BindingDirection.TwoWay;
-                                                            };
-                                                        ]
-                                                        ItemUI: {
-                                                            HorizontalAlignment: Alignment.Stretch;
-                                                            Bindings: [
-                                                                Binding {
-                                                                    Source: "Name";
-                                                                    Target: "Text";
-                                                                    Direction: BindingDirection.TwoWay;
-                                                                };
-                                                            ];
-                                                        };
-                                                    };
-                                                ];
-                                            };
-                                        };
-                                    };
                                     Static {
-                                        Text: "Add Command";
+                                        Text: "Add command";
+                                        Style: "Button";
+                                        HorizontalAlignment: Alignment.Center;
                                         EventCommands: {
                                             Click: "AddItem";
                                         }
@@ -177,9 +237,7 @@ List {
                             };
                         };
 
-                        Divider { };
-
-                        Static { Text: "`_Effects (On Enter)"; }
+                        Static { Text: "`_Effects (On enter)"; }
                         EffectsSelect {
                             HorizontalAlignment: Alignment.Stretch;
                             Bindings: [
@@ -191,9 +249,7 @@ List {
                             ];
                         }
 
-                        Divider { };
-
-                        Static { Text: "`_Max Uses"; }
+                        Static { Text: "`_Max uses"; }
                         NumericInput {
                             HorizontalAlignment: Alignment.Stretch;
                             Bindings: [
@@ -205,7 +261,7 @@ List {
                             ];
                         };
 
-                        Static { Text: "`_Use Count"; }
+                        Static { Text: "`_Use count"; }
                         List {
                         	Direction: Direction.Horizontal;
                         	Margin: 10;

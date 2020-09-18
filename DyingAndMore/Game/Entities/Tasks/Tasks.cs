@@ -219,7 +219,7 @@ namespace DyingAndMore.Game.Entities.Tasks
                 case SetOperation.Outersection:
                     ai.Actor.Factions ^= factions;
                     break;
-                case SetOperation.Difference:
+                case SetOperation.Difference:  
                     ai.Actor.Factions &= ~factions;
                     break;
             }

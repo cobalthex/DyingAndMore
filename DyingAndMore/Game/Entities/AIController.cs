@@ -6,7 +6,7 @@ using Takai;
 namespace DyingAndMore.Game.Entities
 {
     [Flags]
-    public enum Senses
+    public enum Senses : UInt32
     {
         None            = 0b0000000000000000,
         FullHealth      = 0b0000000000000001,
@@ -108,6 +108,7 @@ namespace DyingAndMore.Game.Entities
                 //sb.Append(KnownSenses);
                 //sb.Append(")");
             }
+            sb.Append($" (Target: {Target?.Id})");
             return sb.ToString();
         }
 

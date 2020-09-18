@@ -101,6 +101,18 @@ namespace DyingAndMore.UI
 
     class SquadSelect : DropdownSelect<Squad>
     {
+        public SquadSelect()
+            : base()
+        {
+            ItemUI = new Static
+            {
+                Bindings = new List<Binding>
+                {
+                    new Binding("Name", "Text")
+                }
+            };
+        }
+
         public override void OpenDropdown() //hacky
         {
             Items.Clear();

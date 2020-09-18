@@ -26,26 +26,44 @@ namespace DyingAndMore.Game
         string ICommand.ActionName { get; set; }
         object ICommand.ActionParameter { get; set; }
 
-        public string SquadName { get; set; } = null;
+        [Takai.Data.Serializer.AsReference]
+        public Entities.Squad Squad { get; set; }
 
         public void Invoke(MapBaseInstance map)
         {
-            var minst = (MapInstance)map;
-            if (minst == null)
+            Squad?.SpawnUnits(map);
+        }
+        public override string ToString()
+        {
+            return nameof(SpawnSquadCommand) + $" - Squad: {Squad}";
+        }
+    }
+
+    class AllSquadUnitsEntityCommand : ICommand
+    {
+        public string ActionName { get; set; }
+        public object ActionParameter { get; set; }
+
+        [Takai.Data.Serializer.AsReference]
+        public Entities.Squad Squad { get; set; }
+
+        protected EntityCommand entCommand = new EntityCommand();
+
+        public void Invoke(MapBaseInstance map)
+        {
+            if (Squad == null)
                 return;
-            foreach (var squad in minst.Squads)
-            {
-                if (squad.Name == SquadName)
-                {
-                    minst.Spawn(squad);
-                    break;
-                }
-            }
+
+            entCommand.ActionName = ((ICommand)this).ActionName;
+            entCommand.ActionParameter = ((ICommand)this).ActionParameter;
+
+            foreach (var unit in Squad.Units)
+                entCommand.Invoke(unit);
         }
 
         public override string ToString()
         {
-            return nameof(SpawnSquadCommand) + $" - Squad: {SquadName}";
+            return nameof(AllSquadUnitsEntityCommand) + $" - Squad: {Squad}";
         }
     }
 
@@ -54,26 +72,18 @@ namespace DyingAndMore.Game
         string ICommand.ActionName { get; set; }
         object ICommand.ActionParameter { get; set; }
 
-        public string SquadName { get; set; } = null;
+
+        [Takai.Data.Serializer.AsReference]
+        public Entities.Squad Squad { get; set; }
 
         public void Invoke(MapBaseInstance map)
         {
-            var minst = (MapInstance)map;
-            if (minst == null)
-                return;
-            foreach (var squad in minst.Squads)
-            {
-                if (squad.Name == SquadName)
-                {
-                    squad.DestroyAllUnits();
-                    break;
-                }
-            }
+            Squad?.DestroyAllUnits();
         }
 
         public override string ToString()
         {
-            return nameof(DestroySquadUnitsCommand) + $" - Squad: {SquadName}";
+            return nameof(DestroySquadUnitsCommand) + $" - Squad: {Squad}";
         }
     }
 }

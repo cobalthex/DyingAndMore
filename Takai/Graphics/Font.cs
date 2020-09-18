@@ -15,6 +15,7 @@ namespace Takai.Graphics
         public bool monospace;
         public bool underline;
         public bool oblique;
+        public bool ignoreFormattingCharacters;
 
         public float size; //size of the font, (in pixels height), if 0, default is used
 
@@ -90,7 +91,7 @@ namespace Takai.Graphics
         /// The amount of lateral slant to apply when drawing this font as oblique
         /// Value is a fraction of <see cref="MaxCharWidth"/>
         /// </summary>
-        public float ObliqueSlant { get; set; } = 0.1f;
+        public float ObliqueSlant { get; set; } = 0.05f;
 
         public float GetLineHeight(TextStyle style) => GetLineHeight(style.size);
 
@@ -109,36 +110,61 @@ namespace Takai.Graphics
             if (textLength < 0)
                 textLength = text.Length;
 
+            float lastXUnderhang = 0;
             Vector2 total = Vector2.Zero;
             Vector2 row = Vector2.Zero;
             TextStyle curStyle = style;
+            curStyle.size = size;
+
+            float scale = GetScale(size);
+
             for (int i = textOffset; i < Math.Min(textLength, text.Length); ++i)
             {
                 switch (text[i])
                 {
                     case '\n':
-                        //handle underlines
-                        total.X = Math.Max(total.X, row.X);
+                        if (curStyle.underline)
+                            row.Y = Math.Max(row.Y, (maxCharHeight * scale) + 2);
+                        total.X = Math.Max(total.X, row.X) + lastXUnderhang;
                         total.Y += row.Y;
                         row = Vector2.Zero;
                         break;
 
                     case '`':
-                        if (i + 1 >= text.Length)
+                        if (i + 1 >= text.Length || style.ignoreFormattingCharacters)
                             goto default;
 
                         switch (text[i + 1])
                         {
                             //`x - reset style + color
                             case 'x':
-                                //handle underline
+                                if (curStyle.underline)
+                                    row.Y = Math.Max(row.Y, (maxCharHeight * scale) + 2);
                                 curStyle = style;
+                                textLength += 2;
+                                ++i;
+                                continue;
+
+                            //`+ - increase text size by 20%
+                            case '+':
+                                curStyle.size *= 1.2f;
+                                scale *= 1.2f;
+                                textLength += 2;
+                                ++i;
+                                continue;
+
+                            //`+ - decrease text size by 20%
+                            case '-':
+                                curStyle.size *= 0.8f;
+                                scale *= 0.8f;
                                 textLength += 2;
                                 ++i;
                                 continue;
 
                             //`_ - toggle underline
                             case '_':
+                                if (curStyle.underline)
+                                    row.Y = Math.Max(row.Y, (maxCharHeight * scale) + 2);
                                 curStyle.underline ^= true;
                                 textLength += 2;
                                 ++i;
@@ -172,17 +198,26 @@ namespace Takai.Graphics
                     default:
                         if (Characters.TryGetValue(text[i], out var rgn))
                         {
-                            row.X += (style.monospace ? maxAdvance : rgn.xAdvance);
-                            row.Y = Math.Max(row.Y, rgn.height + rgn.yOffset);
+                            if (style.monospace)
+                            {
+                                lastXUnderhang = 0;
+                                row.X += maxAdvance * scale;
+                            }
+                            else
+                            {
+                                lastXUnderhang = (rgn.width - rgn.xAdvance) * scale;
+                                row.X += rgn.xAdvance * scale;
+                            }
+                            row.Y = Math.Max(row.Y, (rgn.height + rgn.yOffset) * scale);
                         }
                         break;
                 }
             }
 
             //todo: handle obliques
-            total.X = Math.Max(total.X, row.X);
+            total.X = Math.Max(total.X, row.X) + lastXUnderhang;
             total.Y += row.Y;
-            return total * GetScale(size) + Vector2.One;
+            return total;
         }
     }
 
@@ -236,7 +271,8 @@ namespace Takai.Graphics
     public class TextRenderer
     {
         public static TextRenderer Default;
-        public static int MaxBatchVertexCount = 1 << 20; //round-robins past this number
+        public static int MaxBatchIndexCount = short.MaxValue; //round-robins past this number
+        public static int MaxBatchVertexCount = MaxBatchIndexCount / 6 * 4; //round-robins past this number
 
         protected struct TextVertex : IVertexType
         {
@@ -248,6 +284,7 @@ namespace Takai.Graphics
                 new VertexElement(20, VertexElementFormat.Color, VertexElementUsage.Color, 1),
                 new VertexElement(24, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 1),
             });
+            VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
 
             public Vector2 position;
             public Color color;
@@ -263,8 +300,24 @@ namespace Takai.Graphics
                 this.outlineColor = outlineColor;
                 this.outlineThickness = outlineThickness;
             }
+        }
 
+        protected struct TextInstance : IVertexType
+        {
+            public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(new[] {
+                new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 1),
+                new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 2),
+            });
             VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
+
+            public Vector2 offset;
+            public Color color;
+
+            public TextInstance(Vector2 offset, Color color)
+            {
+                this.offset = offset;
+                this.color = color;
+            }
         }
 
         protected class RenderBatch //use struct?
@@ -272,7 +325,20 @@ namespace Takai.Graphics
             public Matrix transform; //todo: this should be part of hash/key
 
             public TextVertex[] vertices;
-            public int nextVertexIndex;
+            public short[] indices;
+            public short nextVertexIndex;
+            public short nextIndexIndex;
+
+            public RenderBatch()
+            {
+                transform = Matrix.Identity;
+
+                const short defaultTriCount = 1000;
+                vertices = new TextVertex[defaultTriCount * 4];
+                indices = new short[defaultTriCount * 6];
+
+                nextVertexIndex = nextIndexIndex = 0;
+            }
         }
 
         protected Dictionary<Texture2D, RenderBatch> batches;
@@ -299,21 +365,38 @@ namespace Takai.Graphics
                 batch.Value.nextVertexIndex = 0;
         }
 
-        protected void EnsureCapacity(int additionalCapacity, RenderBatch batch)
+        protected void EnsureCapacity(int additionalTris, RenderBatch batch)
         {
-            var newCount = batch.nextVertexIndex + additionalCapacity;
+            var additionalVerts = additionalTris * 4;
+            var newCount = batch.nextVertexIndex + additionalVerts;
             if (newCount > MaxBatchVertexCount)
             {
+                System.Diagnostics.Debug.WriteLine("Ran out of text veritces, looping around");
                 batch.nextVertexIndex = 0;
-                newCount = additionalCapacity;
+                newCount = additionalVerts;
             }
-
             if (batch.vertices.Length < newCount)
             {
-                additionalCapacity = Math.Max(batch.vertices.Length * 3 / 2, newCount);
-                var newVertices = new TextVertex[additionalCapacity];
+                newCount = Math.Max(batch.vertices.Length * 3 / 2, newCount);
+                var newVertices = new TextVertex[newCount];
                 batch.vertices.CopyTo(newVertices, 0);
                 batch.vertices = newVertices;
+            }
+
+            var additionalIndices = additionalTris * 6;
+            newCount = batch.nextIndexIndex + additionalIndices;
+            if (newCount > MaxBatchVertexCount)
+            {
+                System.Diagnostics.Debug.WriteLine("Ran out of text indices, looping around");
+                batch.nextIndexIndex = 0;
+                newCount = additionalIndices;
+            }
+            if (batch.indices.Length < newCount)
+            {
+                newCount = Math.Max(batch.indices.Length * 3 / 2, newCount);
+                var newIndices = new short[newCount];
+                batch.indices.CopyTo(newIndices, 0);
+                batch.indices = newIndices;
             }
         }
 
@@ -339,20 +422,13 @@ namespace Takai.Graphics
                 return;
 
             if (!batches.TryGetValue(options.font.Texture, out var batch))
-            {
-                batch = batches[options.font.Texture] = new RenderBatch
-                {
-                    vertices = new TextVertex[4800],
-                    nextVertexIndex = 0,
-                    transform = Matrix.Identity //todo
-                };
-            }
+                batch = batches[options.font.Texture] = new RenderBatch();
 
             if (options.textLength < 0)
                 options.textLength = options.text.Length;
 
             var length = Math.Min(options.text.Length, options.textOffset + options.textLength);
-            EnsureCapacity(length * 6, batch);
+            EnsureCapacity(length * 2, batch);
 
             Color color = options.color;
             TextStyle style = options.style;
@@ -367,9 +443,63 @@ namespace Takai.Graphics
 
             Vector2 offset = options.relativeOffset / options.sizeFraction;
             float lineHeight = 0; //scaled by size on newline
-            float underlineX = 0;
+
+            float underlineStart = options.relativeOffset.X;
+
+            Action MakeUnderline = () =>
+            {
+                var loc = options.position + new Vector2(underlineStart, offset.Y + options.font.maxCharHeight + 2) * options.sizeFraction;
+                var sz = new Vector2((offset.X - underlineStart) * options.sizeFraction, 2); //todo: height
+
+                //todo: clip to bounds
+
+                var tl = new TextVertex(
+                    new Vector2(loc.X + currentSlant, loc.Y),
+                    color,
+                    new Vector2(-2, -2),
+                    style.outlineColor,
+                    style.outlineThickness
+                );
+                var tr = new TextVertex(
+                    new Vector2(loc.X + currentSlant + sz.X, loc.Y),
+                    color,
+                    new Vector2(-1, -2),
+                    style.outlineColor,
+                    style.outlineThickness
+                );
+                var bl = new TextVertex(
+                    new Vector2(loc.X - currentSlant, loc.Y + sz.Y),
+                    color,
+                    new Vector2(-2, -1),
+                    style.outlineColor,
+                    style.outlineThickness
+                );
+                var br = new TextVertex(
+                    new Vector2(loc.X - currentSlant, loc.Y) + sz,
+                    color,
+                    new Vector2(-1, -1),
+                    style.outlineColor,
+                    style.outlineThickness
+                );
+
+                EnsureCapacity(2, batch);
+
+                batch.indices[batch.nextIndexIndex++] = batch.nextVertexIndex;
+                batch.indices[batch.nextIndexIndex++] = (short)(batch.nextVertexIndex + 1);
+                batch.indices[batch.nextIndexIndex++] = (short)(batch.nextVertexIndex + 2);
+                batch.indices[batch.nextIndexIndex++] = (short)(batch.nextVertexIndex + 2);
+                batch.indices[batch.nextIndexIndex++] = (short)(batch.nextVertexIndex + 1);
+                batch.indices[batch.nextIndexIndex++] = (short)(batch.nextVertexIndex + 3);
+
+                batch.vertices[batch.nextVertexIndex++] = tl;
+                batch.vertices[batch.nextVertexIndex++] = tr;
+                batch.vertices[batch.nextVertexIndex++] = bl;
+                batch.vertices[batch.nextVertexIndex++] = br;
+            };
 
             //todo: italics can push text out of container
+
+            //todo: create initial underline
 
             //length ignores formatting characters
             for (int i = options.textOffset; i < Math.Min(length, options.text.Length); ++i)
@@ -378,35 +508,63 @@ namespace Takai.Graphics
                 {
                     case '\n':
                         {
-                            //handle underlines
-                            offset.X = options.relativeOffset.X;
+                            offset.X = options.relativeOffset.X / options.sizeFraction;
                             offset.Y += lineHeight;
                             lineHeight = 0;
-                            underlineX = 0;
+
+                            if (style.underline)
+                            { 
+                                MakeUnderline();
+                                underlineStart = options.relativeOffset.X;
+                            }
                             break;
                         }
 
                     case '`':
                         {
-                            if (i + 1 >= options.text.Length)
-                                break;
+                            if (i + 1 >= options.text.Length || style.ignoreFormattingCharacters)
+                                goto default;
 
                             switch (options.text[i + 1])
                             {
                                 //`x - reset style + color
                                 case 'x':
-                                    //handle underline
+                                    MakeUnderline();
                                     color = options.color;
                                     style = options.style;
                                     currentSlant = style.oblique ? slantFrac : 0;
+                                    options.sizeFraction = options.font.GetScale(style.size);
+                                    clipFrac = options.clipSize / options.sizeFraction;
+                                    length += 2;
+                                    ++i;
+                                    continue;
+
+                                //`+ - increase text size by 20%
+                                case '+':
+                                    style.size *= 1.2f;
+                                    options.sizeFraction *= 1.2f;
+                                    clipFrac = options.clipSize / options.sizeFraction;
+                                    length += 2;
+                                    ++i;
+                                    continue;
+
+                                //`+ - decrease text size by 20%
+                                case '-':
+                                    style.size *= 0.8f;
+                                    options.sizeFraction *= 0.8f;
+                                    clipFrac = options.clipSize / options.sizeFraction;
                                     length += 2;
                                     ++i;
                                     continue;
 
                                 //`_ - toggle underline
                                 case '_':
+                                    if (style.underline)
+                                        MakeUnderline();
+                                    else
+                                        underlineStart = offset.X;
+
                                     style.underline ^= true;
-                                    underlineX = offset.X;
                                     length += 2;
                                     ++i;
                                     continue;
@@ -458,14 +616,13 @@ namespace Takai.Graphics
 
                             //restrict source region to visible area of clip region
                             var rgnExtent = new Extent(rgn.x, rgn.y, rgn.x + rgn.width, rgn.y + rgn.height);
-                            var loc = rgnExtent.min - offset;
+                            var drawOffset = new Vector2(rgn.xOffset, rgn.yOffset);
+                            var loc = rgnExtent.min - offset - drawOffset;
                             var clip = Extent.Intersect(rgnExtent, new Extent(loc, loc + clipFrac));
-                            //todo: clipping not working as expected
 
                             if (clip.Size != Vector2.Zero)
                             {
-                                var adjust = new Vector2(rgn.xOffset, rgn.yOffset);
-                                Vector2 vloc = options.position + (offset + (clip.min - rgnExtent.min) + adjust) * options.sizeFraction;
+                                Vector2 vloc = options.position + (offset + (clip.min - rgnExtent.min) + drawOffset) * options.sizeFraction;
                                 Vector2 vsz = clip.Size * options.sizeFraction;
 
                                 var tl = new TextVertex(
@@ -497,33 +654,48 @@ namespace Takai.Graphics
                                     style.outlineThickness
                                 );
 
+                                batch.indices[batch.nextIndexIndex++] = batch.nextVertexIndex;
+                                batch.indices[batch.nextIndexIndex++] = (short)(batch.nextVertexIndex + 1);
+                                batch.indices[batch.nextIndexIndex++] = (short)(batch.nextVertexIndex + 2);
+                                batch.indices[batch.nextIndexIndex++] = (short)(batch.nextVertexIndex + 2);
+                                batch.indices[batch.nextIndexIndex++] = (short)(batch.nextVertexIndex + 1);
+                                batch.indices[batch.nextIndexIndex++] = (short)(batch.nextVertexIndex + 3);
+
                                 batch.vertices[batch.nextVertexIndex++] = tl;
                                 batch.vertices[batch.nextVertexIndex++] = tr;
                                 batch.vertices[batch.nextVertexIndex++] = bl;
-
-                                batch.vertices[batch.nextVertexIndex++] = bl;
-                                batch.vertices[batch.nextVertexIndex++] = tr;
                                 batch.vertices[batch.nextVertexIndex++] = br;
                             }
 
                             offset.X += (style.monospace ? options.font.maxAdvance : rgn.xAdvance);
                             lineHeight = Math.Max(lineHeight, rgn.height); //include underline height
-
                             break;
                         }
                 }
             }
 
-            //draw trailing underline
+            if (style.underline)
+                MakeUnderline();
         }
 
-        DynamicVertexBuffer dvb;
+        DynamicVertexBuffer textVertices;
+        DynamicIndexBuffer textIndices;
+        VertexBuffer textInstances;
 
         //necessary?
         public void Present(GraphicsDevice graphicsDevice, Matrix transform)
         {
-            if (dvb == null)
-                dvb = new DynamicVertexBuffer(graphicsDevice, typeof(TextVertex), MaxBatchVertexCount, BufferUsage.WriteOnly);
+            if (textVertices == null)
+            {
+                textVertices = new DynamicVertexBuffer(graphicsDevice, typeof(TextVertex), MaxBatchVertexCount, BufferUsage.WriteOnly);
+                textIndices = new DynamicIndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, MaxBatchIndexCount, BufferUsage.WriteOnly);
+
+                textInstances = new VertexBuffer(graphicsDevice, typeof(TextInstance), 2, BufferUsage.WriteOnly);
+                textInstances.SetData(new[] {
+                    new TextInstance(new Vector2(2), Color.Transparent),
+                    new TextInstance(new Vector2(0), Color.White),
+                });
+            }
 
             foreach (var batch in batches)
             {
@@ -531,21 +703,22 @@ namespace Takai.Graphics
                     continue;
 
                 shader.Parameters["Transform"].SetValue(transform * batch.Value.transform);
-                dvb.SetData(batch.Value.vertices, 0, batch.Value.nextVertexIndex);
+                textVertices.SetData(batch.Value.vertices, 0, batch.Value.nextVertexIndex);
+                textIndices.SetData(batch.Value.indices, 0, batch.Value.nextIndexIndex);
                 foreach (var pass in shader.CurrentTechnique.Passes)
                 {
                     pass.Apply();
                     graphicsDevice.Textures[0] = batch.Key;
-                    graphicsDevice.SetVertexBuffer(dvb);
-                    graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, batch.Value.nextVertexIndex / 3);
-
-                    graphicsDevice.DrawUserPrimitives(
-                        PrimitiveType.TriangleList,
-                        batch.Value.vertices,
-                        0, batch.Value.nextVertexIndex / 3
+                    graphicsDevice.SetVertexBuffers(
+                        new VertexBufferBinding(textVertices),
+                        new VertexBufferBinding(textInstances, 0, 1) //option to emboss?
                     );
+                    graphicsDevice.Indices = textIndices;
+                    //graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, batch.Value.nextVertexIndex / 3);
+                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, batch.Value.nextIndexIndex / 3, 2);
                 }
                 batch.Value.nextVertexIndex = 0;
+                batch.Value.nextIndexIndex = 0;
             }
         }
     }

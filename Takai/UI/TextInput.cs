@@ -121,7 +121,16 @@ namespace Takai.UI
 
         protected UIEventResult OnInputBoxPressed(Static sender, UIEventArgs e)
         {
-            var ce = (PointerEventArgs)e;
+            var pea = (PointerEventArgs)e;
+
+#if ANDROID
+            //todo: open soft keyboard
+            //check if number mode
+            //check if password
+
+            //var inputMgr = Application.GetSystemService(Context.InputMethodService) as InputMethodManager;
+            //showSoftInput
+#endif
 
             if (Text == null)
             {
@@ -129,7 +138,7 @@ namespace Takai.UI
                 return UIEventResult.Continue;
             }
 
-            var x = ce.position.X + ScrollPosition;
+            var x = pea.position.X + ScrollPosition;
             var width = 0;
             for (int i = 0; i < Text.Length; ++i)
             {
@@ -244,6 +253,19 @@ namespace Takai.UI
                         keyed = false;
                         break;
                     }
+
+#if WINDOWS
+                    else if (key == Keys.V && isCtrl)
+                    {
+                        if (System.Windows.Forms.Clipboard.ContainsText())
+                        {
+                            if (Text == null)
+                                Text = System.Windows.Forms.Clipboard.GetText();
+                            else
+                                Text = Text.Insert(Caret, System.Windows.Forms.Clipboard.GetText());
+                        }
+                    }
+#endif
 
                     else if (key == Keys.Left && Caret > 0)
                     {

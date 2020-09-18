@@ -206,7 +206,7 @@ namespace DyingAndMore.Game.Entities.Tasks
 
     public enum AimingMethod
     {
-        None, //shoot forward without aiming
+        Forward, //shoot forward without aiming
         Random, // pick a direction (within fov ? ) and aim there
         FaceTarget, //shoot at the target's current position
         LeadTarget, //shoot where the target is likely to be
@@ -227,12 +227,39 @@ namespace DyingAndMore.Game.Entities.Tasks
             if (ai.Target == null || ai.Actor.Weapon == null)
                 return TaskResult.Failure;
 
-            //sight range ?
-
             //shoot N times?
+            //reloading
 
-            //todo: aiming styles
+            switch (aimingMethod)
+            {
+                case AimingMethod.Forward:
+                    break;
 
+                case AimingMethod.Random:
+                    break;
+
+                case AimingMethod.FaceTarget:
+                    var dir = Vector2.Normalize(ai.Target.Position - ai.Actor.WorldPosition);
+                    ai.Actor.TurnTowards(dir, deltaTime); //todo: this is too slow
+
+                    if (Vector2.Dot(ai.Actor.WorldForward, dir) < 0.99f)
+                        return TaskResult.Continue;
+
+                    ai.Actor.Weapon.TryUse();
+                    return TaskResult.Success;
+
+                case AimingMethod.LeadTarget:
+                    return Intercept(deltaTime, ai);
+
+                case AimingMethod.Spray:
+                    //separate task?
+                    break;
+            }
+            return TaskResult.Success;
+        }
+
+        TaskResult Intercept(TimeSpan deltaTime, AIController ai)
+        {
             var projectileSpeed = 10f; //pick another number? (maybe infinite?)
             if (ai.Actor.Weapon.Class is GunClass gun)
                 projectileSpeed = gun.Projectile.MuzzleVelocity.max; //random?
@@ -241,10 +268,10 @@ namespace DyingAndMore.Game.Entities.Tasks
                 ai.Actor.WorldPosition,
                 ai.Actor.Velocity,
                 projectileSpeed,
-                ai.Target.WorldPosition, 
+                ai.Target.WorldPosition,
                 ai.Target.Velocity,
                 Vector2.Zero, // current - last velocity ?
-                ai.Target.MaxSpeed, 
+                ai.Target.MaxSpeed,
                 out var positionToTarget
             );
 
@@ -342,4 +369,6 @@ namespace DyingAndMore.Game.Entities.Tasks
     //possess target
     //alt weapons/grenades
     //berserk
+
+    //issue commands
 }

@@ -12,11 +12,12 @@ List {
 			Children: [
 				List {
 					Direction: Direction.Vertical;
-					Size: [300 NaN];
+					Size: [400 NaN];
 					Margin: 10;
 					Children: [
 						Static { Text: "`_Name"; };
 						TextInput {
+							HorizontalAlignment: Alignment.Stretch;
 							Bindings: [
 								Binding {
 									Source: "Name";
@@ -40,7 +41,7 @@ List {
 						};
 
 						CheckBox {
-							Text: "Disable Spawning if\nLeader is dead";
+							Text: "Disable spawning if\nleader is dead";
 							Bindings: [
 								Binding {
 									Source: "DisableSpawningIfLeaderIsDead";
@@ -50,7 +51,7 @@ List {
 							];
 						};
 
-						Static { Text: "`_Minimum Active Units"; }
+						Static { Text: "`_Minimum active units"; }
 						NumericInput {
 							Bindings: [
 								Binding {
@@ -61,7 +62,7 @@ List {
 							];
 						};
 
-						Static { Text: "`_Maximum Active Units"; }
+						Static { Text: "`_Maximum active units"; }
 						NumericInput {
 							Bindings: [
 								Binding {
@@ -72,7 +73,7 @@ List {
 							];
 						};
 
-						Static { Text: "`_Total Spawn Allowance"; }
+						Static { Text: "`_Total spawn allowance"; }
 						NumericInput {
 							Bindings: [
 								Binding {
@@ -83,7 +84,7 @@ List {
 							];
 						};
 
-						Static { Text: "`_Spawn Delay"; }
+						Static { Text: "`_Spawn delay"; }
 						DurationInput {
 							ShowMinutes: false;
 							Bindings: [
@@ -95,7 +96,7 @@ List {
 							];
 						};
 
-						Static { Text: "`_Current Spawn Count"; }
+						Static { Text: "`_Current spawn count"; }
 						NumericInput {
 							Bindings: [
 								Binding {
@@ -106,7 +107,7 @@ List {
 							];
 						};
 
-						Static { Text: "`_Current Active Count"; }
+						Static { Text: "`_Current active count"; }
 						Static {
 							Bindings: [
 								Binding {
@@ -122,16 +123,17 @@ List {
 
 				List {
 					Direction: Direction.Vertical;
+					VerticalAlignment: Alignment.Stretch;
 					Margin: 10;
-					Size: [300 NaN];
+					Size: [400 NaN];
 					Children: [
-						Static { Text: "`_Spawns"; };
+						Static { Text: "`+`_Spawns"; };
 						Static { };
 
-						Static { Text: "`_Leader (Randomized)"; };
+						Static { Text: "`_Leader (randomized)"; };
 						ScrollBox {
 							HorizontalAlignment: Alignment.Stretch;
-							Size: [NaN 140];
+							VerticalAlignment: Alignment.Stretch;
 							StayAtEnd: true;
 							Children: [
 								ActorList {
@@ -212,7 +214,7 @@ List {
 						Static { Text: "`_Units"; };
 						ScrollBox {
 							HorizontalAlignment: Alignment.Stretch;
-							Size: [NaN 300];
+							VerticalAlignment: Alignment.Stretch;
 							StayAtEnd: true;
 							Children: [
 								ActorList {
@@ -289,14 +291,23 @@ List {
 								};
 							];
 						};
+
+						Static {
+							Text: "Spawn units";
+            				Style: "Button";
+							HorizontalAlignment: Alignment.Center;
+							EventCommands: {
+								Click: "SelectedSquadSpawnUnits";
+							};
+						};
 					];
 				};
 			];
 		};
 
 		Static {
-            Style: "Button";
 			Text: "Close";
+            Style: "Button";
 			HorizontalAlignment: Alignment.Center;
 			EventCommands: {
 				Click: ["CloseModal"];

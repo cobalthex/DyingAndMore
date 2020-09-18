@@ -6,7 +6,7 @@
 			size: 20;
 			outlineThickness: 0.5;
 			outlineColor: [0 0 0 255];
-		}
+		};
 
 		#Padding: Vector2 [0 0];
 		#Color: Color.White;
@@ -55,6 +55,18 @@
 		Margin: 1;
 	};
 
+	TextInput: {
+		BackgroundSprite: @"UI/input.9p.tk";
+		BorderColor: Color.Transparent;
+		Padding: Vector2 [5 5];
+		TextStyle: TextStyle {
+			size: 20;
+			outlineThickness: 0.5;
+			outlineColor: [0 0 0 255];
+			ignoreFormattingCharacters: true;
+		};
+	};
+
 	NumericInput: {
 		BackgroundSprite: @"UI/input.9p.tk";
 		BorderColor: Color.Transparent;
@@ -65,12 +77,6 @@
 		BorderColor: Color.Transparent;
 	};
 	NumericInput.Button: {
-		Padding: Vector2 [5 5];
-	};
-
-	TextInput: {
-		BackgroundSprite: @"UI/input.9p.tk";
-		BorderColor: Color.Transparent;
 		Padding: Vector2 [5 5];
 	};
 

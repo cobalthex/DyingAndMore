@@ -154,6 +154,9 @@ namespace Takai.Game
         /// </summary>
         public string Name { get; set; } = null;
 
+        /// <summary>
+        /// Is this entity alive? Cannot think if dead and (settings dependent) will be reaped
+        /// </summary>
         public bool IsAlive { get; private set; } = true;
 
         /// <summary>
@@ -357,7 +360,7 @@ namespace Takai.Game
 
         public virtual string GetDebugInfo()
         {
-            return $"Class: {(Class?.Name ?? "(none)")}\nName: {(Name ?? "(none)")}\nAlive: {IsAlive}";
+            return $"ID: {Id}\nClass: {(Class?.Name ?? "(none)")}\nName: {(Name ?? "(none)")}\nAlive: {IsAlive}";
         }
 
         public bool InRange(EntityInstance ent, float distanceBetween)

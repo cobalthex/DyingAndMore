@@ -268,7 +268,7 @@ namespace DyingAndMore.Game
 #if ANDROID
                 var movementInput = new PolarInput
                 {
-                    DisplayNormalizedValue = true,
+                    ShowNormalizedValue = true,
                     HorizontalAlignment = Alignment.Start,
                     VerticalAlignment = Alignment.End,
                     Position = new Vector2(20),
@@ -280,7 +280,7 @@ namespace DyingAndMore.Game
                 };
                 var forwardInput = new PolarInput
                 {
-                    DisplayNormalizedValue = true,
+                    ShowNormalizedValue = true,
                     HorizontalAlignment = Alignment.End,
                     VerticalAlignment = Alignment.End,
                     Position = new Vector2(20),
@@ -644,6 +644,10 @@ namespace DyingAndMore.Game
         {
             base.DrawSelf(context);
 
+#if DEBUG
+            var drawText = new Takai.Graphics.DrawTextOptions("", DebugFont, DebugTextStyle, Color.HotPink, Vector2.Zero);
+#endif
+
             foreach (var player in players)
             {
 #if DEBUG
@@ -653,6 +657,13 @@ namespace DyingAndMore.Game
                     {
                         var pos = player.camera.WorldToScreen(ent.WorldPosition - new Vector2(0, ent.Radius + 16));
                         DrawHealthBar(context.spriteBatch, pos, actor.CurrentHealth, actor._Class.MaxHealth);
+
+                        if (Map.renderSettings.drawDebugInfo)
+                        {
+                            drawText.position = player.camera.WorldToScreen(ent.WorldPosition) + new Vector2(5);
+                            drawText.text = ent.GetDebugInfo();
+                            context.textRenderer.Draw(drawText);
+                        }
 
                         Map.DrawLine(actor.WorldPosition + actor.WorldForward * 50, actor.WorldPosition, Color.Black, 50, actor._Class.FieldOfView / 2);
                     }

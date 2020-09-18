@@ -47,9 +47,20 @@ namespace DyingAndMore.Game.Entities
         /// The leader of this squad. There is only one and when they die units may flee
         /// </summary>
         public ActorInstance Leader { get; set; }
+
+        /// <summary>
+        /// All active units in the squad, including the leader
+        /// </summary>
         public List<ActorInstance> Units { get; set; } = new List<ActorInstance>(); //includes leader
 
+        /// <summary>
+        /// The total number of units spawned
+        /// </summary>
         public int TotalSpawnCount { get; set; } = 0;
+
+        /// <summary>
+        /// When the last unit was spawned
+        /// </summary>
         public TimeSpan LastSpawnTime { get; set; } = TimeSpan.Zero;
 
         public Squad Clone()

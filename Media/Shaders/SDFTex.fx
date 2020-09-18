@@ -16,11 +16,14 @@ struct Vertex
     float2 texcoord         : TEXCOORD0;
     float4 outlineColor     : COLOR1;
     float  outlineThickness : TEXCOORD1;
+    
+    //instanced data
+    float4 overrideColor : COLOR2;
 };
 
-Vertex vmain(Vertex vertex)
+Vertex vmain(Vertex vertex, float2 offset : POSITION1)
 {
-    vertex.position = mul(vertex.position, Transform);
+    vertex.position = mul(vertex.position + float4(offset, 0, 0), Transform);
     return vertex;
 }
 
@@ -34,9 +37,14 @@ float4 pmain(
     float4 color            : COLOR0, 
     float2 texcoord         : TEXCOORD0,
     float4 outlineColor     : COLOR1,
-    float  outlineThickness : TEXCOORD1
+    float  outlineThickness : TEXCOORD1,
+    float4 overrideColor    : COLOR2
 ) : SV_Target
 {
+    if (texcoord.x <= -1 || texcoord.y <= -1)
+        return color * overrideColor; //hack used for underline
+    //outline?
+    
     float3 sample = SDF.Sample(Sampler, texcoord).rgb;
 
     //float dx = ddx(texcoord.x) * sz.x;
@@ -45,7 +53,7 @@ float4 pmain(
     float sigDist = median(sample);
     float w = fwidth(sigDist);
     
-    float cmin = 0.5, cmax = 0.5;
+    float cmin = 0.4, cmax = 0.5;
     
     //hinting
     //if (dx > 3)
@@ -60,13 +68,13 @@ float4 pmain(
     
     //float outlineThickness = 0;
     if (outlineThickness == 0)
-        return float4(color.rgb, centerToOutline * color.a);
+        return float4(color.rgb * overrideColor.rgb, centerToOutline * color.a * overrideColor.a);
         
     float centerEdge = cmin - outlineThickness / 2;
     float outlineToEdge = smoothstep(centerEdge - w, centerEdge + w, sigDist);
 
     float4 mix = lerp(outlineColor, color, centerToOutline);
-    return float4(mix.rgb, outlineToEdge * mix.a);
+    return float4(mix.rgb * overrideColor.rgb, outlineToEdge * mix.a * overrideColor.a);
 }
 
 #include "shadermodel.fxh"

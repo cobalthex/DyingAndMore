@@ -59,8 +59,10 @@ UI:
     ✔ BitmapFont text display element @done (20-09-08 10:45)
     ☐ Text Line-height based on baseline?
     ☐ Skip Press event and go directly to drag if mouse delta > some threshold?
-    ☐ Store styles in Trie (faster search for root styles), possibly suffix tree
-
+    ☐ Store styles in Trie: Parent Child { } ... Styles[Child]->Styles[Parent] -- store composite
+    ☐ TextInput android soft keyboard support (support on windows too?)
+    ☐ Sounds (focus change/hover ?, click)
+    ☐ RemoveItem for various UIs (Trigger commands, Actor behaviors + tasks)
 
   ✔  Think only when alive? @done (20-04-10 22:48)
 

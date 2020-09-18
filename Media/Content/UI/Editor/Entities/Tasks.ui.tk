@@ -17,6 +17,7 @@ Switch {
 	    	Children: [
 		    	Static { Text: "`_Relative direction"; };
 		    	PolarInput {
+		    		ShowNormalizedValue: true;
 		    		Bindings: [
 		    			Binding {
 		    				Source: "relativeDirection";
@@ -502,6 +503,22 @@ Switch {
 	    	];
 		};
 
+		TargetAggressor: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	CheckBox {
+		    		Text: "Include Allies";
+		    		Bindings: [
+		    			Binding {
+		    				Source: "includeAllies";
+		    				Target: "IsChecked";
+	    					Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+		};
+
 	    Wait: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
@@ -515,14 +532,6 @@ Switch {
 		    			};
 		    		];
 		    	};
-	    	];
-	    };
-
-	    ProvideCover: List {
-			HorizontalAlignment: Alignment.Stretch;
-	    	Children: [
-		    	Static { Text: "`cfa0Todo"; }; #todo
-
 	    	];
 	    };
 	};

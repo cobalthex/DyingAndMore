@@ -2075,19 +2075,19 @@ namespace Takai.UI
                 //todo: maybe add capture setting
                 else if (InputState.lastTouches.Count > touchIndex && DidPressInside(touchIndex))
                 {
-                    //first if clause ^ shouldnt be necessary
+                    // first if clause ^ shouldnt be necessary
 
                     var lastTouch = InputState.lastTouches[touchIndex];
                     if (lastTouch.Position != touch.Position)
                     {
-                        var pea = new DragEventArgs(this)
+                        var dea = new DragEventArgs(this)
                         {
                             delta = touch.Position - lastTouch.Position,
                             position = touch.Position - OffsetContentArea.Location.ToVector2() + Padding,
                             button = touchIndex,
                             device = DeviceType.Touch
                         };
-                        BubbleEvent(DragEvent, pea);
+                        BubbleEvent(DragEvent, dea);
                     }
                     return false;
                 }
@@ -2146,18 +2146,18 @@ namespace Takai.UI
             //todo: maybe add capture setting
             else if (DidPressInside(button))
             {
-                var lastMousePosition = InputState.LastMouseVector;
-                var newMousePosition = InputState.MouseVector;
-                if (lastMousePosition != newMousePosition)
+                var lastMousePosition = InputState.LastMousePoint;
+                if (lastMousePosition != mousePosition)
                 {
-                    var pea = new DragEventArgs(this)
+                    //wrap mouse in window?
+                    var dea = new DragEventArgs(this)
                     {
-                        delta = newMousePosition - lastMousePosition,
+                        delta = (mousePosition - lastMousePosition).ToVector2(),
                         position = (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
                         button = (int)button,
                         device = DeviceType.Mouse
                     };
-                    BubbleEvent(DragEvent, pea);
+                    BubbleEvent(DragEvent, dea);
                 }
                 return false;
             }
@@ -2524,7 +2524,7 @@ namespace Takai.UI
             //base on rules
         }
 
-        public static void MergeStyles(Dictionary<string, Stylesheet> stylesheets)
+        public static void MergeStyleRules(Dictionary<string, Stylesheet> stylesheets)
         {
             if (Styles == null)
             {

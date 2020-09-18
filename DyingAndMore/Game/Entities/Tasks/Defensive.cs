@@ -7,16 +7,6 @@ namespace DyingAndMore.Game.Entities.Tasks
 {
     public class DefensiveTaskAttribute : Attribute { }
 
-    [DefensiveTask]
-    public struct ProvideCover : ITask
-    {
-
-        public TaskResult Think(TimeSpan deltaTime, AIController ai)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     /// <summary>
     /// Move in opposite direction
     /// </summary>

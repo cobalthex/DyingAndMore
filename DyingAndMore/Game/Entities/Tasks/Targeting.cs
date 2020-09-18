@@ -5,7 +5,17 @@ using Microsoft.Xna.Framework;
 namespace DyingAndMore.Game.Entities.Tasks
 {
     public class TargetingTaskAttribute : Attribute { }
- 
+
+    [TargetingTask]
+    public struct ForgetTarget : ITask
+    {
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            ai.Target = null;
+            return TaskResult.Success;
+        }
+    }
+
     [TargetingTask]
     public struct FindClosestActor : ITask
     {
@@ -16,9 +26,6 @@ namespace DyingAndMore.Game.Entities.Tasks
 
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
-            if (ai.Target != null) //specify as option to change target?
-                return TaskResult.Success;
-
             var ents = ai.Actor.Map.FindEntitiesInRegion(ai.Actor.WorldPosition, ai.SightRange);
 
             var possibles = new List<ActorInstance>();
@@ -57,15 +64,23 @@ namespace DyingAndMore.Game.Entities.Tasks
     }
 
     [TargetingTask]
-    public struct ForgetTarget : ITask
+    public struct TargetAggressor : ITask
     {
+        public bool includeAllies;
+
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
-            //conditions?
-            ai.Target = null;
+            //retry if null?
+
+            if (ai.Actor.LastAgressor != null && ai.Actor.LastAgressor is ActorInstance actor &&
+                (includeAllies || !actor.IsAlliedWith(ai.Actor.Factions)))
+                ai.Target = actor;
+
             return TaskResult.Success;
         }
     }
+
+    //target actor who shot at 'me' most recently
 
     //find downed/dead/low heatlh ally
 }

@@ -157,6 +157,29 @@ namespace Takai.UI
                 return UIEventResult.Continue;
             });
 
+            On(DragEvent, delegate (Static sender, UIEventArgs e)
+            {
+                var dea = (DragEventArgs)e;
+                var sign = System.Math.Sign(dea.delta.Y);
+                ((NumericInput)sender).DecrementValue(sign);
+
+                //wrap mouse when dragging
+#if WINDOWS
+                if (dea.position.Y < 0 || dea.position.Y >= sender.ContentArea.Height)
+                {
+                    var y = (int)dea.position.Y % sender.ContentArea.Height;
+                    y = y < 0 ? sender.ContentArea.Height + y : y;
+
+                    Microsoft.Xna.Framework.Input.Mouse.SetPosition(
+                        Input.InputState.MousePoint.X,
+                        sender.OffsetContentArea.Y + y
+                    );
+                }
+#endif
+
+                return UIEventResult.Handled;
+            });
+
             AddChildren(textInput, upButton, downButton);
         }
 

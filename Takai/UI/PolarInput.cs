@@ -31,7 +31,7 @@ namespace Takai.UI
                     _value = _norm * Math.Min(vlen, 1);
                     //store length?
 
-                    tip = center + (DisplayNormalizedValue ? NormalizedValue : Value) * center;
+                    tip = center + (ShowNormalizedValue ? NormalizedValue : Value) * center;
                     BubbleEvent(ValueChangedEvent, new UIEventArgs(this));
                 }
             }
@@ -51,7 +51,7 @@ namespace Takai.UI
         }
         private Vector2 _norm;
 
-        public bool DisplayNormalizedValue { get; set; } = false;
+        public bool ShowNormalizedValue { get; set; } = false;
 
         public float SnapAngle { get; set; } = MathHelper.PiOver4;
 

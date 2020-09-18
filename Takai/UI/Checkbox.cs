@@ -9,6 +9,8 @@ namespace Takai.UI
     /// </summary>
     public class CheckBox : Static
     {
+        public static int CheckboxSize = 30;
+
         /// <summary>
         /// 9patch sprite to draw for the checkbox
         /// </summary>
@@ -54,7 +56,7 @@ namespace Takai.UI
             var size = Font.MeasureString(Text, TextStyle);
             if (size.X > 0)
                 size.X += Margin;
-            return new Vector2(30 + size.X, System.Math.Max(size.Y, 30));
+            return new Vector2(CheckboxSize + size.X, System.Math.Max(size.Y, CheckboxSize));
         }
 
         public override void ApplyStyles(Dictionary<string, object> styleRules)
@@ -68,18 +70,17 @@ namespace Takai.UI
 
         protected override void DrawSelf(DrawContext context)
         {
-            var checkSize = System.Math.Min(ContentArea.Width, ContentArea.Height);
-
-            var boxBounds = new Rectangle(0, 0, checkSize, checkSize);
+            var checkY = (ContentArea.Height - CheckboxSize) / 2;
+            var boxBounds = new Rectangle(0, checkY, CheckboxSize, CheckboxSize);
             DrawRect(context.spriteBatch, HasFocus ? FocusedBorderColor : CheckColor, boxBounds);
             //todo: DrawNinePatch that is localized
             boxBounds.Offset(OffsetContentArea.Location);
             BoxSprite.Draw(context.spriteBatch, Rectangle.Intersect(boxBounds, VisibleContentArea));
 
             if (IsChecked)
-                DrawSprite(context.spriteBatch, CheckSprite, new Rectangle(2, 2, checkSize - 4, checkSize - 4));
+                DrawSprite(context.spriteBatch, CheckSprite, new Rectangle(2, checkY + 2, CheckboxSize - 4, CheckboxSize - 4));
 
-            DrawText(context.textRenderer, Text, new Vector2(checkSize + Margin, 0));
+            DrawText(context.textRenderer, Text, new Vector2(CheckboxSize + Margin, 0));
         }
     }
 }

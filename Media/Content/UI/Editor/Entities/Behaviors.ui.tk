@@ -39,38 +39,44 @@ BehaviorList {
 	    			};
     			];
     		};
-			@"UI/RemoveItem.ui.tk"; # todo: broken
 
-			List {
-				Direction: Direction.Horizontal;
-				Children: [
+    		Shade {
+    			Text: "Requisite Senses"
+				HorizontalAlignment: Alignment.Stretch;
+				IsCollapsed: true;
+    			Children: [
 					List {
-						Direction: Direction.Vertical;
+						Direction: Direction.Horizontal;
 						Children: [
-				    		Static { Text: "`_Requisite Senses"; };
-							SensesSelect {
-				    			Bindings: [
-				    				Binding {
-				    					Source: "RequisiteSenses";
-				    					Target: "Value";
-					    				Direction: BindingDirection.TwoWay;
-				    				};
+							List {
+								Direction: Direction.Vertical;
+								Children: [
+						    		Static { Text: "`_Required"; };
+									SensesSelect {
+						    			Bindings: [
+						    				Binding {
+						    					Source: "RequisiteSenses";
+						    					Target: "Value";
+							    				Direction: BindingDirection.TwoWay;
+						    				};
+										];
+									};
 								];
 							};
-						];
-					};
 
-					List {
-						Direction: Direction.Vertical;
-						Children: [
-				    		Static { Text: "`_Requisite (Not) Senses"; };
-							SensesSelect {
-				    			Bindings: [
-				    				Binding {
-				    					Source: "RequisiteNotSenses";
-				    					Target: "Value";
-					    				Direction: BindingDirection.TwoWay;
-				    				};
+							List {
+								Direction: Direction.Vertical;
+								Children: [
+						    		Static { Text: "`_Inverted required"; };
+									SensesSelect {
+						    			Bindings: [
+						    				Binding {
+						    					Source: "RequisiteNotSenses";
+						    					Target: "Value";
+							    				Direction: BindingDirection.TwoWay;
+						    				};
+										];
+									};
 								];
 							};
 						];

@@ -181,11 +181,24 @@ namespace DyingAndMore.Game.Entities
         }
         private Weapons.WeaponInstance _weapon;
 
+
+        /// <summary>
+        /// Is this entity thinking? (If false, controller does not think)
+        /// Still responds to events
+        /// </summary>
+        public bool IsAwake { get; set; } = true;
+
         [Takai.Data.Serializer.Ignored] //todo: reload from map.squads
         public Squad Squad { get; internal set; }
 
         [Takai.Data.Serializer.Ignored]
         public Takai.UI.Static Hud { get; set; }
+
+        /// <summary>
+        /// The most recent agressor, if there is one
+        /// </summary>
+        [Takai.Data.Serializer.AsReference]
+        public EntityInstance LastAgressor { get; set; }
 
         public override Dictionary<string, CommandAction> Actions => new Dictionary<string, CommandAction>(base.Actions)
         {
@@ -193,6 +206,20 @@ namespace DyingAndMore.Game.Entities
             {
                 if (controlObj is Controller controller)
                     Controller = controller;
+            },
+            ["Wake"] = delegate (object isAwakeObj)
+            {
+                if (isAwakeObj is bool isAwake)
+                    IsAwake = isAwake;
+                else
+                    IsAwake = true;
+            },
+            ["Sleep"] = delegate (object isAwakeObj)
+            {
+                if (isAwakeObj is bool isAwake)
+                    IsAwake = !isAwake;
+                else
+                    IsAwake = false;
             },
         };
 
@@ -230,7 +257,7 @@ namespace DyingAndMore.Game.Entities
                 condition.Value.Update(this, deltaTime);
             //todo: remove inactive conditions?
 
-            if (IsAlive)
+            if (IsAlive && IsAwake)
                 Controller?.Think(deltaTime);
 
             Weapon?.Think(deltaTime); //weapon can still fire if actor is dead
@@ -303,10 +330,11 @@ namespace DyingAndMore.Game.Entities
         /// <param name="source">The entity that is responsible for this damage</param>
         public void ReceiveDamage(float damage, EntityInstance source = null)
         {
+            LastAgressor = source;
             if (source != this && //can damage self
                 (GameInstance.Current != null && !GameInstance.Current.Game.Configuration.AllowFriendlyFire) &&
                 source is ActorInstance actor &&
-                (actor.Factions & Factions) != 0)
+                IsAlliedWith(actor.Factions))
                 return;
 
             CurrentHealth -= damage;

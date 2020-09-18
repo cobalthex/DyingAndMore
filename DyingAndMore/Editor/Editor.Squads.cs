@@ -35,6 +35,12 @@ namespace DyingAndMore.Editor
                 creatingSquad = false;
             };
 
+            CommandActions["SelectedSquadSpawnUnits"] = delegate (Static sender, object argument)
+            {
+                var self = (SquadsEditorMode)sender;
+                self.SelectedSquad?.SpawnUnits(self.editor.Map);
+            };
+
             On(PressEvent, OnPress);
             On(ClickEvent, OnClick);
             On(DragEvent, OnDrag);
@@ -43,7 +49,7 @@ namespace DyingAndMore.Editor
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
         {
             var pea = (PointerEventArgs)e;
-            var worldPos = editor.Camera.ScreenToWorld(pea.position);
+            var worldPos = editor.Camera.ScreenToWorld(LocalToScreen(pea.position));
 
             if (pea.button == 0)
             {
@@ -84,8 +90,6 @@ namespace DyingAndMore.Editor
 
         protected UIEventResult OnClick(Static sender, UIEventArgs e)
         {
-            var pea = (PointerEventArgs)e;
-
             if (creatingSquad)
             {
                 if (SelectedSquad != null && SelectedSquad.SpawnRadius > 10)
@@ -107,7 +111,7 @@ namespace DyingAndMore.Editor
             {
                 if (creatingSquad)
                 {
-                    var worldPos = editor.Camera.ScreenToWorld(dea.position);
+                    var worldPos = editor.Camera.ScreenToWorld(LocalToScreen(dea.position));
                     if (SelectedSquad == null)
                         SelectedSquad = new Game.Entities.Squad { SpawnPosition = createOrigin };
                     SelectedSquad.SpawnRadius = System.Math.Max(10, Vector2.Distance(worldPos, createOrigin));

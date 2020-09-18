@@ -22,23 +22,22 @@ namespace Takai.UI
     {
         public const string VisibilityChangedEvent = "VisibilityChanged";
 
-
         //direction
 
-        public bool IsMinimized
+        public bool IsCollapsed
         {
-            get => _isMinimized;
+            get => _isCollapsed;
             set
             {
-                if (_isMinimized == value)
+                if (_isCollapsed == value)
                     return;
 
-                _isMinimized = value;
-                BubbleEvent(VisibilityChangedEvent, new VisibilityChangedEventArgs(this, _isMinimized));
+                _isCollapsed = value;
+                BubbleEvent(VisibilityChangedEvent, new VisibilityChangedEventArgs(this, _isCollapsed));
                 InvalidateMeasure();
             }
         }
-        private bool _isMinimized;
+        private bool _isCollapsed;
 
         private int headerSize; //includes margin
 
@@ -50,7 +49,7 @@ namespace Takai.UI
             On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
                 if (e.Source == sender) //prevents annoying clickthroughs
-                    ((Shade)sender).IsMinimized ^= true;
+                    ((Shade)sender).IsCollapsed ^= true;
                 return UIEventResult.Handled;
             });
         }
@@ -64,7 +63,7 @@ namespace Takai.UI
         {
             //todo: animation
             var measured = base.MeasureOverride(availableSize) + new Vector2(0, Padding.Y);
-            if (IsMinimized)
+            if (IsCollapsed)
                 measured.Y = 0;
 
             var header = Font.MeasureString(Text, TextStyle);
@@ -98,10 +97,10 @@ namespace Takai.UI
 
         internal void MinimizeNoEvent() //for use in accordian
         {
-            if (_isMinimized)
+            if (_isCollapsed)
                 return;
 
-            _isMinimized = true;
+            _isCollapsed = true;
             InvalidateMeasure();
         }
     }
@@ -125,6 +124,9 @@ namespace Takai.UI
         {
             On(Shade.VisibilityChangedEvent, delegate (Static sender, UIEventArgs e)
             {
+                if (e.Source.Parent != sender)
+                    return UIEventResult.Continue;
+
                 var self = (Accordian)sender;
                 var vcea = (VisibilityChangedEventArgs)e;
                 if (!vcea.IsMinimized)
@@ -149,7 +151,7 @@ namespace Takai.UI
         {
             var shade = new Shade(child)
             {
-                IsMinimized = InitiallyCollapsed,
+                IsCollapsed = InitiallyCollapsed,
                 HorizontalAlignment = Alignment.Stretch
             };
             var binding = new Data.Binding("Name", "Text");

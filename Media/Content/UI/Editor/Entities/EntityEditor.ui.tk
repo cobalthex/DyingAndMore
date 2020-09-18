@@ -53,9 +53,9 @@ List {
                                                     HorizontalAlignment: Alignment.Stretch;
                                                     Bindings: [
                                                         Binding {
-                                                            Direction: BindingDirection.TwoWay;
                                                             Source: "CurrentHealth";
                                                             Target: "Value";
+                                                            Direction: BindingDirection.TwoWay;
                                                         };
                                                     ];
                                                     Minimum: 0;
@@ -75,6 +75,16 @@ List {
                                                 }
                                             ];
                                         };
+                                        Checkbox {
+                                            Text: "Is Awake?";
+                                            Bindings: [
+                                                Binding {
+                                                    Source: "IsAwake";
+                                                    Target: "IsChecked";
+                                                    Direction: BindingDirection.TwoWay;
+                                                };
+                                            ];
+                                        }
 
                 						#conditions
                 						#actions
@@ -97,6 +107,8 @@ List {
                                         @"./Weapon.ui.tk";
                                     ];
                                 };
+
+                                # pickups
                             };
                         };
                     ];

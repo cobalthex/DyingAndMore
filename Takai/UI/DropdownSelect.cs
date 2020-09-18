@@ -152,7 +152,7 @@ namespace Takai.UI
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             dropdownContainer.Measure(new Vector2(InfiniteSize));
-            return new Vector2(list.MeasuredSize.X, 30); //todo
+            return new Vector2(list.MeasuredSize.X == 0 ? 200 : list.MeasuredSize.X, 30); //todo
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
