@@ -39,17 +39,43 @@ namespace Takai.UI
         }
         private bool _isCollapsed;
 
-        private int headerSize; //includes margin
-
         private float desiredContentSize; //for animation
         private float actualContentSize;
 
+        public Static TitleUI
+        {
+            get => _titleUI;
+            set
+            {
+                if (_titleUI == value)
+                    return;
+
+                //validate not null?
+
+                _titleUI = value;
+                _titleUI?.BindTo(this);
+                base.InternalSwapChild(_titleUI, 0);
+            }
+        }
+        Static _titleUI = new Static
+        {
+            HorizontalAlignment = Alignment.Stretch,
+            Bindings = new List<Data.Binding>
+            {
+                new Data.Binding("Name", "Text")
+            }
+        };
+
         public Shade()
         {
+            base.InternalInsertChild(TitleUI, 0);
+            TitleUI.BindTo(this);
+
             On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
-                if (e.Source == sender) //prevents annoying clickthroughs
-                    ((Shade)sender).IsCollapsed ^= true;
+                var self = (Shade)sender;
+                if (e.Source == sender) //prevents annoying click-throughs
+                    self.IsCollapsed ^= true;
                 return UIEventResult.Handled;
             });
         }
@@ -59,6 +85,28 @@ namespace Takai.UI
             AddChildren(children);
         }
 
+        protected override void FinalizeClone()
+        {
+            base.FinalizeClone();
+            _titleUI = Children[0];
+            TitleUI.BindTo(this);
+        }
+
+        public override void BindTo(object source, Dictionary<string, object> customBindProps = null)
+        {
+            for (int i = 1; i < Children.Count; ++i)
+                Children[i].BindTo(source, customBindProps);
+        }
+
+        public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
+        {
+            return base.InternalInsertChild(child, index < 0 ? -1 : index + 1, reflow, ignoreFocus);
+        }
+        public override bool InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
+        {
+            return base.InternalSwapChild(null, index + 1, reflow, ignoreFocus);
+        }
+
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             //todo: animation
@@ -66,20 +114,26 @@ namespace Takai.UI
             if (IsCollapsed)
                 measured.Y = 0;
 
-            var header = Font.MeasureString(Text, TextStyle);
-            headerSize = (int)(header.Y + Padding.Y);
-            measured = new Vector2(MathHelper.Max(header.X, measured.X), header.Y + measured.Y);
+            var header = TitleUI.Measure(availableSize);
 
+            measured = new Vector2(MathHelper.Max(header.X, measured.X), header.Y + measured.Y);
             desiredContentSize = measured.Y;
 
-            return new Vector2(measured.X, actualContentSize); //round
+            return new Vector2(measured.X, actualContentSize);
         }
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            var container = new Rectangle(0, headerSize, (int)availableSize.X, Math.Max(0, (int)availableSize.Y - headerSize));
-            foreach (var child in Children)
-                child.Arrange(container);
+            TitleUI.Arrange(new Rectangle(0, 0, (int)availableSize.X, (int)TitleUI.MeasuredSize.Y));
+
+            var container = new Rectangle(
+                0,
+                (int)TitleUI.MeasuredSize.Y,
+                (int)availableSize.X,
+                Math.Max(0, (int)availableSize.Y - (int)TitleUI.MeasuredSize.Y)
+            );
+            for (int i = 1; i < Children.Count; ++i)
+                Children[i].Arrange(container);
         }
 
         protected override void UpdateSelf(GameTime time)
@@ -95,7 +149,7 @@ namespace Takai.UI
             base.UpdateSelf(time);
         }
 
-        internal void MinimizeNoEvent() //for use in accordian
+        internal void CollapseNoEvent() //for use in accordian
         {
             if (_isCollapsed)
                 return;
@@ -116,7 +170,24 @@ namespace Takai.UI
         /// </summary>
         public bool InitiallyCollapsed { get; set; } = true;
 
-        //preview UI?
+        public Static ShadeTitleUI
+        {
+            get => _shadeTitleUI;
+            set
+            {
+                if (_shadeTitleUI == value)
+                    return;
+
+                _shadeTitleUI = value;
+                if (_shadeTitleUI != null)
+                {
+                    foreach (var child in Children)
+                        ((Shade)child).TitleUI = _shadeTitleUI;
+                }
+            }
+        }
+
+        private Static _shadeTitleUI = null;
 
         //collapse new vs first?
 
@@ -134,9 +205,11 @@ namespace Takai.UI
                     foreach (var child in self.Children)
                     {
                         if (child != vcea.Source)
-                            ((Shade)child).MinimizeNoEvent();
+                            ((Shade)child).CollapseNoEvent();
                     }
                 }
+                self.InvalidateMeasure();
+                self.InvalidateArrange();
                 return UIEventResult.Handled;
             });
         }
@@ -154,9 +227,12 @@ namespace Takai.UI
                 IsCollapsed = InitiallyCollapsed,
                 HorizontalAlignment = Alignment.Stretch
             };
-            var binding = new Data.Binding("Name", "Text");
+            var binding = new Data.Binding("Name", "Name");
             binding.BindTo(child, shade);
             shade.Bindings = new List<Data.Binding> { binding };
+
+            if (ShadeTitleUI != null)
+                shade.TitleUI = ShadeTitleUI.CloneHierarchy();
 
             return base.InternalInsertChild(shade, index, reflow, ignoreFocus);
         }

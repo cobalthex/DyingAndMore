@@ -20,6 +20,15 @@
 		#Size: Vector2 [NaN NaN];
 	};
 
+	Header: {
+		Padding: Vector2 [10 0];
+		TextStyle: TextStyle {
+			Size: 30;
+			outlineThickness: 0.5;
+			outlineColor: [0 0 0 255];
+		};
+	};
+
 	List: {
     	Margin: 10;
 	};

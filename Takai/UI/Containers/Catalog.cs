@@ -43,10 +43,9 @@ namespace Takai.UI
         }
         private Direction _direction = Direction.Horizontal;
 
-        //todo: shared size? (only measure using MeasuredSize)
         //must manually calculate size?
 
-        //justify option?
+        //justification option?
 
         public Catalog() { }
         public Catalog(params Static[] children)
@@ -76,7 +75,6 @@ namespace Takai.UI
                     if (usedSize.X > 0 && usedSize.X + itemSize.X > availableSize.X)
                         usedSize = new Vector2(0, usedSize.Y + lateralMax + Margin.Y);
 
-                    child.Arrange(new Rectangle(usedSize.ToPoint(), itemSize.ToPoint()));
                     usedSize.X += itemSize.X + Margin.X;
                     lateralMax = System.Math.Max(lateralMax, itemSize.Y);
                 }
@@ -85,7 +83,6 @@ namespace Takai.UI
                     if (usedSize.Y > 0 && usedSize.Y + itemSize.Y > availableSize.Y)
                         usedSize = new Vector2(usedSize.X + lateralMax + Margin.X, 0);
 
-                    child.Arrange(new Rectangle(usedSize.ToPoint(), itemSize.ToPoint()));
                     usedSize.Y += itemSize.Y + Margin.Y;
                     lateralMax = System.Math.Max(lateralMax, itemSize.X);
                 }

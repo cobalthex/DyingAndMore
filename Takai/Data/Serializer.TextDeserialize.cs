@@ -274,15 +274,27 @@ namespace Takai.Data
             }
 
             //external references
+            //@"Root/File"
+            //@"./CwdFile"
+            //@"." <- self
+            //@!"ForceReload"
+            //@@"Load All"
+            //@!@"Force load All"
             if (peek == '@')
             {
+                var force = false;
                 context.reader.Read();
+                if (context.reader.Peek() == '!')
+                {
+                    context.reader.Read();
+                    force = true;
+                }
 
                 object loaded;
                 if (context.reader.Peek() == '.') //recursive reference
                 {
                     context.reader.Read();
-                    loaded = Cache.Load(context.file, context.root, false);
+                    loaded = Cache.Load(context.file, context.root, force);
                 }
                 else
                 {
@@ -298,7 +310,7 @@ namespace Takai.Data
                     if (context.file != null && (file.StartsWith("./") || file.StartsWith(".\\")))
                         file = Path.Combine(Path.GetDirectoryName(context.file), file.Substring(2));
 
-                    loaded = Cache.Load(file, context.root, false, loadAllDefs);
+                    loaded = Cache.Load(file, context.root, force, loadAllDefs);
                 }
 
                 if (loaded is IReferenceable ir)

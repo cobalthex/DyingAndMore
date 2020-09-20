@@ -6,97 +6,106 @@
 }*#
 
 List {
-    Style: "Frame";
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
     IsModal: true;
     margin: 10;
     Children: [
-        Static {
-            Text: "Create a New Map";
-            TextStyle: {
-                Size: 40;
-            }
-            Color: Color.White;
-        }
-
-        Static {
-            Text: "Name";
-        }
-        TextInput {
-            Name: "name";
-            MaxLength: 64;
-            HorizontalAlignment: Alignment.Stretch;
-        }
-
-        Table {
-            Direction: Direction [ Horizontal ];
-            HorizontalAlignment: Alignment.Stretch;
-            Margin: 10;
-            ColumnCount: 2;
-            Children: [
-                Static {
-                    Text: "Width";
-                }
-                Static {
-                    Text: "Height";
-                    HorizontalAlignment: Alignment.Start;
-                }
-
-                NumericInput {
-                    Name: "width";
-                    Minimum: 1;
-                    Maximum: 256;
-                    HorizontalAlignment: Alignment.Stretch;
-                    Width: 120;
-                }
-                NumericInput {
-                    Name: "height";
-                    Minimum: 1;
-                    Maximum: 256;
-                    HorizontalAlignment: Alignment.Stretch;
-                    Width: 120;
-                }
-            ]
-        }
-
-        Static {
-            Text: "Tileset";
-            HorizontalAlignment: Alignment.Start;
-        }
-
-        FileInput {
-            Name: "tileset";
-            Filter: "Tilesets (*.tiles.tk)|*.tiles.tk";
-            HorizontalAlignment: Alignment.Stretch;
-        }
-
         List {
             Direction: Direction.Horizontal;
-            Margin: 10;
-            HorizontalAlignment: Alignment.Center;
+            HorizontalAlignment: Alignment.Stretch;
+            EventCommands: { Drag: "DragModal"; };
+
             Children: [
                 Static {
-                    Style: "Button";
-                    EventCommands: {
-                        Click: ["Create"];
-                    };
-                    Text: "Create";
-                    HorizontalAlignment: Alignment.Center;
-                    VerticalAlignment: Alignment.Center;
-                }
+                    VerticalAlignment: Alignment.Middle;
+                    Style: "Header";
+                    Text: "New map";
+                };
+
+                @!"UI/CloseButton.ui.tk";
+            ];
+        };
+
+        List {
+            Style: "Frame";
+            Children: [
+                Static {
+                    Text: "`_Name";
+                };
+                TextInput {
+                    Name: "name";
+                    MaxLength: 64;
+                    HorizontalAlignment: Alignment.Stretch;
+                };
+
+                Table {
+                    Direction: Direction [ Horizontal ];
+                    HorizontalAlignment: Alignment.Stretch;
+                    Margin: 10;
+                    ColumnCount: 2;
+                    Children: [
+                        Static {
+                            Text: "`_Width";
+                        };
+                        Static {
+                            Text: "`_Height";
+                        };
+
+                        NumericInput {
+                            Name: "width";
+                            Minimum: 1;
+                            Maximum: 256;
+                            HorizontalAlignment: Alignment.Stretch;
+                        };
+                        NumericInput {
+                            Name: "height";
+                            Minimum: 1;
+                            Maximum: 256;
+                            HorizontalAlignment: Alignment.Stretch;
+                        };
+                    ];
+                };
 
                 Static {
-                    Style: "Button";
-                    EventCommands: {
-                        Click: ["CloseModal"];
-                    };
-                    Text: "Cancel";
+                    Text: "`_Tileset";
+                    HorizontalAlignment: Alignment.Start;
+                };
+
+                FileInput {
+                    Name: "tileset";
+                    Filter: "Tilesets (*.tiles.tk)|*.tiles.tk";
+                    HorizontalAlignment: Alignment.Stretch;
+                };
+
+                List {
+                    Direction: Direction.Horizontal;
+                    Margin: 10;
                     HorizontalAlignment: Alignment.Center;
-                    VerticalAlignment: Alignment.Center;
-                }
-            ]
-        }
-    ]
-}
+                    Children: [
+                        Static {
+                            Style: "Button";
+                            EventCommands: {
+                                Click: ["Create"];
+                            };
+                            Text: "Create";
+                            HorizontalAlignment: Alignment.Center;
+                            VerticalAlignment: Alignment.Center;
+                        };
+
+                        Static {
+                            Style: "Button";
+                            EventCommands: {
+                                Click: ["CloseModal"];
+                            };
+                            Text: "Cancel";
+                            HorizontalAlignment: Alignment.Center;
+                            VerticalAlignment: Alignment.Center;
+                        };
+                    ];
+                };
+            ];
+        };
+    ];
+};
 #todo: cleanup styling here

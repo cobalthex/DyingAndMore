@@ -4,7 +4,7 @@ using Takai.Data;
 
 namespace Takai.UI
 {
-    public class EnumSelect<T> : List where T : Enum
+    public class EnumSelect<T> : Catalog where T : Enum
     {
         public T Value
         {
@@ -27,7 +27,7 @@ namespace Takai.UI
         public EnumSelect()
         {
             Direction = Direction.Vertical;
-            Margin = 5;
+            Margin = new Microsoft.Xna.Framework.Vector2(5);
 
             var t = typeof(T);
             var ev = Enum.GetValues(t);
@@ -39,9 +39,11 @@ namespace Takai.UI
                     if (!Util.IsPowerOf2(Convert.ToInt64(e)))
                         continue;
 
+                    var name = Enum.GetName(t, e);
                     var cb = new CheckBox
                     {
-                        Text = Enum.GetName(t, e),
+                        Name = name,
+                        Text = Util.ToSentenceCase(name)
                     };
                     AddChild(cb);
                 }
@@ -51,7 +53,7 @@ namespace Takai.UI
                     var cb = (CheckBox)e.Source;
                     var self = (EnumSelect<T>)sender;
 
-                    var newv = Convert.ToInt64((T)Enum.Parse(typeof(T), cb.Text));
+                    var newv = Convert.ToInt64((T)Enum.Parse(typeof(T), cb.Name));
                     var exv = Convert.ToInt64(self.Value);
                     if (cb.IsChecked)
                         exv |= newv;
@@ -72,7 +74,11 @@ namespace Takai.UI
                         HorizontalAlignment = Alignment.Stretch,
                         Bindings = new System.Collections.Generic.List<Binding>
                         {
+                            new Binding("this", "Name"),
                             new Binding("this", "Text")
+                            {
+                                Converter = new TextCaseConverter(TextCaseConverter.TextCase.Sentence)
+                            }
                         }
                     }
                 };
@@ -104,7 +110,7 @@ namespace Takai.UI
             foreach (var child in Children)
             {
                 if (child is CheckBox cb)
-                    cb.IsChecked = Value.HasFlag((Enum)Enum.Parse(typeof(T), child.Text));
+                    cb.IsChecked = Value.HasFlag((Enum)Enum.Parse(typeof(T), child.Name));
             }
         }
     }

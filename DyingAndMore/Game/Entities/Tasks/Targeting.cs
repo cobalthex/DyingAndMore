@@ -73,10 +73,13 @@ namespace DyingAndMore.Game.Entities.Tasks
             //retry if null?
 
             if (ai.Actor.LastAgressor != null && ai.Actor.LastAgressor is ActorInstance actor &&
-                (includeAllies || !actor.IsAlliedWith(ai.Actor.Factions)))
+                (includeAllies || !actor.IsAlliedWith(ai.Actor.Factions)) &&
+                actor.IsAlive)
+            {
                 ai.Target = actor;
-
-            return TaskResult.Success;
+                return TaskResult.Success;
+            }
+            return TaskResult.Failure;
         }
     }
 

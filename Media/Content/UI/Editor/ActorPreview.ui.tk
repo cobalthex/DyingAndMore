@@ -21,6 +21,6 @@ List {
 			VerticalAlignment: Alignment.Middle;
 		}
 
-		@"UI/RemoveItem.ui.tk";
+		@!"UI/RemoveItem.ui.tk";
 	];
 }

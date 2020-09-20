@@ -347,7 +347,6 @@ namespace Takai.Data
                     //todo: specific option for applying rather than replacing (and maybe serializer.get_dictionary)
                     Serializer.ApplyObject(target, Serializer.Cast(objects[realFile].reference.Target.GetType(), obj.reference.Target));
                 }
-                obj = objects[realFile];
             }
             else
                 objects[realFile] = obj;

@@ -245,20 +245,29 @@ namespace DyingAndMore
                 }
             };
 
-            Static.GlobalCommands["MoveElement"] = delegate (Static ui, object arg)
+            Static.GlobalCommands["DragModal"] = delegate (Static ui, object arg)
             {
-                if (arg == null)
-                    ui.Position += InputState.MouseDelta(); //cross platform support?
+                while (ui != null && !ui.IsModal)
+                    ui = ui.Parent;
 
-                else if (!(arg is Vector2 v))
+                if (ui != null)
                 {
-                    if (!(arg is Point p))
-                        return;
+                    var newPos = ui.Position;
+                    if (InputState.touches.Count > 0)
+                        newPos += InputState.TouchDelta(0) * 2;
+                    else
+                        newPos += InputState.MouseDelta() * 2;
 
-                    ui.Position += p.ToVector2();
+                    //var containerSize = ui.Parent == null
+                    //    ? new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height)
+                    //    : ui.Parent.ContentArea.Size.ToVector2();
+
+                    ////todo: needs to be bounds not content area
+                    ////todo: broken with centering
+                    //ui.Position = Vector2.Clamp(newPos, Vector2.Zero, containerSize - ui.ContentArea.Size.ToVector2());
+
+                    ui.Position = newPos;
                 }
-                else
-                    ui.Position += v;
             };
 
             /*
@@ -379,6 +388,20 @@ namespace DyingAndMore
                 HorizontalAlignment = Alignment.Middle,
                 VerticalAlignment = Alignment.Stretch
             });
+            var acc = new Accordian
+            {
+                Position = new Vector2(100),
+                ShadeTitleUI = new Static
+                {
+                    Bindings = new List<Binding> { new Binding("Name", "Text") },
+                    BackgroundColor = Color.Tomato,
+                    HorizontalAlignment = Alignment.Stretch
+                },
+            };
+            acc.AddChild(new Static("test 1") { Name = "A" });
+            acc.AddChild(new Static("test 2") { Name = "B" });
+            acc.AddChild(new Static("test 3") { Name = "C" });
+            ui.AddChild(acc);
 
             //Static.DebugFont = Static.DefaultFont;
 

@@ -62,7 +62,9 @@ UI:
     ☐ Store styles in Trie: Parent Child { } ... Styles[Child]->Styles[Parent] -- store composite
     ☐ TextInput android soft keyboard support (support on windows too?)
     ☐ Sounds (focus change/hover ?, click)
-    ☐ RemoveItem for various UIs (Trigger commands, Actor behaviors + tasks)
+    ☐ Layout/measure bug w/ scrollbars: See right (units) side of Squad dialog
+    ☐ scrolling sometimes causes scrollbox containers to zero (reflow issue it seems)
+    ☐ Shift up/down for item list
 
   ✔  Think only when alive? @done (20-04-10 22:48)
 

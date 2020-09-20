@@ -148,6 +148,20 @@ namespace Takai.Input
         }
 
         /// <summary>
+        /// Get the change in position of a touch
+        /// Returns 0 if no touch or first touch
+        /// </summary>
+        /// <param name="index">the touch index</param>
+        /// <returns>The change in position, or 0 if no touch index</returns>
+        public static Vector2 TouchDelta(int index)
+        {
+            if (touches.Count < index || lastTouches.Count < index)
+                return Vector2.Zero;
+
+            return touches[index].Position - lastTouches[index].Position;
+        }
+
+        /// <summary>
         /// Calculate the amount pinch-zoomed between touch 0 and touch 1
         /// </summary>
         /// <returns>The delta, or zero if no touch</returns>

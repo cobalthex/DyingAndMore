@@ -3,16 +3,35 @@ List {
     IsModal: true;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
-	Style: "Frame";
-	Margin: 10;
-
-    #EventCommands: {
-    #    Drag: "MoveElement";
-    #}
 
     Children: [
+        List {
+            Direction: Direction.Horizontal;
+            HorizontalAlignment: Alignment.Stretch;
+            EventCommands: { Drag: "DragModal"; };
+
+            Children: [
+                Static {
+                    VerticalAlignment: Alignment.Middle;
+                    Style: "Header";
+                    Bindings: [
+                        Binding {
+                            Source: ":typename";
+                            Target: "Text";
+                            Converter: TextCaseConverter {
+                                DesiredCase: TextCase.Sentence;
+                            }
+                        };
+                    ];
+                };
+
+                @!"UI/CloseButton.ui.tk";
+            ];
+        };
+
         Scrollbox {
-            Size: [600 500];
+            Style: "Frame";
+            Size: [650 650];
             InnerPadding: 10;
             Children: [
                 List {
@@ -114,15 +133,6 @@ List {
                     ];
                 };
             ];
-        };
-
-        Static {
-            Style: "Button";
-            HorizontalAlignment: Alignment.Middle;
-            Text: "Close";
-            EventCommands: {
-                Click: "CloseModal";
-            }
         };
     ];
 }

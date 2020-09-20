@@ -124,7 +124,8 @@ namespace Takai.Graphics
                 {
                     case '\n':
                         if (curStyle.underline)
-                            row.Y = Math.Max(row.Y, (maxCharHeight * scale) + 2);
+                            row.Y = Math.Max(row.Y, (maxCharHeight * scale) + 4
+                                );
                         total.X = Math.Max(total.X, row.X) + lastXUnderhang;
                         total.Y += row.Y;
                         row = Vector2.Zero;
@@ -139,7 +140,7 @@ namespace Takai.Graphics
                             //`x - reset style + color
                             case 'x':
                                 if (curStyle.underline)
-                                    row.Y = Math.Max(row.Y, (maxCharHeight * scale) + 2);
+                                    row.Y = Math.Max(row.Y, (maxCharHeight * scale) + 4);
                                 curStyle = style;
                                 textLength += 2;
                                 ++i;
@@ -164,7 +165,7 @@ namespace Takai.Graphics
                             //`_ - toggle underline
                             case '_':
                                 if (curStyle.underline)
-                                    row.Y = Math.Max(row.Y, (maxCharHeight * scale) + 2);
+                                    row.Y = Math.Max(row.Y, (maxCharHeight * scale) + 4);
                                 curStyle.underline ^= true;
                                 textLength += 2;
                                 ++i;
@@ -213,6 +214,9 @@ namespace Takai.Graphics
                         break;
                 }
             }
+
+            if (curStyle.underline)
+                row.Y = Math.Max(row.Y, (maxCharHeight * scale) + 4);
 
             //todo: handle obliques
             total.X = Math.Max(total.X, row.X) + lastXUnderhang;
@@ -448,34 +452,37 @@ namespace Takai.Graphics
 
             Action MakeUnderline = () =>
             {
-                var loc = options.position + new Vector2(underlineStart, offset.Y + options.font.maxCharHeight + 2) * options.sizeFraction;
-                var sz = new Vector2((offset.X - underlineStart) * options.sizeFraction, 2); //todo: height
+                var xt = Extent.FromRect(
+                    options.position + new Vector2(underlineStart, offset.Y + options.font.maxCharHeight + 2) * options.sizeFraction,
+                    new Vector2((offset.X - underlineStart) * options.sizeFraction, 2)
+                );
+                xt = Extent.Intersect(xt, Extent.FromRect(options.position, options.clipSize));
 
                 //todo: clip to bounds
 
                 var tl = new TextVertex(
-                    new Vector2(loc.X + currentSlant, loc.Y),
+                    new Vector2(xt.min.X + currentSlant, xt.min.Y),
                     color,
                     new Vector2(-2, -2),
                     style.outlineColor,
                     style.outlineThickness
                 );
                 var tr = new TextVertex(
-                    new Vector2(loc.X + currentSlant + sz.X, loc.Y),
+                    new Vector2(xt.max.X + currentSlant, xt.min.Y),
                     color,
                     new Vector2(-1, -2),
                     style.outlineColor,
                     style.outlineThickness
                 );
                 var bl = new TextVertex(
-                    new Vector2(loc.X - currentSlant, loc.Y + sz.Y),
+                    new Vector2(xt.min.X - currentSlant, xt.max.Y),
                     color,
                     new Vector2(-2, -1),
                     style.outlineColor,
                     style.outlineThickness
                 );
                 var br = new TextVertex(
-                    new Vector2(loc.X - currentSlant, loc.Y) + sz,
+                    new Vector2(xt.max.X - currentSlant, xt.max.Y),
                     color,
                     new Vector2(-1, -1),
                     style.outlineColor,

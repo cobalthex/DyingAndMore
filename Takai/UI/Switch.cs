@@ -71,7 +71,13 @@ namespace Takai.UI
             if (newValue == null || Items == null || !Items.TryGetValue(newValue, out item))
                 item = FallbackItem;
 
-            ReplaceChild(item, oldIndex);
+            if (item == null)
+                return;
+
+            if (oldIndex < 0)
+                AddChild(item);
+            else
+                ReplaceChild(item, oldIndex);
         }
     }
 }

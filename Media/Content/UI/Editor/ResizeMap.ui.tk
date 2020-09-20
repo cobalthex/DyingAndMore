@@ -1,5 +1,4 @@
 List {
-	Style: "Frame";
 	Direction: Direction.Vertical;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
@@ -8,89 +7,87 @@ List {
 	IsModal: True;
 
     Children: [
-    	Static {
-    		Text: "Resize Map"
-            TextStyle: {
-                Size: 40;
-            }
-    	}
+        List {
+            Direction: Direction.Horizontal;
+            HorizontalAlignment: Alignment.Stretch;
+            EventCommands: { Drag: "DragModal"; };
 
-    	List {
-			Direction: Direction.Horizontal;
-			Margin: 10;
+            Children: [
+                Static {
+                    VerticalAlignment: Alignment.Middle;
+                    Style: "Header";
+                	Text: "Resize map";
+                };
 
+                @!"UI/CloseButton.ui.tk";
+            ];
+        };
+
+        List {
+			Style: "Frame";
 			Children: [
-				List {
-					Direction: Direction.Vertical;
-					Margin: 10;
+				Table {
+                    HorizontalAlignment: Alignment.Stretch;
+                    Margin: 10;
+                    ColumnCount: 2;
 
 					Children: [
 						Static {
 							Text: "`_Width";
-						}
+						};
+						Static {
+							Text: "`_Height";
+						};
 
 						NumericInput {
 							Bindings: [
 								{
 									Source: "Class.Width";
 									Target: "Value";
-								}
+								};
 							];
 							Minimum: 1;
 							Maximum: 65536;
 							Value: 20;
-							Width: 100;
-						}
-					]
-				}
-
-				List {
-					Direction: Direction.Vertical;
-					Margin: 10;
-
-					Children: [
-						Static {
-							Text: "`_Height";
-						}
-
+						};
 						NumericInput {
 							Bindings: [
 								{
 									Source: "Class.Height";
 									Target: "Value";
-								}
+								};
 							];
 							Minimum: 1;
 							Maximum: 65536;
 							Value: 20;
-							Width: 100;
-						}
-					]
-				}
-			]
-    	}
+						};
+					];
+				};
 
-    	List {
-			Direction: Direction.Horizontal;
-			HorizontalAlignment: Alignment.Center;
-			Margin: 10;
+		    	List {
+					Direction: Direction.Horizontal;
+					HorizontalAlignment: Alignment.Center;
+					Margin: 10;
 
-			Children: [
-				Static {
-                    Style: "Button";
-					EventCommands: {
-						Click: "ResizeMap";
-					};
-					Text: "Resize";
-				}
-				Static {
-                    Style: "Button";
-					EventCommands: {
-						Click: "CloseModal";
-					};
-					Text: "Cancel";
-				}
-			]
-		}
-    ]
-}
+					Children: [
+						Static {
+		                    Style: "Button";
+							EventCommands: {
+								Click: "ResizeMap";
+							};
+							Text: "Resize";
+						};
+
+						Static {
+		                    Style: "Button";
+							EventCommands: {
+								Click: "CloseModal";
+							};
+							Text: "Cancel";
+						};
+					];
+				};
+			];
+		};
+    ];
+};

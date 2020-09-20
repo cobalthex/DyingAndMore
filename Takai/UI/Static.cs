@@ -806,39 +806,52 @@ namespace Takai.UI
             return bindScopeGetset.cachedValue;
         }
 
-        protected void BubbleEvent(string @event, UIEventArgs args)
+        /// <summary>
+        /// Bubble an event up towards the root element
+        /// Stops at any modal element if event is part of <see cref="InputEvents"/>
+        /// </summary>
+        /// <param name="event">The event name</param>
+        /// <param name="eventArgs">Arguments for the event</param>
+        /// <returns>The UI that handled this event (returned UIEVentResult.Handled), null if none</returns>
+        protected Static BubbleEvent(string @event, UIEventArgs args)
         {
-            BubbleEvent(this, @event, args);
+            return BubbleEvent(this, @event, args);
         }
 
         /// <summary>
-        /// Bubble an event back towards the root element.
+        /// Bubble an event up towards the root element.
         /// Stops at any modal element if event is part of <see cref="InputEvents"/>
         /// </summary>
         /// <param name="source">The element to start bubbling from</param>
         /// <param name="event">The event name</param>
         /// <param name="eventArgs">Arguments for the event</param>
-        protected void BubbleEvent(Static source, string @event, UIEventArgs eventArgs)
+        /// <returns>The UI that handled this event (returned UIEVentResult.Handled), null if none</returns>
+        protected Static BubbleEvent(Static source, string @event, UIEventArgs eventArgs)
         {
             if (source == null || @event == null)
-                return;
+                return null;
 
             //Diagnostics.Debug.WriteLine($"Bubbling event {@event} from {GetType().Name}({DebugId})");
 
             var target = source;
             while (target != null)
             {
-                if (target._eventCommands != null && target.EventCommands.TryGetValue(@event, out var command) &&
-                    BubbleCommand(command.command, command.argument))
-                    return;
+                if (target._eventCommands != null && target.EventCommands.TryGetValue(@event, out var command))
+                {
+                    var cmdTarget = BubbleCommand(command.command, command.argument);
+                    if (cmdTarget != null)
+                        return cmdTarget;
+                }
 
                 if ((target.events != null && target.events.TryGetValue(@event, out var handlers) &&
                     handlers.Invoke(target, eventArgs) == UIEventResult.Handled) ||
                     (target.IsModal && InputEvents.Contains(@event))) //no events are routed to the parent when modal
-                    return;
+                    return target;
 
                 target = target.Parent;
             }
+
+            return null;
         }
 
         /// <summary>
@@ -847,11 +860,11 @@ namespace Takai.UI
         /// </summary>
         /// <param name="command">The command to run</param>
         /// <param name="argument">An optional argument to pass thru</param>
-        /// <returns>True if the command had a matching action. False otherwise or if command was null</returns>
-        public bool BubbleCommand(string command, object argument = null)
+        /// <returns>The element that acted upon the command, null if none (or global)</returns>
+        public Static BubbleCommand(string command, object argument = null)
         {
             if (command == null)
-                return false;
+                return null;
 
             //Diagnostics.Debug.WriteLine($"Bubbling command {command} from {GetType().Name}({DebugId})");
 
@@ -862,7 +875,7 @@ namespace Takai.UI
                 {
                     //check if modal?
                     caction.Invoke(target /*this?*/, argument);
-                    return true;
+                    return target;
                 }
 
                 target = target.Parent;
@@ -871,10 +884,10 @@ namespace Takai.UI
             if (target == null && GlobalCommands.TryGetValue(command, out var action))
             {
                 action.Invoke(this, argument);
-                return true;
+                return null;
             }
 
-            return false;
+            return null;
         }
 
         //protected void TunnelEvent(string @event, UIEventArgs args)
@@ -902,7 +915,7 @@ namespace Takai.UI
             _parent = newParent;
 #if DEBUG
             //todo: make this on-demand?
-            foreach (var child in EnumerateRecursive(true))
+            foreach (var child in EnumerateRecursive())
             {
                 child.DebugTreePath = $"/{(child.GetType().Name)}({child.DebugId})";
                 if (child.Parent != null)
@@ -1025,16 +1038,29 @@ namespace Takai.UI
             return true;
         }
 
-        public virtual bool InternalRemoveChildIndex(int index, bool reflow = true)
+        /// <summary>
+        /// Swap a child, can be set to null
+        /// </summary>
+        /// <param name="child">The new child to replace the old with</param>
+        /// <param name="index">The index to swap (must be in range)</param>
+        /// <param name="reflow">Reflow after swapping</param>
+        /// <returns>True if index is in range</returns>
+        public virtual bool InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
         {
             if (index < 0 || index >= Children.Count)
                 return false;
 
-            var child = Children[index];
-            //Diagnostics.Debug.WriteLine($"Removing child ID:{child.DebugId} @ {index} from ID:{DebugId}");
-            _children.RemoveAt(index);
-            if (child.Parent == this)
-                child.SetParentNoReflow(null);
+            var old = Children[index];
+            if (old.Parent == this)
+                old.SetParentNoReflow(null);
+
+            _children[index] = child;
+            if (child != null)
+            {
+                child.SetParentNoReflow(this);
+                if (child.HasFocus && !ignoreFocus)
+                    child.HasFocus = true;
+            }
 
             if (reflow)
                 OnChildRemeasure(this);
@@ -1056,8 +1082,7 @@ namespace Takai.UI
         /// <returns>The staticadded</returns>
         public Static ReplaceChild(Static child, int index)
         {
-            InternalRemoveChildIndex(index);
-            InternalInsertChild(child, index);
+            InternalSwapChild(child, index);
             return child;
         }
 
@@ -1101,21 +1126,26 @@ namespace Takai.UI
         /// <param name="child"></param>
         public Static RemoveChild(Static child)
         {
-            InternalRemoveChildIndex(IndexOf(child));
+            var index = IndexOf(child);
+            InternalSwapChild(null, index);
+            _children.RemoveAt(index);
             return child;
         }
 
         public Static RemoveChildAt(int index)
         {
             var child = Children[index];
-            InternalRemoveChildIndex(index);
+            InternalSwapChild(null, index);
+            _children.RemoveAt(index);
             return child;
         }
 
         public void RemoveAllChildren()
         {
-            for (int i = _children.Count - 1; i >= 0; --i)
-                InternalRemoveChildIndex(i);
+            for (int i = 0; i < _children.Count; ++i)
+                InternalSwapChild(null, i, false);
+            _children.Clear();
+            OnChildRemeasure(this);
         }
 
         /// <summary>
@@ -1127,6 +1157,7 @@ namespace Takai.UI
             //todo: use internal?
             target.AddChildren(_children);
             _children.Clear();
+            InvalidateMeasure();
         }
 
         public void ReplaceAllChildren(params Static[] newChildren)
@@ -1144,9 +1175,8 @@ namespace Takai.UI
         /// Enumerate through all children and their descendents recursively (including this)
         /// This can be overriden by
         /// </summary>
-        /// <param name="includeDisabled">Include elements that havee <see cref="IsEnabled"/> set to false (ignoring this)</param>
         /// <returns>An enumerator to all elements</returns>
-        public IEnumerable<Static> EnumerateRecursive(bool includeDisabled = false)
+        public IEnumerable<Static> EnumerateRecursive()
         {
             Stack<Static> enumeration = new Stack<Static>();
             enumeration.Push(this);
@@ -1171,7 +1201,7 @@ namespace Takai.UI
         public Static _FindInTreeByDebugId(uint id, bool breakOnResult = false)
         {
             var root = GetRoot();
-            foreach (var elem in root.EnumerateRecursive(true))
+            foreach (var elem in root.EnumerateRecursive())
             {
                 if (elem.DebugId == id)
                 {
@@ -2122,8 +2152,6 @@ namespace Takai.UI
 
         bool HandleMouseInput(Point mousePosition, MouseButtons button)
         {
-            //create a button map?
-
             if (InputState.IsPress(button) && VisibleBounds.Contains(mousePosition))
             {
                 var pea = new PointerEventArgs(this)

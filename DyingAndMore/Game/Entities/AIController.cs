@@ -84,12 +84,15 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         TimeSpan nextSenseCheck;
 
+        float lastHealth;
+
         public void Reset()
         {
             CurrentBehavior = null;
             KnownSenses = 0;
             Target = null;
             nextSenseCheck = TimeSpan.Zero;
+            lastHealth = Actor?.CurrentHealth ?? 0;
             //part of ICloneable?
         }
 
@@ -167,7 +170,7 @@ namespace DyingAndMore.Game.Entities
                 }
 
             }
-            else if (DefaultBehaviors != null)
+            else if (DefaultBehaviors != null && DefaultBehaviors.Count > 0)
             {
                 //pick random one and test?
                 foreach (var behavior in DefaultBehaviors)
@@ -179,7 +182,8 @@ namespace DyingAndMore.Game.Entities
                         CurrentBehavior = behavior;
                 }
             }
-            //else return to default behavior after behavior completed?
+            else
+                CurrentBehavior = null;
         }
 
         public Senses BuildSenses(Senses testSenses)
@@ -191,6 +195,10 @@ namespace DyingAndMore.Game.Entities
                 senses |= Senses.FullHealth;
             else if (Actor.CurrentHealth <= maxHealth * 0.2f)
                 senses |= Senses.LowHealth;
+            else if (Actor.CurrentHealth < lastHealth)
+                senses |= Senses.DamageTaken;
+
+            lastHealth = Actor.CurrentHealth;
 
             if (Actor.WorldParent != null)
                 senses |= Senses.Attached;

@@ -137,7 +137,7 @@ namespace Takai.UI
             var previewChildIndex = preview?.ChildIndex ?? -1;
             if (previewChildIndex >= 0)
             {
-                ReplaceChild(preview = list.Container.Children[list.SelectedIndex].CloneHierarchy(), previewChildIndex);
+                preview = list.Container.Children[list.SelectedIndex];
                 preview.BindTo(list.SelectedItem);
             }
             else

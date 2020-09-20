@@ -568,6 +568,11 @@ namespace Takai
             max = new Vector2(rect.Right, rect.Bottom);
         }
 
+        public static Extent FromRect(Vector2 position, Vector2 size)
+        {
+            return new Extent(position, position + size);
+        }
+
         public static implicit operator Extent((Vector2, Vector2) extent)
         {
             return new Extent(extent.Item1, extent.Item2);

@@ -77,8 +77,93 @@ List {
 							]
 						}
 
-						Static { Text: "`_Default Behaviors"; };
-						@"./Behaviors.ui.tk";
+						TabPanel {
+							HorizontalAlignment: Alignment.Stretch;
+							Children: [
+								BehaviorList {
+									Name: "Default Behaviors";
+									HorizontalAlignment: Alignment.Stretch;
+									Container: Accordian {
+										HorizontalAlignment: Alignment.Stretch;
+										Direction: Direction.Vertical;
+										Margin: 10;
+										InitiallyCollapsed: true;
+
+										ShadeTitleUI: List {
+											Direction: Direction.Horizontal;
+											HorizontalAlignment: Alignment.Stretch;
+											Children: [
+												Static {
+													Bindings: [
+														Binding {
+															Source: "Name";
+															Target: "Text";
+															#Converter: StringFormatConverter { Format: "`_{0}"; };
+															DefaultValue: "(Unnamed behavior)";
+														};
+													];
+												};
+
+												@!"UI/RemoveItem.ui.tk";
+											];
+										};
+									};
+
+								    Bindings: [
+								        Binding {
+								            Source: "DefaultBehaviors"; # todo: make this parametric somehow
+								            Target: "Items";
+								            Direction: BindingDirection.TwoWay;
+								        };
+								    ];
+
+									ItemUI: @"./Behaviors.ui.tk";
+
+									AddItemTemplate: { };
+									AddItemUI: Static {
+										HorizontalAlignment: Alignment.Center;
+										Style: "Button";
+										Text: "New Behavior";
+
+										EventCommands: {
+											Click: "AddItem";
+										};
+									};
+								};
+
+								BehaviorList {
+									Name: "Pre-emptive Behaviors";
+									HorizontalAlignment: Alignment.Stretch;
+									Container: Accordian {
+										HorizontalAlignment: Alignment.Stretch;
+										Direction: Direction.Vertical;
+										Margin: 10;
+										InitiallyCollapsed: true;
+									};
+
+								    Bindings: [
+								        Binding {
+								            Source: "PreemptiveBehaviors";
+								            Target: "Items";
+								            Direction: BindingDirection.TwoWay;
+								        };
+								    ];
+
+									ItemUI: @"./Behaviors.ui.tk";
+
+									AddItemTemplate: { };
+									AddItemUI: Static {
+										HorizontalAlignment: Alignment.Center;
+										Style: "Button";
+										Text: "New Behavior";
+
+										EventCommands: {
+											Click: "AddItem";
+										};
+									};
+								};
+							];
+						};
 				    ];
 			    };
 			};

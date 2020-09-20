@@ -3,10 +3,26 @@ List {
     IsModal: true;
     HorizontalAlignment: Alignment.Middle;
     VerticalAlignment: Alignment.Middle;
-	Style: "Frame";
 
     Children: [
+        List {
+            Direction: Direction.Horizontal;
+            HorizontalAlignment: Alignment.Stretch;
+            EventCommands: { Drag: "DragModal"; };
+
+            Children: [
+                Static {
+                    VerticalAlignment: Alignment.Middle;
+                    Style: "Header";
+                    Text: "Trigger";
+                };
+
+                @!"UI/CloseButton.ui.tk";
+            ];
+        };
+
         Scrollbox {
+            Style: "Frame";
             Size: [400 400];
             InnerPadding: 10;
             Children: [
@@ -87,14 +103,22 @@ List {
                                 Direction: Direction.Vertical;
                                 Margin: 10;
                                 Children: [
-                                    Static {
-                                        Bindings: [
-                                            Binding {
-                                                Source: ":typename";
-                                                Target: "Text";
+                                    List {
+                                        Direction: Direction.Horizontal;
+                                        HorizontalAlignment: Alignment.Stretch;
+                                        Children: [
+                                            Static {
+                                                Bindings: [
+                                                    Binding {
+                                                        Source: ":typename";
+                                                        Target: "Text";
+                                                    };
+                                                ];
                                             };
+
+                                            @!"UI/RemoveItem.ui.tk";
                                         ];
-                                    }
+                                    };
 
                                     Switch {
                                         HorizontalAlignment: Alignment.Stretch;
@@ -279,15 +303,6 @@ List {
                     ];
                 };
             ];
-        };
-
-        Static {
-            Style: "Button";
-            HorizontalAlignment: Alignment.Middle;
-            Text: "Close";
-            EventCommands: {
-                Click: "CloseModal";
-            }
         };
     ];
 }

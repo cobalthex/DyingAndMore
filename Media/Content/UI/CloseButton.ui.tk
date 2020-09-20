@@ -1,0 +1,8 @@
+Graphic {
+    HorizontalAlignment: Alignment.Right;
+    Sprite: @"UI/Close.png";
+    Position: [2 0];
+    EventCommands: {
+        Click: "CloseModal";
+    };
+};

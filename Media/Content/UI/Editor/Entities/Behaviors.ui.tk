@@ -1,260 +1,237 @@
-BehaviorList {
-	HorizontalAlignment: Alignment.Stretch;
-	Container: Accordian {
-		HorizontalAlignment: Alignment.Stretch;
-		Direction: Direction.Vertical;
-		Margin: 10;
-		InitiallyCollapsed: true;
-	};
-
+List {
     Bindings: [
+    	# bind the name of the behavior to this list, to pass down
         Binding {
-            Source: "DefaultBehaviors"; # todo: make this parametric somehow
-            Target: "Items";
-            Direction: BindingDirection.TwoWay;
+            Source: "Name";
+            Target: "Name";
         };
     ];
 
-	ItemUI: List {
-	    Bindings: [
-	        Binding {
-	            Source: "Name";
-	            Target: "Name";
-				DefaultValue: "(Unnamed Behavior)";
-	        };
-        ];
+	Style: "Box";
+	HorizontalAlignment: Alignment.Stretch;
+	Direction: Direction.Vertical;
+	Children: [
+		TextInput {
+			HorizontalAlignment: Alignment.Stretch;
+    		Bindings: [
+    			Binding {
+    				Source: "Name";
+    				Target: "Text";
+    				Direction: BindingDirection.TwoWay;
+    			};
+			];
+		};
 
-		Style: "Box";
-		HorizontalAlignment: Alignment.Stretch;
-		Direction: Direction.Vertical;
-		Children: [
-			Static { Text: "`_Name"; };
-			TextInput {
-				HorizontalAlignment: Alignment.Stretch;
-	    		Bindings: [
-	    			Binding {
-	    				Source: "Name";
-	    				Target: "Text";
-	    				Direction: BindingDirection.TwoWay;
-	    			};
-    			];
-    		};
-
-    		Shade {
-    			Text: "Requisite Senses"
-				HorizontalAlignment: Alignment.Stretch;
-				IsCollapsed: true;
-    			Children: [
-					List {
-						Direction: Direction.Horizontal;
-						Children: [
-							List {
-								Direction: Direction.Vertical;
-								Children: [
-						    		Static { Text: "`_Required"; };
-									SensesSelect {
-						    			Bindings: [
-						    				Binding {
-						    					Source: "RequisiteSenses";
-						    					Target: "Value";
-							    				Direction: BindingDirection.TwoWay;
-						    				};
-										];
-									};
-								];
-							};
-
-							List {
-								Direction: Direction.Vertical;
-								Children: [
-						    		Static { Text: "`_Inverted required"; };
-									SensesSelect {
-						    			Bindings: [
-						    				Binding {
-						    					Source: "RequisiteNotSenses";
-						    					Target: "Value";
-							    				Direction: BindingDirection.TwoWay;
-						    				};
-										];
-									};
-								];
-							};
-						];
-					};
-				];
-			};
-
-    		Static { Text: "`_Queue Chance"; };
-    		List {
-				Direction: Direction.Horizontal;
-				Children: [
-					TrackBar {
-						Minimum: 0;
-						Maximum: 100;
-						Increment: 1;
-
-						Bindings: [
-							Binding {
-								Source: "QueueChance";
-								Target: "NormalizedValue";
-								Direction: BindingDirection.TwoWay;
-							};
-						];
-					};
-					Static {
-						Bindings: [
-							Binding {
-								Source: "QueueChance";
-								Target: "Text";
-								Converter: StringFormatConverter {
-									Format: "{0:0%}";
-								}
-							};
-						];
-					};
-				];
-			};
-
-    		Static { Text: "`_On Task Failure"; };
-    		TaskFailureActionSelect {
-				Bindings: [
-					Binding { # todo: not working
-						Source: "OnTaskFailure";
-						Target: "Value";
-						Direction: BindingDirection.TwoWay;
-					};
-				];
-			};
-
-    		Static { Text: "`_Tasks"; };
-    		TaskList {
-				HorizontalAlignment: Alignment.Stretch;
-    			Bindings: [
-    				Binding {
-    					Source: "Tasks";
-    					Target: "Items";
-	    				Direction: BindingDirection.TwoWay;
-    				};
-				];
-
-				ItemUI: List {
-					Style: "Box";
-					HorizontalAlignment: Alignment.Stretch;
+		Shade {
+			Name: "Requisite senses";
+			HorizontalAlignment: Alignment.Stretch;
+			IsCollapsed: true;
+			Children: [
+				List {
+					Direction: Direction.Horizontal;
 					Children: [
-						@"UI/RemoveItem.ui.tk";
-						Static {
-							Bindings: [
-								Binding {
-									Source: ":typename";
-									Target: "Text";
-									Converter: StringFormatConverter { Format: "`_{0}"; };
+						List {
+							Direction: Direction.Vertical;
+							Children: [
+					    		Static { Text: "`_Required"; };
+								SensesSelect {
+					    			Bindings: [
+					    				Binding {
+					    					Source: "RequisiteSenses";
+					    					Target: "Value";
+						    				Direction: BindingDirection.TwoWay;
+					    				};
+									];
 								};
 							];
 						};
 
-						@"./Tasks.ui.tk";
-					];
-				};
-
-				# option to load behavior from file
-
-				AddItemUI: List {
-					Style: "Box";
-					Margin: 10;
-					HorizontalAlignment: Alignment.Stretch;
-					Children: [
-    					Static { Text: "`_New Task"; };
-    					TabPanel {
-    						HorizontalAlignment: Alignment.Stretch;
-    						Children: [
-    							TargetingTaskSelect {
-    								Name: "Targeting";
-									HorizontalAlignment: Alignment.Stretch;
-									Bindings: [
-										Binding {
-											Direction: BindingDirection.TwoWay;
-											Source: "item";
-											Target: "Instance";
-										};
-									];
-    							};
-
-								NavigationTaskSelect {
-									Name: "Navigation";
-									HorizontalAlignment: Alignment.Stretch;
-									Bindings: [
-										Binding {
-											Direction: BindingDirection.TwoWay;
-											Source: "item";
-											Target: "Instance";
-										};
+						List {
+							Direction: Direction.Vertical;
+							Children: [
+					    		Static { Text: "`_Inverted required"; };
+								SensesSelect {
+					    			Bindings: [
+					    				Binding {
+					    					Source: "RequisiteNotSenses";
+					    					Target: "Value";
+						    				Direction: BindingDirection.TwoWay;
+					    				};
 									];
 								};
-
-								OffensiveTaskSelect {
-									Name: "Offensive";
-									HorizontalAlignment: Alignment.Stretch;
-									Bindings: [
-										Binding {
-											Direction: BindingDirection.TwoWay;
-											Source: "item";
-											Target: "Instance";
-										};
-									];
-								};
-
-								DefensiveTaskSelect {
-									Name: "Defensive";
-									HorizontalAlignment: Alignment.Stretch;
-									Bindings: [
-										Binding {
-											Direction: BindingDirection.TwoWay;
-											Source: "item";
-											Target: "Instance";
-										};
-									];
-								};
-
-								MiscellaneousTaskSelect {
-									Name: "Miscellaneous";
-									HorizontalAlignment: Alignment.Stretch;
-									Bindings: [
-										Binding {
-											Direction: BindingDirection.TwoWay;
-											Source: "item";
-											Target: "Instance";
-										};
-									];
-								};
-    						];
-    					};
-
-						Static {
-							HorizontalAlignment: Alignment.Center;
-							Style: "Button";
-							Text: "Add Task";
-
-							EventCommands: {
-								Click: "AddItem";
-							};
+							];
 						};
 					];
 				};
-    		};
-
-    		#on taks failure
-
-		];
-	};
-
-	AddItemTemplate: { };
-	AddItemUI: Static {
-		HorizontalAlignment: Alignment.Center;
-		Style: "Button";
-		Text: "New Behavior";
-
-		EventCommands: {
-			Click: "AddItem";
+			];
 		};
-	};
+
+		Static { Text: "`_Queue Chance"; };
+		List {
+			Direction: Direction.Horizontal;
+			Children: [
+				TrackBar {
+					Minimum: 0;
+					Maximum: 100;
+					Increment: 1;
+
+					Bindings: [
+						Binding {
+							Source: "QueueChance";
+							Target: "NormalizedValue";
+							Direction: BindingDirection.TwoWay;
+						};
+					];
+				};
+				Static {
+					Bindings: [
+						Binding {
+							Source: "QueueChance";
+							Target: "Text";
+							Converter: StringFormatConverter {
+								Format: "{0:0%}";
+							}
+						};
+					];
+				};
+			];
+		};
+
+		Static { Text: "`_On Task Failure"; };
+		TaskFailureActionSelect {
+			Bindings: [
+				Binding { # todo: not working
+					Source: "OnTaskFailure";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		};
+
+		Static { Text: "`_Tasks"; };
+		TaskList {
+			HorizontalAlignment: Alignment.Stretch;
+			Bindings: [
+				Binding {
+					Source: "Tasks";
+					Target: "Items";
+    				Direction: BindingDirection.TwoWay;
+				};
+			];
+
+			ItemUI: List {
+				Style: "Box";
+				HorizontalAlignment: Alignment.Stretch;
+				Children: [
+					List {
+						Direction: Direction.Horizontal;
+						HorizontalAlignment: Alignment.Stretch;
+						Children: [
+							Static {
+								Bindings: [
+									Binding {
+										Source: ":typename";
+										Target: "Text";
+										Converter: StringFormatConverter { Format: "`_{0}"; };
+									};
+								];
+							};
+
+							@!"UI/RemoveItem.ui.tk";
+						];
+					};
+
+					@"./Tasks.ui.tk";
+				];
+			};
+
+			# option to load behavior from file
+
+			AddItemUI: List {
+				Style: "Box";
+				Margin: 10;
+				HorizontalAlignment: Alignment.Stretch;
+				Children: [
+					Static { Text: "`_New Task"; };
+					TabPanel {
+						HorizontalAlignment: Alignment.Stretch;
+						Children: [
+							TargetingTaskSelect {
+								Name: "Targeting";
+								HorizontalAlignment: Alignment.Stretch;
+								Bindings: [
+									Binding {
+										Direction: BindingDirection.TwoWay;
+										Source: "item";
+										Target: "Instance";
+									};
+								];
+							};
+
+							NavigationTaskSelect {
+								Name: "Navigation";
+								HorizontalAlignment: Alignment.Stretch;
+								Bindings: [
+									Binding {
+										Direction: BindingDirection.TwoWay;
+										Source: "item";
+										Target: "Instance";
+									};
+								];
+							};
+
+							OffensiveTaskSelect {
+								Name: "Offensive";
+								HorizontalAlignment: Alignment.Stretch;
+								Bindings: [
+									Binding {
+										Direction: BindingDirection.TwoWay;
+										Source: "item";
+										Target: "Instance";
+									};
+								];
+							};
+
+							DefensiveTaskSelect {
+								Name: "Defensive";
+								HorizontalAlignment: Alignment.Stretch;
+								Bindings: [
+									Binding {
+										Direction: BindingDirection.TwoWay;
+										Source: "item";
+										Target: "Instance";
+									};
+								];
+							};
+
+							MiscellaneousTaskSelect {
+								Name: "Miscellaneous";
+								HorizontalAlignment: Alignment.Stretch;
+								Bindings: [
+									Binding {
+										Direction: BindingDirection.TwoWay;
+										Source: "item";
+										Target: "Instance";
+									};
+								];
+							};
+						];
+					};
+
+					Static {
+						HorizontalAlignment: Alignment.Center;
+						Style: "Button";
+						Text: "Add Task";
+
+						EventCommands: {
+							Click: "AddItem";
+						};
+					};
+				];
+			};
+		};
+
+		#on taks failure
+
+	];
 };

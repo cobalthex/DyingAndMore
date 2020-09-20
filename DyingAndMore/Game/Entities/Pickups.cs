@@ -3,6 +3,9 @@ using Takai.Game;
 
 namespace DyingAndMore.Game.Entities
 {
+    /// <summary>
+    /// make generic, add effect to support things like Health effect
+    /// </summary>
     public class WeaponPickupClass : EntityClass
     {
         public Weapons.WeaponClass Weapon { get; set; }

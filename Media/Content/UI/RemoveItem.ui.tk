@@ -1,10 +1,8 @@
 Graphic {
-	Name: "ex";
-	Sprite: @"./X.png";
-	Padding: 5;
+	Sprite: @"UI/Delete.png";
 	HorizontalAlignment: Alignment.Right;
 	VerticalAlignment: Alignment.Center;
 	EventCommands: {
 		Click: "RemoveSelf";
-	}
-}
+	};
+};

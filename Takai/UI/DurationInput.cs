@@ -112,6 +112,10 @@ namespace Takai.UI
             secondsContainer = new List(seconds, new Static("sec") { HorizontalAlignment = Alignment.Center }) { Direction = Direction.Vertical };
             millisecondsContainer = new List(milliseconds, new Static("msec") { HorizontalAlignment = Alignment.Center }) { Direction = Direction.Vertical };
 
+            minutesContainer.BindTo(this);
+            secondsContainer.BindTo(this);
+            millisecondsContainer.BindTo(this);
+
             AddChildren(minutesContainer, secondsContainer, millisecondsContainer);
 
 			//todo: move labels to to containers with counters to hide/show combo
@@ -120,9 +124,19 @@ namespace Takai.UI
         public override void BindTo(object source, System.Collections.Generic.Dictionary<string, object> customBindProps = null)
         {
             BindToThis(source, customBindProps);
-            minutesContainer.BindTo(this, customBindProps);
-            secondsContainer.BindTo(this, customBindProps);
-            millisecondsContainer.BindTo(this, customBindProps);
+        }
+
+        protected override void FinalizeClone()
+        {
+            base.FinalizeClone();
+
+            minutesContainer = Children[0];
+            secondsContainer = Children[1];
+            millisecondsContainer = Children[2];
+
+            minutesContainer.BindTo(this);
+            secondsContainer.BindTo(this);
+            millisecondsContainer.BindTo(this);
         }
 
         protected override void UpdateSelf(GameTime time)

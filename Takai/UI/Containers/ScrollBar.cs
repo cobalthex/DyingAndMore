@@ -329,15 +329,9 @@ namespace Takai.UI
                 verticalScrollbar.HorizontalAlignment = Alignment.Right;
 
                 if (vsp >= 0)
-                {
-                    base.InternalRemoveChildIndex(vsp);
-                    base.InternalInsertChild(verticalScrollbar, vsp, false);
-                }
+                    base.InternalSwapChild(verticalScrollbar, vsp, false);
                 if (hsp >= 0)
-                {
-                    base.InternalRemoveChildIndex(hsp);
-                    base.InternalInsertChild(horizontalScrollbar, hsp, false);
-                }
+                    base.InternalSwapChild(horizontalScrollbar, hsp, false);
 
                 if (vsp >= 0 || hsp >= 0)
                     InvalidateMeasure();
@@ -462,9 +456,9 @@ namespace Takai.UI
             return base.InternalInsertChild(child, index < 0 ? -1 : index + 2, reflow, ignoreFocus);
         }
 
-        public override bool InternalRemoveChildIndex(int index, bool reflow = true)
+        public override bool InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
         {
-            return base.InternalRemoveChildIndex(index + 2, reflow);
+            return base.InternalSwapChild(child, index + 2, reflow, ignoreFocus);
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)

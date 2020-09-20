@@ -29,6 +29,7 @@ namespace Takai.UI
 
                 var lastTabIndex = _tabIndex;
                 _tabIndex = value;
+                InvalidateMeasure();
 
                 if (lastTabIndex >= 0)
                 {
@@ -88,8 +89,16 @@ namespace Takai.UI
 
         protected override void FinalizeClone()
         {
-            tabBar = Children[0];
             base.FinalizeClone();
+            tabBar = Children[0];
+
+            for (int i = 0; i < tabBar.Children.Count; ++i)
+            {
+                if (i + 1 >= Children.Count)
+                    break; //throw?
+
+                tabBar.Children[i].BindTo(Children[i + 1]);
+            }
         }
 
         public override void BindTo(object source, Dictionary<string, object> customBindProps = null)
@@ -121,10 +130,14 @@ namespace Takai.UI
             return didInsert;
         }
 
-        public override bool InternalRemoveChildIndex(int index, bool reflow = true)
+        public override bool InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
         {
-            tabBar.RemoveChildAt(index);
-            return base.InternalRemoveChildIndex(index + 1, reflow);
+            if (child == null)
+                tabBar.RemoveChildAt(index);
+            else
+                tabBar.Children[index].BindTo(child);
+
+            return base.InternalSwapChild(child, index + 1, reflow, ignoreFocus);
         }
 
         protected override bool HandleInput(GameTime time)
