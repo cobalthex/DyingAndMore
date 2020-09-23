@@ -108,7 +108,7 @@ namespace Takai.UI
                 Children[i].BindTo(source, customBindProps);
         }
 
-        public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
+        protected override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
             var tabHeader = new Static
             {
@@ -130,7 +130,7 @@ namespace Takai.UI
             return didInsert;
         }
 
-        public override bool InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
+        protected override Static InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
         {
             if (child == null)
                 tabBar.RemoveChildAt(index);
@@ -138,6 +138,11 @@ namespace Takai.UI
                 tabBar.Children[index].BindTo(child);
 
             return base.InternalSwapChild(child, index + 1, reflow, ignoreFocus);
+        }
+
+        protected override Static InternalRemoveChild(int index, bool reflow = true)
+        {
+            return base.InternalRemoveChild(index + 1, reflow);
         }
 
         protected override bool HandleInput(GameTime time)

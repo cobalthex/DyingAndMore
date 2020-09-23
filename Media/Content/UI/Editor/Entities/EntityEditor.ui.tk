@@ -70,6 +70,7 @@ List {
                                             Children: [
                                                 NumericInput {
                                                     HorizontalAlignment: Alignment.Stretch;
+                                                    VerticalAlignment: Alignment.Center;
                                                     Bindings: [
                                                         Binding {
                                                             Source: "CurrentHealth";
@@ -81,10 +82,14 @@ List {
                                                     Maximum: 2E9;
                                                 };
 
-                                                Static { Text: "/"; }
+                                                Static {
+                                                    Text: "/";
+                                                    VerticalAlignment: Alignment.Center;
+                                                }
 
                                                 Static {
                                                     HorizontalAlignment: Alignment.Stretch;
+                                                    VerticalAlignment: Alignment.Center;
                                                     Bindings: [
                                                         Binding {
                                                             Source: "Class.MaxHealth";

@@ -563,6 +563,11 @@ namespace Takai.UI
         private BitVector32 didPress = new BitVector32(0);
 
         /// <summary>
+        /// Was a drag event registered? (prevents click events)
+        /// </summary>
+        private bool didDrag; //meld with didPress?
+
+        /// <summary>
         /// Was the mouse pressed inside this static (and is the mouse still down)
         /// </summary>
         /// <returns>True if the mouse is currently down and was pressed inside this static</returns>
@@ -1011,7 +1016,7 @@ namespace Takai.UI
         /// <param name="index">The insert to add at. Out of bounds are added to the end</param>
         /// <param name="ignoreFocus">ignore <see cref="HasFocus"/></param>
         /// <returns>True if the child as added, false otherwise</returns>
-        public virtual bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
+        protected virtual bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
             //Diagnostics.Debug.WriteLine($"Inserting child ID:{child.DebugId} @ {index} into ID:{DebugId}");
             //todo: maybe have a forward setting (forward all additions to specified child)
@@ -1044,11 +1049,11 @@ namespace Takai.UI
         /// <param name="child">The new child to replace the old with</param>
         /// <param name="index">The index to swap (must be in range)</param>
         /// <param name="reflow">Reflow after swapping</param>
-        /// <returns>True if index is in range</returns>
-        public virtual bool InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
+        /// <returns>The old element that was swapped out, or null if the index is out of bounds</returns>
+        protected virtual Static InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
         {
             if (index < 0 || index >= Children.Count)
-                return false;
+                return null;
 
             var old = Children[index];
             if (old.Parent == this)
@@ -1065,7 +1070,31 @@ namespace Takai.UI
             if (reflow)
                 OnChildRemeasure(this);
 
-            return true;
+            return old;
+        }
+
+        /// <summary>
+        /// Remove a child element at the specified index
+        /// </summary>
+        /// <param name="index">The index to remove</param>
+        /// <param name="reflow">Reflow after removing</param>
+        /// <returns>The element that was removed, or null if the index is out of bounds</returns>
+        protected virtual Static InternalRemoveChild(int index, bool reflow = true)
+        {
+
+            if (index < 0 || index >= Children.Count)
+                return null;
+
+            var old = Children[index];
+            if (old.Parent == this)
+                old.SetParentNoReflow(null);
+
+            _children.RemoveAt(index);
+
+            if (reflow)
+                OnChildRemeasure(this);
+
+            return old;
         }
 
         public Static AddChild(Static child)
@@ -1127,22 +1156,23 @@ namespace Takai.UI
         public Static RemoveChild(Static child)
         {
             var index = IndexOf(child);
-            InternalSwapChild(null, index);
-            _children.RemoveAt(index);
+            InternalRemoveChild(index);
             return child;
         }
 
         public Static RemoveChildAt(int index)
         {
-            var child = Children[index];
-            InternalSwapChild(null, index);
-            _children.RemoveAt(index);
-            return child;
+            return InternalRemoveChild(index);
         }
 
         public void RemoveAllChildren()
         {
-            for (int i = 0; i < _children.Count; ++i)
+            //todo: this may break things like Accordians
+            var count = _children.Count;
+            if (count == 0)
+                return;
+
+            for (int i = 0; i < count; ++i)
                 InternalSwapChild(null, i, false);
             _children.Clear();
             OnChildRemeasure(this);
@@ -2152,7 +2182,14 @@ namespace Takai.UI
 
         bool HandleMouseInput(Point mousePosition, MouseButtons button)
         {
-            if (InputState.IsPress(button) && VisibleBounds.Contains(mousePosition))
+            bool isHovering = VisibleBounds.Contains(mousePosition);
+            //todo: these should be handled at HandleInput globally
+            if (isHovering || didPress[1 << (int)button])
+                ApplyStyles(GetStyles(Style, "Hover"));
+            else
+                ApplyStyles(GetStyles(Style));
+
+            if (InputState.IsPress(button) && isHovering)
             {
                 var pea = new PointerEventArgs(this)
                 {
@@ -2162,6 +2199,7 @@ namespace Takai.UI
                 };
                 BubbleEvent(PressEvent, pea);
 
+                ApplyStyles(GetStyles(Style, "Press"));
                 didPress[1 << (int)button] = true;
                 if (CanFocus)
                 {
@@ -2174,6 +2212,8 @@ namespace Takai.UI
             //todo: maybe add capture setting
             else if (DidPressInside(button))
             {
+                if (isHovering)
+                    ApplyStyles(GetStyles(Style, "Press"));
                 var lastMousePosition = InputState.LastMousePoint;
                 if (lastMousePosition != mousePosition)
                 {
@@ -2185,7 +2225,9 @@ namespace Takai.UI
                         button = (int)button,
                         device = DeviceType.Mouse
                     };
-                    BubbleEvent(DragEvent, dea);
+
+                    //not perfect
+                    didDrag |= (BubbleEvent(DragEvent, dea) != null);
                 }
                 return false;
             }
@@ -2195,17 +2237,18 @@ namespace Takai.UI
                 if (didPress[1 << (int)button])
                 {
                     didPress[1 << (int)button] = false;
-                    if (VisibleBounds.Contains(mousePosition)) //gesture pos
+                    if (!didDrag && VisibleBounds.Contains(mousePosition)) //gesture pos
                     {
-                        //todo: only trigger click if did not drag (?) (only if drag event)
-
                         TriggerClick(
                             (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
                             (int)button,
                             DeviceType.Mouse
                         );
+
                         return false;
                     }
+
+                    didDrag = false;
                 }
             }
 
@@ -2433,10 +2476,19 @@ namespace Takai.UI
 
         protected void DrawSprite(SpriteBatch spriteBatch, Sprite sprite, Rectangle localRect)
         {
-            DrawSpriteCustomRegion(spriteBatch, sprite, localRect, VisibleContentArea);
+
+            if (sprite == null)
+                return;
+
+            DrawSpriteCustomRegion(spriteBatch, sprite, localRect, VisibleContentArea, sprite.ElapsedTime);
         }
 
-        void DrawSpriteCustomRegion(SpriteBatch spriteBatch, Sprite sprite, Rectangle localRect, Rectangle clipRegion)
+        protected void DrawSprite(SpriteBatch spriteBatch, Sprite sprite, Rectangle localRect, TimeSpan elapsedTime)
+        {
+            DrawSpriteCustomRegion(spriteBatch, sprite, localRect, VisibleContentArea, elapsedTime);
+        }
+
+        void DrawSpriteCustomRegion(SpriteBatch spriteBatch, Sprite sprite, Rectangle localRect, Rectangle clipRegion, TimeSpan elapsedTime)
         {
             if (sprite?.Texture == null || localRect.Width == 0 || localRect.Height == 0)
                 return;
@@ -2465,7 +2517,7 @@ namespace Takai.UI
             if (finalRect.Bottom == clipRegion.Bottom)
                 clip.Y = 0;
 
-            sprite.Draw(spriteBatch, finalRect, clip, 0, Color.White, sprite.ElapsedTime);
+            sprite.Draw(spriteBatch, finalRect, clip, 0, Color.White, elapsedTime);
             //Primitives2D.DrawRect(spriteBatch, Color.LightSteelBlue, finalRect);
         }
 
@@ -2509,11 +2561,14 @@ namespace Takai.UI
             return fallback;
         }
 
-        public static Stylesheet GetStyles(string styleName, string styleState = "")
+        public static Stylesheet GetStyles(string styleName, string styleState = null)
         {
             Stylesheet styles = null;
             if (styleName != null)
-                Styles.TryGetValue(styleName + (styleState != "" ? "." + styleState : ""), out styles);
+            {
+                styleName += (styleState != null ? ("+" + styleState) : null);
+                Styles.TryGetValue(styleName, out styles); //todo: revamp
+            }
             return styles;
         }
 
@@ -2542,6 +2597,8 @@ namespace Takai.UI
             BorderColor = GetStyleRule(styleRules, "BorderColor", BorderColor);
             BackgroundColor = GetStyleRule(styleRules, "BackgroundColor", BackgroundColor);
             BackgroundSprite = GetStyleRule(styleRules, "BackgroundSprite", BackgroundSprite);
+            if (BackgroundSprite.Sprite != null)
+                BackgroundSprite.Sprite.ElapsedTime = TimeSpan.Zero;
 
             Padding = GetStyleRule(styleRules, "Padding", Padding);
             HorizontalAlignment = GetStyleRule(styleRules, "HorizontalAlignment", HorizontalAlignment);
@@ -2581,7 +2638,7 @@ namespace Takai.UI
             var ce = new PointerEventArgs(this)
             {
                 position = relativePosition,
-                button = 0,
+                button = button,
                 device = device,
                 deviceIndex = deviceIndex
             };

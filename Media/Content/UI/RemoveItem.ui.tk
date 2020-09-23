@@ -1,5 +1,6 @@
-Graphic {
-	Sprite: @"UI/Delete.png";
+Static {
+	Size: [32 32];
+	Style: "XButton";
 	HorizontalAlignment: Alignment.Right;
 	VerticalAlignment: Alignment.Center;
 	EventCommands: {

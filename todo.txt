@@ -65,6 +65,7 @@ UI:
     ☐ Layout/measure bug w/ scrollbars: See right (units) side of Squad dialog
     ☐ scrolling sometimes causes scrollbox containers to zero (reflow issue it seems)
     ☐ Shift up/down for item list
+    ☐ (Maybe?) Make InternalXChild functions fixed and Public API versions mutable
 
   ✔  Think only when alive? @done (20-04-10 22:48)
 

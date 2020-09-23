@@ -1,6 +1,6 @@
 List {
     Bindings: [
-    	# bind the name of the behavior to this list, to pass down
+    	# pass-thru for accordian
         Binding {
             Source: "Name";
             Target: "Name";
@@ -11,6 +11,7 @@ List {
 	HorizontalAlignment: Alignment.Stretch;
 	Direction: Direction.Vertical;
 	Children: [
+		Static { Text: "`_Name"; };
 		TextInput {
 			HorizontalAlignment: Alignment.Stretch;
     		Bindings: [

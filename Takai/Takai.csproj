@@ -114,6 +114,7 @@
     <Compile Include="UI\BitmapTextDisplay.cs" />
     <Compile Include="UI\Containers\Catalog.cs" />
     <Compile Include="UI\CheckBox.cs" />
+    <Compile Include="UI\Containers\Shade.cs" />
     <Compile Include="UI\Drawer.cs" />
     <Compile Include="UI\DropdownSelect.cs" />
     <Compile Include="UI\EnumSelect.cs" />

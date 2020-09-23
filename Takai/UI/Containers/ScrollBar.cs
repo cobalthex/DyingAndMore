@@ -451,14 +451,19 @@ namespace Takai.UI
             ShowScrollbars = GetStyleRule(styleRules, "ShowScrollbars", ShowScrollbars);
         }
 
-        public override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
+        protected override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
             return base.InternalInsertChild(child, index < 0 ? -1 : index + 2, reflow, ignoreFocus);
         }
 
-        public override bool InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
+        protected override Static InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
         {
             return base.InternalSwapChild(child, index + 2, reflow, ignoreFocus);
+        }
+
+        protected override Static InternalRemoveChild(int index, bool reflow = true)
+        {
+            return base.InternalRemoveChild(index + 2, reflow);
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)

@@ -132,7 +132,7 @@
 
 	TabPanel.TabBar: {
 		Margin: 10;
-	}
+	};
 	TabPanel.TabHeader: {
 		Padding: Vector2 [5 5];
 	};
@@ -164,14 +164,51 @@
 
 	Editor.Selector.Eraser: {
         Padding: Vector2 [5 5];
-	}
+	};
 
 	Editor.Play: {
 		Padding: Vector2 [10 10];
-	}
+	};
 	Editor.ResetZoom: {
         Padding: Vector2 [5 5];
-	}
+	};
+
+	XButton: {
+		BackgroundSprite: NinePatch {
+			Sprite: {
+				Texture: @"UI/X.png";
+				clipRect: [0 0 16 16];
+				Width: 16;
+				Height: 16;
+			};
+			CenterRegion: [0 0 16 16];
+		};
+	};
+
+	XButton+Hover: {
+		BackgroundSprite: NinePatch {
+			Sprite: {
+				Texture: @"UI/X.png";
+				clipRect: [16 0 16 16];
+				Width: 16;
+				Height: 16;
+			};
+			CenterRegion: [0 0 16 16];
+		};
+	};
+	XButton+Press: {
+		BackgroundSprite: NinePatch {
+			Sprite: {
+				Texture: @"UI/X.png";
+				clipRect: [32 0 16 16];
+				Width: 16;
+				Height: 16;
+			};
+			CenterRegion: [0 0 16 16];
+		};
+	};
 
 	#todo: support hierarchical styling: ParentElement ChildElement { }
-}
+	#todo: states: (press, hover, etc)
+	#todo: commas for multiple equivelent styles
+};

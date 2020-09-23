@@ -391,10 +391,16 @@ namespace DyingAndMore
             var acc = new Accordian
             {
                 Position = new Vector2(100),
-                ShadeTitleUI = new Static
+                ShadeTitleUI = new List(
+                    new Static
+                    {
+                        Bindings = new List<Binding> { new Binding("Name", "Text") },
+                    },
+                    Cache.Load<Static>("UI/RemoveItem.ui.tk")
+                )
                 {
-                    Bindings = new List<Binding> { new Binding("Name", "Text") },
-                    BackgroundColor = Color.Tomato,
+                    Direction = Direction.Horizontal,
+                    //BackgroundColor = Color.Tomato,
                     HorizontalAlignment = Alignment.Stretch
                 },
             };
@@ -475,6 +481,7 @@ namespace DyingAndMore
                     EventCommands =
                     {
                         [Static.ClickEvent] = "CloseModal",
+                        [Static.DragEvent] = "DragModal"
                     }
                 };
                 ui.AddChild(container);
@@ -504,8 +511,9 @@ namespace DyingAndMore
 
 #if DEBUG
             float y = GraphicsDevice.Viewport.Height - 70;
-            foreach (var row in Takai.LogBuffer.Entries) //convert to UI?
+            for (var it = Takai.LogBuffer.GetEntriesReversed(); it.MoveNext();)
             {
+                var row = it.Current;
                 if (row.text != null && row.time > System.DateTime.UtcNow.Subtract(System.TimeSpan.FromSeconds(3)))
                 {
                     var text = $"{row.text} {row.time.Minute:D2}:{row.time.Second:D2}.{row.time.Millisecond:D3}";

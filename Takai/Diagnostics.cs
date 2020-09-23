@@ -47,6 +47,11 @@ namespace Takai
             for (int i = 0; i < entries.Length; ++i)
                 yield return entries[(i + next) % entries.Length];
         }
+        public IEnumerator<T> GetReverseEnumerator()
+        {
+            for (int i = entries.Length - 1; i >= 0; --i)
+                yield return entries[(i + next) % entries.Length];
+        }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
@@ -69,18 +74,20 @@ namespace Takai
             }
         }
 
-        private static RingBuffer<LogRow> buffer = new RingBuffer<LogRow>(8);
+        private static RingBuffer<LogRow> buffer = new RingBuffer<LogRow>(16);
 
         public static int Count => buffer.Count;
 
         public static IEnumerable<LogRow> Entries => buffer;
+
+        public static IEnumerator<LogRow> GetEntriesReversed() => buffer.GetReverseEnumerator();
 
         public static void Clear()
         {
             buffer.Clear();
         }
 
-        public static void Append(object o) => Append(o.ToString());
+        public static void Append(params object[] o) => Append(string.Join(" ", o));
         public static void Append(string text)
         {
 #if DEBUG
