@@ -64,7 +64,6 @@
     <Compile Include="Data\Serializer.cs" />
     <Compile Include="Data\Serializer.TextDeserialize.cs" />
     <Compile Include="Data\Serializer.TextSerialize.cs" />
-    <Compile Include="Data\SuffixTree.cs" />
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Commands.cs" />
     <Compile Include="Game\Effects.cs" />
@@ -126,6 +125,14 @@
     <Compile Include="UI\ObjectSelect.cs" />
     <Compile Include="UI\PolarInput.cs" />
     <Compile Include="UI\ProgressBar.cs" />
+    <Compile Include="UI\Static.Drawing.cs" />
+    <Compile Include="UI\Static.Events.cs" />
+    <Compile Include="UI\Static.Hierarchy.cs" />
+    <Compile Include="UI\Static.Input.cs" />
+    <Compile Include="UI\Static.Layout.cs" />
+    <Compile Include="UI\Static.Navigation.cs" />
+    <Compile Include="UI\Static.Styling.cs" />
+    <Compile Include="UI\Static.Updating.cs" />
     <Compile Include="UI\Switch.cs" />
     <Compile Include="UI\Containers\Table.cs" />
     <Compile Include="UI\Containers\List.cs" />

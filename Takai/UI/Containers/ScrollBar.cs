@@ -468,8 +468,8 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
-            var hs = horizontalScrollbar.Measure(new Vector2(InfiniteSize));
-            var vs = verticalScrollbar.Measure(new Vector2(InfiniteSize));
+            var hs = horizontalScrollbar.Measure(InfiniteSize);
+            var vs = verticalScrollbar.Measure(InfiniteSize);
 
             var bounds = new Rectangle();
             for (int i = 2; i < Children.Count; ++i)

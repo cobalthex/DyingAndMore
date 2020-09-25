@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 using Takai.UI;
 using Takai.Data;
 using Takai.Input;

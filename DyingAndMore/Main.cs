@@ -405,7 +405,7 @@ namespace DyingAndMore
                 },
             };
             acc.AddChild(new Static("test 1") { Name = "A" });
-            acc.AddChild(new Static("test 2") { Name = "B" });
+            acc.AddChild(new Static("test 2") { Name = "B" });   
             acc.AddChild(new Static("test 3") { Name = "C" });
             ui.AddChild(acc);
 
@@ -491,8 +491,8 @@ namespace DyingAndMore
             else if (InputState.IsPress(Keys.F11))
                 ui.DebugInvalidateTree();
 
+            //debugUI.Update(gameTime);
             ui.Update(gameTime);
-            debugUI.Update(gameTime);
         }
         Vector2 lastTouchPos;
 
@@ -503,6 +503,7 @@ namespace DyingAndMore
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
             var drawContext = new DrawContext
             {
+                gameTime = gameTime,
                 spriteBatch = sbatch,
                 textRenderer = TextRenderer.Default
             };

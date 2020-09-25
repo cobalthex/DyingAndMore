@@ -5,6 +5,7 @@ desktop.ini
 *.suo
 *.user
 *.mgfx
+.git/
 .vs/
 obj/
 bin/

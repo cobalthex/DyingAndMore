@@ -47,8 +47,22 @@ namespace Takai.Graphics
             var lwidth = CenterRegion.X;
             var rwidth = Sprite.Width - CenterRegion.Right;
 
+
             var theight = CenterRegion.Y;
             var bheight = Sprite.Height - CenterRegion.Bottom;
+
+            if (lwidth == 0 && rwidth == 0 &&
+                theight == 0 && bheight == 0)
+            {
+                Sprite.Draw(
+                    spriteBatch,
+                    destination,
+                    0,
+                    Color.White,
+                    Sprite.ElapsedTime
+                );
+                return;
+            }
 
             var xs = destination.Width - lwidth - rwidth;
             var ys = destination.Height - theight - bheight;
@@ -58,6 +72,8 @@ namespace Takai.Graphics
             //  4 5 6
             //  7 8 9
             //sections 2, 4, 5, 6, 8 are stretched (5 in both X and Y)
+
+            //support tiling?
 
             //1 2 3
             var dest = new Rectangle(destination.X, destination.Y, lwidth, lwidth);
