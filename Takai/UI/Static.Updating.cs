@@ -49,9 +49,7 @@ namespace Takai.UI
             while (true)
             {
                 if (handleInput)
-                {
                     handleInput = toUpdate.HandleInput(time) && !toUpdate.IsModal;
-                }
 
                 toUpdate.UpdateSelf(time);
 
@@ -84,8 +82,10 @@ namespace Takai.UI
 
             if (HoveredElement != lastHover)
             {
-                lastHover?.ApplyStateStyle();
-                HoveredElement?.ApplyStateStyle();
+                //lastHover?.ApplyStateStyle();
+                //HoveredElement?.ApplyStyle(state: "Hover");
+                lastHover?.ApplyStyle();
+                HoveredElement?.ApplyStyle("Hover");
                 //LogBuffer.Append($"{lastHover} {HoveredElement}");
             }
 

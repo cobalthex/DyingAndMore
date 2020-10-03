@@ -11,6 +11,7 @@ WeaponPickupClass {
                 height: 64;
                 ClipRect: [128 0 64 64];
             };
+            AlwaysDrawUpright: true;
         };
     };
 

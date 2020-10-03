@@ -270,7 +270,8 @@ namespace Takai.UI
                         if (next._hasFocus)
                         {
                             next._hasFocus = false;
-                            next.ApplyStateStyle();
+                            //reset didPress?
+                            next.ApplyStyle();
                         }
 
                         foreach (var child in next.Children)
@@ -281,7 +282,7 @@ namespace Takai.UI
 
                 _hasFocus = value;
                 if (_hasFocus == true)
-                    ApplyStateStyle();
+                    ApplyStyle();
             }
         }
         private bool _hasFocus = false;

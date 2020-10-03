@@ -59,9 +59,9 @@ namespace Takai.UI
             return new Vector2(CheckboxSize + size.X, System.Math.Max(size.Y, CheckboxSize));
         }
 
-        public override void ApplyStyles(Dictionary<string, object> styleRules)
+        protected override void ApplyStyleRules(Dictionary<string, object> styleRules)
         {
-            base.ApplyStyles(styleRules);
+            base.ApplyStyleRules(styleRules);
             Margin = GetStyleRule(styleRules, "Margin", Margin);
             CheckColor = GetStyleRule(styleRules, "CheckColor", CheckColor);
             BoxSprite = GetStyleRule(styleRules, "BoxSprite", BoxSprite);

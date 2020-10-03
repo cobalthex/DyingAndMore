@@ -105,46 +105,6 @@ namespace Takai.UI
 
         bool HandleTouchInput()
         {
-            /* gestures don't work very conveniently 
-            if (InputState.Gestures.TryGetValue(GestureType.Tap, out var gesture) &&
-                VisibleBounds.Contains(gesture.Position))
-            {
-                var pea = new PointerEventArgs(this)
-                {
-                    position = (gesture.Position - OffsetContentArea.Location.ToVector2()) + Padding,
-                    button = 0,
-                    device = DeviceType.Touch
-                };
-                BubbleEvent(PressEvent, pea);
-                BubbleEvent(ClickEvent, pea);
-
-                if (CanFocus)
-                {
-                    HasFocus = true;
-                    return false;
-                }
-            }
-            else if (InputState.Gestures.TryGetValue(GestureType.FreeDrag, out gesture) && 
-                VisibleBounds.Contains(gesture.Position))
-            {
-                //todo: this needs to support didPress style of moving finger outside of control
-
-                var pea = new DragEventArgs(this)
-                {
-                    position = (gesture.Position - OffsetContentArea.Location.ToVector2()) + Padding,
-                    button = 0,
-                    device = DeviceType.Touch,
-                    delta = gesture.Delta
-                };
-                BubbleEvent(DragEvent, pea);
-
-                if (CanFocus)
-                {
-                    HasFocus = true;
-                    return false;
-                }
-            }*/
-
             bool touched = false;
             for (int touchIndex = InputState.touches.Count - 1; touchIndex >= 0; --touchIndex)
             {
@@ -152,6 +112,8 @@ namespace Takai.UI
 
                 if (InputState.IsPress(touchIndex) && VisibleBounds.Contains(touch.Position))
                 {
+                    didPress[1 << (touchIndex + (int)MouseButtons._TouchIndex)] = true;
+                 
                     var pea = new PointerEventArgs(this)
                     {
                         position = touch.Position - OffsetContentArea.Location.ToVector2() + Padding,
@@ -160,7 +122,6 @@ namespace Takai.UI
                     };
                     BubbleEvent(PressEvent, pea);
 
-                    didPress[1 << (touchIndex + (int)MouseButtons._TouchIndex)] = true;
                     if (CanFocus)
                     {
                         HasFocus = true;
@@ -220,9 +181,13 @@ namespace Takai.UI
         bool HandleMouseInput(Point mousePosition, MouseButtons button)
         {
             bool isHovering = VisibleBounds.Contains(mousePosition);
+            if (isHovering && HoveredElement == null)
+                HoveredElement = this;
+
             if (InputState.IsPress(button) && isHovering)
             {
                 didPress[1 << (int)button] = true;
+                ApplyStyle("Press");
 
                 var pea = new PointerEventArgs(this)
                 {
@@ -232,11 +197,10 @@ namespace Takai.UI
                 };
                 BubbleEvent(PressEvent, pea);
 
-                ApplyStateStyle();
                 if (CanFocus)
                 {
                     HasFocus = true;
-                    return false; //todo: always return false?
+                    return false;
                 }
             }
 
@@ -244,13 +208,11 @@ namespace Takai.UI
             //todo: maybe add capture setting
             else if (DidPressInside(button))
             {
-                //if (isHovering)
-                //    ApplyStyles(GetStyles(Style, "Press"));
+                ApplyStyle(isHovering ? "Press" : "Hover"); //show as hover when not in bounds
 
                 var lastMousePosition = InputState.LastMousePoint;
                 if (lastMousePosition != mousePosition)
                 {
-                    //wrap mouse in window?
                     var dea = new DragEventArgs(this)
                     {
                         delta = (mousePosition - lastMousePosition).ToVector2(),
@@ -267,13 +229,12 @@ namespace Takai.UI
 
             else if (InputState.IsButtonUp(button))
             {
-                if (isHovering && HoveredElement == null)
-                    HoveredElement = this;
-
                 if (didPress[1 << (int)button])
                 {
                     didPress[1 << (int)button] = false;
-                    if (!didDrag && VisibleBounds.Contains(mousePosition)) //gesture pos
+                    ApplyStyle(isHovering ? "Hover" : null);
+
+                    if (!didDrag && isHovering)
                     {
                         TriggerClick(
                             (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,

@@ -12,7 +12,7 @@
 		#Color: Color.White;
 		BackgroundColor: Color.Transparent;
 		#BackgroundSprite: null;
-		#BorderColor: Color.Transparent;
+		BorderColor: Color.Transparent;
 
 		#HorizontalAlignment: Alignment.Start;
 		#VerticalAlignment: Alignment.Start;
@@ -39,9 +39,46 @@
 
 	ScrollBar: {
 		BackgroundSprite: @"UI/scrollback.9p.tk";
-		ThumbSprite: @"UI/scrollthumb.9p.tk";
+		ThumbSprite: NinePatch {
+			Sprite: {
+				Texture: @"./scroll.png";
+				Center: false;
+				ClipRect: [0 0 8 8];
+			};
+			CenterRegion: [3 3 2 2];
+		};
 		Color: Color.Transparent;
 		BorderColor: Color [48 0 128 255];
+	};
+	ScrollBar+Hover: {
+		ThumbSprite: NinePatch {
+			Sprite: {
+				Texture: @"./scroll.png";
+				Center: false;
+				ClipRect: [0 8 24 8];
+				Width: 8;
+				Height: 8;
+				FrameCount: 3;
+				FrameLength: 150msec;
+				Tween: TweenStyle.Overlap;
+			};
+			CenterRegion: [3 3 2 2];
+		};
+	};
+	ScrollBar+Press: {
+		ThumbSprite: NinePatch {
+			Sprite: {
+				Texture: @"./scroll.png";
+				Center: false;
+				ClipRect: [0 16 24 8];
+				Width: 8;
+				Height: 8;
+				FrameCount: 3;
+				FrameLength: 150msec;
+				Tween: TweenStyle.Overlap;
+			};
+			CenterRegion: [3 3 2 2];
+		};
 	};
 
 	Frame: {
@@ -97,10 +134,7 @@
 		BackgroundSprite: @"UI/input.9p.tk";
 		BorderColor: Color.Transparent;
 	};
-	FileInput.TextInput: {
-		BackgroundSprite: null;
-	};
-	FileInput.PickerButton: {
+	FileInput.TextInput, FileInput.PickerButton: {
 		BackgroundSprite: null;
 	};
 

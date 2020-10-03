@@ -19,6 +19,9 @@ Game AI:
     ☐  marquee
     ✔  conditions/senses @done (20-09-10 18:32)
     ☐  enemies that attach to walls and affect map (rumbling, destruction, etc)
+    ☐  Squad behaviors
+      ☐  Flanking
+      ☐  Provide cover (broadcasting between squad members)
 
 Gases:
     ☐  Behavior changing

@@ -11,6 +11,7 @@ WeaponPickupClass {
                 height: 64;
                 ClipRect: [192 64 64 64];
             };
+            AlwaysDrawUpright: true;
         };
     };
     SpawnEffect: @"./PickupSpawn.fx.tk";

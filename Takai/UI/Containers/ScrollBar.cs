@@ -109,9 +109,9 @@ namespace Takai.UI
             On(ClickEvent, (Static Sender, UIEventArgs e) => UIEventResult.Handled);
         }
 
-        public override void ApplyStyles(Dictionary<string, object> styleRules)
+        protected override void ApplyStyleRules(Dictionary<string, object> styleRules)
         {
-            base.ApplyStyles(styleRules);
+            base.ApplyStyleRules(styleRules);
             ThumbSprite = GetStyleRule(styleRules, "ThumbSprite", ThumbSprite);
         }
 
@@ -207,9 +207,9 @@ namespace Takai.UI
             switch (Direction)
             {
                 case Direction.Vertical:
-                    return new Rectangle(0, (int)ThumbPosition, (int)ContentArea.Width, (int)ThumbSize);
+                    return new Rectangle(0, (int)ThumbPosition, ContentArea.Width, (int)ThumbSize);
                 case Direction.Horizontal:
-                    return new Rectangle((int)ThumbPosition, 0, (int)ThumbSize, (int)ContentArea.Height);
+                    return new Rectangle((int)ThumbPosition, 0, (int)ThumbSize, ContentArea.Height);
                 default:
                     return Rectangle.Empty;
             }
@@ -223,9 +223,7 @@ namespace Takai.UI
             {
                 if (DidPressInside(MouseButtons.Left))
                 {
-                    var mouse = InputState.MousePoint - OffsetContentArea.Location;
                     var deltaMouse = InputState.MouseDelta();
-
                     if (didPressThumb)
                     {
                         if (Direction == Direction.Vertical)
@@ -443,9 +441,9 @@ namespace Takai.UI
             horizontalScrollbar = (ScrollBar)Children[1];
         }
 
-        public override void ApplyStyles(Dictionary<string, object> styleRules)
+        protected override void ApplyStyleRules(Dictionary<string, object> styleRules)
         {
-            base.ApplyStyles(styleRules);
+            base.ApplyStyleRules(styleRules);
             StayAtEnd = GetStyleRule(styleRules, "StayAtEnd", StayAtEnd);
             InnerPadding = GetStyleRule(styleRules, "InnerPadding", InnerPadding);
             ShowScrollbars = GetStyleRule(styleRules, "ShowScrollbars", ShowScrollbars);

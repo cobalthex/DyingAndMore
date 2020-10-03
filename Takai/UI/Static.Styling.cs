@@ -24,11 +24,13 @@ namespace Takai.UI
                     return;
 
                 _style = value;
-                ApplyStyles(GetStyles(_style));
+                //ApplyStateStyle();
+                ApplyStyle(force: true);
                 //todo: this needs to clear styles when switching
             }
         }
         private string _style;
+        private string lastStyleState;
 
         protected T GetStyleRule<T>(Stylesheet styleRules, string propName, T fallback)
         {
@@ -60,21 +62,58 @@ namespace Takai.UI
             return styles;
         }
 
-
-        public void ApplyStateStyle(string styleName = null)
+        /// <summary>
+        /// Apply a style, applying the default and/or focus state automatically
+        /// </summary>
+        /// <param name="state">The custom state to apply (Focus is automatically applied)</param>
+        /// <param name="force">Apply this state even if its already applied</param>
+        protected void ApplyStyle(string state = null, bool force = false)
         {
-            ApplyStyles(GetStyles(styleName ?? Style));
+            if (lastStyleState == state && !force)
+                return;
+
+            lastStyleState = state;
+
+            if (state == null)
+                ApplyStyleRecursive(Style); //always apply?
+
             if (HasFocus)
-                ApplyStyles(GetStyles(Style, "Focus"));
-            if (HoveredElement == this)
-            {
-                ApplyStyles(GetStyles(Style, "Hover"));
-                if (didPress.Data != 0) //should ideally only be mouse 0 and touch 0
-                    ApplyStyles(GetStyles(Style, "Press"));
-            }
+                ApplyStyleRecursive(Style, "Focus"); //option to disable?
+
+            if (state != null)
+                ApplyStyleRecursive(Style, state);
         }
 
-        public virtual void ApplyStyles(Stylesheet styleRules)
+        /// <summary>
+        /// Applies a style, setting proto/default base style recrusively
+        /// </summary>
+        /// <param name="style">The style name to apply</param>
+        /// <param name="state">The state of that style</param>
+        private void ApplyStyleRecursive(string style, string state = null)
+        {
+            System.Diagnostics.Debug.WriteLine($"{DebugId}: Applying style {style}+{state} - {lastStyleState}");
+
+            var rules = GetStyles(style, state);
+            if (rules == null)
+            {
+                if (style != DefaultStyleName)
+                    ApplyStyleRecursive(DefaultStyleName, state);
+                return;
+            }
+
+            if (style != DefaultStyleName)
+            {
+                if (!rules.TryGetValue("proto", out var proto))
+                    proto = DefaultStyleName;
+
+                if (proto is string sProto)
+                    ApplyStyleRecursive(sProto, state);
+            }
+
+            ApplyStyleRules(rules);
+        }
+
+        protected virtual void ApplyStyleRules(Stylesheet styleRules)
         {
             Color = GetStyleRule(styleRules, "Color", Color);
             Font = GetStyleRule(styleRules, "Font", Font);
@@ -92,7 +131,7 @@ namespace Takai.UI
             Position = GetStyleRule(styleRules, "Position", Position);
             Size = GetStyleRule(styleRules, "Size", Size);
 
-            //base on rules
+            //todo: evaluate perf cost
         }
 
         public static void MergeStyleRules(Dictionary<string, Stylesheet> stylesheets)
@@ -114,49 +153,19 @@ namespace Takai.UI
                     }
                     else
                         Styles.Add(key, rules.Value);
-
-                    foreach (var state in new[] { "Hover", "Press", "Focus" })
-                    {
-                        var skey = key + "+" + state;
-                        if (!Styles.ContainsKey(skey))
-                            Styles.Add(skey, new Stylesheet());
-                    }
                 }
             }
 
-            //todo: this sucks, use a trie/something
-
-            //apply Default style and proto styles to all elements
-            foreach (var rules in stylesheets)
-            {
-                var keys = rules.Key.Split(',');
-                if (keys.Length == 0)
-                    continue;
-
-                var proto = DefaultStyleName;
-                if (rules.Value.TryGetValue("proto", out object oProto))
-                    proto = oProto as string ?? proto; //print error if not string?
-
-                //need to enumerate keys?
-
-                string state = null;
-                var statePair = keys[0].Split('+');
-                if (statePair[0] == proto)
-                    continue;
-
-                if (statePair.Length > 1)
-                    state = statePair[1];
-
-                var protoRules = GetStyles(proto, state);
-                if (protoRules == null)
-                    continue;
-
-                foreach (var pRule in protoRules)
-                {
-                    if (!rules.Value.ContainsKey(pRule.Key))
-                        rules.Value.Add(pRule.Key, pRule.Value);
-                }
-            }
+            //merge proto styles into styles? more data but better perf: no lookups, no double setting
         }
     }
 }
+
+
+//StyleStates {Normal,Pressed,Hover,Focus}
+
+//Key -> StyleStates
+//
+
+
+//todo: convert styles to typed on load

@@ -106,7 +106,7 @@ namespace DyingAndMore.Editor
 
                 if (SelectedEntity != null && selector.SelectedIndex < 0)
                 {
-                    editor.Map.Destroy(selected[selected.Count - 1]);
+                    editor.Map.Destroy(SelectedEntity);
                     SelectedEntity = null;
                 }
                 else if (selected.Count == 0)
@@ -123,7 +123,7 @@ namespace DyingAndMore.Editor
                     {
                         SelectedEntity = editor.Map.Spawn(
                             selector.ents[selector.SelectedIndex], 
-                            worldPos, 
+                            worldPos,
                             DefaultForward, 
                             Vector2.Zero
                         );
