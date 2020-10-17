@@ -1,5 +1,32 @@
 MapInstance {
-    Squads: Null;
+    Squads: [
+        Squad {
+            Name: "boss";
+            LeaderTemplate: [
+                @"Actors/Rhinovirus.ent.tk"
+            ];
+            UnitsTemplate: [
+                @"Actors/Astrovirus.ent.tk"
+                @"Actors/InfectedCell.ent.tk"
+            ];
+            SpawnPosition: [962.0001 283.0002];
+            SpawnRadius: 72.24953;
+            SpawnForward: [-1 0];
+            DontSpawnAutomatically: True;
+            MinLiveCount: 1;
+            MaxLiveCount: 3;
+            MaxSpawnCount: 8;
+            SpawnDelay: 0;
+            ResetDelay: 0;
+            DisableSpawningIfLeaderIsDead: True;
+            Leader: *ActorInstance.ref_dVwlAtZc;
+            Units: [
+                *ActorInstance.ref_dVwlAtZc
+            ];
+            TotalSpawnCount: 11;
+            LastSpawnTime: 0;
+        }
+    ];
     Class: MapClass {
         Name: "path test";
         Tileset: @"Tilesets/Gray.tiles.tk";
@@ -12,71 +39,55 @@ MapInstance {
         Tiles: [8 0 0 0 0 0 0 89 -1 -1 -1 -1 -1 -1 -1 -1 -1 28 104 0 0 0 0 57 0 0 0 0 0 0 0 0 89 -1 -1 -1 -1 -1 -1 -1 -1 71 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 -1 -1 80 104 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 26 27 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 75 -1 -1 -1 76 0 0 0 0 0 0 0 0 109 0 0 0 0 0 0 0 0 0 0 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 85 60 0 0 0 0 0 0 0 0 11 -1 -1 -1 -1 -1 10 0 0 0 107 106 91 -1 -1];
     };
     Sounds: [];
-    ElapsedTime: 284661.8785;
+    ElapsedTime: 511944.3854;
     TimeScale: 1;
     currentScreenFade: ScreenFade {
         Duration: 0;
         Colors: Null;
         Blend: Null;
     };
-    currentScreenFadeElapsedTime: 284661.8785;
+    currentScreenFadeElapsedTime: 511944.3854;
     Entities: [
         ActorInstance {
             Class: @"Actors/Player.ent.tk";
+            CurrentHealth: 5000;
             Factions: Factions [Player Ally];
             Controller: InputController {
-                Inputs: Null;
+                Inputs: @"$Config/Player1.input.tk";
             };
-            CurrentHealth: 5000;
             Conditions: {
             };
             MaxSpeed: 400;
             Weapon: GunInstance {
-                Class: @"Weapons/MG.wpn.tk";
                 CurrentAmmo: 1000;
+                LastAmmoRefillTime: 285162;
+                OnlyRefillIfIdle: True;
+                Class: @"Weapons/MG.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
             };
+            IsAwake: True;
+            LastAgressor: Null;
             Id: 1;
             Name: Null;
             OutlineColor: [255 215 0 255];
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
             Trail: Null;
-            SpawnTime: 174896;
+            SpawnTime: 502393;
             EventHandlers: Null;
             Position: [145 288];
-            Forward: [0.9988681 0.04756514];
+            Forward: [0.9996853 0.02508863];
             Velocity: [0 0];
         }
         ActorInstance {
-            Class: @"Actors/Orbiter.ent.tk";
-            CurrentHealth: 100;
-            Factions: Factions.None;
+            Class: @"Actors/Rhinovirus.ent.tk";
+            CurrentHealth: 5000;
+            Factions: Factions [Enemy Boss];
             Controller: AIController {
-                SightRange: 400;
+                SightRange: 1000;
                 Target: Null;
-                DefaultBehaviors: [
-                    Behavior {
-                        Name: "Follow path";
-                        File: Null;
-                        RequisiteSenses: Senses.None;
-                        RequisiteNotSenses: Senses.None;
-                        QueueChance: 0.5;
-                        Tasks: [
-                            FollowPath {
-                                path: VectorCurve {
-                                    Values: [
-                                        [0 [900 100]]
-                                        [1 [700 200]]
-                                        [1 [500 100]]
-                                        [1 [300 200]]
-                                        [1 [100 100]]
-                                    ];
-                                };
-                            }
-                        ];
-                        OnTaskFailure: TaskFailureAction.RestartBehavior;
-                    }
-                ];
+                DefaultBehaviors: Null;
                 PreemptiveBehaviors: Null;
                 CurrentBehavior: Null;
                 CurrentTask: 0;
@@ -84,48 +95,28 @@ MapInstance {
             };
             Conditions: {
             };
-            MaxSpeed: 300;
-            Weapon: Null;
+            MaxSpeed: 17.37698;
+            Weapon: GunInstance {
+                CurrentAmmo: 1000;
+                LastAmmoRefillTime: 0;
+                OnlyRefillIfIdle: True;
+                Class: @"Weapons/Boss.wpn.tk";
+                StateTime: 0;
+                Charge: 0;
+            };
+            IsAwake: True;
+            LastAgressor: Null;
             Id: 2;
-            Name: Null;
-            OutlineColor: [0 0 0 0];
+            Name: "ref_dVwlAtZc";
+            Squad: *Squad.boss;
+            OutlineColor: [255 215 0 255];
             TintColor: [255 255 255 255];
             TintColorDuration: 0;
-            Trail: TrailInstance {
-                Class: TrailClass {
-                    File: Null;
-                    Name: Null;
-                    MaxPoints: 1024;
-                    Sprite: Null;
-                    SpriteRenderStyle: TrailSpriteRenderStyle.Stretch;
-                    SpriteScale: 1;
-                    Color: ColorCurve {
-                        Mode: ChromaMode.HSL;
-                        Reverse: False;
-                        Values: [
-                            [0 [63 127 0 0]]
-                            [1 [64 127 192 255]]
-                        ];
-                    };
-                    Width: ScalarCurve {
-                        IsLinear: False;
-                        Values: [
-                            [0 32]
-                            [0.9 8]
-                            [1 0]
-                        ];
-                    };
-                    Jitter: [0 0];
-                    SkipChance: 0;
-                    LifeSpan: 500;
-                    CaptureDelay: 33;
-                    MergeCollinear: False;
-                };
-            };
-            SpawnTime: 174896;
+            Trail: Null;
+            SpawnTime: 508259.4024;
             EventHandlers: Null;
-            Position: [961.0002 285.0005];
-            Forward: [-0.9980526 0.06237818];
+            Position: [964.5703 285.8425];
+            Forward: [-1 0];
             Velocity: [0 0];
         }
     ];

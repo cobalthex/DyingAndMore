@@ -303,18 +303,16 @@ namespace DyingAndMore
             }
 #endif
             */
-            Static childUI;
+            
+            //Static childUI = Cache.Load<Static>("UI/test/meter.ui.tk");
+            //childUI.BindTo(childUI.FindChildByName("input"));
 
-            childUI = new FileList
-            {
-                HorizontalAlignment = Alignment.Middle,
-                VerticalAlignment = Alignment.Middle,
-                BasePath = System.IO.Path.Combine(Cache.ContentRoot, "Mapsrc"),
-                FilterRegex = "\\.(map\\.tk|d2map\\.zip)$",
-            };
+            Static childUI = Cache.Load<Static>("UI/Main.ui.tk");
             childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)
             {
-                var fl = (FileList)s;
+                if (!(ee.Source is FileList fl))
+                    return UIEventResult.Continue;
+                
 #if !ANDROID
                 if (System.IO.File.Exists(fl.SelectedFile))
 #endif
@@ -331,12 +329,14 @@ namespace DyingAndMore
                     if (map is MapClass mc)
                     {
                         mc.InitializeGraphics();
-                        ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
+                        //ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
+                        ui.ReplaceAllChildren(new Game.GameInstance(new Game.Game { Map = (MapInstance)mc.Instantiate() }));
                     }
                     else if (map is MapInstance mi)
                     {
                         mi.Class.InitializeGraphics();
-                        ui.ReplaceAllChildren(new Editor.Editor(mi));
+                        //ui.ReplaceAllChildren(new Editor.Editor(mi));
+                        ui.ReplaceAllChildren(new Game.GameInstance(new Game.Game { Map = mi }));
                     }
                 }
                 return UIEventResult.Handled;
@@ -388,6 +388,8 @@ namespace DyingAndMore
                 HorizontalAlignment = Alignment.Middle,
                 VerticalAlignment = Alignment.Stretch
             });
+
+            /*
             var acc = new Accordian
             {
                 Position = new Vector2(100),
@@ -408,6 +410,7 @@ namespace DyingAndMore
             acc.AddChild(new Static("test 2") { Name = "B" });   
             acc.AddChild(new Static("test 3") { Name = "C" });
             ui.AddChild(acc);
+            */
 
             //Static.DebugFont = Static.DefaultFont;
 

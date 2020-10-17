@@ -48,6 +48,8 @@ namespace Takai.UI
             maskEffect.Parameters["Sampler+Mask"].SetValue(Mask.Texture);
 #else
             maskEffect.Parameters["Mask"].SetValue(Mask.Texture);
+            maskEffect.Parameters["MaskOffset"].SetValue(Mask.ClipRect.Location.ToVector2() /
+                new Vector2(Mask.Texture.Width, Mask.Texture.Height));
 #endif
             sbatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, maskEffect);
             DrawSprite(sbatch, Sprite, new Rectangle(0, 0, ContentArea.Width - 1, ContentArea.Height - 1));

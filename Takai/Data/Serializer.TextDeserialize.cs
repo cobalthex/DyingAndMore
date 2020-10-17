@@ -92,9 +92,9 @@ namespace Takai.Data
             public string root;
 
             public Dictionary<string, object> resolverCache = new Dictionary<string, object>
-                (Serializer.CaseSensitiveIdentifiers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
+                (CaseSensitiveIdentifiers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
             public Dictionary<string, List<PendingResolution>> pendingCache = new Dictionary<string, List<PendingResolution>>
-                (Serializer.CaseSensitiveIdentifiers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
+                (CaseSensitiveIdentifiers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
 
             public void AddPending(PendingResolution pending)
             {
@@ -197,9 +197,9 @@ namespace Takai.Data
                         throw new EndOfStreamException(GetExceptionMessage($"Unexpected end of stream while trying to read object", context));
 
                     var keyStr = key.ToString().TrimEnd();
-#if WINDOWS
-                    String.Intern(keyStr); //todo: necessary?
-#endif
+                    //#if WINDOWS
+                    string.Intern(keyStr); //todo: necessary?
+                                           //#endif
 
                     var value = TextDeserialize(context);
                     if (value is PendingResolution pr)
@@ -207,6 +207,7 @@ namespace Takai.Data
                         pr.target = dict;
                         pr.dictionaryKey = keyStr;
                         context.AddPending(pr);
+                        //value = default;
                     }
 
                     if (dict.ContainsKey(keyStr))
@@ -261,6 +262,7 @@ namespace Takai.Data
                         pr.target = values;
                         pr.listIndex = values.Count;
                         context.AddPending(pr);
+                        value = default;
                     }
 
                     values.Add(value);
@@ -314,7 +316,8 @@ namespace Takai.Data
                 }
 
                 if (loaded is IReferenceable ir)
-                    context.resolverCache[loaded.GetType().Name + "." + ir.Name] = loaded;
+                    ResolveRefernce(context, ir);
+
                 return loaded;
             }
 
@@ -329,7 +332,7 @@ namespace Takai.Data
                     sb.Append(ReadWord(context.reader));
                 } while (context.reader.Peek() == '.' || context.reader.Peek() == '_');
 
-                var refname = sb.ToString();
+                var refname = sb.ToString().TrimEnd();
 
                 //reference already resolved
                 if (context.resolverCache.TryGetValue(refname, out var resolved))
@@ -535,7 +538,12 @@ namespace Takai.Data
                 if (peek == '[')
                 {
                     var list = TextDeserialize(context) as List<object>;
-                    return Cast(type, list, context);
+                    var dest = Cast(type, list, context);
+
+                    if (dest is IReferenceable ir)
+                        ResolveRefernce(context, ir);
+
+                    return dest;
                 }
 
                 //read object
@@ -552,12 +560,7 @@ namespace Takai.Data
                     ParseDictionary(type, dest, dict, context);
 
                     if (dest is IReferenceable ir)
-                    {
-                        string id = dest.GetType().Name + "." + ir.Name;
-                        context.resolverCache[id] = dest; //todo: better id naming and only allow one?
-                    }
-
-                    ApplyPending(context);
+                        ResolveRefernce(context, ir);
 
                     return dest;
                 }
@@ -571,37 +574,31 @@ namespace Takai.Data
             throw new NotSupportedException(GetExceptionMessage($"Unknown identifier: '{word}'", context));
         }
 
-        static void ApplyPending(DeserializationContext context) //move to class?
+        static void ResolveRefernce(DeserializationContext context, IReferenceable reference)
         {
-            foreach (var resolver in context.resolverCache)
-            {
-                if (context.pendingCache.TryGetValue(resolver.Key, out var pending))
-                {
-                    foreach (var pend in pending)
-                    {
-                        if (pend.target is System.Collections.IList)
-                        {
-                            throw new NotImplementedException();
-                        }
-                        else if (pend.target is System.Collections.IDictionary)
-                        {
-                            throw new NotImplementedException();
-                        }
-                        //hash set, etc
-                        //array (emplace)
-                        else if (pend.objectSetter != null)
-                        {
-                            pend.objectSetter.Invoke(pend.target);
-                        }
-                        else
-                            throw new ArgumentException();
-                    }
-                    context.pendingCache.Remove(resolver.Key);
-                }
-            }
+            if (reference.Name == null)
+                return;
 
-            if (context.pendingCache.Count > 0)
-                throw new ArgumentException($"Unresolved references: {string.Join(", ", context.pendingCache.Keys)}");
+            var refName = reference.GetType().Name + "." + reference.Name;
+            context.resolverCache[refName] = reference;
+            if (context.pendingCache.TryGetValue(refName, out var pending))
+            {
+                foreach (var entry in pending)
+                {
+                    if (entry.objectSetter != null)
+                        entry.objectSetter.Invoke(reference);
+
+                    else if (entry.target is System.Collections.IList list)
+                        list[entry.listIndex] = reference;
+
+                    else if (entry.target is System.Collections.IDictionary dict)
+                        dict[entry.dictionaryKey] = reference;
+
+                    else
+                        throw new ArgumentException();
+                }
+                context.pendingCache.Remove(refName);
+            }
         }
 
         static void ParseMember(object dest, object value, MemberInfo member, Type memberType, Action<object, object> setter, bool canWrite, DeserializationContext context)
@@ -622,6 +619,19 @@ namespace Takai.Data
             {
                 var cast = value == null ? null : Cast(memberType, value, context);
                 setter?.Invoke(dest, cast);
+
+                if (member.IsDefined(typeof(AsReferenceAttribute)))
+                {
+                    //inefficient
+                    foreach (var pending in context.pendingCache)
+                    {
+                        foreach (var pend in pending.Value)
+                        {
+                            if (ReferenceEquals(value, pend.target))
+                                pend.target = cast;
+                        }
+                    }
+                }
             }
         }
 
@@ -659,6 +669,8 @@ namespace Takai.Data
 
             var derived = destObject as IDerivedDeserialize;
 
+            //todo: remap pending
+
             foreach (var pair in dict)
             {
                 var late = pair.Value as Cache.LateBindLoad;
@@ -672,7 +684,11 @@ namespace Takai.Data
                         //todo: dynamic dest/target object in late bind load and references, yay or nay?
 
                         if (pending != null) //convert pending dictionary to pending object
+                        {
                             pending.objectSetter = (value) => ParseMember(destObject, value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
+                            pending.target = destObject;
+                            pending.dictionaryKey = null;
+                        }
                         else if (late != null) //////////////////////todo: value fix here~~~~~~~~~
                             late.setter = (value) => ParseMember(destObject, value, field, field.FieldType, field.SetValue, !field.IsInitOnly, context);
                         else

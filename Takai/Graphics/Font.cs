@@ -360,6 +360,8 @@ namespace Takai.Graphics
             shader = textShader;
         }
 
+        public TextRenderer(TextRenderer copy) : this(copy.shader) { }
+
         /// <summary>
         /// Resets batches without drawing
         /// </summary>

@@ -16,6 +16,7 @@ namespace DyingAndMore.Game
     {
         public bool isAiEnabled = true;
         public bool isPlayerInputEnabled = true;
+        public bool limitGore = false;
     }
 
     //separate out debug info
@@ -375,6 +376,8 @@ namespace DyingAndMore.Game
         {
             if (Map.Class != Game.Map.Class)
                 Game = new Game { Map = Map }; //todo: proper map reset support
+
+            Map.LimitGore = GameplaySettings.limitGore;
 
             ElapsedRealTime = TimeSpan.Zero;
 

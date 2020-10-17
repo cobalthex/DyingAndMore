@@ -5,4 +5,5 @@ FluidClass {
     Radius: 27;
     Scale: 0.5;
     Drag: 0.2;
+    ContainsGore: true;
 }

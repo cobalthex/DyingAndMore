@@ -26,7 +26,7 @@ ActorClass {
 
             Behavior {
                 Name: "Flee";
-                RequisiteSenses: Senses [LowHealth HasTarget];
+                RequisiteSenses: Senses [HealthLessThan25Pct HasTarget];
                 Tasks: [
                     FleeFromTarget { };
                 ];

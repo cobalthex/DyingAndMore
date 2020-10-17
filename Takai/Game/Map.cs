@@ -211,6 +211,12 @@ namespace Takai.Game
         /// </summary>
         public List<SoundInstance> Sounds { get; set; } = new List<SoundInstance>();
 
+        /// <summary>
+        /// Limit the amount of gore spawning in the game (does not affect previously spawned gore)
+        /// </summary>
+        [Data.Serializer.Ignored]
+        public bool LimitGore { get; set; } = false;
+
         public MapBaseInstance() { }
 
         public MapBaseInstance(MapBaseClass @class)
@@ -337,6 +343,9 @@ namespace Takai.Game
         /// <param name="velocity">How fast the fluid should be moving</param>
         public void Spawn(FluidClass fluid, Vector2 position, Vector2 velocity)
         {
+            if (fluid.ContainsGore && LimitGore)
+                return;
+
             var instance = fluid.Instantiate();
             instance.position = position;
             instance.velocity = velocity;
@@ -345,6 +354,9 @@ namespace Takai.Game
 
         public void Spawn(FluidInstance instance)
         {
+            if (instance.Class.ContainsGore && LimitGore)
+                return;
+
             var aabb = new Rectangle(
                 (int)(instance.position.X - instance.Class.Radius),
                 (int)(instance.position.Y - instance.Class.Radius),
@@ -368,6 +380,9 @@ namespace Takai.Game
             if (sound.Source == null)
                 return;
 
+            if (sound.ContainsGore && LimitGore)
+                return;
+
             var instance = sound.Instantiate();
             instance.Position = position;
             instance.Forward = forward;
@@ -379,6 +394,9 @@ namespace Takai.Game
         {
             if (sound.Instance == null)
                 return; //logical sounds?
+
+            if (sound.Class.ContainsGore && LimitGore)
+                return;
 
             sound.Instance.Play();
             if (!updateSettings.isSoundEnabled)
@@ -438,7 +456,7 @@ namespace Takai.Game
 
         public void AddDecal(Decal decal)
         {
-            if (decal.texture == null)
+            if (decal.texture == null || (decal.containsGore && LimitGore))
                 return;
 
             var sector = GetOverlappingSector(decal.position);

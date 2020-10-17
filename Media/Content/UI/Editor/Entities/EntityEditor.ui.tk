@@ -124,6 +124,35 @@ List {
                                             ];
                                         }
 
+                                        Static { Text: "`_Squad"; };
+                                        List {
+                                            Direction: Direction.Horizontal;
+                                            Children: [
+                                                Static {
+                                                    Bindings: [
+                                                        {
+                                                            Source: "Squad.Name";
+                                                            Target: "Text";
+                                                            DefaultValue: "(None)";
+                                                            Converter: StringFormatConverter {
+                                                                Format: "`c8ff{0}";
+                                                            };
+                                                        };
+                                                    ];
+                                                };
+
+                                                Static {
+                                                    Text: "`c8ff(Leader)";
+                                                    Bindings: [
+                                                        {
+                                                            Source: "IsSquadLeader";
+                                                            Target: "IsEnabled";
+                                                        };
+                                                    ];
+                                                };
+                                            ];
+                                        };
+
                                         Static { Text: "`_Controller"; };
                                         @"./Controller.ui.tk";
 

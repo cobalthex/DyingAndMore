@@ -101,7 +101,7 @@ MapInstance {
                         Tasks: [
                             NavigateGradient {
                                 targetValue: 0;
-                                successCondition: NavGradientSuccessCondition.LessOrEqual;
+                                successCondition: ComparisonMethod.LessOrEqual;
                             }
                             Suicide {
                                 effect: Null;
@@ -181,17 +181,17 @@ MapInstance {
                             }
                             NavigateGradient {
                                 targetValue: 10;
-                                successCondition: NavGradientSuccessCondition.LessOrEqual;
+                                successCondition: ComparisonMethod.LessOrEqual;
                             }
                             ShootAtTarget {
-                                aimingMethod: AimingMethod.None;
+                                aimingMethod: AimingMethod.Forward;
                             }
                         ];
                     }
                     Behavior {
                         Name: "Flee";
                         File: Null;
-                        RequisiteSenses: Senses [LowHealth HasTarget];
+                        RequisiteSenses: Senses [HealthLessThan25Pct HasTarget];
                         RequisiteNotSenses: Senses.None;
                         QueueChance: 0.5;
                         Tasks: [

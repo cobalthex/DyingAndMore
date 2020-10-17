@@ -90,7 +90,7 @@ namespace Takai.UI
         {
             foreach (var element in EnumerateRecursive())
             {
-                element.lastMeasureContainerBounds = Rectangle.Empty;
+                //element.lastMeasureContainerBounds = Rectangle.Empty;
                 element.lastMeasureAvailableSize = InfiniteSize;
                 element.InvalidateMeasure();
             }

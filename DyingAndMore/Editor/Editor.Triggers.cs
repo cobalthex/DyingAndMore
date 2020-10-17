@@ -145,9 +145,9 @@ namespace DyingAndMore.Editor
                     Font,
                     TextStyle,
                     Color.White,
-                    editor.Camera.WorldToScreen(new Vector2(activeTrigger.Region.X + 10, activeTrigger.Region.Y + 5))
+                    new Vector2(activeTrigger.Region.X + 10, activeTrigger.Region.Y + 5)
                 );
-                context.textRenderer.Draw(drawText);
+                editor.MapTextRenderer.Draw(drawText);
             }
             base.DrawSelf(context);
         }

@@ -74,7 +74,7 @@ namespace Takai.Data
         /// <param name="writer">The stream to write to</param>
         /// <param name="serializing">The object to serialize</param>
         /// <remarks>Some data types (Takai/Xna) are custom serialized</remarks>
-        public static void TextSerialize(TextWriter writer, object serializing, int indentLevel = 0, bool serializeExternals = false, bool serializeNonPublics = false, bool serializeDebuggables = false)
+        public static void TextSerialize(TextWriter writer, object serializing, int indentLevel = 0, bool serializeExternals = false, bool serializeNonPublics = false, bool serializeDebuggables = false, bool asReference = false)
         {
             if (serializing == null)
             {
@@ -87,11 +87,19 @@ namespace Takai.Data
             //external serialization
             if (!serializeExternals && serializing is ISerializeExternally sex)
             {
-                if (!String.IsNullOrEmpty(sex.File))
+                if (!string.IsNullOrEmpty(sex.File))
                 {
                     writer.Write($"@\"{sex.File}\"");
                     return;
                 }
+            }
+
+            if (asReference && serializing is IReferenceable ir)
+            {
+                if (ir.Name == null)
+                    ir.Name = Util.RandomString(8, 8, "ref_");
+                writer.Write($"*{(WriteFullTypeNames ? ty.FullName : ty.Name)}.{ir.Name}"); //todo: serialize externals?
+                return;
             }
 
             var typeInfo = ty.GetTypeInfo();
@@ -168,7 +176,7 @@ namespace Takai.Data
                         writer.Write(key.ToString());
 
                     writer.Write(": ");
-                    TextSerialize(writer, dict[key], indentLevel + 1, serializeExternals, serializeNonPublics, serializeDebuggables);
+                    TextSerialize(writer, dict[key], indentLevel + 1, serializeExternals, serializeNonPublics, serializeDebuggables, asReference: asReference);
                     writer.WriteLine(";");
                 }
 
@@ -193,7 +201,8 @@ namespace Takai.Data
                         writer.Write(' ');
                     once = true;
 
-                    TextSerialize(writer, i, indentLevel + 1, serializeExternals, serializeNonPublics, serializeDebuggables);
+                    TextSerialize(writer, i, indentLevel + 1, serializeExternals, serializeNonPublics, serializeDebuggables,
+                        asReference: asReference);
                 }
                 if (lastWasSerializer)
                 {
@@ -277,11 +286,19 @@ namespace Takai.Data
 
             if (value == null)
                 writer.Write("Null");
-            else if (member.IsDefined(typeof(AsReferenceAttribute)) && value is IReferenceable ir)
+            else if (member.IsDefined(typeof(AsReferenceAttribute)))
             {
-                if (ir.Name == null)
-                    ir.Name = Takai.Util.RandomString(8, 8, "ref_");
-                writer.Write($"*{(Serializer.WriteFullTypeNames ? valueType.FullName : valueType.Name)}.{ir.Name}"); //todo: serialize externals?
+                if (value is IReferenceable ir)
+                {
+                    if (ir.Name == null)
+                        ir.Name = Util.RandomString(8, 8, "ref_");
+                    writer.Write($"*{(WriteFullTypeNames ? valueType.FullName : valueType.Name)}.{ir.Name}"); //todo:  serialize externals?
+                }
+                else
+                {
+                    TextSerialize(writer, value, indentLevel + 1, serializeExternals, serializeNonPublics, serializeDebuggables,
+                        asReference: true);
+                }
             }
             else
             {

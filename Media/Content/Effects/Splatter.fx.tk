@@ -10,16 +10,18 @@ EffectsClass {
                     FrameLength: 100msec;
                 };
                 DestructionFluid: @"Fluids/Blood.fluid.tk";
+                ContainsGore: true;
                 Blend: BlendState.NonPremultiplied;
                 InitialSpeed: [100 200];
                 AngleOverTime: {
                     Values: [
                         [0 0];
-                        [1 0.5pi];
+                        [1 0.1pi];
                     ];
                 };
                 LifeSpan: [0.5sec 0.9sec];
-                Drag: 1;
+                MinimumSpeed: 50;
+                Drag: 0.5;
             }
             Count: [5 10];
         }

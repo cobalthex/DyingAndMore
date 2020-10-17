@@ -172,7 +172,7 @@ namespace Takai.Game
 
         public void Spawn(EffectsInstance instance)
         {
-            if (Class == null)
+            if (Class == null || (Class.ContainsGore && instance.Map.LimitGore))
                 return;
 
             if (!instance.Map.Particles.ContainsKey(Class))
@@ -275,19 +275,15 @@ namespace Takai.Game
     }
 
     /// <summary>
-    /// Apply an outward push force to nearby physical entities
+    /// Apply an outward push force to nearby physical entities (like gravity)
     /// </summary>
-    public class ForceEffect : IGameEffect
+    public class AreaForceEffect : IGameEffect
     {
         public float Force { get; set; } //range?
-        /// <summary>
-        /// The cone of effect for the force (-pi to pi for a full circle)
-        /// </summary>
-        public Range<float> Angle { get; set; } = new Range<float>(-MathHelper.Pi, MathHelper.Pi);
 
         public void Spawn(EffectsInstance instance)
         {
-            if (Force == 0 || Angle.TotalRange() == 0)
+            if (Force == 0)
                 return;
 
             var nearby = instance.Map.FindEntitiesInRegion(instance.Position, (float)Math.Sqrt(Force));
@@ -300,6 +296,30 @@ namespace Takai.Game
                 var l = d.Length();
                 ent.Velocity += (d / l) * (Force);
             }
+        }
+    }
+
+    /// <summary>
+    /// Apply a force to one entity
+    /// </summary>
+    public class JerkEffect : IGameEffect
+    {
+        public float Force { get; set; } //range?
+        /// <summary>
+        /// The cone of effect for the force (-pi to pi for a full circle)
+        /// </summary>
+        public Range<float> Angle { get; set; } = new Range<float>(-MathHelper.Pi, MathHelper.Pi);
+
+
+        public void Spawn(EffectsInstance instance)
+        {
+            if (instance.Target == null)
+            {
+                if (instance.Source != null)
+                    instance.Source.Position += Util.Direction(Angle.Random()) * Force; //world position?
+            }
+            else
+                instance.Target.Position += Util.Direction(Angle.Random()) * Force; //world position?
         }
     }
 

@@ -70,7 +70,7 @@ namespace Takai.UI
 
             dropdownContainer = new Static(dropdown)
             {
-                BackgroundColor = new Color(0, 0, 0, 127),
+                Style = "Backdrop",
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
             };
@@ -114,11 +114,16 @@ namespace Takai.UI
             // (fills in once dropdown is closed)
             var sea = (SelectionChangedEventArgs)e;
 
-            var childIndex = preview?.ChildIndex ?? -1;
+            var previewChildIndex = preview?.ChildIndex ?? -1;
             if (sea.newIndex >= 0)
             {
-                ReplaceChild(preview = list.Container.Children[sea.newIndex].CloneHierarchy(), childIndex);
-                InvalidateMeasure();
+                preview = list.Container.Children[sea.newIndex].CloneHierarchy();
+                
+                if (previewChildIndex < 0)
+                    InsertChild(preview, 0);
+                else
+                    ReplaceChild(preview, previewChildIndex);
+
                 preview.BindTo(list.Items[sea.newIndex]);
             }
             else if (preview != null)

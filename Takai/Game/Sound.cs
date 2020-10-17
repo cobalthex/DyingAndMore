@@ -32,6 +32,8 @@ namespace Takai.Game
 
         public bool DestroyIfOwnerDies { get; set; } = true;
 
+        public bool ContainsGore { get; set; }
+
         public SoundInstance Instantiate()
         {
             return new SoundInstance(this);

@@ -46,11 +46,13 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The leader of this squad. There is only one and when they die units may flee
         /// </summary>
+        [Takai.Data.Serializer.AsReference]
         public ActorInstance Leader { get; set; }
 
         /// <summary>
         /// All active units in the squad, including the leader
         /// </summary>
+        [Takai.Data.Serializer.Ignored]
         public List<ActorInstance> Units { get; set; } = new List<ActorInstance>(); //includes leader
 
         /// <summary>
@@ -67,7 +69,6 @@ namespace DyingAndMore.Game.Entities
         {
             var newSquad = (Squad)MemberwiseClone();
             newSquad.Leader = null;
-            newSquad.Units = new List<ActorInstance>();
             newSquad.LeaderTemplate = LeaderTemplate != null ? new List<ActorClass>(LeaderTemplate) : null;
             newSquad.UnitsTemplate = UnitsTemplate != null ? new List<ActorClass>(UnitsTemplate) : null;
             TotalSpawnCount = 0;
@@ -76,13 +77,20 @@ namespace DyingAndMore.Game.Entities
             return newSquad;
         }
 
+        protected internal void AddUnit(ActorInstance actor)
+        {
+            if (Units == null)
+                Units = new List<ActorInstance>();
+            Units.Add(actor);
+        }
+
         protected ActorInstance SpawnUnit(MapBaseInstance map, List<ActorClass> template)
         {
             if (template == null || template.Count < 1)
                 return null;
 
             var unit = (ActorInstance)Takai.Util.Random(template).Instantiate();
-            Units.Add(unit);
+            unit.Squad = this;
             if (TryPlaceUnit(unit, map))
                 ++TotalSpawnCount;
             return unit;
@@ -106,38 +114,11 @@ namespace DyingAndMore.Game.Entities
             return false;
         }
 
-        public virtual void OnDestroy(MapBaseInstance map)
-        {
-            DestroyAllUnits();
-        }
-
-        public void Update(MapBaseInstance map, TimeSpan deltaTime)
-        {
-            //udpate live count (remove dead units)
-            for (int i = 0; i < Units.Count; ++i)
-            {
-                if (!Units[i].IsAlive || Units[i].Map != map)
-                {
-                    if (Units[i] == Leader)
-                    {
-                        //todo: notify units that leader is dead
-                    }
-                    Units[i] = Units[Units.Count - 1];
-                    Units.RemoveAt(Units.Count - 1);
-                    --i;
-                }
-            }
-
-            if (UnitsTemplate == null ||
-                (DisableSpawningIfLeaderIsDead && Leader != null && !Leader.IsAlive) ||
-                (DontSpawnAutomatically && TotalSpawnCount == 0))
-                return;
-
-            SpawnUnits(map);
-        }
-
         public void SpawnUnits(MapBaseInstance map)
         {
+            if (Leader == null)
+                Leader = SpawnUnit(map, LeaderTemplate);
+
             int liveUnits = Units.Count;
             if (liveUnits < MinLiveCount)
             {
@@ -171,7 +152,39 @@ namespace DyingAndMore.Game.Entities
             Units.Clear();
             Leader = null;
         }
+
+        public virtual void OnDestroy(MapBaseInstance map)
+        {
+            DestroyAllUnits();
+        }
+
+        public void Update(MapBaseInstance map, TimeSpan deltaTime)
+        {
+            //udpate live count (remove dead units)
+            for (int i = 0; i < Units.Count; ++i)
+            {
+                if (!Units[i].IsAlive || Units[i].Map != map)
+                {
+                    //if (Units[i] == Leader)
+                    //{
+                    //    //todo: notify units that leader is dead
+                    //}
+                    Units[i] = Units[Units.Count - 1];
+                    Units.RemoveAt(Units.Count - 1);
+                    --i;
+                }
+            }
+
+            if (UnitsTemplate == null ||
+                (DisableSpawningIfLeaderIsDead && Leader != null && !Leader.IsAlive) ||
+                DontSpawnAutomatically)
+                return;
+
+            SpawnUnits(map);
+        }
     }
 }
 
 //encounters(?) are groups of squads that allow spawning a bunch of squads at  one time if desired
+
+//leader promotion

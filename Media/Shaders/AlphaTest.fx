@@ -2,13 +2,15 @@ Texture2D Tex;
 Texture2D Mask;
 SamplerState Sampler;
 
+float2 MaskOffset;
+
 float Cutoff;
 float Range; //if 0, cutoff is all values below
 //fade?
 
 float4 pmain(float4 position : SV_POSITION, float4 color : COLOR0, float2 texcoord : TEXCOORD0) : SV_Target
 {
-    float4 mask = Mask.Sample(Sampler, texcoord);
+    float4 mask = Mask.Sample(Sampler, texcoord + MaskOffset);
     float4 col = 0;
      if ((Range == 0 && mask.r <= Cutoff) || //todo: replace with sdf
          (Cutoff - Range <= mask.r && Cutoff + Range >= mask.r))

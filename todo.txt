@@ -4,24 +4,27 @@ Bugs:
     ☐ Nine-patch relative clipping
     ☐ Evaluate [perf of] casting style args to correct type
     ☐ Fluids not clipping to map for partial tiles
+    ☐ Spawner does not restart burp animation when still in fov
 
 Conditions:
     ☐  Invisibility
     ☐  Invincibility
 
 Game AI:
-    ☐  Cover
-    ☐  Waypoints
-    ☐  Objectives/navpoints
-    ☐  Cutscenes (maybe with some scripting)
-    ☐  Events
-    ☐  doors/devices
-    ☐  marquee
+    ☐ Cover
+    ☐ Waypoints
+    ☐ Objectives/navpoints
+    ☐ Cutscenes (maybe with some scripting)
+    ☐ Events
+    ☐ doors/devices
+    ☐ marquee
     ✔  conditions/senses @done (20-09-10 18:32)
-    ☐  enemies that attach to walls and affect map (rumbling, destruction, etc)
-    ☐  Squad behaviors
-      ☐  Flanking
-      ☐  Provide cover (broadcasting between squad members)
+    ☐ enemies that attach to walls and affect map (rumbling, destruction, etc)
+    ☐ ability to fully charge weapon
+    ☐ Squad behaviors
+      ☐ Flanking
+      ☐ Provide cover (broadcasting between squad members)
+    ☐ play animations
 
 Gases:
     ☐  Behavior changing
@@ -31,15 +34,15 @@ Gases:
 
   ☐  serializer configurations (save these props under this configuration, etc)
 
-  ☐  Fix pathfinding for non full tiles
+  ☐  Fix pathfinding for non full tiles -- reevaluate post SDF
 
   ☐  tile patches in sectors. allows for destructable/modifyable tiles
 
   ☐  non destroying/pickupable projectiles (arrows)
 
   overhaul physics system:
-    ☐  proper collidable shapes
-    ☐  collision graph (necessary?) Dictionary<Collider, HashSet<Collider>>
+    ☐ proper collidable shapes
+    ☐ collision graph (necessary?) Dictionary<Collider, HashSet<Collider>>
 
 
 Serializer:
@@ -69,6 +72,9 @@ UI:
     ☐ scrolling sometimes causes scrollbox containers to zero (reflow issue it seems)
     ☐ Shift up/down for item list
     ☐ (Maybe?) Make InternalXChild functions fixed and Public API versions mutable
+    ☐ InvalidateVisual
+    ☐ separate Modal element?
+    ☐ Recreate & reintegrate radial menu in editor
 
   ✔  Think only when alive? @done (20-04-10 22:48)
 

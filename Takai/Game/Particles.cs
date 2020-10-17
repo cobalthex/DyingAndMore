@@ -60,6 +60,8 @@ namespace Takai.Game
 
         [Data.Serializer.Ignored]
         public float Radius { get; private set; }
+
+        public bool ContainsGore { get; set; }
     }
 
     /// <summary>

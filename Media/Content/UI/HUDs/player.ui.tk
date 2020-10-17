@@ -4,7 +4,7 @@ Static {
 	Children: [
 		Meter {
 			Name: "Health";
-			Position: [0 64];
+			Position: [2 64];
 
 			Minimum: 0;
 			Bindings: [
@@ -19,25 +19,14 @@ Static {
 			];
 
 			Sprite: {
-				Texture: @"./Player.png";
-				ClipRect: [0 88 84 88];
-				Width: 84;
-				Height: 88;
-			}
+				Texture: @"./Health.png";
+				ClipRect: [0 0 86 92];
+				Width: 86;
+				Height: 92;
+			};
 			Mask: {
-				Texture: @"./player.mask.png";
-				ClipRect: [0 88 84 88];
-				Width: 84;
-				Height: 88;
-			}
-		}
-
-		Graphic {
-			Name: "Health frame";
-			Position: [0 62];
-			Sprite: {
-				Texture: @"./Player.png";
-				ClipRect: [88 77 86 92];
+				Texture: @"./Health.png";
+				ClipRect: [87 0 86 92];
 				Width: 86;
 				Height: 92;
 			};

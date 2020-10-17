@@ -91,7 +91,7 @@ namespace Takai.UI
         /// <param name="state">The state of that style</param>
         private void ApplyStyleRecursive(string style, string state = null)
         {
-            System.Diagnostics.Debug.WriteLine($"{DebugId}: Applying style {style}+{state} - {lastStyleState}");
+            //System.Diagnostics.Debug.WriteLine($"{DebugId}: Applying style {style}+{state} - {lastStyleState}");
 
             var rules = GetStyles(style, state);
             if (rules == null)

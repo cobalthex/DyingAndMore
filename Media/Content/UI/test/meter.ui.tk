@@ -1,10 +1,54 @@
-Meter {
-	name: "meter";
-	Sprite: @"./metertest.png";
-	Mask: @"./metertest.mask.png";
+List {
+	HorizontalAlignment: Alignment.Center;
+	VerticalAlignment: Alignment.Center;
+	Direction: Direction.Vertical;
+	Margin: 50;
+	Style: null;
 
-	Minimum: 0;
-	Maximum: 100;
+	Children: [
+		Meter {
+			HorizontalAlignment: Alignment.Center;
+			VerticalAlignment: Alignment.Center;
+			name: "meter";
+			Sprite: {
+				Texture: @"UI/HUDs/Health.png";
+				ClipRect: [0 0 86 92];
+				Width: 86;
+				Height: 92;
+			};
+			Mask: {
+				Texture: @"UI/HUDs/Health.png";
+				ClipRect: [87 0 86 92];
+				Width: 86;
+				Height: 92;
+			};
 
-	Value: 50;
-}
+			bindings: [
+				Binding {
+					Source: "Increment";
+					Target: "Increment";
+				};
+				Binding {
+					Source: "Value";
+					Target: "Value";
+				};
+				Binding {
+					Source: "Minimum";
+					Target: "Minimum";
+				};
+				Binding {
+					Source: "Maximum";
+					Target: "Maximum";
+				};
+			];
+		};
+
+		TrackBar {
+			name: "input";
+			Minimum: 0;
+			Maximum: 100;
+			Increment: 1;
+			Value: 50;
+		};
+	];
+};

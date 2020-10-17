@@ -210,7 +210,6 @@ namespace DyingAndMore.Game.Entities.Tasks
         Random, // pick a direction (within fov ? ) and aim there
         FaceTarget, //shoot at the target's current position
         LeadTarget, //shoot where the target is likely to be
-        //Spray // rotate in a direction and shoot - ?
     }
 
     [OffensiveTask]
@@ -275,10 +274,6 @@ namespace DyingAndMore.Game.Entities.Tasks
                         direction = Vector2.Normalize(positionToTarget - ai.Actor.WorldPosition);
                     }
                     break;
-
-                //case AimingMethod.Spray:
-                //    //separate task?
-                //    break;
             }
 
             ai.Actor.TurnTowards(direction, deltaTime); //todo: this is too slow
@@ -286,6 +281,25 @@ namespace DyingAndMore.Game.Entities.Tasks
                 return TaskResult.Continue;
 
             ai.Actor.Weapon.TryUse();
+            return TaskResult.Success;
+        }
+    }
+
+    [OffensiveTask]
+    public struct SprayTarget : ITask
+    {
+        /// <summary>
+        /// The total spray angle range to spray
+        /// </summary>
+        public float sprayAngle;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            //option to turn to -angle/2 first?
+            //option to go ccw vs cw
+            //step 1: move to -angle/2
+            //step 2: spray to +angle
+
             return TaskResult.Success;
         }
     }

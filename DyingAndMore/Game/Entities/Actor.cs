@@ -188,8 +188,27 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public bool IsAwake { get; set; } = true;
 
-        [Takai.Data.Serializer.Ignored] //todo: reload from map.squads
-        public Squad Squad { get; internal set; }
+        [Takai.Data.Serializer.AsReference]
+        public Squad Squad
+        {
+            get => _squad;
+            set
+            {
+                if (_squad == value)
+                    return;
+
+                _squad = value;
+                if (_squad != null)
+                    _squad.AddUnit(this);
+
+                //todo: clear squad on Kill()?
+                //todo: remove from old squad if swapping?
+            }
+        }
+        Squad _squad;
+
+        [Takai.Data.Serializer.Ignored]
+        public bool IsSquadLeader => Squad == null ? false : Squad.Leader == this; //primarily for UI
 
         [Takai.Data.Serializer.Ignored]
         public Takai.UI.Static Hud { get; set; }
@@ -198,7 +217,7 @@ namespace DyingAndMore.Game.Entities
         /// The most recent agressor, if there is one
         /// </summary>
         [Takai.Data.Serializer.AsReference]
-        public EntityInstance LastAgressor { get; set; }
+        public EntityInstance LastAggressor { get; set; }
 
         public override Dictionary<string, CommandAction> Actions => new Dictionary<string, CommandAction>(base.Actions)
         {
@@ -330,7 +349,7 @@ namespace DyingAndMore.Game.Entities
         /// <param name="source">The entity that is responsible for this damage</param>
         public void ReceiveDamage(float damage, EntityInstance source = null)
         {
-            LastAgressor = source;
+            LastAggressor = source;
             if (source != this && //can damage self
                 (GameInstance.Current != null && !GameInstance.Current.Game.Configuration.AllowFriendlyFire) &&
                 source is ActorInstance actor &&

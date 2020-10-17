@@ -212,6 +212,13 @@ namespace DyingAndMore.UI
             AddTypeTreeByAttribute<TargetingTaskAttribute>();
         }
     }
+    class SquadTaskSelect : TypeSelect
+    {
+        public SquadTaskSelect()
+        {
+            AddTypeTreeByAttribute<SquadTaskAttribute>();
+        }
+    }
     class MiscellaneousTaskSelect : TypeSelect
     {
         public MiscellaneousTaskSelect()

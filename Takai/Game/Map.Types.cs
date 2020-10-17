@@ -11,5 +11,6 @@ namespace Takai.Game
         public Vector2 position;
         public float angle;
         public float scale;
+        public bool containsGore;
     }
 }

@@ -30,7 +30,7 @@ ProjectileClass {
                 Radius: 100;
             };
 
-            ForceEffect {
+            AreaForceEffect {
                 Force: 8000;
             }
 
@@ -61,7 +61,7 @@ ProjectileClass {
                     InitialSpeed: [400 600];
                     LifeSpan: [0.5sec 0.85sec];
                     Drag: 5;
-                } 
+                }
                 Count: [40 60];
                 Spread: [-1pi 1pi];
             };

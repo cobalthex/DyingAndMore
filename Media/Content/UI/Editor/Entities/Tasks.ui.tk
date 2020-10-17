@@ -183,12 +183,22 @@ Switch {
 	    	];
 		};
 
-		SetTargetBeahavior: List {
+		KillSquadUnits: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
-		    	Static { Text: "`cfa0Todo"; } #todo
+		    	CheckBox {
+		    		Text: "Include self";
+
+		    		Bindings: [
+		    			Binding {
+		    				Source: "includeSelf";
+		    				Target: "IsChecked";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
 	    	];
-		};
+	    };
 
 		MoveToTarget: List {
 			HorizontalAlignment: Alignment.Stretch;
@@ -292,6 +302,33 @@ Switch {
 		    	};
 	    	];
 		};
+
+		PlayEffect: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`_Effect"; };
+		    	DurationInput {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "effect";
+		    				Target: "SelectedItem";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+
+		    	Static { Text: "`_Duration"; };
+		    	DurationInput {
+		    		Bindings: [
+		    			Binding {
+		    				Source: "duration";
+		    				Target: "Duration";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+	    };
 
 		SetConditionOnSelf: List {
 			HorizontalAlignment: Alignment.Stretch;
@@ -409,6 +446,13 @@ Switch {
 	    	];
 		};
 
+		SetTargetBeahavior: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	Static { Text: "`cfa0Todo"; } #todo
+	    	];
+		};
+
 		SetTargetClass: List {
 			HorizontalAlignment: Alignment.Stretch;
 	    	Children: [
@@ -486,6 +530,23 @@ Switch {
 		    	};
 	    	];
 		};
+
+		SpawnSquadUnits: List {
+			HorizontalAlignment: Alignment.Stretch;
+	    	Children: [
+		    	CheckBox {
+		    		Text: "Must be leader";
+
+		    		Bindings: [
+		    			Binding {
+		    				Source: "mustBeLeader";
+		    				Target: "IsChecked";
+		    				Direction: BindingDirection.TwoWay;
+		    			};
+		    		];
+		    	};
+	    	];
+	    };
 
 		Suicide: List {
 			HorizontalAlignment: Alignment.Stretch;

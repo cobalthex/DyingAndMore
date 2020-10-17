@@ -173,7 +173,7 @@ namespace DyingAndMore.Editor
         {
             base.DrawSelf(context);
 
-            if (editor.Map.Squads != null && editUI.Parent == null)
+            if (editor.Map.Squads != null)
             {
                 foreach (var squad in editor.Map.Squads)
                 {
@@ -185,9 +185,9 @@ namespace DyingAndMore.Editor
                         Font,
                         TextStyle,
                         Color.White,
-                        editor.Camera.WorldToScreen(squad.SpawnPosition) - (squadNameSize / 2)
+                        squad.SpawnPosition - (squadNameSize / 2)
                     );
-                    context.textRenderer.Draw(drawText);
+                    editor.MapTextRenderer.Draw(drawText);
                 }
             }
 

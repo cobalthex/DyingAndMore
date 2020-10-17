@@ -15,7 +15,6 @@ namespace DyingAndMore
 
     public class MapInstance : MapBaseInstance
     {
-        [Takai.Data.Serializer.AsReference]
         public HashSet<Game.Entities.Squad> Squads
         {
             get => _squads;

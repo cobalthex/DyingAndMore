@@ -24,7 +24,7 @@ List {
 		};
 
 		Shade {
-			Name: "Requisite senses";
+			Name: "`ccf8Requisite senses";
 			HorizontalAlignment: Alignment.Stretch;
 			IsCollapsed: true;
 			Children: [
@@ -34,7 +34,7 @@ List {
 						List {
 							Direction: Direction.Vertical;
 							Children: [
-					    		Static { Text: "`_Required"; };
+					    		Static { Text: "`_Inclusive"; };
 								SensesSelect {
 					    			Bindings: [
 					    				Binding {
@@ -50,7 +50,7 @@ List {
 						List {
 							Direction: Direction.Vertical;
 							Children: [
-					    		Static { Text: "`_Inverted required"; };
+					    		Static { Text: "`_Exclusive"; };
 								SensesSelect {
 					    			Bindings: [
 					    				Binding {
@@ -195,6 +195,18 @@ List {
 
 							DefensiveTaskSelect {
 								Name: "Defensive";
+								HorizontalAlignment: Alignment.Stretch;
+								Bindings: [
+									Binding {
+										Direction: BindingDirection.TwoWay;
+										Source: "item";
+										Target: "Instance";
+									};
+								];
+							};
+
+							SquadTaskSelect {
+								Name: "Squad";
 								HorizontalAlignment: Alignment.Stretch;
 								Bindings: [
 									Binding {

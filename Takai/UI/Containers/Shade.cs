@@ -146,7 +146,7 @@ namespace Takai.UI
         {
             if (actualContentSize != desiredContentSize)
             {
-                LogBuffer.Append(Name, actualContentSize, desiredContentSize);
+                //LogBuffer.Append(Name, actualContentSize, desiredContentSize);
                 var sign = Math.Sign(desiredContentSize - actualContentSize);
                 var abs = Math.Abs(desiredContentSize - actualContentSize);
                 actualContentSize += sign * Math.Min(abs, 3000 * (float)time.ElapsedGameTime.TotalSeconds);

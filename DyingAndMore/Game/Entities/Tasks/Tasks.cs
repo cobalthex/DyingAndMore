@@ -1,7 +1,6 @@
 ﻿using System;
 using DyingAndMore.Game.Weapons;
 using Microsoft.Xna.Framework;
-using Takai.UI;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
@@ -28,6 +27,23 @@ namespace DyingAndMore.Game.Entities.Tasks
 
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
+            if (ai.Actor.Map.ElapsedTime < ai.CurrentTaskStartTime + duration)
+                return TaskResult.Continue;
+            return TaskResult.Success;
+        }
+    }
+
+    [MiscellaneousTask]
+    public struct PlayEffect : ITask
+    {
+        public Takai.Game.EffectsClass effect;
+        public TimeSpan duration;
+
+        public TaskResult Think(TimeSpan deltaTime, AIController ai)
+        {
+            var fx = effect.Instantiate(ai.Actor);
+            ai.Actor.Map.Spawn(fx);
+
             if (ai.Actor.Map.ElapsedTime < ai.CurrentTaskStartTime + duration)
                 return TaskResult.Continue;
             return TaskResult.Success;

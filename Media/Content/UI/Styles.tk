@@ -21,7 +21,7 @@
 	};
 
 	Static+Focus: {
-		BorderColor: Color.RoyalBlue;
+		#BorderColor: Color.RoyalBlue;
 	};
 
 	Header: {
@@ -153,8 +153,43 @@
 	};
 
 	Button: {
-		BackgroundSprite: @"UI/input.9p.tk";
+		BackgroundSprite: NinePatch {
+			Sprite: {
+				Texture: @"./inputframe.png";
+				Center: false;
+				ClipRect: [0 0 8 8]
+			};
+			CenterRegion: [3 3 2 2];
+		};
 		Padding: Vector2 [10 5];
+	};
+	Button+Hover: {
+		BackgroundSprite: NinePatch {
+			Sprite: {
+				Texture: @"./inputframe.png";
+				Center: false;
+				ClipRect: [0 8 24 8];
+				Width: 8;
+				Height: 8;
+				FrameCount: 3;
+				FrameLength: 100msec;
+			};
+			CenterRegion: [3 3 2 2];
+		};
+	};
+	Button+Press: {
+		BackgroundSprite: NinePatch {
+			Sprite: {
+				Texture: @"./inputframe.png";
+				Center: false;
+				ClipRect: [0 16 24 8];
+				Width: 8;
+				Height: 8;
+				FrameCount: 3;
+				FrameLength: 100msec;
+			};
+			CenterRegion: [3 3 2 2];
+		};
 	};
 
 	Divider: {
@@ -175,16 +210,26 @@
 		Padding: Vector2 [5 5];
 	};
 	TabPanel.TabHeader.Active: {
-		BackgroundColor: Color.RoyalBlue;
+		BackgroundColor: Color.CornflowerBlue;
 	};
 
 	Shade: {
 		Proto: "Box";
 	};
 
+	Drawer: {
+		BackgroundColor: Color [40 32 128 192];
+	};
+
 	GameInstance: {
 		#Font: @"Fonts/UISmall.fnt.tk";
 	};
+
+	Backdrop: {
+		BackgroundColor: Color [0 0 0 127];
+	}
+
+	#* separate below into separate file? *#
 
 	Editor.ModeSelector: {
 		InactiveColor: Color [150 150 255];

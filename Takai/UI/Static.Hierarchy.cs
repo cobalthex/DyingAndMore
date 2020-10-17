@@ -115,13 +115,13 @@ namespace Takai.UI
         /// Swap a child, can be set to null
         /// </summary>
         /// <param name="child">The new child to replace the old with</param>
-        /// <param name="index">The index to swap (must be in range)</param>
+        /// <param name="index">The index to swap. Must be valid child index</param>
         /// <param name="reflow">Reflow after swapping</param>
         /// <returns>The old element that was swapped out, or null if the index is out of bounds</returns>
         protected virtual Static InternalSwapChild(Static child, int index, bool reflow = true, bool ignoreFocus = false)
         {
             if (index < 0 || index >= Children.Count)
-                return null;
+                throw new System.ArgumentOutOfRangeException(nameof(index) + " must be between 0 and the number of children");
 
             var old = Children[index];
             if (old.Parent == this)
@@ -144,14 +144,13 @@ namespace Takai.UI
         /// <summary>
         /// Remove a child element at the specified index
         /// </summary>
-        /// <param name="index">The index to remove</param>
+        /// <param name="index">The index to remove. Must be valid child index</param>
         /// <param name="reflow">Reflow after removing</param>
         /// <returns>The element that was removed, or null if the index is out of bounds</returns>
         protected virtual Static InternalRemoveChild(int index, bool reflow = true)
         {
-
             if (index < 0 || index >= Children.Count)
-                return null;
+                throw new System.ArgumentOutOfRangeException(nameof(index) + " must be between 0 and the number of children");
 
             var old = Children[index];
             if (old.Parent == this)

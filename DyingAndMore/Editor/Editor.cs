@@ -96,7 +96,6 @@ namespace DyingAndMore.Editor
             {
                 Size = new Vector2(6, float.NaN) * (this.selector.ItemSize + this.selector.ItemMargin) 
                      + this.selector.ItemMargin + new Vector2(8), //measure selector given this width and see if requires scrolling?
-                BackgroundColor = new Color(48, 48, 48, 192),
                 HorizontalAlignment = Alignment.Right,
                 VerticalAlignment = Alignment.Stretch,
                 IsEnabled = false
@@ -150,6 +149,9 @@ namespace DyingAndMore.Editor
     public class Editor : Static
     {
         public static Editor Current { get; set; }
+
+        public Takai.Graphics.TextRenderer MapTextRenderer { get; private set; } =
+            new Takai.Graphics.TextRenderer(Takai.Graphics.TextRenderer.Default);
 
         public MapInstance Map
         {
@@ -687,6 +689,13 @@ namespace DyingAndMore.Editor
         {
             base.DrawSelf(context);
             Map.Draw(Camera);
+
+            //ignore camera scale?
+            var gd = context.spriteBatch.GraphicsDevice;
+            MapTextRenderer.Present(
+                gd,
+                Camera.Transform * Matrix.CreateOrthographicOffCenter(gd.Viewport.Bounds, -1, 1)
+            );
         }
     }
 }

@@ -1,0 +1,37 @@
+List {
+	Style: null;
+	Direction: Direction.Vertical;
+	HorizontalAlignment: Alignment.Center;
+	VerticalAlignment: Alignment.Center;
+	Margin: 50;
+
+	Children: [
+		List {
+			Style: null;
+			Direction: Direction.Horizontal;
+			Margin: 50;
+			Children: [
+				Graphic {
+					Sprite: @"Promo/Logo.png";
+				};
+				Graphic {
+					Sprite: @"Promo/Alpha.png";
+					VerticalAlignment: Alignment.Middle;
+				};
+			];
+		};
+
+		ScrollBox {
+			HorizontalAlignment: Alignment.Stretch;
+			Size: [NaN 460];
+
+			Children: [
+				FileList {
+		            HorizontalAlignment: Alignment.Stretch;
+		            BasePath: "Content/Mapsrc";
+		            FilterRegex: "\\.(map\\.tk|d2map\\.zip)$";
+				};
+			];
+		};
+	];
+};

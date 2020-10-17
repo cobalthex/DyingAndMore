@@ -259,6 +259,8 @@ namespace Takai.UI
                     Stack<Static> defocusing = new Stack<Static>();
 
                     //defocus all elements in tree
+                    //this is inefficient, generally unnecessary
+                    //move to function DefocusAll()
                     Static next = this;
                     while (next.Parent != null)
                         next = next.Parent;
@@ -271,7 +273,7 @@ namespace Takai.UI
                         {
                             next._hasFocus = false;
                             //reset didPress?
-                            next.ApplyStyle();
+                            next.ApplyStyle(force: true);
                         }
 
                         foreach (var child in next.Children)
@@ -281,8 +283,7 @@ namespace Takai.UI
                 }
 
                 _hasFocus = value;
-                if (_hasFocus == true)
-                    ApplyStyle();
+                ApplyStyle(force: true);
             }
         }
         private bool _hasFocus = false;

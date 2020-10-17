@@ -43,6 +43,11 @@ namespace Takai.Game
         /// </summary>
         public EffectsClass EntityCollisionEffect { get; set; }
 
+        /// <summary>
+        /// Does this fluid represent blood/guts/etc
+        /// </summary>
+        public bool ContainsGore { get; set; }
+
         //todo: magnetism/cohesion, combinations (n small bloods group into one medium blood, etc)
 
         public FluidInstance Instantiate()

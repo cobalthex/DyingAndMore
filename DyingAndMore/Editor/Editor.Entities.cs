@@ -286,10 +286,10 @@ namespace DyingAndMore.Editor
                         squad.Name,
                         Font,
                         TextStyle,
-                        new Color(Color.White, 0.4f),
-                        editor.Camera.WorldToScreen(squad.SpawnPosition) - (squadNameSize / 2)
+                        new Color(Color.LightCyan, 0.4f),
+                        squad.SpawnPosition - (squadNameSize / 2)
                     );
-                    context.textRenderer.Draw(drawText);
+                    editor.MapTextRenderer.Draw(drawText);
                 }
             }
         }
