@@ -306,7 +306,7 @@ namespace Takai.UI
 
                 _isEnabled = value;
                 if (_isEnabled)
-                    InvalidateArrange();
+                    Parent?.OnChildRemeasure(this);
             }
         }
         private bool _isEnabled = true;

@@ -263,6 +263,7 @@ namespace Takai.Game
                 if (invokeCallback && baseAnimation.CompletionCallback != null)
                     baseAnimation.CompletionCallback();
                 baseAnimation.CompletionCallback = null;
+                baseAnimation.ElapsedTime = TimeSpan.Zero;
 
                 if (Class.DefaultBaseAnimation != null)
                     PlayAnimation(Class.DefaultBaseAnimation);

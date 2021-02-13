@@ -26,7 +26,7 @@ MapInstance {
     Class: MapClass {
         Name: Null;
         Tileset: @"Tilesets/Gray.tiles.tk";
-        MaterialInteractions: @"Materials/Test.mtl.tk";
+        MaterialInteractions: @"Materials/Default.mtl.tk";
         Width: 16;
         Height: 6;
         Tiles: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];

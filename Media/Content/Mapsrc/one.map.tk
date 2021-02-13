@@ -2,7 +2,7 @@ MapInstance {
     Class: MapClass {
         Name: "One tile";
         TileSize: 48;
-        MaterialInteractions: @"Materials/Test.mtl.tk";
+        MaterialInteractions: @"Materials/Default.mtl.tk";
         TilesMaterial: "Tiles";
         TilesImage: "Tilesets/Tiles2.png";
         Width: 1;

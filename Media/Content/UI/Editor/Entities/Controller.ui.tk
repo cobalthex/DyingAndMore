@@ -41,6 +41,7 @@ List {
 								Direction: BindingDirection.TwoWay;
 							}];
 						};
+						# todo: field of view
 						CheckBox {
 							Text: "Can rotate to face target";
 							Bindings: [{

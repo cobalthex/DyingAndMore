@@ -124,6 +124,7 @@ List {
                                             ];
                                         }
 
+                                        # todo: don't display any of this if squad is null?
                                         Static { Text: "`_Squad"; };
                                         List {
                                             Direction: Direction.Horizontal;

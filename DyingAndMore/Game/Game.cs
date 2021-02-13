@@ -368,8 +368,9 @@ namespace DyingAndMore.Game
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            CreatePlayerViewports();
             base.ArrangeOverride(availableSize);
+            Map.Class.OnViewportResized();
+            CreatePlayerViewports();
         }
 
         protected void OnMapChanged(MapInstance oldMap)
@@ -381,9 +382,12 @@ namespace DyingAndMore.Game
 
             ElapsedRealTime = TimeSpan.Zero;
 
+            //todo: map update settings getting fucked
             updateSettingsPane?.BindTo(Map.updateSettings);
             renderSettingsPane?.BindTo(Map.renderSettings);
+
             SelectPlayers();
+            CreatePlayerViewports();
 
             IsPaused = false;
         }
@@ -417,7 +421,7 @@ namespace DyingAndMore.Game
             fpsDisplay.Text = $"FPS:{(1000 / time.ElapsedGameTime.TotalMilliseconds):N2}";
 #endif
 
-            if (isDead && time.TotalGameTime > restartTimer)
+            if (isDead && Map.ElapsedTime > restartTimer)
             {
                 //todo: this is being called imemediately and not sure why
                 isDead = false;
@@ -451,12 +455,15 @@ namespace DyingAndMore.Game
                         if (players[i].inputs.CurrentInputs.TryGetValue(Entities.InputAction.ZoomCamera, out var zoom))
                             players[i].camera.Scale += 0.1f * zoom;
                     }
-
+                    
                     allDead &= !players[i].actor.IsAlive;
                 }
 
                 if (!isDead && allDead)
-                    restartTimer = time.TotalGameTime + TimeSpan.FromSeconds(2);
+                {
+                    Map.TimeScale = 1;
+                    restartTimer = Map.ElapsedTime + TimeSpan.FromSeconds(2);
+                }
                 isDead = allDead;
 
                 Map.Update(time);
@@ -555,6 +562,8 @@ namespace DyingAndMore.Game
 #if DEBUG
             if (IsPaused)
             {
+                //todo: use events
+
                 //per viewport?
                 if (players.Count > 0)
                 {

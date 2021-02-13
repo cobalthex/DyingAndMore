@@ -11,6 +11,7 @@ ActorClass {
     DefaultBaseAnimation: "Idle";
     Animations: {
         Idle: {
+            Name: "Idle";
             Sprite: {
                 texture: @"Actors/spawner.png";
                 Width: 64;
@@ -20,6 +21,7 @@ ActorClass {
             };
         };
         Dead: {
+            Name: "Dead";
             Sprite: {
                 texture: @"Actors/spawner.png";
                 width: 64;
@@ -33,6 +35,7 @@ ActorClass {
             };
         };
         Inactive: {
+            Name: "Inactive";
             Sprite: {
                 texture: @"Actors/spawner.png";
                 width: 64;
@@ -46,6 +49,7 @@ ActorClass {
             };
         };
         SpawnerChargeWeapon: {
+            Name: "SpawnerChargeWeapon";
             Sprite: {
                 texture: @"Actors/spawner.png";
                 width: 64;

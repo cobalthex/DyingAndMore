@@ -150,15 +150,7 @@ namespace Takai.Game
             {
                 spriteBatch = new SpriteBatch(Runtime.GraphicsDevice);
 
-                var dispwidth = Runtime.GraphicsDevice.PresentationParameters.BackBufferWidth;
-                var dispheight = Runtime.GraphicsDevice.PresentationParameters.BackBufferHeight;
-
-                //multisampling must be 0 for OpenGL to work
-                preRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents, true);
-                fluidsRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents, true);
-                reflectionRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents, true);
-                reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents, true);
-                //todo: some of the render targets may be able to be combined
+                OnViewportResized();
 
 //todo: this needs to work with resize
 #if OPENGL
@@ -181,6 +173,27 @@ namespace Takai.Game
             lightmapEffect = Data.Cache.Load<XnaEffect>("Shaders/Lightmap.mgfx");
 
             trailVerts = new TrailVertex[0];
+        }
+
+        public void OnViewportResized()
+        {
+            var dispwidth = Runtime.GraphicsDevice.PresentationParameters.BackBufferWidth;
+            var dispheight = Runtime.GraphicsDevice.PresentationParameters.BackBufferHeight;
+
+            if (preRenderTarget != null)
+            {
+                preRenderTarget.Dispose();
+                fluidsRenderTarget.Dispose();
+                reflectionRenderTarget.Dispose();
+                reflectedRenderTarget.Dispose();
+            }
+            
+            //todo: some of the render targets may be able to be combined
+
+            preRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents, true);
+            fluidsRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents, true);
+            reflectionRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents, true);
+            reflectedRenderTarget = new RenderTarget2D(Runtime.GraphicsDevice, dispwidth, dispheight, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents, true);
         }
 
         public void PatchTileLayoutTexture(Rectangle region)
@@ -770,7 +783,7 @@ namespace Takai.Game
                     foreach (var state in ent.ActiveAnimations)
                     {
                         var stateAngle = state.Class.AlwaysDrawUpright ? 0 : angle;
-
+                        
                         state.Class?.Sprite?.Draw(
                             c.spriteBatch,
                             entPos,

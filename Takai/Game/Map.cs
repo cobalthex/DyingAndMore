@@ -9,37 +9,6 @@ using System.Collections.Generic;
 namespace Takai.Game
 {
     /// <summary>
-    /// An intermediate struct encapsulating tileset properties
-    /// </summary>
-    public struct Tileset : Data.ISerializeExternally
-    {
-        [Data.Serializer.Ignored]
-        public string File { get; set; }
-
-        public Texture2D texture; //sprite?
-        public int size;
-        public string material;
-
-        [Data.Serializer.Ignored]
-        public int TilesPerRow { get; internal set; }
-
-        internal void CalculateTilesPerRow()
-        {
-            TilesPerRow = texture != null ? texture.Width / size : 1;
-        }
-
-        public Tileset(Texture2D texture, int size, string material = "Tiles")
-        {
-            this.File = null;
-            this.texture = texture;
-            this.size = size;
-            this.material = material;
-            this.TilesPerRow = 1;
-            CalculateTilesPerRow();
-        }
-    }
-
-    /// <summary>
     /// The (mostly) static properties of a single map
     /// </summary>
     public partial class MapBaseClass : Data.INamedClass<MapBaseInstance>
@@ -87,6 +56,8 @@ namespace Takai.Game
             {
                 _tileset = value;
                 _tileset.CalculateTilesPerRow();
+
+                SectorPixelSize = Math.Max(1, SectorSize * _tileset.size);
             }
         }
         private Tileset _tileset;

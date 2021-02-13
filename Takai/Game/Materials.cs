@@ -114,11 +114,11 @@ namespace Takai.Game
             if (materialA == null || materialB == null)
                 return;
 
-            AddInteractionSingle(materialA, materialB, interaction);
-            AddInteractionSingle(materialB, materialA, interaction);
+            AddInteractionOneWay(materialA, materialB, interaction);
+            AddInteractionOneWay(materialB, materialA, interaction);
         }
 
-        private void AddInteractionSingle(string outer, string inner, MaterialInteraction interaction)
+        private void AddInteractionOneWay(string outer, string inner, MaterialInteraction interaction)
         {
             if (!interactions.TryGetValue(outer, out var found))
                 found = interactions[outer] = new Dictionary<string, MaterialInteraction>(System.StringComparer.OrdinalIgnoreCase);

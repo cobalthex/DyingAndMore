@@ -4,7 +4,7 @@ using System;
 
 namespace Takai.UI
 {
-    public class DropdownSelect<T> : Static
+    public class DropdownSelect<T> : List
     {
         protected Static dropdownContainer;
         protected ScrollBox dropdown;
@@ -53,9 +53,19 @@ namespace Takai.UI
         }
         bool _allowDefaultValue;
 
+        private Graphic arrowUI;
+
         public DropdownSelect()
         {
-            Style = "DropdownSelect";
+            Direction = Direction.Horizontal;
+
+            arrowUI = new Graphic
+            {
+                Style = "DropdownSelect.Arrow",
+                HorizontalAlignment = Alignment.Right,
+                VerticalAlignment = Alignment.Center,
+            };
+            AddChild(arrowUI);
 
             list = new ItemList<T>()
             {
@@ -98,6 +108,8 @@ namespace Takai.UI
                 ((DropdownSelect<T>)sender).CloseDropDown();
                 return UIEventResult.Continue;
             });
+
+            Style = "DropdownSelect";
         }
 
         public override void BindTo(object source, System.Collections.Generic.Dictionary<string, object> customBindProps = null)
@@ -118,13 +130,13 @@ namespace Takai.UI
             if (sea.newIndex >= 0)
             {
                 preview = list.Container.Children[sea.newIndex].CloneHierarchy();
-                
+                preview.HorizontalAlignment = Alignment.Left; // this shouldn't be necessary
+                preview.BindTo(list.Items[sea.newIndex]);
+
                 if (previewChildIndex < 0)
                     InsertChild(preview, 0);
                 else
                     ReplaceChild(preview, previewChildIndex);
-
-                preview.BindTo(list.Items[sea.newIndex]);
             }
             else if (preview != null)
                 preview.BindTo(null);
@@ -138,12 +150,14 @@ namespace Takai.UI
             dropdownContainer = dropdownContainer.CloneHierarchy();
             dropdown = (ScrollBox)dropdownContainer.Children[0];
             list = (ItemList<T>)System.Linq.Enumerable.First(dropdown.EnumerableChildren);
-            
+            arrowUI = (Graphic)Children[arrowUI.ChildIndex];
+
             var previewChildIndex = preview?.ChildIndex ?? -1;
             if (previewChildIndex >= 0)
             {
                 preview = list.Container.Children[list.SelectedIndex];
                 preview.BindTo(list.SelectedItem);
+                InvalidateArrange();
             }
             else
                 preview = null;
@@ -156,6 +170,7 @@ namespace Takai.UI
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
+            base.MeasureOverride(availableSize); //has to pre-calc stretches
             dropdownContainer.Measure(InfiniteSize);
             return new Vector2(list.MeasuredSize.X == 0 ? 200 : list.MeasuredSize.X, 30); //todo
         }
@@ -165,19 +180,19 @@ namespace Takai.UI
             if (dropdownContainer.Parent != null)
             {
                 var root = GetRoot();
-             
+
                 var dsz = new Point(
                     (int)availableSize.X,
                     (int)dropdownContainer.MeasuredSize.Y
                 );
                 dsz.Y = MathHelper.Clamp(
-                    Math.Min(dsz.Y, DropdownHeight.max), 
-                    DropdownHeight.min, 
+                    Math.Min(dsz.Y, DropdownHeight.max),
+                    DropdownHeight.min,
                     root.OffsetContentArea.Height - OffsetContentArea.Bottom
                 );
 
                 var dpos = new Point(OffsetContentArea.Left - (int)Padding.X, OffsetContentArea.Bottom);
-                
+
                 //keep on-screen
                 dpos.X = MathHelper.Clamp(dpos.X, 0, root.OffsetContentArea.Width - dsz.X);
                 dpos.Y = MathHelper.Clamp(dpos.Y, 0, root.OffsetContentArea.Height - dsz.Y);
@@ -186,7 +201,6 @@ namespace Takai.UI
                 //dropdown.Measure(dsz.ToVector2()); //todo: this is not working
                 dropdown.Arrange(new Rectangle(dpos.X, dpos.Y, dsz.X, dsz.Y));
             }
-            preview?.Arrange(new Rectangle(0, 0, (int)availableSize.X, (int)availableSize.Y));
             base.ArrangeOverride(availableSize);
         }
 
@@ -226,6 +240,13 @@ namespace Takai.UI
                 return base.HandleInput(time);
 
             return false;
+        }
+
+        protected override void ApplyStyleRules(System.Collections.Generic.Dictionary<string, object> styleRules)
+        {
+            base.ApplyStyleRules(styleRules);
+            if (arrowUI != null)
+                arrowUI.Sprite = GetStyleRule(styleRules, "ArrowSprite", arrowUI.Sprite);
         }
     }
 }

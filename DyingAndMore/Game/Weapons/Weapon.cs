@@ -64,6 +64,11 @@ namespace DyingAndMore.Game.Weapons
         public bool CanAlwaysCharge { get; set; } = false;
 
         /// <summary>
+        /// How much to decrease the active charge after discharging
+        /// </summary>
+        public float DischargeCost { get; set; } = 0;
+
+        /// <summary>
         /// Offset from the entity to spawn the effects, projectiles, etc
         /// </summary>
         public float SpawnOffset { get; set; } = 2;
@@ -170,24 +175,27 @@ namespace DyingAndMore.Game.Weapons
             if (wasUsing && !isUsing)
                 OnEndUse();
 
-            if (isUsing)
-            {
-                if (Class.ChargeTime <= TimeSpan.Zero)
-                    Charge = 1;
-                else if (Charge < 1)
-                    Charge += (float)(deltaTime.TotalSeconds / Class.ChargeTime.TotalSeconds);
-            }
-            else
+            
+            if (!isUsing)
             {
                 if (Class.CooldownTime <= TimeSpan.Zero)
                     Charge = 0;
                 else if (Charge > 0)
                     Charge -= (float)(deltaTime.TotalSeconds / Class.CooldownTime.TotalSeconds);
+                Actor.StopAnimation($"{Class.AnimationClass}ChargeWeapon");
             }
 
             switch (State)
             {
                 case WeaponState.Charging:
+                    if (isUsing) //maybe not ideal, but required for charging animation to correctly play between firing
+                    {
+                        if (Class.ChargeTime <= TimeSpan.Zero)
+                            Charge = 1;
+                        else if (Charge < 1)
+                            Charge += (float)(deltaTime.TotalSeconds / Class.ChargeTime.TotalSeconds);
+                    }
+
                     if (Charge >= 1 && CanUse(Actor.Map.ElapsedTime))
                     {
                         switch (Class.OverchargeAction)
@@ -197,8 +205,10 @@ namespace DyingAndMore.Game.Weapons
                                 OnDischarge();
                                 break;
                             case OverchargeAction.Explode:
-                                throw new NotImplementedException("todo");
+                                System.Diagnostics.Debug.Write("Todo: OverchargeAction.Explode"); //todo
+                                break;
                         }
+                        Charge -= Class.DischargeCost;
                     }
                     break;
 
@@ -227,7 +237,8 @@ namespace DyingAndMore.Game.Weapons
                 if (State == WeaponState.Idle)
                 {
                     State = WeaponState.Charging;
-                    Actor.PlayAnimation($"{Class.AnimationClass}ChargeWeapon");
+                    Actor.PlayAnimation($"{Class.AnimationClass}ChargeWeapon"); //time offset?
+                    //if animation is interrupted (see `if (!isUsing)` above), animation will be out of sync with charge
                 }
                 return true;
             }

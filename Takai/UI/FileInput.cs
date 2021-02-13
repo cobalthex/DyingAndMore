@@ -17,14 +17,26 @@ namespace Takai.UI
             get => _value;
             set
             {
-                _value = value;
-                OnFileSelected(System.EventArgs.Empty);
-                FileSelected?.Invoke(this, System.EventArgs.Empty);
+                if (value == _value)
+                    return;
+
+                _value = (RelativeRoot != null && value != null ? Data.Cache.GetRelativePath(value) : value);
+                IsFileValid = !VerifyFileExists || value == null || value.Length == 0 || File.Exists(value);
+
+                BubbleEvent(ValueChangedEvent, new UIEventArgs(this));
             }
         }
         private string _value;
 
-        public bool IsFileValid => !VerifyFileExists || Value.Length == 0 || File.Exists(Value);
+        public bool IsFileValid { get; private set; }
+
+
+        /// <summary>
+        /// If not null, use relative file paths, rooted at this value.
+        /// Defaults to "" (Cache.ContentRoot)
+        /// </summary>
+        public string RelativeRoot { get; set; } = string.Empty;
+
 
         //todo: directory support
 
@@ -32,12 +44,6 @@ namespace Takai.UI
         /// On input, show a little marker whether or not the file exists
         /// </summary>
         public bool VerifyFileExists { get; set; } = true;
-
-        /// <summary>
-        /// Called whenever a valid file name is entered
-        /// </summary>
-        public event System.EventHandler FileSelected = null;
-        protected virtual void OnFileSelected(System.EventArgs e) { }
     }
 
     public enum DialogMode
@@ -172,11 +178,10 @@ namespace Takai.UI
 
         protected void DisplayValidation()
         {
-            bool isValid = IsFileValid;
-            if (isValid)
+            if (IsFileValid)
             {
                 BorderColor = lastBorderColor;
-                OnFileSelected(System.EventArgs.Empty);
+                BubbleEvent(ValueChangedEvent, new UIEventArgs(this));
             }
             else
             {

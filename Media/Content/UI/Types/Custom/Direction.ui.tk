@@ -1,0 +1,11 @@
+# Supported types: Vector2
+PolarInput {
+    ShowNormalizedValue: true;
+    Bindings: [
+        Binding {
+            Source: "this";
+            Target: "NormalizedValue";
+            Direction: BindingDirection.TwoWay;
+        };
+    ];
+};

@@ -1,6 +1,6 @@
 WeaponPickupClass {
 	Weapon: @"Weapons/Test.wpn.tk";
-    
+
     RespawnTime: 3sec;
     DestroyOnDeath: false;
 
@@ -12,6 +12,7 @@ WeaponPickupClass {
         Idle: {
             Name:"Idle";
             EnterEffect: @"./PickupSpawn.fx.tk";
+            AlwaysDrawUpright: true;
         	Sprite: {
                 texture: @"./TuberPickup.png";
                 width: 48;

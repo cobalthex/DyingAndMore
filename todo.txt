@@ -5,6 +5,14 @@ Bugs:
     ☐ Evaluate [perf of] casting style args to correct type
     ☐ Fluids not clipping to map for partial tiles
     ☐ Spawner does not restart burp animation when still in fov
+    ☐ Material interactions broken
+    ☐ objects can collide with their children
+    ☐ Render settings fucked after creating new map
+    ☐ fluid delete broken (right click)
+    ☐ dropdowns dont crop to screen correctly
+    ☐ deleting squad attached to entity (spawner) may leave it orphaned, might cause unloadable level w/ unresolved reference
+    ☐ visible bounds/content area pushed left
+    ☐ Scrollboxes are incorrectly sizing child content
 
 Conditions:
     ☐  Invisibility
@@ -25,6 +33,14 @@ Game AI:
       ☐ Flanking
       ☐ Provide cover (broadcasting between squad members)
     ☐ play animations
+    ☐ flowfinding getting stuck in corners
+
+
+Thrown abilities:
+    ☐ shield
+    ☐ health drain
+    ☐ blinding light
+    ☐ gravity sink
 
 Gases:
     ☐  Behavior changing
@@ -43,7 +59,6 @@ Gases:
   overhaul physics system:
     ☐ proper collidable shapes
     ☐ collision graph (necessary?) Dictionary<Collider, HashSet<Collider>>
-
 
 Serializer:
     ☐ Implicit children (especially for UI elements (e.g. List { a: b; ... ; Child { }; Child { } } ))

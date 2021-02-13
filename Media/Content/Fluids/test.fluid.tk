@@ -1,0 +1,10 @@
+FluidClass {
+    Name: "asdf";
+    Texture: @"Fluids/Mucus.png";
+    Reflection: Null;
+    Scale: 1;
+    Radius: 0;
+    Drag: 0;
+    EntityCollisionEffect: Null;
+    ContainsGore: False;
+}

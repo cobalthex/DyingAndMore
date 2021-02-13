@@ -1,0 +1,27 @@
+List {
+	Direction: Direction.Horizontal;
+	Children: [
+		NumericInput {
+			Minimum: -9223372036854775808;
+			Maximum: 9223372036854775807;
+			Bindings: [
+				Binding {
+					Source: "X";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		}
+		NumericInput {
+			Minimum: -9223372036854775808;
+			Maximum: 9223372036854775807;
+			Bindings: [
+				Binding {
+					Source: "Y";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		}
+	];
+}

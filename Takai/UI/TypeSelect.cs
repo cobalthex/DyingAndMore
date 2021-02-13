@@ -5,14 +5,14 @@ using System.Reflection;
 namespace Takai.UI
 {
     //A dropdown that allows picking from a list of types and constructing an instance
-    public class TypeSelect : DropdownSelect<Type>
+    public class TypeSelect : DropdownSelect<(string name, Type type)>
     {
         public object Instance
         {
             get
             {
-                if (SelectedIndex >= 0 && SelectedItem != null)
-                    return (_instance ?? (_instance = Activator.CreateInstance(SelectedItem)));
+                if (SelectedIndex >= 0 && SelectedItem.type != null)
+                    return (_instance ?? (_instance = Activator.CreateInstance(SelectedItem.type)));
                 else
                     return null;
             }
@@ -21,12 +21,24 @@ namespace Takai.UI
                 if (value == _instance)
                     return;
 
+                _instance = value;
+
                 if (value == null)
                     SelectedIndex = -1;
                 else
-                    SelectedItem = value.GetType();
+                {
+                    var type = value.GetType();
+                    for (int i = 0; i < Items.Count; ++i)
+                    {
+                        if (Items[i].type == type)
+                        {
+                            SelectedIndex = i;
+                            return;
+                        }
+                    }
+                    SelectedIndex = -1;
+                }
 
-                _instance = value;
             }
         }
         private object _instance;
@@ -38,7 +50,7 @@ namespace Takai.UI
                 HorizontalAlignment = Alignment.Stretch,
                 Bindings = new List<Data.Binding>
                 {
-                    new Data.Binding("Name", "Text", Data.BindingDirection.OneWay, "(None)")
+                    new Data.Binding("Item1", "Text")
                 }
             };
 
@@ -50,9 +62,29 @@ namespace Takai.UI
             });
         }
 
+        public TypeSelect(Type type) : this()
+        {
+            AddTypeTree(type);
+        }
+
+        public static TypeSelect FromType<T>()
+        {
+            var sel = new TypeSelect();
+            sel.AddTypeTree(typeof(T));
+            return sel;
+        }
+
         public void AddTypeTree<T>()
         {
             AddTypeTree(typeof(T));
+        }
+        
+        (string name, Type type) GetNameType(Type type)
+        {
+            var dna = type.GetCustomAttribute<DisplayNameAttribute>();
+            if (dna != null)
+                return (dna.Name, type);
+            return (Util.ToSentenceCase(type.Name), type);
         }
 
         /// <summary>
@@ -64,13 +96,13 @@ namespace Takai.UI
         {
             var typeInfo = type.GetTypeInfo();
             if (!typeInfo.IsAbstract)
-                Items.Add(type);
+                Items.Add(GetNameType(type));
 
             foreach (var rtype in Data.Serializer.RegisteredTypes)
             {
                 var rti = rtype.Value.GetTypeInfo();
                 if (!rti.IsAbstract && typeInfo.IsAssignableFrom(rtype.Value))
-                    Items.Add(rtype.Value);
+                    Items.Add(GetNameType(rtype.Value));
             }
         }
 
@@ -91,7 +123,7 @@ namespace Takai.UI
             {
                 var rti = rtype.Value.GetTypeInfo();
                 if (!rti.IsAbstract && rtype.Value.IsDefined(attributeType, true))
-                    Items.Add(rtype.Value);
+                    Items.Add(GetNameType(rtype.Value));
             }
         }
     }

@@ -265,7 +265,7 @@ namespace Takai.Data
 
                 try
                 {
-                    var ext = GetExtension(file);
+                    var ext = GetExtensionWithoutDot(file);
                     if (CustomLoaders.TryGetValue(ext, out var loader))
                     {
                         //todo: multi load support
@@ -411,7 +411,23 @@ namespace Takai.Data
             return (path.StartsWith(root) && (path.Length <= root.Length || path[root.Length] == '\\' || path[root.Length] == '/'));
         }
 
-        public static string GetExtension(string path)
+        public static string GetRelativePath(string path, string root = null)
+        {
+            if (string.IsNullOrEmpty(root))
+                root = ContentRoot;
+            else
+                root = Normalize(root);
+
+            if (!root.EndsWith("/"))
+                root += "/";
+
+            path = Normalize(path);
+
+            var index = path.IndexOf(root);
+            return path.Substring(index + root.Length);
+        }
+
+        public static string GetExtensionWithoutDot(string path)
         {
             return path.Substring(path.LastIndexOf('.') + 1);
 

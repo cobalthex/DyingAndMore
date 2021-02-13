@@ -8,11 +8,17 @@ namespace DyingAndMore.Game.Entities
     public enum Senses
     {
         None                = 0b00000000000000000000,
+
         //only one of these will be set
+        //todo: revisit ^
         FullHealth          = 0b00000000000000000001, //>= max health
+        [Takai.UI.DisplayName("Health < 75%")]
         HealthLessThan75Pct = 0b00000000000000000010,
+        [Takai.UI.DisplayName("Health < 55%")]
         HealthLessThan50Pct = 0b00000000000000000100,
+        [Takai.UI.DisplayName("Health < 25%")]
         HealthLessThan25Pct = 0b00000000000000001000,
+        [Takai.UI.DisplayName("Health < 10%")]
         HealthLessThan10Pct = 0b00000000000000010000,
 
         DamageTaken         = 0b00000000000000100000, //+ HasTarget ?,
@@ -46,7 +52,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The current target actor for behaviors (e.g. enemy to shoot at or ally to follow)
         /// </summary>
-        [Takai.Data.Serializer.AsReference, Takai.UI.UIHidden]
+        [Takai.Data.Serializer.AsReference, Takai.UI.Hidden]
         public ActorInstance Target { get; set; }
 
         /// <summary>
@@ -63,6 +69,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The current 
         /// </summary>
+        [Takai.UI.Hidden]
         public Behavior CurrentBehavior
         {
             get => _currentBehavior;
@@ -78,6 +85,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The current task running in the <see cref="CurrentBehavior"/>
         /// </summary>
+        [Takai.UI.Hidden]
         public int CurrentTask { get; set; }
 
         public TimeSpan CurrentTaskStartTime { get; private set; }
@@ -87,6 +95,7 @@ namespace DyingAndMore.Game.Entities
         /// Reset to 0 when tasks change/fail
         /// </summary>
         /// <remarks>Manually editing this value may cause unintended results</remarks>
+        [Takai.UI.Hidden]
         public int CurrentTaskState { get; set; } = 0;
 
         public Senses KnownSenses { get; private set; }

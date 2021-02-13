@@ -142,7 +142,7 @@ List {
 						];
 					};
 
-					@"./Tasks.ui.tk";
+					GeneratedUI { BindSource: "this"; };
 				];
 			};
 

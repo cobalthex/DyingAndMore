@@ -80,11 +80,11 @@ namespace DyingAndMore.Game.Weapons
             return Squad == null || (SpawnQueue != null && SpawnQueue.Count <= 0); //todo: handle deserializing spawn queue better
         }
 
-        public override bool CanUse(TimeSpan totalTime)
-        {
-            //use squad timers here
-            return base.CanUse(totalTime);
-        }
+        //public override bool CanUse(TimeSpan totalTime)
+        //{
+        //    //use squad timers here
+        //    return base.CanUse(totalTime);
+        //}
 
         protected override void OnDischarge()
         {
@@ -94,6 +94,9 @@ namespace DyingAndMore.Game.Weapons
                 if (IsDepleted())
                     return;
             }
+
+            if (Charge > 0.1f)
+                TryUse();
 
             var next = SpawnQueue.Dequeue();
             if (next != null)

@@ -1,0 +1,9 @@
+FileInput {
+	Bindings: [
+		Binding {
+			Source: "this";
+			Target: "Value";
+			Direction: BindingDirection.TwoWay;
+		};
+	];
+}

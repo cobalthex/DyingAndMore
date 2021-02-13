@@ -1,0 +1,49 @@
+# Supported types: Vector2
+List {
+	Direction: Direction.Horizontal;
+	Children: [
+		Static { Text: "X"; VerticalAlignment: Alignment.Center; };
+		NumericInput {
+			Bindings: [
+				Binding {
+					Source: "X";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		};
+
+		Static { Text: "Y"; VerticalAlignment: Alignment.Center; };
+		NumericInput {
+			Bindings: [
+				Binding {
+					Source: "Y";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		};
+
+		Static { Text: "Width"; VerticalAlignment: Alignment.Center; };
+		NumericInput {
+			Bindings: [
+				Binding {
+					Source: "Width";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		};
+
+		Static { Text: "Height"; VerticalAlignment: Alignment.Center; };
+		NumericInput {
+			Bindings: [
+				Binding {
+					Source: "Height";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		};
+	];
+}

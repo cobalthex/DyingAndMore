@@ -56,6 +56,11 @@ namespace Takai.UI
         public List(params Static[] children)
             : base(children) { }
 
+        public override string ToString()
+        {
+            return base.ToString() + (Direction == Direction.Horizontal ? "↔" : "↕");
+        }
+
         protected override void ApplyStyleRules(Dictionary<string, object> styleRules)
         {
             base.ApplyStyleRules(styleRules);

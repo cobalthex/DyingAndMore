@@ -81,7 +81,7 @@ namespace Takai.UI
             else if (MissingSpriteXColor.A > 0)
             {
                 var rect = VisibleContentArea;
-                rect.Inflate(-4, -4);
+                rect.Inflate(-8, -8);
                 Graphics.Primitives2D.DrawX(context.spriteBatch, MissingSpriteXColor, rect);
 
                 //todo: clip

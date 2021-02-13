@@ -134,10 +134,10 @@ namespace Takai.UI
             //todo: evaluate perf cost
         }
 
-        public static void MergeStyleRules(Dictionary<string, Stylesheet> stylesheets)
+        public static void MergeStyleRules(IEnumerable<KeyValuePair<string, Stylesheet>> stylesheets)
         {
             if (Styles == null)
-                Styles = new Dictionary<string, Stylesheet>(stylesheets.Count * 3 / 2);
+                Styles = new Dictionary<string, Stylesheet>();
 
             foreach (var rules in stylesheets)
             {

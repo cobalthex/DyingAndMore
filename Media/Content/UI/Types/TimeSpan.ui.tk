@@ -1,0 +1,9 @@
+DurationInput {
+    Bindings: [
+        Binding {
+            Source: "this";
+            Target: "Duration";
+            Direction: BindingDirection.TwoWay;
+        };
+    ];
+};

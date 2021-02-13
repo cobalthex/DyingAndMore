@@ -10,9 +10,9 @@
 
 		#Padding: Vector2 [0 0];
 		#Color: Color.White;
-		BackgroundColor: Color.Transparent;
+		#BackgroundColor: Color.Transparent;
 		#BackgroundSprite: null;
-		BorderColor: Color.Transparent;
+		#BorderColor: Color.Transparent;
 
 		#HorizontalAlignment: Alignment.Start;
 		#VerticalAlignment: Alignment.Start;
@@ -96,7 +96,13 @@
 		BackgroundSprite: @"UI/input.9p.tk";
 		BorderColor: Color.Transparent;
 		Padding: Vector2 [5 5];
+		ArrowSprite: Sprite {
+			Texture: @"UI/select.png";
+		};
 	};
+	DropdownSelect.Arrow: {
+		Padding: Vector2 [5 5];
+	}
 	Dropdown: {
 		BackgroundSprite: @"UI/frame.9p.tk";
 		Padding: Vector2 [5 5];
@@ -243,6 +249,7 @@
 		Size: Vector2 [64 64];
 		Padding: Vector2 [4 4];
 		MissingSpriteXColor: Color.Tomato;
+		BorderColor: Color.Black;
 	};
 
 	Editor.Selector.Eraser: {
@@ -293,6 +300,12 @@
 			};
 			CenterRegion: [0 0 16 16];
 		};
+	};
+
+	Texture2D.Preview: {
+		MissingSpriteXColor: Color.Tomato;
+		BackgroundSprite: @"UI/box.9p.tk";
+		Padding: Vector2 [5 5];
 	};
 
 	#todo: support hierarchical styling: ParentElement ChildElement { }

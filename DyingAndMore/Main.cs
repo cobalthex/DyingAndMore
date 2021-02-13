@@ -92,6 +92,10 @@ namespace DyingAndMore
 
             Window.ClientSizeChanged += Window_ClientSizeChanged;
 
+#if DEBUG
+            Window.AllowUserResizing = true;
+#endif
+
             IsMouseVisible = true;
             TargetElapsedTime = System.TimeSpan.FromSeconds(1 / 144f);
             IsFixedTimeStep = false;
@@ -118,9 +122,14 @@ namespace DyingAndMore
         private void Window_ClientSizeChanged(object sender, System.EventArgs e)
         {
             textTransform = CreateScreenTransform();
-            ui?.InvalidateMeasure();
-        }
 
+            ui.Arrange(GraphicsDevice.Viewport.Bounds);
+            ui.InvalidateMeasure();
+
+            debugUI.Arrange(GraphicsDevice.Viewport.Bounds);
+            debugUI.InvalidateMeasure();
+        }
+        
         void GdmDeviceCreated(object sender, System.EventArgs e)
         {
             Takai.Runtime.Game = this;
@@ -270,6 +279,8 @@ namespace DyingAndMore
                 }
             };
 
+            Static childUI;
+
             /*
 #if WINDOWS //UWP launch activation parameters?
             //parse command line args
@@ -303,65 +314,101 @@ namespace DyingAndMore
             }
 #endif
             */
-            
-            //Static childUI = Cache.Load<Static>("UI/test/meter.ui.tk");
+
+            //childUI = Cache.Load<Static>("UI/test/meter.ui.tk");
             //childUI.BindTo(childUI.FindChildByName("input"));
 
-            Static childUI = Cache.Load<Static>("UI/Main.ui.tk");
-            childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)
-            {
-                if (!(ee.Source is FileList fl))
-                    return UIEventResult.Continue;
-                
-#if !ANDROID
-                if (System.IO.File.Exists(fl.SelectedFile))
-#endif
-                {
-                    if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
-                    {
-                        var packmap = (MapInstance)MapBaseInstance.FromPackage(fl.SelectedFile);
-                        packmap.Class.InitializeGraphics();
-                        ui.ReplaceAllChildren(new Editor.Editor(packmap));
-                        return UIEventResult.Handled;
-                    }
+            //            Static childUI = Cache.Load<Static>("UI/Main.ui.tk");
+            //            childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)
+            //            {
+            //                if (!(ee.Source is FileList fl))
+            //                    return UIEventResult.Continue;
 
-                    var map = Cache.Load(fl.SelectedFile);
-                    if (map is MapClass mc)
-                    {
-                        mc.InitializeGraphics();
-                        //ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
-                        ui.ReplaceAllChildren(new Game.GameInstance(new Game.Game { Map = (MapInstance)mc.Instantiate() }));
-                    }
-                    else if (map is MapInstance mi)
-                    {
-                        mi.Class.InitializeGraphics();
-                        //ui.ReplaceAllChildren(new Editor.Editor(mi));
-                        ui.ReplaceAllChildren(new Game.GameInstance(new Game.Game { Map = mi }));
-                    }
-                }
-                return UIEventResult.Handled;
-            });
+            //#if !ANDROID
+            //                if (System.IO.File.Exists(fl.SelectedFile))
+            //#endif
+            //                {
+            //                    if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
+            //                    {
+            //                        var packmap = (MapInstance)MapBaseInstance.FromPackage(fl.SelectedFile);
+            //                        packmap.Class.InitializeGraphics();
+            //                        ui.ReplaceAllChildren(new Editor.Editor(packmap));
+            //                        return UIEventResult.Handled;
+            //                    }
 
-#if DEBUG && ANDROID
-            Static.DisplayDebugInfo = true;
-#endif
+            //                    var map = Cache.Load(fl.SelectedFile);
+            //                    if (map is MapClass mc)
+            //                    {
+            //                        mc.InitializeGraphics();
+            //                        //ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
+            //                        ui.ReplaceAllChildren(new Game.GameInstance(new Game.Game { Map = (MapInstance)mc.Instantiate() }));
+            //                    }
+            //                    else if (map is MapInstance mi)
+            //                    {
+            //                        mi.Class.InitializeGraphics();
+            //                        //ui.ReplaceAllChildren(new Editor.Editor(mi));
+            //                        ui.ReplaceAllChildren(new Game.GameInstance(new Game.Game { Map = mi }));
+            //                    }
+            //                }
+            //                return UIEventResult.Handled;
+            //            });
 
-            //sp = new Takai.Graphics.Sprite();
-            //childUI = Static.GeneratePropSheet(sp);
-            //childUI.Size = new Vector2(400, 500);
+            //#if DEBUG && ANDROID
+            //            Static.DisplayDebugInfo = true;
+            //#endif
 
-            //childUI = new UI.UIDesigner()
+            // // auto tile mapper
             //{
-            //    Size = new Vector2(3000, 2000)
-            //};
+            //    map = new MapClass();
+            //    map.Tileset = Cache.Load<Tileset>("Tilesets/Gray.tiles.tk");
 
-            //{
-            //var map = Cache.Load<MapInstance>("mapsrc/aitest.map.tk");
-            //childUI = new Editor.Editor(map);
-            //map.renderSettings.drawEntityForwardVectors = true;
-            //map.renderSettings.drawEntityHierarchies = true;
+            //    tileGen = new Takai.TilemapGenerator();
+            //    tileGen.TileSize = new Point(map.TileSize);
+            //    tileGen.TilemapTexture = map.Tileset.texture;
+
+            //    map.Tiles = tileGen.Solve(12, 16);
+            //    map.InitializeGraphics();
+            //    childUI = new Editor.Editor((MapInstance)map.Instantiate());
             //}
 
+            // // UI designer
+            //{
+            //  sp = new Takai.Graphics.Sprite();
+            //  childUI = Static.GeneratePropSheet(sp);
+            //  childUI.Size = new Vector2(400, 500);
+
+            //  childUI = new UI.UIDesigner()
+            //  {
+            //      Size = new Vector2(3000, 2000)
+            //  };
+            //}
+
+            //{
+            //    //var map = Cache.Load<MapInstance>("mapsrc/aitest.map.tk");
+            //    var mc = new MapClass
+            //    {
+            //        Tileset = Cache.Load<Tileset>("Tilesets/Gray.tiles.tk"),
+            //        Tiles = new short[20, 20],
+            //        MaterialInteractions = Cache.Load<MaterialInteractions>("Materials/Default.mtl.tk")
+            //    };
+            //    for (int r = 0; r < mc.Tiles.GetLength(0); ++r)
+            //        for (int c = 0; c < mc.Tiles.GetLength(1); ++c)
+            //            mc.Tiles[r, c] = -1;
+
+            //    mc.InitializeGraphics();
+            //    var map = (MapInstance)mc.Instantiate();
+            //    childUI = new Editor.Editor(map);
+            //    map.renderSettings.drawEntityForwardVectors = true;
+            //    map.renderSettings.drawEntityHierarchies = true;
+            //}
+
+            childUI = new ScrollBox(new ObjectClassDesigner())
+            {
+                HorizontalAlignment = Alignment.Center,
+                VerticalAlignment = Alignment.Stretch,
+            };
+
+            //test story flow
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");
             //if (ui is Game.StorySelect ss)
             //{
@@ -380,37 +427,16 @@ namespace DyingAndMore
             ui = new Static
             //ui = new ScrollBox
             {
+                Name = "GameRoot",
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch,
             };
-            ui.AddChild(new ScrollBox(childUI)
-            {
-                HorizontalAlignment = Alignment.Middle,
-                VerticalAlignment = Alignment.Stretch
-            });
-
-            /*
-            var acc = new Accordian
-            {
-                Position = new Vector2(100),
-                ShadeTitleUI = new List(
-                    new Static
-                    {
-                        Bindings = new List<Binding> { new Binding("Name", "Text") },
-                    },
-                    Cache.Load<Static>("UI/RemoveItem.ui.tk")
-                )
-                {
-                    Direction = Direction.Horizontal,
-                    //BackgroundColor = Color.Tomato,
-                    HorizontalAlignment = Alignment.Stretch
-                },
-            };
-            acc.AddChild(new Static("test 1") { Name = "A" });
-            acc.AddChild(new Static("test 2") { Name = "B" });   
-            acc.AddChild(new Static("test 3") { Name = "C" });
-            ui.AddChild(acc);
-            */
+            //ui.AddChild(new ScrollBox(childUI)
+            //{
+            //    HorizontalAlignment = Alignment.Middle,
+            //    VerticalAlignment = Alignment.Stretch
+            //});
+            ui.AddChild(childUI);
 
             //Static.DebugFont = Static.DefaultFont;
 
@@ -443,6 +469,8 @@ namespace DyingAndMore
 
             GraphicsDevice.SetRenderTarget(null);
         }
+        Takai.TilemapGenerator tileGen;
+        MapClass map;
 
         protected override void Update(GameTime gameTime)
         {
@@ -461,6 +489,13 @@ namespace DyingAndMore
             if (InputState.IsPress(Keys.Q)
             && InputState.IsMod(KeyMod.Control))
                 Takai.Runtime.IsExiting = true;
+
+            if (InputState.IsPress(Keys.R) && tileGen != null)
+            {
+                //map.Tiles = tileGen.Solve(map.Height, map.Width);
+                map.Tiles = tileGen.Solve(map.Tiles);
+                map.GenerateCollisionMaskCPU();
+            }
 
             if (Takai.Runtime.IsExiting)
             {

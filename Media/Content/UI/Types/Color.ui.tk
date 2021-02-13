@@ -1,0 +1,68 @@
+List {
+	Direction: Direction.Horizontal;
+	Children: [
+		Static { Text: "R"; VerticalAlignment: Alignment.Center; };
+		NumericInput {
+			Minimum: 0;
+			Maximum: 255;
+			Bindings: [
+				Binding {
+					Source: "R";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		};
+
+		Static { Text: "G"; VerticalAlignment: Alignment.Center; };
+		NumericInput {
+			Minimum: 0;
+			Maximum: 255;
+			Bindings: [
+				Binding {
+					Source: "G";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		};
+
+		Static { Text: "B"; VerticalAlignment: Alignment.Center; };
+		NumericInput {
+			Minimum: 0;
+			Maximum: 255;
+			Bindings: [
+				Binding {
+					Source: "B";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		};
+
+		Static { Text: "A"; VerticalAlignment: Alignment.Center; };
+		NumericInput {
+			Minimum: 0;
+			Maximum: 255;
+			Bindings: [
+				Binding {
+					Source: "A";
+					Target: "Value";
+					Direction: BindingDirection.TwoWay;
+				};
+			];
+		};
+
+		# preview
+		Static {
+			VerticalAlignment: Alignment.Center;
+			Size: [24 24];
+			Bindings: [
+				Binding {
+					Source: "this";
+					Target: "BackgroundColor";
+				};
+			];
+		}
+	];
+}

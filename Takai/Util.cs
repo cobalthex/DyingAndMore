@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 
@@ -50,7 +50,7 @@ namespace Takai
 
         public static readonly Random RandomGenerator = new Random();
 
-        public static T Random<T>(this System.Collections.Generic.IList<T> list) //distribution?
+        public static T Random<T>(this IList<T> list) //distribution?
         {
             if (list == null || list.Count < 1)
                 return default;
@@ -137,7 +137,7 @@ namespace Takai
         /// <param name="list">The list to resize</param>
         /// <param name="newSize">The new size of the list</param>
         /// <param name="defaultValue">A default value for any new items in the list. Existing items will be unchanged</param>
-        public static void Resize<T>(this System.Collections.Generic.List<T> list, int newSize, T defaultValue = default(T))
+        public static void Resize<T>(this List<T> list, int newSize, T defaultValue = default(T))
         {
             var oldSize = list.Count;
             if (newSize < oldSize)
@@ -147,14 +147,22 @@ namespace Takai
         }
 
         /// <summary>
-        /// Resize a list
+        /// Ensure an array is of sufficient size
         /// </summary>
-        /// <typeparam name="T">The type of values in the list</typeparam>
-        /// <param name="array">The list to resize</param>
-        /// <param name="newSize">The new size of the list</param>
-        /// <param name="defaultValue">A default value for any new items in the list. Existing items will be unchanged</param>
+        /// <typeparam name="T">The type of values in the array</typeparam>
+        /// <param name="array">The array to resize, if null, returns a new array of correct size</param>
+        /// <param name="newSize">The new size of the array</param>
+        /// <param name="defaultValue">A default value for any new items in the array. Existing items will be unchanged</param>
         public static T[] EnsureSize<T>(this T[] array, int newSize, T defaultValue = default(T))
         {
+            if (array == null)
+            {
+                var newArray = new T[newSize];
+                for (int i = 0; i < newSize; ++i)
+                    newArray[i] = defaultValue;
+                return newArray;
+            }
+
             if (newSize > array.Length)
             {
                 var newArray = new T[newSize];
@@ -166,7 +174,34 @@ namespace Takai
             return array;
         }
 
-        public static T SwapAndDrop<T>(this System.Collections.Generic.IList<T> list, int index)
+        /// <summary>
+        /// Ensure an list is of sufficient size
+        /// </summary>
+        /// <typeparam name="T">The type of values in the list</typeparam>
+        /// <param name="list">The list to resize, if null, returns a new list of correct size</param>
+        /// <param name="newSize">The new size of the list</param>
+        /// <param name="defaultValue">A default value for any new items in the list. Existing items will be unchanged</param>
+        public static List<T> EnsureSize<T>(this List<T> list, int newSize, T defaultValue = default(T))
+        {
+            if (list == null)
+            {
+                var newList = new List<T>();
+                newList.Resize(newSize, defaultValue);
+                return newList;
+            }
+
+            if (newSize > list.Count)
+            {
+                var newList = new List<T>(newSize);
+                newList.AddRange(list);
+                for (int i = list.Count; i < newSize; ++i)
+                    newList[i] = defaultValue;
+                return newList;
+            }
+            return list;
+        }
+
+        public static T SwapAndDrop<T>(this IList<T> list, int index)
         {
             if (index < 0 || index >= list.Count)
                 throw new IndexOutOfRangeException($"{nameof(index)} must be within the bounds of {nameof(list)}");
@@ -390,7 +425,8 @@ namespace Takai
             builder.Append(char.ToUpper(name[0]));
             for (int i = 1; i < name.Length; ++i)
             {
-                if (char.IsUpper(name[i]) && !char.IsUpper(name[i - 1]))
+                if ((char.IsUpper(name[i]) && !char.IsUpper(name[i - 1])) ||
+                    (!char.IsDigit(name[i - 1]) && char.IsDigit(name[i])))
                 {
                     builder.Append(' ');
                     builder.Append(char.ToLower(name[i]));

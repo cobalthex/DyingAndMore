@@ -239,6 +239,7 @@ namespace Takai.UI
             if (count == 0)
                 return;
 
+            // todo: this is broken with types with hidden children
             for (int i = 0; i < count; ++i)
                 InternalSwapChild(null, i, false);
             _children.Clear();

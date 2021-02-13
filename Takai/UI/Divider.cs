@@ -1,10 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Takai.UI;
 
-namespace DyingAndMore.UI
+namespace Takai.UI
 {
-    class Divider : Static
+    public class Divider : Static
     {
         public Direction Direction
         {
@@ -29,10 +27,19 @@ namespace DyingAndMore.UI
         }
         private Direction _direction;
 
-        public Divider() : base()
+        public Divider() : this(Direction.Horizontal) { }
+        public Divider(Direction direction) : base()
         {
-            HorizontalAlignment = Alignment.Stretch;
-            VerticalAlignment = Alignment.Center;
+            if (direction == Direction.Horizontal)
+            {
+                HorizontalAlignment = Alignment.Stretch;
+                VerticalAlignment = Alignment.Center;
+            }
+            else
+            {
+                HorizontalAlignment = Alignment.Center;
+                VerticalAlignment = Alignment.Stretch;
+            }
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
@@ -42,7 +49,7 @@ namespace DyingAndMore.UI
 
         protected override void DrawSelf(DrawContext context)
         {
-            Takai.Graphics.Primitives2D.DrawFill(context.spriteBatch, Color, VisibleContentArea);
+            Graphics.Primitives2D.DrawFill(context.spriteBatch, Color, VisibleContentArea);
         }
     }
 }

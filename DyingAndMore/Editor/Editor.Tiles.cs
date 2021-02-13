@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using Takai.Input;
 using Takai.UI;
 
@@ -16,6 +16,8 @@ namespace DyingAndMore.Editor
 
         Takai.Graphics.Sprite previewSprite;
 
+        Takai.TilemapGenerator generator;
+
         //short[,] clipboard;
 
         public TilesEditorMode(Editor editor)
@@ -23,6 +25,8 @@ namespace DyingAndMore.Editor
         {
             previewSprite = preview.Sprite;
             preview.StretchToFit = true;
+
+            generator = new Takai.TilemapGenerator(editor.Map.Class.Tileset);
 
             On(PressEvent, OnPress);
             On(DragEvent, OnDrag);
@@ -36,6 +40,13 @@ namespace DyingAndMore.Editor
                 tilesChanged = false;
             }
             base.End();
+        }
+
+        public override void OnMapChanged()
+        {
+            selector = new Selectors.TileSelector(editor.Map.Class.Tileset);
+            generator = new Takai.TilemapGenerator(editor.Map.Class.Tileset);
+            UpdatePreview(selector.SelectedIndex);
         }
 
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
@@ -65,7 +76,10 @@ namespace DyingAndMore.Editor
             else if (InputState.IsMod(KeyMod.Shift))
                 TileFlood(tilePos, tile);
             else
-                TileRect(tilePos, tilePos, tile);
+            {
+                 TileRect(tilePos, tilePos, tile);
+                //SmartPlaceTile(tilePos, tile);
+            }
 
             return UIEventResult.Handled;
         }
@@ -109,6 +123,9 @@ namespace DyingAndMore.Editor
         {
             DyingAndMoreGame.DebugDisplay("X", lastTilePos.X);
             DyingAndMoreGame.DebugDisplay("Y", lastTilePos.Y);
+            if (lastTilePos.X >= 0 && lastTilePos.X < editor.Map.Class.Width &&
+                lastTilePos.Y >= 0 && lastTilePos.Y < editor.Map.Class.Height)
+                DyingAndMoreGame.DebugDisplay("TV", editor.Map.Class.Tiles[lastTilePos.Y, lastTilePos.X]);
 
             if (isPosSaved && !InputState.IsMod(KeyMod.Shift))
             {
@@ -148,6 +165,7 @@ namespace DyingAndMore.Editor
         //Takai.Game.Camera clipCam = new Takai.Game.Camera();
         protected override void DrawSelf(DrawContext context)
         {
+
             var tileSize = new Point(editor.Map.Class.TileSize);
             var lastPos = lastTilePos * tileSize;
             var savedPos = savedTilePos * tileSize;
@@ -173,6 +191,23 @@ namespace DyingAndMore.Editor
                     editor.Map.DrawLine(savedPos.ToVector2() + half, lastPos.ToVector2() + half, Color.GreenYellow);
                 }
             }
+
+#if DEBUG
+            for (int r = 0; r < editor.Map.Class.Height; ++r)
+            {
+                for (int c = 0; c < editor.Map.Class.Width; ++c)
+                {
+                    if (editor.Map.Class.Tiles[r, c] < -1)
+                    {
+                        editor.Map.DrawX(
+                            new Vector2(c + 0.5f, r + 0.5f) * editor.Map.Class.TileSize,
+                            editor.Map.Class.TileSize / 2 - 2,
+                            Color.Tomato
+                        );
+                    }
+                }
+            }
+#endif
 
             //else if (clipboard != null && clipboard.Length > 0)
             //{
@@ -230,7 +265,10 @@ namespace DyingAndMore.Editor
             while (true)
             {
                 if (bounds.Contains(cur))
+                {
                     editor.Map.Class.Tiles[cur.Y, cur.X] = value;
+                    //SmartPlaceTile(cur, value);
+                }
 
                 if (cur.X == end.X && cur.Y == end.Y)
                     break;
@@ -279,7 +317,7 @@ namespace DyingAndMore.Editor
             Point min = tile;
             Point max = tile;
 
-            var queue = new System.Collections.Generic.Queue<Point>();
+            var queue = new Queue<Point>();
             queue.Enqueue(tile);
             while (queue.Count > 0)
             {
@@ -293,6 +331,7 @@ namespace DyingAndMore.Editor
                 for (; left < right; ++left)
                 {
                     editor.Map.Class.Tiles[first.Y, left] = value;
+                    //SmartPlaceTile(new Point(left, first.Y), value);
 
                     if (first.Y > 0 && 
                         editor.Map.Class.Tiles[first.Y - 1, left] == initialValue)
@@ -313,6 +352,72 @@ namespace DyingAndMore.Editor
             bnd.Inflate(1, 1);
             editor.Map.Class.PatchTileLayoutTexture(bnd);
             tilesChanged = true;
+        }
+
+        void SmartPlaceTile(Point pos, short tileValue)
+        {
+            var mc = editor.Map.Class;
+
+            if (pos.X < 0 || pos.Y < 0 || 
+                pos.X >= mc.Width || pos.Y >= mc.Height)
+                return;
+
+            mc.Tiles[pos.Y, pos.X] = tileValue;
+            if (pos.X > 0 && mc.Tiles[pos.Y, pos.X - 1] < 0) // todo: check if old tile is valid and replace if not
+                SetTileAware(pos.X - 1, pos.Y);
+            if (pos.X < mc.Width - 1 && mc.Tiles[pos.Y, pos.X + 1] < 0)
+                SetTileAware(pos.X + 1, pos.Y);
+            if (pos.Y > 0 && mc.Tiles[pos.Y - 1, pos.X] < 0)
+                SetTileAware(pos.X, pos.Y - 1);
+            if (pos.Y < mc.Height - 1 && mc.Tiles[pos.Y + 1, pos.X] < 0)
+                SetTileAware(pos.X, pos.Y + 1);
+
+            editor.Map.Class.PatchTileLayoutTexture(new Rectangle(pos.X - 1, pos.Y - 1, 3, 3));
+        }
+
+        void SetTileAware(int x, int y)
+        {
+            var mc = editor.Map.Class;
+
+            bool filled = false;
+            var available = new HashSet<short>();
+            if (x > 0)
+            {
+                available.UnionWith(generator.Adjacencies[mc.Tiles[y, x - 1] + 1].right);
+                filled = true;
+            }
+            if (x < mc.Width - 1)
+            {
+                var edges = generator.Adjacencies[mc.Tiles[y, x + 1] + 1].left;
+                if (!filled)
+                    available.UnionWith(edges);
+                else
+                    available.IntersectWith(edges);
+                filled = true;
+            }
+            if (y > 0)
+            {
+                var edges = generator.Adjacencies[mc.Tiles[y - 1, x] + 1].bottom;
+                if (!filled)
+                    available.UnionWith(edges);
+                else
+                    available.IntersectWith(edges);
+                filled = true;
+            }
+
+            if (y < mc.Height - 1)
+            {
+                var edges = generator.Adjacencies[mc.Tiles[y + 1, x] + 1].top;
+                if (!filled)
+                    available.UnionWith(edges);
+                else
+                    available.IntersectWith(edges);
+            }
+
+            if (available.Count == 0)
+                mc.Tiles[y, x] = Takai.TilemapGenerator.TILE_CLEAR; // error
+            else
+                mc.Tiles[y, x] = (short)(System.Linq.Enumerable.ElementAt(available, Takai.Util.RandomGenerator.Next(available.Count)) - 1);
         }
     }
 }

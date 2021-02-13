@@ -127,6 +127,23 @@ namespace DyingAndMore.UI
                     rect.Inflate(1, 1);
                     DrawRect(context.spriteBatch, Color.Black, rect);
                 }
+
+                if (InputState.IsMod(KeyMod.Alt))
+                {
+                    var text = new Takai.Graphics.DrawTextOptions(
+                        i.ToString(),
+                        Font,
+                        new Takai.Graphics.TextStyle 
+                        {
+                            size = 12,
+                            outlineColor = Color.Black,
+                            outlineThickness = 0.25f
+                        },
+                        new Color(Color.White, 0.5f),
+                        new Vector2(OffsetContentArea.X + rect.X + 1, OffsetContentArea.Y + rect.Y + 1)
+                    );
+                    context.textRenderer.Draw(text);
+                }
             }
         }
 

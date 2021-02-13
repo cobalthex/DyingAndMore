@@ -159,14 +159,14 @@ namespace Takai.Graphics
         /// <remarks>Only full size frames are used, so any leftover space is ignored</remarks>
         public Rectangle ClipRect
         {
-            get { return clipRect; }
+            get { return _clipRect; }
             set
             {
-                clipRect = value;
+                _clipRect = value;
                 framesPerRow = Math.Max(1, value.Width / _width);
             }
         }
-        private Rectangle clipRect = Rectangle.Empty;
+        private Rectangle _clipRect = Rectangle.Empty;
 
         /// <summary>
         /// The origin of rotation for drawing

@@ -29,7 +29,6 @@ namespace Takai.UI
 
                 var lastTabIndex = _tabIndex;
                 _tabIndex = value;
-                InvalidateMeasure();
 
                 if (lastTabIndex >= 0)
                 {
@@ -41,6 +40,8 @@ namespace Takai.UI
                     Children[_tabIndex + 1].IsEnabled = true;
                     tabBar.Children[_tabIndex].Style = "TabPanel.TabHeader.Active";
                 }
+
+                InvalidateArrange();
             }
         }
         private int _tabIndex = -1;

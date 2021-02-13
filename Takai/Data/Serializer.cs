@@ -36,6 +36,19 @@ namespace Takai.Data
     }
 
     /// <summary>
+    /// For use by custom serializers
+    /// </summary>
+    public struct _ExternalReference : ISerializeExternally
+    {
+        public string File { get; set; }
+
+        public _ExternalReference(string file)
+        {
+            File = file;
+        }
+    }
+
+    /// <summary>
     /// Serialize objects
     /// </summary>
     public static partial class Serializer
@@ -88,10 +101,24 @@ namespace Takai.Data
             LoadTypesFrom(typeof(Serializer).GetTypeInfo().Assembly);
 
             Serializers = new Dictionary<Type, CustomTypeSerializer>();
-            LoadXnaTypes();
+            RegisterSystemTypes();
+            RegisterXnaTypes();
         }
 
-        public static void LoadXnaTypes()
+        public static void RegisterSystemTypes()
+        {
+            RegisterType<Boolean>();
+            RegisterType<Byte>();
+            RegisterType<Char>();
+            RegisterType<Int32>();
+            RegisterType<Int64>();
+            RegisterType<UInt32>();
+            RegisterType<UInt64>();
+            RegisterType<Single>();
+            RegisterType<Double>();
+        }
+
+        public static void RegisterXnaTypes()
         {
             RegisterType<PlayerIndex>();
             RegisterType<BlendState>();
@@ -114,6 +141,7 @@ namespace Takai.Data
             RegisterType<Microsoft.Xna.Framework.Input.Buttons>();
             RegisterType<Microsoft.Xna.Framework.Input.Keys>();
 
+            /* not necessary anymore (hopefully)
             Serializers[typeof(Vector2)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
@@ -165,6 +193,7 @@ namespace Takai.Data
                     return new Point(x, y);
                 }
             };
+            */
 
             Serializers[typeof(Rectangle)] = new CustomTypeSerializer
             {
@@ -198,20 +227,20 @@ namespace Takai.Data
             {
                 Deserialize = (object value, DeserializationContext cxt) =>
                 {
-                    return null; //todo
+                    throw new NullReferenceException();
                 }
             };
 
             Serializers[typeof(Texture2D)] = new CustomTypeSerializer
             {
-                Serialize = (object value) => { return ((Texture2D)value).Name; },
-                Deserialize = (object value, DeserializationContext cxt) => { return Cache.Load<Texture2D>((string)value, cxt.root); } //todo: pass in serialization context
+                Serialize = (object value) => { return new _ExternalReference(((Texture2D)value).Name); },
+                Deserialize = (object value, DeserializationContext cxt) => { return Cache.Load<Texture2D>((string)value, cxt?.root); } //todo: pass in serialization context
             };
 
             Serializers[typeof(SoundEffect)] = new CustomTypeSerializer
             {
-                Serialize = (object value) => { return ((SoundEffect)value).Name; },
-                Deserialize = (object value, DeserializationContext cxt) => { return Cache.Load<SoundEffect>((string)value, cxt.root); }
+                Serialize = (object value) => { return new _ExternalReference(((SoundEffect)value).Name); },
+                Deserialize = (object value, DeserializationContext cxt) => { return Cache.Load<SoundEffect>((string)value, cxt?.root); }
             };
 
             Serializers[typeof(TimeSpan)] = new CustomTypeSerializer

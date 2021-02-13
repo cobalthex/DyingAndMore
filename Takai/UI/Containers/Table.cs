@@ -121,7 +121,7 @@ namespace Takai.UI
 
         protected override void ArrangeOverride(Vector2 availableSize)
         {
-            if (ColumnCount <= 0)
+            if (ColumnCount <= 0 || rowHeights.Length == 0)
                 return;
 
             if (hStretches.Count > 0)

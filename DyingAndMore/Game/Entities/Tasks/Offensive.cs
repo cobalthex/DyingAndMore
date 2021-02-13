@@ -276,7 +276,11 @@ namespace DyingAndMore.Game.Entities.Tasks
                     break;
             }
 
+
             ai.Actor.TurnTowards(direction, deltaTime); //todo: this is too slow
+            if (ai.Actor.Velocity.LengthSquared() > 0.001f)
+                ai.Actor.Accelerate(ai.Actor.WorldForward);
+
             if (Vector2.Dot(ai.Actor.WorldForward, direction) < 0.99f)
                 return TaskResult.Continue;
 

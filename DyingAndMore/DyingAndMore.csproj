@@ -36,6 +36,7 @@
     <DebugType>full</DebugType>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
@@ -50,6 +51,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Editor\EditorModes.cs" />
+    <Compile Include="ObjectClassDesigner.cs" />
     <Compile Include="Game\Entities\Tasks\Defensive.cs" />
     <Compile Include="Game\Entities\Tasks\Navigation.cs" />
     <Compile Include="Game\Entities\Tasks\Offensive.cs" />
@@ -93,7 +96,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Balloon.cs" />
     <Compile Include="UI\Devtools.cs" />
-    <Compile Include="UI\Divider.cs" />
     <Compile Include="UI\EntViewer.cs" />
     <Compile Include="UI\Selects.cs" />
     <Compile Include="UI\TestSizer.cs" />

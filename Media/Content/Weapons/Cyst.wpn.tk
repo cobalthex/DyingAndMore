@@ -1,7 +1,9 @@
 SpawnerClass {
 	Name: "Cyst Spawner";
     AnimationClass: "Spawner";
-    ChargeTime: 500msec;
+    ChargeTime: 380msec; # 400ms animation + 20ms pause
 	DischargeTime: 2sec;
+	DischargeCost: 1;
+	CooldownTime: 0;
 	UnderchargeAction: UnderchargeAction.Discharge;
 }

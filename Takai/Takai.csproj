@@ -58,6 +58,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\Tileset.cs" />
+    <Compile Include="TilemapGenerator.cs" />
     <Compile Include="Curves.cs" />
     <Compile Include="Data\Cache.cs" />
     <Compile Include="Data\Serializer.BinSerialize.cs" />
@@ -113,7 +115,9 @@
     <Compile Include="UI\BitmapTextDisplay.cs" />
     <Compile Include="UI\Containers\Catalog.cs" />
     <Compile Include="UI\CheckBox.cs" />
+    <Compile Include="UI\Containers\KeyValueTable.cs" />
     <Compile Include="UI\Containers\Shade.cs" />
+    <Compile Include="UI\Divider.cs" />
     <Compile Include="UI\Drawer.cs" />
     <Compile Include="UI\DropdownSelect.cs" />
     <Compile Include="UI\EnumSelect.cs" />
@@ -134,19 +138,19 @@
     <Compile Include="UI\Static.Styling.cs" />
     <Compile Include="UI\Static.Updating.cs" />
     <Compile Include="UI\Switch.cs" />
-    <Compile Include="UI\Containers\Table.cs" />
-    <Compile Include="UI\Containers\List.cs" />
+    <Compile Include="UI\Static.cs" />
     <Compile Include="UI\Meter.cs" />
     <Compile Include="UI\NumericInput.cs" />
-    <Compile Include="UI\Containers\RadialList.cs" />
-    <Compile Include="UI\Containers\ScrollBar.cs" />
-    <Compile Include="UI\Static.cs" />
-    <Compile Include="UI\TabPanel.cs" />
     <Compile Include="UI\TextInput.cs" />
     <Compile Include="UI\TrackBar.cs" />
     <Compile Include="UI\TypeSelect.cs" />
     <Compile Include="UI\UITree.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="UI\Containers\Table.cs" />
+    <Compile Include="UI\Containers\List.cs" />
+    <Compile Include="UI\Containers\TabPanel.cs" />
+    <Compile Include="UI\Containers\RadialList.cs" />
+    <Compile Include="UI\Containers\ScrollBar.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TakaiTech.ico" />
@@ -170,7 +174,7 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

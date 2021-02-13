@@ -20,9 +20,6 @@ MapInstance {
             ResetDelay: 0;
             DisableSpawningIfLeaderIsDead: True;
             Leader: *ActorInstance.ref_dVwlAtZc;
-            Units: [
-                *ActorInstance.ref_dVwlAtZc
-            ];
             TotalSpawnCount: 11;
             LastSpawnTime: 0;
         }

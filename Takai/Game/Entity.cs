@@ -360,7 +360,8 @@ namespace Takai.Game
 
         public virtual string GetDebugInfo()
         {
-            return $"ID: {Id}\nClass: {(Class?.Name ?? "(none)")}\nName: {(Name ?? "(none)")}\nAlive: {IsAlive}";
+            return $"ID: {Id}\nClass: {(Class?.Name ?? "(none)")}\nName: {(Name ?? "(none)")}" +
+                $"\nAlive: {IsAlive}\nAnimations: {string.Join(",", ActiveAnimations)}";
         }
 
         public bool InRange(EntityInstance ent, float distanceBetween)

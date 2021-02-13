@@ -895,22 +895,12 @@ namespace Takai.Data
                     return Activator.CreateInstance(destType, expr);
                 }
 
-
-                if (genericType == typeof(Dictionary<,>))
+                //its hacks all the way down
+                if (sourceType.IsGenericType &&
+                    genericType == typeof(System.Collections.ObjectModel.ObservableCollection<>) &&
+                    sourceType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                 {
-                    //todo: revisit, may be able to convert srcDict more easily
-
-                    var srcDict = source as Dictionary<string, object>;
-                    if (srcDict == null)
-                        throw new InvalidCastException($"Type:{destType.Name} is a dictionary but '{source}' is of type:{sourceType.Name}");
-
-                    var dict = Activator.CreateInstance(destType, srcDict.Count);
-                    var add = destType.GetMethod("Add");
-
-                    foreach (var pair in srcDict)
-                        add.Invoke(dict, new[] { Cast(genericArgs[0], pair.Key, context), Cast(genericArgs[1], pair.Value, context) });
-
-                    return dict;
+                    return Activator.CreateInstance(destType, source);
                 }
 
                 if (sourceList != null)
@@ -925,7 +915,6 @@ namespace Takai.Data
                             sourceList[i] = Cast(genericArgs[i], sourceList[i], context);
                         return Activator.CreateInstance(destType, sourceList);
                     }
-
                     //if (typeof(IEnumerable<>).IsAssignableFrom(genericType) && genericArgs.Count() == 1)
                     if (genericType == typeof(HashSet<>) ||
                         genericType == typeof(Queue<>) ||
@@ -951,6 +940,52 @@ namespace Takai.Data
                         return ToListMethod.MakeGenericMethod(genericArgs[0]).Invoke(null, new[] { casted });
                         //return Activator.CreateInstance(destType, new[] { casted });
                     }
+
+                    if (genericType == typeof(Dictionary<,>))
+                    {
+                        var kvpType = sourceType.GenericTypeArguments[0];
+                        if (kvpType.GetGenericTypeDefinition() != typeof(KeyValuePair<,>))
+                            throw new InvalidCastException($"Type:{destType.Name} is a dictionary but '{source}' is not a list of key value pairs");
+
+                        var dict = Activator.CreateInstance(destType, sourceList.Count);
+                        var add = destType.GetMethod("Add");
+
+                        // this is gross
+                        var keyGetter = kvpType.GetProperty(nameof(KeyValuePair<int,int>.Key), BindingFlags.Instance | BindingFlags.Public).GetGetMethod();
+                        var valGetter = kvpType.GetProperty(nameof(KeyValuePair<int,int>.Value), BindingFlags.Instance | BindingFlags.Public).GetGetMethod();
+
+                        var invokeArgs = new object[2];
+                        foreach (var pair in sourceList)
+                        {
+                            invokeArgs[0] = Cast(genericArgs[0], keyGetter.Invoke(pair, null), context);
+                            invokeArgs[1] = Cast(genericArgs[1], valGetter.Invoke(pair, null), context);
+                            add.Invoke(dict, invokeArgs);
+                        }
+
+                        return dict;
+                    }
+                }
+
+                if (genericType == typeof(Dictionary<,>))
+                {
+                    //todo: revisit, may be able to convert srcDict more easily
+
+                    var sourceDict = source as Dictionary<string, object>;
+                    if (sourceDict == null)
+                        throw new InvalidCastException($"Type:{destType.Name} is a dictionary but '{source}' is of type:{sourceType.Name}");
+
+                    var dict = Activator.CreateInstance(destType, sourceDict.Count);
+                    var add = destType.GetMethod("Add");
+                    
+                    var invokeArgs = new object[2];
+                    foreach (var pair in sourceDict)
+                    {
+                        invokeArgs[0] = Cast(genericArgs[0], pair.Key, context);
+                        invokeArgs[1] = Cast(genericArgs[1], pair.Value, context);
+                        add.Invoke(dict, invokeArgs);
+                    }
+
+                    return dict;
                 }
             }
 
