@@ -383,30 +383,33 @@ namespace DyingAndMore
             //  };
             //}
 
-            //{
-            //    //var map = Cache.Load<MapInstance>("mapsrc/aitest.map.tk");
-            //    var mc = new MapClass
-            //    {
-            //        Tileset = Cache.Load<Tileset>("Tilesets/Gray.tiles.tk"),
-            //        Tiles = new short[20, 20],
-            //        MaterialInteractions = Cache.Load<MaterialInteractions>("Materials/Default.mtl.tk")
-            //    };
-            //    for (int r = 0; r < mc.Tiles.GetLength(0); ++r)
-            //        for (int c = 0; c < mc.Tiles.GetLength(1); ++c)
-            //            mc.Tiles[r, c] = -1;
-
-            //    mc.InitializeGraphics();
-            //    var map = (MapInstance)mc.Instantiate();
-            //    childUI = new Editor.Editor(map);
-            //    map.renderSettings.drawEntityForwardVectors = true;
-            //    map.renderSettings.drawEntityHierarchies = true;
-            //}
-
-            childUI = new ScrollBox(new ObjectClassDesigner())
             {
-                HorizontalAlignment = Alignment.Center,
-                VerticalAlignment = Alignment.Stretch,
-            };
+                var map = Cache.Load<MapInstance>("mapsrc/aitest.map.tk");
+                map.Class.InitializeGraphics();
+
+                //var mc = new MapClass
+                //{
+                //    Tileset = Cache.Load<Tileset>("Tilesets/Gray.tiles.tk"),
+                //    Tiles = new short[20, 20],
+                //    MaterialInteractions = Cache.Load<MaterialInteractions>("Materials/Default.mtl.tk")
+                //};
+                //for (int r = 0; r < mc.Tiles.GetLength(0); ++r)
+                //    for (int c = 0; c < mc.Tiles.GetLength(1); ++c)
+                //        mc.Tiles[r, c] = -1;
+
+                //mc.InitializeGraphics();
+                //var map = (MapInstance)mc.Instantiate();
+
+                childUI = new Editor.Editor(map);
+                map.renderSettings.drawEntityForwardVectors = true;
+                map.renderSettings.drawEntityHierarchies = true;
+            }
+
+            //childUI = new ScrollBox(new ObjectClassDesigner())
+            //{
+            //    HorizontalAlignment = Alignment.Center,
+            //    VerticalAlignment = Alignment.Stretch,
+            //};
 
             //test story flow
             //var ui = Cache.Load<Static>("UI/SelectStory.ui.tk");

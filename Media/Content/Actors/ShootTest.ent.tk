@@ -17,7 +17,9 @@ ActorClass {
                 Name: "ShootAtTarget";
                 Tasks: [
                     FindClosestActor { };
-                    NavigateGradient { targetValue: 10; }
+                    SetLocomotor {
+                        locomotor: NavigateGradient { targetValue: 10; };
+                    };
                     ShootAtTarget {
 
                     }
@@ -28,7 +30,9 @@ ActorClass {
                 Name: "Flee";
                 RequisiteSenses: Senses [HealthLessThan25Pct HasTarget];
                 Tasks: [
-                    FleeFromTarget { };
+                    SetLocomotor {
+                        locomotor: FleeFromTarget { };
+                    };
                 ];
             };
         ];

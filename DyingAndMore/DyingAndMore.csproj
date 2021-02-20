@@ -52,13 +52,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Editor\EditorModes.cs" />
+    <Compile Include="Game\Entities\Locomotion\FleeFromTarget.cs" />
+    <Compile Include="Game\Entities\Locomotion\NavigateToTarget.cs" />
+    <Compile Include="Game\Entities\Locomotion\OrbitTarget.cs" />
+    <Compile Include="Game\Entities\TaskBases.cs" />
+    <Compile Include="Game\Entities\Locomotion\MoveToTarget.cs" />
+    <Compile Include="Game\Entities\Locomotion\NavigateGradient.cs" />
+    <Compile Include="Game\Entities\Tasks\Movement.cs" />
     <Compile Include="ObjectClassDesigner.cs" />
     <Compile Include="Game\Entities\Tasks\Defensive.cs" />
-    <Compile Include="Game\Entities\Tasks\Navigation.cs" />
+    <Compile Include="Game\Entities\Locomotion\FollowPath.cs" />
     <Compile Include="Game\Entities\Tasks\Offensive.cs" />
     <Compile Include="Game\Entities\Tasks\Squads.cs" />
     <Compile Include="Game\Entities\Tasks\Targeting.cs" />
-    <Compile Include="Game\Entities\Tasks\Tasks.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous.cs" />
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
@@ -180,6 +187,7 @@
       <Link>Shaders\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Shaders>
   </ItemGroup>
+  <ItemGroup />
   <Target Name="CompileShaders" Label="Compile shaders" AfterTargets="Build" Inputs="@(Shaders)" Outputs="@(Shaders -> '$(MediaDir)Shaders\$(ShaderProfile)\%(RecursiveDir)%(Filename).mgfx')">
     <Exec Command="&#xD;&#xA;powershell.exe @(PowershellArgs, ' ') -File &quot;$(MediaDir)Shaders\compile.ps1&quot; -Verbose -Files %(Shaders.Identity) -$(ShaderProfile) -Configuration $(Configuration)" WorkingDirectory="$(MediaDir)Shaders\" />
   </Target>

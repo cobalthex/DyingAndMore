@@ -76,9 +76,10 @@ namespace DyingAndMore.Game.Entities
             set
             {
                 _currentBehavior = value;
-                CurrentTask = 0;
+                CurrentTaskIndex = 0;
                 CurrentTaskState = 0;
                 CurrentTaskStartTime = Actor?.Map?.ElapsedTime ?? TimeSpan.Zero;
+                //System.Diagnostics.Debug.WriteLine($"{Actor.Id} set behavior to {_currentBehavior?.Name}");
             }
         }
         private Behavior _currentBehavior;
@@ -86,7 +87,7 @@ namespace DyingAndMore.Game.Entities
         /// The current task running in the <see cref="CurrentBehavior"/>
         /// </summary>
         [Takai.UI.Hidden]
-        public int CurrentTask { get; set; }
+        public int CurrentTaskIndex { get; set; }
 
         public TimeSpan CurrentTaskStartTime { get; private set; }
 
@@ -97,6 +98,12 @@ namespace DyingAndMore.Game.Entities
         /// <remarks>Manually editing this value may cause unintended results</remarks>
         [Takai.UI.Hidden]
         public int CurrentTaskState { get; set; } = 0;
+
+        /// <summary>
+        /// The current method this entity is moving.
+        /// Null to stay in place
+        /// </summary>
+        public ILocomotor CurrentLocomotor { get; set; } = null;
 
         public Senses KnownSenses { get; private set; }
 
@@ -124,16 +131,22 @@ namespace DyingAndMore.Game.Entities
 
             var sb = new System.Text.StringBuilder();
             sb.Append(CurrentBehavior.Name);
-            if (CurrentTask < CurrentBehavior.Tasks.Count)
+            if (CurrentTaskIndex < CurrentBehavior.Tasks.Count)
             {
                 sb.Append(": ");
-                sb.Append(CurrentBehavior.Tasks[CurrentTask].GetType().Name);
+                sb.Append(CurrentBehavior.Tasks[CurrentTaskIndex].GetType().Name);
                 //sb.Append("\n(");
                 //sb.Append(KnownSenses);
                 //sb.Append(")");
             }
             sb.Append($" (Target: {Target?.Id})");
             return sb.ToString();
+        }
+
+        public void MaybeInterruptLocomotion(bool shouldInterrupt = true)
+        {
+            if (shouldInterrupt)
+                CurrentLocomotor = null;
         }
 
         public override void Think(TimeSpan deltaTime)
@@ -164,15 +177,17 @@ namespace DyingAndMore.Game.Entities
                 nextSenseCheck = Actor.Map.ElapsedTime + TimeSpan.FromMilliseconds(200);
             }
 
-            if (CurrentBehavior?.Tasks != null && CurrentTask < CurrentBehavior.Tasks.Count)
+            if (CurrentBehavior?.Tasks != null && CurrentTaskIndex < CurrentBehavior.Tasks.Count)
             {
-                var result = CurrentBehavior.Tasks[CurrentTask].Think(deltaTime, this);
-                if (result == Tasks.TaskResult.Failure)
+                var result = CurrentBehavior.Tasks[CurrentTaskIndex].Think(deltaTime, this);
+                if (result == TaskResult.Failure)
                 {
+                    System.Diagnostics.Debug.WriteLine($"{CurrentBehavior.Name}: Task {CurrentTaskIndex} failed with result {result}");
+
                     switch (CurrentBehavior.OnTaskFailure)
                     {
                         case TaskFailureAction.RestartBehavior:
-                            CurrentTask = 0;
+                            CurrentTaskIndex = 0;
                             break;
                         case TaskFailureAction.CancelBehavior:
                             CurrentBehavior = null;
@@ -180,22 +195,24 @@ namespace DyingAndMore.Game.Entities
                         case TaskFailureAction.RetryTask:
                             break;
                         case TaskFailureAction.Ignore:
-                            ++CurrentTask;
+                            ++CurrentTaskIndex;
                             break;
                     }
                     CurrentTaskStartTime = Actor.Map.ElapsedTime;
                     CurrentTaskState = 0;
                 }
-                else if (result == Tasks.TaskResult.Success)
+                else if (result == TaskResult.Success)
                 {
-                    ++CurrentTask;
+                    ++CurrentTaskIndex;
+                    //System.Diagnostics.Debug.WriteLine($"Advancing task to {CurrentTaskIndex}");
                     CurrentTaskState = 0;
                     CurrentTaskStartTime = Actor.Map.ElapsedTime;
                 }
 
             }
-            else if (DefaultBehaviors != null && DefaultBehaviors.Count > 0)
+            else if (DefaultBehaviors != null)
             {
+                Behavior newBehavior = null;
                 //pick random one and test?
                 foreach (var behavior in DefaultBehaviors)
                 {
@@ -203,11 +220,16 @@ namespace DyingAndMore.Game.Entities
                     if ((behavior.RequisiteSenses & KnownSenses) == behavior.RequisiteSenses &&
                         (behavior.RequisiteNotSenses & KnownSenses) == 0 &&
                         (float)Util.RandomGenerator.NextDouble() < behavior.QueueChance)
-                        CurrentBehavior = behavior;
+                        newBehavior = behavior;
                 }
+                CurrentBehavior = newBehavior;
             }
-            else
-                CurrentBehavior = null;
+
+            if (CurrentLocomotor != null)
+            {
+                if (CurrentLocomotor.Move(deltaTime, this) == LocomotionResult.Finished)
+                    CurrentLocomotor = null;
+            }
         }
 
         public Senses BuildSenses(Senses testSenses)
@@ -342,7 +364,7 @@ namespace DyingAndMore.Game.Entities
         /// <summary>
         /// The tasks that comprise this behavior
         /// </summary>
-        public List<Tasks.ITask> Tasks { get; set; }    
+        public List<ITask> Tasks { get; set; }    
 
         public TaskFailureAction OnTaskFailure { get; set; }
 

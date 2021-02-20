@@ -102,6 +102,8 @@ namespace Takai.Data
                     pendingCache[pending.id] = prList = new List<PendingResolution>();
                 prList.Add(pending);
             }
+
+            public override string ToString() => $"{root}:{file}";
         }
 
         public static long GetStreamOffset(TextReader reader)
@@ -724,11 +726,11 @@ namespace Takai.Data
                 }
                 catch (InvalidCastException expt)
                 {
-                    throw new InvalidCastException($"Error casting to field:{pair.Key} in DestType:{destType.Name}: {expt.Message}", expt);
+                    throw new InvalidCastException($"Error casting to field:{pair.Key} in DestType:{destType.Name}: {expt.Message}\n", expt);
                 }
                 catch (Exception expt)
                 {
-                    throw new Exception($"Error parsing field:{pair.Key} in DestType:{destType.Name}: {expt.Message}", expt);
+                    throw new Exception($"Error parsing field:{pair.Key} in DestType:{destType.Name}: {expt.Message}\n", expt);
                 }
             }
 

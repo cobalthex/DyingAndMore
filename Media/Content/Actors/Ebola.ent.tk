@@ -16,29 +16,32 @@ ActorClass {
                 OnTaskFailure: TaskFailureAction.Ignore;
                 Tasks: [
                     FindClosestActor { isAlly: true; };
-                    NavigateGradient { targetValue: 10; }
+                    SetLocomotor {
+                        locomotor: NavigateGradient { targetValue: 10; };
+                    };
+                    WaitForLocomotor { };
                     SetTargetBehavior {
                         applyBehavior: {
                             Name: "Zombie";
                             Tasks: [
                                 #*SetOwnFactions {
                                     factions: Factions.Zombie;
-                                }
+                                };
                                 SetConditionOnSelf {
                                     condition: @"./Conditions/zombie.cond.tk";
                                     duration: 999999days;
-                                }
+                                };
                                 NavigateGradient { };
                                 Suicide { };*#
 
                                 SetOwnClass {
                                     class: @.;
                                     inheritController: true;
-                                }
+                                };
                                 SetConditionOnSelf {
                                     condition: @"./Conditions/zombie.cond.tk";
                                     duration: 999999days;
-                                }
+                                };
                             ];
                         };
                     };

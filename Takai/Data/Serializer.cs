@@ -141,7 +141,7 @@ namespace Takai.Data
             RegisterType<Microsoft.Xna.Framework.Input.Buttons>();
             RegisterType<Microsoft.Xna.Framework.Input.Keys>();
 
-            /* not necessary anymore (hopefully)
+            // required for parsing single values
             Serializers[typeof(Vector2)] = new CustomTypeSerializer
             {
                 Serialize = (object value) => LinearStruct,
@@ -150,7 +150,7 @@ namespace Takai.Data
                     if (value is double d)
                         return new Vector2((float)d);
                     if (value is long l)
-                        return new Vector2((float)l);
+                        return new Vector2(l);
                     return DefaultAction;
                 }
             };
@@ -160,11 +160,11 @@ namespace Takai.Data
                 Serialize = (object value) => LinearStruct,
                 Deserialize = (object value, DeserializationContext cxt) =>
                 {
-                    var v = (List<object>)value;
-                    var x = (float)Convert.ChangeType(v[0], typeof(float));
-                    var y = (float)Convert.ChangeType(v[1], typeof(float));
-                    var z = (float)Convert.ChangeType(v[2], typeof(float));
-                    return new Vector3(x, y, z);
+                    if (value is double d)
+                        return new Vector3((float)d);
+                    if (value is long l)
+                        return new Vector3(l);
+                    return DefaultAction;
                 }
             };
 
@@ -173,12 +173,11 @@ namespace Takai.Data
                 Serialize = (object value) => LinearStruct,
                 Deserialize = (object value, DeserializationContext cxt) =>
                 {
-                    var v = (List<object>)value;
-                    var x = (float)Convert.ChangeType(v[0], typeof(float));
-                    var y = (float)Convert.ChangeType(v[1], typeof(float));
-                    var z = (float)Convert.ChangeType(v[2], typeof(float));
-                    var w = (float)Convert.ChangeType(v[3], typeof(float));
-                    return new Vector4(x, y, z, w);
+                    if (value is double d)
+                        return new Vector4((float)d);
+                    if (value is long l)
+                        return new Vector4(l);
+                    return DefaultAction;
                 }
             };
 
@@ -187,13 +186,11 @@ namespace Takai.Data
                 Serialize = (object value) => LinearStruct,
                 Deserialize = (object value, DeserializationContext cxt) =>
                 {
-                    var v = (List<object>)value;
-                    var x = (int)Convert.ChangeType(v[0], typeof(int));
-                    var y = (int)Convert.ChangeType(v[1], typeof(int));
-                    return new Point(x, y);
+                    if (value is long l)
+                        return new Point((int)l);
+                    return DefaultAction;
                 }
             };
-            */
 
             Serializers[typeof(Rectangle)] = new CustomTypeSerializer
             {
@@ -214,6 +211,11 @@ namespace Takai.Data
                 Serialize = (object value) => { var c = (Color)value; return new[] { c.R, c.G, c.B, c.A }; },
                 Deserialize = (object value, DeserializationContext cxt) =>
                 {
+                    // both assume pre-multiplied
+
+                    if (value is long l) //RGBA packed
+                        return new Color((uint)l);
+
                     var v = (List<object>)value;
                     var r = (int)Convert.ChangeType(v[0], typeof(int));
                     var g = (int)Convert.ChangeType(v[1], typeof(int));
@@ -227,7 +229,7 @@ namespace Takai.Data
             {
                 Deserialize = (object value, DeserializationContext cxt) =>
                 {
-                    throw new NullReferenceException();
+                    throw new NotImplementedException();
                 }
             };
 

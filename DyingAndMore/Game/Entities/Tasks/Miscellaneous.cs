@@ -4,18 +4,6 @@ using Microsoft.Xna.Framework;
 
 namespace DyingAndMore.Game.Entities.Tasks
 {
-    public enum TaskResult
-    {
-        Continue, //rename?
-        Failure,
-        Success
-    }
-
-    public interface ITask
-    {
-        TaskResult Think(TimeSpan deltaTime, AIController ai);
-    }
-
     //pre/suffix tasks with 'Task' ?
 
     public class MiscellaneousTaskAttribute : Attribute { }
@@ -24,9 +12,12 @@ namespace DyingAndMore.Game.Entities.Tasks
     public struct Wait : ITask
     {
         public TimeSpan duration;
+        public bool interruptLocomotion;
 
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
+            ai.MaybeInterruptLocomotion(interruptLocomotion);
+
             if (ai.Actor.Map.ElapsedTime < ai.CurrentTaskStartTime + duration)
                 return TaskResult.Continue;
             return TaskResult.Success;
@@ -77,6 +68,8 @@ namespace DyingAndMore.Game.Entities.Tasks
 
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
+            ai.MaybeInterruptLocomotion();
+
             if (ai.Target == null || ai.Target.WorldParent == ai.Actor)
                 return TaskResult.Failure;
 

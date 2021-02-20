@@ -19,9 +19,12 @@ ActorClass {
                         isAlly: false;
                         isSameClass: false;
                     };
-                    MoveToTarget {
-                        distance: 20;
+                    SetLocomotor {
+                        locomotor: MoveToTarget {
+                            distance: 20;
+                        };
                     };
+                    WaitForLocomotor { };
                     AttachToTarget { };
                 ];
             };

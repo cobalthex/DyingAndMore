@@ -169,8 +169,8 @@ List {
 								];
 							};
 
-							NavigationTaskSelect {
-								Name: "Navigation";
+							MovementTaskSelect {
+								Name: "Movement";
 								HorizontalAlignment: Alignment.Stretch;
 								Bindings: [
 									Binding {

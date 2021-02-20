@@ -15,13 +15,19 @@ ActorClass {
                 Name: "Orbit";
                 Tasks: [
                     FindClosestActor { };
-                    OrbitTarget { radius: 100; };
+                    SetLocomotor {
+                        locomotor: OrbitTarget { radius: 100; };
+                    };
+                    WaitForLocomotor { }; # normal wait?
                 ];
             };
             Behavior {
                 Name: "Kamikazi";
                 Tasks: [
-                    NavigateGradient { };
+                    SetLocomotor {
+                        locomotor: NavigateGradient { };
+                    };
+                    WaitForLocomotor { };
                     Suicide { };
                 ];
             };
@@ -38,10 +44,13 @@ ActorClass {
                 Name: "Follow";
                 Tasks: [
                     FindClosestActor { };
-                    NavigateToTarget {
-                        distance: 100;
-                        permanent: true;
-                    }
+                    SetLocomotor {
+                        locomotor: NavigateToTarget {
+                            distance: 100;
+                            permanent: true;
+                        }
+                    };
+                    WaitForLocomotor { };
                 ]
             }
         ]

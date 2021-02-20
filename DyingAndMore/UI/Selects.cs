@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Takai.Data;
 using DyingAndMore.Game.Entities.Tasks;
+using DyingAndMore.Game.Entities.Locomotion;
 
 namespace DyingAndMore.UI
 {
@@ -198,13 +199,6 @@ namespace DyingAndMore.UI
             AddTypeTreeByAttribute<DefensiveTaskAttribute>();
         }
     }
-    class NavigationTaskSelect : TypeSelect
-    {
-        public NavigationTaskSelect()
-        {
-            AddTypeTreeByAttribute<NavigationTaskAttribute>();
-        }
-    }
     class TargetingTaskSelect : TypeSelect
     {
         public TargetingTaskSelect()
@@ -224,6 +218,21 @@ namespace DyingAndMore.UI
         public MiscellaneousTaskSelect()
         {
             AddTypeTreeByAttribute<MiscellaneousTaskAttribute>();
+        }
+    }
+    class MovementTaskSelect : TypeSelect
+    {
+        public MovementTaskSelect()
+        {
+            AddTypeTreeByAttribute<MovementTaskAttribute>();
+        }
+    }
+
+    class LocomotorTaskSelect : TypeSelect
+    {
+        public LocomotorTaskSelect()
+        {
+            AddTypeTree<ILocomotor>();
         }
     }
 

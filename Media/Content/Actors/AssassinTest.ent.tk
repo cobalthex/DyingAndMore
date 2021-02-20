@@ -17,11 +17,17 @@ ActorClass {
                 Name: "Find target";
                 Tasks: [
                     FindClosestActor { };
-                    NavigateGradient { targetValue: 6; }
-                    OrbitTarget {
-                        radius: 100;
-                        faceTarget: true;
-                    }
+                    SetLocomotor {
+                        locomotor: NavigateGradient { targetValue: 6; };
+                    };
+                    WaitForLocomotor { };
+                    SetLocomotor {
+                        locomotor: OrbitTarget {
+                            radius: 100;
+                            faceTarget: true;
+                        };
+                    };
+                    WaitForLocomotor { };
                 ];
             };
         ];
