@@ -7,39 +7,40 @@ namespace DyingAndMore.Game.Entities
     [Flags]
     public enum Senses
     {
-        None                = 0b00000000000000000000,
+        None                = 0b00000000000000000000000000000000,
 
         //only one of these will be set
         //todo: revisit ^
-        FullHealth          = 0b00000000000000000001, //>= max health
+        FullHealth          = 0b00000000000000000000000000000001, //>= max health
         [Takai.UI.DisplayName("Health < 75%")]
-        HealthLessThan75Pct = 0b00000000000000000010,
+        HealthLessThan75Pct = 0b00000000000000000000000000000010,
         [Takai.UI.DisplayName("Health < 55%")]
-        HealthLessThan50Pct = 0b00000000000000000100,
+        HealthLessThan50Pct = 0b00000000000000000000000000000100,
         [Takai.UI.DisplayName("Health < 25%")]
-        HealthLessThan25Pct = 0b00000000000000001000,
+        HealthLessThan25Pct = 0b00000000000000000000000000001000,
         [Takai.UI.DisplayName("Health < 10%")]
-        HealthLessThan10Pct = 0b00000000000000010000,
+        HealthLessThan10Pct = 0b00000000000000000000000000010000,
 
-        DamageTaken         = 0b00000000000000100000, //+ HasTarget ?,
-        LowAmmo             = 0b00000000000001000000, //+ HasTarget ?, //rename?
+        DamageTaken         = 0b00000000000000000000000000100000, //+ HasTarget ?,
+        LowAmmo             = 0b00000000000000000000000001000000, //+ HasTarget ?, //rename?
 
-        HasTarget           = 0b00000000000010000000, //more allies than enemies
-        TargetVisible       = 0b00000000000100000000, //more enemies than allies
-        TargetCanSeeMe      = 0b00000000001000000000,
+        HasTarget           = 0b00000000000000000000000010000000, //more allies than enemies
+        TargetVisible       = 0b00000000000000000000000100000000, //more enemies than allies
+        TargetCanSeeMe      = 0b00000000000000000000001000000000,
 
-        Supremecy           = 0b00000000010000000000,
-        Outnumbered         = 0b00000000100000000000, // >= 1
-        AllyDied            = 0b00000001000000000000, // >= 1
-        EnemyDied           = 0b00000010000000000000,
-        AllyNearby          = 0b00000100000000000000,
-        EnemyNearby         = 0b00001000000000000000,
-        Attached            = 0b00010000000000000000,
+        Supremecy           = 0b00000000000000000000010000000000,
+        Outnumbered         = 0b00000000000000000000100000000000, // >= 1
+        AllyDied            = 0b00000000000000000001000000000000, // >= 1
+        EnemyDied           = 0b00000000000000000010000000000000,
+        AllyNearby          = 0b00000000000000000100000000000000,
+        EnemyNearby         = 0b00000000000000001000000000000000,
+        Attached            = 0b00000000000000010000000000000000,
 
-        LastSquadUnit       = 0b00100000000000000000,
-        SquadLeaderDead     = 0b01000000000000000000, //leader cannot be null
+        LastSquadUnit       = 0b00000000000000100000000000000000,
+        SquadLeaderDead     = 0b00000000000001000000000000000000, //leader cannot be null
         //squad unit has low health
 
+        // stuck: not moved for more than half a second (but force applied, or has locomotor, something like that)
 
         //target close/far
         //target fleeing?
@@ -103,9 +104,10 @@ namespace DyingAndMore.Game.Entities
         /// The current method this entity is moving.
         /// Null to stay in place
         /// </summary>
+        [Takai.UI.Hidden]
         public ILocomotor CurrentLocomotor { get; set; } = null;
 
-        public Senses KnownSenses { get; private set; }
+        public Senses KnownSenses { get; private set; } = 0;
 
         /// <summary>
         /// when to next check preemptive behaviors

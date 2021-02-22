@@ -168,30 +168,27 @@ namespace Takai.Game
 
         //namespace path info?
 
-        public struct PathTile
+        public struct TileNav
         {
             public uint heuristic;
             internal uint generation;
             internal uint total;
             internal uint count;
         }
-        internal uint pathGeneration = 0;
+        internal uint navGeneration = 0;
 
         [Data.Serializer.Ignored]
-        public PathTile[,] PathInfo { get; set; } = new PathTile[0, 0];
-
-        [Data.Serializer.Ignored]
-        public List<Point> PathOrigins { get; set; } = new List<Point>();
+        public TileNav[,] NavInfo { get; set; } = new TileNav[0, 0];
 
         internal uint MaxHeuristic = 0;
 
-        public PathTile PathInfoAt(Vector2 position)
+        public TileNav NavInfoAt(Vector2 position)
         {
             if (!Class.Bounds.Contains(position))
-                return new PathTile { heuristic = uint.MaxValue };
+                return new TileNav { heuristic = uint.MaxValue };
 
             var tile = (position / Class.TileSize).ToPoint();
-            return PathInfo[tile.Y, tile.X];
+            return NavInfo[tile.Y, tile.X];
         }
 
         public struct HeuristicScore
@@ -235,10 +232,6 @@ namespace Takai.Game
             if (!Class.CanPath(start))
                 return;
 
-            if (!blend)
-                PathOrigins.Clear();
-            PathOrigins.Add(start);
-
             var visibleTiles = Rectangle.Intersect(Class.Bounds, new Rectangle(
                 region.X / Class.TileSize,
                 region.Y / Class.TileSize,
@@ -246,11 +239,11 @@ namespace Takai.Game
                 Util.CeilDiv(region.Height, Class.TileSize)
             ));
 
-            ++pathGeneration;
-            PathInfo[start.Y, start.X] = new PathTile
+            ++navGeneration;
+            NavInfo[start.Y, start.X] = new TileNav
             {
                 heuristic = 0,
-                generation = pathGeneration
+                generation = navGeneration
             };
 
             var queue = new Queue<HeuristicScore>(); //static?
@@ -267,24 +260,24 @@ namespace Takai.Game
                     if (Class.CanPath(pos) &&
                         visibleTiles.Contains(pos))
                     {
-                        if (PathInfo[pos.Y, pos.X].generation != pathGeneration)
+                        if (NavInfo[pos.Y, pos.X].generation != navGeneration)
                         {
                             if (blend)
                             {
-                                var pi = PathInfo[pos.Y, pos.X];
-                                pi.generation = pathGeneration;
+                                var pi = NavInfo[pos.Y, pos.X];
+                                pi.generation = navGeneration;
                                 pi.total += heuristic;
                                 ++pi.count;
                                 pi.heuristic = Math.Min(heuristic, pi.heuristic + 1);
                                 heuristic = pi.heuristic;
-                                PathInfo[pos.Y, pos.X] = pi;
+                                NavInfo[pos.Y, pos.X] = pi;
                             }
                             else
                             {
-                                PathInfo[pos.Y, pos.X] = new PathTile
+                                NavInfo[pos.Y, pos.X] = new TileNav
                                 {
                                     heuristic = heuristic,
-                                    generation = pathGeneration,
+                                    generation = navGeneration,
                                     count = 1,
                                     total = first.value
                                 };
@@ -292,7 +285,7 @@ namespace Takai.Game
                             queue.Enqueue(new HeuristicScore
                             {
                                 tile = pos,
-                                value = PathInfo[pos.Y, pos.X].heuristic + 1
+                                value = NavInfo[pos.Y, pos.X].heuristic + 1
                             });
                         }
                     }
@@ -300,12 +293,15 @@ namespace Takai.Game
                         ++edge;
                 }
 
-                //bias against corners -walls-
+                // todo: need to bias against convex corners
+                // pre-calc&cache where convex corners are and store them in a table?
+
+                //bias against corners/walls
                 if (edge > 1)
                 {
-                    var pi = PathInfo[first.tile.Y, first.tile.X];
+                    var pi = NavInfo[first.tile.Y, first.tile.X];
                     pi.heuristic += edge + WallPathingBias;
-                    PathInfo[first.tile.Y, first.tile.X] = pi;
+                    NavInfo[first.tile.Y, first.tile.X] = pi;
                 }
                 MaxHeuristic = Math.Max(MaxHeuristic, heuristic);
             }
@@ -332,14 +328,14 @@ namespace Takai.Game
             {
                 for (int tbX = Math.Max(0, region.Left); tbX < Math.Min(Class.Width, region.Right); ++tbX)
                 {
-                    if (PathInfo[tbY, tbX].heuristic == uint.MaxValue)
+                    if (NavInfo[tbY, tbX].heuristic == uint.MaxValue)
                         continue;
 
                     var dist = Vector2.DistanceSquared(tilePos, new Vector2(tbX, tbY));
-                    var pi = PathInfo[tbY, tbX];
+                    var pi = NavInfo[tbY, tbX];
                     var rad = 1 - Math.Min(1, dist / weightRadius);
                     pi.heuristic = Math.Min(uint.MaxValue, pi.heuristic + (uint)(4 * rad));
-                    PathInfo[tbY, tbX] = pi;
+                    NavInfo[tbY, tbX] = pi;
                 }
             }
         }

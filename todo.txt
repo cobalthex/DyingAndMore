@@ -13,6 +13,7 @@ Bugs:
     ☐ deleting squad attached to entity (spawner) may leave it orphaned, might cause unloadable level w/ unresolved reference
     ☐ visible bounds/content area pushed left
     ☐ Scrollboxes are incorrectly sizing child content
+    ☐ cloning trails fubars them
 
 Conditions:
     ☐  Invisibility

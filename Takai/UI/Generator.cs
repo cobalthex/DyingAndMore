@@ -13,7 +13,7 @@ namespace Takai.UI
     public class HiddenAttribute : Attribute { }
 
     /// <summary>
-    /// when generating a UI for this type, 
+    /// when generating a UI for this type, use this editor
     /// </summary>
     public class CustomEditorAttribute : Attribute
     {
@@ -30,6 +30,9 @@ namespace Takai.UI
 
     // build from derived types attribute
 
+    /// <summary>
+    /// When creating a generated UI, display a file picker instead of generating the UI for the affected object
+    /// </summary>
     public class LoadFromFileAttribute : Attribute { }
 
     /// <summary>
@@ -37,7 +40,22 @@ namespace Takai.UI
     /// </summary>
     public class GeneratedUI : Static
     {
-        public string BindSource { get; set; }
+        /// <summary>
+        /// The source property of the passed in binding to bind to
+        /// </summary>
+        public string BindSource
+        {
+            get => _bindSource;
+            set
+            {
+                if (_bindSource == value)
+                    return;
+
+                _bindSource = value;
+                proxyBinding = (_bindSource == null ? null : new Binding(BindSource, nameof(BindProxy)));
+            }
+        }
+        private string _bindSource;
 
         private Binding proxyBinding;
 
@@ -70,20 +88,18 @@ namespace Takai.UI
                 throw new ArgumentNullException(nameof(BindSource) + " cannot be null");
 
             BindSource = bindSource;
-
-            proxyBinding = new Binding(BindSource, nameof(BindProxy));
         }
 
         public override void BindTo(object source, Dictionary<string, object> customBindProps = null)
         {
             base.BindTo(source, customBindProps);
-            proxyBinding.BindTo(source, this, null, true);
+            proxyBinding?.BindTo(source, this, null, true);
         }
 
         protected override void UpdateSelf(GameTime time)
         {
             base.UpdateSelf(time);
-            proxyBinding.Update();
+            proxyBinding?.Update();
         }
     }
 
@@ -433,6 +449,11 @@ namespace Takai.UI
                     if (nested != null)
                         root.AddChild(nested);
                 }
+            }
+
+            if (memCount == 0)
+            {
+                root.AddChild(new Static("(No inputs)"));
             }
 
             root.Direction = inlineSmallStructs && type.IsValueType && memCount <= 4 ? Direction.Horizontal : Direction.Vertical;

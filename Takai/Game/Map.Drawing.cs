@@ -630,7 +630,7 @@ namespace Takai.Game
             {
                 for (var x = c.visibleTiles.Left; x < c.visibleTiles.Right; ++x)
                 {
-                    var path = PathInfo[y, x];
+                    var path = NavInfo[y, x];
                     if (path.heuristic == uint.MaxValue)
                         continue;
 

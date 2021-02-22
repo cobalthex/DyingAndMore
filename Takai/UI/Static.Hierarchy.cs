@@ -89,13 +89,21 @@ namespace Takai.UI
             //Diagnostics.Debug.WriteLine($"Inserting child ID:{child.DebugId} @ {index} into ID:{DebugId}");
             //todo: maybe have a forward setting (forward all additions to specified child)
 
-            if (child == null || child.Parent == this)
+            if (child == null)
                 return false;
 
-            if (child.Parent != null)
-                child.RemoveFromParent();
-
-            child.SetParentNoReflow(this);
+            //perform a move
+            if (child.Parent == this)
+            {
+                _children.RemoveAt(child.ChildIndex); // not the most efficient, but ¯\_(ツ)_/¯
+            }
+            else
+            {
+                if (child.Parent != null)
+                    child.RemoveFromParent();
+                
+                child.SetParentNoReflow(this);
+            }
 
             if (index < 0 || index >= _children.Count)
                 _children.Add(child);
@@ -182,6 +190,12 @@ namespace Takai.UI
             return child;
         }
 
+        /// <summary>
+        /// Insert (or re-arrange) a child element
+        /// </summary>
+        /// <param name="child">The child element to move</param>
+        /// <param name="index">the new index for the child</param>
+        /// <returns>The child</returns>
         public Static InsertChild(Static child, int index = 0)
         {
             InternalInsertChild(child, index);

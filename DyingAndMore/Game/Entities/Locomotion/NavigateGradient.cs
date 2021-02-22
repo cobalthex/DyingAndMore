@@ -38,7 +38,7 @@ namespace DyingAndMore.Game.Entities.Locomotion
         {
             var testPos = actor.WorldPosition + (actor.Radius + 1) * actor.Forward;
 
-            var cur = actor.Map.PathInfoAt(testPos).heuristic;
+            var cur = actor.Map.NavInfoAt(testPos).heuristic;
             var best = target < cur ? uint.MaxValue : 0;
 
             var possible = Point.Zero;
@@ -57,7 +57,7 @@ namespace DyingAndMore.Game.Entities.Locomotion
 
                 //note: doesn't really work with cur < target due to how heuristic is generated
                 //maybe use sdf edge detection to work around this?
-                var h = actor.Map.PathInfo[next.Y, next.X].heuristic;
+                var h = actor.Map.NavInfo[next.Y, next.X].heuristic;
                 if ((cur > target && h <= best) ||
                     (cur < target && h >= best))
                 {
@@ -80,7 +80,7 @@ namespace DyingAndMore.Game.Entities.Locomotion
 
         public LocomotionResult Move(TimeSpan deltaTime, AIController ai)
         {
-            var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
+            var cur = ai.Actor.Map.NavInfoAt(ai.Actor.WorldPosition).heuristic;
             switch (successCondition)
             {
                 case ComparisonMethod.Equal:

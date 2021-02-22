@@ -384,7 +384,7 @@ namespace DyingAndMore
             //}
 
             {
-                var map = Cache.Load<MapInstance>("mapsrc/aitest.map.tk");
+                var map = Cache.Load<MapInstance>("mapsrc/navtest.map.tk");
                 map.Class.InitializeGraphics();
 
                 //var mc = new MapClass

@@ -15,8 +15,8 @@ namespace DyingAndMore.Game.Entities.Locomotion
 
             //todo: A*?
 
-            var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
-            var target = ai.Actor.Map.PathInfoAt(ai.Target.WorldPosition).heuristic;
+            var cur = ai.Actor.Map.NavInfoAt(ai.Actor.WorldPosition).heuristic;
+            var target = ai.Actor.Map.NavInfoAt(ai.Target.WorldPosition).heuristic;
             if (Math.Abs(cur - target) <= 1)
                 return permanent ? LocomotionResult.Continue : LocomotionResult.Finished;
 

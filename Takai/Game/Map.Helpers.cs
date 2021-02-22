@@ -114,13 +114,13 @@ namespace Takai.Game
                     Destroy(entity);
             }
 
-            PathInfo = PathInfo.Resize(newHeight, newWidth);
+            NavInfo = NavInfo.Resize(newHeight, newWidth);
             for (int y = 0; y < newHeight; ++y)
             {
                 for (int x = 0; x < newWidth; ++x)
                 {
-                    if (PathInfo[y, x].generation == 0)
-                        PathInfo[y, x] = new PathTile { heuristic = uint.MaxValue, generation = 0 };
+                    if (NavInfo[y, x].generation == 0)
+                        NavInfo[y, x] = new TileNav { heuristic = uint.MaxValue, generation = 0 };
                 }
             }
         }

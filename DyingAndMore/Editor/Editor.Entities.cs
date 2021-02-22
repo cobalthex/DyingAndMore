@@ -122,7 +122,7 @@ namespace DyingAndMore.Editor
                     else if (editor.Map.Class.Bounds.Contains(worldPos) && selector.ents.Count > 0)
                     {
                         SelectedEntity = editor.Map.Spawn(
-                            selector.ents[selector.SelectedIndex], 
+                            selector.SelectedEntity, 
                             worldPos,
                             DefaultForward, 
                             Vector2.Zero
@@ -199,6 +199,16 @@ namespace DyingAndMore.Editor
                         newForward
                     );
                     return false;
+                }
+
+                // duplicate selected entity and place under cursor
+                if (InputState.IsPress(Keys.B))
+                {
+                    var clone = SelectedEntity.Clone();
+                    clone.OutlineColor = Color.Transparent;
+                    clone.Velocity = Vector2.Zero;
+                    clone.SetPositionTransformed(currentWorldPos);
+                    editor.Map.Spawn(clone);
                 }
 
                 if (InputState.IsPress(Keys.Delete))

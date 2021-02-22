@@ -97,7 +97,10 @@
 		BorderColor: Color.Transparent;
 		Padding: Vector2 [5 5];
 		ArrowSprite: Sprite {
-			Texture: @"UI/select.png";
+			Texture: @"UI/arrows.png";
+			ClipRect: [0 0 20 15];
+			Width: 20;
+			Height: 15;
 		};
 	};
 	DropdownSelect.Arrow: {
@@ -299,6 +302,29 @@
 				FrameLength: 50msec;
 			};
 			CenterRegion: [0 0 16 16];
+		};
+	};
+
+	DownButton: {
+		BackgroundSprite: NinePatch {
+			Sprite {
+				Texture: @"UI/arrows.png";
+				ClipRect: [0 0 20 15];
+				Width: 20;
+				Height: 15;
+			};
+			CenterRegion: [0 0 20 15];
+		};
+	};
+	UpButton: {
+		BackgroundSprite: NinePatch {
+			Sprite {
+				Texture: @"UI/arrows.png";
+				ClipRect: [21 0 20 15];
+				Width: 20;
+				Height: 15;
+			};
+			CenterRegion: [0 0 20 15];
 		};
 	};
 

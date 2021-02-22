@@ -250,6 +250,7 @@ namespace Takai.Game
             clone._worldChildren = null; //clone children? (option?)
             clone.Position = clone.WorldPosition;
             clone.Forward = clone.WorldForward;
+            clone.Trail = clone.Trail?.Class?.Instantiate();
             if (clone.Name != null && !clone.Name.EndsWith(" (Clone)"))
                 clone.Name += " (Clone)";
             return clone;

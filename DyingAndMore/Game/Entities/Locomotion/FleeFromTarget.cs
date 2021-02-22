@@ -17,7 +17,7 @@ namespace DyingAndMore.Game.Entities.Locomotion
 
             //determine if cornered (check sdf to sides & behind), move into senses?
 
-            var cur = ai.Actor.Map.PathInfoAt(ai.Actor.WorldPosition).heuristic;
+            var cur = ai.Actor.Map.NavInfoAt(ai.Actor.WorldPosition).heuristic;
             uint target = 50;
             DyingAndMoreGame.DebugDisplay("cur", cur);
             DyingAndMoreGame.DebugDisplay("tgt", target);

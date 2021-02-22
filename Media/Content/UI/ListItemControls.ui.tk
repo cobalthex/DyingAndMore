@@ -1,0 +1,25 @@
+List {
+	Direction: Direction.Horizontal;
+	HorizontalAlignment: Alignment.Right;
+	Children: [
+		Static {
+			Size: [20 15];
+			Style: "UpButton";
+			VerticalAlignment: Alignment.Center;
+			EventCommands: {
+				Click: "ShiftUp";
+			};
+		};
+
+		Static {
+			Size: [20 15];
+			Style: "DownButton";
+			VerticalAlignment: Alignment.Center;
+			EventCommands: {
+				Click: "ShiftDown";
+			};
+		};
+
+		@!"./RemoveItem.ui.tk";
+	];
+}

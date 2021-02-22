@@ -243,8 +243,13 @@ namespace DyingAndMore.Editor
             }
             var rect = Rectangle.Intersect(new Rectangle(start, end - start + new Point(1)), editor.Map.Class.TileBounds);
             for (int y = rect.Top; y < rect.Bottom; ++y)
+            {
                 for (int x = rect.Left; x < rect.Right; ++x)
+                {
                     editor.Map.Class.Tiles[y, x] = value; //use Array.Fill in the future
+                    editor.Map.NavInfo[y, x].heuristic = uint.MaxValue;
+                }
+            }
 
             editor.Map.Class.PatchTileLayoutTexture(rect);
             tilesChanged = true;
@@ -267,6 +272,7 @@ namespace DyingAndMore.Editor
                 if (bounds.Contains(cur))
                 {
                     editor.Map.Class.Tiles[cur.Y, cur.X] = value;
+                    editor.Map.NavInfo[cur.Y, cur.X].heuristic = uint.MaxValue;
                     //SmartPlaceTile(cur, value);
                 }
 
@@ -331,6 +337,7 @@ namespace DyingAndMore.Editor
                 for (; left < right; ++left)
                 {
                     editor.Map.Class.Tiles[first.Y, left] = value;
+                    editor.Map.NavInfo[first.Y, left].heuristic = uint.MaxValue;
                     //SmartPlaceTile(new Point(left, first.Y), value);
 
                     if (first.Y > 0 && 

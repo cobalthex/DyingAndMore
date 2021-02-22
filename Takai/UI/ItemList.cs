@@ -26,6 +26,8 @@ namespace Takai.UI
     {
         public const string AddItemCommand = "AddItem";
         public const string RemoveItemCommand = "RemoveItem";
+        public const string ShiftItemUpCommand = "ShiftItemUp";
+        public const string ShiftItemDownCommand = "ShiftItemDown";
 
         public ObservableCollection<T> Items
         {
@@ -241,6 +243,28 @@ namespace Takai.UI
                 if (arg is int i)
                     self.Items.RemoveAt(i);
             };
+
+            CommandActions[ShiftItemUpCommand] = delegate (Static sender, object arg)
+            {
+                var self = (ItemList<T>)sender;
+                if (arg is int i && i > 0)
+                {
+                    Items.Move(i, i - 1);
+                    if (SelectedIndex == i)
+                        --SelectedIndex;
+                }
+            };
+
+            CommandActions[ShiftItemDownCommand] = delegate (Static sender, object arg)
+            {
+                var self = (ItemList<T>)sender;
+                if (arg is int i && i < self.Items.Count - 1)
+                {
+                    Items.Move(i, i + 1);
+                    if (SelectedIndex == i)
+                        ++SelectedIndex;
+                }
+            };
         }
 
         protected override bool HandleInput(GameTime time)
@@ -321,7 +345,8 @@ namespace Takai.UI
             }
             else if (e.Action == NotifyCollectionChangedAction.Move)
             {
-                throw new NotImplementedException("todo");
+                for (int i = 0; i < e.NewItems.Count; ++i)
+                    Container.InsertChild(Container.Children[i], e.NewStartingIndex + i);
             }
             else if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -379,6 +404,14 @@ namespace Takai.UI
             item.CommandActions["RemoveSelf"] = delegate (Static sender, object arg)
             {
                 sender.BubbleCommand(RemoveItemCommand, sender.ChildIndex);
+            };
+            item.CommandActions["ShiftUp"] = delegate (Static sender, object arg)
+            {
+                sender.BubbleCommand(ShiftItemUpCommand, sender.ChildIndex);
+            };
+            item.CommandActions["ShiftDown"] = delegate (Static sender, object arg)
+            {
+                sender.BubbleCommand(ShiftItemDownCommand, sender.ChildIndex);
             };
             return item;
         }

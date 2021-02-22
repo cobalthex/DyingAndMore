@@ -475,7 +475,7 @@ namespace Takai.UI
 #if DEBUG
             extraInfo = $" ID:{DebugId}";
 #endif
-            return $"{GetType().Name} {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\" {(IsEnabled ? "👁" : "❌")}{extraInfo}";
+            return $"{GetType().Name} ⁅{Style}⁆ {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\" {(IsEnabled ? "👁" : "❌")}{extraInfo}";
         }
 
         public virtual void DerivedDeserialize(Dictionary<string, object> props)
