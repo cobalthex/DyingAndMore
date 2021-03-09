@@ -2,21 +2,6 @@
 
 namespace DyingAndMore.Game.Entities
 {
-    public enum TaskResult
-    {
-        Continue, //rename?
-        Failure,
-        Success
-    }
-
-    /// <summary>
-    /// An individual/atomic action a bot can perform
-    /// </summary>
-    public interface ITask
-    {
-        TaskResult Think(TimeSpan deltaTime, AIController ai);
-    }
-
     public enum LocomotionResult
     {
         Continue,
@@ -35,7 +20,7 @@ namespace DyingAndMore.Game.Entities
         /// <param name="deltaTime">time since last frame</param>
         /// <param name="actor">The actor to move</param>
         /// <returns>The state of this locomotor</returns>
-        LocomotionResult Move(TimeSpan deltaTime, AIController actor);
+        LocomotionResult Move(TimeSpan deltaTime, AIController ai);
     }
 
 

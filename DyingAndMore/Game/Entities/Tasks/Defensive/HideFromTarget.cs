@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
-namespace DyingAndMore.Game.Entities.Tasks
+namespace DyingAndMore.Game.Entities.Tasks.Defensive
 {
-    public class DefensiveTaskAttribute : Attribute { }
-
     /// <summary>
     /// Find a point out of sight of the target
     /// </summary>

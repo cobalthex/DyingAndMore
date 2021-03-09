@@ -45,6 +45,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
+    <Compile Include="Game\Entities\Tasks\ITask.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -55,17 +56,43 @@
     <Compile Include="Game\Entities\Locomotion\FleeFromTarget.cs" />
     <Compile Include="Game\Entities\Locomotion\NavigateToTarget.cs" />
     <Compile Include="Game\Entities\Locomotion\OrbitTarget.cs" />
-    <Compile Include="Game\Entities\TaskBases.cs" />
+    <Compile Include="Game\Entities\Locomotion\ILocomotor.cs" />
     <Compile Include="Game\Entities\Locomotion\MoveToTarget.cs" />
     <Compile Include="Game\Entities\Locomotion\NavigateGradient.cs" />
-    <Compile Include="Game\Entities\Tasks\Movement.cs" />
+    <Compile Include="Game\Entities\Tasks\Defensive\HideFromTarget.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\AttachToTarget.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\CloneSelf.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\FaceTarget.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\HealSelf.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\HealTarget.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\SetTargetWeapon.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\PlayEffect.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\SetOwnClass.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\SetOwnFactions.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\SetOwnWeapon.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\SetTargetClass.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\SetTargetFactions.cs" />
+    <Compile Include="Game\Entities\Tasks\Miscellaneous\Wait.cs" />
+    <Compile Include="Game\Entities\Tasks\Movement\WaitForLocomotor.cs" />
+    <Compile Include="Game\Entities\Tasks\Movement\SetLocomotor.cs" />
+    <Compile Include="Game\Entities\Tasks\Offensive\SetTargetBehavior.cs" />
+    <Compile Include="Game\Entities\Tasks\Offensive\SetConditionOnSelf.cs" />
+    <Compile Include="Game\Entities\Tasks\Offensive\SetConditionOnTarget.cs" />
+    <Compile Include="Game\Entities\Tasks\Offensive\ShootAtTarget.cs" />
+    <Compile Include="Game\Entities\Tasks\Offensive\SprayTarget.cs" />
+    <Compile Include="Game\Entities\Tasks\Offensive\Suicide.cs" />
+    <Compile Include="Game\Entities\Tasks\Offensive\TrajectoryUtils.cs" />
+    <Compile Include="Game\Entities\Tasks\Squads\ShareTargetIfLeader.cs" />
+    <Compile Include="Game\Entities\Tasks\Squads\KillSquadUnits.cs" />
+    <Compile Include="Game\Entities\Tasks\Squads\SetUnitBehavior.cs" />
+    <Compile Include="Game\Entities\Tasks\Squads\SpawnSquadUnits.cs" />
+    <Compile Include="Game\Entities\Tasks\Squads\InheritLeadersTarget.cs" />
+    <Compile Include="Game\Entities\Tasks\Targeting\FindClosestActor.cs" />
+    <Compile Include="Game\Entities\Tasks\Targeting\InheritSquadLeadersTarget.cs" />
+    <Compile Include="Game\Entities\Tasks\Targeting\TargetAggressor.cs" />
+    <Compile Include="Game\Entities\Tasks\Targeting\ForgetTarget.cs" />
     <Compile Include="ObjectClassDesigner.cs" />
-    <Compile Include="Game\Entities\Tasks\Defensive.cs" />
     <Compile Include="Game\Entities\Locomotion\FollowPath.cs" />
-    <Compile Include="Game\Entities\Tasks\Offensive.cs" />
-    <Compile Include="Game\Entities\Tasks\Squads.cs" />
-    <Compile Include="Game\Entities\Tasks\Targeting.cs" />
-    <Compile Include="Game\Entities\Tasks\Miscellaneous.cs" />
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
@@ -84,7 +111,6 @@
     <Compile Include="Game\Effects.cs" />
     <Compile Include="Game\Entities\AIController.cs" />
     <Compile Include="Game\Entities\ArtilleryController.cs" />
-    <Compile Include="Game\Entities\Tasks\Test.cs" />
     <Compile Include="Game\Entities\Conditions.cs" />
     <Compile Include="Game\Entities\Controller.cs" />
     <Compile Include="Game\Entities\Pickups.cs" />

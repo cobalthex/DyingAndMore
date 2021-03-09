@@ -514,7 +514,7 @@ namespace Takai.Data
                     sourceAccessors.cachedHash = srcHash;
                     targetAccessors.cachedValue = bindVal;
                     targetAccessors.cachedHash = bindVal == null ? 0 : bindVal.GetHashCode();
-                    System.Diagnostics.Debug.WriteLine($"Updated binding for source:{Source} ({sourceAccessors.cachedValue}) to target:{Target} ({srcVal})");
+                    //System.Diagnostics.Debug.WriteLine($"Updated binding for source:{Source} ({sourceAccessors.cachedValue}) to target:{Target} ({srcVal})");
 #if DEBUG
                     ++TotalUpdateCount;
 #endif
@@ -538,7 +538,7 @@ namespace Takai.Data
                     targetAccessors.cachedHash = tgtHash;
                     sourceAccessors.cachedValue = bindVal;
                     sourceAccessors.cachedHash = bindVal == null ? 0 : bindVal.GetHashCode();
-                    System.Diagnostics.Debug.WriteLine($"Updated binding for target:{Target} ({targetAccessors.cachedValue}) to source:{Source} ({tgtVal})");
+                    //System.Diagnostics.Debug.WriteLine($"Updated binding for target:{Target} ({targetAccessors.cachedValue}) to source:{Source} ({tgtVal})");
 #if DEBUG
                     ++TotalUpdateCount;
 #endif

@@ -2,20 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
-namespace DyingAndMore.Game.Entities.Tasks
+namespace DyingAndMore.Game.Entities.Tasks.Targeting
 {
-    public class TargetingTaskAttribute : Attribute { }
-
-    [TargetingTask]
-    public struct ForgetTarget : ITask
-    {
-        public TaskResult Think(TimeSpan deltaTime, AIController ai)
-        {
-            ai.Target = null;
-            return TaskResult.Success;
-        }
-    }
-
     [TargetingTask]
     public struct FindClosestActor : ITask
     {
@@ -60,26 +48,6 @@ namespace DyingAndMore.Game.Entities.Tasks
 
             ai.Target = null;
             return TaskResult.Continue;
-        }
-    }
-
-    [TargetingTask]
-    public struct TargetAggressor : ITask
-    {
-        public bool includeAllies;
-
-        public TaskResult Think(TimeSpan deltaTime, AIController ai)
-        {
-            //retry if null?
-
-            if (ai.Actor.LastAggressor != null && ai.Actor.LastAggressor is ActorInstance actor &&
-                (includeAllies || !actor.IsAlliedWith(ai.Actor.Factions)) &&
-                actor.IsAlive)
-            {
-                ai.Target = actor;
-                return TaskResult.Success;
-            }
-            return TaskResult.Failure;
         }
     }
 

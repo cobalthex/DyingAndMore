@@ -19,6 +19,8 @@ ActorClass {
                         locomotor: OrbitTarget { radius: 100; };
                     };
                     WaitForLocomotor { }; # normal wait?
+
+                    # pre-emptive behavior that waits for supremacy to kamakazi? (other entity type?)
                 ];
             };
             Behavior {

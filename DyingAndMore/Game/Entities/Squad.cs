@@ -27,7 +27,7 @@ namespace DyingAndMore.Game.Entities
 
         public bool DontSpawnAutomatically { get; set; }
         public int MinLiveCount { get; set; } = 0;
-        public int MaxLiveCount { get; set; } = 1;
+        public int MaxLiveCount { get; set; } = 1; //cap at ~25?
         public int MaxSpawnCount { get; set; } = 0; //0 for infinite (spawns forever)
         public TimeSpan SpawnDelay { get; set; }
 
