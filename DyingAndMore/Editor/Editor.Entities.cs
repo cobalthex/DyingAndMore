@@ -1,10 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 using Takai.Input;
 using Takai.UI;
 using Takai;
-using Microsoft.Xna.Framework.Graphics;
+using Takai.Game;
+using System.Collections.Generic;
 
 namespace DyingAndMore.Editor
 {
@@ -12,27 +12,19 @@ namespace DyingAndMore.Editor
 
     class EntitiesEditorMode : SelectorEditorMode<Selectors.EntitySelector>
     {
-        public Takai.Game.EntityInstance SelectedEntity
-        {
-            get => _selectedEntity;
-            set
-            {
-                if (_selectedEntity != null)
-                    _selectedEntity.OutlineColor = Color.Transparent;
-                _selectedEntity = value;
-                if (_selectedEntity != null)
-                    _selectedEntity.OutlineColor = Color.Gold;
-            }
-        }
-        Takai.Game.EntityInstance _selectedEntity;
+        private const int MaxSelectedEntityCount = 50;
+
+        readonly List<EntityInstance> selectedEntities = new List<EntityInstance>();
 
         Vector2 currentWorldPos;
 
         Static entEditor;
 
-        bool isBatchDeleting = false;
+        bool isBoxSelecting = false;
         Vector2 savedWorldPos;
-        Rectangle deleteRect;
+        Rectangle selectRect;
+
+        bool didClone = false;
 
         public Vector2 DefaultForward = -Vector2.UnitX; //load from config?
 
@@ -42,7 +34,6 @@ namespace DyingAndMore.Editor
             entEditor = Takai.Data.Cache.Load<Static>("UI/Editor/Entities/EntityEditor.ui.tk").CloneHierarchy();
 
             On(PressEvent, OnPress);
-            On(ClickEvent, OnClick);
             On(DragEvent, OnDrag);
         }
 
@@ -70,13 +61,32 @@ namespace DyingAndMore.Editor
 
         public override void End()
         {
-            SelectedEntity = null;
+            selectedEntities.Clear();
             editor.Map.renderSettings.drawEntityForwardVectors = false;
             editor.Map.renderSettings.drawEntityHierarchies = false;
         }
 
+        bool ShouldMultiSelect() => InputState.IsMod(KeyMod.Shift);
+
+        void SelectEntity(EntityInstance ent)//, bool testIfAlreadySelected = false)
+        {
+            if (ShouldMultiSelect())
+            {
+                if (selectedEntities.Count < MaxSelectedEntityCount)
+                    //(!testIfAlreadySelected || !selectedEntities.Contains(ent)))
+                    selectedEntities.Add(ent);
+            }
+            else
+            {
+                selectedEntities.Clear();
+                selectedEntities.Add(ent);
+            }
+        }
+
         protected UIEventResult OnPress(Static sender, UIEventArgs e)
         {
+            didClone = false;
+
             var pea = (PointerEventArgs)e;
             var worldPos = editor.Camera.ScreenToWorld(LocalToScreen(pea.position));
 
@@ -84,74 +94,51 @@ namespace DyingAndMore.Editor
 
             if (pea.button == 0)
             {
+                // todo: check if already selected & exit if so
+
+                // todo: limit selection size
+
                 var selected = editor.Map.FindEntitiesInRegion(worldPos, inputSearchRadius);
                 if (selected.Count > 0)
                 {
-                    if (InputState.IsMod(KeyMod.Alt) && SelectedEntity != null)
-                        editor.Map.Attach(selected[selected.Count - 1], SelectedEntity);
+                    var last = selected[selected.Count - 1];
 
-                    else
-                    {
-                        SelectedEntity = selected[selected.Count - 1];
-                        SelectedEntity.Velocity = Vector2.Zero;
-
-                        if (InputState.IsMod(KeyMod.Control))
-                        {
-                            SelectedEntity = SelectedEntity.Clone();
-                            //maintain hierarchy?
-                            editor.Map.Spawn(SelectedEntity);
-                        }
-                    }
-                }
-
-                if (SelectedEntity != null && selector.SelectedIndex < 0)
-                {
-                    editor.Map.Destroy(SelectedEntity);
-                    SelectedEntity = null;
-                }
-                else if (selected.Count == 0)
-                {
                     if (selector.SelectedIndex < 0)
                     {
-                        if (SelectedEntity != null)
-                        {
-                            editor.Map.Destroy(SelectedEntity);
-                            SelectedEntity = null;
-                        }
+                        editor.Map.Destroy(last);
+                        return UIEventResult.Handled;
                     }
-                    else if (editor.Map.Class.Bounds.Contains(worldPos) && selector.ents.Count > 0)
+
+                    //if (InputState.IsMod(KeyMod.Alt) && SelectedEntity != null)
+                    //    editor.Map.Attach(selected[selected.Count - 1], SelectedEntity);
+
+                    else if (!selectedEntities.Contains(last))
                     {
-                        SelectedEntity = editor.Map.Spawn(
-                            selector.SelectedEntity, 
-                            worldPos,
-                            DefaultForward, 
-                            Vector2.Zero
-                        );
+                       
+                        last.Velocity = Vector2.Zero;
+                        SelectEntity(last);
                     }
-                    else
-                        SelectedEntity = null;
+                }
+                else
+                {
+                    if (editor.Map.Class.Bounds.Contains(worldPos) && selector.ents.Count > 0)
+                    {
+                        SelectEntity(editor.Map.Spawn(
+                            selector.SelectedEntity,
+                            worldPos,
+                            DefaultForward,
+                            Vector2.Zero
+                        ));
+                    }
+                    else if (ShouldMultiSelect())
+                        selectedEntities.Clear();
                 }
 
                 return UIEventResult.Handled;
             }
 
-            return UIEventResult.Continue;
-        }
-
-        protected UIEventResult OnClick(Static sender, UIEventArgs e)
-        {
-            var pea = (PointerEventArgs)e;
-            var worldPos = editor.Camera.ScreenToWorld(LocalToScreen(pea.position));
-
-            if (pea.device == DeviceType.Mouse && pea.button == (int)MouseButtons.Right)
-            {
-                var selected = editor.Map.FindEntitiesInRegion(worldPos, 1);
-                if (selected.Count > 0 && selected[selected.Count - 1] == SelectedEntity)
-                {
-                    editor.Map.Destroy(SelectedEntity);
-                    SelectedEntity = null;
-                }
-            }
+            else if (pea.button == 1)
+                selectedEntities.Clear();
 
             return UIEventResult.Continue;
         }
@@ -160,10 +147,23 @@ namespace DyingAndMore.Editor
         {
             var dea = (DragEventArgs)e;
 
-            if (dea.button == 0 && SelectedEntity != null)
+            if (dea.button == 0)
             {
+                if (!didClone && InputState.IsMod(KeyMod.Control))
+                {
+                    for (int i = 0; i < selectedEntities.Count; ++i)
+                    {
+                        var clone = selectedEntities[i].Clone();
+                        clone.Velocity = Vector2.Zero;
+                        editor.Map.Spawn(clone);
+                        selectedEntities[i] = clone; // in-place list swap
+                    }
+                    didClone = true;
+                }
+
                 var delta = editor.Camera.LocalToWorld(dea.delta);
-                editor.Map.MoveEnt(SelectedEntity, SelectedEntity.Position + delta, SelectedEntity.Forward);
+                foreach (var ent in selectedEntities)
+                    editor.Map.MoveEnt(ent, ent.Position + delta, ent.Forward);
                 return UIEventResult.Handled;
             }
 
@@ -174,56 +174,68 @@ namespace DyingAndMore.Editor
         {
             currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
             //todo: child entity movement can sometimes break
-            if (SelectedEntity != null)
+            if (selectedEntities.Count > 0)
             {
                 if (InputState.IsButtonDown(Keys.R))
                 {
-                    //needs to take into account parent rotations
-                    var diff = currentWorldPos - SelectedEntity.WorldPosition;
-                    Vector2 newForward;
-                    if (InputState.IsMod(KeyMod.Shift))
-                    {
-                        var theta = Util.Angle(diff);
-                        theta = (float)System.Math.Round(theta / editor.config.snapAngle) * editor.config.snapAngle;
-                        newForward = new Vector2(
-                            (float)System.Math.Cos(theta),
-                            (float)System.Math.Sin(theta)
-                        );
-                    }
-                    else
-                        newForward = diff;
+                    // todo: rotate relative to collective center
 
-                    editor.Map.MoveEnt(
-                        SelectedEntity,
-                        SelectedEntity.Position,
-                        newForward
-                    );
+                    //needs to take into account parent rotations
+                    //var diff = currentWorldPos - SelectedEntity.WorldPosition;
+                    //Vector2 newForward;
+                    //if (InputState.IsMod(KeyMod.Shift))
+                    //{
+                    //    var theta = Util.Angle(diff);
+                    //    theta = (float)System.Math.Round(theta / editor.config.snapAngle) * editor.config.snapAngle;
+                    //    newForward = new Vector2(
+                    //        (float)System.Math.Cos(theta),
+                    //        (float)System.Math.Sin(theta)
+                    //    );
+                    //}
+                    //else
+                    //    newForward = diff;
+
+                    //editor.Map.MoveEnt(
+                    //    SelectedEntity,
+                    //    SelectedEntity.Position,
+                    //    newForward
+                    //);
                     return false;
                 }
 
                 // duplicate selected entity and place under cursor
-                if (InputState.IsPress(Keys.B))
+                if (InputState.IsPress(Keys.V))
                 {
-                    var clone = SelectedEntity.Clone();
-                    clone.OutlineColor = Color.Transparent;
-                    clone.Velocity = Vector2.Zero;
-                    clone.SetPositionTransformed(currentWorldPos);
-                    editor.Map.Spawn(clone);
+                    var relOffset = currentWorldPos - CalculateCollectiveCenter(selectedEntities);
+                    for (int i = 0; i < selectedEntities.Count; ++i)
+                    {
+                        var clone = selectedEntities[i].Clone();
+                        clone.Velocity = Vector2.Zero;
+                        clone.SetPositionTransformed(clone.WorldPosition + relOffset);
+                        editor.Map.Spawn(clone);
+                        selectedEntities[i] = clone; // in-place list swap
+                    }
                 }
 
                 if (InputState.IsPress(Keys.Delete))
                 {
-                    editor.Map.Destroy(SelectedEntity);
-                    SelectedEntity = null;
+                    foreach (var ent in selectedEntities)
+                        editor.Map.Destroy(ent);
+                    selectedEntities.Clear();
 
                     return false;
                 }
 
                 if (InputState.IsPress(Keys.Space))
                 {
-                    entEditor.BindTo(SelectedEntity); //todo: this is blowing away internal bindings
-                    entEditor.FocusFirstAvailable();
-                    AddChild(entEditor);
+                    if (selectedEntities.Count > 1)
+                        editor.DisplayError("You can only edit the properties of one entity at a time");
+                    else
+                    {
+                        entEditor.BindTo(selectedEntities[0]); //todo: this is blowing away internal bindings
+                        entEditor.FocusFirstAvailable();
+                        AddChild(entEditor);
+                    }
                     return false;
                 }
             }
@@ -250,10 +262,12 @@ namespace DyingAndMore.Editor
                 }
             }
 
-            //todo: move to events
-            if (InputState.IsPress(Keys.X))
+#endif
+
+            // box select
+            if (InputState.IsPress(Keys.B))
             {
-                isBatchDeleting = true;
+                isBoxSelecting = true;
                 savedWorldPos = currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
                 if (float.IsNaN(currentWorldPos.X) || float.IsNaN(currentWorldPos.Y))
                 {
@@ -261,47 +275,55 @@ namespace DyingAndMore.Editor
                 }
                 return false;
             }
-
-            if (isBatchDeleting)
+            else if (InputState.IsClick(Keys.B))
             {
-                deleteRect = Util.AbsRectangle(savedWorldPos, currentWorldPos);
-                editor.Map.DrawRect(deleteRect, Color.Red);
-            }
-
-            if (InputState.IsClick(Keys.X))
-            {
-                isBatchDeleting = false;
-                foreach (var ent in editor.Map.FindEntitiesInRegion(deleteRect))
-                    editor.Map.Destroy(ent);
+                isBoxSelecting = false;
+                var ents = editor.Map.FindEntitiesInRegion(selectRect);
+                if (ShouldMultiSelect())
+                {
+                    foreach (var ent in ents)
+                    {
+                        if (!selectedEntities.Contains(ent))
+                            selectedEntities.Add(ent);
+                    }
+                }
+                else
+                {
+                    selectedEntities.Clear();
+                    selectedEntities.AddRange(ents);
+                }
 
                 return false;
             }
-#endif
 
             return base.HandleInput(time);
+        }
+
+        Vector2 CalculateCollectiveCenter(List<EntityInstance> entities)
+        {
+            var center = Vector2.Zero;
+            foreach (var ent in entities)
+                center += ent.WorldPosition;
+
+            if (entities.Count > 0)
+                center /= entities.Count;
+
+            return center;
         }
 
         protected override void DrawSelf(DrawContext context)
         {
             base.DrawSelf(context);
 
-            if (editor.Map.Squads != null)
+            if (isBoxSelecting)
             {
-                foreach (var squad in editor.Map.Squads)
-                {
-                    editor.Map.DrawCircle(squad.SpawnPosition, squad.SpawnRadius, new Color(Color.Cyan, 0.6f), 3, 4 * MathHelper.Pi);
-
-                    var squadNameSize = Font.MeasureString(squad.Name, TextStyle);
-                    var drawText = new Takai.Graphics.DrawTextOptions(
-                        squad.Name,
-                        Font,
-                        TextStyle,
-                        new Color(Color.LightCyan, 0.4f),
-                        squad.SpawnPosition - (squadNameSize / 2)
-                    );
-                    editor.MapTextRenderer.Draw(drawText);
-                }
+                selectRect = Util.AbsRectangle(savedWorldPos, currentWorldPos);
+                editor.Map.DrawRect(selectRect, Color.Yellow);
             }
+
+            // todo: draw outlines around all selected ents
+            foreach (var ent in selectedEntities)
+                editor.Map.DrawCircle(ent.WorldPosition, ent.Radius, Color.Gold);
         }
     }
 }

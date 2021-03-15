@@ -150,23 +150,6 @@ List {
                                                 ];
                                             };
 
-                                            SpawnSquadCommand: List {
-                                                HorizontalAlignment: Alignment.Stretch;
-                                                Children: [
-                                                    Static { Text: "`_Squad"; };
-                                                    SquadSelect {
-                                                        HorizontalAlignment: Alignment.Stretch;
-                                                        Bindings: [
-                                                            Binding {
-                                                                Source: "Squad";
-                                                                Target: "SelectedItem";
-                                                                Direction: BindingDirection.TwoWay;
-                                                            };
-                                                        ];
-                                                    };
-                                                ];
-                                            };
-
 
                                             AllSquadUnitsEntityCommand: List {
                                                 HorizontalAlignment: Alignment.Stretch;

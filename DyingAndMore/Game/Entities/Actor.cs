@@ -189,6 +189,10 @@ namespace DyingAndMore.Game.Entities
         /// </summary>
         public bool IsAwake { get; set; } = true;
 
+        /// <summary>
+        /// The squad this actor is a part of.
+        /// This can be used by AI for group behavior
+        /// </summary>
         [Takai.Data.Serializer.AsReference]
         public Squad Squad
         {
@@ -198,9 +202,10 @@ namespace DyingAndMore.Game.Entities
                 if (_squad == value)
                     return;
 
+                _squad?.Units.Remove(this);
+
                 _squad = value;
-                if (_squad != null)
-                    _squad.AddUnit(this);
+                _squad?.Units.Add(this);
 
                 //todo: clear squad on Kill()?
                 //todo: remove from old squad if swapping?

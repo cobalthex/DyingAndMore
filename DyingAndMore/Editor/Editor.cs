@@ -152,10 +152,11 @@ namespace DyingAndMore.Editor
             modes.AddChild(new DecalsEditorMode(this));
             modes.AddChild(new FluidsEditorMode(this));
             modes.AddChild(new EntitiesEditorMode(this));
-            modes.AddChild(new SquadsEditorMode(this));
             modes.AddChild(new PathsEditorMode(this));
             modes.AddChild(new TriggersEditorMode(this));
+#if DEBUG
             modes.AddChild(new TestEditorMode(this));
+#endif
             modes.TabIndex = 0;
         }
 
@@ -251,6 +252,13 @@ namespace DyingAndMore.Editor
                 resetZoom.IsEnabled = false;
         }
 
+        public void DisplayError(string text)
+        {
+            errorBalloon.ResetTimer();
+            errorBalloon.Text = text;
+            AddChild(errorBalloon);
+        }
+
         void SwitchToGame()
         {
             bool foundPlayer = false;
@@ -259,6 +267,7 @@ namespace DyingAndMore.Editor
                 if (ent is Game.Entities.ActorInstance actor && actor.Controller is Game.Entities.InputController)
                 {
                     foundPlayer = true;
+                    DisplayError("There must be at least one player\n(controller = InputController) to test the map");
                     break;
                 }
             }
@@ -266,9 +275,6 @@ namespace DyingAndMore.Editor
             //allow overriding?
             if (!foundPlayer)
             {
-                errorBalloon.ResetTimer();
-                errorBalloon.Text = "There must be at least one player\n(controller = InputController) to test the map";
-                AddChild(errorBalloon);
                 return;
             }
 

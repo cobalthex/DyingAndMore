@@ -37,26 +37,6 @@ namespace DyingAndMore
                 return;
         }
 
-        /// <summary>
-        /// Reset squad spawn timer/coounters and spawn (up to limits, including previously spawned members)
-        /// </summary>
-        /// <param name="squad">The squad to spawn</param>
-        public void Spawn(Game.Entities.Squad squad)
-        {
-            if (Squads == null)
-                Squads = new HashSet<Game.Entities.Squad>();
-            
-            //if (!Squads.ContainsKey(squad.Name))
-            {
-                if (string.IsNullOrEmpty(squad.Name))
-                    squad.Name = Takai.Util.RandomString(prefix: "squad_");
-                Squads.Add(squad);
-                squad.SpawnUnits(this);
-            }
-        }
-
-        //todo: squads should be clustered?
-
         protected override void UpdateEntities(TimeSpan deltaTime)
         {
             if (updateSettings.isEntityLogicEnabled)

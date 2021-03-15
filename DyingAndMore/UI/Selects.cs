@@ -2,11 +2,11 @@
 using DyingAndMore.Game.Weapons;
 using DyingAndMore.Game.Entities;
 using Takai.Game;
-using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Takai.Data;
 using DyingAndMore.Game.Entities.Tasks;
 using DyingAndMore.Game.Entities.Locomotion;
+using DyingAndMore.Game.Entities.Tasks.Offensive;
 
 namespace DyingAndMore.UI
 {

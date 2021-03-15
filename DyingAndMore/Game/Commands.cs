@@ -21,24 +21,6 @@ namespace DyingAndMore.Game
         }
     }
 
-    class SpawnSquadCommand : ICommand
-    {
-        string ICommand.ActionName { get; set; }
-        object ICommand.ActionParameter { get; set; }
-
-        [Takai.Data.Serializer.AsReference]
-        public Entities.Squad Squad { get; set; }
-
-        public void Invoke(MapBaseInstance map)
-        {
-            Squad?.SpawnUnits(map);
-        }
-        public override string ToString()
-        {
-            return nameof(SpawnSquadCommand) + $" - Squad: {Squad}";
-        }
-    }
-
     class AllSquadUnitsEntityCommand : ICommand
     {
         public string ActionName { get; set; }

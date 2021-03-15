@@ -3,7 +3,7 @@
 namespace DyingAndMore.Game.Entities.Tasks.Squads
 {
     [SquadTask]
-    class ShareTargetIfLeader : ITask
+    class ShareTarget : ITask
     {
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {

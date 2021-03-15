@@ -82,10 +82,9 @@
     <Compile Include="Game\Entities\Tasks\Offensive\SprayTarget.cs" />
     <Compile Include="Game\Entities\Tasks\Offensive\Suicide.cs" />
     <Compile Include="Game\Entities\Tasks\Offensive\TrajectoryUtils.cs" />
-    <Compile Include="Game\Entities\Tasks\Squads\ShareTargetIfLeader.cs" />
+    <Compile Include="Game\Entities\Tasks\Squads\ShareTarget.cs" />
     <Compile Include="Game\Entities\Tasks\Squads\KillSquadUnits.cs" />
     <Compile Include="Game\Entities\Tasks\Squads\SetUnitBehavior.cs" />
-    <Compile Include="Game\Entities\Tasks\Squads\SpawnSquadUnits.cs" />
     <Compile Include="Game\Entities\Tasks\Squads\InheritLeadersTarget.cs" />
     <Compile Include="Game\Entities\Tasks\Targeting\FindClosestActor.cs" />
     <Compile Include="Game\Entities\Tasks\Targeting\InheritSquadLeadersTarget.cs" />
@@ -96,7 +95,6 @@
     <Compile Include="Editor\Editor.Entities.cs" />
     <Compile Include="Editor\Editor.Fluids.cs" />
     <Compile Include="Editor\Editor.Decals.cs" />
-    <Compile Include="Editor\Editor.Squads.cs" />
     <Compile Include="Editor\Editor.Test.cs" />
     <Compile Include="Editor\Editor.Triggers.cs" />
     <Compile Include="Editor\Editor.Paths.cs" />

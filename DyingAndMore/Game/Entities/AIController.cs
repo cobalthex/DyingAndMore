@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DyingAndMore.Game.Entities.Tasks;
+using System;
 using System.Collections.Generic;
 using Takai;
 

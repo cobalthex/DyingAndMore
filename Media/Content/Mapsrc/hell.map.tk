@@ -152,9 +152,6 @@ MapInstance {
             Region: [1831 329 147 932];
             Filter: Null;
             OnEnterCommands: [
-                SpawnSquadCommand {
-                    SquadName: "test";
-                }
             ];
             OnEnterEffects: Null;
             MaxUses: 0;

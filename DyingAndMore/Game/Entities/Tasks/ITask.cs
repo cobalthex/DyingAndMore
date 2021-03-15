@@ -25,6 +25,7 @@ namespace DyingAndMore.Game.Entities.Tasks
     public class SquadTaskAttribute : Attribute { }
     public class TargetingTaskAttribute : Attribute { }
 
+
     public enum SetOperation
     {
         Replace,
@@ -67,5 +68,6 @@ namespace DyingAndMore.Game.Entities.Tasks
 
 ---- 
 - auto create squad for player(s)
+- task to add actor to squad (add target?), join squad
 
 */

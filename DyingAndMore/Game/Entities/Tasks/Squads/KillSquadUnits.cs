@@ -9,10 +9,13 @@ namespace DyingAndMore.Game.Entities.Tasks.Squads
 
         public TaskResult Think(TimeSpan deltaTime, AIController ai)
         {
-            var squad = ai.Actor.Squad;
-            if (squad == null)
+            if (!ai.Actor.IsSquadLeader)
+            {
+                System.Diagnostics.Debug.WriteLine("AI actor must be leader");
                 return TaskResult.Failure;
+            }
 
+            var squad = ai.Actor.Squad;
             if (includeSelf)
                 squad.DestroyAllUnits();
             else
