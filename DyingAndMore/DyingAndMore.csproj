@@ -90,6 +90,7 @@
     <Compile Include="Game\Entities\Tasks\Targeting\InheritSquadLeadersTarget.cs" />
     <Compile Include="Game\Entities\Tasks\Targeting\TargetAggressor.cs" />
     <Compile Include="Game\Entities\Tasks\Targeting\ForgetTarget.cs" />
+    <Compile Include="NotGame\Wizard.cs" />
     <Compile Include="ObjectClassDesigner.cs" />
     <Compile Include="Game\Entities\Locomotion\FollowPath.cs" />
     <Compile Include="Editor\Editor.Entities.cs" />

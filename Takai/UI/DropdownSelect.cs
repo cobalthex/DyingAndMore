@@ -242,7 +242,7 @@ namespace Takai.UI
             return false;
         }
 
-        protected override void ApplyStyleRules(System.Collections.Generic.Dictionary<string, object> styleRules)
+        public override void ApplyStyleRules(System.Collections.Generic.Dictionary<string, object> styleRules)
         {
             base.ApplyStyleRules(styleRules);
             if (arrowUI != null)

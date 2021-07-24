@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Collections.Generic;
 
 using Stylesheet = System.Collections.Generic.Dictionary<string, object>;
+using Microsoft.Xna.Framework;
+using Takai.Graphics;
 
 namespace Takai.UI
 {
@@ -51,7 +53,7 @@ namespace Takai.UI
             return fallback;
         }
 
-        public static Stylesheet GetStyles(string styleName, string styleState = null)
+        public static Stylesheet GetStylesheet(string styleName, string styleState = null)
         {
             Stylesheet styles = null;
             if (styleName != null)
@@ -93,7 +95,7 @@ namespace Takai.UI
         {
             //System.Diagnostics.Debug.WriteLine($"{DebugId}: Applying style {style}+{state} - {lastStyleState}");
 
-            var rules = GetStyles(style, state);
+            var rules = GetStylesheet(style, state);
             if (rules == null)
             {
                 if (style != DefaultStyleName)
@@ -111,9 +113,71 @@ namespace Takai.UI
             }
 
             ApplyStyleRules(rules);
+
+            // check for transitions
+            // apply transition animation if any set
         }
 
-        protected virtual void ApplyStyleRules(Stylesheet styleRules)
+        public static Stylesheet LerpStyles(Stylesheet a, Stylesheet b, float t)
+        {
+            // only lerp specified properties ?
+            if (a == null)
+                return b;
+            if (b == null)
+                return a;
+            
+            var lerped = new Stylesheet();
+            foreach (var ap in a)
+            {
+                var apt = ap.Value.GetType();
+
+                if (!b.TryGetValue(ap.Key, out var bp))
+                {
+                    lerped[ap.Key] = ap.Value;
+                    continue;
+                }
+                if (bp.GetType() == apt)
+                {
+                    if (apt == typeof(Color))
+                    {
+                        lerped[ap.Key] = Color.Lerp((Color)ap.Value, (Color)bp, t);
+                        continue;
+                    }
+                    if (apt == typeof(TextStyle))
+                    {
+                        lerped[ap.Key] = TextStyle.Lerp((TextStyle)ap.Value, (TextStyle)bp, t);
+                        continue;
+                    }
+                }
+                if (Data.Serializer.TryNumericCast(bp, out var destNumber, bp.GetType().GetTypeInfo(), apt.GetTypeInfo()))
+                {
+                    if (apt == typeof(int))
+                        lerped[ap.Key] = (int)MathHelper.Lerp((int)ap.Value, (int)bp, t);
+                    else if (apt == typeof(float))
+                        lerped[ap.Key] = MathHelper.Lerp((float)ap.Value, (float)bp, t);
+                    if (apt == typeof(long))
+                        lerped[ap.Key] = (long)MathHelper.Lerp((long)ap.Value, (long)bp, t);
+                    else if (apt == typeof(double))
+                        lerped[ap.Key] = Util.Lerp((double)ap.Value, (double)bp, t);
+                }
+            }
+
+            var defaultStyles = GetStylesheet(DefaultStyleName); // todo: this isn't ideal
+            foreach (var bp in b)
+            {
+                if (!a.TryGetValue(bp.Key, out var ap) &&
+                    defaultStyles.TryGetValue(bp.Key, out ap))
+                {
+                    //lerped[bp.Key] = MathHelper.Lerp(ap, bp.Value, t); // todo
+                    // set a value? (to ap.Value)
+                    // default value?
+                }
+            }
+
+            return lerped;
+        }
+
+        public virtual void ApplyStyleRules(Stylesheet styleRules)
         {
             Color = GetStyleRule(styleRules, "Color", Color);
             Font = GetStyleRule(styleRules, "Font", Font);

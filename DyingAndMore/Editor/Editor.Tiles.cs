@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using Takai.Data;
+using Takai.Graphics;
 using Takai.Input;
 using Takai.UI;
 
@@ -13,6 +15,7 @@ namespace DyingAndMore.Editor
         Point lastTilePos;
 
         bool tilesChanged = false;
+        public bool useWangPlace = false;
 
         Takai.Graphics.Sprite previewSprite;
 
@@ -26,10 +29,31 @@ namespace DyingAndMore.Editor
             previewSprite = preview.Sprite;
             preview.StretchToFit = true;
 
+            var wangButton = new Graphic(Cache.Load<Sprite>("UI/Editor/Wang.png"));
+            wangButton.EventCommands[ClickEvent] = "ToggleWang";
+            wangButton.AddChild(new CheckBox
+            {
+                Style = "Check",
+                HorizontalAlignment = Alignment.Right,
+                VerticalAlignment = Alignment.Bottom,
+                Bindings = new List<Binding>
+                {
+                    new Binding("useWangPlace", "IsChecked", BindingDirection.TwoWay),
+                }
+            });
+            wangButton.BindTo(this);
+
+            toolbox.AddChild(wangButton);
+
             generator = new Takai.TilemapGenerator(editor.Map.Class.Tileset);
 
             On(PressEvent, OnPress);
             On(DragEvent, OnDrag);
+
+            CommandActions["ToggleWang"] = delegate (Static sender, object arg)
+            {
+                ((TilesEditorMode)sender).useWangPlace ^= true;
+            };
         }
 
         public override void End()
@@ -77,8 +101,10 @@ namespace DyingAndMore.Editor
                 TileFlood(tilePos, tile);
             else
             {
-                 TileRect(tilePos, tilePos, tile);
-                //SmartPlaceTile(tilePos, tile);
+                if (useWangPlace)
+                   WangPlace(tilePos, tile);
+                else
+                    TileRect(tilePos, tilePos, tile);
             }
 
             return UIEventResult.Handled;
@@ -207,6 +233,71 @@ namespace DyingAndMore.Editor
                     }
                 }
             }
+
+            if (InputState.IsButtonDown(Keys.F3))
+            {
+                var offset = new Vector2(100);
+                context.spriteBatch.Draw(editor.Map.Class.Tileset.texture, offset, Color.White);
+                
+                var tileset = editor.Map.Class.Tileset;
+                Vector2 TilePos(int tile)
+                {
+                    return tileset.size * new Vector2(tile % tileset.TilesPerRow, tile / tileset.TilesPerRow);
+                }
+
+                var local = (InputState.MousePoint - offset.ToPoint());
+                local.X /= tileset.size;
+                local.Y /= tileset.size;
+                if (new Rectangle(0, 0, tileset.TilesPerRow, tileset.texture.Height / tileset.size).Contains(local))
+                {
+                    var tile = local.Y * tileset.TilesPerRow + local.X;
+                    Takai.Graphics.Primitives2D.DrawCross(context.spriteBatch, Color.White, new Rectangle((int)offset.X + local.X * tileset.size + 10, (int)offset.Y + local.Y * tileset.size + 10, tileset.size - 20, tileset.size - 20));
+                    context.textRenderer.Draw(new Takai.Graphics.DrawTextOptions(
+                        $"{local} ({tile})",
+                        DebugFont,
+                        DebugTextStyle,
+                        Color.White,
+                        offset - new Vector2(0, 20)
+                    ));
+
+                    var adj = generator.Adjacencies[tile + 1];
+                    for (int a = 0; a < adj.top.Count; ++a) // draws red line on bottom of adjacent tile
+                    {
+                        var adjStart = offset + TilePos(adj.top[a] - 1) + new Vector2(0, tileset.size - 1);
+                        var adjEnd = adjStart + new Vector2(tileset.size - 1, 0);
+                        //float c = 0.5f + ((float)a / adj.top.Count) * 0.5f;
+                        float c = 1;
+                        Takai.Graphics.Primitives2D.DrawLine(context.spriteBatch, new Color(c, 0.2f, 0.2f), adjStart, adjEnd);
+                    }
+
+                    for (int a = 0; a < adj.right.Count; ++a) // draws green line on left of adjacent tile
+                    {
+                        var adjStart = offset + TilePos(adj.right[a] - 1);
+                        var adjEnd = adjStart + new Vector2(0, tileset.size - 1);
+                        //float c = 0.5f + ((float)a / adj.right.Count) * 0.5f;
+                        float c = 1;
+                        Takai.Graphics.Primitives2D.DrawLine(context.spriteBatch, new Color(0.2f, c, 0.2f), adjStart, adjEnd);
+                    }
+
+                    for (int a = 0; a < adj.bottom.Count; ++a) // draws blue line on top of adjacent tile
+                    {
+                        var adjStart = offset + TilePos(adj.bottom[a] - 1);
+                        var adjEnd = adjStart + new Vector2(tileset.size - 1, 0);
+                        //float c = 0.5f + ((float)a / adj.bottom.Count) * 0.5f;
+                        float c = 1;
+                        Takai.Graphics.Primitives2D.DrawLine(context.spriteBatch, new Color(0.5f, 0.5f, c), adjStart, adjEnd);
+                    }
+
+                    for (int a = 0; a < adj.left.Count; ++a) // draws yellow line on right of adjacent tile
+                    {
+                        var adjStart = offset + TilePos(adj.left[a] - 1) + new Vector2(tileset.size - 1, 0);
+                        var adjEnd = adjStart + new Vector2(0, tileset.size - 1);
+                        //float c = 0.5f + ((float)a / adj.left.Count) * 0.5f;
+                        float c = 1;
+                        Takai.Graphics.Primitives2D.DrawLine(context.spriteBatch, new Color(c, c, 0.2f), adjStart, adjEnd);
+                    }
+                }
+            }
 #endif
 
             //else if (clipboard != null && clipboard.Length > 0)
@@ -271,9 +362,11 @@ namespace DyingAndMore.Editor
             {
                 if (bounds.Contains(cur))
                 {
-                    editor.Map.Class.Tiles[cur.Y, cur.X] = value;
                     editor.Map.NavInfo[cur.Y, cur.X].heuristic = uint.MaxValue;
-                    //SmartPlaceTile(cur, value);
+                    if (useWangPlace)
+                        WangPlace(cur, value);
+                    else
+                        editor.Map.Class.Tiles[cur.Y, cur.X] = value;
                 }
 
                 if (cur.X == end.X && cur.Y == end.Y)
@@ -361,7 +454,7 @@ namespace DyingAndMore.Editor
             tilesChanged = true;
         }
 
-        void SmartPlaceTile(Point pos, short tileValue)
+        void WangPlace(Point pos, short tileValue)
         {
             var mc = editor.Map.Class;
 
@@ -370,19 +463,19 @@ namespace DyingAndMore.Editor
                 return;
 
             mc.Tiles[pos.Y, pos.X] = tileValue;
-            if (pos.X > 0 && mc.Tiles[pos.Y, pos.X - 1] < 0) // todo: check if old tile is valid and replace if not
-                SetTileAware(pos.X - 1, pos.Y);
-            if (pos.X < mc.Width - 1 && mc.Tiles[pos.Y, pos.X + 1] < 0)
-                SetTileAware(pos.X + 1, pos.Y);
-            if (pos.Y > 0 && mc.Tiles[pos.Y - 1, pos.X] < 0)
-                SetTileAware(pos.X, pos.Y - 1);
-            if (pos.Y < mc.Height - 1 && mc.Tiles[pos.Y + 1, pos.X] < 0)
-                SetTileAware(pos.X, pos.Y + 1);
+            if (pos.X > 0)// && mc.Tiles[pos.Y, pos.X - 1] < 0) // todo: check if old tile is valid and replace if not
+                SetTileWang(pos.X - 1, pos.Y);
+            if (pos.X < mc.Width - 1)// && mc.Tiles[pos.Y, pos.X + 1] < 0)
+                SetTileWang(pos.X + 1, pos.Y);
+            if (pos.Y > 0)// && mc.Tiles[pos.Y - 1, pos.X] < 0)
+                SetTileWang(pos.X, pos.Y - 1);
+            if (pos.Y < mc.Height - 1)// && mc.Tiles[pos.Y + 1, pos.X] < 0)
+                SetTileWang(pos.X, pos.Y + 1);
 
             editor.Map.Class.PatchTileLayoutTexture(new Rectangle(pos.X - 1, pos.Y - 1, 3, 3));
         }
 
-        void SetTileAware(int x, int y)
+        void SetTileWang(int x, int y)
         {
             var mc = editor.Map.Class;
 

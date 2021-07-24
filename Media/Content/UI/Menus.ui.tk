@@ -1,0 +1,9 @@
+Wizard {
+	HorizontalAlignment: Alignment.Stretch;
+	VerticalAlignment: Alignment.Stretch;
+
+	Children: [
+		@"UI/Menus/Main.ui.tk";
+		@"UI/Menus/Settings.ui.tk";
+	];
+};

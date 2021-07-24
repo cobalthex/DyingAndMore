@@ -36,6 +36,7 @@ namespace DyingAndMore.Editor
         where TSelector : UI.Selector, new()
     {
         public TSelector selector;
+        protected List toolbox;
         public Graphic preview;
 
         private Drawer selectorDrawer;
@@ -75,12 +76,14 @@ namespace DyingAndMore.Editor
                 return UIEventResult.Handled;
             });
 
-            AddChild(new List(preview, eraserButton)
+            toolbox = new List
             {
                 Position = new Vector2(20),
                 Margin = 20,
                 HorizontalAlignment = Alignment.Right
-            });
+            };
+            AddChild(toolbox);
+            toolbox.AddChildren(preview, eraserButton);
 
             On(SelectionChangedEvent, delegate (Static sender, UIEventArgs e)
             {
@@ -113,7 +116,8 @@ namespace DyingAndMore.Editor
 
         protected override void FinalizeClone()
         {
-            preview = (Graphic)Children[0];
+            toolbox = (List)Children[0];
+            preview = (Graphic)toolbox.Children[0];
             selectorDrawer = (Drawer)Children[1];
             base.FinalizeClone();
         }

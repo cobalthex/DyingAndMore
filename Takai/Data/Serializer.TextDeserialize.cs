@@ -533,6 +533,10 @@ namespace Takai.Data
                     if (prop != null)
                         return prop.GetValue(null);
 
+                    var memfn = type.GetMethod(staticVal, BindingFlags.Public | BindingFlags.Static | (CaseSensitiveIdentifiers ? 0 : BindingFlags.IgnoreCase));
+                    if (memfn != null)
+                        return memfn;
+
                     throw new InvalidDataException(GetExceptionMessage($"Expected static value when reading '{staticVal}' from type '{word}'", context));
                 }
 
@@ -1024,6 +1028,10 @@ namespace Takai.Data
                 var dest = CreateType(destType);
                 return ParseDictionary(destType, dest, (Dictionary<string, object>)source, context);
             }
+
+            // gross
+            if (typeof(MulticastDelegate).IsAssignableFrom(destType.BaseType) && source is MethodInfo method)
+                return method.CreateDelegate(destType);
 
             if (sourceTypeInfo.IsGenericType && sourceType.GetGenericTypeDefinition() == typeof(Lazy<>))
             {

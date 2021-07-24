@@ -139,6 +139,7 @@ namespace Takai.UI
         public const string PressEvent = "Press";
         public const string ClickEvent = "Click";
         public const string DragEvent = "Drag";
+        public const string DropEvent = "Drop";
         public const string TextChangedEvent = "TextChanged";
         public const string ValueChangedEvent = "ValueChanged";
         public const string SelectionChangedEvent = "SelectionChanged";
@@ -148,7 +149,7 @@ namespace Takai.UI
         public const string ActiveState = "Active";
         public const string FocusState = "Focus";
 
-        public static readonly HashSet<string> InputEvents = new HashSet<string> { PressEvent, ClickEvent, DragEvent };
+        public static readonly HashSet<string> InputEvents = new HashSet<string> { PressEvent, ClickEvent, DragEvent, DropEvent };
 
         /// <summary>
         /// Global commands that are invoked if routed commands arent triggered

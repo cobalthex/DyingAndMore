@@ -355,7 +355,7 @@ namespace Takai.UI
         }
 
         /// <summary>
-        /// Create a new element
+        /// Create a new element (pre-filling with a list of children)
         /// </summary>
         /// <param name="children">Optionally add children to this element</param>
         public Static(params Static[] children)

@@ -48,6 +48,11 @@ namespace Takai
             return (n != 0 && 0 == (n & (n - 1)));
         }
 
+        public static double Lerp(double a, double b, double t)
+        {
+            return a + (b - a) * t;
+        }
+
         public static readonly Random RandomGenerator = new Random();
 
         public static T Random<T>(this IList<T> list) //distribution?

@@ -28,7 +28,7 @@ namespace Takai.Game
 
         internal void CalculateTilesPerRow()
         {
-            TilesPerRow = texture != null ? texture.Width / size : 1;
+            TilesPerRow = texture != null ? (texture.Width / size) : 1;
         }
 
         public Tileset(Texture2D texture, int size, string material = "Tiles")

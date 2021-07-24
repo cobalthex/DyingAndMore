@@ -29,6 +29,14 @@ namespace Takai.Graphics
         public static bool operator !=(TextStyle a, TextStyle b) => !a.Equals(b);
         public override int GetHashCode() => base.GetHashCode();
         public override bool Equals(object obj) => base.Equals(obj);
+
+        public static TextStyle Lerp(TextStyle a, TextStyle b, float t)
+        {
+            a.size = MathHelper.Lerp(a.size, b.size, t);
+            a.outlineColor = Color.Lerp(a.outlineColor, b.outlineColor, t);
+            a.outlineThickness = MathHelper.Lerp(a.outlineThickness, b.outlineThickness, t);
+            return a;
+        }
     }
 
     public struct CharacterRegion

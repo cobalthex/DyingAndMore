@@ -152,13 +152,18 @@
 		BorderColor: Color.Transparent;
 	};
 
-	CheckBox: {
-		CheckColor: Color.Transparent;
-		BoxSprite: @"UI/input.9p.tk";
+	Check: {
+		BoxSprite: null;
 		Margin: 10;
+		CheckColor: Color.Transparent;
 		CheckSprite: Sprite {
 			Texture: @"UI/Check.png";
 		};
+	};
+
+	CheckBox: {
+		Proto: "Check";
+		BoxSprite: @"UI/input.9p.tk";
 	};
 
 	Button: {

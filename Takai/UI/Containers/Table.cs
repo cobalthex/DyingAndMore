@@ -57,7 +57,7 @@ namespace Takai.UI
             InvalidateArrange();
         }
 
-        protected override void ApplyStyleRules(Dictionary<string, object> styleRules)
+        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
         {
             base.ApplyStyleRules(styleRules);
             Margin = GetStyleRule(styleRules, "Margin", Margin);

@@ -36,6 +36,8 @@ namespace Takai.UI
             while (draws.Count > 0)
             {
                 var toDraw = draws.Pop();
+                if (toDraw.VisibleBounds.Width == 0 || toDraw.VisibleBounds.Height == 0)
+                    continue;
 
                 if (toDraw.BackgroundColor.A > 0)
                     Primitives2D.DrawFill(context.spriteBatch, toDraw.BackgroundColor, toDraw.VisibleBounds);

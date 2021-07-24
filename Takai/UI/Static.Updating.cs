@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace Takai.UI
 {
@@ -119,6 +120,29 @@ namespace Takai.UI
 
                     foreach (var child in Children)
                         child.BindTo(newVal);
+                }
+            }
+
+            if (queuedAnimations != null)
+            {
+                while (queuedAnimations.Count > 0)
+                {
+                    if (activeAnimations == null)
+                        activeAnimations = new List<System.Collections.IEnumerator>();
+
+                    var animation = queuedAnimations.Dequeue();
+                    activeAnimations.Add(animation.animator.Invoke(this, time, animation.argument));
+                }
+            }
+            if (activeAnimations != null)
+            {
+                for (int i = 0; i < activeAnimations.Count; ++i)
+                {
+                    if (!activeAnimations[i].MoveNext())
+                    {
+                        activeAnimations[i] = activeAnimations[activeAnimations.Count - 1];
+                        activeAnimations.RemoveAt(activeAnimations.Count - 1);
+                    }
                 }
             }
         }

@@ -109,7 +109,7 @@ namespace Takai.UI
             On(ClickEvent, (Static Sender, UIEventArgs e) => UIEventResult.Handled);
         }
 
-        protected override void ApplyStyleRules(Dictionary<string, object> styleRules)
+        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
         {
             base.ApplyStyleRules(styleRules);
             ThumbSprite = GetStyleRule(styleRules, "ThumbSprite", ThumbSprite);
@@ -441,7 +441,7 @@ namespace Takai.UI
             horizontalScrollbar = (ScrollBar)Children[1];
         }
 
-        protected override void ApplyStyleRules(Dictionary<string, object> styleRules)
+        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
         {
             base.ApplyStyleRules(styleRules);
             StayAtEnd = GetStyleRule(styleRules, "StayAtEnd", StayAtEnd);

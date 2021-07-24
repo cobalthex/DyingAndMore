@@ -129,6 +129,7 @@
     <Compile Include="UI\ObjectSelect.cs" />
     <Compile Include="UI\PolarInput.cs" />
     <Compile Include="UI\ProgressBar.cs" />
+    <Compile Include="UI\Static.Animation.cs" />
     <Compile Include="UI\Static.Drawing.cs" />
     <Compile Include="UI\Static.Events.cs" />
     <Compile Include="UI\Static.Hierarchy.cs" />

@@ -1,4 +1,5 @@
 List {
+	Name: "MainMenu";
 	Style: null;
 	Direction: Direction.Vertical;
 	HorizontalAlignment: Alignment.Center;
@@ -9,19 +10,18 @@ List {
 		List {
 			Style: null;
 			Direction: Direction.Horizontal;
-			Margin: 50;
 			Children: [
 				Graphic {
 					Sprite: @"Promo/Logo.png";
 				};
 				Graphic {
 					Sprite: @"Promo/Alpha.png";
-					VerticalAlignment: Alignment.Middle;
+					VerticalAlignment: Alignment.Bottom;
 				};
 			];
 		};
 
-		ScrollBox {
+		#*ScrollBox {
 			HorizontalAlignment: Alignment.Stretch;
 			Size: [NaN 460];
 
@@ -32,6 +32,25 @@ List {
 		            FilterRegex: "\\.(map\\.tk|d2map\\.zip)$";
 				};
 			];
+		};*#
+
+		Static {
+			Name: "Play"; # test
+			Text: "Play";
+		};
+
+		Static {
+			Text: "Settings";
+			EventCommands: {
+				Click: ["WizardTransition" "SettingsMenu"];
+			};
+		};
+
+		Static {
+			Text: "Exit";
+			EventCommands: {
+				Click: ["Animate" Animation [BuiltInAnimations.RunCommand "ExitGameNoWarning"]];
+			};
 		};
 	];
 };

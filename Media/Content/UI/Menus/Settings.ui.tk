@@ -1,0 +1,24 @@
+List {
+	Name: "SettingsMenu";
+	Style: null;
+	Direction: Direction.Vertical;
+	HorizontalAlignment: Alignment.Center;
+	VerticalAlignment: Alignment.Center;
+	Margin: 50;
+
+	Children: [
+		Static {
+			Text: "Settings";
+			Style: "Header";
+		};
+
+		Static { Text: "coming soon™️"; };
+
+		Static {
+			Text: "Back";
+			EventCommands: {
+				Click: ["WizardTransition" "MainMenu"];
+			};
+	 	};
+	];
+};

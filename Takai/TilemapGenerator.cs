@@ -132,15 +132,23 @@ namespace Takai
                 edgeValues[ei + 3] = EvaluateHorizontalEdge(ty + TileSize.Y - 1, tx, tx + TileSize.X);
             }
 
+#if DEBUG
             using (var file = new System.IO.StreamWriter("edges.txt"))
             {
                 for (int i = 0; i < edgeValues.Length; i += 4)
                     file.WriteLine($"{(i / 4)}: ↑{edgeValues[i]} ←{edgeValues[i + 1]} →{edgeValues[i + 2]} ↓{edgeValues[i + 3]}");
             }
+#endif
 
             //index 0 is null tile, all others shifted +1
             Adjacencies = new EdgeSimilarity[totalTiles + 1];
-            for (int i = 0; i < Adjacencies.Length; ++i)
+
+            Adjacencies[0].top = new List<short> { 0 };
+            Adjacencies[0].left = new List<short> { 0 };
+            Adjacencies[0].right = new List<short> { 0 };
+            Adjacencies[0].bottom = new List<short> { 0 };
+
+            for (int i = 1; i < Adjacencies.Length; ++i)
             {
                 //todo: allow for similarity sorting
                 Adjacencies[i].top = new List<short>();
@@ -149,12 +157,14 @@ namespace Takai
                 Adjacencies[i].bottom = new List<short>();
             }
 
+            const int similarityThreshold = 8;
+
             bool AreSimilar(Edge a, Edge b) // todo: make customizable
             {
                 return (
-                    Math.Abs(a.totalFilled - b.totalFilled) < 5 &&
-                    Math.Abs(a.firstFilled - b.firstFilled) < 3 &&
-                    Math.Abs(a.lastFilled - b.lastFilled) < 3
+                    Math.Abs(a.totalFilled - b.totalFilled) < similarityThreshold &&
+                    Math.Abs(a.firstFilled - b.firstFilled) < 6 &&
+                    Math.Abs(a.lastFilled - b.lastFilled) < 6
                 );
             }
 
@@ -162,30 +172,44 @@ namespace Takai
             {
                 var ei = (i - 1) * 4;
 
+                var top = edgeValues[ei + 0];
+                var left = edgeValues[ei + 1];
+                var right = edgeValues[ei + 2];
+                var bottom = edgeValues[ei + 3];
+
                 //compare against null tile
-                if (edgeValues[ei + 0].totalFilled == 0)
+                if (top.totalFilled < similarityThreshold)
                 {
                     Adjacencies[i].top.Add(0);
                     Adjacencies[0].bottom.Add(i);
                 }
-                if (edgeValues[ei + 1].totalFilled == 0)
+                if (left.totalFilled < similarityThreshold)
                 {
                     Adjacencies[i].left.Add(0);
                     Adjacencies[0].right.Add(i);
                 }
-                if (edgeValues[ei + 2].totalFilled == 0)
+                if (right.totalFilled < similarityThreshold)
                 {
                     Adjacencies[i].right.Add(0);
                     Adjacencies[0].left.Add(i);
                 }
-                if (edgeValues[ei + 3].totalFilled == 0)
+                if (bottom.totalFilled < similarityThreshold)
                 {
                     Adjacencies[i].bottom.Add(0);
                     Adjacencies[0].top.Add(i);
                 }
 
-                var right = edgeValues[ei + 2];
-                var bottom = edgeValues[ei + 3];
+                //compare null to full fills
+                //if (top.totalFilled >= TileSize.X - 2 &&
+                //    left.totalFilled >= TileSize.Y - 2 &&
+                //    right.totalFilled >= TileSize.Y - 2 &&
+                //    bottom.totalFilled >= TileSize.X - 2)
+                //{
+                //    Adjacencies[0].top.Add(i);
+                //    Adjacencies[0].left.Add(i);
+                //    Adjacencies[0].right.Add(i);
+                //    Adjacencies[0].bottom.Add(i);
+                //}
 
                 //self compares allowed
                 for (short j = 1; j < totalTiles + 1; ++j)
@@ -206,7 +230,7 @@ namespace Takai
                 }
             }
 
-            // todo: outputDebugInfo flag
+#if DEBUG
             using (var file = new System.IO.StreamWriter("similarities.txt"))
             {
                 for (int i = 0; i < Adjacencies.Length; ++i)
@@ -233,6 +257,7 @@ namespace Takai
                         file.Write($" {adj}");
                     file.WriteLine();
                 }
+#endif
             }
         }
 

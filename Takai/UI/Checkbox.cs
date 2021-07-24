@@ -59,7 +59,7 @@ namespace Takai.UI
             return new Vector2(CheckboxSize + size.X, System.Math.Max(size.Y, CheckboxSize));
         }
 
-        protected override void ApplyStyleRules(Dictionary<string, object> styleRules)
+        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
         {
             base.ApplyStyleRules(styleRules);
             Margin = GetStyleRule(styleRules, "Margin", Margin);

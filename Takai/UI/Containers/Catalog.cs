@@ -51,7 +51,7 @@ namespace Takai.UI
         public Catalog(params Static[] children)
             : base(children) { }
 
-        protected override void ApplyStyleRules(Dictionary<string, object> styleRules)
+        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
         {
             base.ApplyStyleRules(styleRules);
             Margin = GetStyleRule(styleRules, "Margin", Margin);

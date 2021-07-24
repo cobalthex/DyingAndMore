@@ -146,6 +146,7 @@ namespace Takai.UI
                             device = DeviceType.Touch
                         };
                         BubbleEvent(DragEvent, dea);
+                        //todo: drop event
                     }
                     return false;
                 }
@@ -234,25 +235,36 @@ namespace Takai.UI
                     didPress[1 << (int)button] = false;
                     ApplyStyle(isHovering ? "Hover" : null);
 
-                    if (!didDrag && isHovering)
+                    bool wasDrag = didDrag;
+                    didDrag = false;
+
+                    if (isHovering) // only applies to click events?
                     {
                         TriggerClick(
                             (mousePosition - OffsetContentArea.Location).ToVector2() + Padding,
                             (int)button,
-                            DeviceType.Mouse
+                            DeviceType.Mouse,
+                            0,
+                            wasDrag
                         );
 
                         return false;
                     }
-
-                    didDrag = false;
                 }
             }
 
             return true;
         }
 
-        public void TriggerClick(Vector2 relativePosition, int button = 0, DeviceType device = DeviceType.Mouse, int deviceIndex = 0)
+        /// <summary>
+        /// Trigger a click event on an element
+        /// </summary>
+        /// <param name="relativePosition">The position of the pointer relative to the input's bounds</param>
+        /// <param name="button">Which device button was used</param>
+        /// <param name="device">The device that the input came from</param>
+        /// <param name="deviceIndex">For devices that can have more than one (gamepad), which one</param>
+        /// <param name="isDropEvent">Is this the drop event from a drag</param>
+        public void TriggerClick(Vector2 relativePosition, int button = 0, DeviceType device = DeviceType.Mouse, int deviceIndex = 0, bool isDropEvent = false)
         {
             var ce = new PointerEventArgs(this)
             {
@@ -261,7 +273,7 @@ namespace Takai.UI
                 device = device,
                 deviceIndex = deviceIndex
             };
-            BubbleEvent(ClickEvent, ce);
+            BubbleEvent(isDropEvent ? DropEvent : ClickEvent, ce);
         }
 
     }

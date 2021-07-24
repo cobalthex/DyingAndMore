@@ -90,7 +90,7 @@ namespace Takai.UI
             base.DrawSelf(context);
         }
 
-        protected override void ApplyStyleRules(Dictionary<string, object> styleRules)
+        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
         {
             base.ApplyStyleRules(styleRules);
             MissingSpriteXColor = GetStyleRule(styleRules, "MissingSpriteXColor", MissingSpriteXColor);

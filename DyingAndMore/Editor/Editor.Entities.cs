@@ -35,6 +35,8 @@ namespace DyingAndMore.Editor
 
             On(PressEvent, OnPress);
             On(DragEvent, OnDrag);
+            On(DropEvent, OnDrop);
+            On(ClickEvent, OnClick);
         }
 
         protected override void UpdatePreview(int selectedItem)
@@ -114,24 +116,17 @@ namespace DyingAndMore.Editor
 
                     else if (!selectedEntities.Contains(last))
                     {
-                       
+
                         last.Velocity = Vector2.Zero;
                         SelectEntity(last);
                     }
                 }
                 else
                 {
-                    if (editor.Map.Class.Bounds.Contains(worldPos) && selector.ents.Count > 0)
-                    {
-                        SelectEntity(editor.Map.Spawn(
-                            selector.SelectedEntity,
-                            worldPos,
-                            DefaultForward,
-                            Vector2.Zero
-                        ));
-                    }
-                    else if (ShouldMultiSelect())
+                    if (!ShouldMultiSelect())
                         selectedEntities.Clear();
+
+                    savedWorldPos = worldPos;
                 }
 
                 return UIEventResult.Handled;
@@ -161,9 +156,68 @@ namespace DyingAndMore.Editor
                     didClone = true;
                 }
 
-                var delta = editor.Camera.LocalToWorld(dea.delta);
-                foreach (var ent in selectedEntities)
-                    editor.Map.MoveEnt(ent, ent.Position + delta, ent.Forward);
+                if (selectedEntities.Count > 0)
+                {
+                    var delta = editor.Camera.LocalToWorld(dea.delta);
+                    foreach (var ent in selectedEntities)
+                        editor.Map.MoveEnt(ent, ent.Position + delta, ent.Forward);
+                }
+                else
+                {
+                    isBoxSelecting = true; // necessary?
+                    selectRect = Util.AbsRectangle(savedWorldPos, currentWorldPos);
+                }
+
+                return UIEventResult.Handled;
+            }
+
+            return UIEventResult.Continue;
+        }
+
+        protected UIEventResult OnDrop(Static sender, UIEventArgs e)
+        {
+            if (!isBoxSelecting)
+            {
+                return OnClick(sender, e);
+                //return UIEventResult.Continue;
+            }
+
+            var ents = editor.Map.FindEntitiesInRegion(selectRect);
+            if (ShouldMultiSelect())
+            {
+                foreach (var ent in ents)
+                {
+                    if (!selectedEntities.Contains(ent))
+                        selectedEntities.Add(ent);
+                }
+            }
+            else
+            {
+                selectedEntities.Clear();
+                selectedEntities.AddRange(ents);
+            }
+
+            isBoxSelecting = false;
+            return UIEventResult.Handled;
+        }
+
+        protected UIEventResult OnClick(Static sender, UIEventArgs e)
+        {
+            var pea = (PointerEventArgs)e;
+            var worldPos = editor.Camera.ScreenToWorld(LocalToScreen(pea.position));
+
+            if (pea.button == 0 &&
+                selectedEntities.Count == 0 &&
+                editor.Map.Class.Bounds.Contains(worldPos) &&
+                selector.ents.Count > 0)
+            {
+                SelectEntity(editor.Map.Spawn(
+                    selector.SelectedEntity,
+                    worldPos,
+                    DefaultForward,
+                    Vector2.Zero
+                ));
+
                 return UIEventResult.Handled;
             }
 
@@ -178,28 +232,31 @@ namespace DyingAndMore.Editor
             {
                 if (InputState.IsButtonDown(Keys.R))
                 {
-                    // todo: rotate relative to collective center
+                    foreach (var ent in selectedEntities)
+                    {
+                        // calculate fwd individually?
+                        var relOffset = currentWorldPos - ent.WorldPosition;
 
-                    //needs to take into account parent rotations
-                    //var diff = currentWorldPos - SelectedEntity.WorldPosition;
-                    //Vector2 newForward;
-                    //if (InputState.IsMod(KeyMod.Shift))
-                    //{
-                    //    var theta = Util.Angle(diff);
-                    //    theta = (float)System.Math.Round(theta / editor.config.snapAngle) * editor.config.snapAngle;
-                    //    newForward = new Vector2(
-                    //        (float)System.Math.Cos(theta),
-                    //        (float)System.Math.Sin(theta)
-                    //    );
-                    //}
-                    //else
-                    //    newForward = diff;
+                        // needs to take into account parent rotations
+                        Vector2 newForward;
+                        if (InputState.IsMod(KeyMod.Shift))
+                        {
+                            var theta = Util.Angle(relOffset);
+                            theta = (float)System.Math.Round(theta / editor.config.snapAngle) * editor.config.snapAngle;
+                            newForward = new Vector2(
+                                (float)System.Math.Cos(theta),
+                                (float)System.Math.Sin(theta)
+                            );
+                        }
+                        else
+                            newForward = relOffset;
 
-                    //editor.Map.MoveEnt(
-                    //    SelectedEntity,
-                    //    SelectedEntity.Position,
-                    //    newForward
-                    //);
+                        editor.Map.MoveEnt(
+                            ent,
+                            ent.Position,
+                            newForward
+                        );
+                    }
                     return false;
                 }
 
@@ -261,39 +318,11 @@ namespace DyingAndMore.Editor
                     }
                 }
             }
-
 #endif
-
-            // box select
-            if (InputState.IsPress(Keys.B))
+            
+            if (InputState.IsClick(MouseButtons.Left))
             {
-                isBoxSelecting = true;
-                savedWorldPos = currentWorldPos = editor.Camera.ScreenToWorld(InputState.MouseVector);
-                if (float.IsNaN(currentWorldPos.X) || float.IsNaN(currentWorldPos.Y))
-                {
-                    savedWorldPos = currentWorldPos = new Vector2();
-                }
-                return false;
-            }
-            else if (InputState.IsClick(Keys.B))
-            {
-                isBoxSelecting = false;
-                var ents = editor.Map.FindEntitiesInRegion(selectRect);
-                if (ShouldMultiSelect())
-                {
-                    foreach (var ent in ents)
-                    {
-                        if (!selectedEntities.Contains(ent))
-                            selectedEntities.Add(ent);
-                    }
-                }
-                else
-                {
-                    selectedEntities.Clear();
-                    selectedEntities.AddRange(ents);
-                }
 
-                return false;
             }
 
             return base.HandleInput(time);
@@ -316,10 +345,7 @@ namespace DyingAndMore.Editor
             base.DrawSelf(context);
 
             if (isBoxSelecting)
-            {
-                selectRect = Util.AbsRectangle(savedWorldPos, currentWorldPos);
                 editor.Map.DrawRect(selectRect, Color.Yellow);
-            }
 
             // todo: draw outlines around all selected ents
             foreach (var ent in selectedEntities)

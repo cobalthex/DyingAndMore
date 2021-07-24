@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using Takai.Data;
 using Takai.Input;
 using Takai.UI;
-using Takai.Game;
 using Takai.Graphics;
+using DyingAndMore.NotGame;
 
 namespace DyingAndMore
 {
@@ -170,11 +170,15 @@ namespace DyingAndMore
 #endif
 
             //var state = new Editor.Editor();
-            //GameManager.PushState(state);
 
             // = Cache.Load<Takai.Graphics.BitmapFneedle.ent.rtkont>("Fonts/test.fnt.tk");
 
             //todo: move elsewhere
+            Static.GlobalCommands["ExitGameNoWarning"] = delegate (Static ui, object arg)
+            {
+                Exit();
+            };
+
             Static.GlobalCommands["AddUI"] = delegate (Static ui, object arg)
             {
                 if (!(arg is Static child))
@@ -279,7 +283,15 @@ namespace DyingAndMore
                 }
             };
 
-            Static childUI;
+            Static.GlobalCommands["Animate"] = delegate (Static ui, object arg)
+            {
+                if (!(arg is Animation animation))
+                    return;
+
+                ui.Animate(animation);
+            };
+
+            Static childUI = null;
 
             /*
 #if WINDOWS //UWP launch activation parameters?
@@ -383,27 +395,27 @@ namespace DyingAndMore
             //  };
             //}
 
-            {
-                var map = Cache.Load<MapInstance>("mapsrc/navtest.map.tk");
-                map.Class.InitializeGraphics();
+            //{
+            //    var map = Cache.Load<MapInstance>("mapsrc/empty.map.tk");
+            //    map.Class.InitializeGraphics();
 
-                //var mc = new MapClass
-                //{
-                //    Tileset = Cache.Load<Tileset>("Tilesets/Gray.tiles.tk"),
-                //    Tiles = new short[20, 20],
-                //    MaterialInteractions = Cache.Load<MaterialInteractions>("Materials/Default.mtl.tk")
-                //};
-                //for (int r = 0; r < mc.Tiles.GetLength(0); ++r)
-                //    for (int c = 0; c < mc.Tiles.GetLength(1); ++c)
-                //        mc.Tiles[r, c] = -1;
+            //    childUI = new Editor.Editor(map);
+            //    map.renderSettings.drawEntityForwardVectors = true;
+            //    map.renderSettings.drawEntityHierarchies = true;
 
-                //mc.InitializeGraphics();
-                //var map = (MapInstance)mc.Instantiate();
+            //    //var mc = new MapClass
+            //    //{
+            //    //    Tileset = Cache.Load<Tileset>("Tilesets/Gray.tiles.tk"),
+            //    //    Tiles = new short[20, 20],
+            //    //    MaterialInteractions = Cache.Load<MaterialInteractions>("Materials/Default.mtl.tk")
+            //    //};
+            //    //for (int r = 0; r < mc.Tiles.GetLength(0); ++r)
+            //    //    for (int c = 0; c < mc.Tiles.GetLength(1); ++c)
+            //    //        mc.Tiles[r, c] = -1;
 
-                childUI = new Editor.Editor(map);
-                map.renderSettings.drawEntityForwardVectors = true;
-                map.renderSettings.drawEntityHierarchies = true;
-            }
+            //    //mc.InitializeGraphics();
+            //    //var map = (MapInstance)mc.Instantiate();
+            //}
 
             //childUI = new ScrollBox(new ObjectClassDesigner())
             //{
@@ -426,6 +438,30 @@ namespace DyingAndMore
             //        ui.ReplaceAllChildren(new Editor.Editor(story.LoadMapIndex(0)));
             //    };
             //}
+
+            childUI = Cache.Load<Wizard>("UI/Menus.ui.tk");
+            Static.Styles.Add("StyleA", new Dictionary<string, object>
+            {
+                ["BackgroundColor"] = new Color(255, 127, 0),
+            });
+            Static.Styles.Add("StyleB", new Dictionary<string, object>
+            {
+                ["BackgroundColor"] = new Color(0, 127, 255),
+                ["TextStyle"] = new TextStyle
+                {
+                    size = 30f,
+                },
+            });
+
+            { // testing
+                var playButton = childUI.FindChildByName("Play");
+                playButton.Style = "StyleA";
+                playButton.On(Static.ClickEvent, delegate (Static sender_, UIEventArgs e_)
+                {
+                    sender_.Transition("StyleB", System.TimeSpan.FromSeconds(2));
+                    return UIEventResult.Handled;
+                });
+            }
 
             ui = new Static
             //ui = new ScrollBox
