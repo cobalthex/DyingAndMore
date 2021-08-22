@@ -54,7 +54,6 @@ namespace DyingAndMore.Game
         string ICommand.ActionName { get; set; }
         object ICommand.ActionParameter { get; set; }
 
-
         [Takai.Data.Serializer.AsReference]
         public Entities.Squad Squad { get; set; }
 
@@ -66,6 +65,17 @@ namespace DyingAndMore.Game
         public override string ToString()
         {
             return nameof(DestroySquadUnitsCommand) + $" - Squad: {Squad}";
+        }
+    }
+
+    class PauseGameCommand : ICommand
+    {
+        string ICommand.ActionName { get; set; }
+        object ICommand.ActionParameter { get; set; }
+
+        public void Invoke(MapBaseInstance map)
+        {
+            // TODO: redesign commands to be registered?
         }
     }
 }

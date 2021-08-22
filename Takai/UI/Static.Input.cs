@@ -188,7 +188,8 @@ namespace Takai.UI
             if (InputState.IsPress(button) && isHovering)
             {
                 didPress[1 << (int)button] = true;
-                ApplyStyle("Press");
+                if (StyleStates.SetSlot((byte)DefaultStyleStates.Press, true))
+                    ApplyStyle(force: true);
 
                 var pea = new PointerEventArgs(this)
                 {
@@ -209,7 +210,8 @@ namespace Takai.UI
             //todo: maybe add capture setting
             else if (DidPressInside(button))
             {
-                ApplyStyle(isHovering ? "Press" : "Hover"); //show as hover when not in bounds
+                if (StyleStates.SetSlot((byte)DefaultStyleStates.Press, true))
+                    ApplyStyle(force: true);
 
                 var lastMousePosition = InputState.LastMousePoint;
                 if (lastMousePosition != mousePosition)
@@ -233,7 +235,9 @@ namespace Takai.UI
                 if (didPress[1 << (int)button])
                 {
                     didPress[1 << (int)button] = false;
-                    ApplyStyle(isHovering ? "Hover" : null);
+
+                    if (StyleStates.SetSlot((byte)DefaultStyleStates.Press, false))
+                        ApplyStyle(force: true);
 
                     bool wasDrag = didDrag;
                     didDrag = false;

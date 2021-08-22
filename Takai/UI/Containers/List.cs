@@ -61,11 +61,10 @@ namespace Takai.UI
             return base.ToString() + (Direction == Direction.Horizontal ? "↔" : "↕");
         }
 
-        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
+        public struct ListStyleSheet // TODO
         {
-            base.ApplyStyleRules(styleRules);
-            Margin = GetStyleRule(styleRules, "Margin", Margin);
-            Direction = GetStyleRule(styleRules, "Direction", Direction);
+            public float? margin;
+            public Direction? direction;
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)

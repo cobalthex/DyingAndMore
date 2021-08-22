@@ -10,6 +10,7 @@
     <RootNamespace>Takai</RootNamespace>
     <AssemblyName>Takai</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>Latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -146,6 +147,7 @@
     <Compile Include="UI\TrackBar.cs" />
     <Compile Include="UI\TypeSelect.cs" />
     <Compile Include="UI\UITree.cs" />
+    <Compile Include="DynamicBitSet.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="UI\Containers\Table.cs" />
     <Compile Include="UI\Containers\List.cs" />

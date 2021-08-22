@@ -249,6 +249,7 @@ namespace Takai.UI
         public void RemoveAllChildren()
         {
             //todo: this may break things like Accordians
+            //todo: this count does not take into account internal children
             var count = _children.Count;
             if (count == 0)
                 return;

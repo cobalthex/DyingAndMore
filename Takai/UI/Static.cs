@@ -273,7 +273,8 @@ namespace Takai.UI
                         {
                             next._hasFocus = false;
                             //reset didPress?
-                            next.ApplyStyle(force: true);
+                            if (next.StyleStates.SetSlot((byte)DefaultStyleStates.Focus, false))
+                                next.ApplyStyle(force: true);
                         }
 
                         foreach (var child in next.Children)
@@ -283,7 +284,8 @@ namespace Takai.UI
                 }
 
                 _hasFocus = value;
-                ApplyStyle(force: true);
+                if (StyleStates.SetSlot((byte)DefaultStyleStates.Focus, _hasFocus))
+                    ApplyStyle(force: true);
             }
         }
         private bool _hasFocus = false;
@@ -341,7 +343,8 @@ namespace Takai.UI
 #endif
             if (Runtime.GraphicsDevice != null)
                 lastMeasureContainerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
-            Style = GetType().Name;
+
+            ApplyStyle(force: true);
         }
 
         /// <summary>

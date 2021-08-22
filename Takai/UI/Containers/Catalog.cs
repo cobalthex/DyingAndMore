@@ -51,11 +51,10 @@ namespace Takai.UI
         public Catalog(params Static[] children)
             : base(children) { }
 
-        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
+        public struct CatalogStyleSheet // TODO
         {
-            base.ApplyStyleRules(styleRules);
-            Margin = GetStyleRule(styleRules, "Margin", Margin);
-            Direction = GetStyleRule(styleRules, "Direction", Direction);
+            public Vector2 margin;
+            public Direction direction;
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)

@@ -57,11 +57,10 @@ namespace Takai.UI
             InvalidateArrange();
         }
 
-        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
+        public struct TableStyleSheet // TODO
         {
-            base.ApplyStyleRules(styleRules);
-            Margin = GetStyleRule(styleRules, "Margin", Margin);
-            CellColor = GetStyleRule(styleRules, "CellColor", CellColor);
+            public Vector2 margin;
+            public Color cellColor;
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)

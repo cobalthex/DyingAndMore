@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Takai.UI
 {
@@ -15,6 +14,12 @@ namespace Takai.UI
         public float GripperWidth { get; set; } = 8;
         public Color GripperColor { get; set; } = Color.CornflowerBlue;
 
+        public struct DrawerStyleSheet // TODO
+        {
+            public float gripperWidth;
+            public Color gripperColor;
+        }
+        
         public Drawer()
         {
             IsModal = true;
@@ -24,6 +29,12 @@ namespace Takai.UI
                 ((Drawer)sender).isSizing = true;
                 return UIEventResult.Handled;
             });
+        }
+
+        public Drawer(params Static[] children)
+            : this()
+        {
+            AddChildren(children);
         }
         
         protected override bool HandleInput(GameTime time)

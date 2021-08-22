@@ -153,6 +153,9 @@ namespace DyingAndMore
                 outlineThickness = 0.2f,
             };
 
+            // TODO: TESTING
+            Static.BaseStyle.font = Static.DebugFont;
+
             //custom cursor
             //Mouse.SetCursor(MouseCursor.FromTexture2D(Cache.Load<Texture2D>("UI/Pointer.png"), 0, 0));
 
@@ -540,6 +543,16 @@ namespace DyingAndMore
             {
                 Exit();
                 return;
+            }
+
+            else if (InputState.IsPress(Keys.F7))
+            {
+                ui.AddChild(new UI.CacheView
+                {
+                    VerticalAlignment = Alignment.Stretch,
+                    HorizontalAlignment = Alignment.Stretch,
+                    IsModal = true,
+                });
             }
 
             else if (InputState.IsPress(Keys.F8))

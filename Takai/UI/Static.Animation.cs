@@ -69,19 +69,21 @@ namespace Takai.UI
             var x = this;
             IEnumerator anim8or(Static target, GameTime time, object arg)
             {
-                var startStyle = Static.GetStylesheet(x.startStyle); // todo: use current style (for partial lerps)?
-                var finishStyle = Static.GetStylesheet(x.finishStyle);
+                // TODO
+                yield return null;
+                //var startStyle = Static.GetStylesheet(x.startStyle); // todo: use current style (for partial lerps)?
+                //var finishStyle = Static.GetStylesheet(x.finishStyle);
 
-                var startTime = time.TotalGameTime;
-                var finishTime = startTime + x.duration;
+                //var startTime = time.TotalGameTime;
+                //var finishTime = startTime + x.duration;
 
-                while (time.TotalGameTime < finishTime)
-                {
-                    var lerped = Static.LerpStyles(startStyle, finishStyle, (float)((time.TotalGameTime - startTime).TotalSeconds / x.duration.TotalSeconds));
-                    target.ApplyStyleRules(lerped);
+                //while (time.TotalGameTime < finishTime)
+                //{
+                //    var lerped = Static.LerpStyles(startStyle, finishStyle, (float)((time.TotalGameTime - startTime).TotalSeconds / x.duration.TotalSeconds));
+                //    target.ApplyStyleRules(lerped);
 
-                    yield return null;
-                }
+                //    yield return null;
+                //}
 
                 target.Style = x.finishStyle;
                 System.Diagnostics.Debug.WriteLine($"Finished transition from {x.startStyle} to {x.finishStyle}");

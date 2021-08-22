@@ -5,7 +5,8 @@ namespace Takai.UI
 {
     public partial class Static
     {
-        static Static HoveredElement;
+        // used to track the deepest hovered element to not show every element under the cursor as highlighted
+        private static Static HoveredElement;
 
         /// <summary>
         /// Update this element and all of its children
@@ -81,14 +82,15 @@ namespace Takai.UI
                     toUpdate = toUpdate.Parent;
             }
 
-            if (HoveredElement != lastHover)
-            {
-                //lastHover?.ApplyStateStyle();
-                //HoveredElement?.ApplyStyle(state: "Hover");
-                lastHover?.ApplyStyle();
-                HoveredElement?.ApplyStyle("Hover");
-                //LogBuffer.Append($"{lastHover} {HoveredElement}");
-            }
+            if (HoveredElement != null && 
+                HoveredElement.StyleStates.SetSlot((byte)DefaultStyleStates.Hover, true))
+                HoveredElement.ApplyStyle(force: true);
+
+            // better way?
+            if (lastHover != null &&
+                lastHover != HoveredElement &&
+                lastHover.StyleStates.SetSlot((byte)DefaultStyleStates.Hover, false))
+                lastHover.ApplyStyle(force: true);
 
 #if DEBUG
             lastUpdateDuration = boop.Elapsed;

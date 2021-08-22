@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Takai.Graphics;
 using Takai.Input;
 
 namespace Takai.UI
@@ -109,11 +110,12 @@ namespace Takai.UI
             On(ClickEvent, (Static Sender, UIEventArgs e) => UIEventResult.Handled);
         }
 
-        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
+        public struct ScrollBarStyleSheet // TODO
         {
-            base.ApplyStyleRules(styleRules);
-            ThumbSprite = GetStyleRule(styleRules, "ThumbSprite", ThumbSprite);
+            public NinePatch thumbSprite;
         }
+
+        public new ScrollBarStyleSheet Stylez { get; set; } // testing
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
@@ -386,6 +388,18 @@ namespace Takai.UI
 
         //velocity?
 
+        public struct ScrollBoxStyleSheet // TODO
+        {
+            public bool? stayAtEnd;
+            public Vector2? innerPadding;
+            public bool? showScrollbars;
+
+            public ScrollBoxStyleSheet LerpWith(ScrollBoxStyleSheet other, float t)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public ScrollBox()
         {
             ScrollBarUI = new ScrollBar();
@@ -439,14 +453,6 @@ namespace Takai.UI
         {
             verticalScrollbar = (ScrollBar)Children[0];
             horizontalScrollbar = (ScrollBar)Children[1];
-        }
-
-        public override void ApplyStyleRules(Dictionary<string, object> styleRules)
-        {
-            base.ApplyStyleRules(styleRules);
-            StayAtEnd = GetStyleRule(styleRules, "StayAtEnd", StayAtEnd);
-            InnerPadding = GetStyleRule(styleRules, "InnerPadding", InnerPadding);
-            ShowScrollbars = GetStyleRule(styleRules, "ShowScrollbars", ShowScrollbars);
         }
 
         protected override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)

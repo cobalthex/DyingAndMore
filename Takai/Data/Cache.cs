@@ -92,6 +92,18 @@ namespace Takai.Data
             }
         }
 
+        /// <summary>
+        /// Tries to get the cached object, or null if it does not exist
+        /// </summary>
+        /// <param name="cacheKey">The name of the cached item</param>
+        /// <returns>The cached item, or null if it does not exist</returns>
+        public static object TryGet(string cacheKey)
+        {
+            if (objects.TryGetValue(cacheKey, out var obj) && obj.reference.IsAlive)
+                return obj.reference.Target;
+            return null;
+        }
+
         private static Dictionary<string, ZipArchive> openZips = new Dictionary<string, ZipArchive>(StringComparer.OrdinalIgnoreCase);
 
         static Cache()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
+using Takai.Graphics;
 
 namespace Takai.UI
 {
@@ -242,11 +243,9 @@ namespace Takai.UI
             return false;
         }
 
-        public override void ApplyStyleRules(System.Collections.Generic.Dictionary<string, object> styleRules)
+        public struct DropdownSelectStyleSheet // TODO
         {
-            base.ApplyStyleRules(styleRules);
-            if (arrowUI != null)
-                arrowUI.Sprite = GetStyleRule(styleRules, "ArrowSprite", arrowUI.Sprite);
+            public Sprite arrowSprite;
         }
     }
 }

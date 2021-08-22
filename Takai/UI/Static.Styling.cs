@@ -2,18 +2,20 @@
 using System.Reflection;
 using System.Collections.Generic;
 
-using Stylesheet = System.Collections.Generic.Dictionary<string, object>;
+using StylesheetOld = System.Collections.Generic.Dictionary<string, object>;
 using Microsoft.Xna.Framework;
 using Takai.Graphics;
+using System.Runtime.CompilerServices;
+using Takai.Data;
 
 namespace Takai.UI
 {
     public partial class Static
     {
         /// <summary>
-        /// All available/known styles (Apply custom styles using <see cref="ApplyStyles(Stylesheet, Static)"/>)
+        /// All available/known styles (Apply custom styles using <see cref="ApplyStyles(StylesheetOld, Static)"/>)
         /// </summary>
-        public static Dictionary<string, Stylesheet> Styles { get; set; }
+        public static Dictionary<string, StylesheetOld> Styles { get; set; }
 
         const string DefaultStyleName = nameof(Static);
 
@@ -34,174 +36,94 @@ namespace Takai.UI
         private string _style;
         private string lastStyleState;
 
-        protected T GetStyleRule<T>(Stylesheet styleRules, string propName, T fallback)
+        public StyleSheet Stylez { get; set; }
+
+        public DynamicBitSet32 StyleStates { get; } = new DynamicBitSet32(3); // See DefaultStyleStates for preset slots
+
+        public static StyleSheet BaseStyle = new StyleSheet
         {
-            //Cast?
-            if (styleRules == null ||
-                !styleRules.TryGetValue(propName, out var sProp))
-                return fallback;
+            color = Color.White,
+            font = null, // needs to be set at runtime
+            textStyle = new TextStyle(),
+            borderColor = Color.Transparent,
+            backgroundColor = Color.Transparent,
+            backgroundSprite = null,
 
-            if (sProp is T prop)
-                return prop;
-
-            if (sProp == null)
-                return default;
-
-            if (Data.Serializer.TryNumericCast(sProp, out var destNumber, sProp.GetType().GetTypeInfo(), typeof(T).GetTypeInfo()))
-                return (T)destNumber;
-
-            return fallback;
-        }
-
-        public static Stylesheet GetStylesheet(string styleName, string styleState = null)
-        {
-            Stylesheet styles = null;
-            if (styleName != null)
-            {
-                styleName += (styleState != null ? ("+" + styleState) : null);
-                Styles.TryGetValue(styleName, out styles); //todo: revamp
-            }
-            return styles;
-        }
+            // don't mandate these by default
+            horizontalAlignment = null,
+            verticalAlignment = null,
+            position = null,
+            size = null,
+            padding = null,
+        };
 
         /// <summary>
         /// Apply a style, applying the default and/or focus state automatically
         /// </summary>
         /// <param name="state">The custom state to apply (Focus is automatically applied)</param>
         /// <param name="force">Apply this state even if its already applied</param>
-        protected void ApplyStyle(string state = null, bool force = false)
+        protected void ApplyStyle(bool force = false)
         {
-            if (lastStyleState == state && !force)
-                return;
+            StyleSheet style = BaseStyle;
+            style.MergeWith(Stylez);
 
-            lastStyleState = state;
+            // TESTING
+            if (StyleStates[(byte)DefaultStyleStates.Focus])
+                style.MergeWith(new StyleSheet { borderColor = Color.Gold });
+            if (StyleStates[(byte)DefaultStyleStates.Hover])
+                style.MergeWith(new StyleSheet { backgroundColor = Color.DarkSlateBlue });
+            if (StyleStates[(byte)DefaultStyleStates.Press])
+                style.MergeWith(new StyleSheet { backgroundColor = Color.DeepSkyBlue });
 
-            if (state == null)
-                ApplyStyleRecursive(Style); //always apply?
+            if (style.color.HasValue) Color = style.color.Value;
+            if (style.font != null) Font = style.font;
+            if (style.textStyle.HasValue) TextStyle = style.textStyle.Value;
+            if (style.borderColor.HasValue) BorderColor = style.borderColor.Value;
+            if (style.backgroundColor.HasValue) BackgroundColor = style.backgroundColor.Value;
+            if (style.backgroundSprite != null) BackgroundSprite = style.backgroundSprite;
+            if (style.horizontalAlignment.HasValue) HorizontalAlignment = style.horizontalAlignment.Value;
+            if (style.verticalAlignment.HasValue) VerticalAlignment = style.verticalAlignment.Value;
+            if (style.position.HasValue) Position = style.position.Value;
+            if (style.size.HasValue) Size = style.size.Value;
+            if (style.padding.HasValue) Padding = style.padding.Value;
 
-            if (HasFocus)
-                ApplyStyleRecursive(Style, "Focus"); //option to disable?
-
-            if (state != null)
-                ApplyStyleRecursive(Style, state);
+            // todo: store list of style states to apply (maybe make enum system (register ID, slot 1 << ID)
         }
 
-        /// <summary>
-        /// Applies a style, setting proto/default base style recrusively
-        /// </summary>
-        /// <param name="style">The style name to apply</param>
-        /// <param name="state">The state of that style</param>
-        private void ApplyStyleRecursive(string style, string state = null)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected T GetStyleValue<T>(T? value, T fallback) where T : struct =>
+            value.GetValueOrDefault(fallback);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected T GetStyleValue<T>(T value, T fallback) where T : class =>
+            value ?? fallback;
+
+        public virtual void ApplyStyleSheet(StyleSheet styleSheet)
         {
-            //System.Diagnostics.Debug.WriteLine($"{DebugId}: Applying style {style}+{state} - {lastStyleState}");
+            Color = GetStyleValue(styleSheet.color, Color);
+            Font = GetStyleValue(styleSheet.font, Font);
+            TextStyle = GetStyleValue(styleSheet.textStyle, TextStyle);
 
-            var rules = GetStylesheet(style, state);
-            if (rules == null)
-            {
-                if (style != DefaultStyleName)
-                    ApplyStyleRecursive(DefaultStyleName, state);
-                return;
-            }
-
-            if (style != DefaultStyleName)
-            {
-                if (!rules.TryGetValue("proto", out var proto))
-                    proto = DefaultStyleName;
-
-                if (proto is string sProto)
-                    ApplyStyleRecursive(sProto, state);
-            }
-
-            ApplyStyleRules(rules);
-
-            // check for transitions
-            // apply transition animation if any set
-        }
-
-        public static Stylesheet LerpStyles(Stylesheet a, Stylesheet b, float t)
-        {
-            // only lerp specified properties ?
-            if (a == null)
-                return b;
-            if (b == null)
-                return a;
-            
-            var lerped = new Stylesheet();
-            foreach (var ap in a)
-            {
-                var apt = ap.Value.GetType();
-
-                if (!b.TryGetValue(ap.Key, out var bp))
-                {
-                    lerped[ap.Key] = ap.Value;
-                    continue;
-                }
-                if (bp.GetType() == apt)
-                {
-                    if (apt == typeof(Color))
-                    {
-                        lerped[ap.Key] = Color.Lerp((Color)ap.Value, (Color)bp, t);
-                        continue;
-                    }
-                    if (apt == typeof(TextStyle))
-                    {
-                        lerped[ap.Key] = TextStyle.Lerp((TextStyle)ap.Value, (TextStyle)bp, t);
-                        continue;
-                    }
-                }
-                if (Data.Serializer.TryNumericCast(bp, out var destNumber, bp.GetType().GetTypeInfo(), apt.GetTypeInfo()))
-                {
-                    if (apt == typeof(int))
-                        lerped[ap.Key] = (int)MathHelper.Lerp((int)ap.Value, (int)bp, t);
-                    else if (apt == typeof(float))
-                        lerped[ap.Key] = MathHelper.Lerp((float)ap.Value, (float)bp, t);
-                    if (apt == typeof(long))
-                        lerped[ap.Key] = (long)MathHelper.Lerp((long)ap.Value, (long)bp, t);
-                    else if (apt == typeof(double))
-                        lerped[ap.Key] = Util.Lerp((double)ap.Value, (double)bp, t);
-                }
-            }
-
-            var defaultStyles = GetStylesheet(DefaultStyleName); // todo: this isn't ideal
-            foreach (var bp in b)
-            {
-                if (!a.TryGetValue(bp.Key, out var ap) &&
-                    defaultStyles.TryGetValue(bp.Key, out ap))
-                {
-                    //lerped[bp.Key] = MathHelper.Lerp(ap, bp.Value, t); // todo
-                    // set a value? (to ap.Value)
-                    // default value?
-                }
-            }
-
-            return lerped;
-        }
-
-        public virtual void ApplyStyleRules(Stylesheet styleRules)
-        {
-            Color = GetStyleRule(styleRules, "Color", Color);
-            Font = GetStyleRule(styleRules, "Font", Font);
-            TextStyle = GetStyleRule(styleRules, "TextStyle", TextStyle);
-
-            BorderColor = GetStyleRule(styleRules, "BorderColor", BorderColor);
-            BackgroundColor = GetStyleRule(styleRules, "BackgroundColor", BackgroundColor);
-            BackgroundSprite = GetStyleRule(styleRules, "BackgroundSprite", BackgroundSprite);
+            BorderColor = GetStyleValue(styleSheet.borderColor, BorderColor);
+            BackgroundColor = GetStyleValue(styleSheet.backgroundColor, BackgroundColor);
+            BackgroundSprite = GetStyleValue(styleSheet.backgroundSprite, BackgroundSprite);
             if (BackgroundSprite.Sprite != null)
                 BackgroundSprite.Sprite.ElapsedTime = TimeSpan.Zero;
 
-            Padding = GetStyleRule(styleRules, "Padding", Padding);
-            HorizontalAlignment = GetStyleRule(styleRules, "HorizontalAlignment", HorizontalAlignment);
-            VerticalAlignment = GetStyleRule(styleRules, "VerticalAlignment", VerticalAlignment);
-            Position = GetStyleRule(styleRules, "Position", Position);
-            Size = GetStyleRule(styleRules, "Size", Size);
+            Padding = GetStyleValue(styleSheet.padding, Padding);
+            HorizontalAlignment = GetStyleValue(styleSheet.horizontalAlignment, HorizontalAlignment);
+            VerticalAlignment = GetStyleValue(styleSheet.verticalAlignment, VerticalAlignment);
+            Position = GetStyleValue(styleSheet.position, Position);
+            Size = GetStyleValue(styleSheet.size, Size);
 
             //todo: evaluate perf cost
         }
 
-        public static void MergeStyleRules(IEnumerable<KeyValuePair<string, Stylesheet>> stylesheets)
+
+        public static void MergeStyleRules(IEnumerable<KeyValuePair<string, StylesheetOld>> stylesheets)
         {
             if (Styles == null)
-                Styles = new Dictionary<string, Stylesheet>();
+                Styles = new Dictionary<string, StylesheetOld>();
 
             foreach (var rules in stylesheets)
             {
@@ -222,14 +144,91 @@ namespace Takai.UI
 
             //merge proto styles into styles? more data but better perf: no lookups, no double setting
         }
+
+        public static Dictionary<string, IStyleSheet> StylesDictionary { get; } = new Dictionary<string, UI.IStyleSheet>();
+
+        protected TStyleSheet GetStyleSheet<TStyleSheet>(string styleName) where TStyleSheet : struct, IStyleSheet<TStyleSheet>
+        {
+            var thisType = GetType();
+            if (thisType != typeof(Static))
+                styleName = $"{styleName}.{thisType.Name}";
+
+            if (StylesDictionary.TryGetValue(styleName, out var style))
+                return (TStyleSheet)style;
+
+            return default; //todo: default style type
+        }
+
+        protected virtual void ApplyStyleSheet()
+        {
+            BaseStyle = GetStyleSheet<StyleSheet>("ZippidyDooDa");
+        }
+    }
+
+    public interface IStyleSheet : IReferenceable { }
+
+    public interface IStyleSheet<TStyleSheet> : IStyleSheet where TStyleSheet : struct
+    {
+        /// <summary>
+        /// Lerp between this and another stylesheet. If a value is missing, the other is taken
+        /// </summary>
+        /// <param name="other">The style to lerp with</param>
+        /// <param name="t">0.0->1.0 from this->other</param>
+        void LerpWith(TStyleSheet other, float t);
+
+        /// <summary>
+        /// Merge two styles, overwritting the current with <see cref="other"/> if set
+        /// </summary>
+        /// <param name="other">The style to merge from</param>
+        void MergeWith(TStyleSheet other);
+    }
+
+    public struct StyleSheet : IReferenceable, IStyleSheet<StyleSheet>
+    {
+        public string Name { get; set; }
+
+        public IStyleSheet<StyleSheet> proto;
+     
+        public Color? color;
+        public Font font;
+        public TextStyle? textStyle;
+        
+        public Color? borderColor;
+        public Color? backgroundColor;
+        public Sprite backgroundSprite;
+
+        public Alignment? horizontalAlignment;
+        public Alignment? verticalAlignment;
+
+        public Vector2? position;
+        public Vector2? size;
+        public Vector2? padding;
+
+        public void LerpWith(StyleSheet other, float t)
+        {
+            throw new NotImplementedException(); // todo
+        }
+
+        public void MergeWith(StyleSheet other)
+        {
+            if (other.color.HasValue) color = other.color;
+            if (other.font != null) font = other.font;
+            if (other.textStyle.HasValue) textStyle = other.textStyle;
+            if (other.borderColor.HasValue) borderColor = other.borderColor;
+            if (other.backgroundColor.HasValue) backgroundColor = other.backgroundColor;
+            if (other.backgroundSprite != null) backgroundSprite = other.backgroundSprite;
+            if (other.horizontalAlignment.HasValue) horizontalAlignment = other.horizontalAlignment;
+            if (other.verticalAlignment.HasValue) verticalAlignment = other.verticalAlignment;
+            if (other.position.HasValue) position = other.position;
+            if (other.size.HasValue) size = other.size;
+            if (other.padding.HasValue) padding = other.padding;
+        }
+    }
+
+    public enum DefaultStyleStates : byte
+    {
+        Focus = 0,
+        Hover = 1,
+        Press = 2,
     }
 }
-
-
-//StyleStates {Normal,Pressed,Hover,Focus}
-
-//Key -> StyleStates
-//
-
-
-//todo: convert styles to typed on load
