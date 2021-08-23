@@ -343,6 +343,7 @@ namespace Takai.UI
             }
         }
 
+        static readonly List<Static> restyleQueue = new List<Static>();
         static readonly List<Static> measureQueue = new List<Static>();
         static readonly List<Static> arrangeQueue = new List<Static>();
 
@@ -351,6 +352,10 @@ namespace Takai.UI
         /// </summary>
         public static void PerformReflows()
         {
+            for (int i = 0; i < restyleQueue.Count; ++i)
+                restyleQueue[i].ApplyStyle();
+            restyleQueue.Clear();
+
             for (int i = 0; i < measureQueue.Count; ++i)
             {
                 measureQueue[i].Measure(measureQueue[i].lastMeasureAvailableSize);

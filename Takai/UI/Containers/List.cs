@@ -61,10 +61,32 @@ namespace Takai.UI
             return base.ToString() + (Direction == Direction.Horizontal ? "↔" : "↕");
         }
 
-        public struct ListStyleSheet // TODO
+        public struct ListStyleSheet : IStyleSheet<ListStyleSheet>
         {
             public float? margin;
             public Direction? direction;
+
+            public void LerpWith(ListStyleSheet other, float t)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public void MergeWith(ListStyleSheet other)
+            {
+                if (other.margin.HasValue) margin = other.margin.Value;
+                if (other.direction.HasValue) direction = other.direction.Value;
+            }
+        }
+
+        protected override void ApplyStyleOverride()
+        {
+            base.ApplyStyleOverride();
+
+            // style states?
+            ListStyleSheet style = GetStyleSheet<ListStyleSheet>(Style);
+
+            if (style.margin.HasValue) Margin = style.margin.Value;
+            if (style.direction.HasValue) Direction = style.direction.Value;
         }
 
         protected override Vector2 MeasureOverride(Vector2 availableSize)

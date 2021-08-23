@@ -94,18 +94,27 @@ namespace Takai.UI
                 }
             }
 
-            if (!HandleTouchInput())
-                return false;
+            // todo: expand this to ^
+            var lastState = didPress.Data;
+            try
+            {
+                if (!HandleTouchInput())
+                    return false;
 
-            var mouse = InputState.MousePoint;
-            return HandleMouseInput(mouse, MouseButtons.Left) &&
-                HandleMouseInput(mouse, MouseButtons.Right) &&
-                HandleMouseInput(mouse, MouseButtons.Middle);
+                var mouse = InputState.MousePoint;
+                return HandleMouseInput(mouse, MouseButtons.Left) &&
+                    HandleMouseInput(mouse, MouseButtons.Right) &&
+                    HandleMouseInput(mouse, MouseButtons.Middle);
+            }
+            finally
+            {
+                if (System.Math.Sign(lastState) != System.Math.Sign(didPress.Data))
+                    InvalidateStyle();
+            }
         }
 
         bool HandleTouchInput()
-        {
-            bool touched = false;
+    {
             for (int touchIndex = InputState.touches.Count - 1; touchIndex >= 0; --touchIndex)
             {
                 var touch = InputState.touches[touchIndex];
@@ -113,7 +122,9 @@ namespace Takai.UI
                 if (InputState.IsPress(touchIndex) && VisibleBounds.Contains(touch.Position))
                 {
                     didPress[1 << (touchIndex + (int)MouseButtons._TouchIndex)] = true;
-                 
+
+                    // todo: style events
+
                     var pea = new PointerEventArgs(this)
                     {
                         position = touch.Position - OffsetContentArea.Location.ToVector2() + Padding,
@@ -176,7 +187,7 @@ namespace Takai.UI
                 }
             }
 
-            return !touched;
+            return true;
         }
 
         bool HandleMouseInput(Point mousePosition, MouseButtons button)
@@ -188,8 +199,6 @@ namespace Takai.UI
             if (InputState.IsPress(button) && isHovering)
             {
                 didPress[1 << (int)button] = true;
-                if (StyleStates.SetSlot((byte)DefaultStyleStates.Press, true))
-                    ApplyStyle(force: true);
 
                 var pea = new PointerEventArgs(this)
                 {
@@ -210,9 +219,6 @@ namespace Takai.UI
             //todo: maybe add capture setting
             else if (DidPressInside(button))
             {
-                if (StyleStates.SetSlot((byte)DefaultStyleStates.Press, true))
-                    ApplyStyle(force: true);
-
                 var lastMousePosition = InputState.LastMousePoint;
                 if (lastMousePosition != mousePosition)
                 {
@@ -235,9 +241,6 @@ namespace Takai.UI
                 if (didPress[1 << (int)button])
                 {
                     didPress[1 << (int)button] = false;
-
-                    if (StyleStates.SetSlot((byte)DefaultStyleStates.Press, false))
-                        ApplyStyle(force: true);
 
                     bool wasDrag = didDrag;
                     didDrag = false;

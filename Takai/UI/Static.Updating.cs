@@ -82,15 +82,13 @@ namespace Takai.UI
                     toUpdate = toUpdate.Parent;
             }
 
-            if (HoveredElement != null && 
-                HoveredElement.StyleStates.SetSlot((byte)DefaultStyleStates.Hover, true))
-                HoveredElement.ApplyStyle(force: true);
-
-            // better way?
-            if (lastHover != null &&
-                lastHover != HoveredElement &&
-                lastHover.StyleStates.SetSlot((byte)DefaultStyleStates.Hover, false))
-                lastHover.ApplyStyle(force: true);
+            if (lastHover != HoveredElement)
+            {
+                if (lastHover != null)
+                    lastHover.InvalidateStyle();
+                if (HoveredElement != null)
+                    HoveredElement.InvalidateStyle();
+            }
 
 #if DEBUG
             lastUpdateDuration = boop.Elapsed;

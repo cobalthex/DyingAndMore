@@ -12,13 +12,17 @@ List {
 			Style: "Header";
 		};
 
-		Static { Text: "coming soon™️"; };
+		Static {
+			Text: "coming soon™️";
+			Style: "Button";
+		};
 
 		Static {
 			Text: "Back";
 			EventCommands: {
 				Click: ["WizardTransition" "MainMenu"];
 			};
+			Style: "Button";
 	 	};
 	];
 };

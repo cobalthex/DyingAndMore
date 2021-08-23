@@ -167,7 +167,7 @@ namespace DyingAndMore
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
-            Static.MergeStyleRules(Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.tk"));
+            Static.ImportStyleSheets(Cache.Load<Dictionary<string, IStyleSheet>>("UI/Styles.tk"));
 #if ANDROID
             Static.MergeStyleRules(Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.Mobile.tk"));
 #endif
@@ -443,25 +443,25 @@ namespace DyingAndMore
             //}
 
             childUI = Cache.Load<Wizard>("UI/Menus.ui.tk");
-            Static.Styles.Add("StyleA", new Dictionary<string, object>
-            {
-                ["BackgroundColor"] = new Color(255, 127, 0),
-            });
-            Static.Styles.Add("StyleB", new Dictionary<string, object>
-            {
-                ["BackgroundColor"] = new Color(0, 127, 255),
-                ["TextStyle"] = new TextStyle
-                {
-                    size = 30f,
-                },
-            });
+            //Static.Styles.Add("StyleA", new Dictionary<string, object>
+            //{
+            //    ["BackgroundColor"] = new Color(255, 127, 0),
+            //});
+            //Static.Styles.Add("StyleB", new Dictionary<string, object>
+            //{
+            //    ["BackgroundColor"] = new Color(0, 127, 255),
+            //    ["TextStyle"] = new TextStyle
+            //    {
+            //        size = 30f,
+            //    },
+            //});
 
             { // testing
                 var playButton = childUI.FindChildByName("Play");
-                playButton.Style = "StyleA";
+                //playButton.Style = "StyleA";
                 playButton.On(Static.ClickEvent, delegate (Static sender_, UIEventArgs e_)
                 {
-                    sender_.Transition("StyleB", System.TimeSpan.FromSeconds(2));
+                    //sender_.Transition("StyleB", System.TimeSpan.FromSeconds(2));
                     return UIEventResult.Handled;
                 });
             }
