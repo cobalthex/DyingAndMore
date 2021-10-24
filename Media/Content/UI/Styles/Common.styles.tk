@@ -1,0 +1,183 @@
+{
+    # default style
+    : StyleSheet {
+        Font: @"Fonts/Bahnschrift.fnt.tk";
+        TextStyle: TextStyle {
+            size: 20;
+            outlineThickness: 0.5;
+            outlineColor: [0 0 0 255];
+        };
+        Color: Color.White;
+        BackgroundColor: Color.Transparent;
+        BorderColor: Color.Transparent;
+        BackgroundSprite: null;
+    }
+
+    Button: StyleSheet {
+        Padding: Vector2 [10 5];
+    };
+
+    Button @Hover, TabPanel.TabHeader @Hover: StyleSheet {
+        BackgroundColor: Color.DarkSlateBlue;
+    };
+
+    Button @Press, TabPanel.TabHeader @Press: StyleSheet {
+        BackgroundColor: Color.Indigo;
+    };
+
+    TabPanel.TabHeader`CheckBox @Checked`CheckBox: CheckBoxStyleSheet {
+        CheckColor: Color.SkyBlue;
+    }
+
+    Button @Focus, CheckBox @Focus, ScrollBar @Focus: StyleSheet {
+        BorderColor: Color.RoyalBlue;
+    }
+
+    ScrollBar`ScrollBar: ScrollBarStyleSheet {
+        ThumbSprite: NinePatch {
+            Sprite: {
+                Texture: @"UI/scroll.png";
+                Center: false;
+                ClipRect: [0 0 8 8];
+            };
+            CenterRegion: [3 3 2 2];
+        };
+    };
+    ScrollBar: StyleSheet {
+        BackgroundSprite: @"UI/scrollback.9p.tk";
+        Color: Color.Transparent;
+        BorderColor: Color [48 0 128 255];
+    }
+    ScrollBar`ScrollBar @Hover`ScrollBar: ScrollBarStyleSheet {
+        ThumbSprite: NinePatch {
+            Sprite: {
+                Texture: @"UI/scroll.png";
+                Center: false;
+                ClipRect: [0 8 24 8];
+                Width: 8;
+                Height: 8;
+                FrameCount: 3;
+                FrameLength: 150msec;
+                Tween: TweenStyle.None; # overlap
+                IsLooping: false;
+            };
+            CenterRegion: [3 3 2 2];
+        };
+    };
+    ScrollBar`ScrollBar @Press`ScrollBar: ScrollBarStyleSheet {
+        ThumbSprite: NinePatch {
+            Sprite: {
+                Texture: @"UI/scroll.png";
+                Center: false;
+                ClipRect: [0 16 24 8];
+                Width: 8;
+                Height: 8;
+                FrameCount: 3;
+                FrameLength: 150msec;
+                Tween: TweenStyle.None; # overlap
+                IsLooping: false;
+            };
+            CenterRegion: [3 3 2 2];
+        };
+    };
+
+    Header: StyleSheet {
+        Padding: Vector2 [10 0];
+        TextStyle: TextStyle {
+            Size: 30;
+            outlineThickness: 0.5;
+            outlineColor: [0 0 0 255];
+        };
+    };
+
+    Frame: StyleSheet {
+        BackgroundSprite: @"UI/frame.9p.tk";
+        Padding: Vector2 [10 10];
+    };
+
+    Box: StyleSheet {
+        BackgroundSprite: @"UI/box.9p.tk";
+        Padding: Vector2 [10 10];
+        Margin: 10;
+    };
+
+    DropdownSelect: StyleSheet {
+        BackgroundSprite: @"UI/input.9p.tk";
+        BorderColor: Color.Transparent;
+        Padding: Vector2 [5 5];
+        ArrowSprite: Sprite {
+            Texture: @"UI/arrows.png";
+            ClipRect: [0 0 20 15];
+            Width: 20;
+            Height: 15;
+        };
+    };
+    DropdownSelect.Arrow: StyleSheet {
+        Padding: Vector2 [5 5];
+    }
+    Dropdown: StyleSheet {
+        BackgroundSprite: @"UI/frame.9p.tk";
+        Padding: Vector2 [5 5];
+    };
+    #Dropdown.List: {
+    #    Margin: 1;
+    #};
+
+    # backdrop behind dropdown select
+    Backdrop: StyleSheet {
+        BackgroundColor: Color [0 0 0 127];
+    };
+
+    NumericInput: StyleSheet {
+        BackgroundSprite: @"UI/input.9p.tk";
+        BorderColor: Color.Transparent;
+    };
+    NumericInput.TextInput: StyleSheet {
+        BackgroundSprite: NinePatch { };
+        Padding: Vector2 [5 5];
+        BorderColor: Color.Transparent;
+    };
+    NumericInput.Button: StyleSheet {
+        Padding: Vector2 [5 5];
+    };
+
+    FileInput: StyleSheet {
+        BackgroundSprite: @"UI/input.9p.tk";
+        BorderColor: Color.Transparent;
+    };
+    FileInput.TextInput, FileInput.PickerButton: StyleSheet {
+        BackgroundSprite: null;
+    };
+
+    PolarInput: StyleSheet {
+        BackgroundSprite: @"UI/input.9p.tk";
+        BorderColor: Color.Transparent;
+    };
+
+    CheckBox`CheckBox: CheckBoxStyleSheet {
+        Margin: 10;
+        BoxSprite: @"UI/input.9p.tk";
+        CheckColor: Color.Transparent;
+        CheckSprite: Sprite {
+            Texture: @"UI/Check.png";
+        };
+    };
+    CheckBox`CheckBox @Hover`CheckBox: CheckBoxStyleSheet {
+        # todo
+    };
+
+    Divider: StyleSheet {
+        Color: Color [220 220 255 127];
+    };
+
+    Balloon: StyleSheet {
+        BackgroundSprite: @"UI/input.9p.tk";
+        Padding: Vector2 [10 10];
+        HorizontalAlignment: Alignment.Center;
+        VerticalAlignment: Alignment.Center;
+    };
+
+    Drawer: StyleSheet {
+        BackgroundColor: Color [40 32 128 192];
+    };
+};

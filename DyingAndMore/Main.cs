@@ -9,6 +9,7 @@ using Takai.Input;
 using Takai.UI;
 using Takai.Graphics;
 using DyingAndMore.NotGame;
+using System.IO;
 
 namespace DyingAndMore
 {
@@ -41,7 +42,7 @@ namespace DyingAndMore
 
         Matrix textTransform;
         SpriteBatch sbatch;
-        Static ui;
+        Static rootUI;
         Static debugUI;
         Takai.FpsGraph fpsGraph;
 
@@ -123,14 +124,14 @@ namespace DyingAndMore
         {
             textTransform = CreateScreenTransform();
 
-            ui.Arrange(GraphicsDevice.Viewport.Bounds);
-            ui.InvalidateMeasure();
+            rootUI.Arrange(GraphicsDevice.Viewport.Bounds);
+            rootUI.InvalidateMeasure();
 
             debugUI.Arrange(GraphicsDevice.Viewport.Bounds);
             debugUI.InvalidateMeasure();
         }
-        
-        void GdmDeviceCreated(object sender, System.EventArgs e)
+
+    void GdmDeviceCreated(object sender, System.EventArgs e)
         {
             Takai.Runtime.Game = this;
 
@@ -153,9 +154,6 @@ namespace DyingAndMore
                 outlineThickness = 0.2f,
             };
 
-            // TODO: TESTING
-            Static.BaseStyle.font = Static.DebugFont;
-
             //custom cursor
             //Mouse.SetCursor(MouseCursor.FromTexture2D(Cache.Load<Texture2D>("UI/Pointer.png"), 0, 0));
 
@@ -167,7 +165,12 @@ namespace DyingAndMore
 
             sbatch = new SpriteBatch(GraphicsDevice);
 
-            Static.ImportStyleSheets(Cache.Load<Dictionary<string, IStyleSheet>>("UI/Styles.tk"));
+            foreach (var file in Directory.EnumerateFiles(Path.Combine(Cache.ContentRoot, "UI", "Styles"), "*.styles.tk", SearchOption.AllDirectories))
+            {
+                // try catch?
+                System.Diagnostics.Debug.WriteLine("Loading styles from " + file);
+                StylesDictionary.Default.ImportStyleSheets(Cache.Load<Dictionary<string, IStyleSheet>>(file));
+            }
 #if ANDROID
             Static.MergeStyleRules(Cache.Load<Dictionary<string, Dictionary<string, object>>>("UI/Styles.Mobile.tk"));
 #endif
@@ -294,6 +297,36 @@ namespace DyingAndMore
                 ui.Animate(animation);
             };
 
+            Static.GlobalCommands["SetMode"] = delegate (Static _, object arg)
+            {
+                switch ((arg as string).ToLowerInvariant())
+                {
+                    case "game":
+                        {
+                            var map = Cache.Load<MapInstance>("mapsrc/empty.map.tk");
+                            map.Class.InitializeGraphics();
+                            rootUI.ReplaceAllChildren(new Game.GameInstance(new Game.Game { Map = map }));
+                        }
+                        break;
+
+                    case "editor":
+                        {
+                            var map = Cache.Load<MapInstance>("mapsrc/empty.map.tk");
+                            map.Class.InitializeGraphics();
+                            rootUI.ReplaceAllChildren(new Editor.Editor(map)
+                            {
+                                HorizontalAlignment = Alignment.Stretch,
+                                VerticalAlignment = Alignment.Stretch,
+                            });
+                        }
+                        break;
+
+                    case "menus":
+                        rootUI.ReplaceAllChildren(Cache.Load<Static>("UI/Menus.ui.tk", forceLoad: true));
+                        break;
+                }
+            };
+
             Static childUI = null;
 
             /*
@@ -329,62 +362,6 @@ namespace DyingAndMore
             }
 #endif
             */
-
-            //childUI = Cache.Load<Static>("UI/test/meter.ui.tk");
-            //childUI.BindTo(childUI.FindChildByName("input"));
-
-            //            Static childUI = Cache.Load<Static>("UI/Main.ui.tk");
-            //            childUI.On(Static.SelectionChangedEvent, delegate (Static s, UIEventArgs ee)
-            //            {
-            //                if (!(ee.Source is FileList fl))
-            //                    return UIEventResult.Continue;
-
-            //#if !ANDROID
-            //                if (System.IO.File.Exists(fl.SelectedFile))
-            //#endif
-            //                {
-            //                    if (System.IO.Path.GetExtension(fl.SelectedFile) == ".zip")
-            //                    {
-            //                        var packmap = (MapInstance)MapBaseInstance.FromPackage(fl.SelectedFile);
-            //                        packmap.Class.InitializeGraphics();
-            //                        ui.ReplaceAllChildren(new Editor.Editor(packmap));
-            //                        return UIEventResult.Handled;
-            //                    }
-
-            //                    var map = Cache.Load(fl.SelectedFile);
-            //                    if (map is MapClass mc)
-            //                    {
-            //                        mc.InitializeGraphics();
-            //                        //ui.ReplaceAllChildren(new Editor.Editor((MapInstance)mc.Instantiate()));
-            //                        ui.ReplaceAllChildren(new Game.GameInstance(new Game.Game { Map = (MapInstance)mc.Instantiate() }));
-            //                    }
-            //                    else if (map is MapInstance mi)
-            //                    {
-            //                        mi.Class.InitializeGraphics();
-            //                        //ui.ReplaceAllChildren(new Editor.Editor(mi));
-            //                        ui.ReplaceAllChildren(new Game.GameInstance(new Game.Game { Map = mi }));
-            //                    }
-            //                }
-            //                return UIEventResult.Handled;
-            //            });
-
-            //#if DEBUG && ANDROID
-            //            Static.DisplayDebugInfo = true;
-            //#endif
-
-            // // auto tile mapper
-            //{
-            //    map = new MapClass();
-            //    map.Tileset = Cache.Load<Tileset>("Tilesets/Gray.tiles.tk");
-
-            //    tileGen = new Takai.TilemapGenerator();
-            //    tileGen.TileSize = new Point(map.TileSize);
-            //    tileGen.TilemapTexture = map.Tileset.texture;
-
-            //    map.Tiles = tileGen.Solve(12, 16);
-            //    map.InitializeGraphics();
-            //    childUI = new Editor.Editor((MapInstance)map.Instantiate());
-            //}
 
             // // UI designer
             //{
@@ -442,32 +419,21 @@ namespace DyingAndMore
             //    };
             //}
 
-            childUI = Cache.Load<Wizard>("UI/Menus.ui.tk");
-            //Static.Styles.Add("StyleA", new Dictionary<string, object>
-            //{
-            //    ["BackgroundColor"] = new Color(255, 127, 0),
-            //});
-            //Static.Styles.Add("StyleB", new Dictionary<string, object>
-            //{
-            //    ["BackgroundColor"] = new Color(0, 127, 255),
-            //    ["TextStyle"] = new TextStyle
-            //    {
-            //        size = 30f,
-            //    },
-            //});
+            // todo: menu idle timer & menu idle visual
+
+            childUI = Cache.Load<Static>("UI/Menus/Main.ui.tk");
 
             { // testing
                 var playButton = childUI.FindChildByName("Play");
                 //playButton.Style = "StyleA";
                 playButton.On(Static.ClickEvent, delegate (Static sender_, UIEventArgs e_)
                 {
-                    //sender_.Transition("StyleB", System.TimeSpan.FromSeconds(2));
+                    sender_.TransitionStyleTo("StyleB", System.TimeSpan.FromSeconds(2));
                     return UIEventResult.Handled;
                 });
             }
 
-            ui = new Static
-            //ui = new ScrollBox
+            rootUI = new Static
             {
                 Name = "GameRoot",
                 HorizontalAlignment = Alignment.Stretch,
@@ -478,7 +444,7 @@ namespace DyingAndMore
             //    HorizontalAlignment = Alignment.Middle,
             //    VerticalAlignment = Alignment.Stretch
             //});
-            ui.AddChild(childUI);
+            rootUI.AddChild(childUI);
 
             //Static.DebugFont = Static.DefaultFont;
 
@@ -506,7 +472,7 @@ namespace DyingAndMore
                 HorizontalAlignment = Alignment.Center,
             });
 
-            ui.HasFocus = true;
+            rootUI.HasFocus = true;
             base.Initialize();
 
             GraphicsDevice.SetRenderTarget(null);
@@ -547,7 +513,7 @@ namespace DyingAndMore
 
             else if (InputState.IsPress(Keys.F7))
             {
-                ui.AddChild(new UI.CacheView
+                rootUI.AddChild(new UI.CacheView
                 {
                     VerticalAlignment = Alignment.Stretch,
                     HorizontalAlignment = Alignment.Stretch,
@@ -560,11 +526,11 @@ namespace DyingAndMore
 
             else if (InputState.IsPress(Keys.F9))
             {
-                var uiTree = new UITree(ui.FindChildAtPoint(InputState.MousePoint));
+                var uiTree = new UITree(rootUI.FindChildAtPoint(InputState.MousePoint));
                 var container = new ScrollBox(uiTree)
                 {
                     Size = new Vector2(600),
-                    Style = "Frame",
+                    Styles = "Frame",
                     HorizontalAlignment = Alignment.Center,
                     VerticalAlignment = Alignment.Center,
                     IsModal = true,
@@ -574,15 +540,15 @@ namespace DyingAndMore
                         [Static.DragEvent] = "DragModal"
                     }
                 };
-                ui.AddChild(container);
+                rootUI.AddChild(container);
             }
             else if (InputState.IsPress(Keys.F10))
                 Static.DisplayDebugInfo ^= true;
             else if (InputState.IsPress(Keys.F11))
-                ui.DebugInvalidateTree();
+                rootUI.DebugInvalidateTree();
 
             //debugUI.Update(gameTime);
-            ui.Update(gameTime);
+            rootUI.Update(gameTime);
         }
         Vector2 lastTouchPos;
 
@@ -597,7 +563,7 @@ namespace DyingAndMore
                 spriteBatch = sbatch,
                 textRenderer = TextRenderer.Default
             };
-            ui.Draw(drawContext);
+            rootUI.Draw(drawContext);
             debugUI.Draw(drawContext);
 
 #if DEBUG

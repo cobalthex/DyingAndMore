@@ -81,13 +81,12 @@ namespace Takai.UI
                 if (i < 0) //todo: does this skip the first child?
                     toUpdate = toUpdate.Parent;
             }
+            
 
             if (lastHover != HoveredElement)
             {
-                if (lastHover != null)
-                    lastHover.InvalidateStyle();
-                if (HoveredElement != null)
-                    HoveredElement.InvalidateStyle();
+                lastHover?.SetStyle("@Hover", false);
+                HoveredElement?.SetStyle("@Hover", true);
             }
 
 #if DEBUG
@@ -145,6 +144,8 @@ namespace Takai.UI
                     }
                 }
             }
+
+            currentStateElapsedTime += time.ElapsedGameTime;
         }
     }
 }

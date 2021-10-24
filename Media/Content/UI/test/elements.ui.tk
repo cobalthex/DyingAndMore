@@ -54,6 +54,7 @@ ScrollBox {
 				Static {
 					Name: "Button";
 					Text: "Button";
+					Styles: "Button";
 					OnClickCommand: "undefined";
 					BorderColor: [192 192 192 128];
 					Padding: 10;

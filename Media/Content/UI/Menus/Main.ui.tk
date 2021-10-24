@@ -1,12 +1,11 @@
 List {
 	Name: "MainMenu";
-	Style: "TestList";
+	Styles: "MainMenu";
 	HorizontalAlignment: Alignment.Center;
 	VerticalAlignment: Alignment.Center;
 
 	Children: [
 		List {
-			Style: null;
 			Direction: Direction.Horizontal;
 			Children: [
 				Graphic {
@@ -35,7 +34,10 @@ List {
 		Static {
 			Name: "Play"; # test
 			Text: "Play";
-			Style: "Button";
+			Styles: "Button";
+			EventCommands: {
+				Click: ["SetMode" "editor"]
+			}
 		};
 
 		Static {
@@ -43,7 +45,7 @@ List {
 			EventCommands: {
 				Click: ["WizardTransition" "SettingsMenu"];
 			};
-			Style: "Button";
+			Styles: "Button";
 		};
 
 		Static {
@@ -51,7 +53,13 @@ List {
 			EventCommands: {
 				Click: ["Animate" Animation [BuiltInAnimations.RunCommand "ExitGameNoWarning"]];
 			};
-			Style: "Button";
+			Styles: "Button";
 		};
+
+		ScrollBar {
+			Direction: Direction.Horizontal;
+			ContentSize: 1000;
+			Size: [200 20];
+		}
 	];
 };

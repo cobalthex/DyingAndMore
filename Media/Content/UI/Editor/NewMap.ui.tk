@@ -19,7 +19,7 @@ List {
             Children: [
                 Static {
                     VerticalAlignment: Alignment.Middle;
-                    Style: "Header";
+                    Styles: "Header";
                     Text: "New map";
                 };
 
@@ -28,7 +28,7 @@ List {
         };
 
         List {
-            Style: "Frame";
+            Styles: "Frame";
             Children: [
                 Static {
                     Text: "`_Name";
@@ -84,7 +84,7 @@ List {
                     HorizontalAlignment: Alignment.Center;
                     Children: [
                         Static {
-                            Style: "Button";
+                            Styles: "Button";
                             EventCommands: {
                                 Click: ["Create"];
                             };
@@ -94,7 +94,7 @@ List {
                         };
 
                         Static {
-                            Style: "Button";
+                            Styles: "Button";
                             EventCommands: {
                                 Click: ["CloseModal"];
                             };

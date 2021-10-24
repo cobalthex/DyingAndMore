@@ -64,7 +64,7 @@ namespace DyingAndMore.Editor
             if (selectedDecal != null)
             {
                 var oldSector = GetDecalSector(selectedDecal);
-                selectedDecal.position += dea.delta;
+                selectedDecal.position += editor.Camera.LocalToWorld(dea.delta);
                 var newSector = GetDecalSector(selectedDecal);
                 if (oldSector != newSector)
                 {

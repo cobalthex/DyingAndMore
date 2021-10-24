@@ -100,14 +100,14 @@ namespace Takai.UI
 
         protected TextInput textInput = new TextInput
         {
-            Style = "FileInput.TextInput",
+            Styles = "FileInput.TextInput",
             HorizontalAlignment = Alignment.Stretch,
             VerticalAlignment = Alignment.Stretch,
             BorderColor = Color.Transparent
         };
         protected Static pickerButton = new Static
         {
-            Style = "FileInput.PickerButton",
+            Styles = "FileInput.PickerButton",
             VerticalAlignment = Alignment.Stretch,
             Text = "...",
             Padding = new Vector2(5, 0)

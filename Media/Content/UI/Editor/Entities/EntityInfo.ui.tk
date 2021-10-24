@@ -1,6 +1,6 @@
 Table {
     Name: "Entity Info";
-	Style: "Frame";
+	Styles: "Frame";
     Position: [20 20];
     VerticalAlignment: Alignment.Bottom;
     ColumnCount: 2;

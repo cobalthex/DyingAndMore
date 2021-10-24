@@ -215,7 +215,7 @@ namespace DyingAndMore.Game
 
             var returnToEditor = new Static("Return to editor")
             {
-                Style = "Button"
+                Styles = "Button"
             };
             returnToEditor.EventCommands[ClickEvent] = SwitchToEditorCommand;
 
@@ -223,7 +223,7 @@ namespace DyingAndMore.Game
             {
                 Name = "Settings Console",
                 VerticalAlignment = Alignment.Stretch,
-                Style = "Frame",
+                Styles = "Frame",
                 IsEnabled = false,
             });
 

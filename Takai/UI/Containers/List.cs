@@ -61,34 +61,6 @@ namespace Takai.UI
             return base.ToString() + (Direction == Direction.Horizontal ? "↔" : "↕");
         }
 
-        public struct ListStyleSheet : IStyleSheet<ListStyleSheet>
-        {
-            public float? margin;
-            public Direction? direction;
-
-            public void LerpWith(ListStyleSheet other, float t)
-            {
-                throw new System.NotImplementedException();
-            }
-
-            public void MergeWith(ListStyleSheet other)
-            {
-                if (other.margin.HasValue) margin = other.margin.Value;
-                if (other.direction.HasValue) direction = other.direction.Value;
-            }
-        }
-
-        protected override void ApplyStyleOverride()
-        {
-            base.ApplyStyleOverride();
-
-            // style states?
-            ListStyleSheet style = GetStyleSheet<ListStyleSheet>(Style);
-
-            if (style.margin.HasValue) Margin = style.margin.Value;
-            if (style.direction.HasValue) Direction = style.direction.Value;
-        }
-
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             stretches = 0;
@@ -214,5 +186,36 @@ namespace Takai.UI
                 }
             }
         }
+        protected override void ApplyStyleOverride()
+        {
+            base.ApplyStyleOverride();
+
+            // don't set defaults, as these can be set manually
+            var style = GenerateStyleSheet<ListStyleSheet>();
+
+            if (style.Margin.HasValue) Margin = style.Margin.Value;
+            if (style.Direction.HasValue) Direction = style.Direction.Value;
+        }
+
+
+        public struct ListStyleSheet : IStyleSheet<ListStyleSheet>
+        {
+            public string Name { get; set; }
+
+            public float? Margin;
+            public Direction? Direction;
+
+            public void LerpWith(ListStyleSheet other, float t)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public void MergeWith(ListStyleSheet other)
+            {
+                if (other.Margin.HasValue) Margin = other.Margin.Value;
+                if (other.Direction.HasValue) Direction = other.Direction.Value;
+            }
+        }
+
     }
 }

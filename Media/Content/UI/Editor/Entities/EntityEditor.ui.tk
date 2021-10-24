@@ -13,7 +13,7 @@ List {
             Children: [
                 Static {
                     VerticalAlignment: Alignment.Middle;
-                    Style: "Header";
+                    Styles: "Header";
                     Bindings: [
                         Binding {
                             Source: ":typename";
@@ -30,7 +30,7 @@ List {
         };
 
         Scrollbox {
-            Style: "Frame";
+            Styles: "Frame";
             Size: [650 650];
             InnerPadding: 10;
             Children: [

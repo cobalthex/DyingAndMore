@@ -53,7 +53,7 @@ namespace DyingAndMore.Editor
                     Height = editor.Map.Class.TileSize,
                 },
                 HorizontalAlignment = Alignment.Right,
-                Style = "Editor.Selector.Preview",
+                Styles = "Editor.Selector.Preview",
             };
             preview.EventCommands[ClickEvent] = "OpenSelector";
             CommandActions["OpenSelector"] = delegate (Static sender, object arg)
@@ -68,7 +68,7 @@ namespace DyingAndMore.Editor
             var eraserButton = new Graphic(Cache.Load<Texture2D>("UI/Editor/Eraser.png"))
             {
                 HorizontalAlignment = Alignment.Right,
-                Style = "Editor.Selector.Eraser"
+                Styles = "Editor.Selector.Eraser"
             };
             eraserButton.On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {

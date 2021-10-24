@@ -33,7 +33,21 @@ namespace Takai.UI
         /// <summary>
         /// Is this checkbox currently checked?
         /// </summary>
-        public bool IsChecked { get; set; } = false;
+        public bool IsChecked
+        {
+            get => _isChecked;
+            set
+            {
+                if (_isChecked == value)
+                    return;
+
+                _isChecked = value;
+
+                SetStyle("Checked", _isChecked);
+                BubbleEvent(this, ValueChangedEvent, new UIEventArgs(this));
+            }
+        }
+        private bool _isChecked = false;
 
         public override bool CanFocus => true;
 
@@ -46,7 +60,6 @@ namespace Takai.UI
             On(ClickEvent, delegate (Static sender, UIEventArgs e)
             {
                 ((CheckBox)sender).IsChecked ^= true;
-                BubbleEvent(sender, ValueChangedEvent, new UIEventArgs(sender));
                 return UIEventResult.Handled;
             });
         }
@@ -58,15 +71,6 @@ namespace Takai.UI
                 size.X += Margin;
             return new Vector2(CheckboxSize + size.X, System.Math.Max(size.Y, CheckboxSize));
         }
-
-        public struct CheckBoxStyleSheet // TOOD
-        {
-            public float margin;
-            public Color checkColor;
-            public Graphics.NinePatch boxSprite;
-            public Graphics.Sprite checkSprite;
-        }
-
         protected override void DrawSelf(DrawContext context)
         {
             var checkY = (ContentArea.Height - CheckboxSize) / 2;
@@ -77,10 +81,55 @@ namespace Takai.UI
             BoxSprite.Draw(context.spriteBatch, Rectangle.Intersect(boxBounds, VisibleContentArea));
 
             if (IsChecked)
-                DrawSprite(context.spriteBatch, CheckSprite, new Rectangle(2, checkY + 2, CheckboxSize - 4, CheckboxSize - 4));
+            {
+                if (CheckSprite != null)
+                    DrawSprite(context.spriteBatch, CheckSprite, new Rectangle(2, checkY + 2, CheckboxSize - 4, CheckboxSize - 4));
+                else
+                {
+                    var y = checkY + CheckboxSize - 4;
+                    DrawLine(context.spriteBatch, CheckColor, new Vector2(4), new Vector2(CheckboxSize - 4, y));
+                    DrawLine(context.spriteBatch, CheckColor, new Vector2(4, y), new Vector2(CheckboxSize - 4, checkY + 4));
+                }
+            }
 
             DrawText(context.textRenderer, Text, new Vector2(CheckboxSize + Margin, 0));
         }
+
+        protected override void ApplyStyleOverride()
+        {
+            base.ApplyStyleOverride();
+
+            var style = GenerateStyleSheet<CheckBoxStyleSheet>();
+
+            if (style.Margin.HasValue) Margin = style.Margin.Value;
+            if (style.CheckColor.HasValue) CheckColor = style.CheckColor.Value;
+            if (style.BoxSprite.HasValue) BoxSprite = style.BoxSprite.Value;
+            if (style.CheckSprite != null) CheckSprite = style.CheckSprite;
+        }
+
+        public struct CheckBoxStyleSheet : IStyleSheet<CheckBoxStyleSheet>
+        {
+            public string Name { get; set; }
+
+            public float? Margin;
+            public Color? CheckColor;
+            public Graphics.NinePatch? BoxSprite;
+            public Graphics.Sprite CheckSprite;
+
+            public void LerpWith(CheckBoxStyleSheet other, float t)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public void MergeWith(CheckBoxStyleSheet other)
+            {
+                if (other.Margin.HasValue) Margin = other.Margin;
+                if (other.CheckColor.HasValue) CheckColor = other.CheckColor;
+                if (other.BoxSprite.HasValue) BoxSprite = other.BoxSprite;
+                if (other.CheckSprite != null) CheckSprite = other.CheckSprite;
+            }
+        }
+
     }
 }
  

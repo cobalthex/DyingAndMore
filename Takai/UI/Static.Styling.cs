@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Takai.Graphics;
-using Takai.Data;
+using System.Linq;
 
 namespace Takai.UI
 {
@@ -10,40 +8,43 @@ namespace Takai.UI
     {
         private bool isStyleValid = true;
 
-        const string DefaultStyleName = nameof(Static);
-
-        public string Style
+        /// <summary>
+        /// A space separated list of the current styles. Don't call directly
+        /// Set individual styles via <see cref="SetStyle(string, bool)"/>
+        /// </summary>
+        public string Styles // string b/c most elements will have a single style -- TODO re-evaluate
         {
-            get => _styleName;
+            get => string.Join(" ", _styleHashes.Select(s => s.value)); // evaluate where this is called
             set
             {
-                if (_styleName == value)
-                    return;
-
-                _styleName = value;
+                _styleHashes = (value ?? "").Split(' ').Distinct().Select(s => new StringHash(s)).ToList();
                 InvalidateStyle();
             }
         }
-        private string _styleName;
+        private List<StringHash> _styleHashes = new();
 
         // custom style object for setting properties?
 
-        public static StyleSheet BaseStyle = new StyleSheet
-        {
-            color = Color.White,
-            font = null, // needs to be set at runtime
-            textStyle = new TextStyle(),
-            borderColor = Color.Transparent,
-            backgroundColor = Color.Transparent,
-            backgroundSprite = null,
+        protected TimeSpan currentStateElapsedTime;
 
-            // don't mandate these by default
-            horizontalAlignment = null,
-            verticalAlignment = null,
-            position = null,
-            size = null,
-            padding = null,
-        };
+        /// <summary>
+        /// Set or cleer a style state
+        /// </summary>
+        /// <param name="style">The name of style to set, it should be in PascalCase</param>
+        /// <param name="add">set or clear the style? (setting twice is idempotent)</param>
+        protected void SetStyle(string style, bool add)
+        {
+            var stringHash = new StringHash(style);
+            if (add && _styleHashes.FindIndex(st => st.Equals(stringHash)) < 0)
+            {
+                _styleHashes.Add(stringHash);
+                InvalidateStyle();
+                return;
+            }
+
+            if (!add && _styleHashes.Remove(stringHash))
+                InvalidateStyle();
+        }
 
         protected void InvalidateStyle()
         {
@@ -60,137 +61,36 @@ namespace Takai.UI
         /// </summary>
         public void ApplyStyle()
         {
+            //System.Diagnostics.Debug.WriteLine($"Syling {DebugId} with states {string.Join(",", styleStates)}");
             ApplyStyleOverride();
             isStyleValid = true;
+            currentStateElapsedTime = TimeSpan.Zero;
         }
 
+        /// <summary>
+        /// Apply a style, overridable to support custom IStyleSheets
+        /// </summary>
         protected virtual void ApplyStyleOverride()
         {
-            StyleSheet style = BaseStyle;
+            var style = GenerateStyleSheet<StyleSheet>();
 
-            style.MergeWith(GetStyleSheet<StyleSheet>(Style));
+            // todo: explicit optional type for ref types
 
-            // store these style states in a DynamicBitSet?
-
-            // todo: extending this is too manual
-
-            if (HasFocus)
-                style.MergeWith(GetStyleSheet<StyleSheet>(Style, nameof(DefaultStyleStates.Focus)));
-
-            if (HoveredElement == this)
-            {
-                style.MergeWith(GetStyleSheet<StyleSheet>(Style, nameof(DefaultStyleStates.Hover)));
-
-                if (didPress.Data != 0)
-                    style.MergeWith(GetStyleSheet<StyleSheet>(Style, nameof(DefaultStyleStates.Press)));
-            }
-
-            if (style.color.HasValue) Color = style.color.Value;
-            if (style.font != null) Font = style.font;
-            if (style.textStyle.HasValue) TextStyle = style.textStyle.Value;
-            if (style.borderColor.HasValue) BorderColor = style.borderColor.Value;
-            if (style.backgroundColor.HasValue) BackgroundColor = style.backgroundColor.Value;
-            if (style.backgroundSprite != null) BackgroundSprite = style.backgroundSprite;
-            if (style.horizontalAlignment.HasValue) HorizontalAlignment = style.horizontalAlignment.Value;
-            if (style.verticalAlignment.HasValue) VerticalAlignment = style.verticalAlignment.Value;
-            if (style.position.HasValue) Position = style.position.Value;
-            if (style.size.HasValue) Size = style.size.Value;
-            if (style.padding.HasValue) Padding = style.padding.Value;
+            if (style.Color.HasValue) Color = style.Color.Value;
+            if (style.Font != null) Font = style.Font;
+            if (style.TextStyle.HasValue) TextStyle = style.TextStyle.Value;
+            if (style.BorderColor.HasValue) BorderColor = style.BorderColor.Value;
+            if (style.BackgroundColor.HasValue) BackgroundColor = style.BackgroundColor.Value;
+            if (style.BackgroundSprite.HasValue) BackgroundSprite = style.BackgroundSprite.Value;
+            if (style.HorizontalAlignment.HasValue) HorizontalAlignment = style.HorizontalAlignment.Value;
+            if (style.VerticalAlignment.HasValue) VerticalAlignment = style.VerticalAlignment.Value;
+            if (style.Position.HasValue) Position = style.Position.Value;
+            if (style.Size.HasValue) Size = style.Size.Value;
+            if (style.Padding.HasValue) Padding = style.Padding.Value;
         }
 
-        public static Dictionary<string, IStyleSheet> StylesDictionary { get; } = new Dictionary<string, UI.IStyleSheet>();
-
-        /// <summary>
-        /// Import a set of stylesheets
-        /// </summary>
-        /// <param name="styles">The stylesheets, by name, see remarks</param>
-        /// <remarks>Style names are in the format of StyleName[+DerivedType]@State, e.g. TestList+List@Hover</remarks>
-        public static void ImportStyleSheets(Dictionary<string, IStyleSheet> styles)
-        {
-            foreach (var style in styles)
-            {
-                // TODO: merge (might have to be reflection based)
-                StylesDictionary[style.Key] = style.Value;
-            }
-        }
-
-        protected TStyleSheet GetStyleSheet<TStyleSheet>(string styleName, string styleState = null) 
+        protected TStyleSheet GenerateStyleSheet<TStyleSheet>()
             where TStyleSheet : struct, IStyleSheet<TStyleSheet>
-        {
-            var sheetType = typeof(TStyleSheet).Name.Replace("StyleSheet", "");
-            if (sheetType.Length > 0)
-                styleName = $"{styleName}+{sheetType}";
-            if (styleState != null)
-                styleName += "@" + styleState;
-
-            if (styleName != null && StylesDictionary.TryGetValue(styleName, out var style))
-                return (TStyleSheet)style;
-
-            return default; //todo: default style type
-        }
-    }
-
-    public interface IStyleSheet { }
-
-    public interface IStyleSheet<TStyleSheet> : IStyleSheet where TStyleSheet : struct
-    {
-        /// <summary>
-        /// Lerp between this and another stylesheet. If a value is missing, the other is taken
-        /// </summary>
-        /// <param name="other">The style to lerp with</param>
-        /// <param name="t">0.0->1.0 from this->other</param>
-        void LerpWith(TStyleSheet other, float t);
-
-        /// <summary>
-        /// Merge two styles, overwritting the current with <see cref="other"/> if set
-        /// </summary>
-        /// <param name="other">The style to merge from</param>
-        void MergeWith(TStyleSheet other);
-    }
-
-    public struct StyleSheet : IStyleSheet<StyleSheet>
-    {
-        public Color? color;
-        public Font font;
-        public TextStyle? textStyle;
-        
-        public Color? borderColor;
-        public Color? backgroundColor;
-        public Sprite backgroundSprite;
-
-        public Alignment? horizontalAlignment;
-        public Alignment? verticalAlignment;
-
-        public Vector2? position;
-        public Vector2? size;
-        public Vector2? padding;
-
-        public void LerpWith(StyleSheet other, float t)
-        {
-            throw new NotImplementedException(); // todo
-        }
-
-        public void MergeWith(StyleSheet other)
-        {
-            if (other.color.HasValue) color = other.color;
-            if (other.font != null) font = other.font;
-            if (other.textStyle.HasValue) textStyle = other.textStyle;
-            if (other.borderColor.HasValue) borderColor = other.borderColor;
-            if (other.backgroundColor.HasValue) backgroundColor = other.backgroundColor;
-            if (other.backgroundSprite != null) backgroundSprite = other.backgroundSprite;
-            if (other.horizontalAlignment.HasValue) horizontalAlignment = other.horizontalAlignment;
-            if (other.verticalAlignment.HasValue) verticalAlignment = other.verticalAlignment;
-            if (other.position.HasValue) position = other.position;
-            if (other.size.HasValue) size = other.size;
-            if (other.padding.HasValue) padding = other.padding;
-        }
-    }
-
-    [Flags]
-    public enum DefaultStyleStates
-    {
-        Focus = 0,
-        Hover = 1,
-        Press = 2,
+            => StylesDictionary.Default.GenerateStyleSheet<TStyleSheet>(_styleHashes);
     }
 }

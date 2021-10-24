@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Takai.Data;
 
 namespace Takai.UI
@@ -33,12 +32,12 @@ namespace Takai.UI
                 if (lastTabIndex >= 0)
                 {
                     Children[lastTabIndex + 1].IsEnabled = false;
-                    tabBar.Children[lastTabIndex].Style = "TabPanel.TabHeader";
+                    ((CheckBox)tabBar.Children[lastTabIndex]).IsChecked = false;
                 }
                 if (_tabIndex >= 0)
                 {
                     Children[_tabIndex + 1].IsEnabled = true;
-                    tabBar.Children[_tabIndex].Style = "TabPanel.TabHeader.Active";
+                    ((CheckBox)tabBar.Children[_tabIndex]).IsChecked = true;
                 }
 
                 InvalidateArrange();
@@ -61,7 +60,7 @@ namespace Takai.UI
             {
                 Direction = Direction.Horizontal,
                 HorizontalAlignment = Alignment.Stretch,
-                Style = "TabPanel.TabBar",
+                Styles = "TabPanel.TabBar",
             };
             base.InternalInsertChild(tabBar);
 
@@ -111,9 +110,9 @@ namespace Takai.UI
 
         protected override bool InternalInsertChild(Static child, int index = -1, bool reflow = true, bool ignoreFocus = false)
         {
-            var tabHeader = new Static
+            var tabHeader = new CheckBox
             {
-                Style = "TabPanel.TabHeader",
+                Styles = "TabPanel.TabHeader",
                 Bindings = new List<Binding>
                 {
                     new Binding("Name", "Text")

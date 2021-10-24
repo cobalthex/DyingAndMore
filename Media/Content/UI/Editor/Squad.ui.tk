@@ -13,7 +13,7 @@ List {
             Children: [
                 Static {
                     VerticalAlignment: Alignment.Middle;
-                    Style: "Header";
+                    Styles: "Header";
                     Text: "Squad";
                 };
 

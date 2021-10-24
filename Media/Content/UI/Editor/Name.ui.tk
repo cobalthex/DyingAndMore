@@ -1,5 +1,5 @@
 List {
-	Style: "Frame";
+	Styles: "Frame";
 	IsModal: true;
 	Direction: Direction.Vertical;
 	HorizontalAlignment: Alignment.Center;
@@ -45,7 +45,7 @@ List {
 			Margin: 10;
 			Children: [
 				Static {
-                    Style: "Button";
+                    Styles: "Button";
 					Text: "Accept";
 					HorizontalAlignment: Alignment.Stretch;
 					EventCommands: {
@@ -54,7 +54,7 @@ List {
 				}
 
 				Static {
-                    Style: "Button";
+                    Styles: "Button";
 					Text: "Cancel";
 					HorizontalAlignment: Alignment.Stretch;
 					EventCommands: {

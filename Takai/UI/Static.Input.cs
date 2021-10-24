@@ -94,8 +94,6 @@ namespace Takai.UI
                 }
             }
 
-            // todo: expand this to ^
-            var lastState = didPress.Data;
             try
             {
                 if (!HandleTouchInput())
@@ -108,8 +106,8 @@ namespace Takai.UI
             }
             finally
             {
-                if (System.Math.Sign(lastState) != System.Math.Sign(didPress.Data))
-                    InvalidateStyle();
+                // todo: expand this to recognize gamepad/etc input ^
+                SetStyle("@Press", didPress.Data > 0 && HoveredElement == this /* todo: hover part doesn't work well */);
             }
         }
 

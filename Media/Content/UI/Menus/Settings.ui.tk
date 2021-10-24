@@ -1,20 +1,18 @@
 List {
 	Name: "SettingsMenu";
-	Style: null;
-	Direction: Direction.Vertical;
+	Styles: "MainMenu";
 	HorizontalAlignment: Alignment.Center;
 	VerticalAlignment: Alignment.Center;
-	Margin: 50;
 
 	Children: [
 		Static {
 			Text: "Settings";
-			Style: "Header";
+			Styles: "Header";
 		};
 
 		Static {
 			Text: "coming soon™️";
-			Style: "Button";
+			Styles: "Button";
 		};
 
 		Static {
@@ -22,7 +20,7 @@ List {
 			EventCommands: {
 				Click: ["WizardTransition" "MainMenu"];
 			};
-			Style: "Button";
+			Styles: "Button";
 	 	};
 	];
 };

@@ -3,7 +3,7 @@ List {
 	VerticalAlignment: Alignment.Center;
 	Direction: Direction.Vertical;
 	Margin: 50;
-	Style: null;
+	Styles: null;
 
 	Children: [
 		Meter {

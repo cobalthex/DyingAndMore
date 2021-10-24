@@ -51,12 +51,6 @@ namespace Takai.UI
         public Catalog(params Static[] children)
             : base(children) { }
 
-        public struct CatalogStyleSheet // TODO
-        {
-            public Vector2 margin;
-            public Direction direction;
-        }
-
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             //todo: item alignments
@@ -134,5 +128,34 @@ namespace Takai.UI
                 }
             }
         }
+
+        protected override void ApplyStyleOverride()
+        {
+            base.ApplyStyleOverride();
+
+            var style = GenerateStyleSheet<CatalogStyleSheet>();
+            if (style.Margin.HasValue) Margin = style.Margin.Value;
+            if (style.Direction.HasValue) Direction = style.Direction.Value;
+        }
+
+        public struct CatalogStyleSheet : IStyleSheet<CatalogStyleSheet>
+        {
+            public string Name { get; set; }
+
+            public Vector2? Margin;
+            public Direction? Direction;
+
+            public void LerpWith(CatalogStyleSheet other, float t)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public void MergeWith(CatalogStyleSheet other)
+            {
+                if (other.Margin.HasValue) Margin = other.Margin;
+                if (other.Direction.HasValue) Direction = other.Direction;
+            }
+        }
+
     }
 }

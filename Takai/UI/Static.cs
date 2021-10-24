@@ -269,10 +269,13 @@ namespace Takai.UI
                     while (defocusing.Count > 0)
                     {
                         next = defocusing.Pop();
-                        if (next._hasFocus)
+                        if (next != this && next._hasFocus)
                         {
                             next._hasFocus = false;
-                            next.ApplyStyle();
+                            next.SetStyle("@Focus", false);
+
+                            next.didPress = new BitVector32();
+                            next.SetStyle("@Press", false);
                         }
 
                         foreach (var child in next.Children)
@@ -281,8 +284,8 @@ namespace Takai.UI
 
                 }
 
-                isStyleValid = _hasFocus != value;
                 _hasFocus = value;
+                SetStyle("@Focus", _hasFocus);
             }
         }
         private bool _hasFocus = false;
@@ -341,6 +344,9 @@ namespace Takai.UI
             if (Runtime.GraphicsDevice != null)
                 lastMeasureContainerBounds = Runtime.GraphicsDevice.Viewport.Bounds;
 
+            var ty = GetType();
+            if (ty != typeof(Static))
+                SetStyle(ty.Name, true);
             ApplyStyle();
         }
 
@@ -475,7 +481,7 @@ namespace Takai.UI
 #if DEBUG
             extraInfo = $" ID:{DebugId}";
 #endif
-            return $"{GetType().Name} ⁅{Style}⁆ {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\" {(IsEnabled ? "👁" : "❌")}{extraInfo}";
+            return $"{GetType().Name} ⁅{Styles}⁆ {{{Name ?? "(No name)"}}}{(HasFocus ? "*" : "")} \"{Text ?? ""}\" {(IsEnabled ? "👁" : "❌")}{extraInfo}";
         }
 
         public virtual void DerivedDeserialize(Dictionary<string, object> props)

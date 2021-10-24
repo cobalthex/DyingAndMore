@@ -13,7 +13,7 @@ List {
             Children: [
                 Static {
                     VerticalAlignment: Alignment.Middle;
-                    Style: "Header";
+                    Styles: "Header";
                     Text: "Trigger";
                 };
 
@@ -22,7 +22,7 @@ List {
         };
 
         Scrollbox {
-            Style: "Frame";
+            Styles: "Frame";
             Size: [400 400];
             InnerPadding: 10;
             Children: [
@@ -98,7 +98,7 @@ List {
                             ];
 
                             ItemUI: List {
-                                Style: "Box";
+                                Styles: "Box";
                                 HorizontalAlignment: Alignment.Stretch;
                                 Direction: Direction.Vertical;
                                 Margin: 10;
@@ -234,7 +234,7 @@ List {
 
                                     Static {
                                         Text: "Add command";
-                                        Style: "Button";
+                                        Styles: "Button";
                                         HorizontalAlignment: Alignment.Center;
                                         EventCommands: {
                                             Click: "AddItem";

@@ -387,9 +387,10 @@ namespace Takai.Graphics
         public void Draw(SpriteBatch spriteBatch, Rectangle bounds, Rectangle relativeClip, float angle, Color color, TimeSpan elapsedTime)
         {
             var elapsed = (float)(elapsedTime.TotalSeconds / FrameLength.TotalSeconds);
-            var cf = IsLooping ? ((int)elapsed % FrameCount) : Util.Clamp((int)elapsed, 0, FrameCount - 1);
-            var nf = IsLooping ? ((cf + 1) % FrameCount) : Util.Clamp(cf + 1, 0, FrameCount - 1);
-            var fd = elapsed % 1;
+            var lastFrame = FrameCount - 1;
+            var cf = IsLooping ? ((int)elapsed % FrameCount) : Util.Clamp((int)elapsed, 0, lastFrame);
+            var nf = IsLooping ? ((cf + 1) % FrameCount) : Util.Clamp(cf + 1, 0, lastFrame);
+            var fd = elapsed % 1; // todo: this can cause wobble for tween types if at last frame of non-looping anim
 
             if (!ShrinkToFit) //todo: fit/contain
                 bounds = GetFitRect(Width, Height, bounds);

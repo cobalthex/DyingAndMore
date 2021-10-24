@@ -68,6 +68,13 @@ namespace Takai.Data
             }
         }
 
+        public static string TextSerializeToString(object serializing)
+        {
+            var sw = new StringWriter();
+            TextSerialize(sw, serializing);
+            return sw.ToString();
+        }
+
         /// <summary>
         /// Serialize an object to a text stream
         /// </summary>

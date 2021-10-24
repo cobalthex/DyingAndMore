@@ -7,6 +7,8 @@ namespace Takai.UI
     {
         //public Direction Direction { get; set; } = Direction.Horizontal; //todo
 
+        // todo: add style support
+
         public override bool CanFocus => true;
 
         protected override bool HandleInput(GameTime time)

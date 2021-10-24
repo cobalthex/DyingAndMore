@@ -176,7 +176,7 @@ namespace DyingAndMore.Editor
 
         protected UIEventResult OnDrop(Static sender, UIEventArgs e)
         {
-            if (!isBoxSelecting)
+            if (!isBoxSelecting || (selectedEntities.Count == 0 && Util.Diagonal(selectRect) < 15))
             {
                 return OnClick(sender, e);
                 //return UIEventResult.Continue;

@@ -62,7 +62,7 @@ namespace Takai.UI
 
             arrowUI = new Graphic
             {
-                Style = "DropdownSelect.Arrow",
+                Styles = nameof(DropdownSelect<T>) + ".Arrow",
                 HorizontalAlignment = Alignment.Right,
                 VerticalAlignment = Alignment.Center,
             };
@@ -72,16 +72,16 @@ namespace Takai.UI
             {
                 HorizontalAlignment = Alignment.Stretch,
             };
-            list.Container.Style = "Dropdown.List";
+            list.Container.Styles = "Dropdown.List";
 
             dropdown = new ScrollBox(list)
             {
-                Style = "Dropdown"
+                Styles = "Dropdown"
             };
 
             dropdownContainer = new Static(dropdown)
             {
-                Style = "Backdrop",
+                Styles = "Backdrop",
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
             };
@@ -109,8 +109,6 @@ namespace Takai.UI
                 ((DropdownSelect<T>)sender).CloseDropDown();
                 return UIEventResult.Continue;
             });
-
-            Style = "DropdownSelect";
         }
 
         public override void BindTo(object source, System.Collections.Generic.Dictionary<string, object> customBindProps = null)
@@ -213,12 +211,14 @@ namespace Takai.UI
             var root = GetRoot();
             root.AddChild(dropdownContainer);
             InvalidateArrange();
+            SetStyle("Open", true);
             // arrange now?
         }
 
         public virtual void CloseDropDown()
         {
             dropdownContainer.RemoveFromParent();
+            SetStyle("Open", false);
         }
 
         protected override bool HandleInput(GameTime time)
@@ -243,9 +243,30 @@ namespace Takai.UI
             return false;
         }
 
-        public struct DropdownSelectStyleSheet // TODO
+        protected override void ApplyStyleOverride()
         {
-            public Sprite arrowSprite;
+            base.ApplyStyleOverride();
+
+            var style = GenerateStyleSheet<DropdownSelectStyleSheet>();
+
+            if (style.ArrowSprite != null) arrowUI.Sprite = style.ArrowSprite;
+        }
+
+        public struct DropdownSelectStyleSheet : IStyleSheet<DropdownSelectStyleSheet>
+        {
+            public string Name { get; set; }
+
+            public Sprite ArrowSprite;
+
+            public void LerpWith(DropdownSelectStyleSheet other, float t)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void MergeWith(DropdownSelectStyleSheet other)
+            {
+                if (other.ArrowSprite != null) ArrowSprite = other.ArrowSprite;
+            }
         }
     }
 }

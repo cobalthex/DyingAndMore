@@ -99,7 +99,7 @@ namespace Takai.UI
             textInput = new TextInput
             {
                 Text = "0",
-                Style = "NumericInput.TextInput",
+                Styles = "NumericInput.TextInput",
                 AllowLetters = false,
                 AllowNumbers = true,
                 AllowSpaces = false,
@@ -125,14 +125,14 @@ namespace Takai.UI
             var upButton = new Static
             {
                 Text = "+",
-                Style = "NumericInput.Button",
+                Styles = "NumericInput.Button",
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
             };
             var downButton = new Static
             {
                 Text = "-",
-                Style = "NumericInput.Button",
+                Styles = "NumericInput.Button",
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch
             };

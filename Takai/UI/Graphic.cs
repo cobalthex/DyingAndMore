@@ -90,11 +90,6 @@ namespace Takai.UI
             base.DrawSelf(context);
         }
 
-        public struct GraphicStyleSheet // TODO
-        {
-            public Color missingSpriteXColor;
-        }
-
         public override void DerivedDeserialize(Dictionary<string, object> props)
         {
             base.DerivedDeserialize(props);
@@ -118,6 +113,32 @@ namespace Takai.UI
             {
                 var height = Data.Serializer.Cast<float>(_height);
                 Size = new Vector2(height * Sprite.Width / Sprite.Height, height);
+            }
+        }
+
+        protected override void ApplyStyleOverride()
+        {
+            base.ApplyStyleOverride();
+
+            var style = GenerateStyleSheet<GraphicStyleSheet>();
+
+            if (style.MissingSpriteXColor.HasValue) MissingSpriteXColor = style.MissingSpriteXColor.Value;
+        }
+
+        public struct GraphicStyleSheet : IStyleSheet<GraphicStyleSheet>
+        {
+            public string Name { get; set; }
+
+            public Color? MissingSpriteXColor;
+
+            public void LerpWith(GraphicStyleSheet other, float t)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public void MergeWith(GraphicStyleSheet other)
+            {
+                if (other.MissingSpriteXColor.HasValue) MissingSpriteXColor = other.MissingSpriteXColor;
             }
         }
     }

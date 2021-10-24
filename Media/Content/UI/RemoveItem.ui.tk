@@ -1,6 +1,6 @@
 Static {
 	Size: [32 32];
-	Style: "XButton";
+	Styles: "XButton";
 	HorizontalAlignment: Alignment.Right;
 	VerticalAlignment: Alignment.Center;
 	EventCommands: {

@@ -40,9 +40,9 @@ namespace Takai.UI
         /// </summary>
         /// <param name="newStyle">The name of the new style (including state)</param>
         /// <param name="duration">How long to transition for</param>
-        public void Transition(string newStyle, TimeSpan duration)
+        public void TransitionStyleTo(string newStyle, TimeSpan duration)
         {
-            if (newStyle == Style) return; // already there
+            if (newStyle == Styles) return; // already there
             
             // cache active transition and lerp between the existing state and new state?
 
@@ -51,8 +51,9 @@ namespace Takai.UI
 
             queuedAnimations.Enqueue(new Transition
             {
-                startStyle = Style,
-                finishStyle = newStyle,
+                startStyle = GenerateStyleSheet<StyleSheet>(),
+                // TODO
+                //finishStyle = GenerateStyleSheet<StyleSheet>(newStyle, styleStates),
                 duration = duration,
             }.GetAnimation());
         }
@@ -60,33 +61,41 @@ namespace Takai.UI
 
     struct Transition
     {
-        public string startStyle;
-        public string finishStyle;
+        public StyleSheet startStyle;
+        public StyleSheet finishStyle;
         public TimeSpan duration;
 
         public Animation GetAnimation()
         {
-            var x = this;
+            var self = this;
             IEnumerator anim8or(Static target, GameTime time, object arg)
             {
-                // TODO
-                yield return null;
-                //var startStyle = Static.GetStylesheet(x.startStyle); // todo: use current style (for partial lerps)?
-                //var finishStyle = Static.GetStylesheet(x.finishStyle);
+                var startTime = time.TotalGameTime;
+                var finishTime = startTime + self.duration;
 
-                //var startTime = time.TotalGameTime;
-                //var finishTime = startTime + x.duration;
+                while (time.TotalGameTime < finishTime)
+                {
+                    var style = self.startStyle;
+                    style.LerpWith(self.finishStyle, (float)((time.TotalGameTime - startTime).TotalSeconds / self.duration.TotalSeconds));
 
-                //while (time.TotalGameTime < finishTime)
-                //{
-                //    var lerped = Static.LerpStyles(startStyle, finishStyle, (float)((time.TotalGameTime - startTime).TotalSeconds / x.duration.TotalSeconds));
-                //    target.ApplyStyleRules(lerped);
+                    // TESTING
+                    if (style.Color.HasValue) target.Color = style.Color.Value;
+                    if (style.Font != null) target.Font = style.Font;
+                    if (style.TextStyle.HasValue) target.TextStyle = style.TextStyle.Value;
+                    if (style.BorderColor.HasValue) target.BorderColor = style.BorderColor.Value;
+                    if (style.BackgroundColor.HasValue) target.BackgroundColor = style.BackgroundColor.Value;
+                    if (style.BackgroundSprite.HasValue) target.BackgroundSprite = style.BackgroundSprite.Value;
+                    if (style.HorizontalAlignment.HasValue) target.HorizontalAlignment = style.HorizontalAlignment.Value;
+                    if (style.VerticalAlignment.HasValue) target.VerticalAlignment = style.VerticalAlignment.Value;
+                    if (style.Position.HasValue) target.Position = style.Position.Value;
+                    if (style.Size.HasValue) target.Size = style.Size.Value;
+                    if (style.Padding.HasValue) target.Padding = style.Padding.Value;
 
-                //    yield return null;
-                //}
+                    yield return null;
+                }
 
-                target.Style = x.finishStyle;
-                System.Diagnostics.Debug.WriteLine($"Finished transition from {x.startStyle} to {x.finishStyle}");
+
+                System.Diagnostics.Debug.WriteLine($"Finished transition");
             }
 
             return new Animation { animator = anim8or };

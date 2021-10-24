@@ -33,7 +33,7 @@ namespace DyingAndMore.Editor
             wangButton.EventCommands[ClickEvent] = "ToggleWang";
             wangButton.AddChild(new CheckBox
             {
-                Style = "Check",
+                Styles = "Check",
                 HorizontalAlignment = Alignment.Right,
                 VerticalAlignment = Alignment.Bottom,
                 Bindings = new List<Binding>

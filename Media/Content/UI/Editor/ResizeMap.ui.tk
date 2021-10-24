@@ -15,7 +15,7 @@ List {
             Children: [
                 Static {
                     VerticalAlignment: Alignment.Middle;
-                    Style: "Header";
+                    Styles: "Header";
                 	Text: "Resize map";
                 };
 
@@ -24,7 +24,7 @@ List {
         };
 
         List {
-			Style: "Frame";
+			Styles: "Frame";
 			Children: [
 				Table {
                     HorizontalAlignment: Alignment.Stretch;
@@ -71,7 +71,7 @@ List {
 
 					Children: [
 						Static {
-		                    Style: "Button";
+		                    Styles: "Button";
 							EventCommands: {
 								Click: "ResizeMap";
 							};
@@ -79,7 +79,7 @@ List {
 						};
 
 						Static {
-		                    Style: "Button";
+		                    Styles: "Button";
 							EventCommands: {
 								Click: "CloseModal";
 							};

@@ -82,7 +82,7 @@ namespace DyingAndMore.Editor
             {
                 HorizontalAlignment = Alignment.Stretch,
                 VerticalAlignment = Alignment.Stretch,
-                Style = "Editor.ModeSelector",
+                Styles = "Editor.ModeSelector",
                 NavigateWithNumKeys = true
             });
 
@@ -91,7 +91,7 @@ namespace DyingAndMore.Editor
                 VerticalAlignment = Alignment.End,
                 HorizontalAlignment = Alignment.Middle,
                 Text = "> PLAY >",
-                Style = "Editor.Play",
+                Styles = "Editor.Play",
             });
 
             errorBalloon = new UI.Balloon
@@ -105,7 +105,7 @@ namespace DyingAndMore.Editor
 
             resetZoom = new Graphic
             {
-                Style = "Input",
+                Styles = "Input",
                 Sprite = Cache.Load<Texture2D>("UI/Editor/ResetZoom.png"),
                 Position = new Vector2(20),
                 VerticalAlignment = Alignment.End,
@@ -120,7 +120,7 @@ namespace DyingAndMore.Editor
             AddModes();
 
             AddChild(renderSettingsConsole = GeneratePropSheet(Map.renderSettings));
-            renderSettingsConsole.Style = "Frame";
+            renderSettingsConsole.Styles = "Frame";
             renderSettingsConsole.IsEnabled = false;
             renderSettingsConsole.Position = new Vector2(100, 0);
             renderSettingsConsole.VerticalAlignment = Alignment.Middle;

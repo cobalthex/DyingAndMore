@@ -14,12 +14,6 @@ namespace Takai.UI
         public float GripperWidth { get; set; } = 8;
         public Color GripperColor { get; set; } = Color.CornflowerBlue;
 
-        public struct DrawerStyleSheet // TODO
-        {
-            public float gripperWidth;
-            public Color gripperColor;
-        }
-        
         public Drawer()
         {
             IsModal = true;
@@ -104,5 +98,34 @@ namespace Takai.UI
 
             base.DrawSelf(context);
         }
+
+        protected override void ApplyStyleOverride()
+        {
+            base.ApplyStyleOverride();
+
+            var style = GenerateStyleSheet<DrawerStyleSheet>();
+            if (style.GripperWidth.HasValue) GripperWidth = style.GripperWidth.Value;
+            if (style.GripperColor.HasValue) GripperColor = style.GripperColor.Value;
+        }
+
+        public struct DrawerStyleSheet : IStyleSheet<DrawerStyleSheet>
+        {
+            public string Name { get; set; }
+
+            public float? GripperWidth;
+            public Color? GripperColor;
+
+            public void LerpWith(DrawerStyleSheet other, float t)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public void MergeWith(DrawerStyleSheet other)
+            {
+                if (other.GripperWidth.HasValue) GripperWidth = other.GripperWidth;
+                if (other.GripperColor.HasValue) GripperColor = other.GripperColor;
+            }
+        }
+        
     }
 }

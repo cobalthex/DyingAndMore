@@ -84,7 +84,7 @@ namespace DyingAndMore.UI
 
             newItemPopup = new ScrollBox(newItemMenu)
             {
-                Style = "Frame",
+                Styles = "Frame",
                 Size = new Vector2(160, 300),
                 IsModal = true
             };

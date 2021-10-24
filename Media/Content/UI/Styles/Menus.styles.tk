@@ -1,0 +1,6 @@
+{
+	MainMenu`List: ListStyleSheet {
+		Direction: Direction.Vertical;
+		Margin: 30;
+	};
+}

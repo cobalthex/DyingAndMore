@@ -7,7 +7,7 @@ List {
         };
     ];
 
-	Style: "Box";
+	Styles: "Box";
 	HorizontalAlignment: Alignment.Stretch;
 	Direction: Direction.Vertical;
 	Children: [
@@ -121,7 +121,7 @@ List {
 			];
 
 			ItemUI: List {
-				Style: "Box";
+				Styles: "Box";
 				HorizontalAlignment: Alignment.Stretch;
 				Children: [
 					List {
@@ -149,7 +149,7 @@ List {
 			# option to load behavior from file
 
 			AddItemUI: List {
-				Style: "Box";
+				Styles: "Box";
 				Margin: 10;
 				HorizontalAlignment: Alignment.Stretch;
 				Children: [
@@ -233,7 +233,7 @@ List {
 
 					Static {
 						HorizontalAlignment: Alignment.Center;
-						Style: "Button";
+						Styles: "Button";
 						Text: "Add Task";
 
 						EventCommands: {

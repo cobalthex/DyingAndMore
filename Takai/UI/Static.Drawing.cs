@@ -78,10 +78,12 @@ namespace Takai.UI
             if (debugDraw != null)
             {
                 DrawTextOptions drawText = new DrawTextOptions(
-                    $"Measure Count: {totalMeasureCount}\n" +
-                    $"Arrange Count: {totalArrangeCount}\n" +
-                    $"Total Elements Created: {idCounter}\n" +
-                    $"Total binding Updates: {Data.Binding.TotalUpdateCount}",
+                    $"Measure Count: {totalMeasureCount}" +
+                    $"\nArrange Count: {totalArrangeCount}" +
+                    $"\nTotal Elements Created: {idCounter}" +
+                    $"\nTotal binding Updates: {Data.Binding.TotalUpdateCount}" +
+                    $"\nTotal cached styles: {StylesDictionary.Default.RenderCacheCount}" +
+                    $"\nHovered Element: {HoveredElement?.DebugId}",
                     DebugFont, DebugTextStyle, Color.CornflowerBlue, new Vector2(10)
                 );
                 context.textRenderer.Draw(drawText);
@@ -117,7 +119,8 @@ namespace Takai.UI
                         + $"Bounds: {OffsetContentArea}\n" //visible bounds?
                         + $"Position: {Position}, Size: {Size}, Padding: {Padding}\n"
                         + $"HAlign: {HorizontalAlignment}, VAlign: {VerticalAlignment}\n"
-                        + $"Style: {Style}\n"
+                        + $"Styles: {Styles}\n"
+                        + (HasFocus ? "(Has focus)\n" : "")
                         + $"Bindings: {(Bindings == null ? "(None)" : string.Join(",", Bindings))}\n"
                         + $"Events: {events?.Count}, Commands: {CommandActions?.Count}\n";
 

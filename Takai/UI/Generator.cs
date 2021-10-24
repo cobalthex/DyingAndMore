@@ -291,7 +291,7 @@ namespace Takai.UI
                     {
                         var ui = new List
                         {
-                            Style = "Range",
+                            Styles = "Range",
                             Direction = Direction.Horizontal,
                         };
 
@@ -372,7 +372,7 @@ namespace Takai.UI
                 {
                     var ui = new List
                     {
-                        Style = "Box",
+                        Styles = "Box",
                         Direction = Direction.Horizontal,
                         HorizontalAlignment = Alignment.Stretch,
                     };
@@ -388,7 +388,7 @@ namespace Takai.UI
                     },
                     new Graphic
                     {
-                        Style = "Texture2D.Preview",
+                        Styles = "Texture2D.Preview",
                         Sprite = new Graphics.Sprite(),
                         Size = new Vector2(128),
                     });

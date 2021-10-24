@@ -57,12 +57,6 @@ namespace Takai.UI
             InvalidateArrange();
         }
 
-        public struct TableStyleSheet // TODO
-        {
-            public Vector2 margin;
-            public Color cellColor;
-        }
-
         protected override Vector2 MeasureOverride(Vector2 availableSize)
         {
             if (ColumnCount <= 0)
@@ -193,6 +187,34 @@ namespace Takai.UI
 
                     offset.X += columnWidths[i % ColumnCount];
                 }
+            }
+        }
+
+        protected override void ApplyStyleOverride()
+        {
+            base.ApplyStyleOverride();
+
+            var style = GenerateStyleSheet<TableStyleSheet>();
+            if (style.Margin.HasValue) Margin = style.Margin.Value;
+            if (style.CellColor.HasValue) CellColor = style.CellColor.Value;
+        }
+
+        public struct TableStyleSheet : IStyleSheet<TableStyleSheet>
+        {
+            public string Name { get; set; }
+
+            public Vector2? Margin;
+            public Color? CellColor;
+
+            public void LerpWith(TableStyleSheet other, float t)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public void MergeWith(TableStyleSheet other)
+            {
+                if (other.Margin.HasValue) Margin = other.Margin;
+                if (other.CellColor.HasValue) CellColor = other.CellColor;
             }
         }
     }

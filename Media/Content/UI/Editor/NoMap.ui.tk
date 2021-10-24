@@ -7,7 +7,7 @@ List {
     Children: [
         Static {
             Text: "No map loaded";
-            TextStyle: {
+            TextStyles: {
                 Size: 40;
             }
             Color: Color.White;

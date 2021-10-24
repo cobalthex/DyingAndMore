@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace Takai.Graphics
 {
@@ -37,7 +38,7 @@ namespace Takai.Graphics
         }
 
         //todo: clip rect
-        public void Draw(SpriteBatch spriteBatch, Rectangle destination)
+        public void Draw(SpriteBatch spriteBatch, Rectangle destination, TimeSpan? elapsedTime = null)
         {
             if (Sprite == null)
                 return;
@@ -51,6 +52,8 @@ namespace Takai.Graphics
             var theight = CenterRegion.Y;
             var bheight = Sprite.Height - CenterRegion.Bottom;
 
+            var time = elapsedTime.HasValue ? elapsedTime.Value : Sprite.ElapsedTime;
+
             if (lwidth == 0 && rwidth == 0 &&
                 theight == 0 && bheight == 0)
             {
@@ -59,7 +62,7 @@ namespace Takai.Graphics
                     destination,
                     0,
                     Color.White,
-                    Sprite.ElapsedTime
+                    time
                 );
                 return;
             }
@@ -83,7 +86,7 @@ namespace Takai.Graphics
                 new Rectangle(0, 0, lwidth, theight),
                 0,
                 Color.White,
-                Sprite.ElapsedTime
+                time
             );
             dest.X += lwidth;
             dest.Width = xs;
@@ -93,7 +96,7 @@ namespace Takai.Graphics
                 new Rectangle(CenterRegion.X, 0, CenterRegion.Width, theight),
                 0,
                 Color.White,
-                Sprite.ElapsedTime
+                time
             );
             dest.X += xs;
             dest.Width = rwidth;
@@ -103,7 +106,7 @@ namespace Takai.Graphics
                 new Rectangle(CenterRegion.Right, 0, rwidth, theight),
                 0,
                 Color.White,
-                Sprite.ElapsedTime
+                time
             );
 
             //4 5 6
@@ -114,7 +117,7 @@ namespace Takai.Graphics
                 new Rectangle(0, CenterRegion.Y, lwidth, CenterRegion.Height),
                 0,
                 Color.White,
-                Sprite.ElapsedTime
+                time
             );
             dest.X += lwidth;
             dest.Width = xs;
@@ -124,7 +127,7 @@ namespace Takai.Graphics
                 CenterRegion,
                 0,
                 Color.White,
-                Sprite.ElapsedTime
+                time
             );
             dest.X += xs;
             dest.Width = rwidth;
@@ -134,7 +137,7 @@ namespace Takai.Graphics
                 new Rectangle(CenterRegion.Right, CenterRegion.Y, rwidth, CenterRegion.Height),
                 0,
                 Color.White,
-                Sprite.ElapsedTime
+                time
             );
             
             //7 8 9
@@ -145,7 +148,7 @@ namespace Takai.Graphics
                 new Rectangle(0, CenterRegion.Bottom, lwidth, bheight),
                 0,
                 Color.White,
-                Sprite.ElapsedTime
+                time
             );
             dest.X += lwidth;
             dest.Width = xs;
@@ -155,7 +158,7 @@ namespace Takai.Graphics
                 new Rectangle(CenterRegion.X, CenterRegion.Bottom, CenterRegion.Width, bheight),
                 0,
                 Color.White,
-                Sprite.ElapsedTime
+                time
             );
             dest.X += xs;
             dest.Width = rwidth;
@@ -165,7 +168,7 @@ namespace Takai.Graphics
                 new Rectangle(CenterRegion.Right, CenterRegion.Bottom, rwidth, bheight),
                 0,
                 Color.White,
-                Sprite.ElapsedTime
+                time
             );
         }
     }

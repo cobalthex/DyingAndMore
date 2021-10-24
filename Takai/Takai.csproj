@@ -59,6 +59,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayEqualityComparer.cs" />
+    <Compile Include="Extent.cs" />
     <Compile Include="Game\Tileset.cs" />
     <Compile Include="TilemapGenerator.cs" />
     <Compile Include="Curves.cs" />
@@ -117,6 +119,7 @@
     <Compile Include="UI\Containers\Catalog.cs" />
     <Compile Include="UI\CheckBox.cs" />
     <Compile Include="UI\Containers\KeyValueTable.cs" />
+    <Compile Include="UI\Containers\ScrollBox.cs" />
     <Compile Include="UI\Containers\Shade.cs" />
     <Compile Include="UI\Divider.cs" />
     <Compile Include="UI\Drawer.cs" />
@@ -126,6 +129,8 @@
     <Compile Include="UI\FileList.cs" />
     <Compile Include="UI\Generator.cs" />
     <Compile Include="UI\Graphic.cs" />
+    <Compile Include="UI\StylesDictionary.cs" />
+    <Compile Include="UI\StyleSheet.cs" />
     <Compile Include="UI\ItemList.cs" />
     <Compile Include="UI\ObjectSelect.cs" />
     <Compile Include="UI\PolarInput.cs" />

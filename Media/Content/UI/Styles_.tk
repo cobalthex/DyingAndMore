@@ -1,4 +1,6 @@
 {
+    ### THIS IS THE OLD VERSION
+
     Static: StyleSheet {
         Font: @"Fonts/Bahnschrift.fnt.tk";
         TextStyle: TextStyle {
@@ -36,49 +38,6 @@
     #   Margin: 10;
     #};
 
-    ScrollBar: StyleSheet {
-        BackgroundSprite: @"UI/scrollback.9p.tk";
-        ThumbSprite: NinePatch {
-            Sprite: {
-                Texture: @"./scroll.png";
-                Center: false;
-                ClipRect: [0 0 8 8];
-            };
-            CenterRegion: [3 3 2 2];
-        };
-        Color: Color.Transparent;
-        BorderColor: Color [48 0 128 255];
-    };
-    ScrollBar+Hover: StyleSheet {
-        ThumbSprite: NinePatch {
-            Sprite: {
-                Texture: @"./scroll.png";
-                Center: false;
-                ClipRect: [0 8 24 8];
-                Width: 8;
-                Height: 8;
-                FrameCount: 3;
-                FrameLength: 150msec;
-                Tween: TweenStyle.Overlap;
-            };
-            CenterRegion: [3 3 2 2];
-        };
-    };
-    ScrollBar+Press: StyleSheet {
-        ThumbSprite: NinePatch {
-            Sprite: {
-                Texture: @"./scroll.png";
-                Center: false;
-                ClipRect: [0 16 24 8];
-                Width: 8;
-                Height: 8;
-                FrameCount: 3;
-                FrameLength: 150msec;
-                Tween: TweenStyle.Overlap;
-            };
-            CenterRegion: [3 3 2 2];
-        };
-    };
 
     Frame: StyleSheet {
         BackgroundSprite: @"UI/frame.9p.tk";

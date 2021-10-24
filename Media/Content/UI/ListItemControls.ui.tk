@@ -4,7 +4,7 @@ List {
 	Children: [
 		Static {
 			Size: [20 15];
-			Style: "UpButton";
+			Styles: "UpButton";
 			VerticalAlignment: Alignment.Center;
 			EventCommands: {
 				Click: "ShiftUp";
@@ -13,7 +13,7 @@ List {
 
 		Static {
 			Size: [20 15];
-			Style: "DownButton";
+			Styles: "DownButton";
 			VerticalAlignment: Alignment.Center;
 			EventCommands: {
 				Click: "ShiftDown";
